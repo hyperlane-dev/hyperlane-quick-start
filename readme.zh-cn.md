@@ -1,6 +1,6 @@
-## hyperlane-快速开始
+## hyperlane-quick-start
 
-[English](README.md) | [简体中文](README.zh-cn.md)
+[English](readme.md) | [简体中文](readme.zh-cn.md)
 
 [![](https://img.shields.io/crates/v/hyperlane.svg)](https://crates.io/crates/hyperlane)  
 [![](https://docs.rs/hyperlane/badge.svg)](https://docs.rs/hyperlane)  
