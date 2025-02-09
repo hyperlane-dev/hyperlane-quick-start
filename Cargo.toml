@@ -1,0 +1,27 @@
+[package]
+name = "hyperlane-quick-start"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+hyperlane = "3.11.1"
+
+[profile.dev]
+incremental = false
+opt-level = 3
+lto = true
+panic = "unwind"
+debug = false
+codegen-units = 1
+strip = "debuginfo"
+backtrace = "off"
+
+[profile.release]
+incremental = false
+opt-level = 3
+lto = true
+panic = "unwind"
+debug = false
+codegen-units = 1
+strip = "debuginfo"
+backtrace = "off"
