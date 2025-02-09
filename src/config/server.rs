@@ -9,5 +9,8 @@ pub async fn server() {
     config::log::log_interval_millis(&mut server);
     config::route::route(&mut server).await;
     config::middleware::middleware(&mut server).await;
+    let cfg: ServerConfig<'_> = server.get_cfg().read().unwrap().clone();
+    let host_port: String = format!("{}:{}", cfg.get_host(), cfg.get_port());
+    println_success!("Server listen:", host_port);
     server.listen();
 }
