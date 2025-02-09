@@ -437,9 +437,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane"
-version = "3.12.0"
+version = "3.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b927e910a0e8a6c6abe775101107fd31d5d2ff4d9a05ac0a7307f02f50d53977"
+checksum = "3eef70f28cc61c1e5150888c054e220092ba46a922e30c22efad41e606a059e1"
 dependencies = [
  "async-func",
  "clonelicious",

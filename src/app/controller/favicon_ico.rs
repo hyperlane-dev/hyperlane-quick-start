@@ -9,7 +9,7 @@ pub async fn favicon_ico(arc_lock_controller_data: ArcRwLockControllerData) {
         response.set_header(CONTENT_TYPE, IMAGE_PNG);
     }
     let send_res: ResponseResult = send_response(&arc_lock_controller_data, 200, data);
-    get_read_controller_data(&arc_lock_controller_data)
+    get_controller_data(&arc_lock_controller_data)
         .get_log()
         .info(format!("Response result => {:?}", send_res), log_handler);
 }
