@@ -1,11 +1,17 @@
+<center>
+
 ## hyperlane-quick-start
 
 [English](readme.md) | [简体中文](readme.zh-cn.md)
 
-[![](https://img.shields.io/crates/v/hyperlane.svg)](https://crates.io/crates/hyperlane)  
-[![](https://docs.rs/hyperlane/badge.svg)](https://docs.rs/hyperlane)  
-[![](https://img.shields.io/crates/l/hyperlane.svg)](./LICENSE)  
+![](./static/img/logo.png){height="160"}
+
+[![](https://img.shields.io/crates/v/hyperlane.svg)](https://crates.io/crates/hyperlane)
+[![](https://docs.rs/hyperlane/badge.svg)](https://docs.rs/hyperlane)
 [![](https://github.com/ltpp-universe/hyperlane/workflows/Rust/badge.svg)](https://github.com/ltpp-universe/hyperlane/actions?query=workflow:Rust)
+[![](https://img.shields.io/crates/l/hyperlane.svg)](./license)
+
+</center>
 
 > **hyperlane** 是一个轻量级且高性能的 Rust HTTP 服务器库，旨在简化网络服务开发。它支持 HTTP 请求解析、响应构建、TCP 通信和重定向功能，非常适合构建现代 Web 服务。
 
