@@ -4,7 +4,7 @@
 
 [English](readme.md) | [简体中文](readme.zh-cn.md)
 
-![](./static/img/logo.png){height="160"}
+<img src="./static/img/logo.png" alt="" height="160">
 
 [![](https://img.shields.io/crates/v/hyperlane.svg)](https://crates.io/crates/hyperlane)
 [![](https://docs.rs/hyperlane/badge.svg)](https://docs.rs/hyperlane)
