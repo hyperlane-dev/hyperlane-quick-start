@@ -1,7 +1,7 @@
 use crate::*;
 
 pub async fn favicon_ico(arc_lock_controller_data: ArcRwLockControllerData) {
-    let data: Vec<u8> = read_from_file("./static/img/logo.png").unwrap();
+    let data: Vec<u8> = plugin::logo_img::get_logo_img();
     {
         let mut controller_data: RwLockWriteControllerData =
             get_rw_lock_write_controller_data(&arc_lock_controller_data);
