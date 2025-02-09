@@ -21,7 +21,7 @@
 
 - [性能测试](https://docs.ltpp.vip/hyperlane/speed/close-keep-alive.html)
 
-## 请作者喝咖啡
+## 赞赏
 
 **如果你觉得 `hyperlane` 对你有所帮助，欢迎捐赠**
 

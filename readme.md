@@ -21,7 +21,7 @@
 
 - [Performance](https://docs.ltpp.vip/hyperlane/speed/close-keep-alive.html)
 
-## Buy the Author a Coffee
+## Appreciate
 
 **If you feel that `hyperlane` is helpful to you, feel free to donate.**
 
