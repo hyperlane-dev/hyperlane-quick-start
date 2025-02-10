@@ -34,9 +34,9 @@
 <img src="https://docs.ltpp.vip/img/wechat-pay.png" width="200">
 <img src="https://docs.ltpp.vip/img/alipay-pay.jpg" width="200">
 
-## License
+## LICENSE
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT LICENSE. See the [LICENSE](LICENSE) file for details.
 
 ## Contributing
 
