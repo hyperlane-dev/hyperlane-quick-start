@@ -27,6 +27,7 @@ where
                 Err(e) => println_danger!(format!("Error starting server in background: {}", e)),
             }
         } else {
+            println_success!("Server started successfully");
             manager.start().await;
         }
     };
