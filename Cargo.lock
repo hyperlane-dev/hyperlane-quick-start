@@ -315,7 +315,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "hyperlane",
  "server-manager",
@@ -749,9 +749,9 @@ dependencies = [
 
 [[package]]
 name = "server-manager"
-version = "3.0.2"
+version = "3.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3672ddb2a12905c451ca779e56af84f07f0c98ffbcff9973adc1fe0f5d828ed3"
+checksum = "955d03e3dd23f7d11291ab1d480e4987e6213b59e11a5b301d5697634e3f227c"
 dependencies = [
  "tokio",
 ]
