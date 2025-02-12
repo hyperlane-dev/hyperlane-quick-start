@@ -23,6 +23,38 @@
 
 - [官方文档](https://docs.ltpp.vip/HYPERLANE/)
 
+## 运行
+
+### 运行
+
+```sh
+cargo run
+```
+
+### 在后台运行
+
+```sh
+cargo run -d
+```
+
+### 停止
+
+```sh
+cargo run stop
+```
+
+### 重启
+
+```sh
+cargo run restart
+```
+
+### 重启在后台运行
+
+```sh
+cargo run restart -d
+```
+
 ## 性能测试
 
 - [性能测试](https://docs.ltpp.vip/hyperlane/speed/close-keep-alive.html)

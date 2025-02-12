@@ -398,9 +398,9 @@ checksum = "d4f65c1d734142034b3e28ee07df50974f6adc2fb2eeb877963181e826d2aa6a"
 
 [[package]]
 name = "http-request"
-version = "8.38.1"
+version = "8.38.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e092b41df9eb9089b05f941df47b41d7a2266802e5ef052931afbb7977dc018b"
+checksum = "bcf845501c24fcbebad4cf25725a454db480fc05b629a2ddb72033302ea98d80"
 dependencies = [
  "brotli",
  "flate2",
@@ -437,9 +437,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane"
-version = "3.12.6"
+version = "3.12.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6bc58f0dd343ecadf873e8c07d709b5ce88241a158412789ed9d01d4f5b605f5"
+checksum = "82834a82eaf60fd12ced1fa624a3fd65b7ce997beb17a700b894d969f991704d"
 dependencies = [
  "async-func",
  "clonelicious",
@@ -476,9 +476,10 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "0.1.0"
+version = "0.3.0"
 dependencies = [
  "hyperlane",
+ "server-manager",
 ]
 
 [[package]]
@@ -982,9 +983,9 @@ dependencies = [
 
 [[package]]
 name = "rustls"
-version = "0.23.22"
+version = "0.23.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9fb9263ab4eb695e42321db096e3b8fbd715a59b154d5c88d82db2175b681ba7"
+checksum = "47796c98c480fce5406ef69d1c76378375492c3b0a0de587be0c1d9feb12f395"
 dependencies = [
  "aws-lc-rs",
  "log",
@@ -1079,6 +1080,15 @@ dependencies = [
  "itoa",
  "ryu",
  "serde",
+]
+
+[[package]]
+name = "server-manager"
+version = "3.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3672ddb2a12905c451ca779e56af84f07f0c98ffbcff9973adc1fe0f5d828ed3"
+dependencies = [
+ "tokio",
 ]
 
 [[package]]

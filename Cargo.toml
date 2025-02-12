@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane-quick-start"
-version = "0.1.0"
+version = "0.3.0"
 edition = "2021"
 authors = ["ltpp-universe <root@ltpp.vip>"] 
 license = "MIT"
@@ -12,11 +12,14 @@ exclude = [
     "target",
     "Cargo.lock",
     "logs",
-    ".github"
+    ".github",
+    "**/*.pid",
+    "**/*.log"
 ]
 
 [dependencies]
-hyperlane = "3.12.6"
+hyperlane = "3.12.7"
+server-manager = "3.0.2"
 
 [profile.dev]
 incremental = false

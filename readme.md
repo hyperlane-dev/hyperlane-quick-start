@@ -23,6 +23,38 @@
 
 - [Official Documentation](https://docs.ltpp.vip/HYPERLANE/)
 
+## Run
+
+### start
+
+```sh
+cargo run
+```
+
+### started in background
+
+```sh
+cargo run -d
+```
+
+### stop
+
+```sh
+cargo run stop
+```
+
+### restart
+
+```sh
+cargo run restart
+```
+
+### restarted in background
+
+```sh
+cargo run restart -d
+```
+
 ## Performance
 
 - [Performance](https://docs.ltpp.vip/hyperlane/speed/close-keep-alive.html)
