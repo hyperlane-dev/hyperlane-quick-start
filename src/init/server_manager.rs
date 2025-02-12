@@ -9,8 +9,6 @@ where
     let args: Vec<String> = std::env::args().collect();
     let config: ServerManagerConfig = ServerManagerConfig {
         pid_file: config::process::PID_FILE_PATH.to_owned(),
-        stdout_log: config::process::STDOUT_LOG_PATH.to_owned(),
-        stderr_log: config::process::STDERR_LOG_PATH.to_owned(),
     };
     let manager: ServerManager<F> = ServerManager::new(config, server_func);
 
