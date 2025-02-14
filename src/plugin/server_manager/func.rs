@@ -8,7 +8,7 @@ where
 {
     let args: Vec<String> = std::env::args().collect();
     let config: ServerManagerConfig = ServerManagerConfig {
-        pid_file: config::process::PID_FILE_PATH.to_owned(),
+        pid_file: config::server_manager::constant::PID_FILE_PATH.to_owned(),
     };
     let manager: ServerManager<F> = ServerManager::new(config, server_func);
 
