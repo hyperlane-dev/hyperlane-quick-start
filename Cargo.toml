@@ -19,7 +19,6 @@ exclude = [
 
 [dependencies]
 hyperlane = "3.12.8"
-redis = "0.28.2"
 server-manager = "3.0.9"
 
 [profile.dev]
