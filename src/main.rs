@@ -6,5 +6,5 @@ pub(crate) use hyperlane::*;
 
 #[tokio::main]
 async fn main() {
-    init::server::run_server().await;
+    init::server::func::run_server().await;
 }

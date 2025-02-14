@@ -1,9 +1,13 @@
 use crate::*;
 
 pub async fn route(server: &mut Server) {
-    server.router("/", app::controller::root::root);
-    server.router("/index", app::controller::index::index);
+    server.router("/", app::controller::root::func::root);
+    server.router("/index", app::controller::index::func::index);
+    server.router("/redis", app::controller::redis::func::redis);
     server
-        .async_router("/favicon.ico", app::controller::favicon_ico::favicon_ico)
+        .async_router(
+            "/favicon.ico",
+            app::controller::favicon_ico::func::favicon_ico,
+        )
         .await;
 }
