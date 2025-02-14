@@ -19,6 +19,6 @@ pub async fn creat_server() {
     server.listen();
 }
 
-pub async fn run_server() {
+pub async fn run() {
     plugin::server_manager::func::creat_server_manage(creat_server).await;
 }
