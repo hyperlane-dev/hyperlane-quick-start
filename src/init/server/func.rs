@@ -5,6 +5,7 @@ pub async fn creat_server() {
     let mut server: Server = Server::new();
     config::server::host::host(&mut server);
     config::server::port::port(&mut server);
+    config::server::print::print(&mut server);
     config::server::log::log_dir(&mut server);
     config::server::log::log_size(&mut server);
     config::server::log::log_interval_millis(&mut server);
