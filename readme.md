@@ -21,7 +21,7 @@
 
 ## Official Documentation
 
-- [Official Documentation](https://docs.ltpp.vip/HYPERLANE/)
+- [Official Documentation](https://docs.ltpp.vip/hyperlane/)
 
 ## Run
 

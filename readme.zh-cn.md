@@ -21,7 +21,7 @@
 
 ## 官方文档
 
-- [官方文档](https://docs.ltpp.vip/HYPERLANE/)
+- [官方文档](https://docs.ltpp.vip/hyperlane/)
 
 ## 运行
 
