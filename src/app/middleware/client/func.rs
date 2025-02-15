@@ -9,7 +9,7 @@ pub fn client(arc_lock_controller_data: ArcRwLockControllerData) {
             println_success!(client_host_port, " visit => ", path);
         }
         Err(err) => {
-            println_danger!(err, " visit => ", path);
+            println_error!(err, " visit => ", path);
         }
     }
 }
