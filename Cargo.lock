@@ -258,9 +258,9 @@ checksum = "b7b4c33e9eccb247e9deb2b644a2e77fd03f71e6233e6c810d063d498822351d"
 
 [[package]]
 name = "http-type"
-version = "2.36.1"
+version = "3.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8c27fa3c59b5ceab585180f45e0d353b80d9d237de339a58136fb0d9d2b89e1d"
+checksum = "7381267bfd4badae560978b76d8c3116dad644414c8e50fef587835578be65e6"
 dependencies = [
  "hex",
  "http-compress",
@@ -276,9 +276,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane"
-version = "3.15.2"
+version = "4.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0ca6d56af8e3107c4978e7b56a38fe5622af438cf364e4aae784822d99cc631d"
+checksum = "a02ab3eee78c7e5933137955046b7ea9fda6e0c0a4bb94e88792a44ba413f3d3"
 dependencies = [
  "async-func",
  "clonelicious",
@@ -301,12 +301,11 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-log"
-version = "1.1.25"
+version = "1.1.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d04e62b6d17a4d4188cc49f9fa7e6d91f3a84904192a2a552107cc5ccfc82273"
+checksum = "dc4b03955c5ff34f7c3b8365fefff1499895da4a42436426e2952fbceee97cf4"
 dependencies = [
  "file-operation",
- "http-type",
  "hyperlane-time",
  "lombok-macros",
  "once_cell",
@@ -315,7 +314,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "0.6.2"
+version = "0.7.0"
 dependencies = [
  "hyperlane",
  "server-manager",

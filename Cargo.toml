@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane-quick-start"
-version = "0.6.2"
+version = "0.7.0"
 edition = "2021"
 authors = ["ltpp-universe <root@ltpp.vip>"] 
 license = "MIT"
@@ -18,7 +18,7 @@ exclude = [
 ]
 
 [dependencies]
-hyperlane = "3.15.2"
+hyperlane = "4.1.1"
 server-manager = "3.0.9"
 
 [profile.dev]

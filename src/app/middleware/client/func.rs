@@ -1,15 +1,11 @@
 use crate::*;
 
-pub fn client(arc_lock_controller_data: ArcRwLockControllerData) {
-    let controller_data: ControllerData = get_controller_data(&arc_lock_controller_data);
-    let path: &String = controller_data.get_request().get_path();
-    let stream: ArcTcpStream = controller_data.get_stream().clone().unwrap();
-    match stream.peer_addr() {
-        Ok(client_host_port) => {
-            println_success!(client_host_port, " visit => ", path);
-        }
-        Err(err) => {
-            println_error!(err, " visit => ", path);
-        }
-    }
+pub async fn client(arc_lock_controller_data: ArcRwLockControllerData) {
+    let socket_addr: String = get_socket_addr(&arc_lock_controller_data)
+        .await
+        .unwrap_or_default();
+    let mut controller_data: RwLockWriteControllerData =
+        get_rw_lock_write_controller_data(&arc_lock_controller_data).await;
+    let response: &mut Response = controller_data.get_mut_response();
+    response.set_header("SocketAddr", socket_addr);
 }
