@@ -2,7 +2,7 @@ use crate::*;
 
 pub async fn cross(arc_lock_controller_data: ArcRwLockControllerData) {
     let mut controller_data: RwLockWriteControllerData =
-        get_rw_lock_write_controller_data(&arc_lock_controller_data).await;
+        arc_lock_controller_data.get_write_lock().await;
     let response: &mut Response = controller_data.get_mut_response();
     response
         .set_header(ACCESS_CONTROL_ALLOW_ORIGIN, ANY)
