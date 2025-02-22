@@ -7,6 +7,7 @@
 <img src="./static/img/logo.png" alt="" height="160">
 
 [![](https://img.shields.io/crates/v/hyperlane.svg)](https://crates.io/crates/hyperlane)
+[![](https://img.shields.io/crates/d/hyperlane.svg)](https://img.shields.io/crates/d/hyperlane.svg)
 [![](https://docs.rs/hyperlane/badge.svg)](https://docs.rs/hyperlane)
 [![](https://github.com/ltpp-universe/hyperlane/workflows/Rust/badge.svg)](https://github.com/ltpp-universe/hyperlane/actions?query=workflow:Rust)
 [![](https://img.shields.io/crates/l/hyperlane.svg)](./license)
