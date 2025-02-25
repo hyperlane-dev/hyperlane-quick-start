@@ -5,7 +5,6 @@ pub async fn root(arc_lock_controller_data: ArcRwLockControllerData) {
         .send_response(200, "hello hyperlane => /")
         .await;
     arc_lock_controller_data
-        .get_log()
-        .await
-        .info(format!("Response result => {:?}", send_res), log_handler);
+        .log_info(format!("Response result => {:?}", send_res), log_handler)
+        .await;
 }
