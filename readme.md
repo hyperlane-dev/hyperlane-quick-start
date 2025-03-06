@@ -58,7 +58,7 @@ cargo run restart -d
 
 ## Performance
 
-- [Performance](https://docs.ltpp.vip/hyperlane/speed/close-keep-alive.html)
+- [Performance](https://docs.ltpp.vip/hyperlane/speed)
 
 ## Appreciate
 
