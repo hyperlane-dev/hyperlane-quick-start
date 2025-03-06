@@ -58,7 +58,7 @@ cargo run restart -d
 
 ## 性能测试
 
-- [性能测试](https://docs.ltpp.vip/hyperlane/speed/close-keep-alive.html)
+- [性能测试](https://docs.ltpp.vip/hyperlane/speed)
 
 ## 赞赏
 
