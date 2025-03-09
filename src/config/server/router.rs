@@ -7,5 +7,5 @@ pub async fn register(server: &mut Server) {
     server
         .router("/favicon.ico", favicon_ico::func::favicon_ico)
         .await;
-    println_success!("Router initialization completed");
+    println_success!("Server router initialization completed");
 }

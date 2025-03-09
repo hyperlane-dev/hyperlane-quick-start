@@ -3,5 +3,5 @@ use crate::*;
 
 pub async fn host(server: &mut Server) {
     server.host(SERVER_HOST).await;
-    println_success!("host: ", SERVER_HOST);
+    println_success!("Server host: ", SERVER_HOST);
 }
