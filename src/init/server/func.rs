@@ -16,9 +16,9 @@ pub async fn creat_server() {
     response_middleware::register(&mut server).await;
     let cfg: ServerConfig<'_> = server.get_cfg().read().await.clone();
     let host_port: String = format!("{}:{}", cfg.get_host(), cfg.get_port());
-    println_success!("Server init successfully");
+    println_success!("Server initialization successful");
     // tips
-    println_success!("Server listen: ", host_port);
+    println_success!("Server listen in: ", host_port);
     // server listen
     server.listen().await;
 }

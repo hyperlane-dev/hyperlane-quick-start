@@ -8,10 +8,15 @@ pub async fn log_dir(server: &mut Server) {
 
 pub async fn log_size(server: &mut Server) {
     server.log_size(SERVER_LOG_SIZE).await;
-    println_success!("Server log size: ", SERVER_LOG_SIZE);
+    println_success!("Server log size: ", SERVER_LOG_SIZE, SPACE, "bytes");
 }
 
 pub async fn log_interval_millis(server: &mut Server) {
     server.log_interval_millis(SERVER_LOG_INTERVAL_MILLIS).await;
-    println_success!("Server log interval millis: ", SERVER_LOG_INTERVAL_MILLIS);
+    println_success!(
+        "Server log interval millis: ",
+        SERVER_LOG_INTERVAL_MILLIS,
+        SPACE,
+        "ms"
+    );
 }
