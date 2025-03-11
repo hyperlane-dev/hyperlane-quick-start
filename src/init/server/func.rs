@@ -11,7 +11,7 @@ pub async fn creat_server() {
     log::log_size(&mut server).await;
     log::log_interval_millis(&mut server).await;
     buffer_size::websocket_buffer_size(&mut server).await;
-    router::register(&mut server).await;
+    route::register(&mut server).await;
     request_middleware::register(&mut server).await;
     response_middleware::register(&mut server).await;
     let cfg: ServerConfig<'_> = server.get_cfg().read().await.clone();
