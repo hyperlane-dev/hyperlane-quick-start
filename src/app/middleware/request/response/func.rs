@@ -11,3 +11,7 @@ pub async fn response_header(controller_data: ControllerData) {
         .set_response_header(CONTENT_TYPE, content_type)
         .await;
 }
+
+pub async fn response_status_code(controller_data: ControllerData) {
+    controller_data.set_response_status_code(200).await;
+}
