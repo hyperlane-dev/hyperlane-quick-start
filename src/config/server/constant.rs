@@ -1,4 +1,3 @@
-pub static SERVER_NAME: &str = "hyperlane";
 pub static SERVER_PORT: usize = 60000;
 pub static SERVER_HOST: &str = "0.0.0.0";
 pub static SERVER_WEB_SOCKET_BUFFER_SIZE: usize = 4096;

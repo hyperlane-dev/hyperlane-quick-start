@@ -9,6 +9,5 @@ pub async fn register(server: &mut Server) {
     server
         .request_middleware(response::func::response_status_code)
         .await;
-    server.request_middleware(client::func::client).await;
     println_success!("Server request middleware initialization completed");
 }
