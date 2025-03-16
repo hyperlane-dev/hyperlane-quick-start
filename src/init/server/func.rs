@@ -9,6 +9,7 @@ pub async fn creat_server() {
     print::print(&mut server).await;
     log::log_dir(&mut server).await;
     log::log_size(&mut server).await;
+    log::inner_log(&mut server).await;
     log::log_interval_millis(&mut server).await;
     buffer_size::websocket_buffer_size(&mut server).await;
     route::register(&mut server).await;

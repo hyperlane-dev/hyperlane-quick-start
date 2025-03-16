@@ -1,10 +1,10 @@
 [package]
 name = "hyperlane-quick-start"
-version = "0.32.0"
+version = "0.33.0"
 edition = "2021"
 authors = ["ltpp-universe <root@ltpp.vip>"] 
 license = "MIT"
-description = """Hyperlane is a lightweight and high-performance Rust HTTP server library designed to simplify network service development. It supports HTTP request parsing, response building, TCP communication, and redirection features, making it ideal for building modern web services."""
+description = """Hyperlane is a lightweight and high-performance Rust HTTP server library designed to simplify network service development. It supports HTTP request parsing, response building, and TCP communication, making it ideal for building modern web services. Additionally, it provides support for request and response middleware, WebSocket, and Server-Sent Events (SSE), enabling flexible and efficient real-time communication."""
 keywords = ["http", "request", "response", "tcp", "redirect"]
 repository = "https://github.com/ltpp-universe/hyperlane-quick-start.git"
 categories = ["network-programming", "web-programming"]
@@ -19,7 +19,7 @@ exclude = [
 ]
 
 [dependencies]
-hyperlane = "4.33.0"
+hyperlane = "4.34.0"
 
 [profile.dev]
 incremental = true

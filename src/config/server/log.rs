@@ -20,3 +20,8 @@ pub async fn log_interval_millis(server: &mut Server) {
         "ms"
     );
 }
+
+pub async fn inner_log(server: &mut Server) {
+    server.inner_log(SERVER_INNER_LOG).await;
+    println_success!("Server inner log: ", SERVER_INNER_LOG);
+}
