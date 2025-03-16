@@ -7,10 +7,5 @@ pub async fn cross(controller_data: ControllerData) {
         .set_response_header(ACCESS_CONTROL_ALLOW_METHODS, ALL_METHODS)
         .await
         .set_response_header(ACCESS_CONTROL_ALLOW_HEADERS, ANY)
-        .await
-        .set_response_header(
-            CONTENT_TYPE,
-            format!("{}; {}", APPLICATION_JSON, CHARSET_UTF_8),
-        )
         .await;
 }
