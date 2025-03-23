@@ -1,7 +1,7 @@
 use super::*;
 use crate::*;
 
-pub async fn port(server: &mut Server) {
+pub async fn port(server: &Server) {
     server.port(SERVER_PORT).await;
     println_success!("Server port: ", SERVER_PORT);
 }

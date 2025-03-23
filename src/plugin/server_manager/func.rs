@@ -1,6 +1,6 @@
 use crate::*;
 
-pub async fn creat_server_manage<F, Fut>(server_func: F)
+pub async fn create_server_manage<F, Fut>(server_func: F)
 where
     F: Fn() -> Fut,
     Fut: std::future::Future<Output = ()>,
