@@ -11,16 +11,6 @@ pub async fn log_size(server: &Server) {
     println_success!("Server log size: ", SERVER_LOG_SIZE, SPACE, "bytes");
 }
 
-pub async fn log_interval_millis(server: &Server) {
-    server.log_interval_millis(SERVER_LOG_INTERVAL_MILLIS).await;
-    println_success!(
-        "Server log interval millis: ",
-        SERVER_LOG_INTERVAL_MILLIS,
-        SPACE,
-        "ms"
-    );
-}
-
 pub async fn inner_log(server: &Server) {
     server.inner_log(SERVER_INNER_LOG).await;
     println_success!("Server inner log: ", SERVER_INNER_LOG);

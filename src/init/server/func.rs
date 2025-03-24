@@ -9,7 +9,6 @@ pub async fn create_server() {
     log::log_dir(&server).await;
     log::log_size(&server).await;
     log::inner_log(&server).await;
-    log::log_interval_millis(&server).await;
     buffer_size::http_line_buffer_size(&server).await;
     buffer_size::websocket_buffer_size(&server).await;
     route::register(&server).await;
