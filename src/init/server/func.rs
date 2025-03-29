@@ -17,8 +17,11 @@ pub async fn create_server() {
     let cfg: ServerConfig<'_> = server.get_cfg().read().await.clone();
     let host_port: String = format!("{}:{}", cfg.get_host(), cfg.get_port());
     println_success!("Server initialization successful");
-    println_success!("Server listen in: ", host_port);
-    server.listen().await;
+    let server_result: ServerResult = server.listen().await;
+    match server_result {
+        Ok(_) => println_success!("Server listen in: ", host_port),
+        Err(server_error) => println_error!("Server run error: ", server_error),
+    }
 }
 
 pub async fn run() {
