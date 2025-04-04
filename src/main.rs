@@ -4,7 +4,6 @@ pub(crate) mod init;
 pub(crate) mod plugin;
 pub(crate) use hyperlane::*;
 
-#[tokio::main]
-async fn main() {
-    init::server::func::run().await;
+fn main() {
+    init::server::func::run();
 }

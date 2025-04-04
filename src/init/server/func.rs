@@ -1,7 +1,21 @@
 use crate::*;
 use config::server::*;
+use tokio::runtime::{Builder, Runtime};
 
-pub async fn create_server() {
+fn runtime() -> Runtime {
+    let thread_count: usize = get_thread_count().max(1);
+    let runtime: Runtime = Builder::new_multi_thread()
+        .worker_threads(thread_count)
+        .thread_stack_size(2097152)
+        .max_blocking_threads(5120)
+        .max_io_events_per_tick(5120)
+        .enable_all()
+        .build()
+        .unwrap();
+    runtime
+}
+
+async fn create_server() {
     let server: Server = Server::new();
     host::host(&server).await;
     port::port(&server).await;
@@ -27,6 +41,8 @@ pub async fn create_server() {
     }
 }
 
-pub async fn run() {
-    plugin::server_manager::func::create_server_manage(create_server).await;
+pub fn run() {
+    runtime().block_on(async move {
+        plugin::server_manager::func::create_server_manage(create_server).await;
+    });
 }
