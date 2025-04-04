@@ -42,7 +42,7 @@ async fn create_server() {
 }
 
 pub fn run() {
-    runtime().block_on(async move {
-        plugin::server_manager::func::create_server_manage(create_server).await;
-    });
+    runtime().block_on(plugin::server_manager::func::create_server_manage(
+        create_server,
+    ));
 }
