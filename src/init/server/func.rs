@@ -3,16 +3,14 @@ use config::server::*;
 use tokio::runtime::{Builder, Runtime};
 
 fn runtime() -> Runtime {
-    let thread_count: usize = get_thread_count().max(1);
-    let runtime: Runtime = Builder::new_multi_thread()
-        .worker_threads(thread_count)
+    Builder::new_multi_thread()
+        .worker_threads(get_thread_count())
         .thread_stack_size(2097152)
         .max_blocking_threads(5120)
         .max_io_events_per_tick(5120)
         .enable_all()
         .build()
-        .unwrap();
-    runtime
+        .unwrap()
 }
 
 async fn create_server() {
