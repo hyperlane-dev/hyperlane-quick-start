@@ -2,4 +2,3 @@
 /logs
 **/*.log
 **/*.pid
-Cargo.lock

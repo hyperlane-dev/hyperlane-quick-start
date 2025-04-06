@@ -3,6 +3,7 @@ use app::controller::*;
 
 pub async fn register(server: &Server) {
     server.route("/", root::func::handle).await;
+    server.route("/hello/:name", hello::func::handle).await;
     server.route("/websocket", websocket::func::handle).await;
     server
         .route("/favicon.ico", favicon_ico::func::favicon_ico)
