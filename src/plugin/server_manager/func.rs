@@ -1,13 +1,14 @@
+use super::*;
 use crate::*;
 
 pub async fn create_server_manage<F, Fut>(server_func: F)
 where
     F: Fn() -> Fut,
-    Fut: std::future::Future<Output = ()>,
+    Fut: Future<Output = ()>,
 {
-    let args: Vec<String> = std::env::args().collect();
+    let args: Vec<String> = args().collect();
     let config: ServerManagerConfig = ServerManagerConfig {
-        pid_file: config::server_manager::constant::PID_FILE_PATH.to_owned(),
+        pid_file: PID_FILE_PATH.to_owned(),
     };
     let manager: ServerManager<F> = ServerManager::new(config, server_func);
 
