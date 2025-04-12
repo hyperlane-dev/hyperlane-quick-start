@@ -8,6 +8,6 @@ pub async fn favicon_ico(ctx: Context) {
         .await
         .set_response_header(CACHE_CONTROL, "public, max-age=3600")
         .await
-        .send_response(200, data)
+        .set_response_body(data)
         .await;
 }
