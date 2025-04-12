@@ -35,7 +35,7 @@ cargo run
 ### 在后台运行
 
 ```sh
-cargo run -d
+cargo run -- -d
 ```
 
 ### 停止

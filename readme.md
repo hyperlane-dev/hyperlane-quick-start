@@ -35,7 +35,7 @@ cargo run
 ### started in background
 
 ```sh
-cargo run -d
+cargo run -- -d
 ```
 
 ### stop
