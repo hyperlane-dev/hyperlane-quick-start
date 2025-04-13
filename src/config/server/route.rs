@@ -12,7 +12,7 @@ pub async fn register(server: &Server) {
         .route("/websocket", controller::websocket::func::handle)
         .await;
     server
-        .route("/favicon.ico", controller::favicon_ico::func::favicon_ico)
+        .route("/favicon.ico", controller::favicon_ico::func::handle)
         .await;
     println_success!("Server route initialization completed");
 }

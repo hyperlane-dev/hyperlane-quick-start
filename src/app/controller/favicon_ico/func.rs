@@ -1,6 +1,6 @@
 use super::*;
 
-pub async fn favicon_ico(ctx: Context) {
+pub async fn handle(ctx: Context) {
     let _ = ctx
         .set_response_header(CONTENT_TYPE, IMAGE_PNG)
         .await
