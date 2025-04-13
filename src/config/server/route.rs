@@ -1,14 +1,18 @@
 use super::*;
-use app::controller::{hello::r#const::*, *};
 
 pub async fn register(server: &Server) {
-    server.route("/", root::func::handle).await;
+    server.route("/", controller::root::func::handle).await;
     server
-        .route(format!("/hello/:{NAME_KEY}"), hello::func::handle)
+        .route(
+            format!("/hello/:{NAME_KEY}"),
+            controller::hello::func::handle,
+        )
         .await;
-    server.route("/websocket", websocket::func::handle).await;
     server
-        .route("/favicon.ico", favicon_ico::func::favicon_ico)
+        .route("/websocket", controller::websocket::func::handle)
+        .await;
+    server
+        .route("/favicon.ico", controller::favicon_ico::func::favicon_ico)
         .await;
     println_success!("Server route initialization completed");
 }

@@ -1,5 +1,4 @@
 use super::*;
-use app::middleware::response;
 
 pub async fn register(server: &Server) {
     server.response_middleware(response::send::func::send).await;

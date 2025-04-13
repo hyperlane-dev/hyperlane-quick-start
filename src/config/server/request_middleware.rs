@@ -1,5 +1,4 @@
 use super::*;
-use app::middleware::request;
 
 pub async fn register(server: &Server) {
     server.request_middleware(request::cross::func::cross).await;
