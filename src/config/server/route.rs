@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 use app::controller::*;
 
 pub static NAME_KEY: &str = "name";

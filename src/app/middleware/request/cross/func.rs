@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 pub async fn cross(ctx: Context) {
     ctx.set_response_header(ACCESS_CONTROL_ALLOW_ORIGIN, ANY)

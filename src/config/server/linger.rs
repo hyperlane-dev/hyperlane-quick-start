@@ -1,5 +1,4 @@
 use super::*;
-use crate::*;
 
 pub async fn linger(server: &Server) {
     server.set_linger(SERVER_LINGER).await;

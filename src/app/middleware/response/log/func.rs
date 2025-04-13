@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 pub async fn log(ctx: Context) {
     let request: String = ctx.get_request().await.get_string();

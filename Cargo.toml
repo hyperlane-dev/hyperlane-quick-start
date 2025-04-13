@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane-quick-start"
-version = "0.64.0"
+version = "0.65.0"
 edition = "2024"
 authors = ["ltpp-universe <root@ltpp.vip>"] 
 license = "MIT"

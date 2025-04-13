@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 use plugin::logo_img::func::*;
 
 pub async fn favicon_ico(ctx: Context) {
