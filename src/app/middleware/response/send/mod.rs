@@ -1,3 +1,3 @@
 pub(crate) mod func;
 
-pub(crate) use super::*;
+pub(super) use super::*;

@@ -3,4 +3,4 @@ pub(crate) mod hello;
 pub(crate) mod root;
 pub(crate) mod websocket;
 
-pub(crate) use super::*;
+pub(super) use super::*;
