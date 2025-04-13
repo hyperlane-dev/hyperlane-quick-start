@@ -9,7 +9,7 @@ pub async fn response_header(ctx: Context) {
         .await
         .set_response_header(CONTENT_TYPE, content_type)
         .await
-        .set_response_header(DATE, current_date_gmt())
+        .set_response_header(DATE, gmt())
         .await
         .set_response_header("SocketAddr", socket_addr_string)
         .await;

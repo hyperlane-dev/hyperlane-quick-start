@@ -134,9 +134,9 @@ checksum = "fc3dfae702af156917c65f4ccc70687088331f0b694e5e687453e4d68a16b496"
 
 [[package]]
 name = "color-output"
-version = "6.5.5"
+version = "6.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a5427d1c209887c8f2e528a64e0849a517fd14fe74d54904af57cb9446cf20b4"
+checksum = "74d465b5dc60106412924964948f7e5c0c1f023e6b45fa451aad4110480bd750"
 dependencies = [
  "hyperlane-time",
 ]
@@ -435,9 +435,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane"
-version = "4.80.1"
+version = "4.81.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "142d5c81e0dca1288070361ed0cb6cca67e7cb368cc5b4135817896ae8602dd3"
+checksum = "13460d520ef7c83755b0492a5aac3e7bf3362f018853dfdfec7c06e6adcfa00a"
 dependencies = [
  "async-func",
  "clonelicious",
@@ -453,9 +453,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-log"
-version = "1.14.2"
+version = "1.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c0794ff7fe0abf336b77ca68f0688ba9ba6a85ad29e3e13ae7042542854f9d3c"
+checksum = "a2138e621306e760a320cfc6aad9b4f408edcb2337d713f21581e8feb47d073a"
 dependencies = [
  "file-operation",
  "hyperlane-time",
@@ -465,16 +465,16 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "0.63.2"
+version = "0.64.0"
 dependencies = [
  "hyperlane",
 ]
 
 [[package]]
 name = "hyperlane-time"
-version = "0.2.1"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d4737d903a4e4ed8c82c13d4878faebc117e06bd3386d7002bad4347558209de"
+checksum = "6aa55a670a0db8677da642e02e3bd61d4fca3765b9d943f9429e4b0e5c5fd7e5"
 
 [[package]]
 name = "icu_collections"
