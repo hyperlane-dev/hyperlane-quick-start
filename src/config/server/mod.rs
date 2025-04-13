@@ -1,5 +1,5 @@
 pub(crate) mod buffer_size;
-pub(crate) mod constant;
+pub(crate) mod r#const;
 pub(crate) mod host;
 pub(crate) mod linger;
 pub(crate) mod log;
@@ -13,4 +13,4 @@ pub(crate) mod ttl;
 
 pub(super) use super::*;
 
-pub(crate) use constant::*;
+pub(crate) use r#const::*;

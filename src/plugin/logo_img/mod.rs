@@ -1,4 +1,4 @@
+pub(crate) mod r#const;
 pub(crate) mod r#func;
-pub(crate) mod r#static;
 
-pub(super) use r#static::*;
+pub(super) use r#const::*;

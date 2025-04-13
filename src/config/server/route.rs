@@ -1,7 +1,5 @@
 use super::*;
-use app::controller::*;
-
-pub static NAME_KEY: &str = "name";
+use app::controller::{hello::r#const::NAME_KEY, *};
 
 pub async fn register(server: &Server) {
     server.route("/", root::func::handle).await;
