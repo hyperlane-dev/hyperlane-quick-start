@@ -5,5 +5,5 @@ pub(crate) mod plugin;
 pub(crate) use hyperlane::*;
 
 fn main() {
-    init::server::func::run();
+    init::server::r#fn::run();
 }
