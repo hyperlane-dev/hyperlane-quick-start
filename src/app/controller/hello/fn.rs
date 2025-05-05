@@ -5,6 +5,6 @@ pub async fn handle(ctx: Context) {
     let _ = ctx
         .set_response_status_code(200)
         .await
-        .set_response_body(format!("Hello {}", name))
+        .set_response_body(format!("Hello {name}"))
         .await;
 }

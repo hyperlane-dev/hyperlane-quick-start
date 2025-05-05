@@ -23,7 +23,7 @@ where
         if is_daemon {
             match manager.start_daemon() {
                 Ok(_) => println_success!("Server started in background successfully"),
-                Err(e) => println_error!(format!("Error starting server in background: {}", e)),
+                Err(e) => println_error!(format!("Error starting server in background: {e}")),
             }
         } else {
             println_success!("Server started successfully");
@@ -34,7 +34,7 @@ where
     let stop_server = || async {
         match manager.stop() {
             Ok(_) => println_success!("Server stopped successfully"),
-            Err(e) => println_error!(format!("Error stopping server: {}", e)),
+            Err(e) => println_error!(format!("Error stopping server: {e}")),
         }
     };
 
@@ -48,7 +48,7 @@ where
         "stop" => stop_server().await,
         "restart" => restart_server().await,
         _ => {
-            println_error!(format!("Invalid command: {}", command));
+            println_error!(format!("Invalid command: {command}"));
         }
     }
 }

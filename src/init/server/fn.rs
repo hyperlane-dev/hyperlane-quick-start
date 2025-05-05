@@ -130,7 +130,7 @@ async fn create_server() {
     register_request_middleware(&server).await;
     register_route(&server).await;
     register_response_middleware(&server).await;
-    let host_port: String = format!("{}:{}", SERVER_HOST, SERVER_PORT);
+    let host_port: String = format!("{SERVER_HOST}:{SERVER_PORT}");
     println_success!("Server initialization successful");
     let server_result: ServerResult = server.listen().await;
     match server_result {
