@@ -1,5 +1,6 @@
 use super::*;
 
 pub async fn handle(ctx: Context) {
-    let _ = ctx.set_response_body("Hello hyperlane").await;
+    let html: String = INDEX_HTML.replace("{{ time }}", &time());
+    let _ = ctx.set_response_body(html).await;
 }

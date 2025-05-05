@@ -7,5 +7,5 @@ pub(super) use app::{
     controller,
     middleware::{request, response},
 };
-pub(super) use config::{hello::*, server::*};
+pub(super) use config::{business::hello::*, server::*};
 pub(super) use tokio::runtime::{Builder, Runtime};
