@@ -70,35 +70,35 @@ async fn ttl(server: &Server) {
 }
 
 async fn register_request_middleware(server: &Server) {
-    server.request_middleware(request::cross::r#fn::cross).await;
+    server.request_middleware(request::cross::cross).await;
     server
-        .request_middleware(request::response::r#fn::response_header)
+        .request_middleware(request::response::response_header)
         .await;
     server
-        .request_middleware(request::response::r#fn::response_status_code)
+        .request_middleware(request::response::response_status_code)
+        .await;
+    server
+        .request_middleware(request::response::response_body)
         .await;
     println_success!("Server request middleware initialization completed");
 }
 
 async fn register_response_middleware(server: &Server) {
-    server.response_middleware(response::send::r#fn::send).await;
-    server.response_middleware(response::log::r#fn::log).await;
+    server.response_middleware(response::send::send).await;
+    server.response_middleware(response::log::log).await;
     println_success!("Server response middleware initialization completed");
 }
 
 async fn register_route(server: &Server) {
-    server.route("/", controller::root::r#fn::handle).await;
+    server.route("/", controller::root::handle).await;
     server
-        .route(
-            format!("/hello/:{NAME_KEY}"),
-            controller::hello::r#fn::handle,
-        )
+        .route(format!("/hello/:{NAME_KEY}"), controller::hello::handle)
         .await;
     server
-        .route("/websocket", controller::websocket::r#fn::handle)
+        .route("/websocket", controller::websocket::handle)
         .await;
     server
-        .route("/favicon.ico", controller::favicon_ico::r#fn::handle)
+        .route("/favicon.ico", controller::favicon_ico::handle)
         .await;
     println_success!("Server route initialization completed");
 }
@@ -140,7 +140,5 @@ async fn create_server() {
 }
 
 pub fn run() {
-    runtime().block_on(plugin::server_manager::r#fn::create_server_manage(
-        create_server,
-    ));
+    runtime().block_on(plugin::server_manager::create_server_manage(create_server));
 }
