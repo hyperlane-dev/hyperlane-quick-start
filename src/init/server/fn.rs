@@ -132,7 +132,7 @@ async fn create_server() {
     register_response_middleware(&server).await;
     let host_port: String = format!("{SERVER_HOST}:{SERVER_PORT}");
     println_success!("Server initialization successful");
-    let server_result: ServerResult = server.listen().await;
+    let server_result: ServerResult = server.run().await;
     match server_result {
         Ok(_) => println_success!("Server listen in: ", host_port),
         Err(server_error) => println_error!("Server run error: ", server_error),
