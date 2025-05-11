@@ -2,3 +2,4 @@
 /logs
 **/*.log
 **/*.pid
+**/node_modules/**
