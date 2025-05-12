@@ -1,13 +1,13 @@
 [package]
 name = "app"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [lib]
 path = "lib.rs"
 
 [dependencies]
 hyperlane = "4.94.0"
-config = { path = "../config" }
-plugin = { path = "../plugin" }
-utils = { path = "../utils" }
+config = { workspace = true }
+plugin = { workspace = true }
+utils = { workspace = true }
