@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane-quick-start"
-version = "0.86.0"
+version = "1.0.0"
 edition = "2024"
 authors = ["ltpp-universe <root@ltpp.vip>"] 
 license = "MIT"
@@ -18,8 +18,30 @@ exclude = [
     "logs"
 ]
 
-[dependencies]
+[workspace]
+members = [
+    "app",
+    "config",
+    "init",
+    "plugin",
+    "utils",
+]
+
+[workspace.dependencies]
 hyperlane = "4.94.0"
+app = { path = "app" }
+config = { path = "config" }
+init = { path = "init" }
+plugin = { path = "plugin" }
+utils = { path = "utils" }
+
+[dependencies]
+hyperlane.workspace = true
+app.workspace = true
+config.workspace = true
+init.workspace = true
+plugin.workspace = true
+utils.workspace = true
 
 [profile.dev]
 incremental = true
