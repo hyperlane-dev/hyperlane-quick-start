@@ -7,8 +7,8 @@ edition = "2024"
 path = "lib.rs"
 
 [dependencies]
-hyperlane = "4.94.0"
-app = { workspace = true }
-config = { workspace = true }
-plugin = { workspace = true }
-utils = { workspace = true }
+hyperlane.workspace = true
+app.workspace = true
+config.workspace = true
+plugin.workspace = true
+utils.workspace = true
