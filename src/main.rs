@@ -1,9 +1,9 @@
-pub(crate) mod app;
-pub(crate) mod config;
-pub(crate) mod init;
-pub(crate) mod plugin;
-pub(crate) mod utils;
+pub(crate) use app;
+pub(crate) use config;
 pub(crate) use hyperlane::*;
+pub(crate) use init;
+pub(crate) use plugin;
+pub(crate) use utils;
 
 fn main() {
     init::server::run();
