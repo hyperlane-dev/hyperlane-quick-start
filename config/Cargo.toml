@@ -1,0 +1,14 @@
+[package]
+name = "config"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+hyperlane = { workspace = true }
+app = { workspace = true }
+init = { workspace = true }
+plugin = { workspace = true }
+utils = { workspace = true }

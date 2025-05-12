@@ -18,8 +18,22 @@ exclude = [
     "logs"
 ]
 
+[workspace]
+members = [
+    "app",
+    "config",
+    "init",
+    "plugin",
+    "utils",
+]
+
 [dependencies]
 hyperlane = "4.94.0"
+app = { path = "app" }
+config = { path = "config" }
+init = { path = "init" }
+plugin = { path = "plugin" }
+utils = { path = "utils" }
 
 [profile.dev]
 incremental = true
