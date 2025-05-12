@@ -29,11 +29,11 @@ members = [
 
 [workspace.dependencies]
 hyperlane = "4.94.0"
-app = { path = "app" }
-config = { path = "config" }
-init = { path = "init" }
-plugin = { path = "plugin" }
-utils = { path = "utils" }
+app = { path = "app", version = "0.1.0" }
+config = { path = "config", version = "0.1.0"  }
+init = { path = "init", version = "0.1.0"  }
+plugin = { path = "plugin", version = "0.1.0"  }
+utils = { path = "utils", version = "0.1.0"  }
 
 [dependencies]
 hyperlane.workspace = true
