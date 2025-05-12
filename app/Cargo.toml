@@ -7,8 +7,7 @@ edition = "2021"
 path = "lib.rs"
 
 [dependencies]
-hyperlane = { workspace = true }
-config = { workspace = true }
-init = { workspace = true }
-plugin = { workspace = true }
-utils = { workspace = true }
+hyperlane = "4.94.0"
+config = { path = "../config" }
+plugin = { path = "../plugin" }
+utils = { path = "../utils" }

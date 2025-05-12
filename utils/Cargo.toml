@@ -7,4 +7,4 @@ edition = "2021"
 path = "lib.rs"
 
 [dependencies]
-hyperlane = { workspace = true }
+hyperlane = "4.94.0"
