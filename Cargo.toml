@@ -29,11 +29,11 @@ members = [
 
 [workspace.dependencies]
 hyperlane = "4.94.0"
-app = { path = "app", version = "0.1.0" }
-config = { path = "config", version = "0.1.0"  }
-init = { path = "init", version = "0.1.0"  }
-plugin = { path = "plugin", version = "0.1.0"  }
-utils = { path = "utils", version = "0.1.0"  }
+app = { path = "app" }
+config = { path = "config" }
+init = { path = "init" }
+plugin = { path = "plugin" }
+utils = { path = "utils" }
 
 [dependencies]
 hyperlane.workspace = true
@@ -42,13 +42,6 @@ config.workspace = true
 init.workspace = true
 plugin.workspace = true
 utils.workspace = true
-
-[patch.crates-io]
-app = { path = "app", version = "0.1.0" }
-config = { path = "config", version = "0.1.0"  }
-init = { path = "init", version = "0.1.0"  }
-plugin = { path = "plugin", version = "0.1.0"  }
-utils = { path = "utils", version = "0.1.0"  }
 
 [profile.dev]
 incremental = true
