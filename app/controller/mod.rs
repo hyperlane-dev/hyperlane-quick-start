@@ -1,6 +1,6 @@
-pub(crate) mod favicon_ico;
-pub(crate) mod hello;
-pub(crate) mod root;
-pub(crate) mod websocket;
+pub mod favicon_ico;
+pub mod hello;
+pub mod root;
+pub mod websocket;
 
 pub(super) use super::*;

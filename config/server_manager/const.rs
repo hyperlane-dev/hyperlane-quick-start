@@ -1,1 +1,1 @@
-pub(crate) const PID_FILE_PATH: &str = "./process/hyperlane.pid";
+pub const PID_FILE_PATH: &str = "./process/hyperlane.pid";

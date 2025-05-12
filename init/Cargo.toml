@@ -8,6 +8,7 @@ path = "lib.rs"
 
 [dependencies]
 hyperlane = "4.94.0"
+app = {path = "../app" }
 config = { path = "../config" }
 plugin = { path = "../plugin" }
 utils = { path = "../utils" }

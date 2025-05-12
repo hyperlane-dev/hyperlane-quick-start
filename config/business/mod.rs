@@ -1,4 +1,4 @@
-pub(crate) mod hello;
-pub(crate) mod logo_img;
-pub(crate) mod not_found;
-pub(crate) mod templates;
+pub mod hello;
+pub mod logo_img;
+pub mod not_found;
+pub mod templates;
