@@ -1,5 +1,5 @@
 [package]
-name = "init"
+name = "app_filter"
 version = "0.1.0"
 edition = "2024"
 
@@ -8,8 +8,6 @@ path = "lib.rs"
 
 [dependencies]
 hyperlane.workspace = true
-app_controller.workspace = true
-app_middleware.workspace = true
 config.workspace = true
 plugin.workspace = true
 utils.workspace = true
