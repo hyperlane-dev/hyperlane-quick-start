@@ -20,55 +20,25 @@ exclude = [
 
 [workspace]
 members = [
-    "app/aspect",
-    "app/controller",
-    "app/exception",
-    "app/filter",
-    "app/mapper",
-    "app/middleware",
-    "app/model",
-    "app/service",
-    "app/utils",
-    "app/view",
+    "app",
     "config",
     "init",
-    "plugin",
-    "utils",
+    "plugin"
 ]
 
 [workspace.dependencies]
 hyperlane = "4.94.0"
-app_aspect = { path = "app/aspect" }
-app_controller = { path = "app/controller" }
-app_exception = { path = "app/exception" }
-app_filter = { path = "app/filter" }
-app_mapper = { path = "app/mapper" }
-app_middleware = { path = "app/middleware" }
-app_model = { path = "app/model" }
-app_service = { path = "app/service" }
-app_utils = { path = "app/utils" }
-app_view = { path = "app/view" }
+app = { path = "app" }
 config = { path = "config" }
 init = { path = "init" }
 plugin = { path = "plugin" }
-utils = { path = "utils" }
 
 [dependencies]
 hyperlane.workspace = true
-app_aspect.workspace = true
-app_controller.workspace = true
-app_exception.workspace = true
-app_filter.workspace = true
-app_mapper.workspace = true
-app_middleware.workspace = true
-app_model.workspace = true
-app_service.workspace = true
-app_utils.workspace = true
-app_view.workspace = true
+app.workspace = true
 config.workspace = true
 init.workspace = true
 plugin.workspace = true
-utils.workspace = true
 
 [profile.dev]
 incremental = true

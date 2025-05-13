@@ -1,0 +1,22 @@
+[package]
+name = "app"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+aspect = { path = "aspect" }
+controller = { path = "controller" }
+exception = { path = "exception" }
+filter = { path = "filter" }
+mapper = { path = "mapper" }
+middleware = { path = "middleware" }
+model = { path = "model" }
+service = { path = "service" }
+utils = { path = "utils" }
+view = { path = "view" }
+hyperlane.workspace = true
+config.workspace = true
+plugin.workspace = true

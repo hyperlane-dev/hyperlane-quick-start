@@ -90,15 +90,15 @@ async fn register_response_middleware(server: &Server) {
 }
 
 async fn register_route(server: &Server) {
-    server.route("/", app_controller::root::handle).await;
+    server.route("/", controller::root::handle).await;
     server
-        .route(format!("/hello/:{NAME_KEY}"), app_controller::hello::handle)
+        .route(format!("/hello/:{NAME_KEY}"), controller::hello::handle)
         .await;
     server
-        .route("/websocket", app_controller::websocket::handle)
+        .route("/websocket", controller::websocket::handle)
         .await;
     server
-        .route("/favicon.ico", app_controller::favicon_ico::handle)
+        .route("/favicon.ico", controller::favicon_ico::handle)
         .await;
     println_success!("Server route initialization completed");
 }

@@ -52,103 +52,31 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "683d7910e743518b0e34f1186f92494becacb047c7b6bf616c96772180fef923"
 
 [[package]]
-name = "app_aspect"
+name = "app"
 version = "0.1.0"
 dependencies = [
+ "aspect",
  "config",
+ "controller",
+ "exception",
+ "filter",
  "hyperlane",
+ "mapper",
+ "middleware",
+ "model",
  "plugin",
+ "service",
  "utils",
+ "view",
 ]
 
 [[package]]
-name = "app_controller"
+name = "aspect"
 version = "0.1.0"
 dependencies = [
  "config",
  "hyperlane",
  "plugin",
- "utils",
-]
-
-[[package]]
-name = "app_exception"
-version = "0.1.0"
-dependencies = [
- "config",
- "hyperlane",
- "plugin",
- "utils",
-]
-
-[[package]]
-name = "app_filter"
-version = "0.1.0"
-dependencies = [
- "config",
- "hyperlane",
- "plugin",
- "utils",
-]
-
-[[package]]
-name = "app_mapper"
-version = "0.1.0"
-dependencies = [
- "config",
- "hyperlane",
- "plugin",
- "utils",
-]
-
-[[package]]
-name = "app_middleware"
-version = "0.1.0"
-dependencies = [
- "config",
- "hyperlane",
- "plugin",
- "utils",
-]
-
-[[package]]
-name = "app_model"
-version = "0.1.0"
-dependencies = [
- "config",
- "hyperlane",
- "plugin",
- "utils",
-]
-
-[[package]]
-name = "app_service"
-version = "0.1.0"
-dependencies = [
- "config",
- "hyperlane",
- "plugin",
- "utils",
-]
-
-[[package]]
-name = "app_utils"
-version = "0.1.0"
-dependencies = [
- "config",
- "hyperlane",
- "plugin",
- "utils",
-]
-
-[[package]]
-name = "app_view"
-version = "0.1.0"
-dependencies = [
- "config",
- "hyperlane",
- "plugin",
- "utils",
 ]
 
 [[package]]
@@ -237,7 +165,15 @@ name = "config"
 version = "0.1.0"
 dependencies = [
  "hyperlane",
- "utils",
+]
+
+[[package]]
+name = "controller"
+version = "0.1.0"
+dependencies = [
+ "config",
+ "hyperlane",
+ "plugin",
 ]
 
 [[package]]
@@ -287,12 +223,30 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
 
 [[package]]
+name = "exception"
+version = "0.1.0"
+dependencies = [
+ "config",
+ "hyperlane",
+ "plugin",
+]
+
+[[package]]
 name = "file-operation"
 version = "0.5.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "78548b84eac71fe0f185f2169fa960f65af6e49ae2b63fdb729e81cacdf7b5da"
 dependencies = [
  "tokio",
+]
+
+[[package]]
+name = "filter"
+version = "0.1.0"
+dependencies = [
+ "config",
+ "hyperlane",
+ "plugin",
 ]
 
 [[package]]
@@ -574,21 +528,11 @@ dependencies = [
 name = "hyperlane-quick-start"
 version = "1.0.0"
 dependencies = [
- "app_aspect",
- "app_controller",
- "app_exception",
- "app_filter",
- "app_mapper",
- "app_middleware",
- "app_model",
- "app_service",
- "app_utils",
- "app_view",
+ "app",
  "config",
  "hyperlane",
  "init",
  "plugin",
- "utils",
 ]
 
 [[package]]
@@ -708,12 +652,10 @@ dependencies = [
 name = "init"
 version = "0.1.0"
 dependencies = [
- "app_controller",
- "app_middleware",
+ "app",
  "config",
  "hyperlane",
  "plugin",
- "utils",
 ]
 
 [[package]]
@@ -772,10 +714,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "mapper"
+version = "0.1.0"
+dependencies = [
+ "config",
+ "hyperlane",
+ "plugin",
+]
+
+[[package]]
 name = "memchr"
 version = "2.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "78ca9ab1a0babb1e7d5695e3530886289c18cf2f87ec19a575a0abdce112e3a3"
+
+[[package]]
+name = "middleware"
+version = "0.1.0"
+dependencies = [
+ "config",
+ "hyperlane",
+ "plugin",
+]
 
 [[package]]
 name = "miniz_oxide"
@@ -795,6 +755,15 @@ dependencies = [
  "libc",
  "wasi 0.11.0+wasi-snapshot-preview1",
  "windows-sys",
+]
+
+[[package]]
+name = "model"
+version = "0.1.0"
+dependencies = [
+ "config",
+ "hyperlane",
+ "plugin",
 ]
 
 [[package]]
@@ -1086,6 +1055,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "service"
+version = "0.1.0"
+dependencies = [
+ "config",
+ "hyperlane",
+ "plugin",
+]
+
+[[package]]
 name = "signal-hook-registry"
 version = "1.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1275,7 +1253,9 @@ checksum = "b6c140620e7ffbb22c2dee59cafe6084a59b5ffc27a8859a5f0d494b5d52b6be"
 name = "utils"
 version = "0.1.0"
 dependencies = [
+ "config",
  "hyperlane",
+ "plugin",
 ]
 
 [[package]]
@@ -1295,6 +1275,15 @@ name = "version_check"
 version = "0.9.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
+
+[[package]]
+name = "view"
+version = "0.1.0"
+dependencies = [
+ "config",
+ "hyperlane",
+ "plugin",
+]
 
 [[package]]
 name = "wasi"
