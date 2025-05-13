@@ -7,9 +7,6 @@ edition = "2024"
 path = "lib.rs"
 
 [dependencies]
-hyperlane.workspace = true
-config.workspace = true
-plugin.workspace = true
 app_aspect = { path = "aspect" }
 app_controller = { path = "controller" }
 app_exception = { path = "exception" }
