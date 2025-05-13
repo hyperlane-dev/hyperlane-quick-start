@@ -7,16 +7,16 @@ edition = "2024"
 path = "lib.rs"
 
 [dependencies]
-aspect = { path = "aspect" }
-controller = { path = "controller" }
-exception = { path = "exception" }
-filter = { path = "filter" }
-mapper = { path = "mapper" }
-middleware = { path = "middleware" }
-model = { path = "model" }
-service = { path = "service" }
-utils = { path = "utils" }
-view = { path = "view" }
 hyperlane.workspace = true
 config.workspace = true
 plugin.workspace = true
+app_aspect = { path = "aspect" }
+app_controller = { path = "controller" }
+app_exception = { path = "exception" }
+app_filter = { path = "filter" }
+app_mapper = { path = "mapper" }
+app_middleware = { path = "middleware" }
+app_model = { path = "model" }
+app_service = { path = "service" }
+app_utils = { path = "utils" }
+app_view = { path = "view" }

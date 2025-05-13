@@ -1,5 +1,5 @@
 [package]
- name = "filter"
+name = "app_filter"
 version = "0.1.0"
 edition = "2024"
 

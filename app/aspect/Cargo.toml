@@ -1,5 +1,5 @@
 [package]
-name = "aspect"
+name = "app_aspect"
 version = "0.1.0"
 edition = "2024"
 

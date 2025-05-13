@@ -1,5 +1,5 @@
 [package]
- name = "exception"
+name = "app_exception"
 version = "0.1.0"
 edition = "2024"
 

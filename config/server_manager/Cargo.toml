@@ -1,5 +1,5 @@
 [package]
-name = "app_utils"
+name = "config_server_manager"
 version = "0.1.0"
 edition = "2024"
 
@@ -8,5 +8,3 @@ path = "lib.rs"
 
 [dependencies]
 hyperlane.workspace = true
-config.workspace = true
-plugin.workspace = true

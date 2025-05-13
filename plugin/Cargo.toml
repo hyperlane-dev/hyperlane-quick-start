@@ -7,5 +7,4 @@ edition = "2024"
 path = "lib.rs"
 
 [dependencies]
-hyperlane.workspace = true
-config.workspace = true
+plugin_server_manager = { path = "server_manager" }

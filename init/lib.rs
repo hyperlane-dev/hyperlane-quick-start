@@ -1,3 +1,1 @@
-pub mod server;
-
-pub(crate) use hyperlane::*;
+pub use init_server as server;

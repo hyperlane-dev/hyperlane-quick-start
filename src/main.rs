@@ -5,5 +5,5 @@ pub use init;
 pub use plugin;
 
 fn main() {
-    init::server::run();
+    init::server::service::run();
 }
