@@ -1,1 +1,1 @@
-pub use init_server as server;
+pub use hyperlane_init_server as server;

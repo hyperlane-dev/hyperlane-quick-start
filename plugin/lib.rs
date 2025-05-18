@@ -1,1 +1,1 @@
-pub use plugin_server_manager as server_manager;
+pub use hyperlane_plugin_server_manager as server_manager;

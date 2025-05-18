@@ -1,5 +1,5 @@
 [package]
-name = "config"
+name = "hyperlane_config"
 version = "0.1.0"
 edition = "2024"
 
@@ -7,6 +7,6 @@ edition = "2024"
 path = "lib.rs"
 
 [dependencies]
-config_server = { path = "server" }
-config_business = { path = "business" }
-config_server_manager = { path = "server_manager" }
+hyperlane_config_server = { path = "server" }
+hyperlane_config_business = { path = "business" }
+hyperlane_config_server_manager = { path = "server_manager" }

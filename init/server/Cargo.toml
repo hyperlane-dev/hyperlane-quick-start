@@ -1,5 +1,5 @@
 [package]
-name = "init_server"
+name = "hyperlane_init_server"
 version = "0.1.0"
 edition = "2024"
 
@@ -8,6 +8,6 @@ path = "lib.rs"
 
 [dependencies]
 hyperlane.workspace = true
-app.workspace = true
-config.workspace = true
-plugin.workspace = true
+hyperlane_app.workspace = true
+hyperlane_config.workspace = true
+hyperlane_plugin.workspace = true

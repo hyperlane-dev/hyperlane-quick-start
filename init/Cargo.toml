@@ -1,5 +1,5 @@
 [package]
-name = "init"
+name = "hyperlane_init"
 version = "0.1.0"
 edition = "2024"
 
@@ -7,4 +7,4 @@ edition = "2024"
 path = "lib.rs"
 
 [dependencies]
-init_server = { path = "server" }
+hyperlane_init_server = { path = "server" }

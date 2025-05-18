@@ -1,5 +1,5 @@
 [package]
-name = "app"
+name = "hyperlane_app"
 version = "0.1.0"
 edition = "2024"
 
@@ -7,13 +7,13 @@ edition = "2024"
 path = "lib.rs"
 
 [dependencies]
-app_aspect = { path = "aspect" }
-app_controller = { path = "controller" }
-app_exception = { path = "exception" }
-app_filter = { path = "filter" }
-app_mapper = { path = "mapper" }
-app_middleware = { path = "middleware" }
-app_model = { path = "model" }
-app_service = { path = "service" }
-app_utils = { path = "utils" }
-app_view = { path = "view" }
+hyperlane_app_aspect = { path = "aspect" }
+hyperlane_app_controller = { path = "controller" }
+hyperlane_app_exception = { path = "exception" }
+hyperlane_app_filter = { path = "filter" }
+hyperlane_app_mapper = { path = "mapper" }
+hyperlane_app_middleware = { path = "middleware" }
+hyperlane_app_model = { path = "model" }
+hyperlane_app_service = { path = "service" }
+hyperlane_app_utils = { path = "utils" }
+hyperlane_app_view = { path = "view" }

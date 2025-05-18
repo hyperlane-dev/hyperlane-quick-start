@@ -1,5 +1,5 @@
 [package]
-name = "app_controller"
+name = "hyperlane_app_controller"
 version = "0.1.0"
 edition = "2024"
 
@@ -8,5 +8,5 @@ path = "lib.rs"
 
 [dependencies]
 hyperlane.workspace = true
-config.workspace = true
-plugin.workspace = true
+hyperlane_config.workspace = true
+hyperlane_plugin.workspace = true

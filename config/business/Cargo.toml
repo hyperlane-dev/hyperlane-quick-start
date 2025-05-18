@@ -1,5 +1,5 @@
 [package]
-name = "config_business"
+name = "hyperlane_config_business"
 version = "0.1.0"
 edition = "2024"
 

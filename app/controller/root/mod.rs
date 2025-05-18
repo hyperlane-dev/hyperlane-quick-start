@@ -3,4 +3,4 @@ pub mod r#fn;
 pub use r#fn::*;
 
 pub(super) use super::*;
-pub(super) use config::business::templates::*;
+pub(super) use hyperlane_config::business::templates::*;
