@@ -1,0 +1,9 @@
+[package]
+name = "hyperlane_utils"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]

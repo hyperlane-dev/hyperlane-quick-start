@@ -461,13 +461,14 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "1.5.0"
+version = "1.6.0"
 dependencies = [
  "hyperlane",
  "hyperlane_app",
  "hyperlane_config",
  "hyperlane_init",
  "hyperlane_plugin",
+ "hyperlane_utils",
 ]
 
 [[package]]
@@ -637,6 +638,10 @@ dependencies = [
  "hyperlane",
  "hyperlane_config",
 ]
+
+[[package]]
+name = "hyperlane_utils"
+version = "0.1.0"
 
 [[package]]
 name = "icu_collections"

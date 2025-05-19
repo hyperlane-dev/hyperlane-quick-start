@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane-quick-start"
-version = "1.5.0"
+version = "1.6.0"
 edition = "2024"
 authors = ["ltpp-universe <root@ltpp.vip>"] 
 license = "MIT"
@@ -23,7 +23,8 @@ members = [
     "app",
     "config",
     "init",
-    "plugin"
+    "plugin",
+    "utils"
 ]
 
 [workspace.dependencies]
@@ -32,6 +33,7 @@ hyperlane_app = { path = "app", version = "0.1.0" }
 hyperlane_config = { path = "config", version = "0.1.0" }
 hyperlane_init = { path = "init", version = "0.1.0" }
 hyperlane_plugin = { path = "plugin", version = "0.1.0" }
+hyperlane_utils = { path = "utils", version = "0.1.0" }
 
 [dependencies]
 hyperlane.workspace = true
@@ -39,12 +41,14 @@ hyperlane_app.workspace = true
 hyperlane_config.workspace = true
 hyperlane_init.workspace = true
 hyperlane_plugin.workspace = true
+hyperlane_utils.workspace = true
 
 [patch.crates-io]
 hyperlane_app = { path = "app" }
 hyperlane_config = { path = "config" }
 hyperlane_init = { path = "init" }
 hyperlane_plugin = { path = "plugin" }
+hyperlane_utils = { path = "utils" }
 
 [profile.dev]
 incremental = true
