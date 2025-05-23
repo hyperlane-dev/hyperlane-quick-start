@@ -49,7 +49,6 @@ export default {
     };
   },
   created() {
-    // 在created钩子中设置用户名
     this.username = this.generateUsername();
   },
   mounted() {
@@ -62,18 +61,11 @@ export default {
       onMessage: this.handleMessage,
     });
 
-    // 保存方法引用
     this.connect = connect;
     this.disconnect = disconnect;
     this.sendWebSocketMessage = sendWebSocketMessage;
-
-    // 使用响应式引用而不是直接赋值
     this.wsConnectionStatus = connectionStatus;
-
-    // 初始状态同步
     this.connectionStatus = connectionStatus.value;
-
-    // 监听WebSocket连接状态变化
     this.$watch(
       () => this.wsConnectionStatus.value,
       (newStatus) => {
@@ -87,9 +79,7 @@ export default {
     this.disconnect();
   },
   methods: {
-    // 生成浏览器指纹
     generateFingerprint() {
-      // 收集浏览器信息
       const browserInfo = [
         navigator.userAgent,
         navigator.language,
@@ -100,7 +90,6 @@ export default {
         new Date().getTimezoneOffset(),
       ].join('|');
 
-      // 简单的哈希函数
       let hash = 0;
       for (let i = 0; i < browserInfo.length; i++) {
         const char = browserInfo.charCodeAt(i);
@@ -108,11 +97,9 @@ export default {
         hash = hash & hash; // 转换为32位整数
       }
 
-      // 转换为正数并取模，确保长度适中
       return Math.abs(hash) % 10000;
     },
 
-    // 生成用户名：微秒时间戳 + 浏览器指纹
     generateUsername() {
       const timestamp = new Date().getTime() * 1000; // 毫秒转微秒（近似值）
       const fingerprint = this.generateFingerprint();
@@ -121,7 +108,6 @@ export default {
 
     handleMessage(data) {
       try {
-        // 判断消息是否是自己发送的
         const isSelf = data.sender === this.username;
 
         this.messages.push({
@@ -131,19 +117,14 @@ export default {
           isSelf,
         });
 
-        // 使用nextTick确保DOM更新后再滚动
         this.$nextTick(() => {
           console.log(this.isNearBottom);
 
-          // 如果是自己发送的消息，总是滚动到底部
           if (isSelf) {
             this.scrollToBottom();
-          }
-          // 如果不是自己发送的消息，且用户在底部附近，自动滚动到底部
-          else if (this.isNearBottom) {
+          } else if (this.isNearBottom) {
             this.scrollToBottom();
           } else {
-            // 否则增加未读消息计数并显示滚动按钮
             this.unreadCount++;
             this.showScrollButton = true;
           }
@@ -162,7 +143,6 @@ export default {
         time: new Date().toLocaleTimeString(),
       };
 
-      // 发送消息后，设置isNearBottom为true，确保消息发送后会滚动到底部
       this.isNearBottom = true;
       this.sendWebSocketMessage(message);
     },
@@ -171,7 +151,7 @@ export default {
       this.$nextTick(() => {
         if (this.$refs.messageListRef) {
           this.$refs.messageListRef.scrollToBottom();
-          // 重置未读消息计数和隐藏滚动按钮
+
           this.unreadCount = 0;
           this.showScrollButton = false;
           this.isNearBottom = true;
@@ -179,11 +159,9 @@ export default {
       });
     },
 
-    // 处理滚动事件
     handleScroll(isNearBottom) {
       this.isNearBottom = isNearBottom;
 
-      // 如果用户滚动到底部，隐藏滚动按钮并重置未读计数
       if (this.isNearBottom && this.showScrollButton) {
         this.showScrollButton = false;
         this.unreadCount = 0;

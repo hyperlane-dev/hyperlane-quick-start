@@ -77,10 +77,8 @@ export default {
     };
   },
   mounted() {
-    // 计算容器高度
     this.updateContainerHeight();
 
-    // 监听窗口大小变化
     window.addEventListener('resize', this.updateContainerHeight);
   },
   beforeUnmount() {
@@ -88,7 +86,6 @@ export default {
   },
   methods: {
     updateContainerHeight() {
-      // 计算消息列表容器的高度 (视口高度减去头部和输入框的高度)
       this.containerHeight = window.innerHeight - 108; // 108px是头部和输入框的大致高度
     },
     scrollToBottom() {
@@ -98,7 +95,6 @@ export default {
       }
     },
     handleScroll(isNearBottom) {
-      // 通知父组件滚动状态变化
       this.$emit('handleScroll', isNearBottom);
     },
   },
