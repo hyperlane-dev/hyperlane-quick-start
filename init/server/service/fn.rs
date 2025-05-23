@@ -69,6 +69,11 @@ async fn ttl(server: &Server) {
     println_success!("Server ttl: ", SERVER_TTI);
 }
 
+async fn enable_inner_websocket_handle(server: &Server) {
+    server.enable_inner_websocket_handle("/websocket").await;
+    println_success!("Server inner websocket handle enable completed");
+}
+
 async fn register_request_middleware(server: &Server) {
     server.request_middleware(request::cross::cross).await;
     server
@@ -127,6 +132,7 @@ async fn create_server() {
     nodelay(&server).await;
     http_line_buffer_size(&server).await;
     websocket_buffer_size(&server).await;
+    enable_inner_websocket_handle(&server).await;
     register_request_middleware(&server).await;
     register_route(&server).await;
     register_response_middleware(&server).await;
