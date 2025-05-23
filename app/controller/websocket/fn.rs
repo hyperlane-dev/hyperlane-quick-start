@@ -1,16 +1,10 @@
 use super::*;
-use hyperlane::tokio::sync::broadcast::{Receiver, Sender, channel};
-use std::sync::OnceLock;
 
-type Message = Vec<u8>;
-static BROADCAST_CHANNEL: OnceLock<Sender<Message>> = OnceLock::new();
+static BROADCAST_CHANNEL: OnceLock<Broadcast<ResponseBody>> = OnceLock::new();
 
-fn ensure_broadcast_channel() -> Sender<Message> {
+fn ensure_broadcast_channel() -> Broadcast<ResponseBody> {
     BROADCAST_CHANNEL
-        .get_or_init(|| {
-            let (sender, _) = channel(1);
-            sender
-        })
+        .get_or_init(|| Broadcast::default())
         .clone()
 }
 
@@ -22,9 +16,9 @@ pub async fn handle(ctx: Context) {
     let stream: ArcRwLockStream = ctx.get_stream().await.unwrap();
     let mut first_request: Request = ctx.get_request().await;
     let log: Log = ctx.get_log().await;
-    let sender: Sender<Vec<u8>> = ensure_broadcast_channel();
+    let broadcast: Broadcast<ResponseBody> = ensure_broadcast_channel();
     let ctx: Context = Context::from_stream_request_log(&stream, &first_request, &log);
-    let mut receiver: Receiver<Vec<u8>> = sender.subscribe();
+    let mut receiver: BroadcastReceiver<Vec<u8>> = broadcast.subscribe();
     loop {
         tokio::select! {
             request_res = Request::websocket_request_from_stream(&stream, 10000) => {
@@ -34,7 +28,7 @@ pub async fn handle(ctx: Context) {
                 let request = request_res.unwrap_or_default();
                 let body: RequestBody = request.get_body().clone();
                 first_request.set_body(body.clone());
-                if sender.send(body).is_err() {
+                if broadcast.send(body).is_err() {
                     break;
                 }
             },
