@@ -90,7 +90,13 @@ async fn register_response_middleware(server: &Server) {
 }
 
 async fn register_route(server: &Server) {
-    server.route("/", controller::root::handle).await;
+    server.route(format!("/"), controller::root::handle).await;
+    server
+        .route(format!("/:{DIR_KEY}"), controller::root::handle)
+        .await;
+    server
+        .route(format!("/:{DIR_KEY}/:{FILE_KEY}"), controller::root::handle)
+        .await;
     server
         .route(format!("/hello/:{NAME_KEY}"), controller::hello::handle)
         .await;
