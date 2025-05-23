@@ -28,7 +28,7 @@ members = [
 ]
 
 [workspace.dependencies]
-hyperlane = "4.104.0"
+hyperlane = "4.104.1"
 hyperlane_app = { path = "app", version = "0.1.0" }
 hyperlane_config = { path = "config", version = "0.1.0" }
 hyperlane_init = { path = "init", version = "0.1.0" }
