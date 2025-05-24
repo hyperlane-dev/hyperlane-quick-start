@@ -34,21 +34,6 @@ async fn linger(server: &Server) {
     println_success!("Server linger: ", format!("{:?}", SERVER_LINGER));
 }
 
-async fn log_dir(server: &Server) {
-    server.log_dir(SERVER_LOG_DIR).await;
-    println_success!("Server log dir: ", SERVER_LOG_DIR);
-}
-
-async fn log_size(server: &Server) {
-    server.log_size(SERVER_LOG_SIZE).await;
-    println_success!("Server log size: ", SERVER_LOG_SIZE, SPACE, "bytes");
-}
-
-async fn inner_log(server: &Server) {
-    server.inner_log(SERVER_INNER_LOG).await;
-    println_success!("Server inner log: ", SERVER_INNER_LOG);
-}
-
 async fn port(server: &Server) {
     server.port(SERVER_PORT).await;
     println_success!("Server port: ", SERVER_PORT);
@@ -59,9 +44,12 @@ async fn nodelay(server: &Server) {
     println_success!("Server nodelay: ", SERVER_NODELAY);
 }
 
-async fn print(server: &Server) {
-    server.inner_print(SERVER_INNER_PRINT).await;
-    println_success!("Server inner print: ", SERVER_INNER_PRINT);
+async fn error_handle(server: &Server) {
+    server
+        .error_handle(|data| {
+            print_error!("Server error: ", data);
+        })
+        .await;
 }
 
 async fn ttl(server: &Server) {
@@ -118,13 +106,10 @@ async fn create_server() {
     let server: Server = Server::new();
     host(&server).await;
     port(&server).await;
-    print(&server).await;
-    log_dir(&server).await;
-    log_size(&server).await;
-    inner_log(&server).await;
     ttl(&server).await;
     linger(&server).await;
     nodelay(&server).await;
+    error_handle(&server).await;
     http_line_buffer_size(&server).await;
     websocket_buffer_size(&server).await;
     register_request_middleware(&server).await;
@@ -140,6 +125,7 @@ async fn create_server() {
 }
 
 pub fn run() {
-    runtime()
-        .block_on(hyperlane_plugin::server_manager::service::create_server_manage(create_server));
+    runtime().block_on(hyperlane_plugin::server::create_server_manage(
+        create_server,
+    ));
 }

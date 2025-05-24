@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane-quick-start"
-version = "1.12.1"
+version = "1.13.0"
 edition = "2024"
 authors = ["root@ltpp.vip"] 
 license = "MIT"
@@ -27,14 +27,42 @@ members = [
 ]
 
 [workspace.dependencies]
-hyperlane = "4.106.0"
+chunkify = "0.6.2"
+future-fn = "0.2.5"
+hyperlane = "5.0.1"
+color-output = "6.6.3"
+clonelicious = "2.0.3"
+hyperlane-log = "1.16.8"
+server-manager = "3.2.4"
+hyperlane-time = "0.5.4"
+file-operation = "0.5.12"
+compare_version = "1.0.0"
+bin-encode-decode = "1.0.1"
+recoverable-spawn = "3.7.11"
+hyperlane-broadcast = "0.2.3"
+recoverable-thread-pool = "2.3.7"
+
 hyperlane_app = { path = "app", version = "0.1.0" }
 hyperlane_config = { path = "config", version = "0.1.0" }
 hyperlane_init = { path = "init", version = "0.1.0" }
 hyperlane_plugin = { path = "plugin", version = "0.1.0" }
 
 [dependencies]
+chunkify.workspace = true
+future-fn.workspace = true
 hyperlane.workspace = true
+color-output.workspace = true
+clonelicious.workspace = true
+hyperlane-log.workspace = true
+server-manager.workspace = true
+hyperlane-time.workspace = true
+file-operation.workspace = true
+compare_version.workspace = true
+bin-encode-decode.workspace = true
+recoverable-spawn.workspace = true
+hyperlane-broadcast.workspace = true
+recoverable-thread-pool.workspace = true
+
 hyperlane_app.workspace = true
 hyperlane_config.workspace = true
 hyperlane_init.workspace = true

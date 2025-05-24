@@ -8,4 +8,7 @@ path = "lib.rs"
 
 [dependencies]
 hyperlane.workspace = true
+color-output.workspace = true
+hyperlane-log.workspace = true
+server-manager.workspace = true
 hyperlane_config.workspace = true

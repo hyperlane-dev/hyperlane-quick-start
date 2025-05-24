@@ -457,23 +457,11 @@ dependencies = [
 
 [[package]]
 name = "hyperlane"
-version = "4.106.0"
+version = "5.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a32bcb9a2066333d78dde3c4c516a9e4f66c9cf17b73f8fb8d458609a7f48c71"
+checksum = "17bc862224f823ff48f93f50904c2edee22888ec5ad330a1218ed2335862552c"
 dependencies = [
- "bin-encode-decode",
- "chunkify",
- "clonelicious",
- "color-output",
- "compare_version",
- "file-operation",
- "future-fn",
  "http-type",
- "hyperlane-broadcast",
- "hyperlane-log",
- "recoverable-spawn",
- "recoverable-thread-pool",
- "server-manager",
 ]
 
 [[package]]
@@ -501,13 +489,26 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "1.12.1"
+version = "1.13.0"
 dependencies = [
+ "bin-encode-decode",
+ "chunkify",
+ "clonelicious",
+ "color-output",
+ "compare_version",
+ "file-operation",
+ "future-fn",
  "hyperlane",
+ "hyperlane-broadcast",
+ "hyperlane-log",
+ "hyperlane-time",
  "hyperlane_app",
  "hyperlane_config",
  "hyperlane_init",
  "hyperlane_plugin",
+ "recoverable-spawn",
+ "recoverable-thread-pool",
+ "server-manager",
 ]
 
 [[package]]
@@ -521,6 +522,7 @@ name = "hyperlane_app"
 version = "0.1.0"
 dependencies = [
  "hyperlane",
+ "hyperlane-time",
  "hyperlane_config",
  "hyperlane_plugin",
 ]
@@ -536,6 +538,7 @@ dependencies = [
 name = "hyperlane_init"
 version = "0.1.0"
 dependencies = [
+ "color-output",
  "hyperlane",
  "hyperlane_app",
  "hyperlane_config",
@@ -546,8 +549,11 @@ dependencies = [
 name = "hyperlane_plugin"
 version = "0.1.0"
 dependencies = [
+ "color-output",
  "hyperlane",
+ "hyperlane-log",
  "hyperlane_config",
+ "server-manager",
 ]
 
 [[package]]

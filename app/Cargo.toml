@@ -8,5 +8,6 @@ path = "lib.rs"
 
 [dependencies]
 hyperlane.workspace = true
+hyperlane-time.workspace = true
 hyperlane_config.workspace = true
 hyperlane_plugin.workspace = true
