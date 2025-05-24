@@ -519,6 +519,7 @@ name = "hyperlane_app_controller"
 version = "0.1.0"
 dependencies = [
  "hyperlane",
+ "hyperlane_app_service",
  "hyperlane_config",
  "hyperlane_plugin",
 ]
@@ -573,6 +574,7 @@ name = "hyperlane_app_service"
 version = "0.1.0"
 dependencies = [
  "hyperlane",
+ "hyperlane_app_model",
  "hyperlane_config",
  "hyperlane_plugin",
 ]

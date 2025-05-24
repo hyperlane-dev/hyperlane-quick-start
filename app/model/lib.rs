@@ -8,3 +8,5 @@ pub mod domain;
 pub mod param;
 pub mod persistent;
 pub mod view;
+
+pub(crate) use hyperlane::*;
