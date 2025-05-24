@@ -9,4 +9,3 @@ path = "lib.rs"
 [dependencies]
 hyperlane.workspace = true
 hyperlane_config.workspace = true
-hyperlane_utils.workspace = true

@@ -10,4 +10,3 @@ path = "lib.rs"
 hyperlane.workspace = true
 hyperlane_config.workspace = true
 hyperlane_plugin.workspace = true
-hyperlane_utils.workspace = true
