@@ -473,7 +473,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "1.11.0"
+version = "1.12.0"
 dependencies = [
  "hyperlane",
  "hyperlane_app",
@@ -493,162 +493,38 @@ checksum = "8e7dd4a0e7011c2909328b695546ef47a520969d619d6f0542a56d8f3ef84470"
 name = "hyperlane_app"
 version = "0.1.0"
 dependencies = [
- "hyperlane_app_aspect",
- "hyperlane_app_controller",
- "hyperlane_app_exception",
- "hyperlane_app_filter",
- "hyperlane_app_mapper",
- "hyperlane_app_middleware",
- "hyperlane_app_model",
- "hyperlane_app_service",
- "hyperlane_app_utils",
- "hyperlane_app_view",
-]
-
-[[package]]
-name = "hyperlane_app_aspect"
-version = "0.1.0"
-dependencies = [
  "hyperlane",
  "hyperlane_config",
  "hyperlane_plugin",
-]
-
-[[package]]
-name = "hyperlane_app_controller"
-version = "0.1.0"
-dependencies = [
- "hyperlane",
- "hyperlane_config",
- "hyperlane_plugin",
-]
-
-[[package]]
-name = "hyperlane_app_exception"
-version = "0.1.0"
-dependencies = [
- "hyperlane",
- "hyperlane_config",
- "hyperlane_plugin",
-]
-
-[[package]]
-name = "hyperlane_app_filter"
-version = "0.1.0"
-dependencies = [
- "hyperlane",
- "hyperlane_config",
- "hyperlane_plugin",
-]
-
-[[package]]
-name = "hyperlane_app_mapper"
-version = "0.1.0"
-dependencies = [
- "hyperlane",
- "hyperlane_config",
- "hyperlane_plugin",
-]
-
-[[package]]
-name = "hyperlane_app_middleware"
-version = "0.1.0"
-dependencies = [
- "hyperlane",
- "hyperlane_config",
- "hyperlane_plugin",
-]
-
-[[package]]
-name = "hyperlane_app_model"
-version = "0.1.0"
-dependencies = [
- "hyperlane",
- "hyperlane_config",
- "hyperlane_plugin",
-]
-
-[[package]]
-name = "hyperlane_app_service"
-version = "0.1.0"
-dependencies = [
- "hyperlane",
- "hyperlane_config",
- "hyperlane_plugin",
-]
-
-[[package]]
-name = "hyperlane_app_utils"
-version = "0.1.0"
-dependencies = [
- "hyperlane",
- "hyperlane_config",
- "hyperlane_plugin",
-]
-
-[[package]]
-name = "hyperlane_app_view"
-version = "0.1.0"
-dependencies = [
- "hyperlane",
- "hyperlane_config",
- "hyperlane_plugin",
+ "hyperlane_utils",
 ]
 
 [[package]]
 name = "hyperlane_config"
 version = "0.1.0"
 dependencies = [
- "hyperlane_config_business",
- "hyperlane_config_server",
- "hyperlane_config_server_manager",
-]
-
-[[package]]
-name = "hyperlane_config_business"
-version = "0.1.0"
-
-[[package]]
-name = "hyperlane_config_server"
-version = "0.1.0"
-dependencies = [
  "hyperlane",
+ "hyperlane_utils",
 ]
-
-[[package]]
-name = "hyperlane_config_server_manager"
-version = "0.1.0"
 
 [[package]]
 name = "hyperlane_init"
-version = "0.1.0"
-dependencies = [
- "hyperlane_init_server",
-]
-
-[[package]]
-name = "hyperlane_init_server"
 version = "0.1.0"
 dependencies = [
  "hyperlane",
  "hyperlane_app",
  "hyperlane_config",
  "hyperlane_plugin",
+ "hyperlane_utils",
 ]
 
 [[package]]
 name = "hyperlane_plugin"
 version = "0.1.0"
 dependencies = [
- "hyperlane_plugin_server_manager",
-]
-
-[[package]]
-name = "hyperlane_plugin_server_manager"
-version = "0.1.0"
-dependencies = [
  "hyperlane",
  "hyperlane_config",
+ "hyperlane_utils",
 ]
 
 [[package]]

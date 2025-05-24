@@ -7,6 +7,5 @@ edition = "2024"
 path = "lib.rs"
 
 [dependencies]
-hyperlane_config_server = { path = "server" }
-hyperlane_config_business = { path = "business" }
-hyperlane_config_server_manager = { path = "server_manager" }
+hyperlane.workspace = true
+hyperlane_utils.workspace = true

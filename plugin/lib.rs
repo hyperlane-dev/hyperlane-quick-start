@@ -1,1 +1,3 @@
-pub use hyperlane_plugin_server_manager as server_manager;
+pub mod server_manager;
+
+pub(crate) use hyperlane::*;
