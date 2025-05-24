@@ -15,9 +15,7 @@ pub async fn handle(ctx: Context) {
     }
     let stream: ArcRwLockStream = ctx.get_stream().await.unwrap();
     let mut first_request: Request = ctx.get_request().await;
-    let log: Log = ctx.get_log().await;
     let broadcast: Broadcast<ResponseBody> = ensure_broadcast_channel();
-    let ctx: Context = Context::from_stream_request_log(&stream, &first_request, &log);
     let mut receiver: BroadcastReceiver<Vec<u8>> = broadcast.subscribe();
     loop {
         tokio::select! {
