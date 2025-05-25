@@ -5,5 +5,5 @@ pub use hyperlane_init;
 pub use hyperlane_plugin;
 
 fn main() {
-    hyperlane_init::framework::server::run();
+    hyperlane_init::infrastructure::hyperlane::run();
 }
