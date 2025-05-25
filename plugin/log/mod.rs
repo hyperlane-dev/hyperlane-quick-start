@@ -1,4 +1,4 @@
-pub mod r#fn;
+pub(crate) mod r#fn;
 pub mod r#static;
 
 pub use r#fn::*;

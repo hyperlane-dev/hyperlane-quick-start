@@ -1,3 +1,3 @@
-pub mod model;
+pub(crate) mod r#const;
 
-pub use model::*;
+pub use r#const::*;
