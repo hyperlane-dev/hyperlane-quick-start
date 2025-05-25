@@ -1,3 +1,3 @@
-pub mod model;
+pub(crate) mod model;
 
 pub use model::*;
