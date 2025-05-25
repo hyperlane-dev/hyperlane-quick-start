@@ -144,9 +144,9 @@ checksum = "b7d51b119ca46e37c21508debf8d9823521be05a70e32ee5afc7695ae1cfb4ec"
 
 [[package]]
 name = "color-output"
-version = "6.6.3"
+version = "6.6.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ed260583bcafb40922925d447c098fd5b94e7b2eb8679e87dae2632da0a01357"
+checksum = "016afb96f1d207a365d175c64b6f7ddef44ba8dfc6ad60cafd596d9f0b146bb1"
 dependencies = [
  "hyperlane-time",
 ]
@@ -430,38 +430,33 @@ checksum = "1808d8983c7ca1d289188767327a24d3e6c0c6a741257745fd7fea9f8f7a7635"
 
 [[package]]
 name = "http-type"
-version = "3.75.2"
+version = "4.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "73650b076522567ed6e3b10a2e08a203c9614858317f8d503bca6281beb6ca63"
+checksum = "402bf8e61c1e41068d8795b145c6b7d3faca8ef5c3eba681958639701d31433f"
 dependencies = [
- "ahash",
  "dashmap",
- "futures",
  "hex",
  "http-compress",
  "http-constant",
  "lombok-macros",
- "num_cpus",
- "once_cell",
  "serde",
  "serde-xml-rs",
  "serde_json",
  "serde_urlencoded",
- "simd-json",
  "std-macro-extensions",
  "tokio",
- "twox-hash",
  "url",
- "urlencoding",
 ]
 
 [[package]]
 name = "hyperlane"
-version = "5.0.1"
+version = "5.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "17bc862224f823ff48f93f50904c2edee22888ec5ad330a1218ed2335862552c"
+checksum = "a762cc3ed9b88db6ff08dc6d5c4c7f266f4e77ccd5092f8887eb13ef98f9da7d"
 dependencies = [
  "http-type",
+ "lombok-macros",
+ "serde",
 ]
 
 [[package]]
@@ -489,8 +484,29 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "1.13.0"
+version = "1.14.0"
 dependencies = [
+ "hyperlane",
+ "hyperlane-utils",
+ "hyperlane_app",
+ "hyperlane_config",
+ "hyperlane_init",
+ "hyperlane_plugin",
+]
+
+[[package]]
+name = "hyperlane-time"
+version = "0.5.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c145707425cdd097e117e8b4ee8baeaf8eb265658a5c37d2c4aa0b24fd26a507"
+
+[[package]]
+name = "hyperlane-utils"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1abe7313f7b46886b32e223dc716a17594e3e82aac2d9a425cb32194d892502c"
+dependencies = [
+ "ahash",
  "bin-encode-decode",
  "chunkify",
  "clonelicious",
@@ -498,31 +514,32 @@ dependencies = [
  "compare_version",
  "file-operation",
  "future-fn",
- "hyperlane",
+ "futures",
+ "hex",
  "hyperlane-broadcast",
  "hyperlane-log",
- "hyperlane-time",
- "hyperlane_app",
- "hyperlane_config",
- "hyperlane_init",
- "hyperlane_plugin",
+ "lombok-macros",
+ "num_cpus",
+ "once_cell",
  "recoverable-spawn",
  "recoverable-thread-pool",
+ "serde",
+ "serde-xml-rs",
+ "serde_json",
+ "serde_urlencoded",
  "server-manager",
+ "simd-json",
+ "twox-hash",
+ "url",
+ "urlencoding",
 ]
-
-[[package]]
-name = "hyperlane-time"
-version = "0.5.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8e7dd4a0e7011c2909328b695546ef47a520969d619d6f0542a56d8f3ef84470"
 
 [[package]]
 name = "hyperlane_app"
 version = "0.1.0"
 dependencies = [
  "hyperlane",
- "hyperlane-time",
+ "hyperlane-utils",
  "hyperlane_config",
  "hyperlane_plugin",
 ]
@@ -538,8 +555,8 @@ dependencies = [
 name = "hyperlane_init"
 version = "0.1.0"
 dependencies = [
- "color-output",
  "hyperlane",
+ "hyperlane-utils",
  "hyperlane_app",
  "hyperlane_config",
  "hyperlane_plugin",
@@ -549,11 +566,9 @@ dependencies = [
 name = "hyperlane_plugin"
 version = "0.1.0"
 dependencies = [
- "color-output",
  "hyperlane",
- "hyperlane-log",
+ "hyperlane-utils",
  "hyperlane_config",
- "server-manager",
 ]
 
 [[package]]
@@ -1145,9 +1160,9 @@ dependencies = [
 
 [[package]]
 name = "tokio"
-version = "1.45.0"
+version = "1.45.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2513ca694ef9ede0fb23fe71a4ee4107cb102b9dc1930f6d0fd77aae068ae165"
+checksum = "75ef51a33ef1da925cea3e4eb122833cb377c61439ca401b770f54902b806779"
 dependencies = [
  "backtrace",
  "bytes",
