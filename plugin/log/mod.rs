@@ -1,5 +1,5 @@
 pub(crate) mod r#fn;
-pub mod r#static;
+pub(crate) mod r#static;
 
 pub use r#fn::*;
 pub use r#static::*;
