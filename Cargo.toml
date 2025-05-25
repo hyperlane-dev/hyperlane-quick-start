@@ -36,13 +36,7 @@ hyperlane_init = { path = "init", version = "0.1.0" }
 hyperlane_plugin = { path = "plugin", version = "0.1.0" }
 
 [dependencies]
-hyperlane.workspace = true
-hyperlane-utils.workspace = true
-
-hyperlane_app.workspace = true
-hyperlane_config.workspace = true
 hyperlane_init.workspace = true
-hyperlane_plugin.workspace = true
 
 [patch.crates-io]
 hyperlane_app = { path = "app" }
