@@ -125,7 +125,7 @@ async fn create_server() {
 }
 
 pub fn run() {
-    runtime().block_on(hyperlane_plugin::server::create_server_manage(
+    runtime().block_on(hyperlane_plugin::server_manager::create_server_manage(
         create_server,
     ));
 }

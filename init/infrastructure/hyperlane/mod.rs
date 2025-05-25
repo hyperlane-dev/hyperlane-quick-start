@@ -4,6 +4,6 @@ pub use r#fn::*;
 
 pub(super) use super::*;
 pub(super) use hyperlane_app::{controller, middleware::*};
-pub(super) use hyperlane_config::{business::hello::*, framework::server::*};
+pub(super) use hyperlane_config::{business::hello::*, infrastructure::hyperlane::*};
 
 pub(super) use tokio::runtime::{Builder, Runtime};

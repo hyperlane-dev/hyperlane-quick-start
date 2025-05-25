@@ -1,3 +1,3 @@
-pub mod server;
+pub mod hyperlane;
 
 pub(super) use super::*;

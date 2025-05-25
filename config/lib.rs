@@ -1,4 +1,4 @@
 pub mod business;
-pub mod framework;
+pub mod infrastructure;
 
 pub(crate) use hyperlane::*;
