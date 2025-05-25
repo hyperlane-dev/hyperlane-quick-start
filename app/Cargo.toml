@@ -7,13 +7,8 @@ edition = "2024"
 path = "lib.rs"
 
 [dependencies]
-hyperlane_app_aspect = { path = "aspect" }
-hyperlane_app_controller = { path = "controller" }
-hyperlane_app_exception = { path = "exception" }
-hyperlane_app_filter = { path = "filter" }
-hyperlane_app_mapper = { path = "mapper" }
-hyperlane_app_middleware = { path = "middleware" }
-hyperlane_app_model = { path = "model" }
-hyperlane_app_service = { path = "service" }
-hyperlane_app_utils = { path = "utils" }
-hyperlane_app_view = { path = "view" }
+hyperlane.workspace = true
+
+hyperlane-utils.workspace = true
+hyperlane_config.workspace = true
+hyperlane_plugin.workspace = true

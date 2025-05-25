@@ -3,4 +3,4 @@ pub mod hello;
 pub mod root;
 pub mod websocket;
 
-pub use super::*;
+pub(super) use super::*;
