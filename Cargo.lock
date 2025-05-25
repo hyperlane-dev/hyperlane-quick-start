@@ -484,14 +484,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "1.17.1"
+version = "1.17.2"
 dependencies = [
- "hyperlane",
- "hyperlane-utils",
- "hyperlane_app",
- "hyperlane_config",
  "hyperlane_init",
- "hyperlane_plugin",
 ]
 
 [[package]]
