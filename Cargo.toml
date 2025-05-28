@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane-quick-start"
-version = "1.17.2"
+version = "1.18.0"
 edition = "2024"
 authors = ["root@ltpp.vip"] 
 license = "MIT"
@@ -27,8 +27,8 @@ members = [
 ]
 
 [workspace.dependencies]
-hyperlane = "5.0.4"
-hyperlane-utils = "0.1.1"
+hyperlane = "5.3.0"
+hyperlane-utils = "0.4.0"
 
 hyperlane_app = { path = "app", version = "0.1.0" }
 hyperlane_config = { path = "config", version = "0.1.0" }
