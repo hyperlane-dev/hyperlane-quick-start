@@ -430,9 +430,9 @@ checksum = "1808d8983c7ca1d289188767327a24d3e6c0c6a741257745fd7fea9f8f7a7635"
 
 [[package]]
 name = "http-type"
-version = "4.2.0"
+version = "4.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ded56a6c9ab56e5ab5100c2f887e1a9460439da0ebcad8a09998f27a739f9e0f"
+checksum = "033ac0e29073bd2c552b135a5074263d1cbf82d3ab8e05849aad867a78d5949a"
 dependencies = [
  "dashmap",
  "hex",
@@ -450,9 +450,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane"
-version = "5.3.0"
+version = "5.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0706a074ca90a966be02b809b75b68e530a61fc4ccf63c81065adb40bb83ce25"
+checksum = "c450649ce23878b5b0a757a4faf9ca1ca837ab9bae6c2b82cbc3e207d2f92fc5"
 dependencies = [
  "http-type",
  "lombok-macros",
@@ -484,7 +484,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "1.18.0"
+version = "1.19.0"
 dependencies = [
  "hyperlane_init",
 ]
