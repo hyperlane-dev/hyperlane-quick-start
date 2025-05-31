@@ -29,7 +29,7 @@ where
         }
     };
     let hot_restart_server = || async {
-        match manager.hot_restart(&["--clear", "-p", "-q", "-x", "run"]) {
+        match manager.hot_restart(&["--clear", "--skip-local-deps", "-q", "-x", "run"]) {
             Ok(_) => println_success!("Server started successfully"),
             Err(e) => println_error!(format!("Error starting server in background: {e}")),
         }
