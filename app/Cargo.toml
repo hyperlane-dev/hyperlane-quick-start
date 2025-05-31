@@ -7,8 +7,8 @@ edition = "2024"
 path = "lib.rs"
 
 [dependencies]
-hyperlane.workspace = true
-
-hyperlane-utils.workspace = true
 hyperlane_config.workspace = true
 hyperlane_plugin.workspace = true
+
+hyperlane.workspace = true
+hyperlane-utils.workspace = true
