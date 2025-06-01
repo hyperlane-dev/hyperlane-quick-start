@@ -94,9 +94,9 @@ async fn register_route(server: &Server) {
 fn runtime() -> Runtime {
     Builder::new_multi_thread()
         .worker_threads(get_thread_count())
-        .thread_stack_size(2097152)
-        .max_blocking_threads(5120)
-        .max_io_events_per_tick(5120)
+        .thread_stack_size(1_048_576)
+        .max_blocking_threads(2_048)
+        .max_io_events_per_tick(1_024)
         .enable_all()
         .build()
         .unwrap()
