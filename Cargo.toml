@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane-quick-start"
-version = "1.29.0"
+version = "1.30.0"
 edition = "2024"
 authors = ["root@ltpp.vip"] 
 license = "MIT"
@@ -10,12 +10,11 @@ repository = "https://github.com/eastspire/hyperlane-quick-start.git"
 categories = ["network-programming", "web-programming"]
 exclude = [
     "target",
-    "Cargo.lock",
-    "logs",
+    "Cargo.lock",    
     ".github",
+    "tmp",
     "**/*.pid",
-    "**/*.log",
-    "logs"
+    "**/*.log"
 ]
 
 [workspace]

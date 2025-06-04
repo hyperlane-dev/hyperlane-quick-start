@@ -1,5 +1,5 @@
 /target
-/logs
+/tmp
 **/*.log
 **/*.pid
 **/node_modules/**
