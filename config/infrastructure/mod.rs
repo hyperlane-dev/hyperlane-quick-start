@@ -1,4 +1,4 @@
-pub mod hyperlane;
+pub mod framework;
 pub mod server_manager;
 
-pub(super) use super::*;
+use super::*;

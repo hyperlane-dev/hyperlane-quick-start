@@ -1,5 +1,5 @@
-pub use hyperlane_init;
+use hyperlane_init;
 
 fn main() {
-    hyperlane_init::infrastructure::hyperlane::run();
+    hyperlane_init::infrastructure::framework::run();
 }
