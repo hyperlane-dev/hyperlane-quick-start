@@ -1,4 +1,4 @@
-pub(crate) mod r#fn;
+mod r#fn;
 
 pub use r#fn::*;
 

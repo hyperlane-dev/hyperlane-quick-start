@@ -1,4 +1,4 @@
-pub(crate) mod r#static;
+mod r#static;
 
 pub use r#static::*;
 
