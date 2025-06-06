@@ -1,3 +1,3 @@
-pub mod hyperlane;
+pub mod framework;
 
-pub(super) use super::*;
+use super::*;
