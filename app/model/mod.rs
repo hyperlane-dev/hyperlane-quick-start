@@ -9,4 +9,4 @@ pub mod param;
 pub mod persistent;
 pub mod view;
 
-pub(super) use super::*;
+use super::*;
