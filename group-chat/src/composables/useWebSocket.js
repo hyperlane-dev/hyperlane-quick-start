@@ -18,6 +18,9 @@ export function useWebSocket({ onMessage }) {
     socket.value = new WebSocket(`${protocol}://${host}/websocket`);
     socket.value.onopen = () => {
       connectionStatus.value = 'connected';
+      if (socket.value && socket.value.readyState === WebSocket.OPEN) {
+        socket.value.send('检测到新用户加入了聊天室');
+      }
       setInterval(() => {
         if (socket.value && socket.value.readyState === WebSocket.OPEN) {
           socket.value.send('');
@@ -30,7 +33,11 @@ export function useWebSocket({ onMessage }) {
         let data = JSON.parse(event.data);
         onMessage(data);
       } catch (error) {
-        console.error('处理消息失败:', error);
+        onMessage({
+          sender: 'System',
+          text: event.data,
+          time: new Date().toLocaleTimeString(),
+        });
       }
     };
 

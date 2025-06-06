@@ -107,31 +107,25 @@ export default {
     },
 
     handleMessage(data) {
-      try {
-        const isSelf = data.sender === this.username;
+      const isSelf = data.sender === this.username;
 
-        this.messages.push({
-          sender: data.sender,
-          text: data.text,
-          time: new Date().toLocaleTimeString(),
-          isSelf,
-        });
+      this.messages.push({
+        sender: data.sender,
+        text: data.text,
+        time: new Date().toLocaleTimeString(),
+        isSelf,
+      });
 
-        this.$nextTick(() => {
-          console.log(this.isNearBottom);
-
-          if (isSelf) {
-            this.scrollToBottom();
-          } else if (this.isNearBottom) {
-            this.scrollToBottom();
-          } else {
-            this.unreadCount++;
-            this.showScrollButton = true;
-          }
-        });
-      } catch (error) {
-        console.error('处理消息失败:', error);
-      }
+      this.$nextTick(() => {
+        if (isSelf) {
+          this.scrollToBottom();
+        } else if (this.isNearBottom) {
+          this.scrollToBottom();
+        } else {
+          this.unreadCount++;
+          this.showScrollButton = true;
+        }
+      });
     },
 
     sendMessage(text) {
