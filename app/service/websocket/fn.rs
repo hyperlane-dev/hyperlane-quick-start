@@ -1,7 +1,5 @@
 use super::*;
 
-pub fn ensure_broadcast_channel() -> Broadcast<ResponseBody> {
-    BROADCAST_CHANNEL
-        .get_or_init(|| Broadcast::default())
-        .clone()
+pub fn get_global_websocket() -> &'static WebSocket {
+    GLOBAL_WEBSOCKET.get_or_init(|| WebSocket::new())
 }

@@ -1,4 +1,4 @@
 pub mod r#static;
 
-use hyperlane_utils::Broadcast;
+use hyperlane_plugin_websocket::WebSocket;
 use std::sync::OnceLock;

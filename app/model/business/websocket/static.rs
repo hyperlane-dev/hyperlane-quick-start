@@ -1,3 +1,3 @@
 use super::*;
 
-pub static BROADCAST_CHANNEL: OnceLock<Broadcast<Vec<u8>>> = OnceLock::new();
+pub static GLOBAL_WEBSOCKET: OnceLock<WebSocket> = OnceLock::new();

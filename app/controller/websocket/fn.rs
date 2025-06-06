@@ -1,27 +1,26 @@
 use super::*;
 
+async fn callback(ctx: Context) {
+    let websocket: &WebSocket = get_global_websocket();
+    let receiver_count: ReceiverCount = websocket
+        .receiver_count(BroadcastType::PointToGroup("/"))
+        .unwrap_or_default();
+    let body: Vec<u8> = ctx.get_request_body().await;
+    ctx.set_response_body(body).await;
+    println_success!(receiver_count);
+}
+
+async fn send_callback(_: Context) {}
+
 pub async fn handle(ctx: Context) {
-    let broadcast: Broadcast<ResponseBody> = ensure_broadcast_channel();
-    let mut receiver: BroadcastReceiver<Vec<u8>> = broadcast.subscribe();
-    loop {
-        tokio::select! {
-            request_res = ctx.websocket_request_from_stream(10000) => {
-                if request_res.is_err() {
-                    break;
-                }
-                let request = request_res.unwrap_or_default();
-                let body: RequestBody = request.get_body().clone();
-                if broadcast.send(body).is_err() {
-                    break;
-                }
-            },
-            msg_res = receiver.recv() => {
-                if let Ok(msg) = msg_res {
-                    if ctx.send_response_body(msg).await.is_err() || ctx.flush().await.is_err() {
-                        break;
-                    }
-                }
-           }
-        }
-    }
+    let websocket: &WebSocket = get_global_websocket();
+    websocket
+        .run(
+            &ctx,
+            1024,
+            BroadcastType::PointToGroup("/"),
+            callback,
+            send_callback,
+        )
+        .await;
 }
