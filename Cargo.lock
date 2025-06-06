@@ -343,9 +343,9 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "chunkify"
-version = "0.6.2"
+version = "0.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5db978867c272fae07fdf73dddfa74c8e276f9b94cd1a55c676a786e9e54e678"
+checksum = "97b2709f42d3cc45eda703223726b05afd42c36f2642e2d292deee1c31b86c69"
 dependencies = [
  "dashmap",
  "file-operation",
@@ -848,9 +848,9 @@ checksum = "c145707425cdd097e117e8b4ee8baeaf8eb265658a5c37d2c4aa0b24fd26a507"
 
 [[package]]
 name = "hyperlane-utils"
-version = "0.16.0"
+version = "0.16.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cce8fa4a2f74cb8204312604036aa86026f33f0b36a9343a69b53d5f68977978"
+checksum = "7c7529493da6f06cd88f8e6246328be7ef4efd0aa98fa476af277c2e780b2cc9"
 dependencies = [
  "ahash",
  "bin-encode-decode",

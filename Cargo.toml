@@ -32,7 +32,7 @@ hyperlane_init = { path = "init", version = "0.1.0" }
 hyperlane_plugin = { path = "plugin", version = "0.1.0" }
 
 hyperlane = "5.17.0"
-hyperlane-utils = "0.16.0"
+hyperlane-utils = "0.16.1"
 hyperlane-plugin-websocket = "0.5.3"
 
 [dependencies]
