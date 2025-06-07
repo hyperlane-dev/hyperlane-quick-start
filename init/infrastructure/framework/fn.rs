@@ -12,13 +12,11 @@ async fn http_line_buffer_size(server: &Server) {
     );
 }
 
-async fn websocket_buffer_size(server: &Server) {
-    server
-        .websocket_buffer_size(SERVER_WEB_SOCKET_BUFFER_SIZE)
-        .await;
+async fn ws_buffer_size(server: &Server) {
+    server.ws_buffer_size(SERVER_WS_BUFFER_SIZE).await;
     println_success!(
         "Server websocket buffer size: ",
-        SERVER_WEB_SOCKET_BUFFER_SIZE,
+        SERVER_WS_BUFFER_SIZE,
         SPACE,
         "bytes"
     );
@@ -44,10 +42,10 @@ async fn nodelay(server: &Server) {
     println_success!("Server nodelay: ", SERVER_NODELAY);
 }
 
-async fn error_handle(server: &Server) {
+async fn error_handler(server: &Server) {
     server
-        .error_handle(|data| {
-            print_error!("Server error: ", data);
+        .error_handler(|data| {
+            println_error!("Server error: ", data);
         })
         .await;
 }
@@ -57,8 +55,8 @@ async fn ttl(server: &Server) {
     println_success!("Server ttl: ", SERVER_TTI);
 }
 
-async fn disable_inner_websocket_handle(server: &Server) {
-    server.disable_inner_websocket_handle("/websocket").await;
+async fn disable_inner_ws_handle(server: &Server) {
+    server.disable_internal_ws_handler("/ws").await;
     println_success!("Server inner websocket handle disable completed");
 }
 
@@ -84,6 +82,7 @@ async fn register_response_middleware(server: &Server) {
 
 async fn register_route(server: &Server) {
     server.route(format!("/"), controller::root::handle).await;
+    server.route("/ws", controller::websocket::handle).await;
     server
         .route(format!("/{{{DIR_KEY}}}"), controller::root::handle)
         .await;
@@ -97,12 +96,15 @@ async fn register_route(server: &Server) {
         )
         .await;
     server
-        .route("/websocket", controller::websocket::handle)
-        .await;
-    server
         .route("/favicon.ico", controller::favicon_ico::handle)
         .await;
     println_success!("Server route initialization completed");
+}
+
+async fn on_ws_connected(server: &Server) {
+    server
+        .on_ws_connected(controller::websocket::on_ws_connected)
+        .await;
 }
 
 fn runtime() -> Runtime {
@@ -123,10 +125,11 @@ async fn create_server() {
     ttl(&server).await;
     linger(&server).await;
     nodelay(&server).await;
-    error_handle(&server).await;
+    error_handler(&server).await;
     http_line_buffer_size(&server).await;
-    websocket_buffer_size(&server).await;
-    disable_inner_websocket_handle(&server).await;
+    ws_buffer_size(&server).await;
+    on_ws_connected(&server).await;
+    disable_inner_ws_handle(&server).await;
     register_request_middleware(&server).await;
     register_route(&server).await;
     register_response_middleware(&server).await;

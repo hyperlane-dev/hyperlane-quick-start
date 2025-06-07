@@ -15,17 +15,9 @@ export function useWebSocket({ onMessage }) {
       window.location.hostname === '127.0.0.1'
         ? 'localhost:60007'
         : window.location.hostname;
-    socket.value = new WebSocket(`${protocol}://${host}/websocket`);
+    socket.value = new WebSocket(`${protocol}://${host}/ws`);
     socket.value.onopen = () => {
       connectionStatus.value = 'connected';
-      if (socket.value && socket.value.readyState === WebSocket.OPEN) {
-        socket.value.send('检测到新用户加入了聊天室');
-      }
-      setInterval(() => {
-        if (socket.value && socket.value.readyState === WebSocket.OPEN) {
-          socket.value.send('');
-        }
-      }, 10000);
     };
 
     socket.value.onmessage = (event) => {

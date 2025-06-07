@@ -31,9 +31,9 @@ hyperlane_config = { path = "config", version = "0.1.0" }
 hyperlane_init = { path = "init", version = "0.1.0" }
 hyperlane_plugin = { path = "plugin", version = "0.1.0" }
 
-hyperlane = "5.18.1"
+hyperlane = "5.22.0"
 hyperlane-utils = "0.16.1"
-hyperlane-plugin-websocket = "0.6.3"
+hyperlane-plugin-websocket = "0.8.0"
 
 [dependencies]
 hyperlane_init = { workspace = true }
