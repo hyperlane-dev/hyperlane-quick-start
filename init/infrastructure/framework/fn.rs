@@ -61,22 +61,28 @@ async fn disable_inner_ws_handle(server: &Server) {
 }
 
 async fn register_request_middleware(server: &Server) {
-    server.request_middleware(request::cross::cross).await;
     server
-        .request_middleware(request::response::response_header)
+        .request_middleware(middleware::request::cross::cross)
         .await;
     server
-        .request_middleware(request::response::response_status_code)
+        .request_middleware(middleware::request::response::response_header)
         .await;
     server
-        .request_middleware(request::response::response_body)
+        .request_middleware(middleware::request::response::response_status_code)
+        .await;
+    server
+        .request_middleware(middleware::request::response::response_body)
         .await;
     println_success!("Server request middleware initialization completed");
 }
 
 async fn register_response_middleware(server: &Server) {
-    server.response_middleware(response::send::send).await;
-    server.response_middleware(response::log::log).await;
+    server
+        .response_middleware(middleware::response::send::send)
+        .await;
+    server
+        .response_middleware(middleware::response::log::log)
+        .await;
     println_success!("Server response middleware initialization completed");
 }
 
@@ -103,7 +109,7 @@ async fn register_route(server: &Server) {
 
 async fn on_ws_connected(server: &Server) {
     server
-        .on_ws_connected(controller::websocket::on_connected)
+        .on_ws_connected(service::websocket::on_connected)
         .await;
 }
 

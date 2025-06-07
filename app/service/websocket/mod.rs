@@ -1,4 +1,6 @@
 pub mod r#fn;
 
+pub use r#fn::*;
+
 use super::*;
 use crate::model::business::websocket::r#static::GLOBAL_WEBSOCKET;
