@@ -103,7 +103,7 @@ async fn register_route(server: &Server) {
 
 async fn on_ws_connected(server: &Server) {
     server
-        .on_ws_connected(controller::websocket::on_ws_connected)
+        .on_ws_connected(controller::websocket::on_connected)
         .await;
 }
 
