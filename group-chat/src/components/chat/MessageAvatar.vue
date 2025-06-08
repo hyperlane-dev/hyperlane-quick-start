@@ -1,6 +1,6 @@
 <template>
   <div :class="['avatar', isSelf ? 'self' : '']">
-    {{ sender?.charAt(0) }}
+    {{ data?.charAt(0) }}
   </div>
 </template>
 
@@ -8,7 +8,7 @@
 export default {
   name: 'MessageAvatar',
   props: {
-    sender: {
+    name: {
       type: String,
       required: true,
     },

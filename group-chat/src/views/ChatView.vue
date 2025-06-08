@@ -30,6 +30,10 @@ import ConnectionStatus from '../components/chat/ConnectionStatus.vue';
 import ScrollToBottomButton from '../components/chat/ScrollToBottomButton.vue';
 import { useWebSocket } from '../composables/useWebSocket';
 
+const MessageType = {
+  OnlineCount: 'OnlineCount',
+};
+
 export default {
   name: 'ChatView',
   components: {
@@ -107,12 +111,9 @@ export default {
     },
 
     handleMessage(data) {
-      const isSelf = data.sender === this.username;
-
+      const isSelf = data.name === this.username;
       this.messages.push({
-        sender: data.sender,
-        text: data.text,
-        time: new Date().toLocaleTimeString(),
+        ...data,
         isSelf,
       });
 
@@ -128,13 +129,12 @@ export default {
       });
     },
 
-    sendMessage(text) {
-      if (!text.trim() || this.connectionStatus !== 'connected') return;
+    sendMessage(data) {
+      if (!data.trim() || this.connectionStatus !== 'connected') return;
 
       const message = {
-        sender: this.username,
-        text: text,
-        time: new Date().toLocaleTimeString(),
+        type: MessageType.OnlineCount,
+        data: data,
       };
 
       this.isNearBottom = true;

@@ -26,8 +26,8 @@ export function useWebSocket({ onMessage }) {
         onMessage(data);
       } catch (error) {
         onMessage({
-          sender: 'System',
-          text: event.data,
+          name: 'System',
+          data: event.data,
           time: new Date().toLocaleTimeString(),
         });
       }

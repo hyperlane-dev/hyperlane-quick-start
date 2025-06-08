@@ -1,12 +1,12 @@
 <template>
   <div class="message-header">
     <template v-if="!isSelf">
-      <div class="sender">{{ sender }}</div>
+      <div class="name">{{ name }}</div>
       <div class="time">{{ time }}</div>
     </template>
     <template v-else>
       <div class="time">{{ time }}</div>
-      <div class="sender">{{ sender }}</div>
+      <div class="name">{{ name }}</div>
     </template>
   </div>
 </template>
@@ -15,7 +15,7 @@
 export default {
   name: 'MessageHeader',
   props: {
-    sender: {
+    data: {
       type: String,
       required: true,
     },
@@ -45,7 +45,7 @@ export default {
   width: 100%;
 }
 
-.sender {
+.name {
   font-weight: 600;
   font-size: 0.56em;
   color: rgb(168, 168, 168);

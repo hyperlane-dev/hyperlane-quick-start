@@ -14,15 +14,15 @@
       >
         <!-- 非自己发送的消息 -->
         <template v-if="!message.isSelf">
-          <MessageAvatar :sender="message.sender" :isSelf="false" />
+          <MessageAvatar :name="message.name" :isSelf="false" />
           <div class="message-info">
             <MessageHeader
-              :sender="message.sender"
+              :name="message.name"
               :time="message.time"
               :isSelf="false"
             />
             <div class="message-content">
-              <div class="text">{{ message.text }}</div>
+              <div class="text">{{ message.data }}</div>
             </div>
           </div>
         </template>
@@ -30,15 +30,15 @@
         <template v-else>
           <div class="message-info self">
             <MessageHeader
-              :sender="message.sender"
+              :name="message.name"
               :time="message.time"
               :isSelf="true"
             />
             <div class="message-content self">
-              <div class="text">{{ message.text }}</div>
+              <div class="text">{{ message.data }}</div>
             </div>
           </div>
-          <MessageAvatar :sender="message.sender" :isSelf="true" />
+          <MessageAvatar :name="message.name" :isSelf="true" />
         </template>
       </div>
     </template>

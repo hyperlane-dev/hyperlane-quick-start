@@ -13,7 +13,7 @@ pub async fn on_connected(ctx: Context) {
             .await
             .unwrap();
     spawn(async move {
-        let _ = websocket.send(key, json_stringify_string(&resp_data).unwrap());
+        let _ = websocket.send(key, resp_data);
     });
 }
 
