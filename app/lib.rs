@@ -14,3 +14,4 @@ use hyperlane_plugin::log::*;
 use hyperlane::*;
 use hyperlane_plugin_websocket::*;
 use hyperlane_utils::*;
+use serde::*;

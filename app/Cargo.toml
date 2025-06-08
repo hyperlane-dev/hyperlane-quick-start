@@ -10,6 +10,7 @@ path = "lib.rs"
 hyperlane_config = { workspace = true }
 hyperlane_plugin = { workspace = true }
 
+serde = { workspace = true }
 hyperlane = { workspace = true }
 hyperlane-utils = { workspace = true }
 hyperlane-plugin-websocket = { workspace = true }

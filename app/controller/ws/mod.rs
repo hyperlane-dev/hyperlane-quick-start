@@ -4,4 +4,4 @@ pub use r#fn::*;
 
 use super::*;
 
-use crate::service::websocket::r#fn::*;
+use crate::service::ws::r#fn::*;

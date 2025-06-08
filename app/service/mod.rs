@@ -1,3 +1,3 @@
-pub mod websocket;
+pub mod ws;
 
 use super::*;

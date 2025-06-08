@@ -88,7 +88,7 @@ async fn register_response_middleware(server: &Server) {
 
 async fn register_route(server: &Server) {
     server.route(format!("/"), controller::root::handle).await;
-    server.route("/ws", controller::websocket::handle).await;
+    server.route("/ws", controller::ws::handle).await;
     server
         .route(format!("/{{{DIR_KEY}}}"), controller::root::handle)
         .await;
@@ -108,9 +108,7 @@ async fn register_route(server: &Server) {
 }
 
 async fn on_ws_connected(server: &Server) {
-    server
-        .on_ws_connected(service::websocket::on_connected)
-        .await;
+    server.on_ws_connected(service::ws::on_connected).await;
 }
 
 fn runtime() -> Runtime {
