@@ -86,9 +86,7 @@ async fn register_route(server: &Server) {
     server
         .route(format!("/hello/{NAME_KEY}"), controller::hello::handle)
         .await;
-    server
-        .route("/websocket", controller::websocket::handle)
-        .await;
+    server.route("/websocket", controller::ws::handle).await;
     server
         .route("/favicon.ico", controller::favicon_ico::handle)
         .await;
