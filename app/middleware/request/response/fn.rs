@@ -5,7 +5,7 @@ pub async fn response_header(ctx: Context) {
     let content_type: String = ContentType::format_content_type_with_charset(TEXT_HTML, UTF8);
     ctx.set_response_header(SERVER, HYPERLANE)
         .await
-        .set_response_header(CONNECTION, CONNECTION_KEEP_ALIVE)
+        .set_response_header(CONNECTION, KEEP_ALIVE)
         .await
         .set_response_header(CONTENT_TYPE, content_type)
         .await
