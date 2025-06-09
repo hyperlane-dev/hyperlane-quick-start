@@ -1,5 +1,6 @@
 use super::*;
 
+#[methods(get, post)]
 pub async fn handle(ctx: Context) {
     let dir_name: String = ctx.get_route_param(DIR_KEY).await.unwrap_or_default();
     let file_name: String = ctx.get_route_param(FILE_KEY).await.unwrap_or_default();

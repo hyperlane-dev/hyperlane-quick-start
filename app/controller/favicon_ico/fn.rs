@@ -1,5 +1,6 @@
 use super::*;
 
+#[get]
 pub async fn handle(ctx: Context) {
     let _ = ctx
         .set_response_header(CONTENT_TYPE, IMAGE_PNG)

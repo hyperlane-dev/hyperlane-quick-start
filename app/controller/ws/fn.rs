@@ -1,5 +1,6 @@
 use super::*;
 
+#[get]
 pub async fn handle(ctx: Context) {
     let websocket: &WebSocket = get_global_websocket();
     let key: BroadcastType<'_> = BroadcastType::PointToGroup("/");
