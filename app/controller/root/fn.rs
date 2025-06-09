@@ -1,5 +1,6 @@
 use super::*;
 
+#[methods(get, post)]
 pub async fn handle(ctx: Context) {
     let html: String = INDEX_HTML.replace("{{ time }}", &time());
     let _ = ctx
