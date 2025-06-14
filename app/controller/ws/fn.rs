@@ -3,7 +3,7 @@ use super::*;
 #[methods(get, post)]
 pub async fn html(ctx: Context) {
     let ws_path: String = ctx.get_route_param(WS_DIR_KEY).await.unwrap_or_default();
-    if ws_path.is_empty() {
+    if ws_path.len() <= 3 {
         ctx.set_response_status_code(301)
             .await
             .set_response_header(LOCATION, INDEX_HTML_URL_PATH)
