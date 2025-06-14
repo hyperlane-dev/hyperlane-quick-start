@@ -3,5 +3,5 @@ module.exports = defineConfig({
   transpileDependencies: true,
   productionSourceMap: false,
   publicPath: '/ws/',
-  outputDir: 'ws',
+  outputDir: './ws',
 });
