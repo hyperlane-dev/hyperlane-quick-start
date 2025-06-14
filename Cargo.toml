@@ -31,6 +31,7 @@ hyperlane_config = { path = "config", version = "0.1.0" }
 hyperlane_init = { path = "init", version = "0.1.0" }
 hyperlane_plugin = { path = "plugin", version = "0.1.0" }
 
+serde = "1.0.219"
 hyperlane = "5.29.0"
 hyperlane-utils = "0.17.1"
 

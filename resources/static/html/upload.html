@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>File Upload</title>
+    <style>
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 1rem;
+        background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+        min-height: 100vh;
+        overflow: hidden;
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        display: flex;
+        flex-direction: column;
+      }
+      @media (max-width: 768px) {
+        body {
+          padding: 0.5rem;
+        }
+        h1 {
+          font-size: 1.5rem;
+        }
+        .upload-container {
+          padding: 0.75rem;
+        }
+        .file-input-label,
+        .upload-btn {
+          padding: 0.5rem 1rem;
+          font-size: 0.875rem;
+        }
+        .history-container {
+          max-height: 50vh;
+          margin-bottom: 0.75rem;
+        }
+        .file-input-container {
+          margin-top: 0.5rem;
+          margin-bottom: 0.5rem;
+        }
+      }
+      h1 {
+        color: #2d3748;
+        text-align: center;
+        font-weight: 600;
+        font-size: 2rem;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        background: linear-gradient(90deg, #4f46e5, #06b6d4);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: gradient 3s ease infinite;
+        background-size: 200%200%;
+      }
+      .upload-container {
+        background-color: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 10px 15px-3px rgba(0, 0, 0, 0.1),
+          0 4px 6px-2px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      .upload-container:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 25px-5px rgba(0, 0, 0, 0.1),
+          0 10px 10px-5px rgba(0, 0, 0, 0.04);
+      }
+      .file-input-container {
+        margin-bottom: 0.25rem;
+        margin-top: 1rem;
+        text-align: center;
+      }
+      .file-input {
+        display: none;
+      }
+      .file-input-label {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(90deg, #4f46e5, #06b6d4);
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-weight: 500;
+        box-shadow: 0 4px 6px-1px rgba(79, 70, 229, 0.3),
+          0 2px 4px-1px rgba(79, 70, 229, 0.2);
+        animation: gradient 3s ease infinite;
+        background-size: 200%200%;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      @keyframes gradient {
+        0% {
+          background-position: 0%50%;
+        }
+        50% {
+          background-position: 100%50%;
+        }
+        100% {
+          background-position: 0%50%;
+        }
+      }
+      .file-input-label:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 15px-3px rgba(79, 70, 229, 0.3),
+          0 4px 6px-2px rgba(79, 70, 229, 0.2);
+      }
+      .file-input-label:active {
+        transform: translateY(0);
+      }
+      .upload-btn {
+        display: block;
+        width: 100%;
+        padding: 0.75rem;
+        background: linear-gradient(90deg, #4f46e5, #06b6d4);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 500;
+        margin-top: 1.5rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 6px-1px rgba(79, 70, 229, 0.3),
+          0 2px 4px-1px rgba(79, 70, 229, 0.2);
+      }
+      .upload-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 15px-3px rgba(79, 70, 229, 0.3),
+          0 4px 6px-2px rgba(79, 70, 229, 0.2);
+      }
+      .upload-btn:disabled {
+        background: #e2e8f0;
+        color: #a0aec0;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+      .status {
+        margin-top: 1.5rem;
+        padding: 1rem;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+        opacity: 0;
+        max-height: 0;
+        overflow: hidden;
+      }
+      .status.show {
+        opacity: 1;
+        max-height: 200px;
+      }
+      .success {
+        background-color: #f0fff4;
+        color: #2f855a;
+      }
+      .error {
+        background-color: #fff5f5;
+        color: #c53030;
+      }
+      .history-container {
+        margin-bottom: 0.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid#e2e8f0;
+        max-height: 70vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+      }
+      .history-container::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      .history-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+      }
+      .history-container::-webkit-scrollbar-thumb {
+        background: linear-gradient(90deg, #4f46e5, #06b6d4);
+        border-radius: 4px;
+      }
+      .history-container::-webkit-scrollbar-button {
+        display: none;
+      }
+      .history-container h2 {
+        color: #2d3748;
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+        font-weight: 600;
+      }
+      .history-container ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .history-container li {
+        padding: 0.75rem 1rem;
+        margin-bottom: 0.5rem;
+        border-radius: 6px;
+        display: block;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+        overflow: hidden;
+        position: relative;
+      }
+      .upload-complete {
+        background-color: #e6ffed;
+        color: #2f855a;
+      }
+      .upload-in-progress {
+        background-color: #ebf8ff;
+        color: #3182ce;
+      }
+      .history-container li:nth-child(even) {
+        border-left: 4px solid#06b6d4;
+      }
+      .history-container li:nth-child(odd) {
+        border-left: 4px solid#2f855a;
+      }
+      .history-container li {
+        position: relative;
+        overflow: hidden;
+      }
+      .history-container li.upload-complete {
+        background-color: #e6ffed;
+        color: #2f855a;
+      }
+      .history-item-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        margin-bottom: 0.5rem;
+        gap: 1rem;
+      }
+      .history-item-header.filename {
+        flex: 1;
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding: 0 0.5rem;
+      }
+      .history-item-header span:last-child {
+        flex-shrink: 0;
+        white-space: nowrap;
+      }
+      .history-item-progress {
+        width: 100%;
+      }
+      .history-progress-bar {
+        height: 6px;
+        background-color: #edf2f7;
+        border-radius: 3px;
+        overflow: hidden;
+        margin-top: 0.5rem;
+        position: relative;
+      }
+      .history-progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #4f46e5, #06b6d4);
+        width: 0%;
+        transition: width 0.3s ease;
+        position: relative;
+        z-index: 1;
+      }
+      .history-container li:hover {
+        background-color: #edf2f7;
+        transform: translateX(4px);
+      }
+      .history-container li span {
+        margin-right: 1rem;
+        color: #4a5568;
+      }
+      .history-container li.filename {
+        max-width: 60%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: inline-block;
+        vertical-align: middle;
+      }
+      .history-container li a {
+        color: #4f46e5;
+        text-decoration: none;
+        font-weight: 500;
+        display: block;
+        padding: 0.75rem 1rem;
+        margin: -0.75rem-1rem;
+      }
+      .history-container li {
+        cursor: pointer;
+      }
+      .history-container li a:hover {
+        text-decoration: none;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .upload-container {
+        animation: fadeIn 0.5s ease-out forwards;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>File Upload</h1>
+    <div class="upload-container">
+      <div class="file-input-container">
+        <label for="file-input" class="file-input-label">Select File</label
+        ><input type="file" id="file-input" class="file-input" multiple />
+      </div>
+      <div class="status" id="status" style="display: none"></div>
+    </div>
+    <script>
+      const CHUNK_SIZE = 512 * 1024;
+      const MAX_RETRIES = 88888888;
+      const UPLOAD_REGISTER_URL = '/upload/register';
+      const UPLOAD_SAVE_URL = '/upload/save';
+      const UPLOAD_MERGE_URL = '/upload/merge';
+      const MAX_CONCURRENT_UPLOADS = 6;
+      const fileInput = document.getElementById('file-input');
+      const statusEl = document.getElementById('status');
+      const uploadBtnStyle = document.querySelector('.upload-btn');
+      let selectedFile = null;
+      if (uploadBtnStyle) {
+        uploadBtnStyle.remove();
+      }
+      const DB_NAME = 'FileUploadDB';
+      const DB_VERSION = 1;
+      const STORE_NAME = 'uploadedFiles';
+      let db = null;
+      async function refreshData() {
+        renderHistoryList(await getAllFiles());
+      }
+      document.addEventListener('DOMContentLoaded', () => {
+        initDB()
+          .then(async () => {
+            await refreshData();
+          })
+          .catch((err) => {
+            throw new Error('Database initialization failed:', err);
+          });
+      });
+      function renderHistoryList(files) {
+        let historyContainer = document.querySelector('.history-container');
+        if (!historyContainer) {
+          historyContainer = document.createElement('div');
+          historyContainer.className = 'history-container';
+          document.querySelector('.upload-container').prepend(historyContainer);
+        }
+        historyContainer.innerHTML = '<h2>Upload History</h2>';
+        files.sort(
+          (a, b) => new Date(b.uploadTime || 0) - new Date(a.uploadTime || 0)
+        );
+        if (files.length === 0) {
+          historyContainer.innerHTML += '<p>No upload records</p>';
+        } else {
+          const list = document.createElement('ul');
+          files.forEach((file) => {
+            const item = document.createElement('li');
+            item.innerHTML = `<a href="${
+              file.url || '/'
+            }"target="_blank"class="${
+              file.progress >= 100 ? 'upload-complete' : ''
+            }"><div class="history-item-header"><span class="filename">${
+              file.name
+            }</span><span>${formatFileSize(
+              file.size
+            )}</span></div><div class="history-item-progress"><div class="history-progress-bar"><div class="history-progress-fill"style="width: ${
+              file.progress || 0
+            }%"></div></div></div></a>`;
+            if (file.progress && file.progress < 100) {
+              item.classList.add('upload-in-progress');
+            }
+            list.appendChild(item);
+          });
+          historyContainer.appendChild(list);
+        }
+      }
+      function initDB() {
+        return new Promise((resolve, reject) => {
+          const request = indexedDB.open(DB_NAME, DB_VERSION);
+          request.onerror = (event) => {
+            reject(event.target.error);
+          };
+          request.onsuccess = (event) => {
+            db = event.target.result;
+            resolve(db);
+          };
+          request.onupgradeneeded = (event) => {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+              db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+            }
+          };
+        });
+      }
+      function saveFileInfo(fileInfo) {
+        return new Promise((resolve, reject) => {
+          if (!db) {
+            reject(new Error('Database not initialized'));
+            return;
+          }
+          const transaction = db.transaction([STORE_NAME], 'readwrite');
+          const store = transaction.objectStore(STORE_NAME);
+          const record = {
+            id: fileInfo.id,
+            progress: fileInfo.progress || 0,
+            name: fileInfo.name,
+            size: fileInfo.size,
+            uploadTime: fileInfo.uploadTime || new Date().toISOString(),
+            url: fileInfo.url || '',
+          };
+          const getRequest = store.get(fileInfo.id);
+          getRequest.onsuccess = () => {
+            const existing = getRequest.result;
+            if (
+              existing &&
+              existing.progress >= (fileInfo.progress || 0) &&
+              existing.url
+            ) {
+              resolve();
+              return;
+            }
+            const request = store.put(record);
+            request.onsuccess = () => resolve(refreshData());
+            request.onerror = (event) => reject(event.target.error);
+          };
+          getRequest.onerror = (event) => reject(event.target.error);
+        });
+      }
+      function getAllFiles() {
+        return new Promise((resolve, reject) => {
+          if (!db) {
+            reject(new Error('Database not initialized'));
+            return;
+          }
+          const transaction = db.transaction([STORE_NAME], 'readonly');
+          const store = transaction.objectStore(STORE_NAME);
+          const request = store.getAll();
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = (event) => reject(event.target.error);
+        });
+      }
+      fileInput.addEventListener('change', (e) => {
+        const files = Array.from(e.target.files);
+        files.forEach((file) => {
+          const fileId = generateUniqueId();
+          uploadFile(file, fileId);
+        });
+        e.target.value = '';
+      });
+      async function uploadFile(file, fileId) {
+        const progressContainer = document.createElement('div');
+        progressContainer.className = 'progress-container';
+        progressContainer.innerHTML = `<div class="progress-bar"><div class="progress-fill"id="progress-fill-${fileId}"></div></div>`;
+        document
+          .querySelector('.upload-container')
+          .appendChild(progressContainer);
+        const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+        const fileCopy = new File([file], file.name, { type: file.type });
+        let uploadQueue = [];
+        let currentIndex = 0;
+        let completedChunks = 0;
+        let lastProgressUpdate = 0;
+        const uploadChunk = async (chunk, index, totalChunks, fileId, file) => {
+          try {
+            const response = await fetch(UPLOAD_SAVE_URL, {
+              method: 'POST',
+              headers: {
+                'X-File-Id': fileId,
+                'X-Chunk-Index': index,
+              },
+              body: chunk,
+            });
+            const data = await response.json();
+            if (data.code == 200) {
+              saveFileInfo({
+                id: fileId,
+                name: data.name,
+                url: data.url || '',
+                size: file.size,
+                uploadTime: new Date().toISOString(),
+                progress: 100,
+              })
+                .then(() => {
+                  statusEl.innerHTML = `Upload successful: ${data.name}`;
+                  statusEl.className = 'status success';
+                  statusEl.style.display = 'block';
+                  return getAllFiles();
+                })
+                .then((files) => {
+                  renderHistoryList(files);
+                })
+                .catch((err) => {
+                  statusEl.textContent =
+                    'Upload successful but failed to save record';
+                  statusEl.className = 'status error';
+                  statusEl.style.display = 'block';
+                });
+              return data;
+            } else if (data.code === 0) {
+              statusEl.textContent = `Upload failed: ${data.msg}`;
+              statusEl.className = 'status error';
+              statusEl.style.display = 'block';
+              throw new Error(data.msg);
+            }
+            const progress = Math.floor(((index + 1) / totalChunks) * 100);
+            const progressFill = document.getElementById(
+              `progress-fill-${fileId}`
+            );
+            const progressText = document.getElementById(
+              `progress-text-${fileId}`
+            );
+            const historyProgress = document.querySelector(
+              `#history-progress-${fileId}.history-progress-fill`
+            );
+            if (progressFill) progressFill.style.width = progress + '%';
+            if (progressText)
+              progressText.textContent = `Progress: ${progress}%`;
+            if (historyProgress) historyProgress.style.width = progress + '%';
+            if (progressFill) progressFill.style.display = 'none';
+            if (progressFill) progressFill.offsetHeight;
+            if (progressFill) progressFill.style.display = 'block';
+            return data;
+          } catch (error) {
+            throw error;
+          }
+        };
+        const updateProgress = async () => {
+          const currentProgress = Math.floor(
+            (completedChunks / totalChunks) * 100
+          );
+          if (currentProgress >= lastProgressUpdate) {
+            lastProgressUpdate = currentProgress;
+            await saveFileInfo({
+              id: fileId,
+              progress: currentProgress,
+              name: file.name,
+              size: file.size,
+            });
+            const progressFill = document.getElementById(
+              `progress-fill-${fileId}`
+            );
+            const historyProgress = document.querySelector(
+              `#history-progress-${fileId}.history-progress-fill`
+            );
+            if (progressFill) {
+              progressFill.style.width = `${currentProgress}%`;
+              progressFill.style.transition = 'width 0.3s ease-in-out';
+            }
+            if (historyProgress) {
+              historyProgress.style.width = `${currentProgress}%`;
+              historyProgress.style.transition = 'width 0.3s ease-in-out';
+            }
+            await getAllFiles().then((files) => renderHistoryList(files));
+          }
+        };
+        const processQueue = async () => {
+          const headers = {
+            'X-File-Id': fileId,
+          };
+          let registerSuccess = false;
+          let registerSuccessfulUploads = null;
+          while (!registerSuccess) {
+            try {
+              const response = await fetch(UPLOAD_REGISTER_URL, {
+                method: 'POST',
+                headers: {
+                  ...headers,
+                  'X-Total-Chunks': totalChunks,
+                  'X-File-Name': encodeURIComponent(file.name),
+                },
+              });
+              registerSuccessfulUploads = await response.json();
+              if (registerSuccessfulUploads.code == 200) {
+                registerSuccess = true;
+              }
+            } catch (error) {
+              registerSuccess = false;
+              await new Promise((resolve) =>
+                setTimeout(resolve, 1000 * retries)
+              );
+            }
+          }
+          const tasks = [];
+          for (let i = 0; i < totalChunks; i++) {
+            const start = i * CHUNK_SIZE;
+            const end = Math.min(start + CHUNK_SIZE, fileCopy.size);
+            const chunk = fileCopy.slice(start, end);
+            tasks.push({
+              chunk,
+              index: i,
+              totalChunks,
+              fileId,
+              file: fileCopy,
+            });
+          }
+          async function processTasksWithConcurrencyLimit(
+            tasks,
+            concurrencyLimit
+          ) {
+            const results = [];
+            const runningTasks = new Set();
+            async function runTask(task) {
+              try {
+                const result = await uploadChunk(
+                  task.chunk,
+                  task.index,
+                  task.totalChunks,
+                  task.fileId,
+                  task.file
+                );
+                completedChunks++;
+                await updateProgress();
+                return result;
+              } catch (error) {
+                let retries = 0;
+                while (retries < MAX_RETRIES) {
+                  try {
+                    const result = await uploadChunk(
+                      task.chunk,
+                      task.index,
+                      task.totalChunks,
+                      task.fileId,
+                      task.file
+                    );
+                    completedChunks++;
+                    await updateProgress();
+                    return result;
+                  } catch (retryError) {
+                    retries++;
+                    if (retries === MAX_RETRIES) throw retryError;
+                    await new Promise((resolve) =>
+                      setTimeout(resolve, 1000 * retries)
+                    );
+                  }
+                }
+              }
+            }
+            while (tasks.length > 0 || runningTasks.size > 0) {
+              while (runningTasks.size < concurrencyLimit && tasks.length > 0) {
+                const task = tasks.shift();
+                const promise = runTask(task).then((result) => {
+                  runningTasks.delete(promise);
+                  results.push(result);
+                  return result;
+                });
+                runningTasks.add(promise);
+              }
+              if (runningTasks.size > 0) {
+                await Promise.race(Array.from(runningTasks));
+              }
+            }
+            return results;
+          }
+          const results = await processTasksWithConcurrencyLimit(
+            tasks,
+            MAX_CONCURRENT_UPLOADS
+          );
+          let mergeSuccess = false;
+          let mergeSuccessfulUploads = null;
+          while (!mergeSuccess) {
+            try {
+              const response = await fetch(UPLOAD_MERGE_URL, {
+                method: 'POST',
+                headers: {
+                  'X-File-Id': fileId,
+                },
+              });
+              mergeSuccessfulUploads = await response.json();
+              if (registerSuccessfulUploads.code == 200) {
+                mergeSuccess = true;
+              }
+            } catch (error) {
+              mergeSuccess = false;
+              await new Promise((resolve) =>
+                setTimeout(resolve, 1000 * retries)
+              );
+            }
+          }
+          if (mergeSuccessfulUploads) {
+            uploadQueue = [];
+            return mergeSuccessfulUploads;
+          } else {
+            throw new Error('Some chunks failed to upload, please try again');
+          }
+        };
+
+        try {
+          await updateProgress();
+          const lastChunkResponse = await processQueue();
+          const data = lastChunkResponse || { url: '' };
+          showStatus('Upload successful', 'success');
+          const progressContainer = document.querySelector(
+            `#progress-fill-${fileId}`
+          )?.parentElement?.parentElement;
+          const progressText = document.getElementById(
+            `progress-text-${fileId}`
+          );
+          if (progressContainer) progressContainer.remove();
+          if (progressText) progressText.remove();
+          const historyProgress = document.querySelector(
+            `#history-progress-${fileId}.history-progress-fill`
+          );
+          if (historyProgress) historyProgress.style.width = '100%';
+          await saveFileInfo({
+            id: fileId,
+            progress: 100,
+            name: file.name,
+            size: file.size,
+            uploadTime: new Date().toISOString(),
+            url: data.url || '',
+          });
+        } catch (error) {
+          showStatus('Upload failed: ' + error.message, 'error');
+        }
+      }
+      function resetStatus() {
+        statusEl.style.display = 'none';
+      }
+      function showStatus(message, type) {
+        statusEl.textContent = message;
+        statusEl.className = 'status ' + type;
+        statusEl.style.display = 'block';
+      }
+      function generateUniqueId() {
+        return (
+          Date.now().toString(36) +
+          Math.random().toString(36).substr(2) +
+          Math.random().toString(36).substr(2)
+        );
+      }
+      function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+      }
+    </script>
+  </body>
+</html>

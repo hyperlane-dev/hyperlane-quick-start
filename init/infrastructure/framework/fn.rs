@@ -86,9 +86,23 @@ async fn register_route(server: &Server) {
     server
         .route(format!("/hello/{{{NAME_KEY}}}"), controller::hello::handle)
         .await;
-    server.route("/websocket", controller::ws::handle).await;
+    server.route("/ws", controller::ws::handle).await;
     server
         .route("/favicon.ico", controller::favicon_ico::handle)
+        .await;
+    server.route("/upload", controller::upload::html).await;
+    server
+        .route("/upload/register", controller::upload::register)
+        .await;
+    server.route("/upload/save", controller::upload::save).await;
+    server
+        .route("/upload/merge", controller::upload::merge)
+        .await;
+    server
+        .route(
+            format!("/static/{{{DIR_KEY}}}/{{{FILE_KEY}}}"),
+            controller::r#static::handle,
+        )
         .await;
     println_success!("Server route initialization completed");
 }

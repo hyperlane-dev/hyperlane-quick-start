@@ -885,6 +885,7 @@ dependencies = [
  "hyperlane-utils",
  "hyperlane_config",
  "hyperlane_plugin",
+ "serde",
 ]
 
 [[package]]
