@@ -9,9 +9,10 @@ pub mod service;
 pub mod utils;
 pub mod view;
 
-use hyperlane_plugin::log::*;
+use hyperlane_config;
+use hyperlane_plugin;
 
 use hyperlane::*;
 use hyperlane_plugin_websocket::*;
 use hyperlane_utils::*;
-use serde::*;
+use serde;

@@ -14,8 +14,11 @@ async fn http_line_buffer_size(server: &Server) {
 
 async fn ws_buffer_size(server: &Server) {
     server.ws_buffer_size(SERVER_WS_BUFFER_SIZE).await;
+async fn ws_buffer_size(server: &Server) {
+    server.ws_buffer_size(SERVER_WS_BUFFER_SIZE).await;
     println_success!(
         "Server websocket buffer size: ",
+        SERVER_WS_BUFFER_SIZE,
         SERVER_WS_BUFFER_SIZE,
         SPACE,
         "bytes"
@@ -42,6 +45,7 @@ async fn nodelay(server: &Server) {
     println_success!("Server nodelay: ", SERVER_NODELAY);
 }
 
+async fn error_handler(server: &Server) {
 async fn error_handler(server: &Server) {
     server
         .error_handler(|data| {
@@ -95,6 +99,7 @@ async fn register_route(server: &Server) {
     server
         .route(format!("/hello/{{{NAME_KEY}}}"), controller::hello::handle)
         .await;
+    server.route("/upload/save", controller::upload::save).await;
     server
         .route(
             format!("/{{{DIR_KEY}}}/{{{FILE_KEY}}}"),
@@ -102,7 +107,21 @@ async fn register_route(server: &Server) {
         )
         .await;
     server
+        .route(
+            format!("/static/{{{DIR_KEY}}}/{{{FILE_KEY}}}"),
+            controller::r#static::handle,
+        )
+        .await;
+     server
+        .route(format!("/hello/{{{NAME_KEY}}}"), controller::hello::handle)
+        .await;
+    server.route("/ws", controller::ws::handle).await;
+    server
         .route("/favicon.ico", controller::favicon_ico::handle)
+        .await;
+    server.route("/upload", controller::upload::html).await;
+    server
+        .route("/upload/register", controller::upload::register)
         .await;
     println_success!("Server route initialization completed");
 }
@@ -129,6 +148,7 @@ async fn create_server() {
     ttl(&server).await;
     linger(&server).await;
     nodelay(&server).await;
+    error_handler(&server).await;
     error_handler(&server).await;
     http_line_buffer_size(&server).await;
     ws_buffer_size(&server).await;
