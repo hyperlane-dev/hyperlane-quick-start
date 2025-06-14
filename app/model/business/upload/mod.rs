@@ -1,6 +1,6 @@
-pub(crate) mod r#struct;
+mod r#struct;
 
-pub(crate) use r#struct::*;
+pub use r#struct::*;
 
 use super::*;
 use serde::Serialize;

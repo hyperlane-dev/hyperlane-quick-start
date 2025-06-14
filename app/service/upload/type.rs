@@ -1,3 +1,3 @@
 use super::*;
 
-pub(crate) type OptionFileChunkData = Option<FileChunkData>;
+pub type OptionFileChunkData = Option<FileChunkData>;
