@@ -1,8 +1,14 @@
 use super::*;
 
 pub async fn handle(ctx: Context) {
-    let dir: String = ctx.get_route_param(DIR_KEY).await.unwrap_or_default();
-    let file: String = ctx.get_route_param(FILE_KEY).await.unwrap_or_default();
+    let dir: String = ctx
+        .get_route_param(UPLOAD_DIR_KEY)
+        .await
+        .unwrap_or_default();
+    let file: String = ctx
+        .get_route_param(UPLOAD_FILE_KEY)
+        .await
+        .unwrap_or_default();
     let decode_dir: String = Decode::execute(CHARSETS, &dir).unwrap_or_default();
     let decode_file: String = Decode::execute(CHARSETS, &file).unwrap_or_default();
     if decode_dir.is_empty() || decode_file.is_empty() {

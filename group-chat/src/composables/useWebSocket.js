@@ -15,7 +15,7 @@ export function useWebSocket({ onMessage }) {
       window.location.hostname === '127.0.0.1'
         ? 'localhost:60007'
         : window.location.hostname;
-    socket.value = new WebSocket(`${protocol}://${host}/ws`);
+    socket.value = new WebSocket(`${protocol}://${host}/api/ws`);
     socket.value.onopen = () => {
       connectionStatus.value = 'connected';
     };

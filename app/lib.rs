@@ -15,4 +15,4 @@ use hyperlane_plugin;
 use hyperlane::*;
 use hyperlane_plugin_websocket::*;
 use hyperlane_utils::*;
-use serde;
+use serde::*;

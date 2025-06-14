@@ -1,2 +1,1 @@
-pub const DIR_KEY: &'static str = "dir";
-pub const FILE_KEY: &'static str = "file";
+pub const WS_DIR_KEY: &'static str = "ws_dir";

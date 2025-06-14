@@ -14,8 +14,6 @@ async fn http_line_buffer_size(server: &Server) {
 
 async fn ws_buffer_size(server: &Server) {
     server.ws_buffer_size(SERVER_WS_BUFFER_SIZE).await;
-async fn ws_buffer_size(server: &Server) {
-    server.ws_buffer_size(SERVER_WS_BUFFER_SIZE).await;
     println_success!(
         "Server websocket buffer size: ",
         SERVER_WS_BUFFER_SIZE,
@@ -46,7 +44,6 @@ async fn nodelay(server: &Server) {
 }
 
 async fn error_handler(server: &Server) {
-async fn error_handler(server: &Server) {
     server
         .error_handler(|data| {
             println_error!("Server error: ", data);
@@ -60,7 +57,7 @@ async fn ttl(server: &Server) {
 }
 
 async fn disable_inner_ws_handle(server: &Server) {
-    server.disable_internal_ws_handler("/ws").await;
+    server.disable_internal_ws_handler("/api/ws").await;
     println_success!("Server inner websocket handle disable completed");
 }
 
@@ -92,37 +89,34 @@ async fn register_response_middleware(server: &Server) {
 
 async fn register_route(server: &Server) {
     server.route(format!("/"), controller::root::handle).await;
-    server.route("/ws", controller::ws::handle).await;
-    server
-        .route(format!("/{{{DIR_KEY}}}"), controller::root::handle)
-        .await;
-    server
-        .route(format!("/hello/{{{NAME_KEY}}}"), controller::hello::handle)
-        .await;
-    server.route("/upload/save", controller::upload::save).await;
-    server
-        .route(
-            format!("/{{{DIR_KEY}}}/{{{FILE_KEY}}}"),
-            controller::root::handle,
-        )
-        .await;
-    server
-        .route(
-            format!("/static/{{{DIR_KEY}}}/{{{FILE_KEY}}}"),
-            controller::r#static::handle,
-        )
-        .await;
-     server
-        .route(format!("/hello/{{{NAME_KEY}}}"), controller::hello::handle)
-        .await;
-    server.route("/ws", controller::ws::handle).await;
+    server.route("/upload", controller::upload::html).await;
     server
         .route("/favicon.ico", controller::favicon_ico::handle)
         .await;
-    server.route("/upload", controller::upload::html).await;
     server
-        .route("/upload/register", controller::upload::register)
+        .route(format!("/hello/{{{NAME_KEY}}}"), controller::hello::handle)
         .await;
+    server
+        .route(
+            format!("/static/{{{UPLOAD_DIR_KEY}}}/{{{UPLOAD_FILE_KEY}}}"),
+            controller::r#static::handle,
+        )
+        .await;
+    server
+        .route(format!("/{{{WS_DIR_KEY}:^ws.*}}"), controller::ws::html)
+        .await;
+
+    server.route("/api/ws", controller::ws::handle).await;
+    server
+        .route("/api/upload/save", controller::upload::save)
+        .await;
+    server
+        .route("/api/upload/register", controller::upload::register)
+        .await;
+    server
+        .route("/api/upload/merge", controller::upload::merge)
+        .await;
+
     println_success!("Server route initialization completed");
 }
 
