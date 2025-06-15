@@ -1,6 +1,6 @@
 <template>
   <div :class="['avatar', isSelf ? 'self' : '']">
-    {{ data?.charAt(0) }}
+    {{ name?.charAt(0) }}
   </div>
 </template>
 

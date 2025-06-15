@@ -10,10 +10,10 @@
   >
     <template v-slot="{ item: message }">
       <div
-        :class="['message', message.isSelf ? 'self-message' : 'other-message']"
+        :class="['message', isMe(message) ? 'self-message' : 'other-message']"
       >
         <!-- 非自己发送的消息 -->
-        <template v-if="!message.isSelf">
+        <template v-if="!isMe(message)">
           <MessageAvatar :name="message.name" :isSelf="false" />
           <div class="message-info">
             <MessageHeader
@@ -49,6 +49,7 @@
 import MessageAvatar from './MessageAvatar.vue';
 import MessageHeader from './MessageHeader.vue';
 import ScrollList from './ScrollList.vue';
+import { getPersistentUUID } from '../../utils/uuid';
 
 export default {
   name: 'MessageList',
@@ -66,7 +67,7 @@ export default {
       type: Boolean,
       default: true,
     },
-    username: {
+    name: {
       type: String,
       required: true,
     },
@@ -78,15 +79,17 @@ export default {
   },
   mounted() {
     this.updateContainerHeight();
-
     window.addEventListener('resize', this.updateContainerHeight);
   },
   beforeUnmount() {
     window.removeEventListener('resize', this.updateContainerHeight);
   },
   methods: {
+    isMe(data) {
+      return data?.name == getPersistentUUID();
+    },
     updateContainerHeight() {
-      this.containerHeight = window.innerHeight - 108; // 108px是头部和输入框的大致高度
+      this.containerHeight = window.innerHeight - 108;
     },
     scrollToBottom() {
       const container = this.$refs.messageContainer;

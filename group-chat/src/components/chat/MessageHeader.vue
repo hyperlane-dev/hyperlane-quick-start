@@ -15,7 +15,7 @@
 export default {
   name: 'MessageHeader',
   props: {
-    data: {
+    name: {
       type: String,
       required: true,
     },

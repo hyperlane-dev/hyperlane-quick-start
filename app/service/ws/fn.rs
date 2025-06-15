@@ -4,6 +4,12 @@ pub(crate) fn get_global_websocket() -> &'static WebSocket {
     GLOBAL_WEBSOCKET.get_or_init(|| WebSocket::new())
 }
 
+pub async fn before_ws_upgrade(ctx: Context) {
+    let addr: String = ctx.get_socket_addr_or_default_string().await;
+    let encode_addr: String = Encode::execute(CHARSETS, &addr).unwrap_or_default();
+    ctx.set_response_header("addr", encode_addr).await;
+}
+
 pub async fn on_connected(ctx: Context) {
     let websocket: &WebSocket = get_global_websocket();
     let key: BroadcastType<'_> = BroadcastType::PointToGroup("/");

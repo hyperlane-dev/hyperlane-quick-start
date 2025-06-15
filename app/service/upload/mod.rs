@@ -11,4 +11,4 @@ pub use r#type::*;
 use hyperlane_config::business::upload::*;
 use model::business::upload::*;
 
-use crate::once_cell::sync::Lazy;
+use once_cell::sync::Lazy;

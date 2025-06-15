@@ -23,6 +23,12 @@ async fn ws_buffer_size(server: &Server) {
     );
 }
 
+async fn before_ws_upgrade(server: &Server) {
+    server
+        .before_ws_upgrade(service::ws::before_ws_upgrade)
+        .await;
+}
+
 async fn host(server: &Server) {
     server.host(SERVER_HOST).await;
     println_success!("Server host: ", SERVER_HOST);
@@ -146,6 +152,7 @@ async fn create_server() {
     error_handler(&server).await;
     http_line_buffer_size(&server).await;
     ws_buffer_size(&server).await;
+    before_ws_upgrade(&server).await;
     on_ws_connected(&server).await;
     disable_inner_ws_handle(&server).await;
     register_request_middleware(&server).await;

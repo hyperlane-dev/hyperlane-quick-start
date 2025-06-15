@@ -1,4 +1,6 @@
 import { ref } from 'vue';
+import { getPersistentUUID } from '../utils/uuid';
+const uuid = getPersistentUUID();
 
 export function useWebSocket({ onMessage }) {
   const socket = ref(null);
@@ -15,7 +17,8 @@ export function useWebSocket({ onMessage }) {
       window.location.hostname === '127.0.0.1'
         ? 'localhost:60007'
         : window.location.hostname;
-    socket.value = new WebSocket(`${protocol}://${host}/api/ws`);
+
+    socket.value = new WebSocket(`${protocol}://${host}/api/ws?uuid=${uuid}`);
     socket.value.onopen = () => {
       connectionStatus.value = 'connected';
     };

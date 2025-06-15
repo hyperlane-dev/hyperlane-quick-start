@@ -3,7 +3,7 @@
     <MessageList
       :messages="messages"
       :isNearBottom="isNearBottom"
-      :username="username"
+      :name="username"
       @handleScroll="handleScroll"
       ref="messageListRef"
     />
@@ -83,31 +83,9 @@ export default {
     this.disconnect();
   },
   methods: {
-    generateFingerprint() {
-      const browserInfo = [
-        navigator.userAgent,
-        navigator.language,
-        navigator.platform,
-        navigator.vendor,
-        screen.colorDepth,
-        screen.width + 'x' + screen.height,
-        new Date().getTimezoneOffset(),
-      ].join('|');
-
-      let hash = 0;
-      for (let i = 0; i < browserInfo.length; i++) {
-        const char = browserInfo.charCodeAt(i);
-        hash = (hash << 5) - hash + char;
-        hash = hash & hash; // 转换为32位整数
-      }
-
-      return Math.abs(hash) % 10000;
-    },
-
     generateUsername() {
-      const timestamp = new Date().getTime() * 1000; // 毫秒转微秒（近似值）
-      const fingerprint = this.generateFingerprint();
-      return `用户${timestamp}-${fingerprint}`;
+      const uuid = crypto.randomUUID();
+      return `用户${uuid}`;
     },
 
     handleMessage(data) {
