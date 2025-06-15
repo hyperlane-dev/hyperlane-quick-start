@@ -34,7 +34,8 @@ pub async fn html(ctx: Context) {
 #[get]
 pub async fn handle(ctx: Context) {
     let websocket: &WebSocket = get_global_websocket();
-    let key: BroadcastType<'_> = BroadcastType::PointToGroup("/");
+    let path: String = ctx.get_request_path().await;
+    let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
     websocket
         .run(&ctx, 1_024_000, key, callback, send_callback, on_closed)
         .await;
