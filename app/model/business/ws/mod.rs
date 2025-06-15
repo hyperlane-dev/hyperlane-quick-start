@@ -13,3 +13,4 @@ use super::*;
 
 use hyperlane_plugin_websocket::WebSocket;
 use std::sync::OnceLock;
+use utoipa::ToSchema;

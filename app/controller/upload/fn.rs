@@ -1,6 +1,53 @@
 use super::*;
 
 #[methods(get, post)]
+#[utoipa::path(
+    get,
+    post,
+    path = "/static/{upload_dir}/{upload_file}",   
+    responses(
+        (status = 200, description = "静态资源", body = String)
+    )
+)]
+pub async fn static_file(ctx: Context) {
+    let dir: String = ctx
+        .get_route_param(UPLOAD_DIR_KEY)
+        .await
+        .unwrap_or_default();
+    let file: String = ctx
+        .get_route_param(UPLOAD_FILE_KEY)
+        .await
+        .unwrap_or_default();
+    let decode_dir: String = Decode::execute(CHARSETS, &dir).unwrap_or_default();
+    let decode_file: String = Decode::execute(CHARSETS, &file).unwrap_or_default();
+    if decode_dir.is_empty() || decode_file.is_empty() {
+        return;
+    }
+    let path: String = format!("{UPLOAD_DIR}/{decode_dir}/{decode_file}");
+    let extension_name: String = FileExtension::get_extension_name(&decode_file);
+    let content_type: &str = FileExtension::parse(&extension_name).get_content_type();
+    let data: Vec<u8> = async_read_from_file(&path).await.unwrap_or_default();
+    ctx.set_response_header(CONTENT_TYPE, content_type)
+        .await
+        .set_response_header(CACHE_CONTROL, "public, max-age=31536000, immutable")
+        .await
+        .set_response_header(EXPIRES, "Wed, 1 Apr 8888 00:00:00 GMT")
+        .await
+        .set_response_status_code(200)
+        .await
+        .set_response_body(data)
+        .await;
+}
+
+#[methods(get, post)]
+#[utoipa::path(
+    get,
+    post,
+    path = "/upload/index.html",   
+    responses(
+        (status = 200, description = "文件分块上传前端界面", body = String)
+    )
+)]
 pub async fn html(ctx: Context) {
     let _ = ctx
         .set_response_status_code(200)
@@ -12,6 +59,13 @@ pub async fn html(ctx: Context) {
 }
 
 #[post]
+#[utoipa::path(
+    post,
+    path = "/api/upload/register",   
+    responses(
+        (status = 200, description = "文件分块上传-注册接口", body = UploadResponse)
+    )
+)]
 pub async fn register(ctx: Context) {
     let file_chunk_data_opt: OptionFileChunkData = get_register_file_chunk_data(&ctx).await;
     if file_chunk_data_opt.is_none() {
@@ -23,6 +77,13 @@ pub async fn register(ctx: Context) {
 }
 
 #[post]
+#[utoipa::path(
+    post,
+    path = "/api/upload/save",   
+    responses(
+        (status = 200, description = "文件分块上传-保存接口", body = UploadResponse)
+    )
+)]
 pub async fn save(ctx: Context) {
     let file_chunk_data_opt: OptionFileChunkData = get_save_file_chunk_data(&ctx).await;
     if file_chunk_data_opt.is_none() {
@@ -62,6 +123,13 @@ pub async fn save(ctx: Context) {
 }
 
 #[post]
+#[utoipa::path(
+    post,
+    path = "/api/upload/merge",   
+    responses(
+        (status = 200, description = "文件分块上传-合并接口", body = UploadResponse)
+    )
+)]
 pub async fn merge(ctx: Context) {
     let file_chunk_data_opt: OptionFileChunkData = get_merge_file_chunk_data(&ctx).await;
     if file_chunk_data_opt.is_none() {

@@ -1,6 +1,14 @@
 use super::*;
 
 #[methods(get, post)]
+#[utoipa::path(
+    get,
+    post,
+    path = "/ws/index.html",   
+    responses(
+        (status = 200, description = "群聊前端界面", body = String)
+    )
+)]
 pub async fn html(ctx: Context) {
     let ws_path: String = ctx.get_route_param(WS_DIR_KEY).await.unwrap_or_default();
     if ws_path.len() <= 3 {
@@ -32,6 +40,13 @@ pub async fn html(ctx: Context) {
 }
 
 #[get]
+#[utoipa::path(
+    get,
+    path = "/api/ws",   
+    responses(
+        (status = 200, description = "群聊接口", body = WebSocketRespData)
+    )
+)]
 pub async fn handle(ctx: Context) {
     let websocket: &WebSocket = get_global_websocket();
     let path: String = ctx.get_request_path().await;

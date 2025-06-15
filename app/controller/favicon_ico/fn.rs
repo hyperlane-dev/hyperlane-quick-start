@@ -1,6 +1,13 @@
 use super::*;
 
 #[get]
+#[utoipa::path(
+    get,
+    path = "/favicon.ico",   
+    responses(
+        (status = 200, description = "图标", body = String)
+    )
+)]
 pub async fn handle(ctx: Context) {
     let _ = ctx
         .set_response_header(CONTENT_TYPE, IMAGE_PNG)

@@ -103,9 +103,15 @@ async fn register_route(server: &Server) {
         .route(format!("/hello/{{{NAME_KEY}}}"), controller::hello::handle)
         .await;
     server
+        .route(format!("/openapi/openapi.json"), controller::openapi::json)
+        .await;
+    server
+        .route(format!("/openapi/index.html"), controller::openapi::html)
+        .await;
+    server
         .route(
             format!("/static/{{{UPLOAD_DIR_KEY}}}/{{{UPLOAD_FILE_KEY}}}"),
-            controller::r#static::handle,
+            controller::upload::static_file,
         )
         .await;
     server

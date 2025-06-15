@@ -1,6 +1,6 @@
 use super::*;
 
-#[derive(Debug, Default, Data, Clone)]
+#[derive(Debug, Default, Data, Clone, ToSchema)]
 pub struct FileChunkData {
     file_id: String,
     file_name: String,
@@ -9,7 +9,7 @@ pub struct FileChunkData {
     base_file_dir: String,
 }
 
-#[derive(Debug, Serialize, Data, Clone)]
+#[derive(Debug, Serialize, Data, Clone, ToSchema)]
 pub struct UploadResponse<'a> {
     pub code: i32,
     pub url: &'a str,

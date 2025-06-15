@@ -1,6 +1,14 @@
 use super::*;
 
 #[methods(get, post)]
+#[utoipa::path(
+    get,
+    post,
+    path = "/",   
+    responses(
+        (status = 200, description = "首页", body = String)
+    )
+)]
 pub async fn handle(ctx: Context) {
     let html: String = INDEX_HTML.replace("{{ time }}", &time());
     let _ = ctx
