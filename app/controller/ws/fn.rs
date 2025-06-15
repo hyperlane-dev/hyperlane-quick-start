@@ -23,6 +23,8 @@ pub async fn html(ctx: Context) {
     let body: Vec<u8> = res.unwrap_or_default();
     ctx.set_response_status_code(200)
         .await
+        .set_response_header(CONTENT_ENCODING, GZIP)
+        .await
         .set_response_header(CONTENT_TYPE, content_type)
         .await
         .set_response_body(body)

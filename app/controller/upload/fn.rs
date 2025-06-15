@@ -4,6 +4,8 @@ pub async fn html(ctx: Context) {
     let _ = ctx
         .set_response_status_code(200)
         .await
+        .set_response_header(CONTENT_ENCODING, GZIP)
+        .await
         .set_response_body(UPLOAD_HTML)
         .await;
 }
