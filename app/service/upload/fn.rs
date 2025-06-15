@@ -107,11 +107,7 @@ pub async fn get_merge_file_chunk_data<'a>(ctx: &Context) -> OptionFileChunkData
             return None;
         }
     };
-    let data_opt = FILE_ID_MAP.get(&file_id);
-    if data_opt.is_none() {
-        return None;
-    }
-    Some(data_opt.unwrap().clone())
+    FILE_ID_MAP.get(&file_id).map(|data| data.clone())
 }
 
 pub async fn set_common_success_response_body<'a>(ctx: &'a Context, url: &'a str) {
