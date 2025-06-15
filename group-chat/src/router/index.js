@@ -1,9 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import ChatView from '../views/ChatView.vue';
 
+const isDev = process.env.NODE_ENV === 'development';
+
 const routes = [
   {
-    path: '/',
+    path: isDev ? '/' : '/ws/index.html',
     name: 'chat',
     component: ChatView,
   },
