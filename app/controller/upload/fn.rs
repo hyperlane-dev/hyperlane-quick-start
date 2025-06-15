@@ -73,6 +73,8 @@ pub async fn merge(ctx: Context) {
     let total_chunks: &usize = file_chunk_data.get_total_chunks();
     let base_file_dir: &str = file_chunk_data.get_base_file_dir();
     let save_upload_dir: String = format!("{UPLOAD_DIR}/{base_file_dir}/{file_id}");
+    ctx.set_response_header("file", save_upload_dir.clone())
+        .await;
     let upload_strategy: ChunkStrategy = ChunkStrategy::new(
         0,
         &save_upload_dir,
