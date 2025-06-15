@@ -94,7 +94,7 @@ async fn register_response_middleware(server: &Server) {
 }
 
 async fn register_route(server: &Server) {
-    server.route(format!("/"), controller::root::handle).await;
+    server.route("/", controller::root::handle).await;
     server.route("/upload", controller::upload::html).await;
     server
         .route("/favicon.ico", controller::favicon_ico::handle)

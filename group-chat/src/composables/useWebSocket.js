@@ -15,7 +15,7 @@ export function useWebSocket({ onMessage }) {
     const host =
       window.location.hostname === 'localhost' ||
       window.location.hostname === '127.0.0.1'
-        ? 'localhost:60007'
+        ? 'localhost:60006'
         : window.location.hostname;
 
     socket.value = new WebSocket(`${protocol}://${host}/api/ws?uuid=${uuid}`);

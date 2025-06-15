@@ -5,6 +5,12 @@
     @scroll="onScroll"
     :style="{ height: containerHeight + 'px' }"
   >
+    <p class="center-text">
+      Server:
+      <a href="https://github.com/eastspire/hyperlane" target="_blank"
+        >Hyperlane</a
+      >
+    </p>
     <div class="list-content">
       <slot
         v-for="(item, index) in items"
@@ -50,6 +56,25 @@ export default {
 </script>
 
 <style scoped>
+.center-text {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+a {
+  color: #1e90ff;
+  text-decoration: none;
+  transition: color 0.3s, border-bottom-color 0.3s;
+}
+a:hover,
+a:focus {
+  color: pink;
+  border-bottom-color: pink;
+  outline: none;
+  cursor: pointer;
+}
 .list-container {
   overflow-y: auto;
   position: relative;

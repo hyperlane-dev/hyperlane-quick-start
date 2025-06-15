@@ -20,6 +20,18 @@
         display: flex;
         flex-direction: column;
       }
+      a {
+        color: #1e90ff;
+        text-decoration: none;
+        transition: color 0.3s, border-bottom-color 0.3s;
+      }
+      a:hover,
+      a:focus {
+        color: pink;
+        border-bottom-color: pink;
+        outline: none;
+        cursor: pointer;
+      }
       @media (max-width: 768px) {
         body {
           padding: 0.5rem;
@@ -320,7 +332,12 @@
     </style>
   </head>
   <body>
-    <h1>File Upload</h1>
+    <h1>
+      File Upload(Server:
+      <a href="https://github.com/eastspire/hyperlane" target="_blank"
+        >Hyperlane</a
+      >)
+    </h1>
     <div class="upload-container">
       <div class="file-input-container">
         <label for="file-input" class="file-input-label">Select File</label

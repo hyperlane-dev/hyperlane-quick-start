@@ -8,11 +8,28 @@
       .center-text {
         text-align: center;
       }
+      a {
+        color: #1e90ff;
+        text-decoration: none;
+        transition: color 0.3s, border-bottom-color 0.3s;
+      }
+      a:hover,
+      a:focus {
+        color: pink;
+        border-bottom-color: pink;
+        outline: none;
+        cursor: pointer;
+      }
     </style>
   </head>
   <body>
     <h1 class="center-text">Hello hyperlane: {{ time }}</h1>
     <hr />
-    <p class="center-text">Server: Hyperlane</p>
+    <p class="center-text">
+      Server:
+      <a href="https://github.com/eastspire/hyperlane" target="_blank"
+        >Hyperlane</a
+      >
+    </p>
   </body>
 </html>

@@ -1,5 +1,6 @@
 use super::*;
 
+#[methods(get, post)]
 pub async fn html(ctx: Context) {
     let _ = ctx
         .set_response_status_code(200)
@@ -10,6 +11,7 @@ pub async fn html(ctx: Context) {
         .await;
 }
 
+#[post]
 pub async fn register(ctx: Context) {
     let file_chunk_data_opt: OptionFileChunkData = get_register_file_chunk_data(&ctx).await;
     if file_chunk_data_opt.is_none() {
@@ -20,6 +22,7 @@ pub async fn register(ctx: Context) {
     set_common_success_response_body(&ctx, "").await;
 }
 
+#[post]
 pub async fn save(ctx: Context) {
     let file_chunk_data_opt: OptionFileChunkData = get_save_file_chunk_data(&ctx).await;
     if file_chunk_data_opt.is_none() {
@@ -56,6 +59,7 @@ pub async fn save(ctx: Context) {
     }
 }
 
+#[post]
 pub async fn merge(ctx: Context) {
     let file_chunk_data_opt: OptionFileChunkData = get_merge_file_chunk_data(&ctx).await;
     if file_chunk_data_opt.is_none() {

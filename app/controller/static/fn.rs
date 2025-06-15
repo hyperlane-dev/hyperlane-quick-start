@@ -1,5 +1,6 @@
 use super::*;
 
+#[methods(get, post)]
 pub async fn handle(ctx: Context) {
     let dir: String = ctx
         .get_route_param(UPLOAD_DIR_KEY)
