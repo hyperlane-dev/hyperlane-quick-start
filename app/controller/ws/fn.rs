@@ -39,6 +39,7 @@ pub async fn html(ctx: Context) {
         .await;
 }
 
+#[ws]
 #[get]
 #[utoipa::path(
     get,
