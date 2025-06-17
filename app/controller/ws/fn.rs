@@ -1,5 +1,6 @@
 use super::*;
 
+#[ws]
 #[get]
 pub async fn handle(ctx: Context) {
     let request_body: Vec<u8> = ctx.get_request_body().await;
