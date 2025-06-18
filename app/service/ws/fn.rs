@@ -43,11 +43,19 @@ pub(crate) async fn callback(ctx: Context) {
         .get_request_body_json::<WebSocketReqData>()
         .await
         .unwrap();
-    let resp_data: WebSocketRespData = if req_data.is_ping() {
-        WebSocketRespData::new(MessageType::Pang, &ctx, "").await
-    } else {
-        req_data.into_resp(&ctx).await
-    };
+    if req_data.is_ping() {
+        let resp_data: WebSocketRespData =
+            WebSocketRespData::new(MessageType::Pang, &ctx, "").await;
+        let resp_data: String = json_stringify_string(&resp_data).unwrap();
+        ctx.set_response_body(resp_data)
+            .await
+            .send_body()
+            .await
+            .unwrap();
+        ctx.set_response_body("").await;
+        return;
+    }
+    let resp_data: WebSocketRespData = req_data.into_resp(&ctx).await;
     let resp_data: String = json_stringify_string(&resp_data).unwrap();
     ctx.set_response_body(resp_data).await;
 }
