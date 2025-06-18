@@ -11,5 +11,7 @@ pub enum MessageType {
     Video,
     Location,
     Custom,
+    Ping,
+    Pang,
     Unknown,
 }

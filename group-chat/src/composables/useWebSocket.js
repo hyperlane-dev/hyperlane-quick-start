@@ -8,6 +8,7 @@ export function useWebSocket({ onMessage }) {
   let reconnectAttempts = 0;
   const maxReconnectAttempts = 5;
   const reconnectInterval = 3000;
+  let sendId = null;
 
   const connect = () => {
     connectionStatus.value = 'connecting';
@@ -21,11 +22,21 @@ export function useWebSocket({ onMessage }) {
     socket.value = new WebSocket(`${protocol}://${host}/api/ws?uuid=${uuid}`);
     socket.value.onopen = () => {
       connectionStatus.value = 'connected';
+      clearInterval(sendId);
+      sendId = setInterval(() => {
+        sendMessage({
+          type: 'Ping',
+          data: '',
+        });
+      }, 8888);
     };
 
     socket.value.onmessage = (event) => {
       try {
         let data = JSON.parse(event.data);
+        if (data.type == 'Pang') {
+          return;
+        }
         onMessage(data);
       } catch (error) {
         onMessage({

@@ -39,13 +39,16 @@ pub(crate) async fn on_closed(ctx: Context) {
 }
 
 pub(crate) async fn callback(ctx: Context) {
-    let data: WebSocketRespData = ctx
+    let req_data: WebSocketReqData = ctx
         .get_request_body_json::<WebSocketReqData>()
         .await
-        .unwrap()
-        .into_resp(&ctx)
-        .await;
-    let resp_data: String = json_stringify_string(&data).unwrap();
+        .unwrap();
+    let resp_data: WebSocketRespData = if req_data.is_ping() {
+        WebSocketRespData::new(MessageType::Pang, &ctx, "").await
+    } else {
+        req_data.into_resp(&ctx).await
+    };
+    let resp_data: String = json_stringify_string(&resp_data).unwrap();
     ctx.set_response_body(resp_data).await;
 }
 

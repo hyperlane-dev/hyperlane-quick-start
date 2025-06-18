@@ -6,11 +6,21 @@ impl Default for MessageType {
     }
 }
 
+impl MessageType {
+    fn is_ping(&self) -> bool {
+        matches!(self, MessageType::Ping)
+    }
+}
+
 impl WebSocketReqData {
     pub fn new<T: ToString>(r#type: MessageType, data: T) -> Self {
         let mut resp_data: Self = Self::default();
         resp_data.set_type(r#type).set_data(data.to_string());
         resp_data
+    }
+
+    pub fn is_ping(&self) -> bool {
+        self.get_type().is_ping()
     }
 
     pub async fn into_resp(&self, ctx: &Context) -> WebSocketRespData {
