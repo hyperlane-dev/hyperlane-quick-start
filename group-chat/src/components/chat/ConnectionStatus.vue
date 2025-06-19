@@ -29,19 +29,18 @@ export default {
 <style scoped>
 .connection-status {
   text-align: center;
-  padding: 10px 15px;
-  background-color: rgba(255, 193, 7, 0.9);
-  color: #333;
-  font-size: 0.9em;
+  padding: 8px 16px;
+  background-color: #f04747;
+  color: white;
+  font-size: 0.875rem;
   position: fixed;
-  bottom: 70px;
+  bottom: 80px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 20;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  border-radius: 30px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
   max-width: 80%;
-  backdrop-filter: blur(5px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -49,6 +48,6 @@ export default {
 
 .status-icon {
   font-style: normal;
-  margin-right: 6px;
+  margin-right: 8px;
 }
 </style>

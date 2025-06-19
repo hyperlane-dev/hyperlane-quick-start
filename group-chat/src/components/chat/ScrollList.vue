@@ -5,12 +5,6 @@
     @scroll="onScroll"
     :style="{ height: containerHeight + 'px' }"
   >
-    <p class="center-text">
-      Server:
-      <a href="https://github.com/eastspire/hyperlane" target="_blank"
-        >Hyperlane</a
-      >
-    </p>
     <div class="list-content">
       <slot
         v-for="(item, index) in items"
@@ -35,34 +29,60 @@ export default {
       default: 500,
     },
   },
+  data() {
+    return {
+      canScroll: false,
+    };
+  },
   methods: {
     onScroll(e) {
-      const scrollTop = e.target.scrollTop;
-      const clientHeight = e.target.clientHeight;
-      const distanceToBottom = e.target.scrollHeight - scrollTop - clientHeight;
-      const isNearBottom = distanceToBottom < 100;
+      const target = e.target;
+      const scrollTop = target.scrollTop;
+      const clientHeight = target.clientHeight;
+      const scrollHeight = target.scrollHeight;
+      const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+      const isNearBottom = distanceFromBottom < 100;
       this.$emit('handleScroll', isNearBottom);
     },
-
     scrollToBottom() {
-      if (this.$refs.container) {
+      if (!this.$refs.container) return;
+
+      const container = this.$refs.container;
+      const scrollHeight = container.scrollHeight;
+      const clientHeight = container.clientHeight;
+
+      // 只有当内容高度大于容器高度时才滚动
+      if (scrollHeight > clientHeight) {
         requestAnimationFrame(() => {
-          this.$refs.container.scrollTop = this.$refs.container.scrollHeight;
+          container.scrollTop = container.scrollHeight;
         });
       }
+    },
+    checkScrollable() {
+      if (!this.$refs.container) return false;
+
+      const container = this.$refs.container;
+      const scrollHeight = container.scrollHeight;
+      const clientHeight = container.clientHeight;
+
+      this.canScroll = scrollHeight > clientHeight;
+      return this.canScroll;
+    },
+  },
+  watch: {
+    items: {
+      handler() {
+        this.$nextTick(() => {
+          this.checkScrollable();
+        });
+      },
+      deep: true,
     },
   },
 };
 </script>
 
 <style scoped>
-.center-text {
-  position: fixed;
-  top: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  text-align: center;
-}
 a {
   color: #1e90ff;
   text-decoration: none;

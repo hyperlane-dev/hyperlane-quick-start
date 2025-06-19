@@ -24,8 +24,8 @@ export default {
   right: 20px;
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #4a9c5e 0%, #2e7d32 100%);
-  color: white;
+  background-color: #202225;
+  color: #dcddde;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -33,13 +33,12 @@ export default {
   cursor: pointer;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
   z-index: 30;
-  transition: all 0.3s ease;
-  animation: bounce 1s infinite alternate;
+  transition: all 0.2s ease;
 }
 
 .scroll-to-bottom:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  background-color: #2f3136;
+  transform: translateY(-2px);
 }
 
 .scroll-icon {
@@ -51,25 +50,16 @@ export default {
   position: absolute;
   top: -8px;
   right: -8px;
-  background-color: #ff4d4f;
+  background-color: #f04747;
   color: white;
-  font-size: 0.7em;
+  font-size: 0.75rem;
   min-width: 18px;
   height: 18px;
   border-radius: 9px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
-
-@keyframes bounce {
-  from {
-    transform: translateY(0);
-  }
-  to {
-    transform: translateY(-5px);
-  }
+  font-weight: 700;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 </style>

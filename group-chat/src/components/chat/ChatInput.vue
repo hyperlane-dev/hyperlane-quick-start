@@ -43,93 +43,93 @@ export default {
 .chat-input {
   display: flex;
   flex-wrap: wrap;
-  padding: 6px 15px;
-  background-color: rgb(242, 242, 242);
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 0 12px;
+  margin: 0 12px 12px;
+  background-color: #40444b;
+  border-radius: 8px;
   position: sticky;
   bottom: 0;
   z-index: 10;
-  width: 100%;
+  width: calc(100% - 24px);
   box-sizing: border-box;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
   align-items: center;
 }
 
 .chat-input input {
   flex: 1;
   min-width: 200px;
-  padding: 8px 16px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 24px;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 4px;
   outline: none;
-  margin-right: 12px;
-  margin-bottom: 0;
-  font-size: 14px;
-  transition: all 0.3s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) inset;
-  background-color: white;
+  margin: 6px 0;
+  font-size: 0.9375rem;
+  background-color: transparent;
+  color: #dcddde;
+  line-height: 1.3;
 }
 
-.chat-input input:focus {
-  border-color: #3a8dde;
-  box-shadow: 0 0 0 2px rgba(58, 141, 222, 0.1);
+.chat-input input::placeholder {
+  color: #72767d;
 }
 
 .chat-input input:disabled {
-  background-color: #f5f5f5;
+  background-color: rgba(0, 0, 0, 0.1);
   cursor: not-allowed;
 }
 
 .chat-input button {
-  padding: 8px 16px;
-  background: linear-gradient(135deg, #4a9c5e 0%, #2e7d32 100%);
+  padding: 6px 10px;
+  height: 28px;
+  background-color: #5865f2;
   color: white;
   border: none;
-  border-radius: 24px;
+  border-radius: 4px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-  font-weight: 600;
-  box-shadow: 0 2px 5px rgba(46, 125, 50, 0.2);
+  transition: all 0.2s ease;
+  margin-left: 8px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9375rem;
 }
 
 .chat-input button:hover:not(:disabled) {
-  background: linear-gradient(135deg, #4a9c5e 20%, #2e7d32 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(46, 125, 50, 0.3);
+  background-color: #4752c4;
 }
 
 .chat-input button:active:not(:disabled) {
-  transform: translateY(1px);
-  box-shadow: 0 1px 3px rgba(46, 125, 50, 0.3);
+  background-color: #3c45a5;
 }
 
 .chat-input button:disabled {
-  background: #cccccc;
+  background-color: #4f545c;
   cursor: not-allowed;
-  box-shadow: none;
+  opacity: 0.5;
 }
 
 .send-icon {
   font-style: normal;
-  margin-left: 6px;
-  font-size: 0.9em;
+  font-size: 1.2em;
+  margin-left: 4px;
 }
 
 @media (max-width: 600px) {
   .chat-input {
-    flex-wrap: nowrap;
-    padding: 6px 6px;
+    margin: 0 6px 8px;
+    padding: 0 6px;
   }
+
   .chat-input input {
     min-width: 0;
-    font-size: 13px;
-    padding: 10px 10px;
-    margin-right: 6px;
+    padding: 6px 8px;
   }
+
   .chat-input button {
-    padding: 10px 14px;
-    font-size: 13px;
+    padding: 4px 8px;
+    margin-left: 6px;
+    height: 26px;
   }
 }
 </style>

@@ -1,25 +1,38 @@
 <template>
   <div class="chat-view">
-    <MessageList
-      :messages="messages"
-      :isNearBottom="isNearBottom"
-      :name="username"
-      @handleScroll="handleScroll"
-      ref="messageListRef"
-    />
-    <ScrollToBottomButton
-      v-if="showScrollButton"
-      :unreadCount="unreadCount"
-      @click="scrollToBottom"
-    />
-    <ConnectionStatus
-      v-if="connectionStatus !== 'connected'"
-      :status="connectionStatus"
-    />
-    <ChatInput
-      :connectionStatus="connectionStatus"
-      @send-message="sendMessage"
-    />
+    <div class="nav-bar">
+      <h1 class="nav-title">
+        <a href="https://github.com/eastspire/hyperlane" target="_blank">
+          Hyperlane Chat
+        </a>
+      </h1>
+      <div class="connection-indicator" :class="connectionStatus">
+        <span class="status-dot"></span>
+        {{ connectionStatus === 'connected' ? '在线' : '离线' }}
+      </div>
+    </div>
+    <div class="chat-container">
+      <MessageList
+        :messages="messages"
+        :isNearBottom="isNearBottom"
+        :name="username"
+        @handleScroll="handleScroll"
+        ref="messageListRef"
+      />
+      <ScrollToBottomButton
+        v-if="showScrollButton"
+        :unreadCount="unreadCount"
+        @click="scrollToBottom"
+      />
+      <ConnectionStatus
+        v-if="connectionStatus !== 'connected'"
+        :status="connectionStatus"
+      />
+      <ChatInput
+        :connectionStatus="connectionStatus"
+        @send-message="sendMessage"
+      />
+    </div>
   </div>
 </template>
 
@@ -96,6 +109,17 @@ export default {
       });
 
       this.$nextTick(() => {
+        const messageList = this.$refs.messageListRef;
+        if (!messageList) return;
+
+        const canScroll = messageList.$refs.messageContainer.checkScrollable();
+        if (!canScroll) {
+          // 如果不可滚动，不显示滚动按钮，也不增加未读消息数
+          this.showScrollButton = false;
+          this.unreadCount = 0;
+          return;
+        }
+
         if (isSelf) {
           this.scrollToBottom();
         } else if (this.isNearBottom) {
@@ -153,6 +177,83 @@ export default {
   border: none;
   overflow: hidden;
   box-shadow: none;
-  background-color: #f0f2f5;
+  background-color: #36393f;
+  color: #dcddde;
+}
+
+.nav-bar {
+  height: 48px;
+  background-color: #202225;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  box-shadow: 0 1px 0 rgba(4, 4, 5, 0.2), 0 1.5px 0 rgba(6, 6, 7, 0.05),
+    0 2px 0 rgba(4, 4, 5, 0.05);
+  flex-shrink: 0;
+  z-index: 100;
+}
+
+.nav-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.nav-title a {
+  color: #fff;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.nav-title a:hover {
+  color: #dcddde;
+}
+
+.connection-indicator {
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+  color: #b9bbbe;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.connection-indicator.connected .status-dot {
+  background-color: #3ba55c;
+}
+
+.connection-indicator.disconnected .status-dot {
+  background-color: #ed4245;
+}
+
+.connection-indicator.connecting .status-dot {
+  background-color: #faa61a;
+  animation: pulse 2s infinite;
+}
+
+.chat-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 </style>

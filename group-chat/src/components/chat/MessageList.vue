@@ -24,6 +24,7 @@
             <div class="message-content">
               <div class="text">{{ message.data }}</div>
             </div>
+            <div class="message-time">{{ message.time }}</div>
           </div>
         </template>
         <!-- 自己发送的消息 -->
@@ -37,6 +38,7 @@
             <div class="message-content self">
               <div class="text">{{ message.data }}</div>
             </div>
+            <div class="message-time">{{ message.time }}</div>
           </div>
           <MessageAvatar :name="message.name" :isSelf="true" />
         </template>
@@ -75,6 +77,7 @@ export default {
   data() {
     return {
       containerHeight: 0,
+      shouldAutoScroll: true,
     };
   },
   mounted() {
@@ -94,11 +97,38 @@ export default {
     scrollToBottom() {
       const container = this.$refs.messageContainer;
       if (container) {
-        container.scrollToBottom();
+        // 检查是否可以滚动
+        const canScroll = container.checkScrollable();
+        if (canScroll) {
+          container.scrollToBottom();
+        }
       }
     },
     handleScroll(isNearBottom) {
-      this.$emit('handleScroll', isNearBottom);
+      // 只有在可滚动的情况下才更新状态
+      const container = this.$refs.messageContainer;
+      if (container && container.canScroll) {
+        this.$emit('handleScroll', isNearBottom);
+      } else {
+        // 如果不可滚动，始终认为在底部
+        this.$emit('handleScroll', true);
+      }
+    },
+  },
+  watch: {
+    messages: {
+      handler() {
+        this.$nextTick(() => {
+          const container = this.$refs.messageContainer;
+          if (container) {
+            const canScroll = container.checkScrollable();
+            if (canScroll && this.shouldAutoScroll) {
+              this.scrollToBottom();
+            }
+          }
+        });
+      },
+      deep: true,
     },
   },
 };
@@ -107,25 +137,71 @@ export default {
 <style scoped>
 .chat-messages {
   flex: 1;
-  padding: 4px 4px;
-  background-color: rgb(242, 242, 242);
+  padding: 16px;
+  background-color: #36393f;
   scrollbar-width: thin;
+  margin-top: 1px;
 }
 
 .message {
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding: 2px 0;
+  margin: 0;
   display: flex;
   animation: fadeIn 0.3s ease-in-out;
   align-items: flex-start;
 }
 
+.message-info {
+  display: flex;
+  flex-direction: column;
+  max-width: 90%;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}
+
+.message-info.self {
+  align-items: flex-end;
+}
+
+.message-content {
+  padding: 8px 12px;
+  border-radius: 4px;
+  position: relative;
+  word-break: break-word;
+  background-color: #40444b;
+  color: #dcddde;
+  font-size: 0.9375rem;
+  line-height: 1.3;
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+}
+
+.message-content.self {
+  background-color: #2f3136;
+}
+
+.message-time {
+  color: #72767d;
+  font-size: 0.75rem;
+  margin-top: 4px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  font-weight: 400;
+}
+
+.message-info.self .message-time {
+  text-align: right;
+}
+
 @keyframes fadeIn {
-  from {
+  0% {
     opacity: 0;
     transform: translateY(10px);
   }
-  to {
+  100% {
     opacity: 1;
     transform: translateY(0);
   }
@@ -139,27 +215,36 @@ export default {
   justify-content: flex-start;
 }
 
-.message-info {
-  display: flex;
-  flex-direction: column;
-  max-width: 70%;
+.text {
+  white-space: pre-wrap;
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
 }
 
-.message-info.self {
-  align-items: flex-end;
+.name {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.message-content {
-  padding: 12px 16px;
-  border-radius: 18px;
-  position: relative;
-  word-break: break-word;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  background-color: white;
-}
+@media (max-width: 600px) {
+  .chat-messages {
+    padding: 8px;
+  }
 
-.message-content.self {
-  background: rgb(0, 153, 255);
-  color: white;
+  .message {
+    margin: 0px 0 12px;
+  }
+
+  .message-content {
+    padding: 6px 10px;
+    font-size: 0.875rem;
+  }
+
+  .name {
+    max-width: 120px;
+  }
 }
 </style>
