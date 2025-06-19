@@ -36,7 +36,7 @@ async fn host(server: &Server) {
 
 async fn linger(server: &Server) {
     server.set_linger(SERVER_LINGER).await;
-    println_success!("Server linger: ", format!("{:?}", SERVER_LINGER));
+    println_success!("Server linger: ", format!("{SERVER_LINGER:?}"));
 }
 
 async fn port(server: &Server) {
