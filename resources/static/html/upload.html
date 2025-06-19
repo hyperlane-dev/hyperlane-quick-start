@@ -5,346 +5,458 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>File Upload</title>
     <style>
+      :root {
+        --primary-gradient: linear-gradient(135deg, #4f46e5, #06b6d4);
+        --primary-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3),
+          0 2px 4px -1px rgba(79, 70, 229, 0.2);
+        --hover-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3),
+          0 4px 6px -2px rgba(79, 70, 229, 0.2);
+        --border-radius: 12px;
+        --spacing-xs: 0.25rem;
+        --spacing-sm: 0.5rem;
+        --spacing-md: 1rem;
+        --spacing-lg: 1.5rem;
+        --font-size-sm: 0.875rem;
+        --font-size-md: 1rem;
+        --font-size-lg: 1.25rem;
+        --font-size-xl: 2rem;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
       body {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 1rem;
         background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
         min-height: 100vh;
-        overflow: hidden;
-        user-select: none;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
+        height: 100vh;
+        margin: 0;
         display: flex;
         flex-direction: column;
+        overflow: hidden;
       }
-      a {
-        color: #1e90ff;
-        text-decoration: none;
-        transition: color 0.3s, border-bottom-color 0.3s;
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        width: 100%;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: var(--spacing-md);
+        overflow: hidden;
       }
-      a:hover,
-      a:focus {
-        color: pink;
-        border-bottom-color: pink;
-        outline: none;
-        cursor: pointer;
-      }
-      @media (max-width: 768px) {
-        body {
-          padding: 0.5rem;
-        }
-        h1 {
-          font-size: 1.5rem;
-        }
-        .upload-container {
-          padding: 0.75rem;
-        }
-        .file-input-label,
-        .upload-btn {
-          padding: 0.5rem 1rem;
-          font-size: 0.875rem;
-        }
-        .history-container {
-          max-height: 50vh;
-          margin-bottom: 0.75rem;
-        }
-        .file-input-container {
-          margin-top: 0.5rem;
-          margin-bottom: 0.5rem;
-        }
-      }
+
       h1 {
-        color: #2d3748;
         text-align: center;
         font-weight: 600;
-        font-size: 2rem;
-        margin-top: 1rem;
-        margin-bottom: 1rem;
-        background: linear-gradient(90deg, #4f46e5, #06b6d4);
+        font-size: var(--font-size-xl);
+        margin: 0 0 var(--spacing-md);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--spacing-sm);
+        flex-wrap: wrap;
+        flex-shrink: 0;
+      }
+
+      h1 .title-container {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+      }
+
+      h1 .title {
+        background: var(--primary-gradient);
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent;
         animation: gradient 3s ease infinite;
-        background-size: 200%200%;
+        background-size: 200% 200%;
       }
+
+      h1 small {
+        font-size: inherit;
+        opacity: 0.8;
+      }
+
+      h1 a {
+        color: #4f46e5;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        position: relative;
+        padding: 2px 4px;
+        border-radius: 4px;
+      }
+
+      h1 a:hover {
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      h1 a::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background: var(--primary-gradient);
+        transform: scaleX(0);
+        transform-origin: right;
+        transition: transform 0.3s ease;
+      }
+
+      h1 a:hover::after {
+        transform: scaleX(1);
+        transform-origin: left;
+      }
+
       .upload-container {
         background-color: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        box-shadow: 0 10px 15px-3px rgba(0, 0, 0, 0.1),
-          0 4px 6px-2px rgba(0, 0, 0, 0.05);
+        border-radius: var(--border-radius);
+        padding: var(--spacing-lg);
+        box-shadow: var(--primary-shadow);
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        flex: 1;
         display: flex;
         flex-direction: column;
-      }
-      .upload-container:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 20px 25px-5px rgba(0, 0, 0, 0.1),
-          0 10px 10px-5px rgba(0, 0, 0, 0.04);
-      }
-      .file-input-container {
-        margin-bottom: 0.25rem;
-        margin-top: 1rem;
-        text-align: center;
-      }
-      .file-input {
-        display: none;
-      }
-      .file-input-label {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0.75rem 1.5rem;
-        background: linear-gradient(90deg, #4f46e5, #06b6d4);
-        color: white;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        font-weight: 500;
-        box-shadow: 0 4px 6px-1px rgba(79, 70, 229, 0.3),
-          0 2px 4px-1px rgba(79, 70, 229, 0.2);
-        animation: gradient 3s ease infinite;
-        background-size: 200%200%;
-        width: 100%;
-        box-sizing: border-box;
-      }
-      @keyframes gradient {
-        0% {
-          background-position: 0%50%;
-        }
-        50% {
-          background-position: 100%50%;
-        }
-        100% {
-          background-position: 0%50%;
-        }
-      }
-      .file-input-label:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 10px 15px-3px rgba(79, 70, 229, 0.3),
-          0 4px 6px-2px rgba(79, 70, 229, 0.2);
-      }
-      .file-input-label:active {
-        transform: translateY(0);
-      }
-      .upload-btn {
-        display: block;
-        width: 100%;
-        padding: 0.75rem;
-        background: linear-gradient(90deg, #4f46e5, #06b6d4);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 1rem;
-        font-weight: 500;
-        margin-top: 1.5rem;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 4px 6px-1px rgba(79, 70, 229, 0.3),
-          0 2px 4px-1px rgba(79, 70, 229, 0.2);
-      }
-      .upload-btn:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 10px 15px-3px rgba(79, 70, 229, 0.3),
-          0 4px 6px-2px rgba(79, 70, 229, 0.2);
-      }
-      .upload-btn:disabled {
-        background: #e2e8f0;
-        color: #a0aec0;
-        cursor: not-allowed;
-        transform: none;
-        box-shadow: none;
-      }
-      .status {
-        margin-top: 1.5rem;
-        padding: 1rem;
-        border-radius: 8px;
-        font-size: 0.875rem;
-        transition: all 0.3s ease;
-        opacity: 0;
-        max-height: 0;
+        gap: var(--spacing-md);
+        position: relative;
+        flex: 1;
         overflow: hidden;
       }
-      .status.show {
-        opacity: 1;
-        max-height: 200px;
-      }
-      .success {
-        background-color: #f0fff4;
-        color: #2f855a;
-      }
-      .error {
-        background-color: #fff5f5;
-        color: #c53030;
-      }
+
       .history-container {
-        margin-bottom: 0.5rem;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid#e2e8f0;
-        max-height: 70vh;
+        flex: 1;
         overflow-y: auto;
-        overflow-x: hidden;
+        border-radius: var(--border-radius);
+        background: rgba(255, 255, 255, 0.5);
+        padding: var(--spacing-md);
+        margin-bottom: var(--spacing-md);
       }
+
       .history-container::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
+        width: 6px;
       }
+
       .history-container::-webkit-scrollbar-track {
         background: #f1f1f1;
-        border-radius: 4px;
+        border-radius: 3px;
       }
+
       .history-container::-webkit-scrollbar-thumb {
-        background: linear-gradient(90deg, #4f46e5, #06b6d4);
-        border-radius: 4px;
+        background: var(--primary-gradient);
+        border-radius: 3px;
       }
-      .history-container::-webkit-scrollbar-button {
-        display: none;
-      }
-      .history-container h2 {
-        color: #2d3748;
-        font-size: 1.25rem;
-        margin-bottom: 1rem;
-        font-weight: 600;
-      }
-      .history-container ul {
+
+      .history-list {
         list-style: none;
-        padding: 0;
-        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-sm);
       }
-      .history-container li {
-        padding: 0.75rem 1rem;
-        margin-bottom: 0.5rem;
-        border-radius: 6px;
-        display: block;
+
+      .history-item {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: var(--spacing-md);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         transition: all 0.2s ease;
-        white-space: nowrap;
-        overflow: hidden;
-        position: relative;
       }
-      .upload-complete {
-        background-color: #e6ffed;
-        color: #2f855a;
+
+      .history-item:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--primary-shadow);
       }
-      .upload-in-progress {
-        background-color: #ebf8ff;
-        color: #3182ce;
-      }
-      .history-container li:nth-child(even) {
-        border-left: 4px solid#06b6d4;
-      }
-      .history-container li:nth-child(odd) {
-        border-left: 4px solid#2f855a;
-      }
-      .history-container li {
-        position: relative;
-        overflow: hidden;
-      }
-      .history-container li.upload-complete {
-        background-color: #e6ffed;
-        color: #2f855a;
-      }
+
       .history-item-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        width: 100%;
-        margin-bottom: 0.5rem;
-        gap: 1rem;
+        margin-bottom: var(--spacing-sm);
       }
-      .history-item-header.filename {
-        flex: 1;
-        min-width: 0;
-        white-space: nowrap;
+
+      .filename {
+        font-weight: 500;
+        color: #2d3748;
         overflow: hidden;
         text-overflow: ellipsis;
-        padding: 0 0.5rem;
+        white-space: nowrap;
+        flex: 1;
+        margin-right: var(--spacing-sm);
       }
-      .history-item-header span:last-child {
-        flex-shrink: 0;
+
+      .filesize {
+        color: #718096;
+        font-size: var(--font-size-sm);
         white-space: nowrap;
       }
-      .history-item-progress {
-        width: 100%;
-      }
-      .history-progress-bar {
+
+      .progress-bar {
         height: 6px;
-        background-color: #edf2f7;
+        background: #e2e8f0;
         border-radius: 3px;
         overflow: hidden;
-        margin-top: 0.5rem;
-        position: relative;
       }
-      .history-progress-fill {
+
+      .progress-fill {
         height: 100%;
-        background: linear-gradient(90deg, #4f46e5, #06b6d4);
-        width: 0%;
+        background: var(--primary-gradient);
         transition: width 0.3s ease;
-        position: relative;
-        z-index: 1;
       }
-      .history-container li:hover {
-        background-color: #edf2f7;
-        transform: translateX(4px);
+
+      .action-group {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: var(--spacing-md);
+        flex-shrink: 0;
+        padding: var(--spacing-md);
+        background: transparent;
       }
-      .history-container li span {
-        margin-right: 1rem;
-        color: #4a5568;
-      }
-      .history-container li.filename {
-        max-width: 60%;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        display: inline-block;
-        vertical-align: middle;
-      }
-      .history-container li a {
-        color: #4f46e5;
-        text-decoration: none;
+
+      .btn {
+        padding: var(--spacing-md);
+        border-radius: var(--border-radius);
+        border: none;
         font-weight: 500;
-        display: block;
-        padding: 0.75rem 1rem;
-        margin: -0.75rem-1rem;
-      }
-      .history-container li {
         cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        font-size: var(--font-size-md);
+        background: var(--primary-gradient);
+        color: white;
+        box-shadow: var(--primary-shadow);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--spacing-sm);
       }
-      .history-container li a:hover {
-        text-decoration: none;
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--hover-shadow);
       }
-      @keyframes fadeIn {
+
+      .btn:active {
+        transform: translateY(0);
+      }
+
+      .btn:disabled {
+        background: #e2e8f0;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .file-input {
+        display: none;
+      }
+
+      .status {
+        position: relative;
+        padding: var(--spacing-sm) var(--spacing-lg);
+        border-radius: var(--border-radius);
+        font-size: var(--font-size-sm);
+        animation: slideIn 0.3s ease;
+        z-index: 1000;
+        box-shadow: var(--primary-shadow);
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--spacing-sm);
+        background: white;
+        margin-bottom: var(--spacing-md);
+      }
+
+      .status.success {
+        background-color: #f0fff4;
+        color: #2f855a;
+        border-left: 4px solid #2f855a;
+      }
+
+      .status.error {
+        background-color: #fff5f5;
+        color: #c53030;
+        border-left: 4px solid #c53030;
+      }
+
+      .status::before {
+        content: '';
+        width: 16px;
+        height: 16px;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: contain;
+      }
+
+      .status.success::before {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%232f855a'%3E%3Cpath fill-rule='evenodd' d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z' clip-rule='evenodd'/%3E%3C/svg%3E");
+      }
+
+      .status.error::before {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23c53030'%3E%3Cpath fill-rule='evenodd' d='M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z' clip-rule='evenodd'/%3E%3C/svg%3E");
+      }
+
+      @keyframes slideIn {
         from {
           opacity: 0;
-          transform: translateY(10px);
+          transform: translateY(-10px);
         }
         to {
           opacity: 1;
           transform: translateY(0);
         }
       }
-      .upload-container {
-        animation: fadeIn 0.5s ease-out forwards;
+
+      @keyframes gradient {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      @media (max-width: 768px) {
+        :root {
+          --spacing-md: 0.75rem;
+          --spacing-lg: 1rem;
+          --font-size-xl: 1.5rem;
+        }
+
+        body {
+          height: 100vh;
+          overflow: hidden;
+        }
+
+        .container {
+          padding: var(--spacing-sm);
+        }
+
+        .upload-container {
+          padding: var(--spacing-md);
+        }
+
+        h1 {
+          font-size: var(--font-size-lg);
+          margin: 0 0 var(--spacing-sm);
+        }
+
+        h1 .title,
+        h1 small {
+          font-size: var(--font-size-lg);
+        }
+
+        .action-group {
+          padding: var(--spacing-sm);
+        }
+
+        .status {
+          padding: var(--spacing-xs) var(--spacing-md);
+          font-size: var(--font-size-sm);
+          margin-bottom: var(--spacing-sm);
+        }
       }
     </style>
   </head>
   <body>
-    <h1>
-      File Upload(Server:
-      <a href="https://github.com/eastspire/hyperlane" target="_blank"
-        >Hyperlane</a
-      >)
-    </h1>
-    <div class="upload-container">
-      <div class="file-input-container">
-        <label for="file-input" class="file-input-label">Select File</label
-        ><input type="file" id="file-input" class="file-input" multiple />
+    <div class="container">
+      <h1>
+        <div class="title-container">
+          <span class="title">File Upload</span>
+          <small>
+            <a
+              href="https://github.com/eastspire/hyperlane"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Hyperlane
+            </a>
+          </small>
+        </div>
+      </h1>
+
+      <div class="upload-container">
+        <div id="status" class="status" style="display: none"></div>
+        <div class="history-container">
+          <div id="history"></div>
+        </div>
+
+        <div class="action-group">
+          <label for="file-input" class="btn">
+            <svg
+              width="20"
+              height="20"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            Select Files
+          </label>
+          <input type="file" id="file-input" class="file-input" multiple />
+
+          <button class="btn" id="exportBtn">
+            <svg
+              width="20"
+              height="20"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+              />
+            </svg>
+            Export Data
+          </button>
+
+          <label for="importFile" class="btn">
+            <svg
+              width="20"
+              height="20"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+              />
+            </svg>
+            Import Data
+          </label>
+          <input
+            type="file"
+            id="importFile"
+            class="file-input"
+            accept=".json"
+          />
+        </div>
       </div>
-      <div class="status" id="status" style="display: none"></div>
     </div>
+
     <script>
       const CHUNK_SIZE = 512 * 1024;
       const MAX_RETRIES = 88888888;
@@ -376,40 +488,49 @@
           });
       });
       function renderHistoryList(files) {
-        let historyContainer = document.querySelector('.history-container');
-        if (!historyContainer) {
-          historyContainer = document.createElement('div');
-          historyContainer.className = 'history-container';
-          document.querySelector('.upload-container').prepend(historyContainer);
-        }
-        historyContainer.innerHTML = '<h2>Upload History</h2>';
+        let historyContainer = document.getElementById('history');
+        if (!historyContainer) return;
+
         files.sort(
           (a, b) => new Date(b.uploadTime || 0) - new Date(a.uploadTime || 0)
         );
+
         if (files.length === 0) {
-          historyContainer.innerHTML += '<p>No upload records</p>';
-        } else {
-          const list = document.createElement('ul');
-          files.forEach((file) => {
-            const item = document.createElement('li');
-            item.innerHTML = `<a href="${
-              file.url || '/'
-            }"target="_blank"class="${
-              file.progress >= 100 ? 'upload-complete' : ''
-            }"><div class="history-item-header"><span class="filename">${
-              file.name
-            }</span><span>${formatFileSize(
-              file.size
-            )}</span></div><div class="history-item-progress"><div class="history-progress-bar"><div class="history-progress-fill"style="width: ${
-              file.progress || 0
-            }%"></div></div></div></a>`;
-            if (file.progress && file.progress < 100) {
-              item.classList.add('upload-in-progress');
-            }
-            list.appendChild(item);
-          });
-          historyContainer.appendChild(list);
+          historyContainer.innerHTML =
+            '<p style="text-align: center; color: #718096;">No upload records</p>';
+          return;
         }
+
+        const list = document.createElement('ul');
+        list.className = 'history-list';
+
+        files.forEach((file) => {
+          const item = document.createElement('li');
+          item.className = 'history-item';
+
+          const progress = file.progress || 0;
+          const isComplete = progress >= 100;
+
+          item.innerHTML = `
+            <div class="history-item-header">
+              <span class="filename">${file.name}</span>
+              <span class="filesize">${formatFileSize(file.size)}</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: ${progress}%"></div>
+            </div>
+          `;
+
+          if (file.url) {
+            item.onclick = () => window.open(file.url, '_blank');
+            item.style.cursor = 'pointer';
+          }
+
+          list.appendChild(item);
+        });
+
+        historyContainer.innerHTML = '';
+        historyContainer.appendChild(list);
       }
       function initDB() {
         return new Promise((resolve, reject) => {
@@ -417,8 +538,9 @@
           request.onerror = (event) => {
             reject(event.target.error);
           };
-          request.onsuccess = (event) => {
+          request.onsuccess = async (event) => {
             db = event.target.result;
+            await cleanupInvalidRecords();
             resolve(db);
           };
           request.onupgradeneeded = (event) => {
@@ -428,6 +550,34 @@
             }
           };
         });
+      }
+      async function cleanupInvalidRecords() {
+        if (!db) return;
+
+        try {
+          const transaction = db.transaction([STORE_NAME], 'readwrite');
+          const store = transaction.objectStore(STORE_NAME);
+          const records = await new Promise((resolve, reject) => {
+            const request = store.getAll();
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+          });
+
+          const deletePromises = records
+            .filter((record) => !record.url)
+            .map(
+              (record) =>
+                new Promise((resolve, reject) => {
+                  const deleteRequest = store.delete(record.id);
+                  deleteRequest.onsuccess = () => resolve();
+                  deleteRequest.onerror = () => reject(deleteRequest.error);
+                })
+            );
+
+          await Promise.all(deletePromises);
+        } catch (error) {
+          console.error('Error cleaning up invalid records:', error);
+        }
       }
       function saveFileInfo(fileInfo) {
         return new Promise((resolve, reject) => {
@@ -520,7 +670,7 @@
                 .then(() => {
                   statusEl.innerHTML = `Upload successful: ${data.name}`;
                   statusEl.className = 'status success';
-                  statusEl.style.display = 'block';
+                  statusEl.style.display = 'flex';
                   return getAllFiles();
                 })
                 .then((files) => {
@@ -530,13 +680,13 @@
                   statusEl.textContent =
                     'Upload successful but failed to save record';
                   statusEl.className = 'status error';
-                  statusEl.style.display = 'block';
+                  statusEl.style.display = 'flex';
                 });
               return data;
             } else if (data.code === 0) {
               statusEl.textContent = `Upload failed: ${data.msg}`;
               statusEl.className = 'status error';
-              statusEl.style.display = 'block';
+              statusEl.style.display = 'flex';
               throw new Error(data.msg);
             }
             const progress = Math.floor(((index + 1) / totalChunks) * 100);
@@ -756,7 +906,8 @@
       function showStatus(message, type) {
         statusEl.textContent = message;
         statusEl.className = 'status ' + type;
-        statusEl.style.display = 'block';
+        statusEl.style.display = 'flex';
+        setTimeout(resetStatus, 3000); // 3秒后自动隐藏
       }
       function generateUniqueId() {
         return (
@@ -772,6 +923,73 @@
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
       }
+
+      // Add export functionality
+      document
+        .getElementById('exportBtn')
+        .addEventListener('click', async () => {
+          try {
+            const files = await getAllFiles();
+            const exportData = JSON.stringify(files, null, 2);
+            const blob = new Blob([exportData], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'upload_history.json';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            showStatus('Export successful', 'success');
+          } catch (error) {
+            showStatus('Export failed: ' + error.message, 'error');
+          }
+        });
+
+      // Add import functionality
+      document
+        .getElementById('importFile')
+        .addEventListener('change', async (event) => {
+          const file = event.target.files[0];
+          if (!file) return;
+
+          try {
+            const text = await file.text();
+            const importData = JSON.parse(text);
+
+            if (!Array.isArray(importData)) {
+              throw new Error('Invalid import data format');
+            }
+
+            const transaction = db.transaction([STORE_NAME], 'readwrite');
+            const store = transaction.objectStore(STORE_NAME);
+
+            for (const record of importData) {
+              // 检查记录是否已存在
+              const existingRecord = await new Promise((resolve) => {
+                const request = store.get(record.id);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => resolve(null);
+              });
+
+              // 如果记录不存在，则添加
+              if (!existingRecord) {
+                await new Promise((resolve, reject) => {
+                  const request = store.put(record);
+                  request.onsuccess = () => resolve();
+                  request.onerror = () => reject(request.error);
+                });
+              }
+            }
+
+            showStatus('Import successful', 'success');
+            await refreshData();
+          } catch (error) {
+            showStatus('Import failed: ' + error.message, 'error');
+          }
+
+          event.target.value = ''; // Reset file input
+        });
     </script>
   </body>
 </html>
