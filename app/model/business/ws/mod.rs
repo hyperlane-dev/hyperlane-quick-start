@@ -1,9 +1,9 @@
-pub mod r#const;
-pub mod r#enum;
-pub mod r#fn;
-pub mod r#impl;
-pub mod r#static;
-pub mod r#struct;
+mod r#const;
+mod r#enum;
+mod r#fn;
+mod r#impl;
+mod r#static;
+mod r#struct;
 
 pub use r#const::*;
 pub use r#enum::*;
