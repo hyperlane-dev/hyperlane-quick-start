@@ -85,7 +85,6 @@ export default {
     },
     dropdownStyle() {
       return {
-        left: `${this.position.x || 0}px`,
         maxHeight: `${this.position.maxHeight || 200}px`,
       };
     },
@@ -171,13 +170,12 @@ export default {
   box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.15);
   z-index: 1000;
   width: 280px;
-  min-height: 120px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  /* 关键：从底部定位，向上展开 */
   bottom: 100%;
-  margin-bottom: 6px; /* 与输入框顶部保持6px间距 */
+  margin-bottom: 6px;
+  left: 0;
 }
 
 .mention-header {
@@ -272,6 +270,39 @@ export default {
   font-size: 0.875rem;
 }
 
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 12px;
+  gap: 8px;
+}
+
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #e9ecef;
+  border-top: 2px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-text {
+  color: #6c757d;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 .mention-list::-webkit-scrollbar {
   width: 4px;
 }
@@ -293,7 +324,6 @@ export default {
   .mention-dropdown {
     width: calc(100% - 20px);
     max-width: 280px;
-    left: 10px;
   }
 }
 

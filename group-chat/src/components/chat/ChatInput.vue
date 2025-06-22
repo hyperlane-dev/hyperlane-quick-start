@@ -20,6 +20,7 @@
       :users="onlineUsers"
       :filter="mentionFilter"
       :position="dropdownPosition"
+      :loading="loadingUsers"
       @select-user="selectMentionUser"
       @close="closeMentionDropdown"
     />
@@ -53,6 +54,7 @@ export default {
       mentionStartIndex: -1,
       onlineUsers: [],
       dropdownPosition: { x: 0, y: 0 },
+      loadingUsers: false,
     };
   },
   computed: {
@@ -108,6 +110,9 @@ export default {
       });
     },
     async fetchOnlineUsers() {
+      if (this.loadingUsers) return; // 防止重复请求
+
+      this.loadingUsers = true;
       try {
         const protocol = window.location.protocol;
         const host =
@@ -125,6 +130,8 @@ export default {
       } catch (error) {
         console.error('Failed to fetch online users list:', error);
         this.onlineUsers = [];
+      } finally {
+        this.loadingUsers = false;
       }
     },
     handleKeyDown(event) {
