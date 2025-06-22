@@ -59,28 +59,41 @@ export default {
 }
 
 .name {
-  font-weight: 500;
-  color: #2c3e50;
+  font-weight: 600;
+  color: #495057;
   font-size: 1rem;
   max-width: 200px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .name.gpt-name {
-  color: #007bff;
-  font-weight: 600;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+  text-shadow: none;
 }
 
 .name.clickable {
   cursor: pointer;
-  transition: color 0.2s ease;
+  transition: all 0.2s ease;
+  background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .name.clickable:hover {
-  color: #0056b3;
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   text-decoration: underline;
+  transform: translateY(-1px);
 }
 
 .self .message-header {

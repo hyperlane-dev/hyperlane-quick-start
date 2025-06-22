@@ -195,30 +195,32 @@ export default {
 }
 
 .message-content {
-  padding: 8px 12px;
-  border-radius: 4px;
+  padding: 10px 14px;
+  border-radius: 12px;
   position: relative;
   word-break: break-word;
-  background-color: #ffffff;
+  background: linear-gradient(135deg, #e8f4f8 0%, #d1ecf1 100%);
   color: #2c3e50;
   font-size: 0.9375rem;
-  line-height: 1.3;
+  line-height: 1.4;
   user-select: text;
   -webkit-user-select: text;
   -moz-user-select: text;
-  border: 1px solid #e9ecef;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid #bee5eb;
+  box-shadow: 0 2px 8px rgba(23, 162, 184, 0.15);
 }
 
 .message-content.self {
-  background-color: #e3f2fd;
+  background: #e3f2fd;
   border: 1px solid #bbdefb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .message-content.gpt-response {
-  background-color: #f0f8ff;
+  background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
   border-left: 4px solid #007bff;
-  border: 1px solid #cce7ff;
+  border: 1px solid #b3d9ff;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.15);
 }
 
 .gpt-message {
