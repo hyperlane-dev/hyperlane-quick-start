@@ -32,6 +32,11 @@ export default {
       default: false,
     },
   },
+  data() {
+    return {
+      timeoutId: null,
+    };
+  },
   computed: {
     iconClass() {
       const icons = {
@@ -45,12 +50,25 @@ export default {
   },
   watch: {
     visible(newVal) {
+      // 清除之前的定时器
+      if (this.timeoutId) {
+        clearTimeout(this.timeoutId);
+        this.timeoutId = null;
+      }
+
       if (newVal && this.duration > 0) {
-        setTimeout(() => {
+        this.timeoutId = setTimeout(() => {
           this.$emit('close');
+          this.timeoutId = null;
         }, this.duration);
       }
     },
+  },
+  beforeUnmount() {
+    // 组件销毁时清除定时器
+    if (this.timeoutId) {
+      clearTimeout(this.timeoutId);
+    }
   },
 };
 </script>

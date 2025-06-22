@@ -184,7 +184,15 @@ export default {
       this.autoResize();
     },
     checkMobile() {
+      const wasMobile = this.isMobile;
       this.isMobile = window.innerWidth <= 768;
+
+      // 如果设备类型发生变化，重新调整输入框高度
+      if (wasMobile !== this.isMobile) {
+        this.$nextTick(() => {
+          this.autoResize();
+        });
+      }
     },
     autoResize() {
       const textarea = this.$refs.messageInput;
@@ -203,10 +211,10 @@ export default {
           const lineHeight = 20; // 大约的行高
           const minHeight = lineHeight;
           const maxHeight = lineHeight * 3; // 限制为最多3行
-          const newHeight = Math.min(
-            Math.max(textarea.scrollHeight, minHeight),
-            maxHeight
-          );
+
+          // 确保即使内容为空也有最小高度
+          const scrollHeight = Math.max(textarea.scrollHeight, minHeight);
+          const newHeight = Math.min(scrollHeight, maxHeight);
 
           textarea.style.height = newHeight + 'px';
 
