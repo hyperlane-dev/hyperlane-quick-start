@@ -34,7 +34,7 @@ export default {
   color: white;
   font-size: 0.875rem;
   position: fixed;
-  bottom: 81px;
+  bottom: 88px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 20;
@@ -44,6 +44,13 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* 移动端样式 */
+@media (max-width: 600px) {
+  .connection-status {
+    bottom: 66px;
+  }
 }
 
 .status-icon {

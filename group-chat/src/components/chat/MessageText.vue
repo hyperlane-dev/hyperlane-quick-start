@@ -392,13 +392,13 @@ export default {
   overflow-wrap: break-word;
 }
 
-/* Code blocks should scroll horizontally if needed */
 .message-text :deep(pre) {
   max-width: 100%;
-  overflow-x: auto;
-  white-space: pre;
-  word-wrap: normal;
-  overflow-wrap: normal;
+  overflow-x: hidden;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-all;
 }
 
 /* Inline code should break */
@@ -407,20 +407,21 @@ export default {
   overflow-wrap: break-word;
 }
 
-/* Tables should be responsive */
+/* Tables should be responsive and wrap content */
 .message-text :deep(table) {
   max-width: 100%;
-  overflow-x: auto;
-  display: block;
-  white-space: nowrap;
-}
-
-.message-text :deep(table) tbody,
-.message-text :deep(table) thead,
-.message-text :deep(table) tr {
-  display: table;
   width: 100%;
   table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.message-text :deep(th),
+.message-text :deep(td) {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  max-width: 0;
+  padding: 8px 12px;
 }
 
 /* Long URLs and text should break */
@@ -429,7 +430,7 @@ export default {
   overflow-wrap: break-word;
 }
 
-/* Ensure paragraphs and other text elements break properly */
+/* Ensure all block elements break properly and prevent overflow */
 .message-text :deep(p),
 .message-text :deep(div),
 .message-text :deep(span),
@@ -439,11 +440,24 @@ export default {
 .message-text :deep(h4),
 .message-text :deep(h5),
 .message-text :deep(h6),
-.message-text :deep(li) {
+.message-text :deep(li),
+.message-text :deep(blockquote),
+.message-text :deep(ul),
+.message-text :deep(ol) {
   word-wrap: break-word;
   overflow-wrap: break-word;
   word-break: break-word;
   max-width: 100%;
+  overflow: hidden;
+}
+
+/* Special handling for blockquotes */
+.message-text :deep(blockquote) {
+  border-left: 4px solid #ddd;
+  margin: 8px 0;
+  padding: 8px 16px;
+  background-color: #f8f9fa;
+  border-radius: 0 4px 4px 0;
 }
 
 /* Mention Styling */
