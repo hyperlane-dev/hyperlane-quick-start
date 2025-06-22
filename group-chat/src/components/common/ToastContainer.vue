@@ -24,46 +24,67 @@ export default {
     return {
       toasts: [],
       nextId: 1,
+      currentToastTimer: null, // 当前toast的定时器
     };
   },
   methods: {
     addToast(options) {
-      // 单例模式：清除所有现有的toast
-      this.clearAll();
+      // 清除当前的定时器
+      if (this.currentToastTimer) {
+        clearTimeout(this.currentToastTimer);
+        this.currentToastTimer = null;
+      }
 
-      const toast = {
-        id: this.nextId++,
-        message: options.message || '',
-        type: options.type || 'info',
-        duration: options.duration || 1000, // 默认1秒
-        visible: true,
-      };
+      // 如果已有toast，更新内容；否则创建新的
+      if (this.toasts.length > 0) {
+        // 更新现有toast的内容
+        this.toasts[0].message = options.message || '';
+        this.toasts[0].type = options.type || 'info';
+        this.toasts[0].duration = options.duration || 1000;
+      } else {
+        // 创建新toast
+        const toast = {
+          id: this.nextId++,
+          message: options.message || '',
+          type: options.type || 'info',
+          duration: options.duration || 1000,
+          visible: true,
+        };
+        this.toasts.push(toast);
+      }
 
-      this.toasts.push(toast);
+      const duration = options.duration || 1000;
+      this.currentToastTimer = setTimeout(() => {
+        this.clearAll();
+        this.currentToastTimer = null;
+      }, duration);
 
-      return toast.id;
+      return this.toasts[0].id;
     },
 
-    removeToast(id) {
-      const index = this.toasts.findIndex((toast) => toast.id === id);
-      if (index > -1) {
-        this.toasts[index].visible = false;
-        // 等待动画完成后移除
-        setTimeout(() => {
-          const currentIndex = this.toasts.findIndex(
-            (toast) => toast.id === id
-          );
-          if (currentIndex > -1) {
-            this.toasts.splice(currentIndex, 1);
-          }
-        }, 300);
+    removeToast() {
+      // 清除定时器并移除toast
+      if (this.currentToastTimer) {
+        clearTimeout(this.currentToastTimer);
+        this.currentToastTimer = null;
       }
+      this.clearAll();
     },
 
     clearAll() {
-      // 立即清除所有toast，不等待动画
+      // 立即清除所有toast
       this.toasts = [];
+      if (this.currentToastTimer) {
+        clearTimeout(this.currentToastTimer);
+        this.currentToastTimer = null;
+      }
     },
+  },
+  beforeUnmount() {
+    // 组件销毁时清除定时器
+    if (this.currentToastTimer) {
+      clearTimeout(this.currentToastTimer);
+    }
   },
 };
 </script>
