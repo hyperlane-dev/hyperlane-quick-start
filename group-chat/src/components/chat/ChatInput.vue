@@ -55,12 +55,14 @@ export default {
       onlineUsers: [],
       dropdownPosition: { x: 0, y: 0 },
       loadingUsers: false,
+      isMobile: false,
     };
   },
   computed: {
     placeholderText() {
-      const basePlaceholder =
-        '(use @name to mention users, ctrl+enter or shift+enter for new line)';
+      const basePlaceholder = this.isMobile
+        ? '(use @name to mention users)'
+        : '(use @name to mention users, ctrl+enter or shift+enter for new line)';
       if (this.onlineCountText) {
         return `${this.onlineCountText} ${basePlaceholder}`;
       }
@@ -68,10 +70,18 @@ export default {
     },
   },
   mounted() {
+    // 检测是否为移动端
+    this.checkMobile();
+    // 监听窗口大小变化
+    window.addEventListener('resize', this.checkMobile);
+
     // 初始化textarea高度
     this.$nextTick(() => {
       this.autoResize();
     });
+  },
+  beforeUnmount() {
+    window.removeEventListener('resize', this.checkMobile);
   },
   methods: {
     sendMessage() {
@@ -144,8 +154,8 @@ export default {
       }
 
       if (event.key === 'Enter' && !this.showMentionDropdown) {
-        if (event.ctrlKey || event.shiftKey) {
-          // Ctrl+Enter 或 Shift+Enter: 插入换行符
+        if (!this.isMobile && (event.ctrlKey || event.shiftKey)) {
+          // PC端：Ctrl+Enter 或 Shift+Enter: 插入换行符
           event.preventDefault();
           const textarea = this.$refs.messageInput;
           const start = textarea.selectionStart;
@@ -160,7 +170,7 @@ export default {
             this.autoResize();
           });
         } else {
-          // Enter: 发送消息
+          // Enter: 发送消息 (移动端总是发送，PC端普通Enter也发送)
           event.preventDefault();
           this.sendMessage();
         }
@@ -173,28 +183,39 @@ export default {
       this.checkMentionTrigger();
       this.autoResize();
     },
+    checkMobile() {
+      this.isMobile = window.innerWidth <= 768;
+    },
     autoResize() {
       const textarea = this.$refs.messageInput;
       if (textarea) {
-        // 重置高度以获取正确的scrollHeight
-        textarea.style.height = 'auto';
-
-        // 计算新高度，最小1行，最大5行
-        const lineHeight = 20; // 大约的行高
-        const minHeight = lineHeight;
-        const maxHeight = lineHeight * 5;
-        const newHeight = Math.min(
-          Math.max(textarea.scrollHeight, minHeight),
-          maxHeight
-        );
-
-        textarea.style.height = newHeight + 'px';
-
-        // 如果内容超过最大高度，显示滚动条
-        if (textarea.scrollHeight > maxHeight) {
-          textarea.style.overflowY = 'auto';
-        } else {
+        if (this.isMobile) {
+          // 移动端：保持单行
+          const lineHeight = 20;
+          textarea.style.height = lineHeight + 'px';
           textarea.style.overflowY = 'hidden';
+        } else {
+          // PC端：支持多行
+          // 重置高度以获取正确的scrollHeight
+          textarea.style.height = 'auto';
+
+          // 计算新高度，最小1行，最大3行
+          const lineHeight = 20; // 大约的行高
+          const minHeight = lineHeight;
+          const maxHeight = lineHeight * 3; // 限制为最多3行
+          const newHeight = Math.min(
+            Math.max(textarea.scrollHeight, minHeight),
+            maxHeight
+          );
+
+          textarea.style.height = newHeight + 'px';
+
+          // 如果内容超过最大高度，显示滚动条
+          if (textarea.scrollHeight > maxHeight) {
+            textarea.style.overflowY = 'auto';
+          } else {
+            textarea.style.overflowY = 'hidden';
+          }
         }
       }
     },
@@ -320,9 +341,23 @@ export default {
   line-height: 1.4;
   resize: none;
   overflow-y: hidden;
+  overflow-x: hidden;
   font-family: inherit;
   min-height: 20px;
-  max-height: 100px;
+  max-height: 60px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* 移动端样式 */
+@media (max-width: 768px) {
+  .chat-input textarea {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-height: 20px;
+    height: 20px;
+  }
 }
 
 .chat-input textarea::placeholder {

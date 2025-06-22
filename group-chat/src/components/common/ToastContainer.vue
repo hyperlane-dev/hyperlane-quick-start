@@ -28,20 +28,18 @@ export default {
   },
   methods: {
     addToast(options) {
+      // 单例模式：清除所有现有的toast
+      this.clearAll();
+
       const toast = {
         id: this.nextId++,
         message: options.message || '',
         type: options.type || 'info',
-        duration: options.duration || 3000,
+        duration: options.duration || 1000, // 默认1秒
         visible: true,
       };
 
       this.toasts.push(toast);
-
-      // 限制最多显示5个Toast
-      if (this.toasts.length > 5) {
-        this.removeToast(this.toasts[0].id);
-      }
 
       return toast.id;
     },
@@ -63,12 +61,8 @@ export default {
     },
 
     clearAll() {
-      this.toasts.forEach((toast) => {
-        toast.visible = false;
-      });
-      setTimeout(() => {
-        this.toasts = [];
-      }, 300);
+      // 立即清除所有toast，不等待动画
+      this.toasts = [];
     },
   },
 };

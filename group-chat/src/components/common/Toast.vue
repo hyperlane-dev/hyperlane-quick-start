@@ -25,7 +25,7 @@ export default {
     },
     duration: {
       type: Number,
-      default: 3000, // 3 seconds
+      default: 1000,
     },
     visible: {
       type: Boolean,

@@ -10,7 +10,7 @@ class ToastService {
   }
 
   // Show info toast
-  info(message, duration = 3000) {
+  info(message, duration = 1000) {
     return this.show({
       message,
       type: 'info',
@@ -19,7 +19,7 @@ class ToastService {
   }
 
   // Show success toast
-  success(message, duration = 3000) {
+  success(message, duration = 1000) {
     return this.show({
       message,
       type: 'success',
@@ -28,7 +28,7 @@ class ToastService {
   }
 
   // Show warning toast
-  warning(message, duration = 3000) {
+  warning(message, duration = 1000) {
     return this.show({
       message,
       type: 'warning',
@@ -37,7 +37,7 @@ class ToastService {
   }
 
   // Show error toast
-  error(message, duration = 3000) {
+  error(message, duration = 1000) {
     return this.show({
       message,
       type: 'error',

@@ -376,10 +376,20 @@ export default {
   transform: scale(1.02);
 }
 
-/* Ensure all content respects container width */
+/* Ensure all content respects container width and prevents overflow */
+.message-text {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
+  overflow: hidden;
+}
+
 .message-text :deep(*) {
   max-width: 100%;
   box-sizing: border-box;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 /* Code blocks should scroll horizontally if needed */
@@ -387,6 +397,14 @@ export default {
   max-width: 100%;
   overflow-x: auto;
   white-space: pre;
+  word-wrap: normal;
+  overflow-wrap: normal;
+}
+
+/* Inline code should break */
+.message-text :deep(code:not(pre code)) {
+  word-break: break-all;
+  overflow-wrap: break-word;
 }
 
 /* Tables should be responsive */
@@ -405,10 +423,27 @@ export default {
   table-layout: fixed;
 }
 
-/* Long URLs should break */
+/* Long URLs and text should break */
 .message-text :deep(a) {
   word-break: break-all;
   overflow-wrap: break-word;
+}
+
+/* Ensure paragraphs and other text elements break properly */
+.message-text :deep(p),
+.message-text :deep(div),
+.message-text :deep(span),
+.message-text :deep(h1),
+.message-text :deep(h2),
+.message-text :deep(h3),
+.message-text :deep(h4),
+.message-text :deep(h5),
+.message-text :deep(h6),
+.message-text :deep(li) {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
 }
 
 /* Mention Styling */

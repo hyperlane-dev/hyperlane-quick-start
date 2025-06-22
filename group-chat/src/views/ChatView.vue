@@ -95,7 +95,6 @@ export default {
     this.$watch(
       () => this.wsConnectionStatus.value,
       (newStatus) => {
-        console.log('WebSocket连接状态变化:', newStatus);
         this.connectionStatus = newStatus;
       }
     );
