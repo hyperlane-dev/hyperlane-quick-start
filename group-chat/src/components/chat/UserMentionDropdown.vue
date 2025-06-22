@@ -23,7 +23,13 @@
           @mouseenter="selectedIndex = index"
         >
           <div
-            :class="['user-avatar', { 'gpt-avatar': user.username === 'GPT' }]"
+            :class="[
+              'user-avatar',
+              {
+                'gpt-avatar': user.username === 'gpt',
+                'other-user-avatar': user.username !== 'gpt',
+              },
+            ]"
           >
             {{ user.username === 'gpt' ? '🤖' : user.username.charAt(0) }}
           </div>
@@ -197,7 +203,7 @@ export default {
 .mention-item {
   display: flex;
   align-items: center;
-  padding: 8px 12px;
+  padding: 10px 12px;
   cursor: pointer;
   transition: background-color 0.15s ease;
 }
@@ -208,18 +214,23 @@ export default {
 }
 
 .user-avatar {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: #6c757d;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.75rem;
-  font-weight: 600;
-  margin-right: 8px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  margin-right: 12px;
   flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  line-height: 1;
+  text-align: center;
 }
 
 .user-info {
@@ -250,8 +261,16 @@ export default {
 }
 
 .user-avatar.gpt-avatar {
-  background: #007bff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   font-size: 1rem;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.user-avatar.other-user-avatar {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
 .user-name.gpt-name {
