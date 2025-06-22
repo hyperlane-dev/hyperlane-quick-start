@@ -84,14 +84,14 @@ export default {
 
 <style scoped>
 a {
-  color: #1e90ff;
+  color: #007bff;
   text-decoration: none;
   transition: color 0.3s, border-bottom-color 0.3s;
 }
 a:hover,
 a:focus {
-  color: pink;
-  border-bottom-color: pink;
+  color: #0056b3;
+  border-bottom-color: #0056b3;
   outline: none;
   cursor: pointer;
 }
@@ -101,7 +101,7 @@ a:focus {
   scrollbar-width: thin;
   height: 100%;
   /* 优化滚动条样式 */
-  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  scrollbar-color: rgba(108, 117, 125, 0.5) transparent;
 }
 
 /* 针对Webkit浏览器（Chrome、Safari等）优化滚动条 */
@@ -110,7 +110,7 @@ a:focus {
 }
 
 .list-container::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(108, 117, 125, 0.5);
   border-radius: 3px;
 }
 

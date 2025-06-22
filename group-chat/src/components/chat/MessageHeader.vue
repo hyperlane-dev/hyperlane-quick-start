@@ -60,7 +60,7 @@ export default {
 
 .name {
   font-weight: 500;
-  color: #fff;
+  color: #2c3e50;
   font-size: 1rem;
   max-width: 200px;
   white-space: nowrap;
@@ -69,7 +69,7 @@ export default {
 }
 
 .name.gpt-name {
-  color: #3b82f6;
+  color: #007bff;
   font-weight: 600;
 }
 
@@ -79,7 +79,7 @@ export default {
 }
 
 .name.clickable:hover {
-  color: #5865f2;
+  color: #0056b3;
   text-decoration: underline;
 }
 

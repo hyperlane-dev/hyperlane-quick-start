@@ -188,21 +188,22 @@ export default {
   border: none;
   overflow: hidden;
   box-shadow: none;
-  background-color: #36393f;
-  color: #dcddde;
+  background-color: #f8f9fa;
+  color: #2c3e50;
 }
 
 .nav-bar {
   height: 48px;
-  background-color: #202225;
+  background-color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
-  box-shadow: 0 1px 0 rgba(4, 4, 5, 0.2), 0 1.5px 0 rgba(6, 6, 7, 0.05),
-    0 2px 0 rgba(4, 4, 5, 0.05);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1), 0 1.5px 0 rgba(0, 0, 0, 0.05),
+    0 2px 0 rgba(0, 0, 0, 0.05);
   flex-shrink: 0;
   z-index: 100;
+  border-bottom: 1px solid #e9ecef;
 }
 
 .nav-title {
@@ -212,20 +213,20 @@ export default {
 }
 
 .nav-title a {
-  color: #fff;
+  color: #2c3e50;
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .nav-title a:hover {
-  color: #dcddde;
+  color: #3498db;
 }
 
 .connection-indicator {
   display: flex;
   align-items: center;
   font-size: 0.875rem;
-  color: #b9bbbe;
+  color: #6c757d;
 }
 
 .status-dot {
@@ -236,15 +237,15 @@ export default {
 }
 
 .connection-indicator.connected .status-dot {
-  background-color: #3ba55c;
+  background-color: #28a745;
 }
 
 .connection-indicator.disconnected .status-dot {
-  background-color: #ed4245;
+  background-color: #dc3545;
 }
 
 .connection-indicator.connecting .status-dot {
-  background-color: #faa61a;
+  background-color: #ffc107;
   animation: pulse 2s infinite;
 }
 

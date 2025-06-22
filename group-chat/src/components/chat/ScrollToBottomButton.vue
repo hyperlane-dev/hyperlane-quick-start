@@ -24,21 +24,23 @@ export default {
   right: 20px;
   width: 40px;
   height: 40px;
-  background-color: #202225;
-  color: #dcddde;
+  background-color: #ffffff;
+  color: #2c3e50;
+  border: 1px solid #dee2e6;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   z-index: 30;
   transition: all 0.2s ease;
 }
 
 .scroll-to-bottom:hover {
-  background-color: #2f3136;
+  background-color: #f8f9fa;
   transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 }
 
 .scroll-icon {
@@ -50,7 +52,7 @@ export default {
   position: absolute;
   top: -8px;
   right: -8px;
-  background-color: #f04747;
+  background-color: #dc3545;
   color: white;
   font-size: 0.75rem;
   min-width: 18px;

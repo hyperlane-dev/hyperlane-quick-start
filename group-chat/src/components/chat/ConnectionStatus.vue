@@ -30,7 +30,7 @@ export default {
 .connection-status {
   text-align: center;
   padding: 8px 16px;
-  background-color: #f04747;
+  background-color: #dc3545;
   color: white;
   font-size: 0.875rem;
   position: fixed;
@@ -38,7 +38,7 @@ export default {
   left: 50%;
   transform: translateX(-50%);
   z-index: 20;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
   border-radius: 4px;
   max-width: 80%;
   display: flex;

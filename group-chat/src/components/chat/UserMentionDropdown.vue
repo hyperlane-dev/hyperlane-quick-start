@@ -152,10 +152,10 @@ export default {
 <style scoped>
 .mention-dropdown {
   position: absolute;
-  background: #2f3136;
-  border: 1px solid #40444b;
+  background: #ffffff;
+  border: 1px solid #dee2e6;
   border-radius: 8px;
-  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.24);
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.15);
   z-index: 1000;
   width: 280px;
   min-height: 120px;
@@ -169,12 +169,12 @@ export default {
 
 .mention-header {
   padding: 8px 12px;
-  background: #36393f;
-  color: #b9bbbe;
+  background: #f8f9fa;
+  color: #6c757d;
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
-  border-bottom: 1px solid #40444b;
+  border-bottom: 1px solid #dee2e6;
 }
 
 .mention-list {
@@ -193,14 +193,14 @@ export default {
 
 .mention-item:hover,
 .mention-item.active {
-  background: #5865f2;
+  background: #007bff;
 }
 
 .user-avatar {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #7289da;
+  background: #6c757d;
   color: white;
   display: flex;
   align-items: center;
@@ -217,7 +217,7 @@ export default {
 }
 
 .user-name {
-  color: #dcddde;
+  color: #2c3e50;
   font-size: 0.875rem;
   font-weight: 500;
   white-space: nowrap;
@@ -226,7 +226,7 @@ export default {
 }
 
 .user-id {
-  color: #72767d;
+  color: #6c757d;
   font-size: 0.75rem;
   white-space: nowrap;
   overflow: hidden;
@@ -239,21 +239,21 @@ export default {
 }
 
 .mention-item.gpt-user {
-  background: rgba(59, 130, 246, 0.1);
-  border-left: 3px solid #3b82f6;
+  background: rgba(0, 123, 255, 0.05);
+  border-left: 3px solid #007bff;
 }
 
 .mention-item.gpt-user.active {
-  background: #3b82f6;
+  background: #007bff;
 }
 
 .user-avatar.gpt-avatar {
-  background: #3b82f6;
+  background: #007bff;
   font-size: 1rem;
 }
 
 .user-name.gpt-name {
-  color: #3b82f6;
+  color: #007bff;
   font-weight: 600;
 }
 
@@ -264,7 +264,7 @@ export default {
 .no-users {
   padding: 16px 12px;
   text-align: center;
-  color: #72767d;
+  color: #6c757d;
   font-size: 0.875rem;
 }
 
@@ -277,12 +277,12 @@ export default {
 }
 
 .mention-list::-webkit-scrollbar-thumb {
-  background: #202225;
+  background: #dee2e6;
   border-radius: 2px;
 }
 
 .mention-list::-webkit-scrollbar-thumb:hover {
-  background: #36393f;
+  background: #adb5bd;
 }
 
 @media (max-width: 600px) {

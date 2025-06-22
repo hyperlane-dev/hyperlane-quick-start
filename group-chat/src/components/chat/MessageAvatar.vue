@@ -30,7 +30,7 @@ export default {
   height: 40px;
   min-width: 40px; /* Prevent shrinking */
   border-radius: 50%;
-  background: #7289da;
+  background: #6c757d;
   color: white;
   display: flex;
   align-items: center;
@@ -47,12 +47,12 @@ export default {
 }
 
 .avatar.self {
-  background: #43b581;
+  background: #28a745;
   margin: 0 0 0 16px;
 }
 
 .avatar.gpt {
-  background: #3b82f6;
+  background: #007bff;
   font-size: 1.2rem;
 }
 

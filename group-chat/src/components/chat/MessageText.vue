@@ -85,27 +85,27 @@ export default {
 }
 
 .message-text :deep(.mention-other) {
-  background-color: rgba(88, 101, 242, 0.2);
-  color: #5865f2;
-  border: 1px solid rgba(88, 101, 242, 0.3);
+  background-color: rgba(0, 123, 255, 0.15);
+  color: #0056b3;
+  border: 1px solid rgba(0, 123, 255, 0.3);
 }
 
 .message-text :deep(.mention-self) {
-  background-color: rgba(250, 166, 26, 0.3);
-  color: #faa61a;
-  border: 1px solid rgba(250, 166, 26, 0.5);
+  background-color: rgba(255, 193, 7, 0.2);
+  color: #e67e22;
+  border: 1px solid rgba(255, 193, 7, 0.4);
   animation: mentionPulse 2s ease-in-out;
 }
 
 @keyframes mentionPulse {
   0% {
-    background-color: rgba(250, 166, 26, 0.4);
+    background-color: rgba(255, 193, 7, 0.3);
   }
   50% {
-    background-color: rgba(250, 166, 26, 0.2);
+    background-color: rgba(255, 193, 7, 0.1);
   }
   100% {
-    background-color: rgba(250, 166, 26, 0.3);
+    background-color: rgba(255, 193, 7, 0.2);
   }
 }
 </style>

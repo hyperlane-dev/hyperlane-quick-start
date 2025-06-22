@@ -208,7 +208,8 @@ export default {
   flex-wrap: wrap;
   padding: 0 12px;
   margin: 0 12px 12px;
-  background-color: #40444b;
+  background-color: #ffffff;
+  border: 1px solid #dee2e6;
   border-radius: 8px;
   position: sticky;
   bottom: 0;
@@ -230,23 +231,23 @@ export default {
   margin: 6px 0;
   font-size: 0.9375rem;
   background-color: transparent;
-  color: #dcddde;
+  color: #2c3e50;
   line-height: 1.3;
 }
 
 .chat-input input::placeholder {
-  color: #72767d;
+  color: #6c757d;
 }
 
 .chat-input input:disabled {
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: rgba(0, 0, 0, 0.05);
   cursor: not-allowed;
 }
 
 .chat-input button {
   padding: 6px 10px;
   height: 28px;
-  background-color: #5865f2;
+  background-color: #007bff;
   color: white;
   border: none;
   border-radius: 4px;
@@ -261,15 +262,15 @@ export default {
 }
 
 .chat-input button:hover:not(:disabled) {
-  background-color: #4752c4;
+  background-color: #0056b3;
 }
 
 .chat-input button:active:not(:disabled) {
-  background-color: #3c45a5;
+  background-color: #004085;
 }
 
 .chat-input button:disabled {
-  background-color: #4f545c;
+  background-color: #6c757d;
   cursor: not-allowed;
   opacity: 0.5;
 }

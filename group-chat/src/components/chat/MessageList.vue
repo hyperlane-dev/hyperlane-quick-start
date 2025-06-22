@@ -168,7 +168,7 @@ export default {
 .chat-messages {
   flex: 1;
   padding: 16px;
-  background-color: #36393f;
+  background-color: #f8f9fa;
   scrollbar-width: thin;
   margin-top: 1px;
 }
@@ -199,33 +199,37 @@ export default {
   border-radius: 4px;
   position: relative;
   word-break: break-word;
-  background-color: #40444b;
-  color: #dcddde;
+  background-color: #ffffff;
+  color: #2c3e50;
   font-size: 0.9375rem;
   line-height: 1.3;
   user-select: text;
   -webkit-user-select: text;
   -moz-user-select: text;
+  border: 1px solid #e9ecef;
 }
 
 .message-content.self {
-  background-color: #2f3136;
+  background-color: #e3f2fd;
+  border: 1px solid #bbdefb;
 }
 
 .message-content.gpt-response {
-  background-color: #1e3a8a;
-  border-left: 4px solid #3b82f6;
+  background-color: #f0f8ff;
+  border-left: 4px solid #007bff;
+  border: 1px solid #cce7ff;
 }
 
 .gpt-message {
-  background-color: rgba(59, 130, 246, 0.05);
+  background-color: rgba(0, 123, 255, 0.05);
   border-radius: 8px;
   padding: 8px;
   margin: 4px 0;
+  border: 1px solid rgba(0, 123, 255, 0.1);
 }
 
 .message-time {
-  color: #72767d;
+  color: #6c757d;
   font-size: 0.75rem;
   margin-top: 4px;
   -webkit-user-select: none;
