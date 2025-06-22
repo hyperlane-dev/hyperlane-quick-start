@@ -21,17 +21,13 @@ export default {
   methods: {
     formatMentions(text) {
       const currentUserId = getPersistentUUID();
-      const currentUsername = `用户${currentUserId}`;
+      const currentUsername = `User${currentUserId}`;
 
-      // 匹配@用户名的正则表达式
-      // 支持@用户名 或 @"用户名" 格式，以及中文用户名
       const mentionRegex = /@([^\s@]+|"[^"]+"|'[^']+'|[\u4e00-\u9fa5]+\d*)/g;
 
       return text.replace(mentionRegex, (match, username) => {
-        // 移除引号（如果有的话）
         const cleanUsername = username.replace(/^["']|["']$/g, '');
 
-        // 检查是否@的是当前用户
         const isSelfMention = this.isCurrentUser(
           cleanUsername,
           currentUserId,
@@ -46,16 +42,13 @@ export default {
       });
     },
     isCurrentUser(mentionedUsername, currentUserId, currentUsername) {
-      // 精确匹配当前用户的各种可能形式
       const possibleMatches = [
         currentUserId,
         currentUsername,
-        '我',
         'me',
         'Me',
         'ME',
         '@me',
-        '@我',
       ];
 
       return possibleMatches.some(
@@ -72,51 +65,47 @@ export default {
   user-select: text;
   -webkit-user-select: text;
   -moz-user-select: text;
+  line-height: 1.6;
+  word-wrap: break-word;
 }
 
 .message-text :deep(.mention) {
   font-weight: 600;
   padding: 2px 6px;
-  margin: 0 1px;
+  margin: 2px 2px;
   border-radius: 4px;
   text-decoration: none;
   display: inline-block;
-  line-height: 1.2;
-  /* 防止高亮重叠 */
+  line-height: 1.3;
   box-sizing: border-box;
   vertical-align: baseline;
+  white-space: nowrap;
+  font-size: inherit;
+  min-height: 1.3em;
 }
 
 .message-text :deep(.mention-other) {
-  background-color: rgba(88, 101, 242, 0.3);
+  background-color: rgba(88, 101, 242, 0.2);
   color: #5865f2;
-  border: 1px solid rgba(88, 101, 242, 0.5);
+  border: 1px solid rgba(88, 101, 242, 0.3);
 }
 
 .message-text :deep(.mention-self) {
-  background-color: rgba(250, 166, 26, 0.4);
+  background-color: rgba(250, 166, 26, 0.3);
   color: #faa61a;
-  border: 1px solid rgba(250, 166, 26, 0.6);
+  border: 1px solid rgba(250, 166, 26, 0.5);
   animation: mentionPulse 2s ease-in-out;
-  /* 自己被@时的特殊效果 */
-  box-shadow: 0 0 0 2px rgba(250, 166, 26, 0.2);
 }
 
 @keyframes mentionPulse {
   0% {
-    background-color: rgba(250, 166, 26, 0.6);
-    box-shadow: 0 0 0 2px rgba(250, 166, 26, 0.4);
-    transform: scale(1);
+    background-color: rgba(250, 166, 26, 0.4);
   }
   50% {
-    background-color: rgba(250, 166, 26, 0.4);
-    box-shadow: 0 0 0 4px rgba(250, 166, 26, 0.2);
-    transform: scale(1.02);
+    background-color: rgba(250, 166, 26, 0.2);
   }
   100% {
-    background-color: rgba(250, 166, 26, 0.4);
-    box-shadow: 0 0 0 2px rgba(250, 166, 26, 0.2);
-    transform: scale(1);
+    background-color: rgba(250, 166, 26, 0.3);
   }
 }
 </style>

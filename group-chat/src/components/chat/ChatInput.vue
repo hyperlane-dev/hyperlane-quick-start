@@ -7,11 +7,11 @@
       @keydown="handleKeyDown"
       @keyup="handleKeyUp"
       @input="handleInput"
-      placeholder="输入消息... (使用@用户名来提及其他用户)"
+      placeholder="Type a message... (use @username to mention users)"
       :disabled="connectionStatus !== 'connected'"
     />
     <button @click="sendMessage" :disabled="connectionStatus !== 'connected'">
-      <span>发送</span>
+      <span>Send</span>
       <i class="send-icon">➤</i>
     </button>
 
@@ -90,7 +90,7 @@ export default {
           this.onlineUsers = data.users || [];
         }
       } catch (error) {
-        console.error('获取在线用户列表失败:', error);
+        console.error('Failed to fetch online users list:', error);
         this.onlineUsers = [];
       }
     },
@@ -152,29 +152,23 @@ export default {
         this.$refs.chatInputContainer.getBoundingClientRect();
       const inputRect = input.getBoundingClientRect();
 
-      // 创建临时元素来测量文本宽度
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
       const computedStyle = window.getComputedStyle(input);
       context.font = `${computedStyle.fontSize} ${computedStyle.fontFamily}`;
-      // 计算下拉框的最大高度（避免溢出屏幕）
-      const availableHeight = inputRect.top - 20; // 距离屏幕顶部至少20px
-      const maxHeight = Math.max(120, Math.min(250, availableHeight - 6)); // 减去6px间距
+      const availableHeight = inputRect.top - 20;
+      const maxHeight = Math.max(120, Math.min(250, availableHeight - 6));
 
-      // 计算相对于容器的X位置 - 与输入框左边对齐
       const dropdownWidth = 280;
       const containerWidth = containerRect.width;
 
-      // 获取输入框相对于容器的左边距（padding）
-      const inputPaddingLeft = 12; // 与CSS中的padding: 0 12px对应
-      let xPosition = inputPaddingLeft; // 与输入框左边对齐
+      const inputPaddingLeft = 12;
+      let xPosition = inputPaddingLeft;
 
-      // 确保不超出容器右边界
       if (xPosition + dropdownWidth > containerWidth) {
         xPosition = containerWidth - dropdownWidth;
       }
 
-      // 确保不超出容器左边界
       if (xPosition < 0) {
         xPosition = 0;
       }
@@ -193,7 +187,6 @@ export default {
       this.message = beforeMention + `@${user.username} ` + afterMention;
       this.closeMentionDropdown();
 
-      // 设置光标位置
       this.$nextTick(() => {
         const newCursorPos = beforeMention.length + user.username.length + 2;
         this.$refs.messageInput.setSelectionRange(newCursorPos, newCursorPos);
@@ -223,7 +216,7 @@ export default {
   width: calc(100% - 24px);
   box-sizing: border-box;
   align-items: center;
-  /* 为绝对定位的下拉框提供定位上下文 */
+
   position: relative;
 }
 

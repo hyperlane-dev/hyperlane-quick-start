@@ -1,6 +1,6 @@
 <template>
   <div v-if="visible" class="mention-dropdown" :style="dropdownStyle">
-    <div class="mention-header">选择用户</div>
+    <div class="mention-header">Select User</div>
     <div class="mention-list">
       <div
         v-for="(user, index) in filteredUsers"
@@ -27,7 +27,7 @@
       </div>
     </div>
     <div v-if="filteredUsers.length === 0" class="no-users">
-      没有找到匹配的用户
+      No matching users found
     </div>
   </div>
 </template>
@@ -238,7 +238,6 @@ export default {
   color: white;
 }
 
-/* GPT用户特殊样式 */
 .mention-item.gpt-user {
   background: rgba(59, 130, 246, 0.1);
   border-left: 3px solid #3b82f6;
@@ -286,7 +285,6 @@ export default {
   background: #36393f;
 }
 
-/* 响应式设计 */
 @media (max-width: 600px) {
   .mention-dropdown {
     width: calc(100% - 20px);
@@ -295,7 +293,6 @@ export default {
   }
 }
 
-/* 确保下拉框不会超出屏幕顶部 */
 @media (max-height: 400px) {
   .mention-dropdown {
     max-height: 150px !important;

@@ -4,9 +4,9 @@ use crate::model::business::ws::get_online_users_list;
 #[get]
 #[utoipa::path(
     get,
-    path = "/api/users/online",   
+    path = "/api/users/online",
     responses(
-        (status = 200, description = "获取在线用户列表", body = UserListResponse)
+        (status = 200, description = "Get online users list", body = UserListResponse)
     )
 )]
 pub async fn online_users(ctx: Context) {
