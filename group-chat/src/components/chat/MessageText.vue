@@ -84,7 +84,7 @@ export default {
         }
         return this.md.render(text);
       } catch (error) {
-        console.warn('Markdown parsing error:', error);
+        console.error('Markdown parsing error:', error);
         return text; // Fallback to plain text
       }
     },
