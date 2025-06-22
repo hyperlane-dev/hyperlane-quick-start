@@ -174,6 +174,10 @@ async fn create_server() {
 }
 
 pub fn run() {
+    if let Err(e) = init_env_config() {
+        println_error!("Failed to initialize environment configuration: ", e);
+    }
+    println_success!("Environment configuration loaded successfully");
     runtime().block_on(hyperlane_plugin::server_manager::create_server_manage(
         create_server,
     ));

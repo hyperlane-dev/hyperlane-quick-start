@@ -5,4 +5,4 @@ pub mod not_found;
 pub mod root;
 pub mod templates;
 pub mod upload;
-pub mod websocket;
+pub mod ws;

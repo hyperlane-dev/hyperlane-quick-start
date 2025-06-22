@@ -12,7 +12,9 @@ pub use r#static::*;
 pub use r#struct::*;
 
 use super::*;
+use hyperlane_config::business::ws::*;
 
 use hyperlane_plugin_websocket::WebSocket;
-use std::sync::OnceLock;
 use utoipa::ToSchema;
+
+use std::{borrow::Cow, collections::HashMap, sync::OnceLock};
