@@ -2,7 +2,7 @@
   <div class="chat-view">
     <div class="nav-bar">
       <div class="nav-left">
-        <img src="/favicon.ico" alt="Hyperlane Logo" class="nav-logo" />
+        <img src="../../public/logo.png" alt="" class="nav-logo" />
         <h1 class="nav-title">
           <a href="https://github.com/eastspire/hyperlane" target="_blank">
             Hyperlane Chat
