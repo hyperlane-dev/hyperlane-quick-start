@@ -1,14 +1,17 @@
 <template>
   <div class="chat-view">
     <div class="nav-bar">
-      <h1 class="nav-title">
-        <a href="https://github.com/eastspire/hyperlane" target="_blank">
-          Hyperlane Chat
-        </a>
-      </h1>
+      <div class="nav-left">
+        <img src="/favicon.ico" alt="Hyperlane Logo" class="nav-logo" />
+        <h1 class="nav-title">
+          <a href="https://github.com/eastspire/hyperlane" target="_blank">
+            Hyperlane Chat
+          </a>
+        </h1>
+      </div>
       <div class="connection-indicator" :class="connectionStatus">
         <span class="status-dot"></span>
-        {{ connectionStatus === 'connected' ? '在线' : '离线' }}
+        {{ connectionStatus === 'connected' ? 'Online' : 'Offline' }}
       </div>
     </div>
     <div class="chat-container">
@@ -204,6 +207,20 @@ export default {
   flex-shrink: 0;
   z-index: 100;
   border-bottom: 1px solid #e9ecef;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 .nav-title {
