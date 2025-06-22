@@ -199,15 +199,15 @@ export default {
   border-radius: 12px;
   position: relative;
   word-break: break-word;
-  background: linear-gradient(135deg, #e8f4f8 0%, #d1ecf1 100%);
+  background: #f8f9fa;
   color: #2c3e50;
   font-size: 0.9375rem;
   line-height: 1.4;
   user-select: text;
   -webkit-user-select: text;
   -moz-user-select: text;
-  border: 1px solid #bee5eb;
-  box-shadow: 0 2px 8px rgba(23, 162, 184, 0.15);
+  border: 1px solid #dee2e6;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .message-content.self {
@@ -217,10 +217,10 @@ export default {
 }
 
 .message-content.gpt-response {
-  background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
+  background: #f0f8ff;
   border-left: 4px solid #007bff;
-  border: 1px solid #b3d9ff;
-  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.15);
+  border: 1px solid #cce7ff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .gpt-message {

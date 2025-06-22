@@ -1,15 +1,15 @@
 <template>
   <div class="chat-input" ref="chatInputContainer">
-    <input
+    <textarea
       ref="messageInput"
-      type="text"
       v-model="message"
       @keydown="handleKeyDown"
       @keyup="handleKeyUp"
       @input="handleInput"
-      placeholder="Type a message... (use @username to mention users)"
+      :placeholder="placeholderText"
       :disabled="connectionStatus !== 'connected'"
-    />
+      rows="1"
+    ></textarea>
     <button @click="sendMessage" :disabled="connectionStatus !== 'connected'">
       <span>Send</span>
       <i class="send-icon">➤</i>
@@ -39,6 +39,10 @@ export default {
       type: String,
       required: true,
     },
+    onlineCountText: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
@@ -50,6 +54,22 @@ export default {
       dropdownPosition: { x: 0, y: 0 },
     };
   },
+  computed: {
+    placeholderText() {
+      const basePlaceholder =
+        'Type a message... (use @username to mention users, Ctrl+Enter for new line)';
+      if (this.onlineCountText) {
+        return `${basePlaceholder} - ${this.onlineCountText}`;
+      }
+      return basePlaceholder;
+    },
+  },
+  mounted() {
+    // 初始化textarea高度
+    this.$nextTick(() => {
+      this.autoResize();
+    });
+  },
   methods: {
     sendMessage() {
       if (!this.message.trim() || this.connectionStatus !== 'connected') return;
@@ -57,6 +77,11 @@ export default {
       this.$emit('send-message', this.message);
       this.message = '';
       this.closeMentionDropdown();
+
+      // 重置textarea高度
+      this.$nextTick(() => {
+        this.autoResize();
+      });
     },
     addMention(username) {
       const mention = `@${username} `;
@@ -104,7 +129,26 @@ export default {
       }
 
       if (event.key === 'Enter' && !this.showMentionDropdown) {
-        this.sendMessage();
+        if (event.ctrlKey) {
+          // Ctrl+Enter: 插入换行符
+          event.preventDefault();
+          const textarea = this.$refs.messageInput;
+          const start = textarea.selectionStart;
+          const end = textarea.selectionEnd;
+          const value = textarea.value;
+
+          this.message =
+            value.substring(0, start) + '\n' + value.substring(end);
+
+          this.$nextTick(() => {
+            textarea.selectionStart = textarea.selectionEnd = start + 1;
+            this.autoResize();
+          });
+        } else {
+          // Enter: 发送消息
+          event.preventDefault();
+          this.sendMessage();
+        }
       }
     },
     handleKeyUp() {
@@ -112,6 +156,32 @@ export default {
     },
     handleInput() {
       this.checkMentionTrigger();
+      this.autoResize();
+    },
+    autoResize() {
+      const textarea = this.$refs.messageInput;
+      if (textarea) {
+        // 重置高度以获取正确的scrollHeight
+        textarea.style.height = 'auto';
+
+        // 计算新高度，最小1行，最大5行
+        const lineHeight = 20; // 大约的行高
+        const minHeight = lineHeight;
+        const maxHeight = lineHeight * 5;
+        const newHeight = Math.min(
+          Math.max(textarea.scrollHeight, minHeight),
+          maxHeight
+        );
+
+        textarea.style.height = newHeight + 'px';
+
+        // 如果内容超过最大高度，显示滚动条
+        if (textarea.scrollHeight > maxHeight) {
+          textarea.style.overflowY = 'auto';
+        } else {
+          textarea.style.overflowY = 'hidden';
+        }
+      }
     },
     checkMentionTrigger() {
       const input = this.$refs.messageInput;
@@ -221,7 +291,7 @@ export default {
   position: relative;
 }
 
-.chat-input input {
+.chat-input textarea {
   flex: 1;
   min-width: 200px;
   padding: 8px 10px;
@@ -232,14 +302,19 @@ export default {
   font-size: 0.9375rem;
   background-color: transparent;
   color: #2c3e50;
-  line-height: 1.3;
+  line-height: 1.4;
+  resize: none;
+  overflow-y: hidden;
+  font-family: inherit;
+  min-height: 20px;
+  max-height: 100px;
 }
 
-.chat-input input::placeholder {
+.chat-input textarea::placeholder {
   color: #6c757d;
 }
 
-.chat-input input:disabled {
+.chat-input textarea:disabled {
   background-color: rgba(0, 0, 0, 0.05);
   cursor: not-allowed;
 }
@@ -287,7 +362,7 @@ export default {
     padding: 0 6px;
   }
 
-  .chat-input input {
+  .chat-input textarea {
     min-width: 0;
     padding: 6px 8px;
   }

@@ -34,6 +34,7 @@
       />
       <ChatInput
         :connectionStatus="connectionStatus"
+        :onlineCountText="onlineCountText"
         @send-message="sendMessage"
         ref="chatInputRef"
       />
@@ -69,6 +70,7 @@ export default {
       showScrollButton: false,
       unreadCount: 0,
       connectionStatus: 'disconnected',
+      onlineCountText: '',
     };
   },
   created() {
@@ -110,11 +112,19 @@ export default {
     handleMessage(data) {
       const isSelf = data.name === this.username;
       const isGptResponse = data.type === MessageType.GptResponse;
+      const isOnlineCount = data.type === MessageType.OnlineCount;
+
+      // 处理在线人数更新
+      if (isOnlineCount) {
+        this.onlineCountText = data.data;
+        // OnlineCount消息也显示在聊天列表中
+      }
 
       this.messages.push({
         ...data,
         isSelf,
         isGptResponse,
+        isOnlineCount,
       });
 
       this.$nextTick(() => {
@@ -144,7 +154,7 @@ export default {
       if (!data.trim() || this.connectionStatus !== 'connected') return;
 
       const message = {
-        type: MessageType.OnlineCount,
+        type: 'Text',
         data: data,
       };
 
@@ -295,6 +305,33 @@ export default {
   }
   100% {
     opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-bar {
+    padding: 0 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-title {
+    font-size: 0.9rem;
+  }
+
+  .nav-title a {
+    display: none;
+  }
+
+  .nav-left::after {
+    content: 'Chat';
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #2c3e50;
+  }
+
+  .connection-indicator {
+    font-size: 0.8rem;
   }
 }
 </style>
