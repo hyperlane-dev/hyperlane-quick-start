@@ -20,8 +20,8 @@ export default {
   },
   methods: {
     formatMentions(text) {
-      const currentUserId = getPersistentUUID();
-      const currentUsername = `User${currentUserId}`;
+      const currentUuid = getPersistentUUID();
+      const currentUsername = `User${currentUuid}`;
 
       const mentionRegex = /@([^\s@]+|"[^"]+"|'[^']+'|[\u4e00-\u9fa5]+\d*)/g;
 
@@ -30,7 +30,7 @@ export default {
 
         const isSelfMention = this.isCurrentUser(
           cleanUsername,
-          currentUserId,
+          currentUuid,
           currentUsername
         );
 
@@ -41,9 +41,9 @@ export default {
         }
       });
     },
-    isCurrentUser(mentionedUsername, currentUserId, currentUsername) {
+    isCurrentUser(mentionedUsername, currentUuid, currentUsername) {
       const possibleMatches = [
-        currentUserId,
+        currentUuid,
         currentUsername,
         'me',
         'Me',

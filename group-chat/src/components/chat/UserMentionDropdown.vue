@@ -15,14 +15,15 @@
         @click="selectUser(user)"
         @mouseenter="selectedIndex = index"
       >
-        <div :class="['user-avatar', { 'gpt-avatar': user.user_id === 'gpt' }]">
-          {{ user.user_id === 'gpt' ? '🤖' : user.username.charAt(0) }}
+        <div
+          :class="['user-avatar', { 'gpt-avatar': user.username === 'GPT' }]"
+        >
+          {{ user.username === 'gpt' ? '🤖' : user.username.charAt(0) }}
         </div>
         <div class="user-info">
-          <div :class="['user-name', { 'gpt-name': user.user_id === 'gpt' }]">
+          <div :class="['user-name', { 'gpt-name': user.username === 'GPT' }]">
             {{ user.username }}
           </div>
-          <div class="user-id">{{ user.user_id }}</div>
         </div>
       </div>
     </div>
@@ -64,10 +65,8 @@ export default {
         return this.users;
       }
       const filterLower = this.filter.toLowerCase();
-      return this.users.filter(
-        (user) =>
-          user.username.toLowerCase().includes(filterLower) ||
-          user.user_id.toLowerCase().includes(filterLower)
+      return this.users.filter((user) =>
+        user.username.toLowerCase().includes(filterLower)
       );
     },
     dropdownStyle() {
@@ -225,16 +224,7 @@ export default {
   text-overflow: ellipsis;
 }
 
-.user-id {
-  color: #6c757d;
-  font-size: 0.75rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.mention-item.active .user-name,
-.mention-item.active .user-id {
+.mention-item.active .user-name {
   color: white;
 }
 

@@ -58,7 +58,6 @@ impl ChatSession {
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct OnlineUser {
-    pub user_id: String,
     pub username: String,
     pub join_time: String,
 }

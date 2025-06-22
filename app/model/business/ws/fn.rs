@@ -24,21 +24,20 @@ pub fn get_global_online_users() -> &'static Arc<Mutex<HashMap<String, OnlineUse
     GLOBAL_ONLINE_USERS.get_or_init(|| Arc::new(Mutex::new(HashMap::new())))
 }
 
-pub fn add_online_user(user_id: &str, username: &str) {
+pub fn add_online_user(username: &str) {
     let users: &Arc<Mutex<HashMap<String, OnlineUser>>> = get_global_online_users();
     let mut users_guard: MutexGuard<'_, HashMap<String, OnlineUser>> = users.lock().unwrap();
     let online_user: OnlineUser = OnlineUser {
-        user_id: user_id.to_string(),
         username: username.to_string(),
         join_time: time(),
     };
-    users_guard.insert(user_id.to_string(), online_user);
+    users_guard.insert(username.to_string(), online_user);
 }
 
-pub fn remove_online_user(user_id: &str) {
+pub fn remove_online_user(username: &str) {
     let users: &Arc<Mutex<HashMap<String, OnlineUser>>> = get_global_online_users();
     let mut users_guard: MutexGuard<'_, HashMap<String, OnlineUser>> = users.lock().unwrap();
-    users_guard.remove(user_id);
+    users_guard.remove(username);
 }
 
 pub fn get_online_users_list() -> UserListResponse {
@@ -46,7 +45,6 @@ pub fn get_online_users_list() -> UserListResponse {
     let users_guard: MutexGuard<'_, HashMap<String, OnlineUser>> = users.lock().unwrap();
     let mut users_vec: Vec<OnlineUser> = users_guard.values().cloned().collect();
     let gpt_user: OnlineUser = OnlineUser {
-        user_id: GPT.to_string(),
         username: GPT.to_string(),
         join_time: time(),
     };

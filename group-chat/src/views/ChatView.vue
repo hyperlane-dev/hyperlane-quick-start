@@ -101,7 +101,7 @@ export default {
   methods: {
     generateUsername() {
       const uuid = crypto.randomUUID();
-      return `用户${uuid}`;
+      return `User${uuid}`;
     },
 
     handleMessage(data) {

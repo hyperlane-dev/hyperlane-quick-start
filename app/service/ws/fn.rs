@@ -17,9 +17,8 @@ pub async fn on_connected(ctx: Context) {
     let receiver_count: String = websocket
         .receiver_count_after_increment(key.clone())
         .to_string();
-    let user_id: String = get_name(&ctx).await;
-    let username: String = format!("User{}", user_id);
-    add_online_user(&user_id, &username);
+    let username: String = get_name(&ctx).await;
+    add_online_user(&username);
     let data: String = format!("{ONLINE_CONNECTIONS}{COLON_SPACE}{receiver_count}");
     let resp_data: String = WebSocketRespData::get_json_data(MessageType::OnlineCount, &ctx, data)
         .await
@@ -34,8 +33,8 @@ pub(crate) async fn on_closed(ctx: Context) {
     let path: String = ctx.get_request_path().await;
     let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
     let receiver_count: ReceiverCount = websocket.receiver_count_after_decrement(key);
-    let user_id: String = get_name(&ctx).await;
-    remove_online_user(&user_id);
+    let username: String = get_name(&ctx).await;
+    remove_online_user(&username);
     let data: String = format!("{ONLINE_CONNECTIONS}{COLON_SPACE}{receiver_count}");
     let resp_data: String = WebSocketRespData::get_json_data(MessageType::OnlineCount, &ctx, data)
         .await
