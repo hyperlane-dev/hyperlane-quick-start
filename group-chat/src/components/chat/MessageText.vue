@@ -130,10 +130,7 @@ export default {
 
 <style scoped>
 .message-text {
-  user-select: text;
-  -webkit-user-select: text;
-  -moz-user-select: text;
-  line-height: 1.6;
+  line-height: 1.8;
   word-wrap: break-word;
   word-break: break-word;
   overflow-wrap: break-word;
@@ -417,8 +414,8 @@ export default {
 /* Mention Styling */
 .message-text :deep(.mention) {
   font-weight: 600;
-  padding: 1px 6px;
-  margin: 0 2px;
+  padding: 2px 6px;
+  margin: 0 3px;
   border-radius: 4px;
   text-decoration: none;
   display: inline;
@@ -430,6 +427,9 @@ export default {
   max-width: 150px;
   overflow: hidden;
   text-overflow: ellipsis;
+  /* 确保边框完全显示 */
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
 }
 
 .message-text :deep(.mention-other) {

@@ -48,6 +48,7 @@ import ChatInput from '../components/chat/ChatInput.vue';
 import ConnectionStatus from '../components/chat/ConnectionStatus.vue';
 import ScrollToBottomButton from '../components/chat/ScrollToBottomButton.vue';
 import { useWebSocket } from '../composables/useWebSocket';
+import { toast } from '../utils/toast.js';
 
 const MessageType = {
   OnlineCount: 'OnlineCount',
@@ -151,7 +152,14 @@ export default {
     },
 
     sendMessage(data) {
-      if (!data.trim() || this.connectionStatus !== 'connected') return;
+      // 检查连接状态
+      if (this.connectionStatus !== 'connected') return;
+
+      // 检查是否为空消息
+      if (!data.trim()) {
+        toast.warning('Please enter a message before sending.');
+        return;
+      }
 
       const message = {
         type: 'Text',

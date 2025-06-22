@@ -10,9 +10,8 @@ use crate::model::business::ws::get_online_users_list;
     )
 )]
 pub async fn online_users(ctx: Context) {
-    let user_list = get_online_users_list();
-    let response_json = json_stringify_string(&user_list).unwrap_or_default();
-
+    let user_list: UserListResponse = get_online_users_list();
+    let response_json: String = json_stringify_string(&user_list).unwrap_or_default();
     ctx.set_response_status_code(200)
         .await
         .set_response_header(CONTENT_TYPE, APPLICATION_JSON)

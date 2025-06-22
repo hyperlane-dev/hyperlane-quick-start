@@ -28,6 +28,7 @@
 
 <script>
 import UserMentionDropdown from './UserMentionDropdown.vue';
+import { toast } from '../../utils/toast.js';
 
 export default {
   name: 'ChatInput',
@@ -57,9 +58,9 @@ export default {
   computed: {
     placeholderText() {
       const basePlaceholder =
-        'Type a message... (use @username to mention users, ctrl+enter or shift+enter for new line)';
+        '(use @name to mention users, ctrl+enter or shift+enter for new line)';
       if (this.onlineCountText) {
-        return `${basePlaceholder} - ${this.onlineCountText}`;
+        return `${this.onlineCountText} ${basePlaceholder}`;
       }
       return basePlaceholder;
     },
@@ -72,7 +73,14 @@ export default {
   },
   methods: {
     sendMessage() {
-      if (!this.message.trim() || this.connectionStatus !== 'connected') return;
+      // 检查连接状态
+      if (this.connectionStatus !== 'connected') return;
+
+      // 检查是否为空消息
+      if (!this.message.trim()) {
+        toast.warning('Please enter a message before sending.');
+        return;
+      }
 
       this.$emit('send-message', this.message);
       this.message = '';

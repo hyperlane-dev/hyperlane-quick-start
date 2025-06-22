@@ -38,9 +38,6 @@ export default {
   font-weight: 700;
   margin: 0 16px 0 0;
   font-size: 1rem;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  user-select: none;
   align-self: flex-start;
   line-height: 1;
   text-align: center;

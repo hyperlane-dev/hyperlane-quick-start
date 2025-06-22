@@ -2,33 +2,43 @@
   <div v-if="visible" class="mention-dropdown" :style="dropdownStyle">
     <div class="mention-header">Select User</div>
     <div class="mention-list">
-      <div
-        v-for="(user, index) in filteredUsers"
-        :key="user.user_id"
-        :class="[
-          'mention-item',
-          {
-            active: index === selectedIndex,
-            'gpt-user': user.user_id === 'gpt',
-          },
-        ]"
-        @click="selectUser(user)"
-        @mouseenter="selectedIndex = index"
-      >
+      <!-- Loading state -->
+      <div v-if="loading" class="loading-container">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading users...</div>
+      </div>
+      <!-- User list -->
+      <template v-else>
         <div
-          :class="['user-avatar', { 'gpt-avatar': user.username === 'GPT' }]"
+          v-for="(user, index) in filteredUsers"
+          :key="user.user_id"
+          :class="[
+            'mention-item',
+            {
+              active: index === selectedIndex,
+              'gpt-user': user.user_id === 'gpt',
+            },
+          ]"
+          @click="selectUser(user)"
+          @mouseenter="selectedIndex = index"
         >
-          {{ user.username === 'gpt' ? '🤖' : user.username.charAt(0) }}
-        </div>
-        <div class="user-info">
-          <div :class="['user-name', { 'gpt-name': user.username === 'GPT' }]">
-            {{ user.username }}
+          <div
+            :class="['user-avatar', { 'gpt-avatar': user.username === 'GPT' }]"
+          >
+            {{ user.username === 'gpt' ? '🤖' : user.username.charAt(0) }}
+          </div>
+          <div class="user-info">
+            <div
+              :class="['user-name', { 'gpt-name': user.username === 'GPT' }]"
+            >
+              {{ user.username }}
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-    <div v-if="filteredUsers.length === 0" class="no-users">
-      No matching users found
+        <div v-if="filteredUsers.length === 0" class="no-users">
+          No matching users found
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -52,6 +62,10 @@ export default {
     position: {
       type: Object,
       default: () => ({ x: 0, y: 0, maxHeight: 200 }),
+    },
+    loading: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {

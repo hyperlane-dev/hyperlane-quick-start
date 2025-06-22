@@ -185,9 +185,6 @@ export default {
   display: flex;
   flex-direction: column;
   max-width: 90%;
-  user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
 }
 
 .message-info.self {
@@ -203,9 +200,6 @@ export default {
   color: #2c3e50;
   font-size: 0.9375rem;
   line-height: 1.4;
-  user-select: text;
-  -webkit-user-select: text;
-  -moz-user-select: text;
   border: 1px solid #dee2e6;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
@@ -235,9 +229,6 @@ export default {
   color: #6c757d;
   font-size: 0.75rem;
   margin-top: 4px;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  user-select: none;
   font-weight: 400;
 }
 

@@ -53,9 +53,6 @@ export default {
   padding: 0;
   margin-top: 0;
   width: 100%;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  user-select: none;
 }
 
 .name {
