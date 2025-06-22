@@ -17,6 +17,9 @@ pub async fn on_connected(ctx: Context) {
     let receiver_count: String = websocket
         .receiver_count_after_increment(key.clone())
         .to_string();
+    let user_id: String = get_name(&ctx).await;
+    let username: String = format!("用户{}", user_id);
+    add_online_user(&user_id, &username);
     let data: String = format!("{ONLINE_CONNECTIONS}{COLON_SPACE}{receiver_count}");
     let resp_data: String = WebSocketRespData::get_json_data(MessageType::OnlineCount, &ctx, data)
         .await
@@ -31,6 +34,8 @@ pub(crate) async fn on_closed(ctx: Context) {
     let path: String = ctx.get_request_path().await;
     let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
     let receiver_count: ReceiverCount = websocket.receiver_count_after_decrement(key);
+    let user_id: String = get_name(&ctx).await;
+    remove_online_user(&user_id);
     let data: String = format!("{ONLINE_CONNECTIONS}{COLON_SPACE}{receiver_count}");
     let resp_data: String = WebSocketRespData::get_json_data(MessageType::OnlineCount, &ctx, data)
         .await
@@ -55,21 +60,39 @@ pub(crate) async fn callback(ctx: Context) {
         ctx.set_response_body("").await;
         return;
     }
-    clone!(req_data, ctx => {
+    let session_id: String = get_name(&ctx).await;
+    clone!(req_data, ctx, session_id => {
         spawn(async move {
             let req_msg: &String = req_data.get_data();
-            let api_response = match call_gpt_api(req_msg).await {
-                Ok(response) => response,
-                Err(error) => {
-                    let err_msg: String = format!("[API 调用失败: {}]", error);
-                    err_msg
-                }
-            };
-            let _ = ctx.set_response_body(api_response)
-                .await
-                .send_body()
-                .await;
-            ctx.flush().await.unwrap();
+
+            // 检查消息是否@了GPT
+            let is_gpt_mentioned = req_msg.contains("@GPT") ||
+                                  req_msg.contains("@GPT Assistant") ||
+                                  req_msg.contains("@gpt");
+
+            if is_gpt_mentioned {
+                let mut session = get_or_create_session(&session_id);
+                session.add_message("user".to_string(), req_msg.clone());
+                let api_response = match call_gpt_api_with_context(&session).await {
+                    Ok(gpt_response) => {
+                        let username = format!("用户{}", session_id);
+                        let response = format!("@{} {}", username, gpt_response);
+                        session.add_message("assistant".to_string(), response.clone());
+                        update_session(session);
+                        response
+                    }
+                    Err(error) => {
+                        let err_msg: String = format!("[API 调用失败: {}]", error);
+                        err_msg
+                    }
+                };
+                let gpt_resp_data = WebSocketRespData::new(MessageType::GptResponse, &ctx, &api_response).await;
+                let gpt_resp_json = json_stringify_string(&gpt_resp_data).unwrap();
+                let websocket = get_global_websocket();
+                let path = ctx.get_request_path().await;
+                let key = BroadcastType::PointToGroup(path);
+                let _ = websocket.send(key, gpt_resp_json);
+            }
         });
     });
     let resp_data: WebSocketRespData = req_data.into_resp(&ctx).await;
@@ -77,17 +100,19 @@ pub(crate) async fn callback(ctx: Context) {
     ctx.set_response_body(resp_data).await;
 }
 
-async fn call_gpt_api(message: &str) -> Result<String, String> {
-    let config = get_global_env_config();
-    let gpt_api_url = &config.gpt_api_url;
-    let api_key = &config.gpt_api_key;
+async fn call_gpt_api_with_context(session: &ChatSession) -> Result<String, String> {
+    let config: &EnvConfig = get_global_env_config();
+    let gpt_api_url: &String = &config.gpt_api_url;
+    let api_key: &String = &config.gpt_api_key;
+    let mut messages = Vec::new();
+    for msg in &session.messages {
+        messages.push(json_value!({
+            "role": msg.role,
+            "content": msg.content
+        }));
+    }
     let body: JsonValue = json_value!({
-        "messages": [
-            {
-                "role": "user",
-                "content": message
-            }
-        ]
+        "messages": messages
     });
     let mut headers: HashMapXxHash3_64<&str, String> = hash_map_xx_hash3_64();
     headers.insert(HOST, "api.cloudflare.com".to_string());

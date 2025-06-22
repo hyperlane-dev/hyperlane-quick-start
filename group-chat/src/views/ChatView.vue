@@ -17,6 +17,7 @@
         :isNearBottom="isNearBottom"
         :name="username"
         @handleScroll="handleScroll"
+        @mention-user="handleMentionUser"
         ref="messageListRef"
       />
       <ScrollToBottomButton
@@ -31,6 +32,7 @@
       <ChatInput
         :connectionStatus="connectionStatus"
         @send-message="sendMessage"
+        ref="chatInputRef"
       />
     </div>
   </div>
@@ -45,6 +47,7 @@ import { useWebSocket } from '../composables/useWebSocket';
 
 const MessageType = {
   OnlineCount: 'OnlineCount',
+  GptResponse: 'GptResponse',
 };
 
 export default {
@@ -103,9 +106,12 @@ export default {
 
     handleMessage(data) {
       const isSelf = data.name === this.username;
+      const isGptResponse = data.type === MessageType.GptResponse;
+
       this.messages.push({
         ...data,
         isSelf,
+        isGptResponse,
       });
 
       this.$nextTick(() => {
@@ -120,7 +126,7 @@ export default {
           return;
         }
 
-        if (isSelf) {
+        if (isSelf || isGptResponse) {
           this.scrollToBottom();
         } else if (this.isNearBottom) {
           this.scrollToBottom();
@@ -161,6 +167,11 @@ export default {
       if (this.isNearBottom && this.showScrollButton) {
         this.showScrollButton = false;
         this.unreadCount = 0;
+      }
+    },
+    handleMentionUser(username) {
+      if (this.$refs.chatInputRef) {
+        this.$refs.chatInputRef.addMention(username);
       }
     },
   },

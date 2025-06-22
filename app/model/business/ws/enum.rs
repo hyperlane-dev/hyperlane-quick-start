@@ -13,5 +13,6 @@ pub enum MessageType {
     Custom,
     Ping,
     Pang,
+    GptResponse,
     Unknown,
 }

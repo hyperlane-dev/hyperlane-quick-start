@@ -120,6 +120,9 @@ async fn register_route(server: &Server) {
 
     server.route("/api/ws", controller::ws::handle).await;
     server
+        .route("/api/users/online", controller::users::online_users)
+        .await;
+    server
         .route("/api/upload/save", controller::upload::save)
         .await;
     server

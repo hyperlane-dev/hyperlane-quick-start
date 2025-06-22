@@ -10,19 +10,43 @@
   >
     <template v-slot="{ item: message }">
       <div
-        :class="['message', isMe(message) ? 'self-message' : 'other-message']"
+        :class="[
+          'message',
+          isMe(message) && !message.isGptResponse
+            ? 'self-message'
+            : 'other-message',
+          message.isGptResponse ? 'gpt-message' : '',
+        ]"
       >
+        <!-- GPT响应消息 -->
+        <template v-if="message.isGptResponse">
+          <MessageAvatar :name="'GPT'" :isSelf="false" :isGpt="true" />
+          <div class="message-info">
+            <MessageHeader
+              :name="'GPT Assistant'"
+              :time="message.time"
+              :isSelf="false"
+              :isGpt="true"
+              @mention-user="handleMentionUser"
+            />
+            <div class="message-content gpt-response">
+              <MessageText :text="message.data" />
+            </div>
+            <div class="message-time">{{ message.time }}</div>
+          </div>
+        </template>
         <!-- 非自己发送的消息 -->
-        <template v-if="!isMe(message)">
+        <template v-else-if="!isMe(message)">
           <MessageAvatar :name="message.name" :isSelf="false" />
           <div class="message-info">
             <MessageHeader
               :name="message.name"
               :time="message.time"
               :isSelf="false"
+              @mention-user="handleMentionUser"
             />
             <div class="message-content">
-              <div class="text">{{ message.data }}</div>
+              <MessageText :text="message.data" />
             </div>
             <div class="message-time">{{ message.time }}</div>
           </div>
@@ -34,9 +58,10 @@
               :name="message.name"
               :time="message.time"
               :isSelf="true"
+              @mention-user="handleMentionUser"
             />
             <div class="message-content self">
-              <div class="text">{{ message.data }}</div>
+              <MessageText :text="message.data" />
             </div>
             <div class="message-time">{{ message.time }}</div>
           </div>
@@ -50,6 +75,7 @@
 <script>
 import MessageAvatar from './MessageAvatar.vue';
 import MessageHeader from './MessageHeader.vue';
+import MessageText from './MessageText.vue';
 import ScrollList from './ScrollList.vue';
 import { getPersistentUUID } from '../../utils/uuid';
 
@@ -58,6 +84,7 @@ export default {
   components: {
     MessageAvatar,
     MessageHeader,
+    MessageText,
     ScrollList,
   },
   props: {
@@ -113,6 +140,9 @@ export default {
         // 如果不可滚动，始终认为在底部
         this.$emit('handleScroll', true);
       }
+    },
+    handleMentionUser(username) {
+      this.$emit('mention-user', username);
     },
   },
   watch: {
@@ -182,6 +212,18 @@ export default {
   background-color: #2f3136;
 }
 
+.message-content.gpt-response {
+  background-color: #1e3a8a;
+  border-left: 4px solid #3b82f6;
+}
+
+.gpt-message {
+  background-color: rgba(59, 130, 246, 0.05);
+  border-radius: 8px;
+  padding: 8px;
+  margin: 4px 0;
+}
+
 .message-time {
   color: #72767d;
   font-size: 0.75rem;
@@ -213,13 +255,6 @@ export default {
 
 .other-message {
   justify-content: flex-start;
-}
-
-.text {
-  white-space: pre-wrap;
-  user-select: text;
-  -webkit-user-select: text;
-  -moz-user-select: text;
 }
 
 .name {

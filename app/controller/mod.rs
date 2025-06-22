@@ -3,6 +3,7 @@ pub mod hello;
 pub mod openapi;
 pub mod root;
 pub mod upload;
+pub mod users;
 pub mod ws;
 
 use super::*;

@@ -1,6 +1,6 @@
 <template>
-  <div :class="['avatar', isSelf ? 'self' : '']">
-    {{ name?.charAt(0) }}
+  <div :class="['avatar', isSelf ? 'self' : '', isGpt ? 'gpt' : '']">
+    {{ isGpt ? '🤖' : name?.charAt(0) }}
   </div>
 </template>
 
@@ -13,6 +13,10 @@ export default {
       required: true,
     },
     isSelf: {
+      type: Boolean,
+      default: false,
+    },
+    isGpt: {
       type: Boolean,
       default: false,
     },
@@ -45,6 +49,11 @@ export default {
 .avatar.self {
   background: #43b581;
   margin: 0 0 0 16px;
+}
+
+.avatar.gpt {
+  background: #3b82f6;
+  font-size: 1.2rem;
 }
 
 @media (max-width: 600px) {

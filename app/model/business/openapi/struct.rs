@@ -2,7 +2,14 @@ use super::*;
 
 #[derive(utoipa::OpenApi)]
 #[openapi(
-    components(schemas(FileChunkData, UploadResponse, WebSocketReqData, WebSocketRespData)),
+    components(schemas(
+        FileChunkData,
+        UploadResponse,
+        WebSocketReqData,
+        WebSocketRespData,
+        OnlineUser,
+        UserListResponse
+    )),
     info(
         title = "Hyperlane",
         version = "latest",
@@ -19,6 +26,7 @@ use super::*;
         controller::upload::merge,
         controller::upload::register,
         controller::upload::save,
+        controller::users::online_users,
         controller::ws::html,
         controller::ws::handle,
     )

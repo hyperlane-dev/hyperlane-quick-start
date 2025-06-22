@@ -1,6 +1,15 @@
 <template>
   <div class="message-header">
-    <div class="name">{{ name }}</div>
+    <div
+      :class="[
+        'name',
+        isGpt ? 'gpt-name' : '',
+        !isGpt && !isSelf ? 'clickable' : '',
+      ]"
+      @click="handleNameClick"
+    >
+      {{ name }}
+    </div>
   </div>
 </template>
 
@@ -19,6 +28,17 @@ export default {
     isSelf: {
       type: Boolean,
       default: false,
+    },
+    isGpt: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  methods: {
+    handleNameClick() {
+      if (!this.isGpt && !this.isSelf) {
+        this.$emit('mention-user', this.name);
+      }
     },
   },
 };
@@ -46,6 +66,21 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.name.gpt-name {
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+.name.clickable {
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.name.clickable:hover {
+  color: #5865f2;
+  text-decoration: underline;
 }
 
 .self .message-header {
