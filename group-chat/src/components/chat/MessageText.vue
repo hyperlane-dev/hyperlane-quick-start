@@ -415,7 +415,7 @@ export default {
 .message-text :deep(.mention) {
   font-weight: 600;
   padding: 3px 6px;
-  margin: 1px 3px;
+  margin: 1px 0px;
   border-radius: 4px;
   text-decoration: none;
   display: inline-block;
@@ -427,10 +427,8 @@ export default {
   max-width: 150px;
   overflow: hidden;
   text-overflow: ellipsis;
-  /* 确保边框完全显示 */
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
-  /* 调整垂直对齐 */
   transform: translateY(-1px);
 }
 

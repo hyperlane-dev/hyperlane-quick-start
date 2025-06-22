@@ -228,7 +228,7 @@ export default {
   flex-shrink: 0;
   box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
   border: 2px solid rgba(255, 255, 255, 0.2);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
   line-height: 1;
   text-align: center;
 }
