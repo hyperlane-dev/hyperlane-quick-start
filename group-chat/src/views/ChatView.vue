@@ -226,7 +226,7 @@ export default {
   display: flex;
   align-items: center;
   font-size: 0.875rem;
-  color: #6c757d;
+  font-weight: 600;
 }
 
 .status-dot {
@@ -236,12 +236,24 @@ export default {
   margin-right: 6px;
 }
 
+.connection-indicator.connected {
+  color: #28a745;
+}
+
 .connection-indicator.connected .status-dot {
   background-color: #28a745;
 }
 
+.connection-indicator.disconnected {
+  color: #dc3545;
+}
+
 .connection-indicator.disconnected .status-dot {
   background-color: #dc3545;
+}
+
+.connection-indicator.connecting {
+  color: #ffc107;
 }
 
 .connection-indicator.connecting .status-dot {

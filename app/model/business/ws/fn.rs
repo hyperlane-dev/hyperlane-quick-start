@@ -46,8 +46,8 @@ pub fn get_online_users_list() -> UserListResponse {
     let users_guard: MutexGuard<'_, HashMap<String, OnlineUser>> = users.lock().unwrap();
     let mut users_vec: Vec<OnlineUser> = users_guard.values().cloned().collect();
     let gpt_user: OnlineUser = OnlineUser {
-        user_id: "gpt".to_string(),
-        username: "GPT Assistant".to_string(),
+        user_id: GPT.to_string(),
+        username: GPT.to_string(),
         join_time: time(),
     };
     users_vec.insert(0, gpt_user);

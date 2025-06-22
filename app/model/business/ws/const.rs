@@ -1,1 +1,1 @@
-pub static ONLINE_CONNECTIONS: &'static str = "Current number of online connections";
+pub const GPT: &'static str = "gpt";

@@ -43,6 +43,35 @@ pub(crate) async fn on_closed(ctx: Context) {
     ctx.set_response_body(resp_data).await;
 }
 
+fn remove_mentions(text: &str) -> String {
+    let mut result: String = String::new();
+    let mut chars: Peekable<Chars<'_>> = text.chars().peekable();
+
+    while let Some(ch) = chars.next() {
+        if ch == '@' {
+            // Skip the @ and the following username
+            while let Some(&next_ch) = chars.peek() {
+                if next_ch.is_whitespace() {
+                    break;
+                }
+                chars.next();
+            }
+            // Skip any trailing whitespace after the mention
+            while let Some(&next_ch) = chars.peek() {
+                if !next_ch.is_whitespace() {
+                    break;
+                }
+                chars.next();
+            }
+        } else {
+            result.push(ch);
+        }
+    }
+
+    // Clean up multiple consecutive spaces and trim
+    result.split_whitespace().collect::<Vec<&str>>().join(" ")
+}
+
 pub(crate) async fn callback(ctx: Context) {
     let req_data: WebSocketReqData = ctx
         .get_request_body_json::<WebSocketReqData>()
@@ -64,21 +93,18 @@ pub(crate) async fn callback(ctx: Context) {
     clone!(req_data, ctx, session_id => {
         spawn(async move {
             let req_msg: &String = req_data.get_data();
-
             let is_gpt_mentioned = req_msg.contains("@GPT") ||
                                   req_msg.contains("@GPT Assistant") ||
                                   req_msg.contains("@gpt");
-
             if is_gpt_mentioned {
                 let mut session = get_or_create_session(&session_id);
-                session.add_message("user".to_string(), req_msg.clone());
+                let cleaned_msg = remove_mentions(req_msg);
+                session.add_message("user".to_string(), cleaned_msg);
                 let api_response = match call_gpt_api_with_context(&session).await {
                     Ok(gpt_response) => {
-                        let username = format!("User{}", session_id);
-                        let response = format!("@{} {}", username, gpt_response);
-                        session.add_message("assistant".to_string(), response.clone());
+                        session.add_message("assistant".to_string(), gpt_response.clone());
                         update_session(session);
-                        response
+                        format!("@{} {}", session_id, gpt_response)
                     }
                     Err(error) => {
                         let err_msg: String = format!("[API call failed: {}]", error);

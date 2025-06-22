@@ -20,10 +20,10 @@
       >
         <!-- GPT响应消息 -->
         <template v-if="message.isGptResponse">
-          <MessageAvatar :name="'GPT'" :isSelf="false" :isGpt="true" />
+          <MessageAvatar :name="'gpt'" :isSelf="false" :isGpt="true" />
           <div class="message-info">
             <MessageHeader
-              :name="'GPT Assistant'"
+              :name="'gpt'"
               :time="message.time"
               :isSelf="false"
               :isGpt="true"
@@ -207,6 +207,7 @@ export default {
   -webkit-user-select: text;
   -moz-user-select: text;
   border: 1px solid #e9ecef;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .message-content.self {
@@ -221,11 +222,11 @@ export default {
 }
 
 .gpt-message {
-  background-color: rgba(0, 123, 255, 0.05);
-  border-radius: 8px;
-  padding: 8px;
+  background-color: transparent;
+  border-radius: 0;
+  padding: 0;
   margin: 4px 0;
-  border: 1px solid rgba(0, 123, 255, 0.1);
+  border: none;
 }
 
 .message-time {

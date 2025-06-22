@@ -71,17 +71,19 @@ export default {
 
 .message-text :deep(.mention) {
   font-weight: 600;
-  padding: 2px 6px;
-  margin: 2px 2px;
+  padding: 1px 6px;
+  margin: 0 2px;
   border-radius: 4px;
   text-decoration: none;
-  display: inline-block;
-  line-height: 1.3;
+  display: inline;
+  line-height: inherit;
   box-sizing: border-box;
   vertical-align: baseline;
   white-space: nowrap;
   font-size: inherit;
-  min-height: 1.3em;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .message-text :deep(.mention-other) {
