@@ -57,7 +57,7 @@ export default {
   computed: {
     placeholderText() {
       const basePlaceholder =
-        'Type a message... (use @username to mention users, Ctrl+Enter for new line)';
+        'Type a message... (use @username to mention users, ctrl+enter or shift+enter for new line)';
       if (this.onlineCountText) {
         return `${basePlaceholder} - ${this.onlineCountText}`;
       }
@@ -129,8 +129,8 @@ export default {
       }
 
       if (event.key === 'Enter' && !this.showMentionDropdown) {
-        if (event.ctrlKey) {
-          // Ctrl+Enter: 插入换行符
+        if (event.ctrlKey || event.shiftKey) {
+          // Ctrl+Enter 或 Shift+Enter: 插入换行符
           event.preventDefault();
           const textarea = this.$refs.messageInput;
           const start = textarea.selectionStart;
