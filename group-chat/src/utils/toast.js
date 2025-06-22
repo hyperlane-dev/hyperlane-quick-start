@@ -48,7 +48,6 @@ class ToastService {
   // Show toast with custom options
   show(options) {
     if (!this.container) {
-      console.warn('Toast container not initialized');
       return null;
     }
     return this.container.addToast(options);

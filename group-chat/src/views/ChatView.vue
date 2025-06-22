@@ -72,12 +72,17 @@ export default {
       unreadCount: 0,
       connectionStatus: 'disconnected',
       onlineCountText: '',
+      isMobile: false,
     };
   },
   created() {
     this.username = this.generateUsername();
   },
   mounted() {
+    // 检测移动端
+    this.checkMobile();
+    window.addEventListener('resize', this.checkMobile);
+
     const {
       connectionStatus,
       connect,
@@ -102,6 +107,7 @@ export default {
   },
   beforeUnmount() {
     this.disconnect();
+    window.removeEventListener('resize', this.checkMobile);
   },
   methods: {
     generateUsername() {
@@ -193,6 +199,9 @@ export default {
       if (this.$refs.chatInputRef) {
         this.$refs.chatInputRef.addMention(username);
       }
+    },
+    checkMobile() {
+      this.isMobile = window.innerWidth <= 480;
     },
   },
 };
@@ -324,17 +333,6 @@ export default {
 @media (max-width: 480px) {
   .nav-title {
     font-size: 0.9rem;
-  }
-
-  .nav-title a {
-    display: none;
-  }
-
-  .nav-left::after {
-    content: 'Chat';
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: #2c3e50;
   }
 
   .connection-indicator {
