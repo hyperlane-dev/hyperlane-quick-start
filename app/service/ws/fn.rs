@@ -18,7 +18,7 @@ pub async fn on_connected(ctx: Context) {
         .receiver_count_after_increment(key.clone())
         .to_string();
     let user_id: String = get_name(&ctx).await;
-    let username: String = format!("用户{}", user_id);
+    let username: String = format!("User{}", user_id);
     add_online_user(&user_id, &username);
     let data: String = format!("{ONLINE_CONNECTIONS}{COLON_SPACE}{receiver_count}");
     let resp_data: String = WebSocketRespData::get_json_data(MessageType::OnlineCount, &ctx, data)
@@ -65,7 +65,6 @@ pub(crate) async fn callback(ctx: Context) {
         spawn(async move {
             let req_msg: &String = req_data.get_data();
 
-            // 检查消息是否@了GPT
             let is_gpt_mentioned = req_msg.contains("@GPT") ||
                                   req_msg.contains("@GPT Assistant") ||
                                   req_msg.contains("@gpt");
@@ -75,14 +74,14 @@ pub(crate) async fn callback(ctx: Context) {
                 session.add_message("user".to_string(), req_msg.clone());
                 let api_response = match call_gpt_api_with_context(&session).await {
                     Ok(gpt_response) => {
-                        let username = format!("用户{}", session_id);
+                        let username = format!("User{}", session_id);
                         let response = format!("@{} {}", username, gpt_response);
                         session.add_message("assistant".to_string(), response.clone());
                         update_session(session);
                         response
                     }
                     Err(error) => {
-                        let err_msg: String = format!("[API 调用失败: {}]", error);
+                        let err_msg: String = format!("[API call failed: {}]", error);
                         err_msg
                     }
                 };
@@ -128,10 +127,17 @@ async fn call_gpt_api_with_context(session: &ChatSession) -> Result<String, Stri
         Ok(response) => {
             let response_text: String = response.text().get_body();
             if response_text.trim().is_empty() {
-                return Err("API 响应为空，可能是认证失败或网络问题".to_string());
+                return Err(
+                    "API response is empty, possible authentication failure or network issue"
+                        .to_string(),
+                );
             }
-            let response_json: JsonValue = serde_json::from_str(&response_text)
-                .map_err(|e| format!("JSON 解析失败: {} (响应内容: {})", e, response_text))?;
+            let response_json: JsonValue = serde_json::from_str(&response_text).map_err(|e| {
+                format!(
+                    "JSON parsing failed: {} (response content: {})",
+                    e, response_text
+                )
+            })?;
             if let Some(result) = response_json.get("result") {
                 if let Some(response_content) = result.get("response") {
                     if let Some(response_str) = response_content.as_str() {
@@ -156,15 +162,15 @@ async fn call_gpt_api_with_context(session: &ChatSession) -> Result<String, Stri
                 if let Some(first_error) = errors.get(0) {
                     if let Some(error_message) = first_error.get("message") {
                         return Err(format!(
-                            "API 错误: {}",
-                            error_message.as_str().unwrap_or("未知错误")
+                            "API error: {}",
+                            error_message.as_str().unwrap_or("Unknown error")
                         ));
                     }
                 }
             }
-            Err(format!("API 响应格式不正确: {}", response_text))
+            Err(format!("Incorrect API response format: {}", response_text))
         }
-        Err(e) => Err(format!("请求发送失败: {}", e)),
+        Err(e) => Err(format!("Request sending failed: {}", e)),
     }
 }
 
