@@ -73,7 +73,7 @@ impl EnvConfig {
         let env_content: Cow<'_, str> = String::from_utf8_lossy(&env_content);
         let mut config_map: HashMap<String, String> = HashMap::new();
         for line in env_content.lines() {
-            let line = line.trim();
+            let line: &str = line.trim();
             if line.is_empty() || line.starts_with('#') {
                 continue;
             }
@@ -85,7 +85,6 @@ impl EnvConfig {
             .get("GPT_API_URL")
             .ok_or("GPT_API_URL not found in /shell/env")?
             .clone();
-
         let gpt_api_key: String = config_map
             .get("GPT_API_KEY")
             .ok_or("GPT_API_KEY not found in /shell/env")?

@@ -86,28 +86,12 @@ export default {
         const response = await fetch(`${protocol}//${host}/api/users/online`);
         if (response.ok) {
           const data = await response.json();
-          const realUsers = data.users || [];
-
-          // 创建GPT用户对象，常驻在第一位
-          const gptUser = {
-            user_id: 'gpt',
-            username: 'GPT Assistant',
-            join_time: new Date().toISOString(),
-          };
-
-          // GPT排在第一位，其他用户跟在后面
-          this.onlineUsers = [gptUser, ...realUsers];
+          // 直接使用后端返回的用户列表（已包含GPT）
+          this.onlineUsers = data.users || [];
         }
       } catch (error) {
         console.error('获取在线用户列表失败:', error);
-        // 即使获取失败，也要保证GPT在列表中
-        this.onlineUsers = [
-          {
-            user_id: 'gpt',
-            username: 'GPT Assistant',
-            join_time: new Date().toISOString(),
-          },
-        ];
+        this.onlineUsers = [];
       }
     },
     handleKeyDown(event) {

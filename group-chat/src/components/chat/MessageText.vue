@@ -76,31 +76,47 @@ export default {
 
 .message-text :deep(.mention) {
   font-weight: 600;
-  padding: 1px 4px;
-  border-radius: 3px;
+  padding: 2px 6px;
+  margin: 0 1px;
+  border-radius: 4px;
   text-decoration: none;
+  display: inline-block;
+  line-height: 1.2;
+  /* 防止高亮重叠 */
+  box-sizing: border-box;
+  vertical-align: baseline;
 }
 
 .message-text :deep(.mention-other) {
   background-color: rgba(88, 101, 242, 0.3);
   color: #5865f2;
+  border: 1px solid rgba(88, 101, 242, 0.5);
 }
 
 .message-text :deep(.mention-self) {
-  background-color: rgba(250, 166, 26, 0.3);
+  background-color: rgba(250, 166, 26, 0.4);
   color: #faa61a;
+  border: 1px solid rgba(250, 166, 26, 0.6);
   animation: mentionPulse 2s ease-in-out;
+  /* 自己被@时的特殊效果 */
+  box-shadow: 0 0 0 2px rgba(250, 166, 26, 0.2);
 }
 
 @keyframes mentionPulse {
   0% {
     background-color: rgba(250, 166, 26, 0.6);
+    box-shadow: 0 0 0 2px rgba(250, 166, 26, 0.4);
+    transform: scale(1);
   }
   50% {
-    background-color: rgba(250, 166, 26, 0.3);
+    background-color: rgba(250, 166, 26, 0.4);
+    box-shadow: 0 0 0 4px rgba(250, 166, 26, 0.2);
+    transform: scale(1.02);
   }
   100% {
-    background-color: rgba(250, 166, 26, 0.3);
+    background-color: rgba(250, 166, 26, 0.4);
+    box-shadow: 0 0 0 2px rgba(250, 166, 26, 0.2);
+    transform: scale(1);
   }
 }
 </style>

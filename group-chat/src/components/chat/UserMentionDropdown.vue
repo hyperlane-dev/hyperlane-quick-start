@@ -238,6 +238,30 @@ export default {
   color: white;
 }
 
+/* GPT用户特殊样式 */
+.mention-item.gpt-user {
+  background: rgba(59, 130, 246, 0.1);
+  border-left: 3px solid #3b82f6;
+}
+
+.mention-item.gpt-user.active {
+  background: #3b82f6;
+}
+
+.user-avatar.gpt-avatar {
+  background: #3b82f6;
+  font-size: 1rem;
+}
+
+.user-name.gpt-name {
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+.mention-item.gpt-user.active .user-name.gpt-name {
+  color: white;
+}
+
 .no-users {
   padding: 16px 12px;
   text-align: center;
