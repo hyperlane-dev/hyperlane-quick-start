@@ -34,7 +34,7 @@ export default {
   color: white;
   font-size: 0.875rem;
   position: fixed;
-  bottom: 80px;
+  bottom: 81px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 20;
