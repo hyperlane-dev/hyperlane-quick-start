@@ -203,14 +203,14 @@ export default {
           textarea.style.height = lineHeight + 'px';
           textarea.style.overflowY = 'hidden';
         } else {
-          // PC端：支持多行
+          // PC端：支持多行，但在固定容器内
           // 重置高度以获取正确的scrollHeight
           textarea.style.height = 'auto';
 
-          // 计算新高度，最小1行，最大3行
+          // 计算新高度，最小1行，最大2行（适应固定容器）
           const lineHeight = 20; // 大约的行高
           const minHeight = lineHeight;
-          const maxHeight = lineHeight * 3; // 限制为最多3行
+          const maxHeight = lineHeight * 2; // 限制为最多2行，适应60px容器
 
           // 确保即使内容为空也有最小高度
           const scrollHeight = Math.max(textarea.scrollHeight, minHeight);
@@ -331,8 +331,8 @@ export default {
   width: calc(100% - 24px);
   box-sizing: border-box;
   align-items: center;
-
   position: relative;
+  min-height: 60px;
 }
 
 .chat-input textarea {
@@ -342,7 +342,7 @@ export default {
   border: none;
   border-radius: 4px;
   outline: none;
-  margin: 6px 0;
+  margin: 8px 0;
   font-size: 0.9375rem;
   background-color: transparent;
   color: #2c3e50;
@@ -352,7 +352,7 @@ export default {
   overflow-x: hidden;
   font-family: inherit;
   min-height: 20px;
-  max-height: 60px;
+  max-height: 40px;
   white-space: pre-wrap;
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -401,46 +401,81 @@ export default {
 }
 
 .chat-input button {
-  padding: 6px 10px;
-  height: 28px;
-  background-color: #007bff;
+  padding: 8px 16px;
+  height: 40px;
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  margin-left: 8px;
-  font-weight: 500;
+  transition: all 0.3s ease;
+  margin-left: 12px;
+  font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.9375rem;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.chat-input button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s ease;
 }
 
 .chat-input button:hover:not(:disabled) {
-  background-color: #0056b3;
+  background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+.chat-input button:hover:not(:disabled)::before {
+  left: 100%;
 }
 
 .chat-input button:active:not(:disabled) {
-  background-color: #004085;
+  background: linear-gradient(135deg, #004085 0%, #003366 100%);
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
 }
 
 .chat-input button:disabled {
-  background-color: #6c757d;
+  background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: 0.6;
+  box-shadow: none;
+  transform: none;
 }
 
 .send-icon {
   font-style: normal;
-  font-size: 1.2em;
-  margin-left: 4px;
+  font-size: 1.3em;
+  margin-left: 6px;
+  transition: transform 0.2s ease;
+}
+
+.chat-input button:hover:not(:disabled) .send-icon {
+  transform: translateX(2px);
 }
 
 @media (max-width: 600px) {
   .chat-input {
     margin: 0 6px 8px;
     padding: 0 6px;
+    min-height: 40px;
   }
 
   .chat-input textarea {
@@ -452,6 +487,44 @@ export default {
     padding: 4px 8px;
     margin-left: 6px;
     height: 26px;
+    /* 移动端保持简洁样式 */
+    background: #007bff !important;
+    box-shadow: none !important;
+    border-radius: 4px !important;
+    transform: none !important;
+    font-weight: 500 !important;
+  }
+
+  .chat-input button::before {
+    display: none;
+  }
+
+  .chat-input button:hover:not(:disabled) {
+    background: #0056b3 !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+
+  .chat-input button:active:not(:disabled) {
+    background: #004085 !important;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  .chat-input button:disabled {
+    background: #6c757d !important;
+    opacity: 0.5 !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+
+  .send-icon {
+    font-size: 1.2em !important;
+    margin-left: 4px !important;
+  }
+
+  .chat-input button:hover:not(:disabled) .send-icon {
+    transform: none !important;
   }
 }
 </style>
