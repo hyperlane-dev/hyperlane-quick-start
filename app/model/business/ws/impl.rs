@@ -61,8 +61,15 @@ impl WebSocketRespData {
 
 impl EnvConfig {
     pub fn load() -> Result<Self, String> {
-        let env_content: Vec<u8> = read_from_file(WS_ENV_FILE_PATH)
-            .map_err(|e| format!("Failed to read /shell/env file: {}", e))?;
+        let env_content: Vec<u8> = match read_from_file(WS_ENV_FILE_PATH) {
+            Ok(content) => content,
+            Err(_) => {
+                let example_content: &str = "GPT_API_URL=\nGPT_API_KEY=";
+                let _ = write_to_file(WS_ENV_FILE_PATH, example_content.as_bytes())
+                    .map_err(|e| format!("Failed to create example env file: {}", e))?;
+                return Self::load();
+            }
+        };
         let env_content: Cow<'_, str> = String::from_utf8_lossy(&env_content);
         let mut config_map: HashMap<String, String> = HashMap::new();
         for line in env_content.lines() {
@@ -74,16 +81,15 @@ impl EnvConfig {
                 config_map.insert(key.trim().to_string(), value.trim().to_string());
             }
         }
-        let gpt_api_url = config_map
+        let gpt_api_url: String = config_map
             .get("GPT_API_URL")
             .ok_or("GPT_API_URL not found in /shell/env")?
             .clone();
 
-        let gpt_api_key = config_map
+        let gpt_api_key: String = config_map
             .get("GPT_API_KEY")
             .ok_or("GPT_API_KEY not found in /shell/env")?
             .clone();
-
         Ok(EnvConfig {
             gpt_api_url,
             gpt_api_key,
