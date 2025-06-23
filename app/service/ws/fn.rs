@@ -106,7 +106,7 @@ pub(crate) async fn callback(ctx: Context) {
                         format!("@{} {}", session_id, gpt_response)
                     }
                     Err(error) => {
-                        let err_msg: String = format!("[API call failed: {}]", error);
+                        let err_msg: String = format!("API call failed: {error}");
                         err_msg
                     }
                 };
@@ -136,7 +136,7 @@ async fn call_gpt_api_with_context(session: &ChatSession) -> Result<String, Stri
         }));
     }
     let body: JsonValue = json_value!({
-        "max_tokens": 130000,
+        "max_tokens": 100000,
         "messages": messages
     });
     let mut headers: HashMapXxHash3_64<&str, String> = hash_map_xx_hash3_64();
