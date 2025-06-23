@@ -128,7 +128,7 @@ async fn call_gpt_api_with_context(session: &ChatSession) -> Result<String, Stri
     let config: &EnvConfig = get_global_env_config();
     let gpt_api_url: &String = &config.gpt_api_url;
     let api_key: &String = &config.gpt_api_key;
-    let mut messages = Vec::new();
+    let mut messages: Vec<JsonValue> = Vec::new();
     for msg in &session.messages {
         messages.push(json_value!({
             "role": msg.role,
@@ -136,6 +136,7 @@ async fn call_gpt_api_with_context(session: &ChatSession) -> Result<String, Stri
         }));
     }
     let body: JsonValue = json_value!({
+        "max_tokens": 130000,
         "messages": messages
     });
     let mut headers: HashMapXxHash3_64<&str, String> = hash_map_xx_hash3_64();
