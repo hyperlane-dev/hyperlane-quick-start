@@ -1,12 +1,10 @@
 use super::*;
 
-async fn http_line_buffer_size(server: &Server) {
-    server
-        .http_line_buffer_size(SERVER_HTTP_LINE_BUFFER_SIZE)
-        .await;
+async fn http_buffer_size(server: &Server) {
+    server.http_buffer_size(SERVER_HTTP_BUFFER_SIZE).await;
     println_success!(
-        "Server http line buffer size: ",
-        SERVER_HTTP_LINE_BUFFER_SIZE,
+        "Server http buffer size: ",
+        SERVER_HTTP_BUFFER_SIZE,
         SPACE,
         "bytes"
     );
@@ -112,7 +110,7 @@ async fn create_server() {
     linger(&server).await;
     nodelay(&server).await;
     error_handler(&server).await;
-    http_line_buffer_size(&server).await;
+    http_buffer_size(&server).await;
     ws_buffer_size(&server).await;
     register_request_middleware(&server).await;
     register_route(&server).await;
