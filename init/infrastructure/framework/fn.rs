@@ -58,7 +58,7 @@ async fn ttl(server: &Server) {
     println_success!("Server ttl: ", SERVER_TTI);
 }
 
-async fn disable_inner_ws_handle(server: &Server) {
+async fn disable_ws_handle(server: &Server) {
     server.disable_ws_handler("/api/ws").await;
     println_success!("Server inner websocket handle disable completed");
 }
@@ -154,12 +154,11 @@ async fn create_server() {
     linger(&server).await;
     nodelay(&server).await;
     error_handler(&server).await;
-    error_handler(&server).await;
     http_buffer_size(&server).await;
     ws_buffer_size(&server).await;
     pre_ws_upgrade(&server).await;
     on_ws_connected(&server).await;
-    disable_inner_ws_handle(&server).await;
+    disable_ws_handle(&server).await;
     register_request_middleware(&server).await;
     register_route(&server).await;
     register_response_middleware(&server).await;
