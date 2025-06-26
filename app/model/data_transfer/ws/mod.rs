@@ -4,5 +4,5 @@ pub use r#struct::*;
 
 use super::*;
 
-use model::business::ws::*;
+use model::data::ws::*;
 use utoipa::ToSchema;
