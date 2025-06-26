@@ -3,7 +3,7 @@ mod r#fn;
 pub use r#fn::*;
 
 use super::*;
-use crate::model::business::ws::WebSocketRespData;
 use hyperlane_config::business::{root::*, ws::*};
+use model::data_transfer::ws::*;
 
-use service::ws::r#fn::*;
+use service::ws::*;

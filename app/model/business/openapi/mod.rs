@@ -4,4 +4,8 @@ pub use r#struct::*;
 
 use super::*;
 
-use model::business::{upload::*, ws::*};
+use model::{
+    business::{upload::*, ws::*},
+    data_transfer::{upload::*, ws::*},
+    param::ws::*,
+};

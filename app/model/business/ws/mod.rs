@@ -13,6 +13,7 @@ pub use r#struct::*;
 
 use super::*;
 use hyperlane_config::business::ws::*;
+use model::{data_transfer::ws::*, param::ws::*};
 
 use std::{
     borrow::Cow,

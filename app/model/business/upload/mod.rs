@@ -9,5 +9,4 @@ pub use r#type::*;
 use super::*;
 
 use once_cell::sync::Lazy;
-use serde::Serialize;
 use utoipa::ToSchema;

@@ -8,10 +8,3 @@ pub struct FileChunkData {
     total_chunks: usize,
     base_file_dir: String,
 }
-
-#[derive(Debug, Serialize, Data, Clone, ToSchema)]
-pub struct UploadResponse<'a> {
-    pub code: i32,
-    pub url: &'a str,
-    pub msg: &'a str,
-}

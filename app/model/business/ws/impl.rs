@@ -95,3 +95,26 @@ impl EnvConfig {
         })
     }
 }
+
+impl ChatSession {
+    pub fn new(session_id: String) -> Self {
+        Self {
+            session_id,
+            messages: Vec::new(),
+            last_activity: std::time::Instant::now(),
+        }
+    }
+
+    pub fn add_message(&mut self, role: String, content: String) {
+        self.messages.push(ChatMessage { role, content });
+        self.last_activity = std::time::Instant::now();
+
+        if self.messages.len() > 20 {
+            self.messages.drain(0..self.messages.len() - 20);
+        }
+    }
+
+    pub fn is_expired(&self, timeout_minutes: u64) -> bool {
+        self.last_activity.elapsed().as_secs() > timeout_minutes * 60
+    }
+}
