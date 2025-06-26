@@ -1,9 +1,7 @@
 use super::*;
 
-async fn http_line_buffer_size(server: &Server) {
-    server
-        .http_line_buffer_size(SERVER_HTTP_LINE_BUFFER_SIZE)
-        .await;
+async fn http_buffer_size(server: &Server) {
+    server.http_buffer_size(SERVER_HTTP_LINE_BUFFER_SIZE).await;
     println_success!(
         "Server http line buffer size: ",
         SERVER_HTTP_LINE_BUFFER_SIZE,
@@ -23,10 +21,8 @@ async fn ws_buffer_size(server: &Server) {
     );
 }
 
-async fn before_ws_upgrade(server: &Server) {
-    server
-        .before_ws_upgrade(service::ws::before_ws_upgrade)
-        .await;
+async fn pre_ws_upgrade(server: &Server) {
+    server.pre_ws_upgrade(service::ws::pre_ws_upgrade).await;
 }
 
 async fn host(server: &Server) {
@@ -63,7 +59,7 @@ async fn ttl(server: &Server) {
 }
 
 async fn disable_inner_ws_handle(server: &Server) {
-    server.disable_internal_ws_handler("/api/ws").await;
+    server.disable_ws_handler("/api/ws").await;
     println_success!("Server inner websocket handle disable completed");
 }
 
@@ -159,9 +155,9 @@ async fn create_server() {
     nodelay(&server).await;
     error_handler(&server).await;
     error_handler(&server).await;
-    http_line_buffer_size(&server).await;
+    http_buffer_size(&server).await;
     ws_buffer_size(&server).await;
-    before_ws_upgrade(&server).await;
+    pre_ws_upgrade(&server).await;
     on_ws_connected(&server).await;
     disable_inner_ws_handle(&server).await;
     register_request_middleware(&server).await;
