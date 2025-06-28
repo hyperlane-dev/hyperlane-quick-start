@@ -15,9 +15,8 @@ pub async fn response_header(ctx: Context) {
         .await;
 }
 
-pub async fn response_status_code(ctx: Context) {
-    ctx.set_response_status_code(404).await;
-}
+#[status_code(404)]
+pub async fn response_status_code(ctx: Context) {}
 
 pub async fn response_body(ctx: Context) {
     ctx.set_response_body(NOT_FOUND_HTML).await;
