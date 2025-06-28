@@ -1,10 +1,10 @@
 use super::*;
 
 async fn http_buffer_size(server: &Server) {
-    server.http_buffer_size(SERVER_HTTP_LINE_BUFFER_SIZE).await;
+    server.http_buffer_size(SERVER_HTTP_BUFFER_SIZE).await;
     println_success!(
-        "Server http line buffer size: ",
-        SERVER_HTTP_LINE_BUFFER_SIZE,
+        "Server http buffer size: ",
+        SERVER_HTTP_BUFFER_SIZE,
         SPACE,
         "bytes"
     );
@@ -47,9 +47,7 @@ async fn nodelay(server: &Server) {
 
 async fn error_handler(server: &Server) {
     server
-        .error_handler(async |data: PanicInfo| {
-            println_error!(data);
-        })
+        .error_handler(exception::framework::error_handler)
         .await;
 }
 
@@ -172,7 +170,7 @@ async fn create_server() {
 }
 
 pub fn run() {
-    if let Err(e) = init_env_config() {
+    if let Err(e) = model::business::ws::init_env_config() {
         println_error!("Failed to initialize environment configuration: ", e);
     }
     println_success!("Environment configuration loaded successfully");

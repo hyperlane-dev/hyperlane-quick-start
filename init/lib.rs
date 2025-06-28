@@ -1,5 +1,5 @@
 pub mod business;
-pub mod infrastructure;
+pub mod framework;
 
 use hyperlane::*;
 use hyperlane_utils::*;
