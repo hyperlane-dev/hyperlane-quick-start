@@ -14,4 +14,3 @@ serde = { workspace = true }
 hyperlane = { workspace = true }
 http-request = { workspace = true }
 hyperlane-utils = { workspace = true }
-hyperlane-plugin-websocket = { workspace = true }

@@ -14,5 +14,4 @@ use std::{
     sync::{Arc, Mutex, OnceLock},
 };
 
-use hyperlane_plugin_websocket::WebSocket;
 use utoipa::ToSchema;

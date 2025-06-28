@@ -9,16 +9,14 @@ use super::*;
         (status = 200, description = "静态资源", body = String)
     )
 )]
+#[route_param(UPLOAD_DIR_KEY => dir)]
 pub async fn static_file(ctx: Context) {
-    let dir: String = ctx
-        .get_route_param(UPLOAD_DIR_KEY)
-        .await
-        .unwrap_or_default();
     let file: String = ctx
         .get_route_param(UPLOAD_FILE_KEY)
         .await
         .unwrap_or_default();
-    let decode_dir: String = Decode::execute(CHARSETS, &dir).unwrap_or_default();
+    let decode_dir: String =
+        Decode::execute(CHARSETS, &dir.unwrap_or_default()).unwrap_or_default();
     let decode_file: String = Decode::execute(CHARSETS, &file).unwrap_or_default();
     if decode_dir.is_empty() || decode_file.is_empty() {
         return;
