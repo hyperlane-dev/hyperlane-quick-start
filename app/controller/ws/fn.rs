@@ -53,6 +53,13 @@ pub async fn handle(ctx: Context) {
     let path: String = ctx.get_request_path().await;
     let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
     websocket
-        .run(&ctx, 1_024_000, key, callback, send_callback, on_closed)
+        .run(
+            &ctx,
+            SERVER_WS_BUFFER_SIZE,
+            key,
+            callback,
+            send_callback,
+            on_closed,
+        )
         .await;
 }

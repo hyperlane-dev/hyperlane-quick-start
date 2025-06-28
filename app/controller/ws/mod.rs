@@ -3,7 +3,9 @@ mod r#fn;
 pub use r#fn::*;
 
 use super::*;
-use hyperlane_config::business::{root::*, ws::*};
+use hyperlane_config::{
+    business::{root::*, ws::*},
+    framework::*,
+};
 use model::data_transfer::ws::*;
-
 use service::ws::*;
