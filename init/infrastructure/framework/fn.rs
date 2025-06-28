@@ -47,7 +47,7 @@ async fn nodelay(server: &Server) {
 
 async fn error_handler(server: &Server) {
     server
-        .error_handler(|data| {
+        .error_handler(async |data| {
             println_error!("Server error: ", data);
         })
         .await;
