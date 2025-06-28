@@ -47,8 +47,8 @@ async fn nodelay(server: &Server) {
 
 async fn error_handler(server: &Server) {
     server
-        .error_handler(async |data| {
-            println_error!("Server error: ", data);
+        .error_handler(async |data: PanicInfo| {
+            println_error!(data);
         })
         .await;
 }
