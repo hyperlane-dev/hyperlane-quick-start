@@ -9,14 +9,13 @@ use super::*;
         (status = 200, description = "静态资源", body = String)
     )
 )]
-#[route_param(UPLOAD_DIR_KEY => dir)]
+#[route_param(UPLOAD_DIR_KEY => dir_opt)]
+#[route_param(UPLOAD_FILE_KEY => file_opt)]
+#[status_code(200)]
 pub async fn static_file(ctx: Context) {
-    let file: String = ctx
-        .get_route_param(UPLOAD_FILE_KEY)
-        .await
-        .unwrap_or_default();
-    let decode_dir: String =
-        Decode::execute(CHARSETS, &dir.unwrap_or_default()).unwrap_or_default();
+    let dir: String = dir_opt.unwrap_or_default();
+    let file: String = file_opt.unwrap_or_default();
+    let decode_dir: String = Decode::execute(CHARSETS, &dir).unwrap_or_default();
     let decode_file: String = Decode::execute(CHARSETS, &file).unwrap_or_default();
     if decode_dir.is_empty() || decode_file.is_empty() {
         return;
@@ -31,8 +30,6 @@ pub async fn static_file(ctx: Context) {
         .await
         .set_response_header(EXPIRES, "Wed, 1 Apr 8888 00:00:00 GMT")
         .await
-        .set_response_status_code(200)
-        .await
         .set_response_body(data)
         .await;
 }
@@ -46,10 +43,9 @@ pub async fn static_file(ctx: Context) {
         (status = 200, description = "文件分块上传前端界面", body = String)
     )
 )]
+#[status_code(200)]
 pub async fn html(ctx: Context) {
     let _ = ctx
-        .set_response_status_code(200)
-        .await
         .set_response_header(CONTENT_ENCODING, GZIP)
         .await
         .set_response_body(UPLOAD_HTML)

@@ -71,11 +71,9 @@ fn remove_mentions(text: &str) -> String {
     result.split_whitespace().collect::<Vec<&str>>().join(" ")
 }
 
+#[body(req_data_res: WebSocketReqData)]
 pub(crate) async fn callback(ctx: Context) {
-    let req_data: WebSocketReqData = ctx
-        .get_request_body_json::<WebSocketReqData>()
-        .await
-        .unwrap();
+    let req_data: WebSocketReqData = req_data_res.unwrap();
     if req_data.is_ping() {
         let resp_data: WebSocketRespData =
             WebSocketRespData::new(MessageType::Pang, &ctx, "").await;
@@ -92,9 +90,7 @@ pub(crate) async fn callback(ctx: Context) {
     clone!(req_data, ctx, session_id => {
         spawn(async move {
             let req_msg: &String = req_data.get_data();
-            let is_gpt_mentioned = req_msg.contains("@GPT") ||
-                                  req_msg.contains("@GPT Assistant") ||
-                                  req_msg.contains("@gpt");
+            let is_gpt_mentioned = req_msg.contains("@GPT") || req_msg.contains("@GPT Assistant") || req_msg.contains("@gpt");
             if is_gpt_mentioned {
                 let mut session = get_or_create_session(&session_id);
                 let cleaned_msg = remove_mentions(req_msg);

@@ -9,8 +9,10 @@ use super::*;
         (status = 200, description = "群聊前端界面", body = String)
     )
 )]
+#[route_param(WS_DIR_KEY => ws_path_opt)]
+#[status_code(200)]
 pub async fn html(ctx: Context) {
-    let ws_path: String = ctx.get_route_param(WS_DIR_KEY).await.unwrap_or_default();
+    let ws_path: String = ws_path_opt.unwrap_or_default();
     if ws_path.len() <= 3 {
         ctx.set_response_status_code(301)
             .await
@@ -20,7 +22,6 @@ pub async fn html(ctx: Context) {
             .await;
         return;
     }
-
     let file_path: String = format!("./group-chat/{ws_path}");
     let extension_name: String = FileExtension::get_extension_name(&file_path);
     let content_type: &str = FileExtension::parse(&extension_name).get_content_type();
@@ -29,9 +30,7 @@ pub async fn html(ctx: Context) {
         return;
     }
     let body: Vec<u8> = res.unwrap_or_default();
-    ctx.set_response_status_code(200)
-        .await
-        .set_response_header(CONTENT_ENCODING, GZIP)
+    ctx.set_response_header(CONTENT_ENCODING, GZIP)
         .await
         .set_response_header(CONTENT_TYPE, content_type)
         .await
