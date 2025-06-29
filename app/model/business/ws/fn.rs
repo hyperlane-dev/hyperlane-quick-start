@@ -56,7 +56,7 @@ pub fn get_online_users_list() -> UserListResponse {
     }
 }
 
-#[query("uuid" => uuid_opt)]
+#[request_query("uuid" => uuid_opt)]
 pub async fn get_name(ctx: &Context) -> String {
     uuid_opt.unwrap_or_default()
 }

@@ -6,10 +6,10 @@ pub fn get_base_file_dir() -> String {
     full_dir
 }
 
-#[header(CHUNKIFY_FILE_ID_HEADER => file_id_opt)]
-#[header(CHUNKIFY_TOTAL_CHUNKS_HEADER => total_chunks_opt)]
-#[header(CHUNKIFY_FILE_NAME_HEADER => file_name_opt)]
-#[header(CHUNKIFY_DIRECTORY_HEADER => base_file_dir_opt)]
+#[request_header(CHUNKIFY_FILE_ID_HEADER => file_id_opt)]
+#[request_header(CHUNKIFY_TOTAL_CHUNKS_HEADER => total_chunks_opt)]
+#[request_header(CHUNKIFY_FILE_NAME_HEADER => file_name_opt)]
+#[request_header(CHUNKIFY_DIRECTORY_HEADER => base_file_dir_opt)]
 pub async fn get_register_file_chunk_data<'a>(ctx: &'a Context) -> OptionFileChunkData {
     let file_id: String = match file_id_opt {
         Some(id) => id,
@@ -70,7 +70,7 @@ pub async fn get_register_file_chunk_data<'a>(ctx: &'a Context) -> OptionFileChu
     ))
 }
 
-#[header(CHUNKIFY_CHUNK_INDEX_HEADER => chunk_index_opt)]
+#[request_header(CHUNKIFY_CHUNK_INDEX_HEADER => chunk_index_opt)]
 pub async fn get_save_file_chunk_data<'a>(ctx: &'a Context) -> OptionFileChunkData {
     let mut data: FileChunkData = get_merge_file_chunk_data(ctx).await?;
     let chunk_index: usize = match chunk_index_opt {
@@ -103,7 +103,7 @@ pub async fn remove_file_id_map(file_id: &str) {
     FILE_ID_MAP.remove(file_id);
 }
 
-#[header(CHUNKIFY_FILE_ID_HEADER => file_id_opt)]
+#[request_header(CHUNKIFY_FILE_ID_HEADER => file_id_opt)]
 pub async fn get_merge_file_chunk_data<'a>(ctx: &Context) -> OptionFileChunkData {
     let file_id: String = match file_id_opt {
         Some(id) => id,
@@ -116,7 +116,7 @@ pub async fn get_merge_file_chunk_data<'a>(ctx: &Context) -> OptionFileChunkData
     FILE_ID_MAP.get(&file_id).map(|data| data.clone())
 }
 
-#[status_code(200)]
+#[response_status_code(200)]
 pub async fn set_common_success_response_body<'a>(ctx: &'a Context, url: &'a str) {
     let mut data: UploadResponse<'_> = UploadResponse::default();
     data.set_code(200).set_msg(OK).set_url(url);
@@ -124,7 +124,7 @@ pub async fn set_common_success_response_body<'a>(ctx: &'a Context, url: &'a str
     let _ = ctx.set_response_body(data_json).await;
 }
 
-#[status_code(200)]
+#[response_status_code(200)]
 pub async fn set_common_error_response_body<'a>(ctx: &'a Context, error: String) {
     let mut data: UploadResponse<'_> = UploadResponse::default();
     data.set_msg(&error);

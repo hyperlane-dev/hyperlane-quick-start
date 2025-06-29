@@ -10,13 +10,12 @@ use super::*;
     )
 )]
 #[route_param(WS_DIR_KEY => ws_path_opt)]
-#[status_code(200)]
+#[response_status_code(200)]
+#[response_header(LOCATION => INDEX_HTML_URL_PATH)]
 pub async fn html(ctx: Context) {
     let ws_path: String = ws_path_opt.unwrap_or_default();
     if ws_path.len() <= 3 {
         ctx.set_response_status_code(301)
-            .await
-            .set_response_header(LOCATION, INDEX_HTML_URL_PATH)
             .await
             .set_response_body(vec![])
             .await;

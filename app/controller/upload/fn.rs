@@ -11,7 +11,9 @@ use super::*;
 )]
 #[route_param(UPLOAD_DIR_KEY => dir_opt)]
 #[route_param(UPLOAD_FILE_KEY => file_opt)]
-#[status_code(200)]
+#[response_status_code(200)]
+#[response_header(CACHE_CONTROL => "public, max-age=31536000, immutable")]
+#[response_header(EXPIRES => "Wed, 1 Apr 8888 00:00:00 GMT")]
 pub async fn static_file(ctx: Context) {
     let dir: String = dir_opt.unwrap_or_default();
     let file: String = file_opt.unwrap_or_default();
@@ -26,10 +28,6 @@ pub async fn static_file(ctx: Context) {
     let data: Vec<u8> = async_read_from_file(&path).await.unwrap_or_default();
     ctx.set_response_header(CONTENT_TYPE, content_type)
         .await
-        .set_response_header(CACHE_CONTROL, "public, max-age=31536000, immutable")
-        .await
-        .set_response_header(EXPIRES, "Wed, 1 Apr 8888 00:00:00 GMT")
-        .await
         .set_response_body(data)
         .await;
 }
@@ -43,14 +41,10 @@ pub async fn static_file(ctx: Context) {
         (status = 200, description = "文件分块上传前端界面", body = String)
     )
 )]
-#[status_code(200)]
-pub async fn html(ctx: Context) {
-    let _ = ctx
-        .set_response_header(CONTENT_ENCODING, GZIP)
-        .await
-        .set_response_body(UPLOAD_HTML)
-        .await;
-}
+#[response_status_code(200)]
+#[response_header(CONTENT_ENCODING => GZIP)]
+#[response_body(UPLOAD_HTML)]
+pub async fn html(ctx: Context) {}
 
 #[post]
 #[utoipa::path(
