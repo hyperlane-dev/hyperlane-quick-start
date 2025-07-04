@@ -77,7 +77,7 @@ pub(crate) async fn callback(ctx: Context) {
     if req_data.is_ping() {
         let resp_data: WebSocketRespData =
             WebSocketRespData::new(MessageType::Pang, &ctx, "").await;
-        let resp_data: String = json_stringify_string(&resp_data).unwrap();
+        let resp_data: String = serde_json::to_string(&resp_data).unwrap();
         ctx.set_response_body(resp_data)
             .await
             .send_body()
@@ -107,7 +107,7 @@ pub(crate) async fn callback(ctx: Context) {
                     }
                 };
                 let gpt_resp_data = WebSocketRespData::new(MessageType::GptResponse, &ctx, &api_response).await;
-                let gpt_resp_json = json_stringify_string(&gpt_resp_data).unwrap();
+                let gpt_resp_json = serde_json::to_string(&gpt_resp_data).unwrap();
                 let websocket = get_global_websocket();
                 let path = ctx.get_request_path().await;
                 let key = BroadcastType::PointToGroup(path);
@@ -116,7 +116,7 @@ pub(crate) async fn callback(ctx: Context) {
         });
     });
     let resp_data: WebSocketRespData = req_data.into_resp(&ctx).await;
-    let resp_data: String = json_stringify_string(&resp_data).unwrap();
+    let resp_data: String = serde_json::to_string(&resp_data).unwrap();
     ctx.set_response_body(resp_data).await;
 }
 

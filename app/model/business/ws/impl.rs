@@ -55,7 +55,7 @@ impl WebSocketRespData {
         ctx: &Context,
         data: T,
     ) -> ResultJsonError<String> {
-        json_stringify_string(&WebSocketRespData::new(r#type, ctx, data).await)
+        serde_json::to_string(&WebSocketRespData::new(r#type, ctx, data).await)
     }
 }
 
