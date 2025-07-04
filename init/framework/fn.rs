@@ -91,7 +91,7 @@ async fn register_route(server: &Server) {
 
 fn runtime() -> Runtime {
     Builder::new_multi_thread()
-        .worker_threads(get_thread_count())
+        .worker_threads(num_cpus::get_physical())
         .thread_stack_size(1_048_576)
         .max_blocking_threads(2_048)
         .max_io_events_per_tick(1_024)
@@ -100,8 +100,8 @@ fn runtime() -> Runtime {
         .unwrap()
 }
 
+#[hyperlane(server)]
 async fn create_server() {
-    let server: Server = Server::new();
     host(&server).await;
     port(&server).await;
     ttl(&server).await;
