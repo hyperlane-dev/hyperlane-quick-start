@@ -907,9 +907,9 @@ checksum = "087d27cd719e5a80b34b1fab3aead80a366ce4e903d198334ede177f391e1fbb"
 
 [[package]]
 name = "http-request"
-version = "8.88.3"
+version = "8.89.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f6c76b2db5e583f6c47073b83a6cfb705b41cf97a4f4d5138227f2ca5f1e89bb"
+checksum = "710b8b274422ee5007542966ab37117071b3066d5d9c3c00ab501c1c1c593f2e"
 dependencies = [
  "futures",
  "http-type",
@@ -925,9 +925,9 @@ dependencies = [
 
 [[package]]
 name = "http-type"
-version = "4.26.0"
+version = "4.27.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6831414384644bced5286ecba9ce813f72db3048e83b18f0e65f065e9d7fbe86"
+checksum = "6804e58f67d8afc41be9f546ae35f8505ee2695c0e27b6e94a67aae56017bd7d"
 dependencies = [
  "dashmap",
  "hex",
@@ -956,9 +956,9 @@ checksum = "df3b46402a9d5adb4c86a0cf463f42e19994e3ee891101b1841f30a545cb49a9"
 
 [[package]]
 name = "hyperlane"
-version = "5.39.0"
+version = "5.40.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2291a6f9a3d60bde6fd9c408313169ea589bce50a433cc6d4be9b83448de84bd"
+checksum = "b7581865927715597cb3ac428b2a6269880136370350469fab2bdc5c5e56b629"
 dependencies = [
  "http-type",
  "lombok-macros",
@@ -1000,9 +1000,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-plugin-websocket"
-version = "1.0.0"
+version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b5df0f89377b615caf7d04e14bbbd02528526ef99ffd178f172d65cde314d755"
+checksum = "b4b6f68b4a3fbda3a60ff6563a275ac78bb45313b02d88b290a6bbe56b18aa4b"
 dependencies = [
  "hyperlane",
  "hyperlane-broadcast",
@@ -1023,9 +1023,9 @@ checksum = "c145707425cdd097e117e8b4ee8baeaf8eb265658a5c37d2c4aa0b24fd26a507"
 
 [[package]]
 name = "hyperlane-utils"
-version = "1.4.3"
+version = "1.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ada8f20de625e1d55591f2b5c570e04d82139aab9b45999fad855f01a70b3c17"
+checksum = "2a250a28af194328ae0fd7b68e11a72ea33e9ad3aa3a9415d8d50a650d619da6"
 dependencies = [
  "ahash",
  "bin-encode-decode",
@@ -1224,6 +1224,17 @@ dependencies = [
  "equivalent",
  "hashbrown 0.15.4",
  "serde",
+]
+
+[[package]]
+name = "io-uring"
+version = "0.7.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b86e202f00093dcba4275d4636b93ef9dd75d025ae560d2521b45ea28ab49013"
+dependencies = [
+ "bitflags",
+ "cfg-if",
+ "libc",
 ]
 
 [[package]]
@@ -2075,17 +2086,19 @@ dependencies = [
 
 [[package]]
 name = "tokio"
-version = "1.45.1"
+version = "1.46.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "75ef51a33ef1da925cea3e4eb122833cb377c61439ca401b770f54902b806779"
+checksum = "1140bb80481756a8cbe10541f37433b459c5aa1e727b4c020fbfebdc25bf3ec4"
 dependencies = [
  "backtrace",
  "bytes",
+ "io-uring",
  "libc",
  "mio",
  "parking_lot",
  "pin-project-lite",
  "signal-hook-registry",
+ "slab",
  "socket2",
  "tokio-macros",
  "windows-sys 0.52.0",
