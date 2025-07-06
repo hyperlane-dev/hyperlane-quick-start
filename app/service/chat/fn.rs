@@ -212,5 +212,8 @@ pub(crate) async fn send_callback(ctx: Context) {
         BR,
         response_string
     );
-    log_info(format!("{request}{BR}{response}")).await;
+    log_info(format!(
+        "{request}{BR}{request_string}{BR}{response}{BR}{response_string}"
+    ))
+    .await;
 }
