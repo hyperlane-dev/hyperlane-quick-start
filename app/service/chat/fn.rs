@@ -111,7 +111,9 @@ pub(crate) async fn callback(ctx: Context) {
                 let websocket = get_global_websocket();
                 let path = ctx.get_request_path().await;
                 let key = BroadcastType::PointToGroup(path);
-                let _ = websocket.send(key, gpt_resp_json);
+                let _ = websocket.send(key, gpt_resp_json.clone());
+                ctx.set_response_body(gpt_resp_json).await;
+                send_callback(ctx).await;
             }
         });
     });
@@ -196,4 +198,19 @@ async fn call_gpt_api_with_context(session: &ChatSession) -> Result<String, Stri
     }
 }
 
-pub(crate) async fn send_callback(_: Context) {}
+pub(crate) async fn send_callback(ctx: Context) {
+    let request_string: String = ctx.get_request().await.get_body_string();
+    let response_string: String = ctx.get_response().await.get_body_string();
+    let request: String = ctx.get_request().await.get_string();
+    let response: String = ctx.get_response().await.get_string();
+    println_success!(
+        request,
+        BR,
+        request_string,
+        BR,
+        response,
+        BR,
+        response_string
+    );
+    log_info(format!("{request}{BR}{response}")).await;
+}
