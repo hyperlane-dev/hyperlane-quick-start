@@ -71,7 +71,7 @@ fn remove_mentions(text: &str) -> String {
     result.split_whitespace().collect::<Vec<&str>>().join(" ")
 }
 
-#[body(req_data_res: WebSocketReqData)]
+#[request_body_json(req_data_res: WebSocketReqData)]
 pub(crate) async fn callback(ctx: Context) {
     let req_data: WebSocketReqData = req_data_res.unwrap();
     if req_data.is_ping() {
