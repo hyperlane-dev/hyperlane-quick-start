@@ -3,5 +3,5 @@ module.exports = defineConfig({
   transpileDependencies: true,
   productionSourceMap: false,
   publicPath: './',
-  outputDir: './ws',
+  outputDir: './chat',
 });

@@ -1,4 +1,4 @@
 pub mod upload;
-pub mod ws;
+pub mod chat;
 
 use super::*;

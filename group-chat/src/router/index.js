@@ -5,7 +5,7 @@ const isDev = process.env.NODE_ENV === 'development';
 
 const routes = [
   {
-    path: isDev ? '/' : '/ws/index.html',
+    path: isDev ? '/' : '/chat/index.html',
     name: 'chat',
     component: ChatView,
   },

@@ -22,7 +22,7 @@ async fn ws_buffer_size(server: &Server) {
 }
 
 async fn pre_ws_upgrade(server: &Server) {
-    server.pre_ws_upgrade(service::ws::pre_ws_upgrade).await;
+    server.pre_ws_upgrade(service::chat::pre_ws_upgrade).await;
 }
 
 async fn host(server: &Server) {
@@ -57,7 +57,7 @@ async fn ttl(server: &Server) {
 }
 
 async fn disable_ws_handle(server: &Server) {
-    server.disable_ws_handler("/api/ws").await;
+    server.disable_ws_handler("/api/chat").await;
     println_success!("Server inner websocket handle disable completed");
 }
 
@@ -109,10 +109,10 @@ async fn register_route(server: &Server) {
         )
         .await;
     server
-        .route(format!("/{{{WS_DIR_KEY}:^ws.*}}"), controller::ws::html)
+        .route(format!("/{{{WS_DIR_KEY}:^chat.*}}"), controller::chat::html)
         .await;
 
-    server.route("/api/ws", controller::ws::handle).await;
+    server.route("/api/chat", controller::chat::handle).await;
     server
         .route("/api/users/online", controller::users::online_users)
         .await;
@@ -130,7 +130,7 @@ async fn register_route(server: &Server) {
 }
 
 async fn on_ws_connected(server: &Server) {
-    server.on_ws_connected(service::ws::on_connected).await;
+    server.on_ws_connected(service::chat::on_connected).await;
 }
 
 fn runtime() -> Runtime {
@@ -170,7 +170,7 @@ async fn create_server() {
 }
 
 pub fn run() {
-    if let Err(e) = model::business::ws::init_env_config() {
+    if let Err(e) = model::business::chat::init_env_config() {
         println_error!("Failed to initialize environment configuration: ", e);
     }
     println_success!("Environment configuration loaded successfully");

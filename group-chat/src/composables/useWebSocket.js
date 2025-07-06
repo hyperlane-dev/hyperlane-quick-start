@@ -19,7 +19,7 @@ export function useWebSocket({ onMessage }) {
         ? 'localhost:60006'
         : window.location.hostname;
 
-    socket.value = new WebSocket(`${protocol}://${host}/api/ws?uuid=${uuid}`);
+    socket.value = new WebSocket(`${protocol}://${host}/api/chat?uuid=${uuid}`);
     socket.value.onopen = () => {
       connectionStatus.value = 'connected';
       clearInterval(sendId);

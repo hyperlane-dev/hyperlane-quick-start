@@ -27,8 +27,8 @@ use super::*;
         controller::upload::register,
         controller::upload::save,
         controller::users::online_users,
-        controller::ws::html,
-        controller::ws::handle,
+        controller::chat::html,
+        controller::chat::handle,
     )
 )]
 pub struct ApiDoc;

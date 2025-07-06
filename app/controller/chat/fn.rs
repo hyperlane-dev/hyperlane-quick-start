@@ -4,18 +4,19 @@ use super::*;
 #[utoipa::path(
     get,
     post,
-    path = "/ws/index.html",   
+    path = "/chat/index.html",   
     responses(
         (status = 200, description = "群聊前端界面", body = String)
     )
 )]
 #[route_param(WS_DIR_KEY => ws_path_opt)]
-#[response_status_code(200)]
 #[response_header(LOCATION => INDEX_HTML_URL_PATH)]
 pub async fn html(ctx: Context) {
     let ws_path: String = ws_path_opt.unwrap_or_default();
-    if ws_path.len() <= 3 {
+    if ws_path.len() <= 5 {
         ctx.set_response_status_code(301)
+            .await
+            .set_response_header(LOCATION, INDEX_HTML_URL_PATH)
             .await
             .set_response_body(vec![])
             .await;
@@ -29,7 +30,9 @@ pub async fn html(ctx: Context) {
         return;
     }
     let body: Vec<u8> = res.unwrap_or_default();
-    ctx.set_response_header(CONTENT_ENCODING, GZIP)
+    ctx.set_response_status_code(200)
+        .await
+        .set_response_header(CONTENT_ENCODING, GZIP)
         .await
         .set_response_header(CONTENT_TYPE, content_type)
         .await
@@ -41,7 +44,7 @@ pub async fn html(ctx: Context) {
 #[get]
 #[utoipa::path(
     get,
-    path = "/api/ws",   
+    path = "/api/chat",   
     responses(
         (status = 200, description = "群聊接口", body = WebSocketRespData)
     )

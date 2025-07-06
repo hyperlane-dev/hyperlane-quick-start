@@ -4,6 +4,6 @@ pub mod openapi;
 pub mod root;
 pub mod upload;
 pub mod users;
-pub mod ws;
+pub mod chat;
 
 use super::*;

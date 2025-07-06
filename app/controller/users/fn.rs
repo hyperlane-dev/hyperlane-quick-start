@@ -1,5 +1,5 @@
 use super::*;
-use crate::model::business::ws::get_online_users_list;
+use crate::model::business::chat::get_online_users_list;
 
 #[get]
 #[utoipa::path(
