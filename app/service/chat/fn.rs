@@ -134,7 +134,7 @@ async fn call_gpt_api_with_context(session: &ChatSession) -> Result<String, Stri
         }));
     }
     let body: JsonValue = json_value!({
-        "max_tokens": 100000,
+        "max_tokens": 32000,
         "messages": messages
     });
     let mut headers: HashMapXxHash3_64<&str, String> = hash_map_xx_hash3_64();
