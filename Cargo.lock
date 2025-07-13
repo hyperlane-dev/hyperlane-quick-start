@@ -409,9 +409,9 @@ checksum = "9555578bc9e57714c812a1f84e4fc5b4d21fcb063490c624de019f7464c91268"
 
 [[package]]
 name = "chunkify"
-version = "0.6.5"
+version = "0.6.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "02824ded63d411f7469f59f8c28f50d2f963feefbbbf01ba780e4120e67f9d33"
+checksum = "75362a621fbf83ae5a5c3d5c6167fe7f8021c9ec60f35eaa2531c3ee7fbc7f17"
 dependencies = [
  "dashmap",
  "file-operation",
@@ -616,9 +616,9 @@ dependencies = [
 
 [[package]]
 name = "file-operation"
-version = "0.5.14"
+version = "0.5.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5ed4567f6a714792534e876e3830b00402ffc59b74d60e6ade3df2c6c442b377"
+checksum = "db833ed44bb54a24e43acc553147e7d0a8f1111128b261646afd11c28151a79c"
 dependencies = [
  "tokio",
 ]
@@ -978,9 +978,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-log"
-version = "1.17.5"
+version = "1.17.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e998c4119e059d56924d40e57e59fc8ef8652afbb60697b38799770981322e93"
+checksum = "26dd0b3f778923b011e44659b7d27c079c57bb8927efc68227cb9ec3c78f0c12"
 dependencies = [
  "file-operation",
  "hyperlane-time",
@@ -1022,9 +1022,9 @@ checksum = "7d7e07007bd67be0c3f07646066d9300ea999fb7d3371610354393101ac2db2c"
 
 [[package]]
 name = "hyperlane-utils"
-version = "1.5.0"
+version = "1.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ad977a053b600b1d99a4b3aa562d10324a20240b26231741f2e39c660c2e70d9"
+checksum = "8863c247b799204818306fe237defb7d437e3d1398c00281442eac5ab455e3fb"
 dependencies = [
  "ahash",
  "bin-encode-decode",
