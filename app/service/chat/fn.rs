@@ -78,22 +78,19 @@ pub(crate) async fn callback(ctx: Context) {
         let resp_data: WebSocketRespData =
             WebSocketRespData::new(MessageType::Pang, &ctx, "").await;
         let resp_data: String = serde_json::to_string(&resp_data).unwrap();
-        ctx.set_response_body(resp_data)
-            .await
-            .send_body()
-            .await
-            .unwrap();
+        let _ = ctx.set_response_body(resp_data).await.send_body().await;
         ctx.set_response_body("").await;
         return;
     }
     let session_id: String = get_name(&ctx).await;
     clone!(req_data, ctx, session_id => {
-        spawn(async move {
-            let req_msg: &String = req_data.get_data();
-            let is_gpt_mentioned = req_msg.contains("@GPT") || req_msg.contains("@GPT Assistant") || req_msg.contains("@gpt");
-            if is_gpt_mentioned {
+        let req_msg: &String = req_data.get_data();
+        let is_gpt_mentioned = req_msg.contains("@GPT") || req_msg.contains("@GPT Assistant") || req_msg.contains("@gpt");
+        if is_gpt_mentioned {
+            let req_msg_clone = req_msg.clone();
+            spawn(async move {
                 let mut session = get_or_create_session(&session_id);
-                let cleaned_msg = remove_mentions(req_msg);
+                let cleaned_msg = remove_mentions(&req_msg_clone);
                 session.add_message("user".to_string(), cleaned_msg);
                 let api_response = match call_gpt_api_with_context(&session).await {
                     Ok(gpt_response) => {
@@ -114,8 +111,8 @@ pub(crate) async fn callback(ctx: Context) {
                 let _ = websocket.send(key, gpt_resp_json.clone());
                 ctx.set_response_body(gpt_resp_json).await;
                 send_callback(ctx).await;
-            }
-        });
+            });
+        }
     });
     let resp_data: WebSocketRespData = req_data.into_resp(&ctx).await;
     let resp_data: String = serde_json::to_string(&resp_data).unwrap();
