@@ -19,6 +19,8 @@ async fn configure_server_basic(server: &Server) {
         .ws_buffer_size(SERVER_WS_BUFFER_SIZE)
         .await
         .on_ws_connected(service::chat::on_connected)
+        .await
+        .disable_ws_handler("/api/chat")
         .await;
 }
 
@@ -62,9 +64,7 @@ async fn configure_routes(server: &Server) {
         )
         .await
         .route(format!("/{{{WS_DIR_KEY}:^chat.*}}"), controller::chat::html)
-        .await;
-
-    server
+        .await
         .route("/api/chat", controller::chat::handle)
         .await
         .route("/api/users/online", controller::users::online_users)
