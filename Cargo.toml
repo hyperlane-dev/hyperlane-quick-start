@@ -48,8 +48,8 @@ incremental = true
 opt-level = 1
 lto = false
 panic = "unwind"
-debug = true
-codegen-units = 16
+debug = false
+codegen-units = 32
 strip = "none"
 
 [profile.release]
