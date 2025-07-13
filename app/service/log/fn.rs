@@ -1,6 +1,4 @@
 use super::*;
-use std::fs;
-use std::path::Path;
 
 pub async fn read_log_file(level: &str) -> String {
     let log_dir: String = format!("{}/{}", SERVER_LOG_DIR, level);
