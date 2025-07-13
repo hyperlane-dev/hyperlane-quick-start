@@ -62,19 +62,24 @@ cargo run restart -d
 
 ## Appreciate
 
-**If you feel that `hyperlane` is helpful to you, feel free to donate.**
+> If you feel that `hyperlane` is helpful to you, feel free to donate
+
+### WeChat Pay
 
 <img src="https://docs.ltpp.vip/img/wechat-pay.png" width="200">
+
+### Alipay
+
 <img src="https://docs.ltpp.vip/img/alipay-pay.jpg" width="200">
 
-## LICENSE
+## License
 
-This project is licensed under the MIT LICENSE. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. For more details, please see the [license](license) file.
 
 ## Contributing
 
-Contributions are welcome! Please open an issue or submit a pull request.
+Contributions are welcome! Please submit an issue or create a pull request.
 
 ## Contact
 
-For any inquiries, please reach out to the author at [root@ltpp.vip](mailto:root@ltpp.vip).
+If you have any questions, please contact the author: [root@ltpp.vip](mailto:root@ltpp.vip).
