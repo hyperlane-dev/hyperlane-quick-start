@@ -74,6 +74,12 @@ async fn configure_routes(server: &Server) {
         .route("/api/upload/register", controller::upload::register)
         .await
         .route("/api/upload/merge", controller::upload::merge)
+        .await
+        .route("/log/info", controller::log::info)
+        .await
+        .route("/log/warn", controller::log::warn)
+        .await
+        .route("/log/error", controller::log::error)
         .await;
 }
 

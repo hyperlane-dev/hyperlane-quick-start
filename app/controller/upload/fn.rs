@@ -24,7 +24,8 @@ pub async fn static_file(ctx: Context) {
     }
     let path: String = format!("{UPLOAD_DIR}/{decode_dir}/{decode_file}");
     let extension_name: String = FileExtension::get_extension_name(&decode_file);
-    let content_type: &str = FileExtension::parse(&extension_name).get_content_type();
+    let file_type: &str = FileExtension::parse(&extension_name).get_content_type();
+    let content_type: String = ContentType::format_content_type_with_charset(file_type, UTF8);
     let data: Vec<u8> = async_read_from_file(&path).await.unwrap_or_default();
     ctx.set_response_header(CONTENT_TYPE, content_type)
         .await

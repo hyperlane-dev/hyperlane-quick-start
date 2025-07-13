@@ -1,9 +1,10 @@
+pub mod chat;
 pub mod favicon_ico;
 pub mod hello;
+pub mod log;
 pub mod openapi;
 pub mod root;
 pub mod upload;
 pub mod users;
-pub mod chat;
 
 use super::*;
