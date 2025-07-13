@@ -1,97 +1,60 @@
 use super::*;
 
-async fn http_buffer_size(server: &Server) {
-    server.http_buffer_size(SERVER_HTTP_BUFFER_SIZE).await;
-    println_success!(
-        "Server http buffer size: ",
-        SERVER_HTTP_BUFFER_SIZE,
-        SPACE,
-        "bytes"
-    );
-}
-
-async fn ws_buffer_size(server: &Server) {
-    server.ws_buffer_size(SERVER_WS_BUFFER_SIZE).await;
-    println_success!(
-        "Server websocket buffer size: ",
-        SERVER_WS_BUFFER_SIZE,
-        SPACE,
-        "bytes"
-    );
-}
-
-async fn host(server: &Server) {
-    server.host(SERVER_HOST).await;
-    println_success!("Server host: ", SERVER_HOST);
-}
-
-async fn linger(server: &Server) {
-    server.set_linger(SERVER_LINGER).await;
-    println_success!("Server linger: ", format!("{:?}", SERVER_LINGER));
-}
-
-async fn port(server: &Server) {
-    server.port(SERVER_PORT).await;
-    println_success!("Server port: ", SERVER_PORT);
-}
-
-async fn nodelay(server: &Server) {
-    server.set_nodelay(SERVER_NODELAY).await;
-    println_success!("Server nodelay: ", SERVER_NODELAY);
-}
-
-async fn error_handler(server: &Server) {
+async fn configure_server_basic(server: &Server) {
     server
+        .host(SERVER_HOST)
+        .await
+        .port(SERVER_PORT)
+        .await
+        .set_ttl(SERVER_TTI)
+        .await
+        .set_linger(SERVER_LINGER)
+        .await
+        .set_nodelay(SERVER_NODELAY)
+        .await
         .error_handler(exception::framework::error_handler)
+        .await
+        .http_buffer_size(SERVER_HTTP_BUFFER_SIZE)
+        .await
+        .ws_buffer_size(SERVER_WS_BUFFER_SIZE)
         .await;
 }
 
-async fn ttl(server: &Server) {
-    server.set_ttl(SERVER_TTI).await;
-    println_success!("Server ttl: ", SERVER_TTI);
-}
-
-async fn register_request_middleware(server: &Server) {
+async fn configure_request_middleware(server: &Server) {
     server
         .request_middleware(middleware::request::cross::cross)
-        .await;
-    server
+        .await
         .request_middleware(middleware::request::response::response_header)
-        .await;
-    server
+        .await
         .request_middleware(middleware::request::response::response_status_code)
-        .await;
-    server
+        .await
         .request_middleware(middleware::request::response::response_body)
         .await;
-    println_success!("Server request middleware initialization completed");
 }
 
-async fn register_response_middleware(server: &Server) {
+async fn configure_response_middleware(server: &Server) {
     server
         .response_middleware(middleware::response::send::send)
-        .await;
-    server
+        .await
         .response_middleware(middleware::response::log::log)
         .await;
-    println_success!("Server response middleware initialization completed");
 }
 
-async fn register_route(server: &Server) {
-    server.route("/", controller::root::handle).await;
+async fn configure_routes(server: &Server) {
     server
+        .route("/", controller::root::handle)
+        .await
         .route(format!("/hello/{{{NAME_KEY}}}"), controller::hello::handle)
-        .await;
-    server.route("/websocket", controller::ws::handle).await;
-    server
+        .await
+        .route("/websocket", controller::ws::handle)
+        .await
         .route("/favicon.ico", controller::favicon_ico::handle)
         .await;
-    println_success!("Server route initialization completed");
 }
 
 fn runtime() -> Runtime {
     Builder::new_multi_thread()
-        .worker_threads(num_cpus::get_physical())
+        .worker_threads(num_cpus::get_physical() << 1)
         .thread_stack_size(1_048_576)
         .max_blocking_threads(2_048)
         .max_io_events_per_tick(1_024)
@@ -102,22 +65,17 @@ fn runtime() -> Runtime {
 
 #[hyperlane(server)]
 async fn create_server() {
-    host(&server).await;
-    port(&server).await;
-    ttl(&server).await;
-    linger(&server).await;
-    nodelay(&server).await;
-    error_handler(&server).await;
-    http_buffer_size(&server).await;
-    ws_buffer_size(&server).await;
-    register_request_middleware(&server).await;
-    register_route(&server).await;
-    register_response_middleware(&server).await;
-    let host_port: String = format!("{SERVER_HOST}:{SERVER_PORT}");
+    configure_server_basic(&server).await;
+    configure_request_middleware(&server).await;
+    configure_routes(&server).await;
+    configure_response_middleware(&server).await;
     println_success!("Server initialization successful");
-    let server_result: ServerResult = server.run().await;
-    match server_result {
-        Ok(_) => println_success!("Server listen in: ", host_port),
+    let server_run_result: ServerResult = server.run().await;
+    match server_run_result {
+        Ok(_) => {
+            let host_port: String = format!("{SERVER_HOST}:{SERVER_PORT}");
+            println_success!("Server listen in: ", host_port)
+        }
         Err(server_error) => println_error!("Server run error: ", server_error),
     }
 }
