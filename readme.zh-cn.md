@@ -62,9 +62,14 @@ cargo run restart -d
 
 ## 赞赏
 
-**如果你觉得 `hyperlane` 对你有所帮助，欢迎捐赠**
+> 如果你觉得 `hyperlane` 对你有所帮助，欢迎捐赠
 
-<img src="https://docs.ltpp.vip/img/wechat-pay.png" width="200">  
+### 微信支付
+
+<img src="https://docs.ltpp.vip/img/wechat-pay.png" width="200">
+
+### 支付宝支付
+
 <img src="https://docs.ltpp.vip/img/alipay-pay.jpg" width="200">
 
 ## 许可证
