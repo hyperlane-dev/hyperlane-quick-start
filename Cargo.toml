@@ -51,7 +51,7 @@ opt-level = 1
 lto = false
 panic = "unwind"
 debug = false
-codegen-units = 32
+codegen-units = 1
 strip = "none"
 
 [profile.release]
