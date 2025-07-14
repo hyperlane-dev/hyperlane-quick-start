@@ -149,6 +149,114 @@ pub async fn serve_static_file(dir: &str, file: &str) -> Result<(Vec<u8>, String
     Ok((data, content_type))
 }
 
+pub fn parse_range_header(range_header: &str, file_size: u64) -> Result<RangeRequest, String> {
+    if !range_header.starts_with("bytes=") {
+        return Err("Invalid range header format".to_string());
+    }
+    let range_spec: &str = &range_header[6..];
+    let parts: Vec<&str> = range_spec.split('-').collect();
+    if parts.len() != 2 {
+        return Err("Invalid range specification".to_string());
+    }
+    let start_str: &str = parts[0];
+    let end_str: &str = parts[1];
+    if start_str.is_empty() && end_str.is_empty() {
+        return Err("Invalid range: both start and end are empty".to_string());
+    }
+    let start: u64 = if start_str.is_empty() {
+        let suffix_length: u64 = end_str.parse().map_err(|_| "Invalid end range")?;
+        if suffix_length >= file_size {
+            0
+        } else {
+            file_size - suffix_length
+        }
+    } else {
+        start_str.parse().map_err(|_| "Invalid start range")?
+    };
+    let end: Option<u64> = if end_str.is_empty() {
+        None
+    } else {
+        Some(end_str.parse().map_err(|_| "Invalid end range")?)
+    };
+    if start >= file_size {
+        return Err("Range start exceeds file size".to_string());
+    }
+    Ok(RangeRequest { start, end })
+}
+
+pub async fn read_file_range(path: &str, start: u64, length: u64) -> Result<Vec<u8>, String> {
+    use std::io::{Read, Seek, SeekFrom};
+    let mut file: std::fs::File =
+        std::fs::File::open(path).map_err(|e| format!("Failed to open file: {}", e))?;
+    file.seek(SeekFrom::Start(start))
+        .map_err(|e| format!("Failed to seek file: {}", e))?;
+    let mut buffer: Vec<u8> = vec![0; length as usize];
+    let bytes_read: usize = file
+        .read(&mut buffer)
+        .map_err(|e| format!("Failed to read file: {}", e))?;
+    buffer.truncate(bytes_read);
+    Ok(buffer)
+}
+
+pub async fn serve_static_file_with_range(
+    dir: &str,
+    file: &str,
+    range_request: Option<RangeRequest>,
+) -> Result<(PartialContent, String), String> {
+    let decode_dir: String = Decode::execute(CHARSETS, dir).unwrap_or_default();
+    let decode_file: String = Decode::execute(CHARSETS, file).unwrap_or_default();
+    if decode_dir.is_empty() || decode_file.is_empty() {
+        return Err("Invalid directory or file name".to_string());
+    }
+    let path: String = format!("{UPLOAD_DIR}/{decode_dir}/{decode_file}");
+    let extension_name: String = FileExtension::get_extension_name(&decode_file);
+    let file_type: &str = FileExtension::parse(&extension_name).get_content_type();
+    let content_type: String = ContentType::format_content_type_with_charset(file_type, UTF8);
+    let file_metadata: std::fs::Metadata =
+        std::fs::metadata(&path).map_err(|_| "File not found".to_string())?;
+    let file_size: u64 = file_metadata.len();
+    if file_size == 0 {
+        return Err("File is empty".to_string());
+    }
+    match range_request {
+        Some(range) => {
+            let start: u64 = range.start;
+            let end: u64 = range.end.unwrap_or(file_size - 1).min(file_size - 1);
+            if start > end {
+                return Err("Invalid range: start > end".to_string());
+            }
+            let content_length: u64 = end - start + 1;
+            let data: Vec<u8> = read_file_range(&path, start, content_length).await?;
+            let content_range: String = format!("bytes {}-{}/{}", start, end, file_size);
+            Ok((
+                PartialContent {
+                    data,
+                    content_range,
+                    content_length,
+                    total_size: file_size,
+                },
+                content_type,
+            ))
+        }
+        None => {
+            let data: Vec<u8> = async_read_from_file(&path).await.unwrap_or_default();
+            if data.is_empty() {
+                return Err("File not found or empty".to_string());
+            }
+            let content_range: String = format!("bytes 0-{}/{}", file_size - 1, file_size);
+            Ok((
+                PartialContent {
+                    data,
+                    content_range,
+                    content_length: file_size,
+                    total_size: file_size,
+                },
+                content_type,
+            ))
+        }
+    }
+}
+
 pub async fn save_file_chunk(
     file_chunk_data: &FileChunkData,
     chunk_data: Vec<u8>,

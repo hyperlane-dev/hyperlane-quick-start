@@ -4,25 +4,60 @@ use super::*;
 #[utoipa::path(
     get,
     post,
-    path = "/static/{upload_dir}/{upload_file}",   
+    path = "/static/{upload_dir}/{upload_file}",
     responses(
-        (status = 200, description = "静态资源", body = String)
+        (status = 200, description = "静态资源", body = String),
+        (status = 206, description = "部分内容", body = String)
     )
 )]
 #[route_param(UPLOAD_DIR_KEY => dir_opt)]
 #[route_param(UPLOAD_FILE_KEY => file_opt)]
-#[response_status_code(200)]
-#[response_header(CACHE_CONTROL => "public, max-age=31536000, immutable")]
-#[response_header(EXPIRES => "Wed, 1 Apr 8888 00:00:00 GMT")]
+#[request_header(RANGE_HEADER => range_header_opt)]
 pub async fn static_file(ctx: Context) {
     let dir: String = dir_opt.unwrap_or_default();
     let file: String = file_opt.unwrap_or_default();
-    match serve_static_file(&dir, &file).await {
-        Ok((data, content_type)) => {
-            ctx.set_response_header(CONTENT_TYPE, content_type)
-                .await
-                .set_response_body(data)
+    let has_range_request: bool = range_header_opt.is_some();
+    let range_request: Option<RangeRequest> = match &range_header_opt {
+        Some(range_header) => {
+            let file_path: String = format!(
+                "{UPLOAD_DIR}/{}/{}",
+                Decode::execute(CHARSETS, &dir).unwrap_or_default(),
+                Decode::execute(CHARSETS, &file).unwrap_or_default()
+            );
+            match std::fs::metadata(&file_path) {
+                Ok(metadata) => {
+                    let file_size: u64 = metadata.len();
+                    match parse_range_header(&range_header, file_size) {
+                        Ok(range) => Some(range),
+                        Err(_) => None,
+                    }
+                }
+                Err(_) => None,
+            }
+        }
+        None => None,
+    };
+    match serve_static_file_with_range(&dir, &file, range_request).await {
+        Ok((partial_content, content_type)) => {
+            ctx.set_response_header(CONTENT_TYPE, content_type).await;
+            ctx.set_response_header(ACCEPT_RANGES, BYTES).await;
+            ctx.set_response_header(CACHE_CONTROL, "public, max-age=31536000, immutable")
                 .await;
+            ctx.set_response_header(EXPIRES, "Wed, 1 Apr 8888 00:00:00 GMT")
+                .await;
+            if has_range_request {
+                ctx.set_response_status_code(HttpStatus::PartialContent.code())
+                    .await;
+                ctx.set_response_header(CONTENT_RANGE, partial_content.content_range)
+                    .await;
+                ctx.set_response_header(CONTENT_LENGTH, partial_content.content_length.to_string())
+                    .await;
+            } else {
+                ctx.set_response_status_code(200).await;
+                ctx.set_response_header(CONTENT_LENGTH, partial_content.total_size.to_string())
+                    .await;
+            }
+            ctx.set_response_body(partial_content.data).await;
         }
         Err(_) => {
             return;
