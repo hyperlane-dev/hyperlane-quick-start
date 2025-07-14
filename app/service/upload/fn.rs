@@ -131,3 +131,79 @@ pub async fn set_common_error_response_body<'a>(ctx: &'a Context, error: String)
     let data_json: String = serde_json::to_string(&data).unwrap_or_default();
     let _ = ctx.set_response_body(data_json).await;
 }
+
+pub async fn serve_static_file(dir: &str, file: &str) -> Result<(Vec<u8>, String), String> {
+    let decode_dir: String = Decode::execute(CHARSETS, dir).unwrap_or_default();
+    let decode_file: String = Decode::execute(CHARSETS, file).unwrap_or_default();
+    if decode_dir.is_empty() || decode_file.is_empty() {
+        return Err("Invalid directory or file name".to_string());
+    }
+    let path: String = format!("{UPLOAD_DIR}/{decode_dir}/{decode_file}");
+    let extension_name: String = FileExtension::get_extension_name(&decode_file);
+    let file_type: &str = FileExtension::parse(&extension_name).get_content_type();
+    let content_type: String = ContentType::format_content_type_with_charset(file_type, UTF8);
+    let data: Vec<u8> = async_read_from_file(&path).await.unwrap_or_default();
+    if data.is_empty() {
+        return Err("File not found or empty".to_string());
+    }
+    Ok((data, content_type))
+}
+
+pub async fn save_file_chunk(
+    file_chunk_data: &FileChunkData,
+    chunk_data: Vec<u8>,
+) -> Result<String, String> {
+    if chunk_data.is_empty() {
+        return Err(ChunkStrategyError::EmptyChunkData.to_string());
+    }
+    let file_id: &str = file_chunk_data.get_file_id();
+    let file_name: &str = file_chunk_data.get_file_name();
+    let chunk_index: &usize = file_chunk_data.get_chunk_index();
+    let total_chunks: &usize = file_chunk_data.get_total_chunks();
+    let base_file_dir: &str = file_chunk_data.get_base_file_dir();
+    let save_upload_dir: String = format!("{UPLOAD_DIR}/{base_file_dir}/{file_id}");
+    let upload_strategy: ChunkStrategy = ChunkStrategy::new(
+        0,
+        &save_upload_dir,
+        &file_id,
+        &file_name,
+        *total_chunks,
+        |a, b| format!("{a}.{b}"),
+    )
+    .map_err(|e| e.to_string())?;
+    upload_strategy
+        .save_chunk(&chunk_data, *chunk_index)
+        .await
+        .map_err(|e| e.to_string())?;
+    Ok(save_upload_dir.clone())
+}
+
+pub async fn merge_file_chunks(
+    file_chunk_data: &FileChunkData,
+) -> Result<(String, String), String> {
+    let file_id: &str = file_chunk_data.get_file_id();
+    let file_name: &str = file_chunk_data.get_file_name();
+    let total_chunks: &usize = file_chunk_data.get_total_chunks();
+    let base_file_dir: &str = file_chunk_data.get_base_file_dir();
+    let save_upload_dir: String = format!("{UPLOAD_DIR}/{base_file_dir}/{file_id}");
+    let upload_strategy: ChunkStrategy = ChunkStrategy::new(
+        0,
+        &save_upload_dir,
+        &file_id,
+        &file_name,
+        *total_chunks,
+        |a, b| format!("{a}.{b}"),
+    )
+    .map_err(|e| e.to_string())?;
+    let url_encode_dir: String =
+        Encode::execute(CHARSETS, &format!("{base_file_dir}/{file_id}")).unwrap_or_default();
+    let url_encode_dir_file_name: String =
+        Encode::execute(CHARSETS, &file_name).unwrap_or_default();
+    let url: String = format!("/{STATIC_ROUTE}/{url_encode_dir}/{url_encode_dir_file_name}");
+    upload_strategy
+        .merge_chunks()
+        .await
+        .map_err(|e| e.to_string())?;
+    remove_file_id_map(&file_id).await;
+    Ok((save_upload_dir.clone(), url))
+}

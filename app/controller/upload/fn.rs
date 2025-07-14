@@ -17,20 +17,17 @@ use super::*;
 pub async fn static_file(ctx: Context) {
     let dir: String = dir_opt.unwrap_or_default();
     let file: String = file_opt.unwrap_or_default();
-    let decode_dir: String = Decode::execute(CHARSETS, &dir).unwrap_or_default();
-    let decode_file: String = Decode::execute(CHARSETS, &file).unwrap_or_default();
-    if decode_dir.is_empty() || decode_file.is_empty() {
-        return;
+    match serve_static_file(&dir, &file).await {
+        Ok((data, content_type)) => {
+            ctx.set_response_header(CONTENT_TYPE, content_type)
+                .await
+                .set_response_body(data)
+                .await;
+        }
+        Err(_) => {
+            return;
+        }
     }
-    let path: String = format!("{UPLOAD_DIR}/{decode_dir}/{decode_file}");
-    let extension_name: String = FileExtension::get_extension_name(&decode_file);
-    let file_type: &str = FileExtension::parse(&extension_name).get_content_type();
-    let content_type: String = ContentType::format_content_type_with_charset(file_type, UTF8);
-    let data: Vec<u8> = async_read_from_file(&path).await.unwrap_or_default();
-    ctx.set_response_header(CONTENT_TYPE, content_type)
-        .await
-        .set_response_body(data)
-        .await;
 }
 
 #[methods(get, post)]
@@ -79,34 +76,14 @@ pub async fn save(ctx: Context) {
         return;
     }
     let file_chunk_data: FileChunkData = file_chunk_data_opt.unwrap_or_default();
-    let file_id: &str = file_chunk_data.get_file_id();
-    let file_name: &str = file_chunk_data.get_file_name();
-    let chunk_index: &usize = file_chunk_data.get_chunk_index();
-    let total_chunks: &usize = file_chunk_data.get_total_chunks();
-    let base_file_dir: &str = file_chunk_data.get_base_file_dir();
     let chunk_data: Vec<u8> = ctx.get_request_body().await;
-    if chunk_data.is_empty() {
-        set_common_error_response_body(&ctx, ChunkStrategyError::EmptyChunkData.to_string()).await;
-        return;
-    }
-    let save_upload_dir: String = format!("{UPLOAD_DIR}/{base_file_dir}/{file_id}");
-    ctx.set_response_header("file", save_upload_dir.clone())
-        .await;
-    let upload_strategy: ChunkStrategy = ChunkStrategy::new(
-        0,
-        &save_upload_dir,
-        &file_id,
-        &file_name,
-        *total_chunks,
-        |a, b| format!("{a}.{b}"),
-    )
-    .unwrap();
-    match upload_strategy.save_chunk(&chunk_data, *chunk_index).await {
-        Ok(_) => {
+    match save_file_chunk(&file_chunk_data, chunk_data).await {
+        Ok(save_upload_dir) => {
+            ctx.set_response_header("file", save_upload_dir).await;
             set_common_success_response_body(&ctx, "").await;
         }
         Err(error) => {
-            set_common_error_response_body(&ctx, error.to_string()).await;
+            set_common_error_response_body(&ctx, error).await;
         }
     }
 }
@@ -125,34 +102,13 @@ pub async fn merge(ctx: Context) {
         return;
     }
     let file_chunk_data: FileChunkData = file_chunk_data_opt.unwrap_or_default();
-    let file_id: &str = file_chunk_data.get_file_id();
-    let file_name: &str = file_chunk_data.get_file_name();
-    let total_chunks: &usize = file_chunk_data.get_total_chunks();
-    let base_file_dir: &str = file_chunk_data.get_base_file_dir();
-    let save_upload_dir: String = format!("{UPLOAD_DIR}/{base_file_dir}/{file_id}");
-    ctx.set_response_header("file", save_upload_dir.clone())
-        .await;
-    let upload_strategy: ChunkStrategy = ChunkStrategy::new(
-        0,
-        &save_upload_dir,
-        &file_id,
-        &file_name,
-        *total_chunks,
-        |a, b| format!("{a}.{b}"),
-    )
-    .unwrap();
-    let url_encode_dir: String =
-        Encode::execute(CHARSETS, &format!("{base_file_dir}/{file_id}")).unwrap_or_default();
-    let url_encode_dir_file_name: String =
-        Encode::execute(CHARSETS, &file_name).unwrap_or_default();
-    let url: String = format!("/{STATIC_ROUTE}/{url_encode_dir}/{url_encode_dir_file_name}");
-    match upload_strategy.merge_chunks().await {
-        Ok(_) => {
-            remove_file_id_map(&file_id).await;
+    match merge_file_chunks(&file_chunk_data).await {
+        Ok((save_upload_dir, url)) => {
+            ctx.set_response_header("file", save_upload_dir).await;
             set_common_success_response_body(&ctx, &url).await;
         }
         Err(error) => {
-            set_common_error_response_body(&ctx, error.to_string()).await;
+            set_common_error_response_body(&ctx, error).await;
         }
     }
 }
