@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane-quick-start"
-version = "1.58.4"
+version = "1.58.5"
 edition = "2024"
 authors = ["root@ltpp.vip"]
 license = "MIT"
@@ -49,7 +49,7 @@ opt-level = 1
 lto = false
 panic = "unwind"
 debug = false
-codegen-units = 32
+codegen-units = 1
 strip = "none"
 
 [profile.release]
