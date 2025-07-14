@@ -12,7 +12,7 @@ use super::*;
 )]
 #[route_param(UPLOAD_DIR_KEY => dir_opt)]
 #[route_param(UPLOAD_FILE_KEY => file_opt)]
-#[request_header(RANGE_HEADER => range_header_opt)]
+#[request_header(RANGE => range_header_opt)]
 pub async fn static_file(ctx: Context) {
     let dir: String = dir_opt.unwrap_or_default();
     let file: String = file_opt.unwrap_or_default();
