@@ -200,15 +200,27 @@ pub(crate) async fn send_callback(ctx: Context) {
     let response_string: String = ctx.get_response().await.get_body_string();
     let request: String = ctx.get_request().await.get_string();
     let response: String = ctx.get_response().await.get_string();
-    println_success!(
-        request,
-        BR,
-        request_string,
-        BR,
-        response,
-        BR,
-        response_string
-    );
+    if *ctx.get_response().await.get_status_code() == 200 {
+        println_success!(
+            request,
+            BR,
+            request_string,
+            BR,
+            response,
+            BR,
+            response_string
+        );
+    } else {
+        println_warning!(
+            request,
+            BR,
+            request_string,
+            BR,
+            response,
+            BR,
+            response_string
+        );
+    }
     log_info(format!(
         "{request}{BR}{request_string}{BR}{response}{BR}{response_string}"
     ))
