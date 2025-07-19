@@ -10,7 +10,7 @@ pub async fn pre_ws_upgrade(ctx: Context) {
     ctx.set_response_header("addr", encode_addr).await;
 }
 
-pub async fn on_connected(ctx: Context) {
+pub async fn connected_hook(ctx: Context) {
     let websocket: &WebSocket = get_global_websocket();
     let path: String = ctx.get_request_path().await;
     let key: BroadcastType<String> = BroadcastType::PointToGroup(path);

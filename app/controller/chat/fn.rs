@@ -56,7 +56,7 @@ pub async fn handle(ctx: Context) {
     websocket
         .run(
             &ctx,
-            SERVER_WS_BUFFER_SIZE,
+            SERVER_WS_BUFFER,
             key,
             callback,
             send_callback,

@@ -96,11 +96,13 @@ pub async fn get_save_file_chunk_data<'a>(ctx: &'a Context) -> OptionFileChunkDa
 }
 
 pub async fn add_file_id_map(data: &FileChunkData) {
-    FILE_ID_MAP.insert(data.get_file_id().to_owned(), data.clone());
+    write_file_id_map()
+        .await
+        .insert(data.get_file_id().to_owned(), data.clone());
 }
 
 pub async fn remove_file_id_map(file_id: &str) {
-    FILE_ID_MAP.remove(file_id);
+    write_file_id_map().await.remove(file_id);
 }
 
 #[request_header(CHUNKIFY_FILE_ID_HEADER => file_id_opt)]
@@ -113,7 +115,10 @@ pub async fn get_merge_file_chunk_data<'a>(ctx: &Context) -> OptionFileChunkData
             return None;
         }
     };
-    FILE_ID_MAP.get(&file_id).map(|data| data.clone())
+    read_file_id_map()
+        .await
+        .get(&file_id)
+        .map(|data| data.clone())
 }
 
 #[response_status_code(200)]
