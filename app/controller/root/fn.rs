@@ -6,7 +6,7 @@ use super::*;
     post,
     path = "/",   
     responses(
-        (status = 200, description = "首页", body = String)
+        (status = 200, description = "Home page", body = String)
     )
 )]
 #[response_status_code(200)]

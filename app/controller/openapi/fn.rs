@@ -1,28 +1,32 @@
 use super::*;
 
+/// Serve OpenAPI JSON specification
+///
+/// Returns the OpenAPI specification in JSON format
 #[methods(get, post)]
 #[utoipa::path(
     get,
-    path = "/openapi/openapi.json",   
+    path = "/openapi/openapi.json",
     responses(
-        (status = 200, description = "Openapi数据", body = String)
+        (status = 200, description = "OpenAPI data", body = String)
     )
 )]
 #[response_status_code(200)]
 pub async fn json(ctx: Context) {
-    ctx.set_response_body(ApiDoc::openapi().to_json().unwrap())
-        .await
-        .send()
-        .await
-        .unwrap();
+    if let Ok(json_data) = ApiDoc::openapi().to_json() {
+        let _ = ctx.set_response_body(json_data).await.send().await;
+    }
 }
 
+/// Serve OpenAPI documentation HTML page
+///
+/// Returns the RapiDoc HTML interface for the OpenAPI specification
 #[methods(get, post)]
 #[utoipa::path(
     get,
-    path = "/openapi/index.html",   
+    path = "/openapi/index.html",
     responses(
-        (status = 200, description = "Openapi文档", body = String)
+        (status = 200, description = "OpenAPI documentation", body = String)
     )
 )]
 #[response_status_code(200)]
@@ -30,5 +34,5 @@ pub async fn json(ctx: Context) {
 pub async fn html(ctx: Context) {
     SwaggerUi::new("/openapi/{file}").url("/openapi/openapi.json", ApiDoc::openapi());
     let res: String = RapiDoc::with_openapi("/openapi/openapi.json", ApiDoc::openapi()).to_html();
-    ctx.set_response_body(res).await.send().await.unwrap();
+    let _ = ctx.set_response_body(res).await.send().await;
 }

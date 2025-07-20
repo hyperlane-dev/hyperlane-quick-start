@@ -5,7 +5,7 @@ use super::*;
     get,
     path = "/hello/{name}",   
     responses(
-        (status = 200, description = "你好", body = String)
+        (status = 200, description = "Hello", body = String)
     )
 )]
 #[response_status_code(200)]

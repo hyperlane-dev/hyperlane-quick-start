@@ -4,14 +4,24 @@ pub fn get_global_chat_sessions() -> &'static Arc<Mutex<HashMap<String, ChatSess
     GLOBAL_CHAT_SESSIONS.get_or_init(|| Arc::new(Mutex::new(HashMap::new())))
 }
 
+/// Get or create a chat session for the given session ID
+///
+/// # Arguments
+/// * `session_id` - The unique identifier for the chat session
+///
+/// # Returns
+/// A ChatSession instance, either existing or newly created
 pub fn get_or_create_session(session_id: &str) -> ChatSession {
     let sessions: &Arc<Mutex<HashMap<String, ChatSession>>> = get_global_chat_sessions();
-    let mut sessions_guard: MutexGuard<'_, HashMap<String, ChatSession>> = sessions.lock().unwrap();
-    sessions_guard.retain(|_, session| !session.is_expired(30));
-    sessions_guard
-        .entry(session_id.to_string())
-        .or_insert_with(|| ChatSession::new(session_id.to_string()))
-        .clone()
+    if let Ok(mut sessions_guard) = sessions.lock() {
+        sessions_guard.retain(|_, session| !session.is_expired(30));
+        sessions_guard
+            .entry(session_id.to_string())
+            .or_insert_with(|| ChatSession::new(session_id.to_string()))
+            .clone()
+    } else {
+        ChatSession::new(session_id.to_string())
+    }
 }
 
 pub fn update_session(session: ChatSession) {
@@ -40,10 +50,17 @@ pub fn remove_online_user(username: &str) {
     users_guard.remove(username);
 }
 
+/// Get the list of online users including GPT assistant
+///
+/// # Returns
+/// A UserListResponse containing all online users and total count
 pub fn get_online_users_list() -> UserListResponse {
     let users: &Arc<Mutex<HashMap<String, OnlineUser>>> = get_global_online_users();
-    let users_guard: MutexGuard<'_, HashMap<String, OnlineUser>> = users.lock().unwrap();
-    let mut users_vec: Vec<OnlineUser> = users_guard.values().cloned().collect();
+    let mut users_vec: Vec<OnlineUser> = if let Ok(users_guard) = users.lock() {
+        users_guard.values().cloned().collect()
+    } else {
+        Vec::new()
+    };
     let gpt_user: OnlineUser = OnlineUser {
         username: GPT.to_string(),
         join_time: time(),

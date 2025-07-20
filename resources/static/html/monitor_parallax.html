@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>服务器监控大屏</title>
+    <title>Server Monitoring Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
@@ -29,7 +29,7 @@
         overflow-x: hidden;
       }
 
-      /* 视差背景 */
+      /* Parallax background */
       .parallax-bg {
         position: fixed;
         top: -10%;
@@ -94,7 +94,7 @@
         transition: transform 0.1s ease-out;
       }
 
-      /* 分屏容器 */
+      /* Screen container */
       .screen {
         min-height: 100vh;
         display: flex;
@@ -130,7 +130,7 @@
         z-index: 2;
       }
 
-      /* 第一屏：标题和系统信息 */
+      /* First screen: title and system info */
       .overview-screen {
         background: linear-gradient(
           135deg,
@@ -271,7 +271,7 @@
         font-family: 'Orbitron', monospace;
       }
 
-      /* 第二屏：实时指标 */
+      /* Second screen: real-time metrics */
       .metrics-screen {
         background: linear-gradient(
           135deg,
@@ -406,7 +406,7 @@
         }
       }
 
-      /* 第三屏：趋势图表 */
+      /* Third screen: trend charts */
       .charts-screen {
         background: linear-gradient(
           135deg,
@@ -489,7 +489,7 @@
         height: auto !important;
       }
 
-      /* 连接状态 */
+      /* Connection status */
       .connection-status {
         position: fixed;
         top: 30px;
@@ -548,7 +548,7 @@
         }
       }
 
-      /* 滚动指示器 */
+      /* Scroll indicator */
       .scroll-indicator {
         position: fixed;
         bottom: 30px;
@@ -576,7 +576,7 @@
         }
       }
 
-      /* 响应式设计 */
+      /* Responsive design */
       @media (max-width: 768px) {
         .header h1 {
           font-size: 2.5rem;
@@ -639,24 +639,24 @@
 
     <div class="connection-status" id="connectionStatus">
       <span class="status-indicator"></span>
-      <span>连接中...</span>
+      <span>Connecting...</span>
     </div>
 
-    <!-- 第一屏：系统概览 -->
+    <!-- First screen: system overview -->
     <section class="screen overview-screen" id="overview">
       <div class="screen-content">
         <div class="header">
-          <h1>服务器监控大屏</h1>
+          <h1>Server Monitoring Dashboard</h1>
           <p class="subtitle">REAL-TIME SYSTEM MONITORING</p>
         </div>
 
         <div class="system-overview">
           <div class="system-info-item">
-            <div class="system-info-label">主机名</div>
+            <div class="system-info-label">Hostname</div>
             <div class="system-info-value" id="hostname">-</div>
           </div>
           <div class="system-info-item">
-            <div class="system-info-label">操作系统</div>
+            <div class="system-info-label">Operating System</div>
             <div class="system-info-value" id="osName">-</div>
           </div>
           <div class="system-info-item">

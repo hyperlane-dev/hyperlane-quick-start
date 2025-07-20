@@ -5,7 +5,7 @@ use super::*;
     get,
     path = "/log/info",   
     responses(
-        (status = 200, description = "查看info级别日志", body = String)
+        (status = 200, description = "View info level logs", body = String)
     )
 )]
 #[response_status_code(200)]
@@ -20,7 +20,7 @@ pub async fn info(ctx: Context) {
     get,
     path = "/log/warn",   
     responses(
-        (status = 200, description = "查看warn级别日志", body = String)
+        (status = 200, description = "View warn level logs", body = String)
     )
 )]
 #[response_status_code(200)]
@@ -35,7 +35,7 @@ pub async fn warn(ctx: Context) {
     get,
     path = "/log/error",   
     responses(
-        (status = 200, description = "查看error级别日志", body = String)
+        (status = 200, description = "View error level logs", body = String)
     )
 )]
 #[response_status_code(200)]

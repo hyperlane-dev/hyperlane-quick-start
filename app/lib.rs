@@ -12,6 +12,8 @@ pub mod view;
 use hyperlane_config;
 use hyperlane_plugin;
 
+use std::*;
+
 use http_request::*;
 use hyperlane::*;
 use hyperlane_utils::*;
