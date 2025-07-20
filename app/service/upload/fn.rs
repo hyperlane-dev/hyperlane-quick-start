@@ -6,61 +6,110 @@ pub fn get_base_file_dir() -> String {
     full_dir
 }
 
+fn validate_file_id(file_id_opt: Option<String>, ctx: &Context) -> Result<String, ()> {
+    match file_id_opt {
+        Some(id) => Ok(id),
+        None => {
+            tokio::spawn({
+                let ctx = ctx.clone();
+                async move {
+                    set_common_error_response_body(
+                        &ctx,
+                        ChunkStrategyError::MissingFileId.to_string(),
+                    )
+                    .await;
+                }
+            });
+            Err(())
+        }
+    }
+}
+
+fn validate_total_chunks(total_chunks_opt: Option<String>, ctx: &Context) -> Result<usize, ()> {
+    match total_chunks_opt {
+        Some(total) => match total.parse::<usize>() {
+            Ok(t) => Ok(t),
+            Err(_) => {
+                tokio::spawn({
+                    let ctx = ctx.clone();
+                    async move {
+                        set_common_error_response_body(
+                            &ctx,
+                            ChunkStrategyError::InvalidTotalChunks.to_string(),
+                        )
+                        .await;
+                    }
+                });
+                Err(())
+            }
+        },
+        None => {
+            tokio::spawn({
+                let ctx = ctx.clone();
+                async move {
+                    set_common_error_response_body(
+                        &ctx,
+                        ChunkStrategyError::MissingTotalChunks.to_string(),
+                    )
+                    .await;
+                }
+            });
+            Err(())
+        }
+    }
+}
+
+fn validate_file_name(file_name_opt: Option<String>, ctx: &Context) -> Result<String, ()> {
+    match file_name_opt {
+        Some(name) => Ok(urlencoding::decode(&name).unwrap_or_default().into_owned()),
+        None => {
+            tokio::spawn({
+                let ctx = ctx.clone();
+                async move {
+                    set_common_error_response_body(
+                        &ctx,
+                        ChunkStrategyError::MissingFileName.to_string(),
+                    )
+                    .await;
+                }
+            });
+            Err(())
+        }
+    }
+}
+
+fn validate_and_decode_directory(base_file_dir_opt: Option<String>) -> String {
+    match base_file_dir_opt {
+        Some(encode_dir) => {
+            let decode_dir: String = urlencoding::decode(&encode_dir)
+                .unwrap_or_default()
+                .into_owned();
+            if is_valid_directory_path(&decode_dir) {
+                decode_dir
+            } else {
+                get_base_file_dir()
+            }
+        }
+        None => get_base_file_dir(),
+    }
+}
+
+fn is_valid_directory_path(path: &str) -> bool {
+    !path.is_empty()
+        && !path.contains("../")
+        && path.chars().all(|c| c.is_ascii_digit() || c == '/')
+}
+
 #[request_header(CHUNKIFY_FILE_ID_HEADER => file_id_opt)]
 #[request_header(CHUNKIFY_TOTAL_CHUNKS_HEADER => total_chunks_opt)]
 #[request_header(CHUNKIFY_FILE_NAME_HEADER => file_name_opt)]
 #[request_header(CHUNKIFY_DIRECTORY_HEADER => base_file_dir_opt)]
 pub async fn get_register_file_chunk_data<'a>(ctx: &'a Context) -> OptionFileChunkData {
-    let file_id: String = match file_id_opt {
-        Some(id) => id,
-        None => {
-            set_common_error_response_body(ctx, ChunkStrategyError::MissingFileId.to_string())
-                .await;
-            return None;
-        }
-    };
-    let total_chunks: usize = match total_chunks_opt {
-        Some(total) => match total.parse::<usize>() {
-            Ok(t) => t,
-            Err(_) => {
-                set_common_error_response_body(
-                    ctx,
-                    ChunkStrategyError::InvalidTotalChunks.to_string(),
-                )
-                .await;
-                return None;
-            }
-        },
-        None => {
-            set_common_error_response_body(ctx, ChunkStrategyError::MissingTotalChunks.to_string())
-                .await;
-            return None;
-        }
-    };
-    let file_name: String = match file_name_opt {
-        Some(name) => urlencoding::decode(&name).unwrap_or_default().into_owned(),
-        None => {
-            set_common_error_response_body(ctx, ChunkStrategyError::MissingFileName.to_string())
-                .await;
-            return None;
-        }
-    };
-    let base_file_dir: String = match base_file_dir_opt {
-        Some(encode_dir) => {
-            let decode_dir: String = urlencoding::decode(&encode_dir)
-                .unwrap_or_default()
-                .into_owned();
-            if decode_dir.is_empty()
-                || decode_dir.contains("../")
-                || !decode_dir.chars().all(|c| c.is_ascii_digit() || c == '/')
-            {
-                get_base_file_dir()
-            } else {
-                decode_dir
-            }
-        }
-        None => get_base_file_dir(),
-    };
+    let file_id: String = validate_file_id(file_id_opt, ctx).ok()?;
+    let total_chunks: usize = validate_total_chunks(total_chunks_opt, ctx).ok()?;
+    let file_name: String = validate_file_name(file_name_opt, ctx).ok()?;
+    let base_file_dir: String = validate_and_decode_directory(base_file_dir_opt);
+
     Some(FileChunkData::new(
         file_id,
         file_name,
@@ -203,62 +252,100 @@ pub async fn read_file_range(path: &str, start: u64, length: u64) -> Result<Vec<
     Ok(buffer)
 }
 
+fn validate_file_paths(dir: &str, file: &str) -> Result<(String, String), String> {
+    let decode_dir: String = Decode::execute(CHARSETS, dir).unwrap_or_default();
+    let decode_file: String = Decode::execute(CHARSETS, file).unwrap_or_default();
+
+    if decode_dir.is_empty() || decode_file.is_empty() {
+        return Err("Invalid directory or file name".to_string());
+    }
+
+    Ok((decode_dir, decode_file))
+}
+
+fn get_file_metadata_and_content_type(
+    path: &str,
+    decode_file: &str,
+) -> Result<(std::fs::Metadata, String), String> {
+    let file_metadata: std::fs::Metadata =
+        std::fs::metadata(path).map_err(|_| "File not found".to_string())?;
+
+    if file_metadata.len() == 0 {
+        return Err("File is empty".to_string());
+    }
+
+    let extension_name: String = FileExtension::get_extension_name(decode_file);
+    let file_type: &str = FileExtension::parse(&extension_name).get_content_type();
+    let content_type: String = ContentType::format_content_type_with_charset(file_type, UTF8);
+
+    Ok((file_metadata, content_type))
+}
+
+async fn handle_range_request(
+    path: &str,
+    range: RangeRequest,
+    file_size: u64,
+    content_type: String,
+) -> Result<(PartialContent, String), String> {
+    let start: u64 = range.start;
+    let end: u64 = range.end.unwrap_or(file_size - 1).min(file_size - 1);
+
+    if start > end {
+        return Err("Invalid range: start > end".to_string());
+    }
+
+    let content_length: u64 = end - start + 1;
+    let data: Vec<u8> = read_file_range(path, start, content_length).await?;
+    let content_range: String = format!("bytes {}-{}/{}", start, end, file_size);
+
+    Ok((
+        PartialContent {
+            data,
+            content_range,
+            content_length,
+            total_size: file_size,
+        },
+        content_type,
+    ))
+}
+
+async fn handle_full_file_request(
+    path: &str,
+    file_size: u64,
+    content_type: String,
+) -> Result<(PartialContent, String), String> {
+    let data: Vec<u8> = async_read_from_file(path).await.unwrap_or_default();
+
+    if data.is_empty() {
+        return Err("File not found or empty".to_string());
+    }
+
+    let content_range: String = format!("bytes 0-{}/{}", file_size - 1, file_size);
+
+    Ok((
+        PartialContent {
+            data,
+            content_range,
+            content_length: file_size,
+            total_size: file_size,
+        },
+        content_type,
+    ))
+}
+
 pub async fn serve_static_file_with_range(
     dir: &str,
     file: &str,
     range_request: Option<RangeRequest>,
 ) -> Result<(PartialContent, String), String> {
-    let decode_dir: String = Decode::execute(CHARSETS, dir).unwrap_or_default();
-    let decode_file: String = Decode::execute(CHARSETS, file).unwrap_or_default();
-    if decode_dir.is_empty() || decode_file.is_empty() {
-        return Err("Invalid directory or file name".to_string());
-    }
+    let (decode_dir, decode_file) = validate_file_paths(dir, file)?;
     let path: String = format!("{UPLOAD_DIR}/{decode_dir}/{decode_file}");
-    let extension_name: String = FileExtension::get_extension_name(&decode_file);
-    let file_type: &str = FileExtension::parse(&extension_name).get_content_type();
-    let content_type: String = ContentType::format_content_type_with_charset(file_type, UTF8);
-    let file_metadata: std::fs::Metadata =
-        std::fs::metadata(&path).map_err(|_| "File not found".to_string())?;
+    let (file_metadata, content_type) = get_file_metadata_and_content_type(&path, &decode_file)?;
     let file_size: u64 = file_metadata.len();
-    if file_size == 0 {
-        return Err("File is empty".to_string());
-    }
+
     match range_request {
-        Some(range) => {
-            let start: u64 = range.start;
-            let end: u64 = range.end.unwrap_or(file_size - 1).min(file_size - 1);
-            if start > end {
-                return Err("Invalid range: start > end".to_string());
-            }
-            let content_length: u64 = end - start + 1;
-            let data: Vec<u8> = read_file_range(&path, start, content_length).await?;
-            let content_range: String = format!("bytes {}-{}/{}", start, end, file_size);
-            Ok((
-                PartialContent {
-                    data,
-                    content_range,
-                    content_length,
-                    total_size: file_size,
-                },
-                content_type,
-            ))
-        }
-        None => {
-            let data: Vec<u8> = async_read_from_file(&path).await.unwrap_or_default();
-            if data.is_empty() {
-                return Err("File not found or empty".to_string());
-            }
-            let content_range: String = format!("bytes 0-{}/{}", file_size - 1, file_size);
-            Ok((
-                PartialContent {
-                    data,
-                    content_range,
-                    content_length: file_size,
-                    total_size: file_size,
-                },
-                content_type,
-            ))
-        }
+        Some(range) => handle_range_request(&path, range, file_size, content_type).await,
+        None => handle_full_file_request(&path, file_size, content_type).await,
     }
 }
 

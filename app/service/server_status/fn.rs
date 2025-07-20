@@ -67,39 +67,74 @@ pub async fn get_system_info() -> SystemInfo {
     }
 }
 
-async fn get_cpu_usage() -> f64 {
-    #[cfg(target_os = "windows")]
+#[cfg(target_os = "windows")]
+fn get_cpu_usage_via_powershell() -> Option<f64> {
+    use std::process::Command;
+    if let Ok(output) = Command::new("powershell")
+        .args(&["-Command", "Get-WmiObject -Class Win32_Processor | Measure-Object -Property LoadPercentage -Average | Select-Object -ExpandProperty Average"])
+        .output()
     {
-        use std::process::Command;
-        if let Ok(output) = Command::new("powershell")
-            .args(&["-Command", "Get-WmiObject -Class Win32_Processor | Measure-Object -Property LoadPercentage -Average | Select-Object -ExpandProperty Average"])
-            .output()
-        {
-            let output_str: String = String::from_utf8_lossy(&output.stdout).to_string();
-            if let Ok(cpu_usage) = output_str.trim().parse::<f64>() {
-                return cpu_usage;
-            }
+        let output_str: String = String::from_utf8_lossy(&output.stdout).to_string();
+        if let Ok(cpu_usage) = output_str.trim().parse::<f64>() {
+            return Some(cpu_usage);
         }
+    }
+    None
+}
 
-        // 备用方法：使用typeperf
-        if let Ok(output) = Command::new("typeperf")
-            .args(&["-sc", "1", "\\Processor(_Total)\\% Processor Time"])
-            .output()
-        {
-            let output_str: String = String::from_utf8_lossy(&output.stdout).to_string();
-            for line in output_str.lines() {
-                if line.contains("Processor Time") && line.contains(",") {
-                    let parts: Vec<&str> = line.split(',').collect();
-                    if parts.len() >= 2 {
-                        let cpu_str: String = parts[1].trim_matches('"').replace(',', ".");
-                        if let Ok(cpu_usage) = cpu_str.parse::<f64>() {
-                            return cpu_usage;
-                        }
+#[cfg(target_os = "windows")]
+fn get_cpu_usage_via_typeperf() -> Option<f64> {
+    use std::process::Command;
+    if let Ok(output) = Command::new("typeperf")
+        .args(&["-sc", "1", "\\Processor(_Total)\\% Processor Time"])
+        .output()
+    {
+        let output_str: String = String::from_utf8_lossy(&output.stdout).to_string();
+        for line in output_str.lines() {
+            if line.contains("Processor Time") && line.contains(",") {
+                let parts: Vec<&str> = line.split(',').collect();
+                if parts.len() >= 2 {
+                    let cpu_str: String = parts[1].trim_matches('"').replace(',', ".");
+                    if let Ok(cpu_usage) = cpu_str.parse::<f64>() {
+                        return Some(cpu_usage);
                     }
                 }
             }
         }
+    }
+    None
+}
 
+#[cfg(not(target_os = "windows"))]
+fn parse_proc_stat_line(line: &str) -> Option<f64> {
+    let parts: Vec<&str> = line.split_whitespace().collect();
+    if parts.len() >= 8 {
+        let user: u64 = parts[1].parse::<u64>().unwrap_or(0);
+        let nice: u64 = parts[2].parse::<u64>().unwrap_or(0);
+        let system: u64 = parts[3].parse::<u64>().unwrap_or(0);
+        let idle: u64 = parts[4].parse::<u64>().unwrap_or(0);
+        let iowait: u64 = parts[5].parse::<u64>().unwrap_or(0);
+        let irq: u64 = parts[6].parse::<u64>().unwrap_or(0);
+        let softirq: u64 = parts[7].parse::<u64>().unwrap_or(0);
+
+        let total: u64 = user + nice + system + idle + iowait + irq + softirq;
+        let used: u64 = total - idle - iowait;
+        if total > 0 {
+            return Some((used as f64 / total as f64) * 100.0);
+        }
+    }
+    None
+}
+
+async fn get_cpu_usage() -> f64 {
+    #[cfg(target_os = "windows")]
+    {
+        if let Some(usage) = get_cpu_usage_via_powershell() {
+            return usage;
+        }
+        if let Some(usage) = get_cpu_usage_via_typeperf() {
+            return usage;
+        }
         return 25.5;
     }
 
@@ -107,21 +142,8 @@ async fn get_cpu_usage() -> f64 {
     {
         if let Ok(stat) = fs::read_to_string("/proc/stat") {
             if let Some(line) = stat.lines().next() {
-                let parts: Vec<&str> = line.split_whitespace().collect();
-                if parts.len() >= 8 {
-                    let user: u64 = parts[1].parse::<u64>().unwrap_or(0);
-                    let nice: u64 = parts[2].parse::<u64>().unwrap_or(0);
-                    let system: u64 = parts[3].parse::<u64>().unwrap_or(0);
-                    let idle: u64 = parts[4].parse::<u64>().unwrap_or(0);
-                    let iowait: u64 = parts[5].parse::<u64>().unwrap_or(0);
-                    let irq: u64 = parts[6].parse::<u64>().unwrap_or(0);
-                    let softirq: u64 = parts[7].parse::<u64>().unwrap_or(0);
-
-                    let total: u64 = user + nice + system + idle + iowait + irq + softirq;
-                    let used: u64 = total - idle - iowait;
-                    if total > 0 {
-                        return (used as f64 / total as f64) * 100.0;
-                    }
+                if let Some(usage) = parse_proc_stat_line(line) {
+                    return usage;
                 }
             }
         }
@@ -129,184 +151,190 @@ async fn get_cpu_usage() -> f64 {
     }
 }
 
-async fn get_memory_info() -> (u64, u64, f64) {
-    #[cfg(target_os = "windows")]
-    {
-        use std::process::Command;
+#[cfg(target_os = "windows")]
+fn parse_memory_from_powershell(output_str: &str) -> Option<(u64, u64, f64)> {
+    let line: &str = output_str.trim();
+    if let Some(comma_pos) = line.find(',') {
+        let total_str: &str = &line[..comma_pos];
+        let free_str: &str = &line[comma_pos + 1..];
 
-        // 方法1：使用PowerShell获取详细内存信息
-        if let Ok(output) = Command::new("powershell")
-            .args(&[
-                "-Command",
-                r#"
-                $os = Get-CimInstance -ClassName Win32_OperatingSystem
-                $totalKB = $os.TotalVisibleMemorySize
-                $freeKB = $os.FreePhysicalMemory
-                Write-Output "$totalKB,$freeKB"
-                "#,
-            ])
-            .output()
-        {
-            let output_str: String = String::from_utf8_lossy(&output.stdout).to_string();
-            let line: &str = output_str.trim();
-
-            if let Some(comma_pos) = line.find(',') {
-                let total_str: &str = &line[..comma_pos];
-                let free_str: &str = &line[comma_pos + 1..];
-
-                if let (Ok(total_kb), Ok(free_kb)) = (
-                    total_str.trim().parse::<u64>(),
-                    free_str.trim().parse::<u64>(),
-                ) {
-                    let total: u64 = total_kb * 1024;
-                    let free: u64 = free_kb * 1024;
-                    let used: u64 = total.saturating_sub(free);
-                    let usage: f64 = if total > 0 {
-                        (used as f64 / total as f64) * 100.0
-                    } else {
-                        0.0
-                    };
-                    return (used, total, usage);
-                }
-            }
-        }
-
-        // 方法2：使用wmic获取总内存，再用另一个命令获取可用内存
-        let mut total_memory: u64 = 0;
-        let mut available_memory: u64 = 0;
-
-        if let Ok(output) = Command::new("wmic")
-            .args(&["computersystem", "get", "TotalPhysicalMemory", "/value"])
-            .output()
-        {
-            let output_str: String = String::from_utf8_lossy(&output.stdout).to_string();
-            for line in output_str.lines() {
-                if line.starts_with("TotalPhysicalMemory=") {
-                    if let Some(value) = line.split('=').nth(1) {
-                        total_memory = value.trim().parse::<u64>().unwrap_or(0);
-                        break;
-                    }
-                }
-            }
-        }
-
-        if total_memory > 0 {
-            if let Ok(output) = Command::new("wmic")
-                .args(&["OS", "get", "FreePhysicalMemory", "/value"])
-                .output()
-            {
-                let output_str: String = String::from_utf8_lossy(&output.stdout).to_string();
-                for line in output_str.lines() {
-                    if line.starts_with("FreePhysicalMemory=") {
-                        if let Some(value) = line.split('=').nth(1) {
-                            available_memory = value.trim().parse::<u64>().unwrap_or(0) * 1024;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            let used: u64 = total_memory.saturating_sub(available_memory);
-            let usage: f64 = if total_memory > 0 {
-                (used as f64 / total_memory as f64) * 100.0
+        if let (Ok(total_kb), Ok(free_kb)) = (
+            total_str.trim().parse::<u64>(),
+            free_str.trim().parse::<u64>(),
+        ) {
+            let total: u64 = total_kb * 1024;
+            let free: u64 = free_kb * 1024;
+            let used: u64 = total.saturating_sub(free);
+            let usage: f64 = if total > 0 {
+                (used as f64 / total as f64) * 100.0
             } else {
                 0.0
             };
-            return (used, total_memory, usage);
+            return Some((used, total, usage));
         }
+    }
+    None
+}
 
-        // 方法3：使用typeperf获取性能计数器
-        if let Ok(output) = Command::new("typeperf")
-            .args(&[r#"\Memory\Available Bytes"#, "-sc", "1"])
-            .output()
-        {
-            let output_str: String = String::from_utf8_lossy(&output.stdout).to_string();
-            for line in output_str.lines() {
-                if line.contains("Available Bytes") {
-                    let parts: Vec<&str> = line.split(',').collect();
-                    if parts.len() >= 2 {
-                        let value_str: String = parts[1].trim().replace("\"", "");
-                        if let Ok(available) = value_str.parse::<f64>() {
-                            available_memory = available as u64;
-                            break;
-                        }
-                    }
+#[cfg(target_os = "windows")]
+fn get_memory_via_powershell() -> Option<(u64, u64, f64)> {
+    use std::process::Command;
+    if let Ok(output) = Command::new("powershell")
+        .args(&[
+            "-Command",
+            r#"
+            $os = Get-CimInstance -ClassName Win32_OperatingSystem
+            $totalKB = $os.TotalVisibleMemorySize
+            $freeKB = $os.FreePhysicalMemory
+            Write-Output "$totalKB,$freeKB"
+            "#,
+        ])
+        .output()
+    {
+        let output_str: String = String::from_utf8_lossy(&output.stdout).to_string();
+        return parse_memory_from_powershell(&output_str);
+    }
+    None
+}
+
+#[cfg(target_os = "windows")]
+fn get_total_memory_via_wmic() -> Option<u64> {
+    use std::process::Command;
+    if let Ok(output) = Command::new("wmic")
+        .args(&["computersystem", "get", "TotalPhysicalMemory", "/value"])
+        .output()
+    {
+        let output_str: String = String::from_utf8_lossy(&output.stdout).to_string();
+        for line in output_str.lines() {
+            if line.starts_with("TotalPhysicalMemory=") {
+                if let Some(value) = line.split('=').nth(1) {
+                    return value.trim().parse::<u64>().ok();
                 }
             }
         }
+    }
+    None
+}
 
-        if let Ok(output) = Command::new("wmic")
-            .args(&["computersystem", "get", "TotalPhysicalMemory", "/value"])
-            .output()
-        {
-            let output_str: String = String::from_utf8_lossy(&output.stdout).to_string();
-            for line in output_str.lines() {
-                if line.starts_with("TotalPhysicalMemory=") {
-                    if let Some(value) = line.split('=').nth(1) {
-                        if let Ok(total) = value.trim().parse::<u64>() {
-                            let used: u64 = total.saturating_sub(available_memory);
-                            let usage: f64 = if total > 0 {
-                                (used as f64 / total as f64) * 100.0
-                            } else {
-                                0.0
-                            };
-                            return (used, total, usage);
-                        }
-                    }
+#[cfg(target_os = "windows")]
+fn get_free_memory_via_wmic() -> Option<u64> {
+    use std::process::Command;
+    if let Ok(output) = Command::new("wmic")
+        .args(&["OS", "get", "FreePhysicalMemory", "/value"])
+        .output()
+    {
+        let output_str: String = String::from_utf8_lossy(&output.stdout).to_string();
+        for line in output_str.lines() {
+            if line.starts_with("FreePhysicalMemory=") {
+                if let Some(value) = line.split('=').nth(1) {
+                    return value.trim().parse::<u64>().ok().map(|v| v * 1024);
                 }
             }
         }
+    }
+    None
+}
 
-        // 如果所有方法都失败，返回错误指示而不是假数据
+#[cfg(target_os = "windows")]
+fn calculate_memory_usage(total: u64, available: u64) -> (u64, u64, f64) {
+    let used: u64 = total.saturating_sub(available);
+    let usage: f64 = if total > 0 {
+        (used as f64 / total as f64) * 100.0
+    } else {
+        0.0
+    };
+    (used, total, usage)
+}
+
+#[cfg(not(target_os = "windows"))]
+struct LinuxMemoryInfo {
+    total: u64,
+    available: u64,
+    free: u64,
+    buffers: u64,
+    cached: u64,
+}
+
+#[cfg(not(target_os = "windows"))]
+impl LinuxMemoryInfo {
+    fn new() -> Self {
+        Self {
+            total: 0,
+            available: 0,
+            free: 0,
+            buffers: 0,
+            cached: 0,
+        }
+    }
+
+    fn parse_meminfo_line(&mut self, line: &str) {
+        if line.starts_with("MemTotal:") {
+            if let Some(value) = line.split_whitespace().nth(1) {
+                self.total = value.parse::<u64>().unwrap_or(0) * 1024;
+            }
+        } else if line.starts_with("MemAvailable:") {
+            if let Some(value) = line.split_whitespace().nth(1) {
+                self.available = value.parse::<u64>().unwrap_or(0) * 1024;
+            }
+        } else if line.starts_with("MemFree:") {
+            if let Some(value) = line.split_whitespace().nth(1) {
+                self.free = value.parse::<u64>().unwrap_or(0) * 1024;
+            }
+        } else if line.starts_with("Buffers:") {
+            if let Some(value) = line.split_whitespace().nth(1) {
+                self.buffers = value.parse::<u64>().unwrap_or(0) * 1024;
+            }
+        } else if line.starts_with("Cached:") {
+            if let Some(value) = line.split_whitespace().nth(1) {
+                self.cached = value.parse::<u64>().unwrap_or(0) * 1024;
+            }
+        }
+    }
+
+    fn calculate_usage(&self) -> (u64, u64, f64) {
+        let available: u64 = if self.available == 0 && self.total > 0 {
+            self.free + self.buffers + self.cached
+        } else {
+            self.available
+        };
+
+        let used: u64 = self.total.saturating_sub(available);
+        let usage: f64 = if self.total > 0 {
+            (used as f64 / self.total as f64) * 100.0
+        } else {
+            0.0
+        };
+        (used, self.total, usage)
+    }
+}
+
+async fn get_memory_info() -> (u64, u64, f64) {
+    #[cfg(target_os = "windows")]
+    {
+        if let Some(memory_info) = get_memory_via_powershell() {
+            return memory_info;
+        }
+
+        if let Some(total_memory) = get_total_memory_via_wmic() {
+            if let Some(available_memory) = get_free_memory_via_wmic() {
+                return calculate_memory_usage(total_memory, available_memory);
+            }
+        }
+
         return (0, 0, 0.0);
     }
 
     #[cfg(not(target_os = "windows"))]
     {
-        let mut total: u64 = 0;
-        let mut available: u64 = 0;
-        let mut free: u64 = 0;
-        let mut buffers: u64 = 0;
-        let mut cached: u64 = 0;
+        let mut memory_info: LinuxMemoryInfo = LinuxMemoryInfo::new();
 
         if let Ok(meminfo) = fs::read_to_string("/proc/meminfo") {
             for line in meminfo.lines() {
-                if line.starts_with("MemTotal:") {
-                    if let Some(value) = line.split_whitespace().nth(1) {
-                        total = value.parse::<u64>().unwrap_or(0) * 1024;
-                    }
-                } else if line.starts_with("MemAvailable:") {
-                    if let Some(value) = line.split_whitespace().nth(1) {
-                        available = value.parse::<u64>().unwrap_or(0) * 1024;
-                    }
-                } else if line.starts_with("MemFree:") {
-                    if let Some(value) = line.split_whitespace().nth(1) {
-                        free = value.parse::<u64>().unwrap_or(0) * 1024;
-                    }
-                } else if line.starts_with("Buffers:") {
-                    if let Some(value) = line.split_whitespace().nth(1) {
-                        buffers = value.parse::<u64>().unwrap_or(0) * 1024;
-                    }
-                } else if line.starts_with("Cached:") {
-                    if let Some(value) = line.split_whitespace().nth(1) {
-                        cached = value.parse::<u64>().unwrap_or(0) * 1024;
-                    }
-                }
+                memory_info.parse_meminfo_line(line);
             }
         }
 
-        // 优先使用MemAvailable，如果不存在则计算
-        if available == 0 && total > 0 {
-            available = free + buffers + cached;
-        }
-
-        let used: u64 = total.saturating_sub(available);
-        let usage: f64 = if total > 0 {
-            (used as f64 / total as f64) * 100.0
-        } else {
-            0.0
-        };
-        (used, total, usage)
+        memory_info.calculate_usage()
     }
 }
 
