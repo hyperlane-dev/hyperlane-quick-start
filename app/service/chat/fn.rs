@@ -7,7 +7,7 @@ pub(crate) fn get_global_websocket() -> &'static WebSocket {
 pub async fn pre_ws_upgrade(ctx: Context) {
     let addr: String = ctx.get_socket_addr_or_default_string().await;
     let encode_addr: String = Encode::execute(CHARSETS, &addr).unwrap_or_default();
-    ctx.set_response_header("addr", encode_addr).await;
+    ctx.set_response_header("X-Client-Addr", encode_addr).await;
 }
 
 pub async fn connected_hook(ctx: Context) {

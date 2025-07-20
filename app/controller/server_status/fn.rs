@@ -1,9 +1,4 @@
 use super::*;
-use crate::service::network_capture::{
-    get_network_capture_data, get_network_capture_stream, start_network_capture,
-};
-use crate::service::server_status::{get_server_status, get_system_info};
-use tokio::time::{Duration, sleep};
 
 #[get]
 #[utoipa::path(
@@ -15,7 +10,6 @@ use tokio::time::{Duration, sleep};
 )]
 #[response_status_code(200)]
 #[response_header(CONTENT_TYPE => TEXT_EVENT_STREAM)]
-#[response_header(ACCESS_CONTROL_ALLOW_ORIGIN => WILDCARD_ANY)]
 pub async fn status_sse(ctx: Context) {
     let _ = ctx.send().await;
     loop {
@@ -26,9 +20,8 @@ pub async fn status_sse(ctx: Context) {
         if send_result.is_err() {
             break;
         }
-        sleep(Duration::from_secs(1)).await;
+        sleep(Duration::from_millis(360)).await;
     }
-
     let _ = ctx.closed().await;
 }
 

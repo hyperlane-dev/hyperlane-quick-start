@@ -41,10 +41,9 @@ pub async fn static_file(ctx: Context) {
         Ok((partial_content, content_type)) => {
             ctx.set_response_header(CONTENT_TYPE, content_type).await;
             ctx.set_response_header(ACCEPT_RANGES, BYTES).await;
-            ctx.set_response_header(CACHE_CONTROL, "public, max-age=31536000, immutable")
+            ctx.set_response_header(CACHE_CONTROL, CACHE_CONTROL_STATIC_ASSETS)
                 .await;
-            ctx.set_response_header(EXPIRES, "Wed, 1 Apr 8888 00:00:00 GMT")
-                .await;
+            ctx.set_response_header(EXPIRES, EXPIRES_FAR_FUTURE).await;
             if has_range_request {
                 ctx.set_response_status_code(HttpStatus::PartialContent.code())
                     .await;
@@ -114,7 +113,8 @@ pub async fn save(ctx: Context) {
     let chunk_data: Vec<u8> = ctx.get_request_body().await;
     match save_file_chunk(&file_chunk_data, chunk_data).await {
         Ok(save_upload_dir) => {
-            ctx.set_response_header("file", save_upload_dir).await;
+            ctx.set_response_header("X-File-Path", save_upload_dir)
+                .await;
             set_common_success_response_body(&ctx, "").await;
         }
         Err(error) => {

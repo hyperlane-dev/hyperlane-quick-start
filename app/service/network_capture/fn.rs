@@ -6,7 +6,7 @@ pub async fn start_network_capture() {
     init_network_capture_globals();
     set_capture_status(CaptureStatus::Running);
 
-    let _handle = std::thread::spawn(|| {
+    let _handle: std::thread::JoinHandle<()> = std::thread::spawn(|| {
         let rt: Runtime = Runtime::new().unwrap();
         rt.block_on(async {
             loop {
@@ -189,17 +189,17 @@ pub async fn get_network_capture_data(ctx: Context) {
 
     if let Ok(json) = serde_json::to_string(&response_data) {
         ctx.set_response_body(json).await;
-        ctx.set_response_header("Content-Type", "application/json")
+        ctx.set_response_header(CONTENT_TYPE, APPLICATION_JSON)
             .await;
     }
 }
 
 pub async fn get_network_capture_stream(ctx: Context) {
-    ctx.set_response_header("Content-Type", "text/event-stream")
+    ctx.set_response_header(CONTENT_TYPE, TEXT_EVENT_STREAM)
         .await;
-    ctx.set_response_header("Cache-Control", "no-cache").await;
-    ctx.set_response_header("Connection", "keep-alive").await;
-    ctx.set_response_header("Access-Control-Allow-Origin", "*")
+    ctx.set_response_header(CACHE_CONTROL, NO_CACHE).await;
+    ctx.set_response_header(CONNECTION, KEEP_ALIVE).await;
+    ctx.set_response_header(ACCESS_CONTROL_ALLOW_ORIGIN, WILDCARD_ANY)
         .await;
 
     let response_data: NetworkStats = get_network_stats().unwrap_or_else(|| NetworkStats {
