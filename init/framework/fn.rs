@@ -11,18 +11,29 @@ async fn configure_server_basic(server: &Server) {
     server.ws_buffer(SERVER_WS_BUFFER).await;
     server.connected_hook(service::chat::connected_hook).await;
     server.disable_ws_hook("/api/chat").await;
+    server.host(SERVER_HOST).await;
+    server.port(SERVER_PORT).await;
+    server.set_ttl(SERVER_TTI).await;
+    server.set_linger(SERVER_LINGER).await;
+    server.set_nodelay(SERVER_NODELAY).await;
+    server.error_hook(exception::framework::error_hook).await;
+    server.http_buffer(SERVER_HTTP_BUFFER).await;
+    server.ws_buffer(SERVER_WS_BUFFER).await;
 }
 
 async fn configure_request_middleware(server: &Server) {
     server
         .request_middleware(middleware::request::cross::cross)
         .await;
+    server.await;
     server
         .request_middleware(middleware::request::response::response_header)
         .await;
+    server.await;
     server
         .request_middleware(middleware::request::response::response_status_code)
         .await;
+    server.await;
     server
         .request_middleware(middleware::request::response::response_body)
         .await;
@@ -40,6 +51,11 @@ async fn configure_response_middleware(server: &Server) {
 async fn configure_routes(server: &Server) {
     server.route("/", controller::root::handle).await;
     server.route("/upload", controller::upload::html).await;
+    server.route("/", controller::root::handle).await;
+    server
+        .route(format!("/hello/{{{NAME_KEY}}}"), controller::hello::handle)
+        .await;
+    server.route("/websocket", controller::ws::handle).await;
     server
         .route("/favicon.ico", controller::favicon_ico::handle)
         .await;
