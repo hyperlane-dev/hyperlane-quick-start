@@ -7,8 +7,7 @@ pub use r#enum::*;
 pub use r#static::*;
 
 use super::*;
-
-use crate::model::business::chat::*;
+use model::business::chat::*;
 
 use std::{
     collections::HashMap,

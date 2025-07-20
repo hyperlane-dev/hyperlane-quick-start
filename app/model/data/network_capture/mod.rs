@@ -7,8 +7,7 @@ pub use r#enum::*;
 pub use r#static::*;
 
 use super::*;
-
-use crate::model::business::network_capture::*;
+use model::business::network_capture::*;
 
 use std::{
     collections::HashMap,

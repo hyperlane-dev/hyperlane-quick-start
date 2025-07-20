@@ -7,8 +7,7 @@ pub use r#static::*;
 pub use r#type::*;
 
 use super::*;
-
-use crate::model::business::upload::*;
+use model::business::upload::*;
 
 use once_cell::sync::Lazy;
 use tokio::sync::{RwLockReadGuard, RwLockWriteGuard};

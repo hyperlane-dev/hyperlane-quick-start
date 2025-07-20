@@ -3,10 +3,9 @@ mod r#fn;
 pub use r#fn::*;
 
 use super::*;
-
-use crate::hyperlane_config::{
+use hyperlane_config::{
     business::{chat::*, root::*},
     framework::*,
 };
-use crate::model::data_transfer::chat::*;
-use crate::service::chat::*;
+use model::data_transfer::chat::*;
+use service::chat::*;
