@@ -97,7 +97,8 @@ async fn create_server() {
     configure_routes(&server).await;
     configure_response_middleware(&server).await;
     println_success!("Server initialization successful");
-    match server.run().await {
+    let server_result: ServerResult<()> = server.run().await;
+    match server_result {
         Ok(_) => {
             let host_port: String = format!("{SERVER_HOST}:{SERVER_PORT}");
             println_success!("Server listen in: ", host_port)
