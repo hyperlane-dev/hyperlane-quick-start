@@ -9,6 +9,8 @@ pub async fn response_header(ctx: Context) {
     ctx.set_response_header(CONTENT_TYPE, content_type)
         .await
         .set_response_header("SocketAddr", socket_addr_string)
+        .await
+        .set_response_version(HttpVersion::HTTP1_1)
         .await;
 }
 

@@ -8,7 +8,9 @@ use super::*;
         WebSocketReqData,
         WebSocketRespData,
         OnlineUser,
-        UserListResponse
+        UserListResponse,
+        ServerStatus,
+        SystemInfo
     )),
     info(
         title = "Hyperlane",
@@ -29,6 +31,9 @@ use super::*;
         controller::users::online_users,
         controller::chat::html,
         controller::chat::handle,
+        controller::server_status::status_sse,
+        controller::server_status::system_info,
+        controller::server_status::monitor_dashboard,
     )
 )]
 pub struct ApiDoc;

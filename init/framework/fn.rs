@@ -77,6 +77,15 @@ async fn configure_routes(server: &Server) {
     server.route("/log/info", controller::log::info).await;
     server.route("/log/warn", controller::log::warn).await;
     server.route("/log/error", controller::log::error).await;
+    server
+        .route("/api/server/status", controller::server_status::status_sse)
+        .await;
+    server
+        .route("/api/server/info", controller::server_status::system_info)
+        .await;
+    server
+        .route("/monitor", controller::server_status::monitor_dashboard)
+        .await;
 }
 
 fn runtime() -> Runtime {
