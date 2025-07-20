@@ -1,5 +1,4 @@
 use super::*;
-use std::collections::HashMap;
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct NetworkPacket {

@@ -1,6 +1,7 @@
 mod r#struct;
 
-use super::*;
 pub use r#struct::*;
+
+use super::*;
 
 use utoipa::ToSchema;

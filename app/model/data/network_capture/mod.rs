@@ -7,11 +7,11 @@ pub use r#enum::*;
 pub use r#static::*;
 
 use super::*;
-use model::business::network_capture::*;
+
+use crate::model::business::network_capture::*;
 
 use std::{
     collections::HashMap,
     sync::{Arc, Mutex, OnceLock},
 };
-
 use utoipa::ToSchema;
