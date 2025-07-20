@@ -1,54 +1,82 @@
 use super::*;
 
-fn configure_server_basic(server: &Server) {
-    server
-        .host(SERVER_HOST)
-        .port(SERVER_PORT)
-        .set_ttl(SERVER_TTI)
-        .set_linger(SERVER_LINGER)
-        .set_nodelay(SERVER_NODELAY)
-        .error_hook(exception::framework::error_hook)
-        .http_buffer(SERVER_HTTP_BUFFER)
-        .ws_buffer(SERVER_WS_BUFFER)
-        .connected_hook(service::chat::connected_hook)
-        .disable_ws_hook("/api/chat");
+async fn configure_server_basic(server: &Server) {
+    server.host(SERVER_HOST).await;
+    server.port(SERVER_PORT).await;
+    server.set_ttl(SERVER_TTI).await;
+    server.set_linger(SERVER_LINGER).await;
+    server.set_nodelay(SERVER_NODELAY).await;
+    server.error_hook(exception::framework::error_hook).await;
+    server.http_buffer(SERVER_HTTP_BUFFER).await;
+    server.ws_buffer(SERVER_WS_BUFFER).await;
+    server.connected_hook(service::chat::connected_hook).await;
+    server.disable_ws_hook("/api/chat").await;
 }
 
-fn configure_request_middleware(server: &Server) {
+async fn configure_request_middleware(server: &Server) {
     server
         .request_middleware(middleware::request::cross::cross)
+        .await;
+    server
         .request_middleware(middleware::request::response::response_header)
+        .await;
+    server
         .request_middleware(middleware::request::response::response_status_code)
-        .request_middleware(middleware::request::response::response_body);
+        .await;
+    server
+        .request_middleware(middleware::request::response::response_body)
+        .await;
 }
 
-fn configure_response_middleware(server: &Server) {
+async fn configure_response_middleware(server: &Server) {
     server
         .response_middleware(middleware::response::send::send)
-        .response_middleware(middleware::response::log::log);
+        .await;
+    server
+        .response_middleware(middleware::response::log::log)
+        .await;
 }
 
-fn configure_routes(server: &Server) {
+async fn configure_routes(server: &Server) {
+    server.route("/", controller::root::handle).await;
+    server.route("/upload", controller::upload::html).await;
     server
-        .route("/", controller::root::handle)
-        .route("/upload", controller::upload::html)
         .route("/favicon.ico", controller::favicon_ico::handle)
+        .await;
+    server
         .route(format!("/hello/{{{NAME_KEY}}}"), controller::hello::handle)
+        .await;
+    server
         .route(format!("/openapi/openapi.json"), controller::openapi::json)
+        .await;
+    server
         .route(format!("/openapi/index.html"), controller::openapi::html)
+        .await;
+    server
         .route(
             format!("/static/{{{UPLOAD_DIR_KEY}}}/{{{UPLOAD_FILE_KEY}}}"),
             controller::upload::static_file,
         )
+        .await;
+    server
         .route(format!("/{{{WS_DIR_KEY}:^chat.*}}"), controller::chat::html)
-        .route("/api/chat", controller::chat::handle)
+        .await;
+    server.route("/api/chat", controller::chat::handle).await;
+    server
         .route("/api/users/online", controller::users::online_users)
+        .await;
+    server
         .route("/api/upload/save", controller::upload::save)
+        .await;
+    server
         .route("/api/upload/register", controller::upload::register)
+        .await;
+    server
         .route("/api/upload/merge", controller::upload::merge)
-        .route("/log/info", controller::log::info)
-        .route("/log/warn", controller::log::warn)
-        .route("/log/error", controller::log::error);
+        .await;
+    server.route("/log/info", controller::log::info).await;
+    server.route("/log/warn", controller::log::warn).await;
+    server.route("/log/error", controller::log::error).await;
 }
 
 fn runtime() -> Runtime {
@@ -64,12 +92,12 @@ fn runtime() -> Runtime {
 
 #[hyperlane(server)]
 async fn create_server() {
-    configure_server_basic(&server);
-    configure_request_middleware(&server);
-    configure_routes(&server);
-    configure_response_middleware(&server);
+    configure_server_basic(&server).await;
+    configure_request_middleware(&server).await;
+    configure_routes(&server).await;
+    configure_response_middleware(&server).await;
     println_success!("Server initialization successful");
-    match server.run() {
+    match server.run().await {
         Ok(_) => {
             let host_port: String = format!("{SERVER_HOST}:{SERVER_PORT}");
             println_success!("Server listen in: ", host_port)
