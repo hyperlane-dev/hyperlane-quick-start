@@ -16,6 +16,12 @@ pub struct ServerStatus {
     pub load_average: f64,
     pub active_connections: u32,
     pub process_count: u32,
+    pub hostname: String,
+    pub os_name: String,
+    pub os_version: String,
+    pub kernel_version: String,
+    pub cpu_cores: u32,
+    pub cpu_model: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
@@ -47,6 +53,12 @@ impl Default for ServerStatus {
             load_average: 0.0,
             active_connections: 0,
             process_count: 0,
+            hostname: String::new(),
+            os_name: String::new(),
+            os_version: String::new(),
+            kernel_version: String::new(),
+            cpu_cores: 0,
+            cpu_model: String::new(),
         }
     }
 }

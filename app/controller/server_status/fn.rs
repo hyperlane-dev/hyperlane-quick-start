@@ -1,4 +1,7 @@
 use super::*;
+use crate::service::network_capture::{
+    get_network_capture_data, get_network_capture_stream, start_network_capture,
+};
 use crate::service::server_status::{get_server_status, get_system_info};
 use tokio::time::{Duration, sleep};
 
@@ -10,34 +13,20 @@ use tokio::time::{Duration, sleep};
         (status = 200, description = "服务器实时状态SSE流", body = String)
     )
 )]
+#[response_status_code(200)]
+#[response_header(CONTENT_TYPE => TEXT_EVENT_STREAM)]
+#[response_header(ACCESS_CONTROL_ALLOW_ORIGIN => WILDCARD_ANY)]
 pub async fn status_sse(ctx: Context) {
-    let _ = ctx
-        .set_response_header(CONTENT_TYPE, TEXT_EVENT_STREAM)
-        .await
-        .set_response_header(CACHE_CONTROL, "no-cache")
-        .await
-        .set_response_header(CONNECTION, "keep-alive")
-        .await
-        .set_response_header(ACCESS_CONTROL_ALLOW_ORIGIN, "*")
-        .await
-        .set_response_status_code(200)
-        .await
-        .send()
-        .await;
-
+    let _ = ctx.send().await;
     loop {
-        let server_status = get_server_status().await;
-        let status_json = serde_json::to_string(&server_status).unwrap_or_default();
-
-        let sse_data = format!("data: {}\n\n", status_json);
-
-        let send_result = ctx.set_response_body(sse_data).await.send_body().await;
-
+        let server_status: ServerStatus = get_server_status().await;
+        let status_json: String = serde_json::to_string(&server_status).unwrap_or_default();
+        let sse_data: String = format!("data: {}\n\n", status_json);
+        let send_result: ResponseResult = ctx.set_response_body(sse_data).await.send_body().await;
         if send_result.is_err() {
             break;
         }
-
-        sleep(Duration::from_secs(2)).await;
+        sleep(Duration::from_secs(1)).await;
     }
 
     let _ = ctx.closed().await;
@@ -54,8 +43,8 @@ pub async fn status_sse(ctx: Context) {
 #[response_status_code(200)]
 #[response_header(CONTENT_TYPE => APPLICATION_JSON)]
 pub async fn system_info(ctx: Context) {
-    let system_info = get_system_info().await;
-    let info_json = serde_json::to_string(&system_info).unwrap_or_default();
+    let system_info: SystemInfo = get_system_info().await;
+    let info_json: String = serde_json::to_string(&system_info).unwrap_or_default();
     ctx.set_response_body(info_json).await;
 }
 
@@ -70,6 +59,34 @@ pub async fn system_info(ctx: Context) {
 )]
 #[response_status_code(200)]
 pub async fn monitor_dashboard(ctx: Context) {
-    let html = include_str!("../../../resources/static/html/monitor.html");
+    let html: &str = include_str!("../../../resources/static/html/monitor_parallax.html");
     ctx.set_response_body(html).await;
+}
+
+#[get]
+#[utoipa::path(
+    get,
+    path = "/api/network/capture",
+    responses(
+        (status = 200, description = "Network capture data", body = String)
+    )
+)]
+pub async fn network_capture_data(ctx: Context) {
+    get_network_capture_data(ctx).await;
+}
+
+#[get]
+#[utoipa::path(
+    get,
+    path = "/api/network/capture/stream",
+    responses(
+        (status = 200, description = "Network capture stream", body = String)
+    )
+)]
+pub async fn network_capture_stream(ctx: Context) {
+    get_network_capture_stream(ctx).await;
+}
+
+pub async fn init_network_capture() {
+    start_network_capture().await;
 }

@@ -10,7 +10,12 @@ use super::*;
         OnlineUser,
         UserListResponse,
         ServerStatus,
-        SystemInfo
+        SystemInfo,
+        NetworkPacket,
+        NetworkStats,
+        ConnectionInfo,
+        NetworkCaptureRequest,
+        NetworkCaptureResponse
     )),
     info(
         title = "Hyperlane",
@@ -34,6 +39,8 @@ use super::*;
         controller::server_status::status_sse,
         controller::server_status::system_info,
         controller::server_status::monitor_dashboard,
+        controller::server_status::network_capture_data,
+        controller::server_status::network_capture_stream,
     )
 )]
 pub struct ApiDoc;

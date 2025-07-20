@@ -86,6 +86,18 @@ async fn configure_routes(server: &Server) {
     server
         .route("/monitor", controller::server_status::monitor_dashboard)
         .await;
+    server
+        .route(
+            "/api/network/capture",
+            controller::server_status::network_capture_data,
+        )
+        .await;
+    server
+        .route(
+            "/api/network/capture/stream",
+            controller::server_status::network_capture_stream,
+        )
+        .await;
 }
 
 fn runtime() -> Runtime {
@@ -105,6 +117,10 @@ async fn create_server() {
     configure_request_middleware(&server).await;
     configure_routes(&server).await;
     configure_response_middleware(&server).await;
+
+    // 初始化网络抓包功能
+    controller::server_status::init_network_capture().await;
+
     println_success!("Server initialization successful");
     let server_result: ServerResult<()> = server.run().await;
     match server_result {
