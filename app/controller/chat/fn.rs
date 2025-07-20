@@ -22,7 +22,7 @@ pub async fn html(ctx: Context) {
             .await;
         return;
     }
-    let file_path: String = format!("./group-chat/{ws_path}");
+    let file_path: String = format!("./chat/{ws_path}");
     let extension_name: String = FileExtension::get_extension_name(&file_path);
     let content_type: &str = FileExtension::parse(&extension_name).get_content_type();
     let res: Option<Vec<u8>> = async_read_from_file(&file_path).await.ok();
