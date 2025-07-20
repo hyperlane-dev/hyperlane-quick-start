@@ -383,9 +383,9 @@ dependencies = [
 
 [[package]]
 name = "cc"
-version = "1.2.29"
+version = "1.2.30"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5c1599538de2394445747c8cf7935946e3cc27e9625f889d979bfb2aaf569362"
+checksum = "deec109607ca693028562ed836a5f1c4b8bd77755c4e132fc5ce11b0b6211ae7"
 dependencies = [
  "jobserver",
  "libc",
@@ -449,9 +449,7 @@ dependencies = [
 [[package]]
 name = "color-output"
 version = "7.0.6"
-version = "7.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cbc27a5ff3d0c995385ab290d6a4d3e95b6013756d671f6c895810e63cb71cd7"
 checksum = "cbc27a5ff3d0c995385ab290d6a4d3e95b6013756d671f6c895810e63cb71cd7"
 dependencies = [
  "hyperlane-time",
@@ -474,9 +472,9 @@ dependencies = [
 
 [[package]]
 name = "crc32fast"
-version = "1.4.2"
+version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a97769d94ddab943e4510d138150169a2758b5ef3eb191a9ee688de3e23ef7b3"
+checksum = "9481c1c90cbf2ac953f07c8d4a58aa3945c425b7185c9154d67a65e4230da511"
 dependencies = [
  "cfg-if",
 ]
@@ -903,7 +901,6 @@ dependencies = [
 
 [[package]]
 name = "http-constant"
-version = "1.58.0"
 version = "1.58.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "713c314c36507a41a6414cac9dded28dcfed32aaa08d381eec76d57ffd841bd4"
