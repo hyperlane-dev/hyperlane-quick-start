@@ -1,5 +1,8 @@
 use super::*;
 
+#[response_status_code(404)]
+pub async fn response_status_code(ctx: Context) {}
+
 #[response_header(DATE => gmt())]
 #[response_header(SERVER => HYPERLANE)]
 #[response_header(CONNECTION => KEEP_ALIVE)]
@@ -13,9 +16,6 @@ pub async fn response_header(ctx: Context) {
         .set_response_header("SocketAddr", socket_addr_string)
         .await;
 }
-
-#[response_status_code(404)]
-pub async fn response_status_code(ctx: Context) {}
 
 #[response_body(NOT_FOUND_HTML)]
 pub async fn response_body(ctx: Context) {}
