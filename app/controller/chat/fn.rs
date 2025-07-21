@@ -34,7 +34,7 @@ pub async fn html(ctx: Context) {
         .await
         .set_response_header(CONTENT_ENCODING, GZIP)
         .await
-        .set_response_header(CONTENT_TYPE, content_type)
+        .replace_response_header(CONTENT_TYPE, content_type)
         .await
         .set_response_body(body)
         .await;
