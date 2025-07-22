@@ -998,9 +998,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-plugin-websocket"
-version = "2.0.3"
+version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f56a9466f0a449b44abbb35f197792ea6b5e9ee4f4ecc5c611a66dd6789276fc"
+checksum = "2609f3e5f674c0a4f28e73031f2b78c0853794dbb798c902b0200af6f9d6de44"
 dependencies = [
  "hyperlane",
  "hyperlane-broadcast",
@@ -1021,9 +1021,9 @@ checksum = "7d7e07007bd67be0c3f07646066d9300ea999fb7d3371610354393101ac2db2c"
 
 [[package]]
 name = "hyperlane-utils"
-version = "2.0.0"
+version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a8b7a4ea85439016b84297609536006f3199b0b3734464c42bbd29bf720c01ca"
+checksum = "c925d2fc28c1bc0be58b3b355535e4fc5b22dc1165c09ecf403c9bf707f48f27"
 dependencies = [
  "ahash",
  "bin-encode-decode",
