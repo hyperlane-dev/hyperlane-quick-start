@@ -6,7 +6,7 @@ async fn configure_server_basic(server: &Server) {
     server.set_ttl(SERVER_TTI).await;
     server.set_linger(SERVER_LINGER).await;
     server.set_nodelay(SERVER_NODELAY).await;
-    server.error_hook(exception::framework::error_hook).await;
+    server.panic_hook(exception::framework::error_hook).await;
     server.http_buffer(SERVER_HTTP_BUFFER).await;
     server.ws_buffer(SERVER_WS_BUFFER).await;
     server.connected_hook(service::chat::connected_hook).await;

@@ -53,14 +53,12 @@ pub async fn handle(ctx: Context) {
     let websocket: &WebSocket = get_global_websocket();
     let path: String = ctx.get_request_path().await;
     let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
-    websocket
-        .run(
-            &ctx,
-            SERVER_WS_BUFFER,
-            key,
-            callback,
-            send_callback,
-            on_closed,
-        )
-        .await;
+    let cfg: WebSocketConfig<String> = WebSocketConfig::new()
+        .set_context(ctx.clone())
+        .set_broadcast_type(key)
+        .set_buffer_size(SERVER_WS_BUFFER)
+        .set_request_hook(callback)
+        .set_sended_hook(send_callback)
+        .set_closed_hook(on_closed);
+    websocket.run(cfg).await;
 }
