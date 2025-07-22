@@ -780,9 +780,9 @@ checksum = "df3b46402a9d5adb4c86a0cf463f42e19994e3ee891101b1841f30a545cb49a9"
 
 [[package]]
 name = "hyperlane"
-version = "5.58.0"
+version = "5.61.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e02b61d52ee1f445cd014c4dbf1e470b53ee8545c5854d875c7d58e81673717f"
+checksum = "0546fe8ccd52964aec24c315fb90e778dea9031ab6ac6989dfc0e7b9ba4378a1"
 dependencies = [
  "http-type",
  "lombok-macros",
@@ -792,9 +792,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-broadcast"
-version = "0.5.2"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4a423ac5192dfe8c977d7fab2566198b3cdc58fd0857717b54701f6f04c6881f"
+checksum = "2874b1a5d9e08b7ad2c68a70893fc290deacd23836f94e9152b316bed5346020"
 dependencies = [
  "dashmap",
  "tokio",
@@ -812,9 +812,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-macros"
-version = "1.9.0"
+version = "1.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1e64fa7b3eac6425ad62f0c6176fe680db11520ccb8e1690492ab528cac953c9"
+checksum = "d11f66306c0ba8d913beb1beadb410249067d35e81b3278ad57d4ca734419060"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -823,9 +823,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-plugin-websocket"
-version = "1.0.22"
+version = "2.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7f667cb71eea22bdccf47ec43b8957c64ce7f3a7d3b2e3b0923f04d56dd5e7a6"
+checksum = "f56a9466f0a449b44abbb35f197792ea6b5e9ee4f4ecc5c611a66dd6789276fc"
 dependencies = [
  "hyperlane",
  "hyperlane-broadcast",
@@ -833,7 +833,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "1.63.2"
+version = "1.64.0"
 dependencies = [
  "hyperlane_init",
 ]
@@ -846,9 +846,9 @@ checksum = "7d7e07007bd67be0c3f07646066d9300ea999fb7d3371610354393101ac2db2c"
 
 [[package]]
 name = "hyperlane-utils"
-version = "1.8.0"
+version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9e5e7dec6c58926957efe24190ef78d21f0a5da84eaa6d25e3d461bf95ed00c6"
+checksum = "a8b7a4ea85439016b84297609536006f3199b0b3734464c42bbd29bf720c01ca"
 dependencies = [
  "ahash",
  "bin-encode-decode",

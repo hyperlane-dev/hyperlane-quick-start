@@ -10,11 +10,14 @@ pub async fn error_hook(ctx: Context) {
         response_body.push_str(&request_string);
         response_body.push_str(BR);
     }
-    println_error!(response_body);
+    println_error!("{}", response_body);
+    log_error(response_body.clone()).await;
     let _ = ctx
         .set_response_status_code(500)
         .await
         .clear_response_headers()
+        .await
+        .set_response_header(SERVER, HYPERLANE)
         .await
         .set_response_header(CONTENT_TYPE, content_type)
         .await
