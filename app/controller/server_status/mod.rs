@@ -3,7 +3,6 @@ mod r#fn;
 pub use r#fn::*;
 
 use super::*;
-
 use model::business::server_status::*;
 use service::{
     network_capture::{
