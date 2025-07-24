@@ -1,7 +1,6 @@
 use super::*;
 
 pub async fn start_network_capture() {
-    use std::time::Duration;
     init_network_capture_globals();
     set_capture_status(CaptureStatus::Running);
     let _handle: std::thread::JoinHandle<()> = std::thread::spawn(|| {

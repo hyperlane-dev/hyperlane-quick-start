@@ -100,6 +100,10 @@ async fn configure_routes(server: &Server) {
         .await;
 }
 
+async fn init_network_capture() {
+    start_network_capture().await;
+}
+
 fn runtime() -> Runtime {
     Builder::new_multi_thread()
         .worker_threads(num_cpus::get_physical() << 1)
@@ -117,10 +121,7 @@ async fn create_server() {
     configure_request_middleware(&server).await;
     configure_routes(&server).await;
     configure_response_middleware(&server).await;
-
-    // 初始化网络抓包功能
-    controller::server_status::init_network_capture().await;
-
+    init_network_capture().await;
     println_success!("Server initialization successful");
     let server_result: ServerResult<()> = server.run().await;
     match server_result {

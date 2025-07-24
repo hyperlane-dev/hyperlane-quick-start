@@ -79,7 +79,3 @@ pub async fn network_capture_data(ctx: Context) {
 pub async fn network_capture_stream(ctx: Context) {
     get_network_capture_stream(ctx).await;
 }
-
-pub async fn init_network_capture() {
-    start_network_capture().await;
-}
