@@ -12,7 +12,7 @@ pub struct NetworkPacket {
     pub direction: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]
 pub struct NetworkStats {
     pub total_packets: u64,
     pub total_bytes: u64,

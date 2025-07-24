@@ -7,7 +7,8 @@ pub(crate) fn get_global_websocket() -> &'static WebSocket {
 pub async fn pre_ws_upgrade(ctx: Context) {
     let addr: String = ctx.get_socket_addr_or_default_string().await;
     let encode_addr: String = Encode::execute(CHARSETS, &addr).unwrap_or_default();
-    ctx.set_response_header("X-Client-Addr", encode_addr).await;
+    ctx.set_response_header(HEADER_X_CLIENT_ADDR, encode_addr)
+        .await;
 }
 
 async fn create_online_count_message(ctx: &Context, receiver_count: String) -> String {
@@ -53,32 +54,10 @@ pub(crate) async fn on_closed(ctx: Context) {
 }
 
 fn remove_mentions(text: &str) -> String {
-    let mut result: String = String::new();
-    let mut chars: Peekable<Chars<'_>> = text.chars().peekable();
-
-    while let Some(ch) = chars.next() {
-        if ch == '@' {
-            // Skip the @ and the following username
-            while let Some(&next_ch) = chars.peek() {
-                if next_ch.is_whitespace() {
-                    break;
-                }
-                chars.next();
-            }
-            // Skip any trailing whitespace after the mention
-            while let Some(&next_ch) = chars.peek() {
-                if !next_ch.is_whitespace() {
-                    break;
-                }
-                chars.next();
-            }
-        } else {
-            result.push(ch);
-        }
-    }
-
-    // Clean up multiple consecutive spaces and trim
-    result.split_whitespace().collect::<Vec<&str>>().join(" ")
+    text.split_whitespace()
+        .filter(|word| !word.starts_with(MENTION_PREFIX))
+        .collect::<Vec<&str>>()
+        .join(SPACE)
 }
 
 async fn handle_ping_request(ctx: &Context, req_data: &WebSocketReqData) -> bool {
@@ -93,28 +72,29 @@ async fn handle_ping_request(ctx: &Context, req_data: &WebSocketReqData) -> bool
 }
 
 fn is_gpt_mentioned(message: &str) -> bool {
-    message.contains("@GPT") || message.contains("@GPT Assistant") || message.contains("@gpt")
+    message.contains(GPT_MENTION_UPPER)
+        || message.contains(GPT_MENTION_FULL)
+        || message.contains(GPT_MENTION_LOWER)
 }
 
 async fn process_gpt_request(session_id: String, message: String, ctx: Context) {
-    let mut session = get_or_create_session(&session_id);
-    let cleaned_msg = remove_mentions(&message);
-    session.add_message("user".to_string(), cleaned_msg);
-
-    let api_response = match call_gpt_api_with_context(&session).await {
+    let mut session: ChatSession = get_or_create_session(&session_id);
+    let cleaned_msg: String = remove_mentions(&message);
+    session.add_message(ROLE_USER.to_string(), cleaned_msg);
+    let api_response: String = match call_gpt_api_with_context(&session).await {
         Ok(gpt_response) => {
-            session.add_message("assistant".to_string(), gpt_response.clone());
+            session.add_message(ROLE_ASSISTANT.to_string(), gpt_response.clone());
             update_session(session);
-            format!("@{} {}", session_id, gpt_response)
+            format!("{}{}{}", MENTION_PREFIX, session_id, gpt_response)
         }
-        Err(error) => format!("API call failed: {error}"),
+        Err(error) => format!("API call failed: {}", error),
     };
-
-    let gpt_resp_data = WebSocketRespData::new(MessageType::GptResponse, &ctx, &api_response).await;
-    let gpt_resp_json = serde_json::to_string(&gpt_resp_data).unwrap();
-    let websocket = get_global_websocket();
-    let path = ctx.get_request_path().await;
-    let key = BroadcastType::PointToGroup(path);
+    let gpt_resp_data: WebSocketRespData =
+        WebSocketRespData::new(MessageType::GptResponse, &ctx, &api_response).await;
+    let gpt_resp_json: String = serde_json::to_string(&gpt_resp_data).unwrap();
+    let websocket: &WebSocket = get_global_websocket();
+    let path: String = ctx.get_request_path().await;
+    let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
     let _ = websocket.send(key, gpt_resp_json.clone());
     ctx.set_response_body(gpt_resp_json).await;
     send_callback(ctx).await;
@@ -150,106 +130,90 @@ fn build_gpt_request_messages(session: &ChatSession) -> Vec<JsonValue> {
         .iter()
         .map(|msg| {
             json_value!({
-                "role": msg.role,
-                "content": msg.content
+                JSON_FIELD_ROLE: msg.role,
+                JSON_FIELD_CONTENT: msg.content
             })
         })
         .collect()
 }
 
-fn build_gpt_request_headers(api_key: &str) -> HashMapXxHash3_64<&str, String> {
-    let mut headers: HashMapXxHash3_64<&str, String> = hash_map_xx_hash3_64();
-    headers.insert(HOST, "api.cloudflare.com".to_string());
+fn build_gpt_request_headers(api_key: &str) -> HashMapXxHash3_64<&'static str, String> {
+    let mut headers: HashMapXxHash3_64<&'static str, String> = hash_map_xx_hash3_64();
+    headers.insert(HOST, GPT_API_HOST.to_string());
     headers.insert(AUTHORIZATION, format!("Bearer {}", api_key));
     headers.insert(CONTENT_TYPE, APPLICATION_JSON.to_string());
     headers
 }
 
 fn extract_response_content(response_json: &JsonValue) -> Option<String> {
-    if let Some(result) = response_json.get("result") {
-        if let Some(response_content) = result.get("response") {
-            if let Some(response_str) = response_content.as_str() {
-                if !response_str.is_empty() {
-                    return Some(response_str.to_string());
-                }
-            }
-        }
-    }
-
-    if let Some(choices) = response_json.get("choices") {
-        if let Some(first_choice) = choices.get(0) {
-            if let Some(message) = first_choice.get("message") {
-                if let Some(content) = message.get("content") {
-                    if let Some(content_str) = content.as_str() {
-                        return Some(content_str.to_string());
-                    }
-                }
-            }
-        }
-    }
-
-    None
+    response_json
+        .get(JSON_FIELD_RESULT)
+        .and_then(|result| result.get(JSON_FIELD_RESPONSE))
+        .and_then(|response| response.as_str())
+        .filter(|s| !s.is_empty())
+        .map(String::from)
+        .or_else(|| {
+            response_json
+                .get(JSON_FIELD_CHOICES)
+                .and_then(|choices| choices.get(0))
+                .and_then(|choice| choice.get(JSON_FIELD_MESSAGE))
+                .and_then(|message| message.get(JSON_FIELD_CONTENT))
+                .and_then(|content| content.as_str())
+                .map(String::from)
+        })
 }
 
 fn extract_error_message(response_json: &JsonValue) -> Option<String> {
-    if let Some(errors) = response_json.get("errors") {
-        if let Some(first_error) = errors.get(0) {
-            if let Some(error_message) = first_error.get("message") {
-                return Some(format!(
-                    "API error: {}",
-                    error_message.as_str().unwrap_or("Unknown error")
-                ));
-            }
-        }
+    response_json
+        .get(JSON_FIELD_ERRORS)
+        .and_then(|errors| errors.get(0))
+        .and_then(|error| error.get(JSON_FIELD_MESSAGE))
+        .and_then(|message| message.as_str())
+        .map(|msg| format!("API error: {}", msg))
+        .or_else(|| Some(format!("API error: {}", "Unknown error")))
+}
+
+fn handle_gpt_api_response(response_text: &str) -> Result<String, String> {
+    if response_text.trim().is_empty() {
+        return Err(
+            "API response is empty, possible authentication failure or network issue".to_string(),
+        );
     }
-    None
+    let response_json: JsonValue = serde_json::from_str(response_text).map_err(|e| {
+        format!(
+            "JSON parsing failed: {} (response content: {})",
+            e, response_text
+        )
+    })?;
+    if let Some(content) = extract_response_content(&response_json) {
+        return Ok(content);
+    }
+    if let Some(error) = extract_error_message(&response_json) {
+        return Err(error);
+    }
+    Err(format!("Incorrect API response format: {}", response_text))
 }
 
 async fn call_gpt_api_with_context(session: &ChatSession) -> Result<String, String> {
     let config: &EnvConfig = get_global_env_config();
     let gpt_api_url: &String = &config.gpt_api_url;
     let api_key: &String = &config.gpt_api_key;
-
     let messages: Vec<JsonValue> = build_gpt_request_messages(session);
     let body: JsonValue = json_value!({
-        "max_tokens": 32000,
-        "messages": messages
+        JSON_FIELD_MAX_TOKENS: GPT_API_MAX_TOKENS,
+        JSON_FIELD_MESSAGES: messages
     });
-
-    let headers: HashMapXxHash3_64<&str, String> = build_gpt_request_headers(api_key);
+    let headers: HashMapXxHash3_64<&'static str, String> = build_gpt_request_headers(api_key);
     let mut request_builder = RequestBuilder::new()
         .post(gpt_api_url)
         .json(body)
         .headers(headers)
         .redirect()
         .build_async();
-
     match request_builder.send().await {
         Ok(response) => {
             let response_text: String = response.text().get_body();
-            if response_text.trim().is_empty() {
-                return Err(
-                    "API response is empty, possible authentication failure or network issue"
-                        .to_string(),
-                );
-            }
-
-            let response_json: JsonValue = serde_json::from_str(&response_text).map_err(|e| {
-                format!(
-                    "JSON parsing failed: {} (response content: {})",
-                    e, response_text
-                )
-            })?;
-
-            if let Some(content) = extract_response_content(&response_json) {
-                return Ok(content);
-            }
-
-            if let Some(error) = extract_error_message(&response_json) {
-                return Err(error);
-            }
-
-            Err(format!("Incorrect API response format: {}", response_text))
+            handle_gpt_api_response(&response_text)
         }
         Err(e) => Err(format!("Request sending failed: {}", e)),
     }
