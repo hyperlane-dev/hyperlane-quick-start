@@ -39,11 +39,7 @@ async fn read_and_reverse_log_file(full_path: &Path) -> Result<String, String> {
             if content_str.trim().is_empty() {
                 String::new()
             } else {
-                content_str
-                    .lines()
-                    .rev()
-                    .collect::<Vec<&str>>()
-                    .join(LOG_LINE_SEPARATOR)
+                content_str.lines().rev().collect::<Vec<&str>>().join(BR)
             }
         })
         .map_err(|_| {
@@ -83,6 +79,6 @@ pub async fn read_log_file(level: &str) -> String {
     if all_logs.is_empty() {
         format!("No {} logs found in {}", level, log_dir.display())
     } else {
-        all_logs.join(LOG_GROUP_SEPARATOR)
+        all_logs.join(BR)
     }
 }
