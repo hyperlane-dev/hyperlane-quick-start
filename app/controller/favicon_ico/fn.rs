@@ -5,7 +5,7 @@ use super::*;
     get,
     path = "/favicon.ico",   
     responses(
-        (status = 200, description = "图标", body = String)
+        (status = 200, description = "Icon", body = String)
     )
 )]
 #[response_status_code(200)]

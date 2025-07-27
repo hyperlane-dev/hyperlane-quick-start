@@ -5,7 +5,7 @@ use super::*;
     get,
     path = "/api/server/status",   
     responses(
-        (status = 200, description = "服务器实时状态SSE流", body = String)
+        (status = 200, description = "Server real-time status SSE stream", body = String)
     )
 )]
 #[response_status_code(200)]
@@ -30,7 +30,7 @@ pub async fn status_sse(ctx: Context) {
     get,
     path = "/api/server/info",   
     responses(
-        (status = 200, description = "服务器系统信息", body = String)
+        (status = 200, description = "Server system information", body = String)
     )
 )]
 #[response_status_code(200)]
@@ -47,7 +47,7 @@ pub async fn system_info(ctx: Context) {
     post,
     path = "/monitor",   
     responses(
-        (status = 200, description = "服务器监控大屏界面", body = String)
+        (status = 200, description = "Server monitoring dashboard interface", body = String)
     )
 )]
 #[response_status_code(200)]

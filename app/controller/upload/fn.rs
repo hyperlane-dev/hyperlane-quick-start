@@ -6,8 +6,8 @@ use super::*;
     post,
     path = "/static/{upload_dir}/{upload_file}",
     responses(
-        (status = 200, description = "静态资源", body = String),
-        (status = 206, description = "部分内容", body = String)
+        (status = 200, description = "Static resources", body = String),
+        (status = 206, description = "Partial content", body = String)
     )
 )]
 #[route_param(UPLOAD_DIR_KEY => dir_opt)]
@@ -70,7 +70,7 @@ pub async fn static_file(ctx: Context) {
     post,
     path = "/upload/index.html",   
     responses(
-        (status = 200, description = "文件分块上传前端界面", body = String)
+        (status = 200, description = "File chunk upload frontend interface", body = String)
     )
 )]
 #[response_status_code(200)]
@@ -83,7 +83,7 @@ pub async fn html(ctx: Context) {}
     post,
     path = "/api/upload/register",   
     responses(
-        (status = 200, description = "文件分块上传-注册接口", body = UploadResponse)
+        (status = 200, description = "File chunk upload - register API", body = UploadResponse)
     )
 )]
 pub async fn register(ctx: Context) {
@@ -101,7 +101,7 @@ pub async fn register(ctx: Context) {
     post,
     path = "/api/upload/save",   
     responses(
-        (status = 200, description = "文件分块上传-保存接口", body = UploadResponse)
+        (status = 200, description = "File chunk upload - save API", body = UploadResponse)
     )
 )]
 pub async fn save(ctx: Context) {
@@ -128,7 +128,7 @@ pub async fn save(ctx: Context) {
     post,
     path = "/api/upload/merge",   
     responses(
-        (status = 200, description = "文件分块上传-合并接口", body = UploadResponse)
+        (status = 200, description = "File chunk upload - merge API", body = UploadResponse)
     )
 )]
 pub async fn merge(ctx: Context) {

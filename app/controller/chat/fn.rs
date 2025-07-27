@@ -6,7 +6,7 @@ use super::*;
     post,
     path = "/chat/index.html",   
     responses(
-        (status = 200, description = "群聊前端界面", body = String)
+        (status = 200, description = "Chat frontend interface", body = String)
     )
 )]
 #[route_param(WS_DIR_KEY => ws_path_opt)]
@@ -46,7 +46,7 @@ pub async fn html(ctx: Context) {
     get,
     path = "/api/chat",   
     responses(
-        (status = 200, description = "群聊接口", body = WebSocketRespData)
+        (status = 200, description = "Chat API", body = WebSocketRespData)
     )
 )]
 pub async fn handle(ctx: Context) {
