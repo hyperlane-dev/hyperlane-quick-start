@@ -17,9 +17,9 @@ pub async fn error_hook(ctx: Context) {
         .await
         .clear_response_headers()
         .await
-        .set_response_header(SERVER, HYPERLANE)
+        .replace_response_header(SERVER, HYPERLANE)
         .await
-        .set_response_header(CONTENT_TYPE, content_type)
+        .replace_response_header(CONTENT_TYPE, content_type)
         .await
         .set_response_body(response_body)
         .await
