@@ -9,12 +9,12 @@
 [![](https://img.shields.io/crates/v/hyperlane.svg)](https://crates.io/crates/hyperlane)
 [![](https://img.shields.io/crates/d/hyperlane.svg)](https://img.shields.io/crates/d/hyperlane.svg)
 [![](https://docs.rs/hyperlane/badge.svg)](https://docs.rs/hyperlane)
-[![](https://github.com/eastspire/hyperlane/workflows/Rust/badge.svg)](https://github.com/eastspire/hyperlane/actions?query=workflow:Rust)
+[![](https://github.com/hyperlane-dev/hyperlane/workflows/Rust/badge.svg)](https://github.com/hyperlane-dev/hyperlane/actions?query=workflow:Rust)
 [![](https://img.shields.io/crates/l/hyperlane.svg)](./license)
 
 </center>
 
-> hyperlane 是一个轻量级且高性能的 Rust HTTP 服务器库，旨在简化网络服务开发。它支持 HTTP 请求解析、响应构建和 TCP 通信，非常适合构建现代 Web 服务。此外，它还支持请求和响应中间件、WebSocket 和 Server-Sent Events (SSE)，从而实现灵活高效的实时通信。Hyperlane 使用纯 Rust 和标准库构建，提供跨 Windows、Linux 和 macOS 的真正跨平台兼容性，且所有平台上的 API 体验一致，依托 Tokio 的异步运行时实现无缝网络通信，无需特定于平台的依赖。
+> 一款轻量级的 rust http 服务器，支持中间件、websocket、sse 和 tcp，基于 tokio 构建，实现出色的跨平台异步网络通信，hyperlane 简化了现代 web 服务的开发。
 
 ## API 文档
 
