@@ -907,9 +907,9 @@ checksum = "887157a2e25d623755ac1dcc670e2e2d20e46dcbc2b2389a048dcb0dab74dacd"
 
 [[package]]
 name = "http-request"
-version = "8.91.2"
+version = "8.91.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1abfd0b2333054fcbfebb3aa5d24f57d2ca05a48b0cd62185d74680314bcf993"
+checksum = "6213b88adea0e3a947b9f24bff40a56f95a11376fbff4f9d2b928f2e8cc279c1"
 dependencies = [
  "futures",
  "http-type",
@@ -924,9 +924,9 @@ dependencies = [
 
 [[package]]
 name = "http-type"
-version = "4.55.2"
+version = "4.55.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "986a7315b8ea73b17750e6306b6fb29eaacdb0061812715074ffbded248181a3"
+checksum = "f44b5ba384056338f7b2081157a76d742d7d6d174f159bd30e49d16bbde19013"
 dependencies = [
  "hex",
  "http-compress",
@@ -954,9 +954,9 @@ checksum = "df3b46402a9d5adb4c86a0cf463f42e19994e3ee891101b1841f30a545cb49a9"
 
 [[package]]
 name = "hyperlane"
-version = "5.66.5"
+version = "5.66.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0df02aad9b3cbe69e46762b4fce9bd0b16c4dc2ebac5ada89674d612e6c5ff21"
+checksum = "6c42551ed162931fd810c2b9573bef5e84b4d340490ff90cdb10e234534f374d"
 dependencies = [
  "http-type",
  "lombok-macros",
@@ -1021,9 +1021,9 @@ checksum = "2398b90ccee6c47d163bbf1a1af956f631233caa13bbd9ae3f25d6afbcdc36a5"
 
 [[package]]
 name = "hyperlane-utils"
-version = "2.1.7"
+version = "2.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c75f6a26de239775ea4812a7e5bad9c9c6d5a21c9427c9ae73ed070bc014d5d4"
+checksum = "5d13874cf59e1e89046ac663d70536747eceb340dabd7768467bdfa0188b713c"
 dependencies = [
  "ahash",
  "bin-encode-decode",
@@ -1844,9 +1844,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.141"
+version = "1.0.142"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "30b9eff21ebe718216c6ec64e1d9ac57087aad11efc64e32002bce4a0d4c03d3"
+checksum = "030fedb782600dcbd6f02d479bf0d817ac3bb40d644745b769d6a96bc3afc5a7"
 dependencies = [
  "itoa",
  "memchr",
@@ -1868,9 +1868,9 @@ dependencies = [
 
 [[package]]
 name = "server-manager"
-version = "3.5.0"
+version = "3.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "58c3284cc179cf02bd9763adf53503501578e26b84071c6a70bdb2823b7ddd8d"
+checksum = "8802b4ee467fe251ba0aca09b9f6ee3dbc40c695f6c272071895b5c01716e1f8"
 dependencies = [
  "tokio",
 ]
