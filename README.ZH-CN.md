@@ -2,7 +2,7 @@
 
 ## hyperlane-quick-start
 
-[English](readme.md) | [简体中文](readme.zh-cn.md)
+[English](README.md) | [简体中文](README.ZH-CN.md)
 
 <img src="./static/img/logo.png" alt="" height="160">
 
@@ -14,7 +14,7 @@
 
 </center>
 
-> 一款轻量级的 rust http 服务器，支持中间件、websocket、sse 和 tcp，基于 tokio 构建，实现出色的跨平台异步网络通信，hyperlane 简化了现代 web 服务的开发。
+> 一个轻量级的 Rust HTTP 服务器，支持中间件、WebSocket、SSE 和 TCP。它基于 Tokio 构建，用于跨平台的异步网络编程，hyperlane 简化了现代 Web 服务的开发。
 
 ## API 文档
 
