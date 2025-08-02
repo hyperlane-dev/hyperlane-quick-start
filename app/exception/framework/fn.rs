@@ -1,6 +1,6 @@
 use super::*;
 
-pub async fn error_hook(ctx: Context) {
+pub async fn panic_hook(ctx: Context) {
     let request_string: String = ctx.get_request_string().await;
     let error: Panic = ctx.get_panic().await.unwrap_or_default();
     let mut response_body: String = error.to_string();
