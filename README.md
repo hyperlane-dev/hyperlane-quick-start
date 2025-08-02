@@ -2,7 +2,7 @@
 
 ## hyperlane-quick-start
 
-[English](readme.md) | [简体中文](readme.zh-cn.md)
+[English](README.md) | [简体中文](README.ZH-CN.md)
 
 <img src="./static/img/logo.png" alt="" height="160">
 
