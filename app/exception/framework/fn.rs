@@ -13,6 +13,8 @@ pub async fn error_hook(ctx: Context) {
     println_error!("{}", response_body);
     log_error(response_body.clone()).await;
     let _ = ctx
+        .set_response_version(HttpVersion::HTTP1_1)
+        .await
         .set_response_status_code(500)
         .await
         .clear_response_headers()
