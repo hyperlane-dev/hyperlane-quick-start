@@ -1,6 +1,6 @@
 use super::*;
 
-pub async fn error_hook(ctx: Context) {
+pub async fn panic_hook(ctx: Context) {
     let request_string: String = ctx.get_request_string().await;
     let error: Panic = ctx.get_panic().await.unwrap_or_default();
     let mut response_body: String = error.to_string();
@@ -13,6 +13,8 @@ pub async fn error_hook(ctx: Context) {
     println_error!("{}", response_body);
     log_error(response_body.clone()).await;
     let _ = ctx
+        .set_response_version(HttpVersion::HTTP1_1)
+        .await
         .set_response_status_code(500)
         .await
         .clear_response_headers()
