@@ -4,7 +4,7 @@
 
 [English](README.md) | [简体中文](README.ZH-CN.md)
 
-<img src="./static/img/logo.png" alt="" height="160">
+<img src="./resources/static/img/logo.jpg" alt="" height="160">
 
 [![](https://img.shields.io/crates/v/hyperlane.svg)](https://crates.io/crates/hyperlane)
 [![](https://img.shields.io/crates/d/hyperlane.svg)](https://img.shields.io/crates/d/hyperlane.svg)
