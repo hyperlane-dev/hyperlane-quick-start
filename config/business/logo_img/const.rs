@@ -1,2 +1,1 @@
-pub const LOGO_IMG: &'static [u8; 124822] =
-    include_bytes!("../../../resources/static/img/logo.png");
+pub const LOGO_IMG_URL: &str = "https://docs.ltpp.vip/img/hyperlane.png";
