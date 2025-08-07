@@ -14,6 +14,8 @@ use hyperlane_plugin;
 
 use std::*;
 
+use hyperlane_plugin::log::*;
+
 use http_request::*;
 use hyperlane::*;
 use hyperlane_utils::*;
