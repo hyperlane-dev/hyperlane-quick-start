@@ -64,11 +64,13 @@ async fn create_server() {
     configure_routes(&server).await;
     configure_response_middleware(&server).await;
     println_success!("Server initialization successful");
-    let server_result: ServerResult<()> = server.run().await;
+    let server_result: ServerResult<ServerRunHook> = server.run().await;
     match server_result {
-        Ok(_) => {
+        Ok(server_run_hook) => {
             let host_port: String = format!("{SERVER_HOST}:{SERVER_PORT}");
-            println_success!("Server listen in: ", host_port)
+            println_success!("Server listen in: ", host_port);
+            let get_wait_hook: &ArcPinBoxFutureSend = server_run_hook.get_wait_hook();
+            get_wait_hook().await;
         }
         Err(server_error) => println_error!("Server run error: ", server_error),
     }
