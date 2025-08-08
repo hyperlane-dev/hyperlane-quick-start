@@ -4,7 +4,7 @@
       <div class="nav-left">
         <img src="../../public/logo.png" alt="" class="nav-logo" />
         <h1 class="nav-title">
-          <a href="https://github.com/eastspire/hyperlane" target="_blank">
+          <a href="https://github.com/hyperlane-dev/hyperlane" target="_blank">
             Hyperlane Chat
           </a>
         </h1>
