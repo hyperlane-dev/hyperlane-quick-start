@@ -1,18 +1,15 @@
 use super::*;
 
-pub async fn create<F, Fut, H, Hut>(server_hook: F, hook: H)
+pub async fn create<F, Fut>(server_hook: F)
 where
     F: Fn() -> Fut + Send + Sync + 'static,
     Fut: Future<Output = ()> + Send + 'static,
-    H: Fn() -> Hut + Send + Sync + 'static,
-    Hut: Future<Output = ()> + Send + 'static,
 {
     let args: Vec<String> = args().collect();
     let mut manager: ServerManager = ServerManager::new();
     manager
         .set_pid_file(PID_FILE_PATH)
-        .set_server_hook(server_hook)
-        .set_stop_hook(hook);
+        .set_server_hook(server_hook);
     let is_daemon: bool = args.len() >= 3 && args[2].to_lowercase() == "-d";
     let start_server = || async {
         if is_daemon {
