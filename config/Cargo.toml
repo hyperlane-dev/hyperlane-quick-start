@@ -8,3 +8,4 @@ path = "lib.rs"
 
 [dependencies]
 hyperlane = { workspace = true }
+hyperlane-utils = { workspace = true }
