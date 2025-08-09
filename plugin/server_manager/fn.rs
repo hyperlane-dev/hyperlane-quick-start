@@ -1,35 +1,41 @@
 use super::*;
 
-pub async fn create_server_manage<F, Fut>(server_func: F)
+pub async fn create<F, Fut, H, Hut>(server_hook: F, hook: H)
 where
-    F: Fn() -> Fut,
-    Fut: Future<Output = ()>,
+    F: Fn() -> Fut + Send + Sync + 'static,
+    Fut: Future<Output = ()> + Send + 'static,
+    H: Fn() -> Hut + Send + Sync + 'static,
+    Hut: Future<Output = ()> + Send + 'static,
 {
     let args: Vec<String> = args().collect();
-    let config: ServerManagerConfig = ServerManagerConfig {
-        pid_file: PID_FILE_PATH.to_owned(),
-    };
-    let manager: ServerManager<F> = ServerManager::new(config, server_func);
+    let mut manager: ServerManager = ServerManager::new();
+    manager
+        .set_pid_file(PID_FILE_PATH)
+        .set_server_hook(server_hook)
+        .set_stop_hook(hook);
     let is_daemon: bool = args.len() >= 3 && args[2].to_lowercase() == "-d";
     let start_server = || async {
         if is_daemon {
-            match manager.start_daemon() {
+            match manager.start_daemon().await {
                 Ok(_) => println_success!("Server started in background successfully"),
                 Err(e) => println_error!(format!("Error starting server in background: {e}")),
-            }
+            };
         } else {
             println_success!("Server started successfully");
             manager.start().await;
         }
     };
     let stop_server = || async {
-        match manager.stop() {
+        match manager.stop().await {
             Ok(_) => println_success!("Server stopped successfully"),
             Err(e) => println_error!(format!("Error stopping server: {e}")),
-        }
+        };
     };
     let hot_restart_server = || async {
-        match manager.hot_restart(&["--clear", "--skip-local-deps", "-q", "-x", "run"]) {
+        match manager
+            .watch_detached(&["--clear", "--skip-local-deps", "-q", "-x", "run"])
+            .await
+        {
             Ok(_) => println_success!("Server started successfully"),
             Err(e) => println_error!(format!("Error starting server in background: {e}")),
         }

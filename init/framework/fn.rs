@@ -128,6 +128,8 @@ async fn create_server() {
         Ok(server_hook) => {
             let host_port: String = format!("{SERVER_HOST}:{SERVER_PORT}");
             println_success!("Server listen in: ", host_port);
+            let shutdown: ArcPinBoxFutureSend = server_hook.get_shutdown_hook().clone();
+            set_shutdown(shutdown);
             server_hook.wait().await;
         }
         Err(server_error) => println_error!("Server run error: ", server_error),
@@ -139,7 +141,8 @@ pub fn run() {
         println_error!(e);
     }
     println_success!("Environment configuration loaded successfully");
-    runtime().block_on(hyperlane_plugin::server_manager::create_server_manage(
-        create_server,
-    ));
+    runtime().block_on(server_manager::create(create_server, || async {
+        shutdown()().await;
+        println_warning!("Server stopped successfully");
+    }));
 }

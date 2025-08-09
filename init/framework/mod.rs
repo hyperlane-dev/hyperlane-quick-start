@@ -11,5 +11,6 @@ use hyperlane_config::{
     business::{chat::*, hello::*, upload::*},
     framework::*,
 };
+use hyperlane_plugin::server_manager;
 
 use tokio::runtime::{Builder, Runtime};
