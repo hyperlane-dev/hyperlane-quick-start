@@ -204,13 +204,11 @@ async fn call_gpt_api_with_context(session: &ChatSession) -> Result<String, Stri
         JSON_FIELD_MESSAGES: messages
     });
     let headers: HashMapXxHash3_64<&'static str, String> = build_gpt_request_headers(api_key);
-    let mut request_builder = RequestBuilder::new()
+    let mut request_builder: BoxAsyncRequestTrait = RequestBuilder::new()
         .post(gpt_api_url)
         .json(body)
         .headers(headers)
         .redirect()
-        .http_proxy("172.17.0.1", 7890)
-        .https_proxy("172.17.0.1", 7890)
         .build_async();
     match request_builder.send().await {
         Ok(response) => {
