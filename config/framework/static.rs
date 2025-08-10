@@ -1,3 +1,3 @@
 use super::*;
 
-pub(super) static SHUTDOWN: OnceLock<ArcPinBoxFutureSend> = OnceLock::new();
+pub(super) static SHUTDOWN: OnceLock<ArcFnPinBoxFutureSend<()>> = OnceLock::new();
