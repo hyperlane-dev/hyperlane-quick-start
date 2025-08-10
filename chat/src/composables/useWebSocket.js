@@ -13,9 +13,7 @@ export function useWebSocket({ onMessage }) {
   const connect = () => {
     connectionStatus.value = 'connecting';
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const host = process.env.VUE_APP_WS_HOST || window.location.hostname;
-    const port = process.env.VUE_APP_WS_PORT;
-    const hostWithPort = port ? `${host}:${port}` : host;
+    const hostWithPort = window.location.host;
 
     socket.value = new WebSocket(
       `${protocol}://${hostWithPort}/api/chat?uuid=${uuid}`
