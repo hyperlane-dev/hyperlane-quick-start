@@ -9,11 +9,11 @@ use super::*;
         (status = 200, description = "Chat frontend interface", body = String)
     )
 )]
-#[route_param(WS_DIR_KEY => ws_path_opt)]
+#[route_param(WS_DIR_KEY => request_path_opt)]
 #[response_header(LOCATION => INDEX_HTML_URL_PATH)]
 pub async fn html(ctx: Context) {
-    let ws_path: String = ws_path_opt.unwrap_or_default();
-    if ws_path.len() <= 5 {
+    let request_path: String = request_path_opt.unwrap_or_default();
+    if request_path.len() <= 5 {
         ctx.set_response_status_code(301)
             .await
             .set_response_header(LOCATION, INDEX_HTML_URL_PATH)
@@ -22,7 +22,7 @@ pub async fn html(ctx: Context) {
             .await;
         return;
     }
-    let file_path: String = format!("./chat/{ws_path}");
+    let file_path: String = format!("./chat/{request_path}");
     let extension_name: String = FileExtension::get_extension_name(&file_path);
     let content_type: &str = FileExtension::parse(&extension_name).get_content_type();
     let res: Option<Vec<u8>> = async_read_from_file(&file_path).await.ok();

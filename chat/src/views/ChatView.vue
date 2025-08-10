@@ -2,7 +2,11 @@
   <div class="chat-view">
     <div class="nav-bar">
       <div class="nav-left">
-        <img src="../../public/logo.png" alt="" class="nav-logo" />
+        <img
+          src="https://docs.ltpp.vip/img/hyperlane.png"
+          alt=""
+          class="nav-logo"
+        />
         <h1 class="nav-title">
           <a href="https://github.com/hyperlane-dev/hyperlane" target="_blank">
             Hyperlane Chat
