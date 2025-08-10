@@ -53,6 +53,7 @@ import ConnectionStatus from '../components/chat/ConnectionStatus.vue';
 import ScrollToBottomButton from '../components/chat/ScrollToBottomButton.vue';
 import { useWebSocket } from '../composables/useWebSocket';
 import { toast } from '../utils/toast.js';
+import { v4 as uuidv4 } from 'uuid';
 
 const MessageType = {
   OnlineCount: 'OnlineCount',
@@ -115,7 +116,7 @@ export default {
   },
   methods: {
     generateUsername() {
-      const uuid = crypto.randomUUID();
+      const uuid = uuidv4();
       return `User${uuid}`;
     },
 
