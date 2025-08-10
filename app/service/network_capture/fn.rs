@@ -183,6 +183,7 @@ async fn capture_linux_network() -> Option<NetworkStats> {
     Some(stats)
 }
 
+#[cfg(target_os = "windows")]
 fn parse_connection_line(parts: &[&str]) -> Option<((String, u16), (String, u16))> {
     if parts.len() < 3 {
         return None;
@@ -192,6 +193,7 @@ fn parse_connection_line(parts: &[&str]) -> Option<((String, u16), (String, u16)
     Some((local, remote))
 }
 
+#[cfg(target_os = "windows")]
 fn parse_address(addr: &str) -> Option<(String, u16)> {
     let colon_pos: usize = addr.rfind(':')?;
     let ip: String = addr[..colon_pos].to_string();
