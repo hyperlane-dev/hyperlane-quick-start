@@ -24,7 +24,7 @@ pub async fn json(ctx: Context) {
 #[methods(get, post)]
 #[utoipa::path(
     get,
-    path = "/openapi/index.html",
+    path = "/openapi",
     responses(
         (status = 200, description = "OpenAPI documentation", body = String)
     )

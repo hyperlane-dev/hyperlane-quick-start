@@ -50,7 +50,7 @@ async fn configure_routes(server: &Server) {
         .route(format!("/openapi/openapi.json"), controller::openapi::json)
         .await;
     server
-        .route(format!("/openapi/index.html"), controller::openapi::html)
+        .route(format!("/openapi"), controller::openapi::html)
         .await;
     server
         .route(
