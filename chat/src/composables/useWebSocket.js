@@ -13,11 +13,13 @@ export function useWebSocket({ onMessage }) {
   const connect = () => {
     connectionStatus.value = 'connecting';
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const hostWithPort = window.location.host;
+    const host =
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1'
+        ? 'localhost:60006'
+        : window.location.host;
 
-    socket.value = new WebSocket(
-      `${protocol}://${hostWithPort}/api/chat?uuid=${uuid}`
-    );
+    socket.value = new WebSocket(`${protocol}://${host}/api/chat?uuid=${uuid}`);
     socket.value.onopen = () => {
       connectionStatus.value = 'connected';
       clearInterval(sendId);

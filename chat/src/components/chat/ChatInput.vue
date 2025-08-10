@@ -129,7 +129,7 @@ export default {
           window.location.hostname === 'localhost' ||
           window.location.hostname === '127.0.0.1'
             ? 'localhost:60006'
-            : window.location.hostname;
+            : window.location.host;
 
         const response = await fetch(`${protocol}//${host}/api/users/online`);
         if (response.ok) {
