@@ -209,6 +209,7 @@ async fn call_gpt_api_with_context(session: &ChatSession) -> Result<String, Stri
         .json(body)
         .headers(headers)
         .redirect()
+        .http1_1_only()
         .build_async();
     match request_builder.send().await {
         Ok(response) => {
