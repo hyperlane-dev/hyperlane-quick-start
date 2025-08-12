@@ -8,4 +8,7 @@ pub use r#fn::*;
 use super::*;
 use r#static::*;
 
-use std::sync::{Arc, OnceLock};
+use std::{
+    sync::{Arc, OnceLock},
+    time::Duration,
+};

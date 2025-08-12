@@ -780,9 +780,9 @@ checksum = "df3b46402a9d5adb4c86a0cf463f42e19994e3ee891101b1841f30a545cb49a9"
 
 [[package]]
 name = "hyperlane"
-version = "6.6.0"
+version = "7.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8b7977949b728631efd15f05ac20930c3d4881cab8ec1ad7d723a99431a21443"
+checksum = "9f6c402e51ff5fee4987d3f604e5f43c89001e200d1c124b1a5714450995aa23"
 dependencies = [
  "http-type",
  "lombok-macros",
@@ -814,9 +814,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-macros"
-version = "1.10.26"
+version = "1.10.30"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "66a880ba31b9fa424a20391ac2c4d150909eac0f88337a55e12dd52553cabed3"
+checksum = "d40917bd58956696ee16957e6e35542e0ac912b422286530b87099e51c453b62"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -825,9 +825,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-plugin-websocket"
-version = "2.2.23"
+version = "2.2.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f801817550f6d83002406005812161d65445b721155a715009fca0756950ad2f"
+checksum = "63935babdf9d52f6ea3e96c3f4b560f1c39224a634b78cc110dc87450ac8bfbd"
 dependencies = [
  "hyperlane",
  "hyperlane-broadcast",
@@ -835,7 +835,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "2.4.0"
+version = "3.0.0"
 dependencies = [
  "hyperlane_init",
 ]
@@ -848,9 +848,9 @@ checksum = "ed590017e6b8cd1c4f25cf6b5beda4efd3c5a76842c8782dca4fe650552a6c21"
 
 [[package]]
 name = "hyperlane-utils"
-version = "4.0.2"
+version = "4.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "04afb7b4ec016b5bc363d3785b9a26cbf9c440f6cad3e6311252233d171c3665"
+checksum = "02ecbd58fab89f1771abd76b37263b61f8e32795bc9c20e69538be9bdb113ac8"
 dependencies = [
  "ahash",
  "bin-encode-decode",
@@ -1298,9 +1298,9 @@ dependencies = [
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.95"
+version = "1.0.97"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "02b3e5e68a3a1a02aad3ec490a98007cbc13c37cbe84a3cd7b8e406d76e7f778"
+checksum = "d61789d7719defeb74ea5fe81f2fdfdbd28a803847077cecce2ff14e1472f6f1"
 dependencies = [
  "unicode-ident",
 ]
