@@ -1,15 +1,26 @@
 use super::*;
 
-async fn configure_server_basic(server: &Server) {
-    server.host(SERVER_HOST).await;
-    server.port(SERVER_PORT).await;
-    server.set_ttl(SERVER_TTI).await;
-    server.set_linger(SERVER_LINGER).await;
-    server.set_nodelay(SERVER_NODELAY).await;
+async fn configure_config(server: &Server) {
+    let config: ServerConfig = ServerConfig::new();
+    config.host(SERVER_HOST).await;
+    config.port(SERVER_PORT).await;
+    config.ttl(SERVER_TTI).await;
+    config.linger(SERVER_LINGER).await;
+    config.nodelay(SERVER_NODELAY).await;
+    config.http_buffer(SERVER_HTTP_BUFFER).await;
+    config.ws_buffer(SERVER_WS_BUFFER).await;
+    server.config(config).await;
+}
+
+async fn configure_panic_hook(server: &Server) {
     server.panic_hook(exception::framework::panic_hook).await;
-    server.http_buffer(SERVER_HTTP_BUFFER).await;
-    server.ws_buffer(SERVER_WS_BUFFER).await;
+}
+
+async fn configure_connected_hook(server: &Server) {
     server.connected_hook(service::chat::connected_hook).await;
+}
+
+async fn configure_disable_ws_hook(server: &Server) {
     server.disable_ws_hook("/api/chat").await;
 }
 
@@ -117,7 +128,10 @@ fn runtime() -> Runtime {
 
 #[hyperlane(server)]
 async fn create_server() {
-    configure_server_basic(&server).await;
+    configure_config(&server).await;
+    configure_panic_hook(&server).await;
+    configure_connected_hook(&server).await;
+    configure_disable_ws_hook(&server).await;
     configure_request_middleware(&server).await;
     configure_routes(&server).await;
     configure_response_middleware(&server).await;
