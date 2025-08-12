@@ -16,7 +16,7 @@ export function useWebSocket({ onMessage }) {
     const host =
       window.location.hostname === 'localhost' ||
       window.location.hostname === '127.0.0.1'
-        ? 'localhost:65001'
+        ? 'localhost:65002'
         : window.location.host;
 
     socket.value = new WebSocket(`${protocol}://${host}/api/chat?uuid=${uuid}`);

@@ -1,6 +1,6 @@
 use super::*;
 
-pub const SERVER_PORT: usize = 65001;
+pub const SERVER_PORT: usize = 65002;
 pub const SERVER_HOST: &str = "0.0.0.0";
 pub const SERVER_WS_BUFFER: usize = 4096;
 pub const SERVER_HTTP_BUFFER: usize = 4096;
