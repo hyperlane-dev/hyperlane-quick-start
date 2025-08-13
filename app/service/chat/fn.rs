@@ -196,16 +196,18 @@ fn handle_gpt_api_response(response_text: &str) -> Result<String, String> {
 
 async fn call_gpt_api_with_context(session: &ChatSession) -> Result<String, String> {
     let config: &EnvConfig = get_global_env_config();
-    let gpt_api_url: &String = &config.gpt_api_url;
-    let api_key: &String = &config.gpt_api_key;
+    let api_key: &str = &config.gpt_api_key;
+    let gtp_max_tokens: usize = config.gtp_max_tokens;
+    let gtp_model: &str = &config.gtp_model;
     let messages: Vec<JsonValue> = build_gpt_request_messages(session);
     let body: JsonValue = json_value!({
-        JSON_FIELD_MAX_TOKENS: GPT_API_MAX_TOKENS,
+        JSON_FIELD_MAX_TOKENS: gtp_max_tokens,
         JSON_FIELD_MESSAGES: messages
     });
+    let gpt_api_url: String = format!("{}/{}", &config.gpt_api_url, gtp_model);
     let headers: HashMapXxHash3_64<&'static str, String> = build_gpt_request_headers(api_key);
     let mut request_builder: BoxAsyncRequestTrait = RequestBuilder::new()
-        .post(gpt_api_url)
+        .post(&gpt_api_url)
         .json(body)
         .headers(headers)
         .redirect()

@@ -89,9 +89,20 @@ impl EnvConfig {
             .get("GPT_API_KEY")
             .ok_or("GPT_API_KEY not found in /shell/env")?
             .clone();
+        let gtp_model: String = config_map
+            .get("GPT_MODEL")
+            .ok_or("GPT_API_KEY not found in /shell/env")?
+            .clone();
+        let gtp_max_tokens: usize = config_map
+            .get("GPT_MAX_TOKENS")
+            .ok_or("GPT_API_KEY not found in /shell/env")?
+            .parse::<usize>()
+            .unwrap();
         Ok(EnvConfig {
             gpt_api_url,
             gpt_api_key,
+            gtp_model,
+            gtp_max_tokens,
         })
     }
 }

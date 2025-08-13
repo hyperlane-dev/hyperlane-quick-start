@@ -22,4 +22,3 @@ pub const JSON_FIELD_ERRORS: &str = "errors";
 pub const JSON_FIELD_MAX_TOKENS: &str = "max_tokens";
 
 pub const GPT_API_HOST: &str = "api.cloudflare.com";
-pub const GPT_API_MAX_TOKENS: u32 = 32000;
