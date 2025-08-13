@@ -197,7 +197,7 @@ fn handle_gpt_api_response(response_text: &str) -> Result<String, String> {
 async fn call_gpt_api_with_context(session: &ChatSession) -> Result<String, String> {
     let config: &EnvConfig = get_global_env_config();
     let api_key: &str = &config.gpt_api_key;
-    let gtp_max_tokens: usize = config.gtp_max_tokens;
+    let gtp_max_tokens: isize = config.gtp_max_tokens;
     let gtp_model: &str = &config.gtp_model;
     let messages: Vec<JsonValue> = build_gpt_request_messages(session);
     let body: JsonValue = json_value!({
