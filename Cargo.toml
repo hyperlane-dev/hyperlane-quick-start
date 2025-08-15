@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane-quick-start"
-version = "3.0.0"
+version = "3.1.0"
 readme = "README.md"
 edition = "2024"
 authors = ["root@ltpp.vip"]
@@ -32,8 +32,8 @@ hyperlane_config = { path = "config", version = "0.1.0" }
 hyperlane_init = { path = "init", version = "0.1.0" }
 hyperlane_plugin = { path = "plugin", version = "0.1.0" }
 
-hyperlane = "7.0.1"
-hyperlane-utils = "4.0.4"
+hyperlane = "7.1.0"
+hyperlane-utils = "4.0.5"
 
 [dependencies]
 hyperlane_init = { workspace = true }

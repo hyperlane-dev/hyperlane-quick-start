@@ -13,9 +13,9 @@ pub async fn panic_hook(ctx: Context) {
         .await
         .clear_response_headers()
         .await
-        .replace_response_header(SERVER, HYPERLANE)
+        .set_response_header(SERVER, HYPERLANE)
         .await
-        .replace_response_header(CONTENT_TYPE, content_type)
+        .set_response_header(CONTENT_TYPE, content_type)
         .await
         .set_response_body(response_body)
         .await
