@@ -1,6 +1,6 @@
 use super::*;
 
-#[server_config(config)]
+#[hyperlane(ServerConfig => config)]
 async fn configure_config(server: &Server) {
     config.host(SERVER_HOST).await;
     config.port(SERVER_PORT).await;
@@ -62,7 +62,7 @@ fn runtime() -> Runtime {
         .unwrap()
 }
 
-#[server(server)]
+#[hyperlane(Server => server)]
 async fn create_server() {
     configure_config(&server).await;
     configure_panic_hook(&server).await;
