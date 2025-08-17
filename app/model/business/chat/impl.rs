@@ -64,7 +64,7 @@ impl EnvConfig {
         let env_content: Vec<u8> = match read_from_file(WS_ENV_FILE_PATH) {
             Ok(content) => content,
             Err(_) => {
-                let example_content: &str = "GPT_API_URL=\nGPT_API_KEY=";
+                let example_content: &str = "GPT_API_URL=";
                 let _ = write_to_file(WS_ENV_FILE_PATH, example_content.as_bytes())
                     .map_err(|e| format!("Failed to create example env file: {}", e))?;
                 return Self::load();
@@ -85,24 +85,13 @@ impl EnvConfig {
             .get("GPT_API_URL")
             .ok_or("GPT_API_URL not found in /shell/env")?
             .clone();
-        let gpt_api_key: String = config_map
-            .get("GPT_API_KEY")
-            .ok_or("GPT_API_KEY not found in /shell/env")?
-            .clone();
         let gtp_model: String = config_map
             .get("GPT_MODEL")
-            .ok_or("GPT_API_KEY not found in /shell/env")?
+            .ok_or("GPT_MODEL not found in /shell/env")?
             .clone();
-        let gtp_max_tokens: isize = config_map
-            .get("GPT_MAX_TOKENS")
-            .ok_or("GPT_API_KEY not found in /shell/env")?
-            .parse::<isize>()
-            .unwrap();
         Ok(EnvConfig {
             gpt_api_url,
-            gpt_api_key,
             gtp_model,
-            gtp_max_tokens,
         })
     }
 }

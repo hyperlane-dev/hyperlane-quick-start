@@ -3,9 +3,7 @@ use super::*;
 #[derive(Debug, Clone, Default)]
 pub struct EnvConfig {
     pub gpt_api_url: String,
-    pub gpt_api_key: String,
     pub gtp_model: String,
-    pub gtp_max_tokens: isize,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

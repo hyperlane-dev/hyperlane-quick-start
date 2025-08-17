@@ -85,7 +85,7 @@ async fn process_gpt_request(session_id: String, message: String, ctx: Context) 
         Ok(gpt_response) => {
             session.add_message(ROLE_ASSISTANT.to_string(), gpt_response.clone());
             update_session(session);
-            format!("{}{}{}", MENTION_PREFIX, session_id, gpt_response)
+            format!("{}{}{}{}", MENTION_PREFIX, session_id, SPACE, gpt_response)
         }
         Err(error) => format!("API call failed: {}", error),
     };
@@ -137,10 +137,8 @@ fn build_gpt_request_messages(session: &ChatSession) -> Vec<JsonValue> {
         .collect()
 }
 
-fn build_gpt_request_headers(api_key: &str) -> HashMapXxHash3_64<&'static str, String> {
+fn build_gpt_request_headers() -> HashMapXxHash3_64<&'static str, String> {
     let mut headers: HashMapXxHash3_64<&'static str, String> = hash_map_xx_hash3_64();
-    headers.insert(HOST, GPT_API_HOST.to_string());
-    headers.insert(AUTHORIZATION, format!("Bearer {}", api_key));
     headers.insert(CONTENT_TYPE, APPLICATION_JSON.to_string());
     headers
 }
@@ -196,18 +194,15 @@ fn handle_gpt_api_response(response_text: &str) -> Result<String, String> {
 
 async fn call_gpt_api_with_context(session: &ChatSession) -> Result<String, String> {
     let config: &EnvConfig = get_global_env_config();
-    let api_key: &str = &config.gpt_api_key;
-    let gtp_max_tokens: isize = config.gtp_max_tokens;
     let gtp_model: &str = &config.gtp_model;
     let messages: Vec<JsonValue> = build_gpt_request_messages(session);
     let body: JsonValue = json_value!({
-        JSON_FIELD_MAX_TOKENS: gtp_max_tokens,
+        GPT_MODEL: gtp_model,
         JSON_FIELD_MESSAGES: messages
     });
-    let gpt_api_url: String = format!("{}/{}", &config.gpt_api_url, gtp_model);
-    let headers: HashMapXxHash3_64<&'static str, String> = build_gpt_request_headers(api_key);
+    let headers: HashMapXxHash3_64<&'static str, String> = build_gpt_request_headers();
     let mut request_builder: BoxAsyncRequestTrait = RequestBuilder::new()
-        .post(&gpt_api_url)
+        .post(&config.gpt_api_url)
         .json(body)
         .headers(headers)
         .redirect()

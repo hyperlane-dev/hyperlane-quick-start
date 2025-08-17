@@ -19,6 +19,4 @@ pub const JSON_FIELD_CHOICES: &str = "choices";
 pub const JSON_FIELD_MESSAGE: &str = "message";
 pub const JSON_FIELD_MESSAGES: &str = "messages";
 pub const JSON_FIELD_ERRORS: &str = "errors";
-pub const JSON_FIELD_MAX_TOKENS: &str = "max_tokens";
-
-pub const GPT_API_HOST: &str = "api.cloudflare.com";
+pub const GPT_MODEL: &str = "model";
