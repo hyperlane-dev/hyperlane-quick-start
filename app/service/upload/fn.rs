@@ -269,15 +269,12 @@ fn get_file_metadata_and_content_type(
 ) -> Result<(std::fs::Metadata, String), String> {
     let file_metadata: std::fs::Metadata =
         std::fs::metadata(path).map_err(|_| "File not found".to_string())?;
-
     if file_metadata.len() == 0 {
         return Err("File is empty".to_string());
     }
-
     let extension_name: String = FileExtension::get_extension_name(decode_file);
     let file_type: &str = FileExtension::parse(&extension_name).get_content_type();
     let content_type: String = ContentType::format_content_type_with_charset(file_type, UTF8);
-
     Ok((file_metadata, content_type))
 }
 
@@ -289,15 +286,12 @@ async fn handle_range_request(
 ) -> Result<(PartialContent, String), String> {
     let start: u64 = range.start;
     let end: u64 = range.end.unwrap_or(file_size - 1).min(file_size - 1);
-
     if start > end {
         return Err("Invalid range: start > end".to_string());
     }
-
     let content_length: u64 = end - start + 1;
     let data: Vec<u8> = read_file_range(path, start, content_length).await?;
     let content_range: String = format!("bytes {}-{}/{}", start, end, file_size);
-
     Ok((
         PartialContent {
             data,
@@ -315,13 +309,10 @@ async fn handle_full_file_request(
     content_type: String,
 ) -> Result<(PartialContent, String), String> {
     let data: Vec<u8> = async_read_from_file(path).await.unwrap_or_default();
-
     if data.is_empty() {
         return Err("File not found or empty".to_string());
     }
-
     let content_range: String = format!("bytes 0-{}/{}", file_size - 1, file_size);
-
     Ok((
         PartialContent {
             data,
@@ -342,7 +333,6 @@ pub async fn serve_static_file_with_range(
     let path: String = format!("{UPLOAD_DIR}/{decode_dir}/{decode_file}");
     let (file_metadata, content_type) = get_file_metadata_and_content_type(&path, &decode_file)?;
     let file_size: u64 = file_metadata.len();
-
     match range_request {
         Some(range) => handle_range_request(&path, range, file_size, content_type).await,
         None => handle_full_file_request(&path, file_size, content_type).await,
