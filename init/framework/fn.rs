@@ -109,9 +109,6 @@ async fn configure_routes(server: &Server) {
             controller::server_status::network_capture_stream,
         )
         .await;
-    server
-        .route("/api/tracking", controller::tracking::report_tracking_data)
-        .await;
 }
 
 async fn init_network_capture() {
