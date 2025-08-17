@@ -273,7 +273,10 @@ fn get_file_metadata_and_content_type(
         return Err("File is empty".to_string());
     }
     let extension_name: String = FileExtension::get_extension_name(decode_file);
-    let file_type: &str = FileExtension::parse(&extension_name).get_content_type();
+    let mut file_type: &str = FileExtension::parse(&extension_name).get_content_type();
+    if file_type.is_empty() {
+        file_type = FileExtension::FileExtensionText.get_content_type();
+    }
     let content_type: String = ContentType::format_content_type_with_charset(file_type, UTF8);
     Ok((file_metadata, content_type))
 }
