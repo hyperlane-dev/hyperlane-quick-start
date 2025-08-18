@@ -925,9 +925,7 @@ dependencies = [
 [[package]]
 name = "http-type"
 version = "4.58.1"
-version = "4.58.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "abed1c209d167f814d402413f3de1ea85b9d200ddf7724d5cf487531580beafb"
 checksum = "abed1c209d167f814d402413f3de1ea85b9d200ddf7724d5cf487531580beafb"
 dependencies = [
  "hex",
