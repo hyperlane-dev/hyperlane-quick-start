@@ -750,9 +750,9 @@ checksum = "c10a92fc539f5fc3b2c5c3de4255e4f62f2768c9cd5a0e7879edf3d3b3189186"
 
 [[package]]
 name = "http-type"
-version = "4.58.0"
+version = "4.58.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e6dbfb0b1023ffc8124ca98204254d6df8a4d0d88b5ba68f74c5b2d395ede3b2"
+checksum = "abed1c209d167f814d402413f3de1ea85b9d200ddf7724d5cf487531580beafb"
 dependencies = [
  "hex",
  "http-compress",
@@ -780,9 +780,9 @@ checksum = "df3b46402a9d5adb4c86a0cf463f42e19994e3ee891101b1841f30a545cb49a9"
 
 [[package]]
 name = "hyperlane"
-version = "7.6.0"
+version = "7.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a73bb4db70de1a4be3df0bfd3146102d1a96483f8e2ed3a8fa749e9e7846d294"
+checksum = "0f9d7945668a0db60ff3ed6b139d6a5d3e59bb171a3b065745066f74e01eaab7"
 dependencies = [
  "http-type",
  "lombok-macros",
@@ -814,9 +814,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-macros"
-version = "4.0.1"
+version = "4.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0a9a03780897dc292229c8081b329bf7578c0f9525be5cac2b61c592a4841249"
+checksum = "cc0533bde7acd85eab208956077089fd07041ac2c494fa4885423471d4289d11"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -825,9 +825,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-plugin-websocket"
-version = "2.2.31"
+version = "2.2.32"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cfa7f24062ab9954ecaa75ef2c2d16db324ae526a0553eabad11ad4b877ce928"
+checksum = "65615dee15a1771a02504f05c46dfd3ef40f9bf91c6c9d1935e9971372bae006"
 dependencies = [
  "hyperlane",
  "hyperlane-broadcast",
@@ -835,7 +835,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "3.6.0"
+version = "3.6.1"
 dependencies = [
  "hyperlane_init",
 ]
@@ -848,9 +848,9 @@ checksum = "ed590017e6b8cd1c4f25cf6b5beda4efd3c5a76842c8782dca4fe650552a6c21"
 
 [[package]]
 name = "hyperlane-utils"
-version = "7.0.1"
+version = "7.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6d819e6f949e58a9f89636727cde831e09d6c53131e2af537a18d0d73a4602e5"
+checksum = "c4f0a9600aff2e9180a2903e98624b207d4f5441ad1f4855b2686ceff5574bdd"
 dependencies = [
  "ahash",
  "bin-encode-decode",
