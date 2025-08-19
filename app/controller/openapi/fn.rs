@@ -1,8 +1,5 @@
 use super::*;
 
-/// Serve OpenAPI JSON specification
-///
-/// Returns the OpenAPI specification in JSON format
 #[methods(get, post)]
 #[utoipa::path(
     get,
@@ -18,9 +15,6 @@ pub async fn json(ctx: Context) {
     }
 }
 
-/// Serve OpenAPI documentation HTML page
-///
-/// Returns the RapiDoc HTML interface for the OpenAPI specification
 #[methods(get, post)]
 #[utoipa::path(
     get,

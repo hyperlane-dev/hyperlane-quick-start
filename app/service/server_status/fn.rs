@@ -343,7 +343,6 @@ async fn get_disk_info() -> (u64, u64, f64) {
     {
         use std::process::Command;
 
-        // 使用PowerShell获取C盘信息
         if let Ok(output) = Command::new("powershell")
             .args(&["-Command", "Get-PSDrive C | Select-Object Used, Free"])
             .output()
@@ -368,7 +367,6 @@ async fn get_disk_info() -> (u64, u64, f64) {
             }
         }
 
-        // 备用方法：使用fsutil
         if let Ok(output) = Command::new("fsutil")
             .args(&["volume", "diskfree", "C:"])
             .output()
@@ -432,7 +430,6 @@ async fn get_network_info() -> (u64, u64) {
         let mut rx_bytes: u64 = 0;
         let mut tx_bytes: u64 = 0;
 
-        // 使用PowerShell获取网络接口统计信息
         if let Ok(output) = Command::new("powershell")
             .args(&[
                 "-Command",
@@ -462,7 +459,6 @@ async fn get_network_info() -> (u64, u64) {
             }
         }
 
-        // 备用方法：使用WMI获取累计流量
         if rx_bytes == 0 && tx_bytes == 0 {
             if let Ok(output) = Command::new("powershell")
                 .args(&[
@@ -723,7 +719,6 @@ async fn get_cpu_cores() -> u32 {
     #[cfg(target_os = "windows")]
     {
         use std::process::Command;
-        // 使用更可靠的方法获取CPU核心数
         if let Ok(output) = Command::new("powershell")
             .args(&["-Command", "Get-WmiObject -Class Win32_Processor | Select-Object -ExpandProperty NumberOfCores"])
             .output()
@@ -734,7 +729,6 @@ async fn get_cpu_cores() -> u32 {
             }
         }
 
-        // 备用方法：使用环境变量
         use std::env;
         if let Ok(cores_str) = env::var("NUMBER_OF_PROCESSORS") {
             if let Ok(cores) = cores_str.parse::<u32>() {
@@ -760,7 +754,6 @@ async fn get_cpu_model() -> String {
     #[cfg(target_os = "windows")]
     {
         use std::process::Command;
-        // 使用PowerShell获取CPU型号
         if let Ok(output) = Command::new("powershell")
             .args(&[
                 "-Command",
@@ -775,7 +768,6 @@ async fn get_cpu_model() -> String {
             }
         }
 
-        // 备用方法：使用wmic
         if let Ok(output) = Command::new("wmic")
             .args(&["cpu", "get", "Name", "/format:list"])
             .output()

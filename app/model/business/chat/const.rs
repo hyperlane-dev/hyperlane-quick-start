@@ -1,5 +1,3 @@
-//! This module contains constants related to the chat business logic.
-
 pub const HEADER_X_CLIENT_ADDR: &str = "X-Client-Addr";
 
 pub const MENTION_PREFIX: char = '@';
