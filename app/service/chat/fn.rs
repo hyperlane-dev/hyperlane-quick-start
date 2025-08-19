@@ -1,9 +1,5 @@
 use super::*;
 
-pub(crate) fn get_global_websocket() -> &'static WebSocket {
-    GLOBAL_WEBSOCKET.get_or_init(|| WebSocket::new())
-}
-
 pub async fn pre_ws_upgrade(ctx: Context) {
     let addr: String = ctx.get_socket_addr_or_default_string().await;
     let encode_addr: String = Encode::execute(CHARSETS, &addr).unwrap_or_default();
@@ -138,7 +134,7 @@ fn build_gpt_request_messages(session: &ChatSession) -> Vec<JsonValue> {
 }
 
 fn build_gpt_request_headers() -> HashMapXxHash3_64<&'static str, String> {
-    let mut headers: HashMapXxHash3_64<&'static str, String> = hash_map_xx_hash3_64();
+    let mut headers: HashMapXxHash3_64<&str, String> = hash_map_xx_hash3_64();
     headers.insert(CONTENT_TYPE, APPLICATION_JSON.to_string());
     headers
 }
@@ -200,7 +196,7 @@ async fn call_gpt_api_with_context(session: &ChatSession) -> Result<String, Stri
         GPT_MODEL: gtp_model,
         JSON_FIELD_MESSAGES: messages
     });
-    let headers: HashMapXxHash3_64<&'static str, String> = build_gpt_request_headers();
+    let headers: HashMapXxHash3_64<&str, String> = build_gpt_request_headers();
     let mut request_builder: BoxAsyncRequestTrait = RequestBuilder::new()
         .post(&config.gpt_api_url)
         .json(body)

@@ -115,7 +115,7 @@ pub async fn save(ctx: Context) {
         Ok(save_upload_dir) => {
             ctx.set_response_header("X-File-Path", save_upload_dir)
                 .await;
-            set_common_success_response_body(&ctx, "").await;
+            set_common_success_response_body(&ctx, EMPTY_STR).await;
         }
         Err(error) => {
             set_common_error_response_body(&ctx, error).await;

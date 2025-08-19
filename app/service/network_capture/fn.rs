@@ -201,22 +201,18 @@ fn parse_address(addr: &str) -> Option<(String, u16)> {
     Some((ip, port))
 }
 
+#[response_header(CONTENT_TYPE => APPLICATION_JSON)]
 pub async fn get_network_capture_data(ctx: Context) {
     let response_data: NetworkStats = get_network_stats().unwrap_or_default();
     if let Ok(json) = serde_json::to_string(&response_data) {
         ctx.set_response_body(json).await;
-        ctx.set_response_header(CONTENT_TYPE, APPLICATION_JSON)
-            .await;
     }
 }
 
+#[response_header(CONTENT_TYPE => TEXT_EVENT_STREAM)]
+#[response_header(CACHE_CONTROL => NO_CACHE)]
+#[response_header(ACCESS_CONTROL_ALLOW_ORIGIN => WILDCARD_ANY)]
 pub async fn get_network_capture_stream(ctx: Context) {
-    ctx.set_response_header(CONTENT_TYPE, TEXT_EVENT_STREAM)
-        .await;
-    ctx.set_response_header(CACHE_CONTROL, NO_CACHE).await;
-    ctx.set_response_header(CONNECTION, KEEP_ALIVE).await;
-    ctx.set_response_header(ACCESS_CONTROL_ALLOW_ORIGIN, WILDCARD_ANY)
-        .await;
     let response_data: NetworkStats = get_network_stats().unwrap_or_default();
     if let Ok(json) = serde_json::to_string(&response_data) {
         let event: String = format!("{}{}{}", SSE_DATA_PREFIX, json, SSE_EVENT_SUFFIX);

@@ -7,5 +7,5 @@ use hyperlane_config::{
     business::{chat::*, root::*},
     framework::*,
 };
-use model::data_transfer::chat::*;
+use model::{data::chat::*, data_transfer::chat::*};
 use service::chat::*;

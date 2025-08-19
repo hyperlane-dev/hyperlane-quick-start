@@ -51,10 +51,8 @@ pub async fn system_info(ctx: Context) {
     )
 )]
 #[response_status_code(200)]
-pub async fn monitor_dashboard(ctx: Context) {
-    let html: &str = include_str!("../../../resources/static/html/monitor_parallax.html");
-    ctx.set_response_body(html).await;
-}
+#[response_body(MONITOR_DASHBOARD_HTML)]
+pub async fn monitor_dashboard(ctx: Context) {}
 
 #[get]
 #[utoipa::path(
