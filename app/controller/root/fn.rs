@@ -1,5 +1,6 @@
 use super::*;
 
+#[route("/")]
 #[methods(get, post)]
 #[utoipa::path(
     get,
