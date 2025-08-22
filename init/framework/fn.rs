@@ -41,13 +41,8 @@ async fn configure_response_middleware(server: &Server) {
 }
 
 async fn configure_routes(server: &Server) {
-    server.route("/", controller::root::handle).await;
     server
         .route(format!("/hello/{{{NAME_KEY}}}"), controller::hello::handle)
-        .await;
-    server.route("/websocket", controller::ws::handle).await;
-    server
-        .route("/favicon.ico", controller::favicon_ico::handle)
         .await;
 }
 

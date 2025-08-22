@@ -1,5 +1,6 @@
 use super::*;
 
+#[route("/")]
 #[methods(get, post)]
 #[response_status_code(200)]
 pub async fn handle(ctx: Context) {
