@@ -19,14 +19,11 @@ async fn configure_panic_hook(server: &Server) {
 async fn configure_request_middleware(server: &Server) {
     server
         .request_middleware(middleware::request::cross::cross)
-        .await;
-    server
+        .await
         .request_middleware(middleware::request::response::response_header)
-        .await;
-    server
+        .await
         .request_middleware(middleware::request::response::response_status_code)
-        .await;
-    server
+        .await
         .request_middleware(middleware::request::response::response_body)
         .await;
 }
@@ -34,8 +31,7 @@ async fn configure_request_middleware(server: &Server) {
 async fn configure_response_middleware(server: &Server) {
     server
         .response_middleware(middleware::response::send::send)
-        .await;
-    server
+        .await
         .response_middleware(middleware::response::log::log)
         .await;
 }
