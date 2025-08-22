@@ -1,6 +1,5 @@
 use super::*;
 
-#[get]
 #[utoipa::path(
     get,
     path = "/api/server/status",   
@@ -8,7 +7,9 @@ use super::*;
         (status = 200, description = "Server real-time status SSE stream", body = String)
     )
 )]
+#[get]
 #[response_status_code(200)]
+#[route("/api/server/status")]
 #[response_header(CONTENT_TYPE => TEXT_EVENT_STREAM)]
 pub async fn status_sse(ctx: Context) {
     let _ = ctx.send().await;
@@ -25,7 +26,6 @@ pub async fn status_sse(ctx: Context) {
     let _ = ctx.closed().await;
 }
 
-#[get]
 #[utoipa::path(
     get,
     path = "/api/server/info",   
@@ -33,6 +33,8 @@ pub async fn status_sse(ctx: Context) {
         (status = 200, description = "Server system information", body = String)
     )
 )]
+#[get]
+#[route("/api/server/info")]
 #[response_status_code(200)]
 #[response_header(CONTENT_TYPE => APPLICATION_JSON)]
 pub async fn system_info(ctx: Context) {
@@ -41,7 +43,6 @@ pub async fn system_info(ctx: Context) {
     ctx.set_response_body(info_json).await;
 }
 
-#[methods(get, post)]
 #[utoipa::path(
     get,
     post,
@@ -50,11 +51,12 @@ pub async fn system_info(ctx: Context) {
         (status = 200, description = "Server monitoring dashboard interface", body = String)
     )
 )]
+#[route("/monitor")]
+#[methods(get, post)]
 #[response_status_code(200)]
 #[response_body(MONITOR_DASHBOARD_HTML)]
 pub async fn monitor_dashboard(ctx: Context) {}
 
-#[get]
 #[utoipa::path(
     get,
     path = "/api/network/capture",
@@ -62,11 +64,12 @@ pub async fn monitor_dashboard(ctx: Context) {}
         (status = 200, description = "Network capture data", body = String)
     )
 )]
+#[get]
+#[route("/api/network/capture")]
 pub async fn network_capture_data(ctx: Context) {
     get_network_capture_data(ctx).await;
 }
 
-#[get]
 #[utoipa::path(
     get,
     path = "/api/network/capture/stream",
@@ -74,6 +77,8 @@ pub async fn network_capture_data(ctx: Context) {
         (status = 200, description = "Network capture stream", body = String)
     )
 )]
+#[get]
+#[route("/api/network/capture/stream")]
 pub async fn network_capture_stream(ctx: Context) {
     get_network_capture_stream(ctx).await;
 }

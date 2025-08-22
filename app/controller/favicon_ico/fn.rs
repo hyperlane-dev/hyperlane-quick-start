@@ -1,14 +1,5 @@
 use super::*;
 
-#[get]
-#[utoipa::path(
-    get,
-    path = "/favicon.ico",   
-    responses(
-        (status = 200, description = "Icon", body = String)
-    )
-)]
-#[get]
 #[utoipa::path(
     get,
     path = "/favicon.ico",   

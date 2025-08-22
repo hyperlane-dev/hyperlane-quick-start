@@ -42,6 +42,7 @@ pub async fn html(ctx: Context) {
 
 #[ws]
 #[get]
+#[route("/api/chat")]
 #[utoipa::path(
     get,
     path = "/api/chat",   

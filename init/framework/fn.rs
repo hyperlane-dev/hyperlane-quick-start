@@ -27,14 +27,11 @@ async fn configure_disable_ws_hook(server: &Server) {
 async fn configure_request_middleware(server: &Server) {
     server
         .request_middleware(middleware::request::cross::cross)
-        .await;
-    server
+        .await
         .request_middleware(middleware::request::response::response_header)
-        .await;
-    server
+        .await
         .request_middleware(middleware::request::response::response_status_code)
-        .await;
-    server
+        .await
         .request_middleware(middleware::request::response::response_body)
         .await;
 }
@@ -42,72 +39,21 @@ async fn configure_request_middleware(server: &Server) {
 async fn configure_response_middleware(server: &Server) {
     server
         .response_middleware(middleware::response::send::send)
-        .await;
-    server
+        .await
         .response_middleware(middleware::response::log::log)
         .await;
 }
 
 async fn configure_routes(server: &Server) {
-    server.route("/", controller::root::handle).await;
-    server.route("/upload", controller::upload::html).await;
-    server
-        .route("/favicon.ico", controller::favicon_ico::handle)
-        .await;
     server
         .route(format!("/hello/{{{NAME_KEY}}}"), controller::hello::handle)
-        .await;
-    server
-        .route(format!("/openapi/openapi.json"), controller::openapi::json)
-        .await;
-    server
-        .route(format!("/openapi"), controller::openapi::html)
-        .await;
-    server
+        .await
         .route(
             format!("/static/{{{UPLOAD_DIR_KEY}}}/{{{UPLOAD_FILE_KEY}}}"),
             controller::upload::static_file,
         )
-        .await;
-    server
+        .await
         .route(format!("/{{{WS_DIR_KEY}:^chat.*}}"), controller::chat::html)
-        .await;
-    server.route("/api/chat", controller::chat::handle).await;
-    server
-        .route("/api/users/online", controller::users::online_users)
-        .await;
-    server
-        .route("/api/upload/save", controller::upload::save)
-        .await;
-    server
-        .route("/api/upload/register", controller::upload::register)
-        .await;
-    server
-        .route("/api/upload/merge", controller::upload::merge)
-        .await;
-    server.route("/log/info", controller::log::info).await;
-    server.route("/log/warn", controller::log::warn).await;
-    server.route("/log/error", controller::log::error).await;
-    server
-        .route("/api/server/status", controller::server_status::status_sse)
-        .await;
-    server
-        .route("/api/server/info", controller::server_status::system_info)
-        .await;
-    server
-        .route("/monitor", controller::server_status::monitor_dashboard)
-        .await;
-    server
-        .route(
-            "/api/network/capture",
-            controller::server_status::network_capture_data,
-        )
-        .await;
-    server
-        .route(
-            "/api/network/capture/stream",
-            controller::server_status::network_capture_stream,
-        )
         .await;
 }
 

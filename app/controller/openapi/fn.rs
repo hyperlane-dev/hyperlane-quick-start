@@ -1,6 +1,5 @@
 use super::*;
 
-#[methods(get, post)]
 #[utoipa::path(
     get,
     path = "/openapi/openapi.json",
@@ -8,7 +7,9 @@ use super::*;
         (status = 200, description = "OpenAPI data", body = String)
     )
 )]
+#[methods(get, post)]
 #[response_status_code(200)]
+#[route("/openapi/openapi.json")]
 pub async fn json(ctx: Context) {
     if let Ok(json_data) = ApiDoc::openapi().to_json() {
         let _ = ctx.set_response_body(json_data).await.send().await;
@@ -23,6 +24,7 @@ pub async fn json(ctx: Context) {
         (status = 200, description = "OpenAPI documentation", body = String)
     )
 )]
+#[route("/openapi")]
 #[response_status_code(200)]
 #[response_header(CONTENT_TYPE => TEXT_HTML)]
 pub async fn html(ctx: Context) {
