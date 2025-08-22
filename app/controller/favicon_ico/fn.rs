@@ -1,7 +1,7 @@
 use super::*;
 
 #[get]
+#[route("/favicon.ico")]
 #[response_status_code(301)]
 #[response_header(LOCATION => LOGO_IMG_URL)]
-#[route("/favicon.ico")]
 pub async fn handle(ctx: Context) {}
