@@ -1,6 +1,5 @@
 use super::*;
 
-#[methods(get, post)]
 #[utoipa::path(
     get,
     post,
@@ -9,6 +8,7 @@ use super::*;
         (status = 200, description = "Chat frontend interface", body = String)
     )
 )]
+#[methods(get, post)]
 #[route_param(WS_DIR_KEY => request_path_opt)]
 #[response_header(LOCATION => INDEX_HTML_URL_PATH)]
 pub async fn html(ctx: Context) {
@@ -43,6 +43,7 @@ pub async fn html(ctx: Context) {
 #[ws]
 #[get]
 #[route("/api/chat")]
+#[disable_ws_hook("/api/chat")]
 #[utoipa::path(
     get,
     path = "/api/chat",   

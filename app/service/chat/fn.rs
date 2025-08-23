@@ -20,6 +20,7 @@ fn broadcast_online_count(key: BroadcastType<String>, message: String) {
 }
 
 #[ws]
+#[connected_hook]
 pub async fn connected_hook(ctx: Context) {
     let websocket: &WebSocket = get_global_websocket();
     let path: String = ctx.get_request_path().await;

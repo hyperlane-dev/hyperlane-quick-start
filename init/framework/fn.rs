@@ -12,18 +12,6 @@ async fn configure_config(server: &Server) {
     server.config(config).await;
 }
 
-async fn configure_panic_hook(server: &Server) {
-    server.panic_hook(exception::framework::panic_hook).await;
-}
-
-async fn configure_connected_hook(server: &Server) {
-    server.connected_hook(service::chat::connected_hook).await;
-}
-
-async fn configure_disable_ws_hook(server: &Server) {
-    server.disable_ws_hook("/api/chat").await;
-}
-
 async fn configure_request_middleware(server: &Server) {
     server
         .request_middleware(middleware::request::cross::cross)
@@ -75,9 +63,6 @@ fn runtime() -> Runtime {
 #[hyperlane(server: Server)]
 async fn create_server() {
     configure_config(&server).await;
-    configure_panic_hook(&server).await;
-    configure_connected_hook(&server).await;
-    configure_disable_ws_hook(&server).await;
     configure_request_middleware(&server).await;
     configure_routes(&server).await;
     configure_response_middleware(&server).await;
