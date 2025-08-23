@@ -9,6 +9,7 @@ use super::*;
     )
 )]
 #[methods(get, post)]
+#[route("/{ws_dir:^chat.*}")]
 #[route_param(WS_DIR_KEY => request_path_opt)]
 #[response_header(LOCATION => INDEX_HTML_URL_PATH)]
 pub async fn html(ctx: Context) {

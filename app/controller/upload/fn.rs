@@ -10,6 +10,7 @@ use super::*;
         (status = 206, description = "Partial content", body = String)
     )
 )]
+#[route("/static/{upload_dir}/{upload_file}")]
 #[route_param(UPLOAD_DIR_KEY => dir_opt)]
 #[route_param(UPLOAD_FILE_KEY => file_opt)]
 #[request_header(RANGE => range_header_opt)]

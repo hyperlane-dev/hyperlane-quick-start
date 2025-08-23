@@ -954,9 +954,9 @@ checksum = "df3b46402a9d5adb4c86a0cf463f42e19994e3ee891101b1841f30a545cb49a9"
 
 [[package]]
 name = "hyperlane"
-version = "7.9.0"
+version = "7.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "caafaacd1082b6643923995a7a7f2a58cd3d1b7d1195bd56daa6c553d1320382"
+checksum = "f27442ff5f2d29a978d060adb8968e4fb448d515cffa8db9d0c637580014160d"
 dependencies = [
  "http-type",
  "inventory",
@@ -989,9 +989,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-macros"
-version = "4.2.0"
+version = "4.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "42df09e8779be2d87635147f78d285c23590f112e55538192a2190d24ade0b63"
+checksum = "dc1d455742614ae97f98367619863f7bc4acd9f65ade8497380b689d15d75767"
 dependencies = [
  "inventory",
  "proc-macro2",
@@ -1001,9 +1001,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-plugin-websocket"
-version = "2.2.34"
+version = "2.2.36"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4b3d43a55b2e272cc57e39cf1e98d965ffcd8b82227b51eea2d8d6183078269c"
+checksum = "d31326df1ebde965e8f2f088a5e7a61b9550b594fd98b5871809fd39c7a316d2"
 dependencies = [
  "hyperlane",
  "hyperlane-broadcast",
@@ -1011,7 +1011,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "3.8.0"
+version = "3.9.0"
 dependencies = [
  "hyperlane_init",
 ]
@@ -1024,9 +1024,9 @@ checksum = "ed590017e6b8cd1c4f25cf6b5beda4efd3c5a76842c8782dca4fe650552a6c21"
 
 [[package]]
 name = "hyperlane-utils"
-version = "7.3.0"
+version = "7.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7cce2cec685c40aa707d6981054b9281aa4a5f9d2d2fc7673994f6e36e557b28"
+checksum = "45bf66f91b7979c639bb814ef834a38570b5324f672d9d000b99f1882b956a87"
 dependencies = [
  "ahash",
  "bin-encode-decode",
@@ -2268,13 +2268,14 @@ checksum = "8ecb6da28b8a351d773b68d5825ac39017e680750f980f3a1a85cd8dd28a47c1"
 
 [[package]]
 name = "url"
-version = "2.5.6"
+version = "2.5.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "137a3c834eaf7139b73688502f3f1141a0337c5d8e4d9b536f9b8c796e26a7c4"
+checksum = "08bc136a29a3d1758e07a9cca267be308aeebf5cfd5a10f3f67ab2097683ef5b"
 dependencies = [
  "form_urlencoded",
  "idna",
  "percent-encoding",
+ "serde",
 ]
 
 [[package]]

@@ -12,39 +12,6 @@ async fn configure_config(server: &Server) {
     server.config(config).await;
 }
 
-async fn configure_request_middleware(server: &Server) {
-    server
-        .request_middleware(middleware::request::cross::cross)
-        .await
-        .request_middleware(middleware::request::response::response_header)
-        .await
-        .request_middleware(middleware::request::response::response_status_code)
-        .await
-        .request_middleware(middleware::request::response::response_body)
-        .await;
-}
-
-async fn configure_response_middleware(server: &Server) {
-    server
-        .response_middleware(middleware::response::send::send)
-        .await
-        .response_middleware(middleware::response::log::log)
-        .await;
-}
-
-async fn configure_routes(server: &Server) {
-    server
-        .route(format!("/hello/{{{NAME_KEY}}}"), controller::hello::handle)
-        .await
-        .route(
-            format!("/static/{{{UPLOAD_DIR_KEY}}}/{{{UPLOAD_FILE_KEY}}}"),
-            controller::upload::static_file,
-        )
-        .await
-        .route(format!("/{{{WS_DIR_KEY}:^chat.*}}"), controller::chat::html)
-        .await;
-}
-
 async fn init_network_capture() {
     start_network_capture().await;
 }
@@ -63,9 +30,6 @@ fn runtime() -> Runtime {
 #[hyperlane(server: Server)]
 async fn create_server() {
     configure_config(&server).await;
-    configure_request_middleware(&server).await;
-    configure_routes(&server).await;
-    configure_response_middleware(&server).await;
     init_network_capture().await;
     println_success!("Server initialization successful");
     let server_result: ServerResult<ServerHook> = server.run().await;
