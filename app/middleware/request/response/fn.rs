@@ -1,8 +1,6 @@
 use super::*;
 
-#[response_status_code(404)]
-pub async fn response_status_code(ctx: Context) {}
-
+#[request_middleware(2)]
 #[response_header(DATE => gmt())]
 #[response_header(SERVER => HYPERLANE)]
 #[response_header(CONNECTION => KEEP_ALIVE)]
@@ -17,5 +15,10 @@ pub async fn response_header(ctx: Context) {
         .await;
 }
 
+#[request_middleware(3)]
+#[response_status_code(404)]
+pub async fn response_status_code(ctx: Context) {}
+
+#[request_middleware(4)]
 #[response_body(NOT_FOUND_HTML)]
 pub async fn response_body(ctx: Context) {}

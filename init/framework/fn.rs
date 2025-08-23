@@ -12,32 +12,6 @@ async fn configure_config(server: &Server) {
     server.config(config).await;
 }
 
-async fn configure_request_middleware(server: &Server) {
-    server
-        .request_middleware(middleware::request::cross::cross)
-        .await
-        .request_middleware(middleware::request::response::response_header)
-        .await
-        .request_middleware(middleware::request::response::response_status_code)
-        .await
-        .request_middleware(middleware::request::response::response_body)
-        .await;
-}
-
-async fn configure_response_middleware(server: &Server) {
-    server
-        .response_middleware(middleware::response::send::send)
-        .await
-        .response_middleware(middleware::response::log::log)
-        .await;
-}
-
-async fn configure_routes(server: &Server) {
-    server
-        .route(format!("/hello/{{{NAME_KEY}}}"), controller::hello::handle)
-        .await;
-}
-
 fn runtime() -> Runtime {
     Builder::new_multi_thread()
         .worker_threads(num_cpus::get_physical() << 1)
@@ -52,9 +26,6 @@ fn runtime() -> Runtime {
 #[hyperlane(server: Server)]
 async fn create_server() {
     configure_config(&server).await;
-    configure_request_middleware(&server).await;
-    configure_routes(&server).await;
-    configure_response_middleware(&server).await;
     println_success!("Server initialization successful");
     let server_result: ServerResult<ServerHook> = server.run().await;
     match server_result {
