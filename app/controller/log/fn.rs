@@ -7,10 +7,12 @@ use super::*;
         (status = 200, description = "View info level logs", body = String)
     )
 )]
-#[get]
 #[route("/log/info")]
-#[response_status_code(200)]
-#[response_header(CONTENT_TYPE => ContentType::format_content_type_with_charset(TEXT_PLAIN, UTF8))]
+#[prologue_hooks[
+    get,
+    response_status_code(200),
+    response_header(CONTENT_TYPE => ContentType::format_content_type_with_charset(TEXT_PLAIN, UTF8))
+]]
 pub async fn info(ctx: Context) {
     let log_content: String = read_log_file("info").await;
     ctx.set_response_body(log_content).await;

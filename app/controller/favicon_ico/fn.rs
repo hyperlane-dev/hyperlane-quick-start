@@ -7,7 +7,6 @@ use super::*;
         (status = 200, description = "Icon", body = String)
     )
 )]
-#[get]
 #[route("/favicon.ico")]
 #[prologue_hooks[
   get,

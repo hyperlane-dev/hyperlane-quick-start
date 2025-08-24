@@ -1,6 +1,5 @@
 use super::*;
 
-#[post]
 #[utoipa::path(
     get,
     path = "/hello/{name}",   
