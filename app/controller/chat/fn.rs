@@ -9,11 +9,11 @@ use super::*;
         (status = 200, description = "Chat frontend interface", body = String)
     )
 )]
-#[prologue_hooks[
+#[prologue_hooks(
     methods(get, post),
     route_param(WS_DIR_KEY => request_path_opt),
     response_header(LOCATION => INDEX_HTML_URL_PATH)
-]]
+)]
 pub async fn html(ctx: Context) {
     let request_path: String = request_path_opt.unwrap_or_default();
     if request_path.len() <= 5 {
@@ -52,10 +52,7 @@ pub async fn html(ctx: Context) {
         (status = 200, description = "Chat API", body = WebSocketRespData)
     )
 )]
-#[prologue_hooks[
-    ws,
-    get
-]]
+#[prologue_hooks(ws, get)]
 pub async fn handle(ctx: Context) {
     let websocket: &WebSocket = get_global_websocket();
     let path: String = ctx.get_request_path().await;

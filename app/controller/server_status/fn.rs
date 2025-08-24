@@ -34,11 +34,11 @@ pub async fn status_sse(ctx: Context) {
         (status = 200, description = "Server system information", body = String)
     )
 )]
-#[prologue_hooks[
+#[prologue_hooks(
     get,
     response_status_code(200),
     response_header(CONTENT_TYPE => APPLICATION_JSON)
-]]
+)]
 pub async fn system_info(ctx: Context) {
     let system_info: SystemInfo = get_system_info().await;
     let info_json: String = serde_json::to_string(&system_info).unwrap_or_default();
@@ -54,11 +54,11 @@ pub async fn system_info(ctx: Context) {
         (status = 200, description = "Server monitoring dashboard interface", body = String)
     )
 )]
-#[prologue_hooks[
+#[prologue_hooks(
     methods(get, post),
     response_status_code(200),
     response_body(MONITOR_DASHBOARD_HTML)
-]]
+)]
 pub async fn monitor_dashboard(ctx: Context) {}
 
 #[route("/api/network/capture")]
@@ -84,12 +84,12 @@ pub async fn network_capture_data(ctx: Context) {
         (status = 200, description = "Network capture stream", body = String)
     )
 )]
-#[prologue_hooks[
+#[prologue_hooks(
     methods(get, post),
     response_header(CONTENT_TYPE => TEXT_EVENT_STREAM),
     response_header(CACHE_CONTROL => NO_CACHE),
     response_header(ACCESS_CONTROL_ALLOW_ORIGIN => WILDCARD_ANY)
-]]
+)]
 pub async fn network_capture_stream(ctx: Context) {
     get_network_capture_stream(ctx).await;
 }

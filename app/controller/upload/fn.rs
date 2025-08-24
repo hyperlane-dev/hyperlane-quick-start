@@ -10,12 +10,12 @@ use super::*;
         (status = 206, description = "Partial content", body = String)
     )
 )]
-#[prologue_hooks[
+#[prologue_hooks(
     methods(get, post),
     route_param(UPLOAD_DIR_KEY => dir_opt),
     route_param(UPLOAD_FILE_KEY => file_opt),
     request_header(RANGE => range_header_opt)
-]]
+)]
 pub async fn static_file(ctx: Context) {
     let dir: String = dir_opt.unwrap_or_default();
     let file: String = file_opt.unwrap_or_default();
@@ -76,12 +76,12 @@ pub async fn static_file(ctx: Context) {
         (status = 200, description = "File chunk upload frontend interface", body = String)
     )
 )]
-#[prologue_hooks[
+#[prologue_hooks(
     methods(get, post),
     response_status_code(200),
     response_body(UPLOAD_HTML),
     response_header(CONTENT_ENCODING => GZIP)
-]]
+)]
 pub async fn html(ctx: Context) {}
 
 #[route("/api/upload/register")]
@@ -111,11 +111,11 @@ pub async fn register(ctx: Context) {
         (status = 200, description = "File chunk upload - save API", body = UploadResponse)
     )
 )]
-#[prologue_hooks[
+#[prologue_hooks(
     post,
     request_header(CHUNKIFY_FILE_ID_HEADER => file_id_opt),
     request_header(CHUNKIFY_CHUNK_INDEX_HEADER => chunk_index_opt)
-]]
+)]
 pub async fn save(ctx: Context) {
     let file_chunk_data_opt: OptionFileChunkData =
         get_save_file_chunk_data(&ctx, file_id_opt, chunk_index_opt).await;
@@ -144,10 +144,10 @@ pub async fn save(ctx: Context) {
         (status = 200, description = "File chunk upload - merge API", body = UploadResponse)
     )
 )]
-#[prologue_hooks[
+#[prologue_hooks(
     post,
     request_header(CHUNKIFY_FILE_ID_HEADER => file_id_opt)
-]]
+)]
 pub async fn merge(ctx: Context) {
     let file_chunk_data_opt: OptionFileChunkData =
         get_merge_file_chunk_data(&ctx, file_id_opt).await;

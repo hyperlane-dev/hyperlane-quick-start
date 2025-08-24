@@ -9,7 +9,7 @@ use super::*;
         (status = 200, description = "Hello", body = String)
     )
 )]
-#[prologue_hooks[
+#[prologue_hooks(
   methods(get, post),
   response_status_code(200),
   route_param(NAME_KEY => name_opt),
