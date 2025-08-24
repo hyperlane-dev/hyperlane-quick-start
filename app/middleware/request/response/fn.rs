@@ -7,7 +7,7 @@ use super::*;
 #[response_header(CONTENT_TYPE => TEXT_HTML)]
 #[response_version(HttpVersion::HTTP1_1)]
 pub async fn response_header(ctx: Context) {
-    let socket_addr_string: String = ctx.get_socket_addr_or_default_string().await;
+    let socket_addr_string: String = ctx.get_socket_addr_string().await;
     let content_type: String = ContentType::format_content_type_with_charset(TEXT_HTML, UTF8);
     ctx.set_response_header(CONTENT_TYPE, content_type)
         .await
