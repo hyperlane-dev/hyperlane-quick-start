@@ -1,5 +1,6 @@
 use super::*;
 
+#[route("/api/server/status")]
 #[utoipa::path(
     get,
     path = "/api/server/status",   
@@ -9,7 +10,6 @@ use super::*;
 )]
 #[get]
 #[response_status_code(200)]
-#[route("/api/server/status")]
 #[response_header(CONTENT_TYPE => TEXT_EVENT_STREAM)]
 pub async fn status_sse(ctx: Context) {
     let _ = ctx.send().await;
@@ -26,6 +26,7 @@ pub async fn status_sse(ctx: Context) {
     let _ = ctx.closed().await;
 }
 
+#[route("/api/server/info")]
 #[utoipa::path(
     get,
     path = "/api/server/info",   
@@ -33,16 +34,18 @@ pub async fn status_sse(ctx: Context) {
         (status = 200, description = "Server system information", body = String)
     )
 )]
-#[get]
-#[route("/api/server/info")]
-#[response_status_code(200)]
-#[response_header(CONTENT_TYPE => APPLICATION_JSON)]
+#[prologue_hooks[
+    get,
+    response_status_code(200),
+    response_header(CONTENT_TYPE => APPLICATION_JSON)
+]]
 pub async fn system_info(ctx: Context) {
     let system_info: SystemInfo = get_system_info().await;
     let info_json: String = serde_json::to_string(&system_info).unwrap_or_default();
     ctx.set_response_body(info_json).await;
 }
 
+#[route("/monitor")]
 #[utoipa::path(
     get,
     post,
@@ -51,34 +54,42 @@ pub async fn system_info(ctx: Context) {
         (status = 200, description = "Server monitoring dashboard interface", body = String)
     )
 )]
-#[route("/monitor")]
-#[methods(get, post)]
-#[response_status_code(200)]
-#[response_body(MONITOR_DASHBOARD_HTML)]
+#[prologue_hooks[
+    methods(get, post),
+    response_status_code(200),
+    response_body(MONITOR_DASHBOARD_HTML)
+]]
 pub async fn monitor_dashboard(ctx: Context) {}
 
+#[route("/api/network/capture")]
 #[utoipa::path(
     get,
+    post,
     path = "/api/network/capture",
     responses(
         (status = 200, description = "Network capture data", body = String)
     )
 )]
-#[get]
-#[route("/api/network/capture")]
+#[methods(get, post)]
 pub async fn network_capture_data(ctx: Context) {
     get_network_capture_data(ctx).await;
 }
 
+#[route("/api/network/capture/stream")]
 #[utoipa::path(
     get,
+    post,
     path = "/api/network/capture/stream",
     responses(
         (status = 200, description = "Network capture stream", body = String)
     )
 )]
-#[get]
-#[route("/api/network/capture/stream")]
+#[prologue_hooks[
+    methods(get, post),
+    response_header(CONTENT_TYPE => TEXT_EVENT_STREAM),
+    response_header(CACHE_CONTROL => NO_CACHE),
+    response_header(ACCESS_CONTROL_ALLOW_ORIGIN => WILDCARD_ANY)
+]]
 pub async fn network_capture_stream(ctx: Context) {
     get_network_capture_stream(ctx).await;
 }

@@ -1,5 +1,6 @@
 use super::*;
 
+#[route("/")]
 #[utoipa::path(
     get,
     post,
@@ -8,7 +9,6 @@ use super::*;
         (status = 200, description = "Home page", body = String)
     )
 )]
-#[route("/")]
 #[prologue_hooks[
     methods(get, post),
     response_status_code(200)

@@ -1,6 +1,6 @@
 use super::*;
 
-#[methods(get, post)]
+#[route("/static/{upload_dir}/{upload_file}")]
 #[utoipa::path(
     get,
     post,
@@ -10,10 +10,12 @@ use super::*;
         (status = 206, description = "Partial content", body = String)
     )
 )]
-#[route("/static/{upload_dir}/{upload_file}")]
-#[route_param(UPLOAD_DIR_KEY => dir_opt)]
-#[route_param(UPLOAD_FILE_KEY => file_opt)]
-#[request_header(RANGE => range_header_opt)]
+#[prologue_hooks[
+    methods(get, post),
+    route_param(UPLOAD_DIR_KEY => dir_opt),
+    route_param(UPLOAD_FILE_KEY => file_opt),
+    request_header(RANGE => range_header_opt)
+]]
 pub async fn static_file(ctx: Context) {
     let dir: String = dir_opt.unwrap_or_default();
     let file: String = file_opt.unwrap_or_default();
@@ -65,7 +67,7 @@ pub async fn static_file(ctx: Context) {
     }
 }
 
-#[methods(get, post)]
+#[route("/upload")]
 #[utoipa::path(
     get,
     post,
@@ -74,12 +76,15 @@ pub async fn static_file(ctx: Context) {
         (status = 200, description = "File chunk upload frontend interface", body = String)
     )
 )]
-#[route("/upload")]
-#[response_status_code(200)]
-#[response_body(UPLOAD_HTML)]
-#[response_header(CONTENT_ENCODING => GZIP)]
+#[prologue_hooks[
+    methods(get, post),
+    response_status_code(200),
+    response_body(UPLOAD_HTML),
+    response_header(CONTENT_ENCODING => GZIP)
+]]
 pub async fn html(ctx: Context) {}
 
+#[route("/api/upload/register")]
 #[utoipa::path(
     post,
     path = "/api/upload/register",   
@@ -88,7 +93,6 @@ pub async fn html(ctx: Context) {}
     )
 )]
 #[post]
-#[route("/api/upload/register")]
 pub async fn register(ctx: Context) {
     let file_chunk_data_opt: OptionFileChunkData = get_register_file_chunk_data(&ctx).await;
     if file_chunk_data_opt.is_none() {
@@ -99,6 +103,7 @@ pub async fn register(ctx: Context) {
     set_common_success_response_body(&ctx, "").await;
 }
 
+#[route("/api/upload/save")]
 #[utoipa::path(
     post,
     path = "/api/upload/save",   
@@ -106,10 +111,14 @@ pub async fn register(ctx: Context) {
         (status = 200, description = "File chunk upload - save API", body = UploadResponse)
     )
 )]
-#[post]
-#[route("/api/upload/save")]
+#[prologue_hooks[
+    post,
+    request_header(CHUNKIFY_FILE_ID_HEADER => file_id_opt),
+    request_header(CHUNKIFY_CHUNK_INDEX_HEADER => chunk_index_opt)
+]]
 pub async fn save(ctx: Context) {
-    let file_chunk_data_opt: OptionFileChunkData = get_save_file_chunk_data(&ctx).await;
+    let file_chunk_data_opt: OptionFileChunkData =
+        get_save_file_chunk_data(&ctx, file_id_opt, chunk_index_opt).await;
     if file_chunk_data_opt.is_none() {
         return;
     }
@@ -127,6 +136,7 @@ pub async fn save(ctx: Context) {
     }
 }
 
+#[route("/api/upload/merge")]
 #[utoipa::path(
     post,
     path = "/api/upload/merge",   
@@ -134,10 +144,13 @@ pub async fn save(ctx: Context) {
         (status = 200, description = "File chunk upload - merge API", body = UploadResponse)
     )
 )]
-#[post]
-#[route("/api/upload/merge")]
+#[prologue_hooks[
+    post,
+    request_header(CHUNKIFY_FILE_ID_HEADER => file_id_opt)
+]]
 pub async fn merge(ctx: Context) {
-    let file_chunk_data_opt: OptionFileChunkData = get_merge_file_chunk_data(&ctx).await;
+    let file_chunk_data_opt: OptionFileChunkData =
+        get_merge_file_chunk_data(&ctx, file_id_opt).await;
     if file_chunk_data_opt.is_none() {
         return;
     }

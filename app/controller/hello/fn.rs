@@ -1,15 +1,16 @@
 use super::*;
 
+#[route("/hello/{name}")]
 #[utoipa::path(
     get,
+    post,
     path = "/hello/{name}",   
     responses(
         (status = 200, description = "Hello", body = String)
     )
 )]
-#[route("/hello/{name}")]
 #[prologue_hooks[
-  post,
+  methods(get, post),
   response_status_code(200),
   route_param(NAME_KEY => name_opt),
   response_body(format!("Hello {}", name_opt.unwrap_or_default())),

@@ -119,9 +119,12 @@ pub async fn get_register_file_chunk_data<'a>(ctx: &'a Context) -> OptionFileChu
     ))
 }
 
-#[request_header(CHUNKIFY_CHUNK_INDEX_HEADER => chunk_index_opt)]
-pub async fn get_save_file_chunk_data<'a>(ctx: &'a Context) -> OptionFileChunkData {
-    let mut data: FileChunkData = get_merge_file_chunk_data(ctx).await?;
+pub async fn get_save_file_chunk_data<'a>(
+    ctx: &'a Context,
+    file_id_opt: Option<String>,
+    chunk_index_opt: Option<String>,
+) -> OptionFileChunkData {
+    let mut data: FileChunkData = get_merge_file_chunk_data(ctx, file_id_opt).await?;
     let chunk_index: usize = match chunk_index_opt {
         Some(idx) => match idx.parse::<usize>() {
             Ok(i) => i,
@@ -154,8 +157,10 @@ pub async fn remove_file_id_map(file_id: &str) {
     write_file_id_map().await.remove(file_id);
 }
 
-#[request_header(CHUNKIFY_FILE_ID_HEADER => file_id_opt)]
-pub async fn get_merge_file_chunk_data<'a>(ctx: &Context) -> OptionFileChunkData {
+pub async fn get_merge_file_chunk_data<'a>(
+    ctx: &Context,
+    file_id_opt: Option<String>,
+) -> OptionFileChunkData {
     let file_id: String = match file_id_opt {
         Some(id) => id,
         None => {
