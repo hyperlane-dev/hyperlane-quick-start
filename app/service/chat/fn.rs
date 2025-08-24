@@ -1,7 +1,7 @@
 use super::*;
 
 pub async fn pre_ws_upgrade(ctx: Context) {
-    let addr: String = ctx.get_socket_addr_or_default_string().await;
+    let addr: String = ctx.get_socket_addr_string().await;
     let encode_addr: String = Encode::execute(CHARSETS, &addr).unwrap_or_default();
     ctx.set_response_header(HEADER_X_CLIENT_ADDR, encode_addr)
         .await;

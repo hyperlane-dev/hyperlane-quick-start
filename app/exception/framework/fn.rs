@@ -6,7 +6,7 @@ use super::*;
 #[response_header(SERVER => HYPERLANE)]
 #[response_version(HttpVersion::HTTP1_1)]
 pub async fn panic_hook(ctx: Context) {
-    let error: Panic = ctx.get_panic().await.unwrap_or_default();
+    let error: Panic = ctx.try_get_panic().await.unwrap_or_default();
     let response_body: String = error.to_string();
     println_error!(response_body);
     log_error(response_body.clone()).await;
