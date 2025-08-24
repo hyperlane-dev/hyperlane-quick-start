@@ -8,9 +8,9 @@ use super::*;
     )
 )]
 #[route("/favicon.ico")]
-#[prologue_hooks[
+#[prologue_hooks(
   get,
   response_status_code(301),
   response_header(LOCATION => LOGO_IMG_URL)
-]]
+)]
 pub async fn handle(ctx: Context) {}

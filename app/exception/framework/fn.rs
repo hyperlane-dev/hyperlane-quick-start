@@ -2,11 +2,11 @@ use super::*;
 
 #[send]
 #[panic_hook]
-#[prologue_hooks[
+#[prologue_hooks(
     response_status_code(500),
     response_header(SERVER => HYPERLANE),
     response_version(HttpVersion::HTTP1_1)
-]]
+)]
 pub async fn panic_hook(ctx: Context) {
     let error: Panic = ctx.try_get_panic().await.unwrap_or_default();
     let response_body: String = error.to_string();
