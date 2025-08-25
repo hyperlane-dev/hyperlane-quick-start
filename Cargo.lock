@@ -780,9 +780,9 @@ checksum = "df3b46402a9d5adb4c86a0cf463f42e19994e3ee891101b1841f30a545cb49a9"
 
 [[package]]
 name = "hyperlane"
-version = "8.1.0"
+version = "8.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8214bca91a32a3c1f2345dbb5e872160e581a1b0b7be60f1e9aa70895defe839"
+checksum = "7968f7272ce9339f8d77effc5f27b7ae571e0061decc67c5d44508e729a93603"
 dependencies = [
  "http-type",
  "inventory",
@@ -815,9 +815,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-macros"
-version = "6.0.2"
+version = "6.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "069d6ef8c8c45e6d59a059156a7f0da33f03880f1909f29292641923835e6e20"
+checksum = "2ab60274958b3b848d1c579eafd5494201bf49f0e116a5edbd8debb935be9009"
 dependencies = [
  "inventory",
  "proc-macro2",
@@ -827,9 +827,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-plugin-websocket"
-version = "2.2.42"
+version = "2.2.43"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c9e1fffd0a3b8787bf5ac31b1c1e3c66cc037dc6bea994c4a2d7ad594853a51a"
+checksum = "c94d61d52cf528f669e1d5f499676c7363134d878851dd9e91491f101a84b6a7"
 dependencies = [
  "hyperlane",
  "hyperlane-broadcast",
@@ -837,7 +837,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "5.0.2"
+version = "5.0.3"
 dependencies = [
  "hyperlane_init",
 ]
@@ -850,9 +850,9 @@ checksum = "19b7a0bcb6105d14602c6777b955605fd0abee9c3fd412b4af4712db8a61e358"
 
 [[package]]
 name = "hyperlane-utils"
-version = "9.0.2"
+version = "9.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "49eddb901313bb140fe72d520b1d96469365d991b2d83ecdd838bb3e17d19ad7"
+checksum = "1aa397f33eb712a9263a9b054572e2bf72591935d9a9eae78cde68669002a403"
 dependencies = [
  "ahash",
  "bin-encode-decode",
@@ -1412,9 +1412,9 @@ dependencies = [
 
 [[package]]
 name = "regex"
-version = "1.11.1"
+version = "1.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b544ef1b4eac5dc2db33ea63606ae9ffcfac26c1416a2806ae0bf5f56b201191"
+checksum = "23d7fd106d8c02486a8d64e778353d1cffe08ce79ac2e82f540c86d0facf6912"
 dependencies = [
  "aho-corasick",
  "memchr",
