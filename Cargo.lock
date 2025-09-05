@@ -750,9 +750,9 @@ checksum = "c10a92fc539f5fc3b2c5c3de4255e4f62f2768c9cd5a0e7879edf3d3b3189186"
 
 [[package]]
 name = "http-type"
-version = "4.60.0"
+version = "4.60.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "31db399a7dbd7ddd5098b6c8ace6959ed1651a21d9ac76cc099c8bd10af3038c"
+checksum = "06c38390c7028a26ccdb0ba7ad7e604caa3bc924439692e5719b43fb9445907a"
 dependencies = [
  "hex",
  "http-compress",
@@ -780,9 +780,9 @@ checksum = "df3b46402a9d5adb4c86a0cf463f42e19994e3ee891101b1841f30a545cb49a9"
 
 [[package]]
 name = "hyperlane"
-version = "8.1.2"
+version = "8.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7968f7272ce9339f8d77effc5f27b7ae571e0061decc67c5d44508e729a93603"
+checksum = "ca55f01d40fa16c4df4ebdecaa9d6e74f14f25e8dc198d87d235c2cbd5f173d1"
 dependencies = [
  "http-type",
  "inventory",
@@ -815,9 +815,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-macros"
-version = "6.1.0"
+version = "6.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fe7796a0c01872bdb0f96730a6881c5f8db3cfcba491f901f8739aab9e60c66a"
+checksum = "a5d3d85f0dcb4ab754f4361d9668120b9636cba09b3319ec0e83a41b0b117146"
 dependencies = [
  "inventory",
  "proc-macro2",
@@ -827,9 +827,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-plugin-websocket"
-version = "2.2.44"
+version = "2.2.45"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "44432853addd03b6972061e20acbc22b5d82284087ecd17d0c63e230b9a6f4a1"
+checksum = "9a894784ac8e6ff830a9b081aec47422b9ed1efc65475421d28f37ed69142b7e"
 dependencies = [
  "hyperlane",
  "hyperlane-broadcast",
@@ -837,7 +837,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "5.1.0"
+version = "5.1.1"
 dependencies = [
  "hyperlane_init",
 ]
@@ -850,9 +850,9 @@ checksum = "19b7a0bcb6105d14602c6777b955605fd0abee9c3fd412b4af4712db8a61e358"
 
 [[package]]
 name = "hyperlane-utils"
-version = "9.1.0"
+version = "9.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1d1435574b5038d78d5153350fad00f4f99bb87fd4e76ba7ffdd51add4fb0e3d"
+checksum = "430ab4b341f267771b66d5b570bcd1055233238bb35505b652c5973234709fa0"
 dependencies = [
  "ahash",
  "bin-encode-decode",
@@ -1145,9 +1145,9 @@ dependencies = [
 
 [[package]]
 name = "log"
-version = "0.4.27"
+version = "0.4.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "13dc2df351e3202783a1fe0d44375f7295ffb4049267b0f3018346dc122a1d94"
+checksum = "34080505efa8e45a4b816c349525ebe327ceaa8559756f0356cba97ef3bf7432"
 
 [[package]]
 name = "lombok-macros"
@@ -1840,9 +1840,9 @@ dependencies = [
 
 [[package]]
 name = "twox-hash"
-version = "2.1.1"
+version = "2.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8b907da542cbced5261bd3256de1b3a1bf340a3d37f93425a07362a1d687de56"
+checksum = "9ea3136b675547379c4bd395ca6b938e5ad3c3d20fad76e7fe85f9e0d011419c"
 dependencies = [
  "rand",
 ]
