@@ -1,4 +1,4 @@
-pub mod server;
 pub mod shutdown;
+pub mod wait;
 
 use super::*;
