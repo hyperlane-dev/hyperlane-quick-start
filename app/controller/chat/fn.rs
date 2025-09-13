@@ -52,7 +52,6 @@ pub async fn html(ctx: Context) {
     )
 )]
 #[prologue_hooks(ws, get)]
-#[ws_from_stream]
 pub async fn handle(ctx: Context) {
     let websocket: &WebSocket = get_global_websocket();
     let path: String = ctx.get_request_path().await;
