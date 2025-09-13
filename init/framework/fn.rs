@@ -1,5 +1,18 @@
 use super::*;
 
+pub fn set_shutdown(shutdown: ArcFnPinBoxFutureSend<()>) {
+    if SHUTDOWN.get().is_some() {
+        return;
+    }
+    let _ = SHUTDOWN.set(shutdown);
+}
+
+pub fn shutdown() -> ArcFnPinBoxFutureSend<()> {
+    SHUTDOWN
+        .get_or_init(|| Arc::new(|| Box::pin(async {})))
+        .clone()
+}
+
 #[hyperlane(config: ServerConfig)]
 async fn configure_config(server: &Server) {
     config.host(SERVER_HOST).await;
@@ -7,8 +20,7 @@ async fn configure_config(server: &Server) {
     config.ttl(SERVER_TTI).await;
     config.linger(SERVER_LINGER).await;
     config.nodelay(SERVER_NODELAY).await;
-    config.http_buffer(SERVER_HTTP_BUFFER).await;
-    config.ws_buffer(SERVER_WS_BUFFER).await;
+    config.buffer(SERVER_BUFFER).await;
     server.config(config).await;
 }
 
