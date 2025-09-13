@@ -19,5 +19,5 @@ pub async fn response_header(ctx: Context) {
 pub async fn response_status_code(ctx: Context) {}
 
 #[request_middleware(4)]
-#[response_body(NOT_FOUND_HTML)]
+#[response_body(INDEX_HTML.replace("{{ time }}", &time()))]
 pub async fn response_body(ctx: Context) {}

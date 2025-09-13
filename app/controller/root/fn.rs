@@ -1,8 +1,0 @@
-use super::*;
-
-#[route("/")]
-#[prologue_hooks(methods(get, post))]
-pub async fn handle(ctx: Context) {
-    let html: String = INDEX_HTML.replace("{{ time }}", &time());
-    let _ = ctx.set_response_body(html).await;
-}
