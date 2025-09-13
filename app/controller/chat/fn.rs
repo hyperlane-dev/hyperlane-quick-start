@@ -44,7 +44,6 @@ pub async fn html(ctx: Context) {
 }
 
 #[route("/api/chat")]
-#[disable_ws_hook("/api/chat")]
 #[utoipa::path(
     get,
     path = "/api/chat",   
@@ -53,6 +52,7 @@ pub async fn html(ctx: Context) {
     )
 )]
 #[prologue_hooks(ws, get)]
+#[ws_from_stream]
 pub async fn handle(ctx: Context) {
     let websocket: &WebSocket = get_global_websocket();
     let path: String = ctx.get_request_path().await;

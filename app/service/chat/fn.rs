@@ -7,36 +7,16 @@ pub async fn pre_ws_upgrade(ctx: Context) {
         .await;
 }
 
-async fn create_online_count_message(ctx: &Context, receiver_count: String) -> String {
+pub async fn create_online_count_message(ctx: &Context, receiver_count: String) -> String {
     let data: String = format!("{ONLINE_CONNECTIONS}{COLON_SPACE}{receiver_count}");
     WebSocketRespData::get_json_data(MessageType::OnlineCount, ctx, data)
         .await
         .unwrap()
 }
 
-fn broadcast_online_count(key: BroadcastType<String>, message: String) {
+pub fn broadcast_online_count(key: BroadcastType<String>, message: String) {
     let websocket: &'static WebSocket = get_global_websocket();
     let _ = websocket.send(key, message);
-}
-
-#[ws]
-#[connected_hook]
-pub async fn connected_hook(ctx: Context) {
-    let websocket: &WebSocket = get_global_websocket();
-    let path: String = ctx.get_request_path().await;
-    let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
-    let receiver_count: String = websocket
-        .receiver_count_after_increment(key.clone())
-        .to_string();
-    let username: String = get_name(&ctx).await;
-    add_online_user(&username);
-    let resp_data: String = create_online_count_message(&ctx, receiver_count).await;
-    let _ = ctx
-        .set_response_body(resp_data.clone())
-        .await
-        .send_body()
-        .await;
-    broadcast_online_count(key, resp_data);
 }
 
 pub(crate) async fn on_closed(ctx: Context) {

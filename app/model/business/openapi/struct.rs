@@ -27,7 +27,6 @@ use super::*;
         controller::hello::handle,
         controller::openapi::html,
         controller::openapi::json,
-        controller::root::handle,
         controller::upload::html,
         controller::upload::static_file,
         controller::upload::merge,
