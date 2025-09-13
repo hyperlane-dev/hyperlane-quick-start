@@ -6,6 +6,8 @@ pub use r#fn::*;
 use r#static::*;
 
 use super::*;
+#[allow(unused_imports)]
+use hyperlane_app::*;
 use hyperlane_config::framework::*;
 use hyperlane_plugin::server_manager;
 
