@@ -1,8 +1,9 @@
 use super::*;
 
+#[ws]
 #[route("/websocket")]
-#[prologue_hooks(ws, get)]
+#[ws_from_stream(request)]
 pub async fn handle(ctx: Context) {
-    let request_body: Vec<u8> = ctx.get_request_body().await;
+    let request_body: RequestBody = request.get_body().clone();
     let _ = ctx.set_response_body(request_body).await.send_body().await;
 }

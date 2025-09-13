@@ -5,7 +5,6 @@ use super::*;
 #[response_header(SERVER => HYPERLANE)]
 #[response_header(CONNECTION => KEEP_ALIVE)]
 #[response_header(CONTENT_TYPE => TEXT_HTML)]
-#[response_version(HttpVersion::HTTP1_1)]
 pub async fn response_header(ctx: Context) {
     let socket_addr_string: String = ctx.get_socket_addr_string().await;
     let content_type: String = ContentType::format_content_type_with_charset(TEXT_HTML, UTF8);
@@ -16,7 +15,7 @@ pub async fn response_header(ctx: Context) {
 }
 
 #[request_middleware(3)]
-#[response_status_code(404)]
+#[response_status_code(200)]
 pub async fn response_status_code(ctx: Context) {}
 
 #[request_middleware(4)]
