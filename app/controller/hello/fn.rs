@@ -2,7 +2,7 @@ use super::*;
 
 #[route("/hello/{name}")]
 #[prologue_hooks(
-  post,
+  methods(get, post),
   route_param(NAME_KEY => name_opt),
   response_body(format!("Hello {}", name_opt.unwrap_or_default())),
 )]

@@ -1,5 +1,5 @@
 use hyperlane_init;
 
 fn main() {
-    hyperlane_init::framework::run();
+    hyperlane_init::framework::server::run();
 }
