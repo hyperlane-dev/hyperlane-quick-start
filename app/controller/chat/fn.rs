@@ -60,7 +60,7 @@ pub async fn handle(ctx: Context) {
     let cfg: WebSocketConfig<String> = WebSocketConfig::new()
         .set_context(ctx.clone())
         .set_broadcast_type(key)
-        .set_buffer_size(SERVER_WS_BUFFER)
+        .set_buffer_size(SERVER_BUFFER)
         .set_request_hook(callback)
         .set_sended_hook(send_callback)
         .set_closed_hook(on_closed);
