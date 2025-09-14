@@ -14,6 +14,9 @@ use super::*;
     route_param(WS_DIR_KEY => request_path_opt),
     response_header(LOCATION => INDEX_HTML_URL_PATH)
 )]
+#[epilogue_hooks(
+    response_header(LOCATION => file_path)
+)]
 pub async fn html(ctx: Context) {
     let request_path: String = request_path_opt.unwrap_or_default();
     if request_path.len() <= 5 {
