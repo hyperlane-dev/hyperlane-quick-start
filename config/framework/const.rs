@@ -8,7 +8,7 @@ pub const SERVER_LOG_DIR: &str = "./logs";
 pub const SERVER_INNER_PRINT: bool = true;
 pub const SERVER_INNER_LOG: bool = true;
 pub const SERVER_NODELAY: bool = true;
-pub const SERVER_LINGER: Duration = Duration::ZERO;
+pub const SERVER_LINGER: Duration = Duration::from_secs(6);
 pub const SERVER_TTI: u32 = 128;
 
 pub const CACHE_CONTROL_STATIC_ASSETS: &str = "public, max-age=31536000, immutable";

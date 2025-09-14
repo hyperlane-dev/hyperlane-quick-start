@@ -7,14 +7,14 @@ pub async fn pre_ws_upgrade(ctx: Context) {
         .await;
 }
 
-pub async fn create_online_count_message(ctx: &Context, receiver_count: String) -> String {
+pub async fn create_online_count_message(ctx: &Context, receiver_count: String) -> ResponseBody {
     let data: String = format!("{ONLINE_CONNECTIONS}{COLON_SPACE}{receiver_count}");
     WebSocketRespData::get_json_data(MessageType::OnlineCount, ctx, data)
         .await
         .unwrap()
 }
 
-pub fn broadcast_online_count(key: BroadcastType<String>, message: String) {
+pub fn broadcast_online_count(key: BroadcastType<String>, message: ResponseBody) {
     let websocket: &'static WebSocket = get_global_websocket();
     let _ = websocket.send(key, message);
 }
@@ -26,7 +26,8 @@ pub(crate) async fn on_closed(ctx: Context) {
     let receiver_count: ReceiverCount = websocket.receiver_count_after_decrement(key);
     let username: String = get_name(&ctx).await;
     remove_online_user(&username);
-    let resp_data: String = create_online_count_message(&ctx, receiver_count.to_string()).await;
+    let resp_data: ResponseBody =
+        create_online_count_message(&ctx, receiver_count.to_string()).await;
     ctx.set_response_body(&resp_data).await;
 }
 

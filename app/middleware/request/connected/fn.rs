@@ -11,7 +11,7 @@ pub async fn connected_hook(ctx: Context) {
         .to_string();
     let username: String = get_name(&ctx).await;
     add_online_user(&username);
-    let resp_data: String = create_online_count_message(&ctx, receiver_count).await;
+    let resp_data: ResponseBody = create_online_count_message(&ctx, receiver_count).await;
     let _ = ctx.set_response_body(&resp_data).await.send_body().await;
     broadcast_online_count(key, resp_data);
 }
