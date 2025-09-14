@@ -890,9 +890,9 @@ checksum = "c10a92fc539f5fc3b2c5c3de4255e4f62f2768c9cd5a0e7879edf3d3b3189186"
 
 [[package]]
 name = "http-request"
-version = "8.91.25"
+version = "8.91.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ac77292c98a3c1b63aeda4d24d235b7c2b68bb663041dc00ea6b8dadad356e24"
+checksum = "0024d90b7fecf77d5f887931c5fd588c3bf15945331cf004f11b41d4877a152e"
 dependencies = [
  "futures",
  "http-type",
