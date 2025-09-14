@@ -1,5 +1,5 @@
 pub mod favicon_ico;
 pub mod hello;
-pub mod ws;
+pub mod websocket;
 
 use super::*;
