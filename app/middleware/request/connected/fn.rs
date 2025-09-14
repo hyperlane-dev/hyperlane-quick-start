@@ -1,7 +1,7 @@
 use super::*;
 
 #[ws]
-#[request_middleware(6)]
+#[request_middleware(7)]
 pub async fn connected_hook(ctx: Context) {
     let websocket: &WebSocket = get_global_websocket();
     let path: String = ctx.get_request_path().await;
