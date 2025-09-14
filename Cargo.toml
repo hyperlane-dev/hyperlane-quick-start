@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane-quick-start"
-version = "6.2.1"
+version = "6.2.2"
 readme = "README.md"
 edition = "2024"
 authors = ["root@ltpp.vip"]
