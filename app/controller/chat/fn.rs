@@ -4,7 +4,7 @@ use super::*;
 #[utoipa::path(
     get,
     post,
-    path = "/chat/index.html",   
+    path = "/chat/*",   
     responses(
         (status = 200, description = "Chat frontend interface", body = String)
     )
