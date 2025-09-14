@@ -17,7 +17,7 @@ pub async fn status_sse(ctx: Context) {
         let server_status: ServerStatus = get_server_status().await;
         let status_json: String = serde_json::to_string(&server_status).unwrap_or_default();
         let sse_data: String = format!("data: {}\n\n", status_json);
-        let send_result: ResponseResult = ctx.set_response_body(sse_data).await.send_body().await;
+        let send_result: ResponseResult = ctx.set_response_body(&sse_data).await.send_body().await;
         if send_result.is_err() {
             break;
         }
@@ -42,7 +42,7 @@ pub async fn status_sse(ctx: Context) {
 pub async fn system_info(ctx: Context) {
     let system_info: SystemInfo = get_system_info().await;
     let info_json: String = serde_json::to_string(&system_info).unwrap_or_default();
-    ctx.set_response_body(info_json).await;
+    ctx.set_response_body(&info_json).await;
 }
 
 #[route("/monitor")]

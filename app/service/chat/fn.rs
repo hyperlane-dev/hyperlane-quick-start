@@ -27,7 +27,7 @@ pub(crate) async fn on_closed(ctx: Context) {
     let username: String = get_name(&ctx).await;
     remove_online_user(&username);
     let resp_data: String = create_online_count_message(&ctx, receiver_count.to_string()).await;
-    ctx.set_response_body(resp_data).await;
+    ctx.set_response_body(&resp_data).await;
 }
 
 fn remove_mentions(text: &str) -> String {
@@ -41,7 +41,7 @@ async fn handle_ping_request(ctx: &Context, req_data: &WebSocketReqData) -> bool
     if req_data.is_ping() {
         let resp_data: WebSocketRespData = WebSocketRespData::new(MessageType::Pang, ctx, "").await;
         let resp_data: String = serde_json::to_string(&resp_data).unwrap();
-        let _ = ctx.set_response_body(resp_data).await.send_body().await;
+        let _ = ctx.set_response_body(&resp_data).await.send_body().await;
         ctx.set_response_body("").await;
         return true;
     }
@@ -73,18 +73,16 @@ async fn process_gpt_request(session_id: String, message: String, ctx: Context) 
     let path: String = ctx.get_request_path().await;
     let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
     let _ = websocket.send(key, gpt_resp_json.clone());
-    ctx.set_response_body(gpt_resp_json).await;
+    ctx.set_response_body(&gpt_resp_json).await;
     send_callback(ctx).await;
 }
 
 #[request_body_json(req_data_res: WebSocketReqData)]
 pub(crate) async fn callback(ctx: Context) {
     let req_data: WebSocketReqData = req_data_res.unwrap();
-
     if handle_ping_request(&ctx, &req_data).await {
         return;
     }
-
     let session_id: String = get_name(&ctx).await;
     clone!(req_data, ctx, session_id => {
         let req_msg: &String = req_data.get_data();
@@ -95,10 +93,9 @@ pub(crate) async fn callback(ctx: Context) {
             });
         }
     });
-
     let resp_data: WebSocketRespData = req_data.into_resp(&ctx).await;
     let resp_data: String = serde_json::to_string(&resp_data).unwrap();
-    ctx.set_response_body(resp_data).await;
+    ctx.set_response_body(&resp_data).await;
 }
 
 fn build_gpt_request_messages(session: &ChatSession) -> Vec<JsonValue> {

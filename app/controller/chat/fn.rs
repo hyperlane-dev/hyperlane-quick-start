@@ -24,7 +24,7 @@ pub async fn html(ctx: Context) {
             .await
             .set_response_header(LOCATION, INDEX_HTML_URL_PATH)
             .await
-            .set_response_body(vec![])
+            .set_response_body(&vec![])
             .await;
         return;
     }
@@ -40,7 +40,7 @@ pub async fn html(ctx: Context) {
         .await
         .set_response_header(CONTENT_TYPE, content_type)
         .await
-        .set_response_body(body)
+        .set_response_body(&body)
         .await;
 }
 

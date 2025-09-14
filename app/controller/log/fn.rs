@@ -15,7 +15,7 @@ use super::*;
 )]
 pub async fn info(ctx: Context) {
     let log_content: String = read_log_file("info").await;
-    ctx.set_response_body(log_content).await;
+    ctx.set_response_body(&log_content).await;
 }
 
 #[route("/log/warn")]
@@ -33,7 +33,7 @@ pub async fn info(ctx: Context) {
 )]
 pub async fn warn(ctx: Context) {
     let log_content: String = read_log_file("warn").await;
-    ctx.set_response_body(log_content).await;
+    ctx.set_response_body(&log_content).await;
 }
 
 #[route("/log/error")]

@@ -43,20 +43,20 @@ pub async fn static_file(ctx: Context) {
     if let Ok((partial_content, content_type)) =
         serve_static_file_with_range(&dir, &file, range_request).await
     {
-        ctx.set_response_body(partial_content.data).await;
-        ctx.set_response_header(CONTENT_TYPE, content_type).await;
+        ctx.set_response_body(&partial_content.data).await;
+        ctx.set_response_header(CONTENT_TYPE, &content_type).await;
         ctx.set_response_header(ACCEPT_RANGES, BYTES).await;
         ctx.set_response_header(CACHE_CONTROL, CACHE_CONTROL_STATIC_ASSETS)
             .await;
         ctx.set_response_header(EXPIRES, EXPIRES_FAR_FUTURE).await;
-        ctx.set_response_header(CONTENT_LENGTH, partial_content.total_size.to_string())
+        ctx.set_response_header(CONTENT_LENGTH, &partial_content.total_size.to_string())
             .await;
         if has_range_request {
             ctx.set_response_status_code(HttpStatus::PartialContent.code())
                 .await;
-            ctx.set_response_header(CONTENT_RANGE, partial_content.content_range)
+            ctx.set_response_header(CONTENT_RANGE, &partial_content.content_range)
                 .await;
-            ctx.set_response_header(CONTENT_LENGTH, partial_content.content_length.to_string())
+            ctx.set_response_header(CONTENT_LENGTH, &partial_content.content_length.to_string())
                 .await;
         }
     }

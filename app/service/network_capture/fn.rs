@@ -205,7 +205,7 @@ fn parse_address(addr: &str) -> Option<(String, u16)> {
 pub async fn get_network_capture_data(ctx: Context) {
     let response_data: NetworkStats = get_network_stats().unwrap_or_default();
     if let Ok(json) = serde_json::to_string(&response_data) {
-        ctx.set_response_body(json).await;
+        ctx.set_response_body(&json).await;
     }
 }
 
@@ -213,6 +213,6 @@ pub async fn get_network_capture_stream(ctx: Context) {
     let response_data: NetworkStats = get_network_stats().unwrap_or_default();
     if let Ok(json) = serde_json::to_string(&response_data) {
         let event: String = format!("{}{}{}", SSE_DATA_PREFIX, json, SSE_EVENT_SUFFIX);
-        ctx.set_response_body(event).await;
+        ctx.set_response_body(&event).await;
     }
 }

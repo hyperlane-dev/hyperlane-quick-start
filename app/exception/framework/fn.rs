@@ -18,7 +18,7 @@ pub async fn panic_hook(ctx: Context) {
         .await
         .set_response_header(CONTENT_TYPE, content_type)
         .await
-        .set_response_body(response_body)
+        .set_response_body(&response_body)
         .await
         .send()
         .await;
