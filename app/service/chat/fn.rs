@@ -42,8 +42,9 @@ async fn handle_ping_request(ctx: &Context, req_data: &WebSocketReqData) -> bool
     if req_data.is_ping() {
         let resp_data: WebSocketRespData = WebSocketRespData::new(MessageType::Pang, ctx, "").await;
         let resp_data: ResponseBody = serde_json::to_vec(&resp_data).unwrap();
-        let _ = ctx.set_response_body(&resp_data).await.send_body().await;
-        ctx.set_response_body("").await;
+        ctx.set_response_body(&resp_data).await;
+        ctx.try_get_send_body_hook().await.unwrap()(ctx.clone()).await;
+        ctx.set_response_body(&vec![]).await;
         return true;
     }
     false
