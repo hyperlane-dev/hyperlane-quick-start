@@ -20,6 +20,6 @@ pub async fn panic_hook(ctx: Context) {
         .await
         .send()
         .await;
+    log_error(&response_body).await;
     println_error!(response_body);
-    log_error(response_body).await;
 }
