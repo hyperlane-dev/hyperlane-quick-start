@@ -3,7 +3,7 @@ use super::*;
 pub async fn pre_ws_upgrade(ctx: Context) {
     let addr: String = ctx.get_socket_addr_string().await;
     let encode_addr: String = Encode::execute(CHARSETS, &addr).unwrap_or_default();
-    ctx.set_response_header(HEADER_X_CLIENT_ADDR, encode_addr)
+    ctx.set_response_header(HEADER_X_CLIENT_ADDR, &encode_addr)
         .await;
 }
 
@@ -15,7 +15,7 @@ pub async fn create_online_count_message(ctx: &Context, receiver_count: String) 
 }
 
 pub fn broadcast_online_count(key: BroadcastType<String>, message: ResponseBody) {
-    let websocket: &'static WebSocket = get_global_websocket();
+    let websocket: &WebSocket = get_global_websocket();
     let _ = websocket.send(key, message);
 }
 
@@ -218,7 +218,7 @@ pub(crate) async fn send_callback(ctx: Context) {
             response_string
         );
     }
-    log_info(format!(
+    log_info(&format!(
         "{request}{BR}{request_string}{BR}{response}{BR}{response_string}"
     ))
     .await;
