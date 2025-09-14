@@ -31,11 +31,11 @@ pub async fn html(ctx: Context) {
     let file_path: String = format!("./chat/{request_path}");
     let extension_name: String = FileExtension::get_extension_name(&file_path);
     let content_type: &str = FileExtension::parse(&extension_name).get_content_type();
-    let res: Option<Vec<u8>> = async_read_from_file(&file_path).await.ok();
+    let res: Option<ResponseBody> = async_read_from_file(&file_path).await.ok();
     if res.is_none() {
         return;
     }
-    let body: Vec<u8> = res.unwrap_or_default();
+    let body: ResponseBody = res.unwrap_or_default();
     ctx.set_response_header(CONTENT_ENCODING, GZIP)
         .await
         .set_response_header(CONTENT_TYPE, content_type)
