@@ -8,9 +8,9 @@ use super::*;
 pub async fn response_header(ctx: Context) {
     let socket_addr_string: String = ctx.get_socket_addr_string().await;
     let content_type: String = ContentType::format_content_type_with_charset(TEXT_HTML, UTF8);
-    ctx.set_response_header(CONTENT_TYPE, content_type)
+    ctx.set_response_header(CONTENT_TYPE, &content_type)
         .await
-        .set_response_header("SocketAddr", socket_addr_string)
+        .set_response_header("SocketAddr", &socket_addr_string)
         .await;
 }
 
