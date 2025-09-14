@@ -41,7 +41,7 @@ fn remove_mentions(text: &str) -> String {
 async fn handle_ping_request(ctx: &Context, req_data: &WebSocketReqData) -> bool {
     if req_data.is_ping() {
         let resp_data: WebSocketRespData = WebSocketRespData::new(MessageType::Pang, ctx, "").await;
-        let resp_data: String = serde_json::to_string(&resp_data).unwrap();
+        let resp_data: ResponseBody = serde_json::to_vec(&resp_data).unwrap();
         let _ = ctx.set_response_body(&resp_data).await.send_body().await;
         ctx.set_response_body("").await;
         return true;
@@ -69,7 +69,7 @@ async fn process_gpt_request(session_id: String, message: String, ctx: Context) 
     };
     let gpt_resp_data: WebSocketRespData =
         WebSocketRespData::new(MessageType::GptResponse, &ctx, &api_response).await;
-    let gpt_resp_json: String = serde_json::to_string(&gpt_resp_data).unwrap();
+    let gpt_resp_json: ResponseBody = serde_json::to_vec(&gpt_resp_data).unwrap();
     let websocket: &WebSocket = get_global_websocket();
     let path: String = ctx.get_request_path().await;
     let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
@@ -95,7 +95,7 @@ pub(crate) async fn callback(ctx: Context) {
         }
     });
     let resp_data: WebSocketRespData = req_data.into_resp(&ctx).await;
-    let resp_data: String = serde_json::to_string(&resp_data).unwrap();
+    let resp_data: ResponseBody = serde_json::to_vec(&resp_data).unwrap();
     ctx.set_response_body(&resp_data).await;
 }
 

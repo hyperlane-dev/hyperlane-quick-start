@@ -204,7 +204,7 @@ fn parse_address(addr: &str) -> Option<(String, u16)> {
 #[response_header(CONTENT_TYPE => APPLICATION_JSON)]
 pub async fn get_network_capture_data(ctx: Context) {
     let response_data: NetworkStats = get_network_stats().unwrap_or_default();
-    if let Ok(json) = serde_json::to_string(&response_data) {
+    if let Ok(json) = serde_json::to_vec(&response_data) {
         ctx.set_response_body(&json).await;
     }
 }

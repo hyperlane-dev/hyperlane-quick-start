@@ -41,7 +41,7 @@ pub async fn status_sse(ctx: Context) {
 )]
 pub async fn system_info(ctx: Context) {
     let system_info: SystemInfo = get_system_info().await;
-    let info_json: String = serde_json::to_string(&system_info).unwrap_or_default();
+    let info_json: ResponseBody = serde_json::to_vec(&system_info).unwrap_or_default();
     ctx.set_response_body(&info_json).await;
 }
 
