@@ -14,3 +14,11 @@ serde = { workspace = true }
 hyperlane = { workspace = true }
 http-request = { workspace = true }
 hyperlane-utils = { workspace = true }
+tokio-postgres = { workspace = true, features = ["with-chrono-0_4"] }
+bb8 = { workspace = true }
+bb8-postgres = { workspace = true }
+bcrypt = { workspace = true }
+thiserror = { workspace = true }
+chrono = { workspace = true }
+uuid = { workspace = true }
+async-trait = "0.1"

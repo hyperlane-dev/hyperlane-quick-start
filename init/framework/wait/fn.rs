@@ -15,6 +15,21 @@ async fn init_network_capture() {
     start_network_capture().await;
 }
 
+async fn init_application() -> Result<(), Box<dyn std::error::Error>> {
+    use super::super::database_init::DatabaseInitializer;
+
+    match DatabaseInitializer::initialize().await {
+        Ok(()) => {
+            println_success!("Database initialization successful");
+            Ok(())
+        }
+        Err(e) => {
+            println_error!("Database initialization failed: ", e);
+            Err(Box::new(e))
+        }
+    }
+}
+
 fn runtime() -> Runtime {
     Builder::new_multi_thread()
         .worker_threads(num_cpus::get_physical() << 1)
@@ -29,6 +44,16 @@ fn runtime() -> Runtime {
 #[hyperlane(server: Server)]
 async fn create_server() {
     configure_config(&server).await;
+
+    // Initialize application (database, health checks, etc.)
+    if let Err(e) = init_application().await {
+        println_error!(
+            "Failed to initialize application, server startup aborted: ",
+            e
+        );
+        std::process::exit(1);
+    }
+
     init_network_capture().await;
     println_success!("Server initialization successful");
     let server_result: ServerResult<ServerHook> = server.run().await;

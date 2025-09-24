@@ -9,3 +9,10 @@ path = "lib.rs"
 [dependencies]
 hyperlane = { workspace = true }
 hyperlane-utils = { workspace = true }
+tokio-postgres = { workspace = true, features = ["with-chrono-0_4"] }
+bb8 = { workspace = true }
+bb8-postgres = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
+chrono = { workspace = true }
+once_cell = "1.19"
