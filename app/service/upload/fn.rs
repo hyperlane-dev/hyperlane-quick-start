@@ -199,8 +199,8 @@ pub async fn serve_static_file(dir: &str, file: &str) -> Result<(Vec<u8>, String
     }
     let path: String = format!("{UPLOAD_DIR}/{decode_dir}/{decode_file}");
     let extension_name: String = FileExtension::get_extension_name(&decode_file);
-    let file_type: &str = FileExtension::parse(&extension_name).get_content_type();
-    let content_type: String = ContentType::format_content_type_with_charset(file_type, UTF8);
+    let content_type: &str = FileExtension::parse(&extension_name).get_content_type();
+    let content_type: String = ContentType::format_content_type_with_charset(content_type, UTF8);
     let data: Vec<u8> = async_read_from_file(&path).await.unwrap_or_default();
     if data.is_empty() {
         return Err("File not found or empty".to_string());

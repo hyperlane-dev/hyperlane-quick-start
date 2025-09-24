@@ -12,7 +12,9 @@ pub mod view;
 // Re-export commonly used types and functions
 pub use model::data_access::*;
 pub use model::persistent::*;
+pub use model::business::static_files::*;
 pub use service::auth::*;
+pub use service::static_files::*;
 pub use utils::password::*;
 
 use hyperlane_config;

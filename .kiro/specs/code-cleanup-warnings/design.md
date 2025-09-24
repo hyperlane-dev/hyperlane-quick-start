@@ -48,6 +48,33 @@ The cleanup will follow a layered approach, addressing warnings by category and 
   - Remove unnecessary `mut` keywords
   - Preserve all functional logic
 
+### Comment Removal Component
+- **Purpose**: Remove all comments from source code
+- **Scope**: All `.rs` files in the project
+- **Strategy**:
+  - Remove single-line comments (`//`)
+  - Remove multi-line comments (`/* */`)
+  - Preserve doc comments for public APIs if needed
+  - Maintain code functionality
+
+### Type Annotation Component
+- **Purpose**: Add explicit type annotations
+- **Scope**: Variable declarations, function parameters, and return types
+- **Strategy**:
+  - Replace type inference with explicit types
+  - Add missing parameter types
+  - Make return types explicit
+  - Ensure type safety is maintained
+
+### Output Macro Standardization Component
+- **Purpose**: Replace println! with standardized macros
+- **Scope**: All print statements in the codebase
+- **Strategy**:
+  - Replace success messages with `println_success!`
+  - Replace warning/error messages with `println_warning!`
+  - Ensure macros are properly imported
+  - Maintain message content and formatting
+
 ## Data Models
 
 ### Warning Categories
@@ -133,7 +160,22 @@ enum FixAction {
 - Very low risk, cosmetic changes mostly
 - Final cleanup of remaining warnings
 
-### Phase 5: Final Verification
+### Phase 5: Comment Removal
+- Remove all comments from source files
+- Preserve essential documentation where needed
+- Very low risk, cosmetic changes
+
+### Phase 6: Type Annotation Enhancement
+- Add explicit types to variable declarations
+- Make function parameter and return types explicit
+- Low risk, improves code clarity
+
+### Phase 7: Output Macro Standardization
+- Replace println! with println_success! and println_warning!
+- Ensure consistent logging throughout codebase
+- Low risk, standardization improvement
+
+### Phase 8: Final Verification
 - Comprehensive testing of all changes
 - Documentation of any behavioral changes
 - Confirmation of zero-warning compilation

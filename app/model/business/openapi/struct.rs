@@ -5,6 +5,9 @@ use super::*;
     components(schemas(
         FileChunkData,
         UploadResponse,
+        StaticFileResponse,
+        StaticFileError,
+        SecurityError,
         WebSocketReqData,
         WebSocketRespData,
         OnlineUser,
@@ -25,19 +28,26 @@ use super::*;
     paths(
         controller::favicon_ico::handle,
         controller::hello::handle,
-        controller::openapi::html,
+        // controller::openapi::html, // 已移至统一路由
         controller::openapi::json,
-        controller::upload::html,
-        controller::upload::static_file,
+        controller::static_files::serve_static_resource,
+        controller::static_files::serve_index_page,
+        controller::static_files::serve_upload_page,
+        controller::static_files::serve_monitor_page,
+        controller::static_files::serve_openapi_page,
+        controller::static_files::serve_chat_page,
+        controller::static_files::serve_fallback_page,
+        // controller::upload::html, // 已移至统一路由
+        controller::upload::upload_file,
         controller::upload::merge,
         controller::upload::register,
         controller::upload::save,
         controller::users::online_users,
-        controller::chat::html,
+        // controller::chat::html, // 已移至统一路由
         controller::chat::handle,
         controller::server_status::status_sse,
         controller::server_status::system_info,
-        controller::server_status::monitor_dashboard,
+        // controller::server_status::monitor_dashboard, // 已移至统一路由
         controller::server_status::network_capture_data,
         controller::server_status::network_capture_stream,
     )

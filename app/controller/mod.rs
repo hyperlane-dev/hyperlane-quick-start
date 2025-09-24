@@ -7,6 +7,7 @@ pub mod html;
 pub mod log;
 pub mod openapi;
 pub mod server_status;
+pub mod static_files;
 pub mod upload;
 pub mod users;
 pub mod websocket;

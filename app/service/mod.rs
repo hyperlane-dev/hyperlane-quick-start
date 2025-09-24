@@ -4,8 +4,7 @@ pub mod log;
 pub mod network_capture;
 pub mod send;
 pub mod server_status;
+pub mod static_files;
 pub mod upload;
-
-pub use auth::*;
 
 use super::*;

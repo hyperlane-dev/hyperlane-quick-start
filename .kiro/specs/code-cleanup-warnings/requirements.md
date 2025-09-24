@@ -71,3 +71,36 @@ This feature involves cleaning up all compilation warnings in the Rust codebase 
 2. WHEN running `cargo build` THEN the build SHALL complete without warnings
 3. WHEN all fixes are applied THEN the application SHALL function identically to before
 4. WHEN the cleanup is complete THEN the code SHALL be more maintainable and readable
+
+### Requirement 7
+
+**User Story:** As a developer, I want all comments removed from the codebase, so that the code is clean and self-documenting.
+
+#### Acceptance Criteria
+
+1. WHEN reviewing source files THEN there SHALL be no comment lines (// or /* */)
+2. WHEN removing comments THEN the code functionality SHALL remain unchanged
+3. WHEN comments are removed THEN doc comments for public APIs SHALL be preserved if they serve documentation purposes
+4. WHEN cleaning comments THEN inline comments SHALL be completely removed
+
+### Requirement 8
+
+**User Story:** As a developer, I want all variable types to be explicitly declared, so that the code is more readable and type-safe.
+
+#### Acceptance Criteria
+
+1. WHEN declaring variables THEN explicit types SHALL be specified instead of type inference
+2. WHEN function parameters lack explicit types THEN they SHALL be added
+3. WHEN return types are inferred THEN they SHALL be made explicit
+4. WHEN adding explicit types THEN the code behavior SHALL remain identical
+
+### Requirement 9
+
+**User Story:** As a developer, I want standardized output macros used throughout the codebase, so that logging is consistent.
+
+#### Acceptance Criteria
+
+1. WHEN success messages are printed THEN `println_success!` macro SHALL be used
+2. WHEN warning or error messages are printed THEN `println_warning!` macro SHALL be used
+3. WHEN replacing println! calls THEN the message content SHALL remain the same
+4. WHEN using new macros THEN they SHALL be properly imported or defined

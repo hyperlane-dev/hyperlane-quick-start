@@ -120,13 +120,54 @@
     - Remove unused `Error as PostgresError` and `NoTls` imports
     - _Requirements: 1.1, 1.2, 1.4_
 
-- [ ] 14. Final verification and testing
-  - [ ] 14.1 Run comprehensive compilation check
+- [ ] 14. Remove all comments from source files
+  - [x] 14.1 Remove comments from app/controller/static_files/fn.rs
+    - Remove all single-line comments (`//`)
+    - Remove all multi-line comments (`/* */`)
+    - Preserve functionality while removing explanatory comments
+    - _Requirements: 7.1, 7.2, 7.4_
+  
+  - [ ] 14.2 Remove comments from remaining controller files
+    - Clean up all comment lines in controller modules
+    - Ensure no functional code is accidentally removed
+    - _Requirements: 7.1, 7.2, 7.4_
+  
+  - [ ] 14.3 Remove comments from model and service files
+    - Clean up all comment lines in model and service modules
+    - Remove explanatory comments while preserving code structure
+    - _Requirements: 7.1, 7.2, 7.4_
+
+- [ ] 15. Add explicit type annotations
+  - [x] 15.1 Add explicit types to app/controller/static_files/fn.rs
+    - Add explicit types to variable declarations using type inference
+    - Make function parameter types explicit where missing
+    - Add explicit return types to functions
+    - _Requirements: 8.1, 8.2, 8.3, 8.4_
+  
+  - [ ] 15.2 Add explicit types to remaining modules
+    - Review all variable declarations for missing explicit types
+    - Ensure function signatures have complete type information
+    - _Requirements: 8.1, 8.2, 8.3, 8.4_
+
+- [ ] 16. Standardize output macros
+  - [x] 16.1 Replace println! with standardized macros in static_files/fn.rs
+    - Replace success messages with `println_success!` macro
+    - Replace warning/error messages with `println_warning!` macro
+    - Ensure macros are properly imported or defined
+    - _Requirements: 9.1, 9.2, 9.3, 9.4_
+  
+  - [ ] 16.2 Update remaining files with standardized output macros
+    - Replace all println! calls throughout the codebase
+    - Ensure consistent usage of success and warning macros
+    - _Requirements: 9.1, 9.2, 9.3, 9.4_
+
+- [ ] 17. Final verification and testing
+  - [ ] 17.1 Run comprehensive compilation check
     - Execute `cargo check` to verify zero warnings
     - Execute `cargo build` to ensure successful build
     - _Requirements: 6.1, 6.2, 6.3_
   
-  - [ ] 14.2 Verify application functionality
+  - [ ] 17.2 Verify application functionality
     - Test that the application starts without errors
     - Verify that all modules can be imported correctly
     - Confirm that no functionality has been broken

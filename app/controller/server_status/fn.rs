@@ -45,21 +45,22 @@ pub async fn system_info(ctx: Context) {
     ctx.set_response_body(&info_json).await;
 }
 
-#[route("/monitor")]
-#[utoipa::path(
-    get,
-    post,
-    path = "/monitor",   
-    responses(
-        (status = 200, description = "Server monitoring dashboard interface", body = String)
-    )
-)]
-#[prologue_hooks(
-    methods(get, post),
-    response_status_code(200),
-    response_body(MONITOR_DASHBOARD_HTML)
-)]
-pub async fn monitor_dashboard(ctx: Context) {}
+// 监控面板路由已移至统一的静态资源路由处理
+// #[route("/monitor")]
+// #[utoipa::path(
+//     get,
+//     post,
+//     path = "/monitor",   
+//     responses(
+//         (status = 200, description = "Server monitoring dashboard interface", body = String)
+//     )
+// )]
+// #[prologue_hooks(
+//     methods(get, post),
+//     response_status_code(200),
+//     response_body(MONITOR_DASHBOARD_HTML)
+// )]
+// pub async fn monitor_dashboard(ctx: Context) {}
 
 #[route("/api/network/capture")]
 #[utoipa::path(
