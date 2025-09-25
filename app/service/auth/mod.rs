@@ -1,11 +1,15 @@
 pub mod r#impl;
-pub mod r#struct;
 pub mod session;
 
-pub use r#struct::*;
 pub use session::*;
-pub use crate::model::domain::auth::*;
-pub use crate::model::persistent::user::*;
 
 use super::*;
+use crate::controller::auth::*;
+use crate::model::data_access::*;
+use crate::model::domain::auth::*;
+use crate::model::domain::password::*;
+
 use std::sync::Arc;
+use std::time::Instant;
+
+use bcrypt::{DEFAULT_COST, hash, verify};

@@ -88,32 +88,36 @@ impl LoginRequest {
         if self.username.trim().is_empty() {
             return Err(UserValidationError::EmptyUsername);
         }
-        
+
         if self.username.len() < 3 || self.username.len() > 255 {
             return Err(UserValidationError::InvalidUsername);
         }
-        
+
         // 验证用户名格式（只允许字母、数字、下划线和连字符）
-        if !self.username.chars().all(|c| c.is_alphanumeric() || c == '_' || c == '-') {
+        if !self
+            .username
+            .chars()
+            .all(|c| c.is_alphanumeric() || c == '_' || c == '-')
+        {
             return Err(UserValidationError::InvalidUsername);
         }
-        
+
         // 验证密码
         if self.password.is_empty() {
             return Err(UserValidationError::EmptyPassword);
         }
-        
+
         if self.password.len() < 6 {
             return Err(UserValidationError::PasswordTooShort);
         }
-        
+
         if self.password.len() > 128 {
             return Err(UserValidationError::PasswordTooLong);
         }
 
         Ok(())
     }
-    
+
     /// 创建新的登录请求，自动去除用户名的首尾空白字符
     pub fn new(username: String, password: String) -> Self {
         Self {
@@ -145,9 +149,13 @@ impl LoginResponse {
             expires_at: None,
         }
     }
-    
+
     /// 设置会话信息
-    pub fn with_session(mut self, session_id: String, expires_at: chrono::DateTime<chrono::Utc>) -> Self {
+    pub fn with_session(
+        mut self,
+        session_id: String,
+        expires_at: chrono::DateTime<chrono::Utc>,
+    ) -> Self {
         self.session_id = Some(session_id);
         self.expires_at = Some(expires_at);
         self

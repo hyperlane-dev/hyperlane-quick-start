@@ -1,7 +1,4 @@
 use super::*;
-use hyperlane_config::framework::*;
-use thiserror::Error;
-use tokio_postgres::{Error as PostgresError, NoTls};
 
 pub struct DatabaseInitializer;
 

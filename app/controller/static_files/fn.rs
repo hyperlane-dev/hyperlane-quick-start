@@ -20,8 +20,6 @@ use super::*;
 #[prologue_hooks(
     methods(get),
     route_param(STATIC_PATH_KEY => path_opt),
-    request_header("If-Modified-Since" => if_modified_since_opt),
-    request_header("If-None-Match" => if_none_match_opt),
     request_header("Range" => range_opt)
 )]
 pub async fn serve_static_resource(ctx: Context) {
@@ -54,12 +52,6 @@ pub async fn serve_static_resource(ctx: Context) {
                 return;
             }
 
-            if should_return_not_modified(&response, &if_modified_since_opt, &if_none_match_opt) {
-                println_success!("🔄 返回 304 Not Modified");
-                send_not_modified_response(&ctx, &response).await;
-                return;
-            }
-
             println_success!("📤 发送完整响应");
             send_success_response(&ctx, &response).await;
         }
@@ -74,33 +66,11 @@ pub async fn serve_static_resource(ctx: Context) {
 async fn send_success_response(ctx: &Context, response: &StaticFileResponse) {
     ctx.set_response_status_code(200).await;
     ctx.set_response_body(&response.content).await;
-
     ctx.set_response_header("Content-Type", &response.content_type)
         .await;
     ctx.set_response_header("Content-Length", &response.file_size.to_string())
         .await;
-
-    set_cache_headers(ctx, response).await;
-
     ctx.set_response_header("Accept-Ranges", "bytes").await;
-}
-
-async fn send_not_modified_response(ctx: &Context, response: &StaticFileResponse) {
-    ctx.set_response_status_code(304).await;
-
-    if let Some(etag) = &response.etag {
-        ctx.set_response_header("ETag", etag).await;
-    }
-
-    if let Some(last_modified) = &response.last_modified {
-        let formatted_date: String = format_http_date_rfc2822(*last_modified);
-        ctx.set_response_header("Last-Modified", &formatted_date)
-            .await;
-    }
-
-    let cache_control: String = get_cache_control_header(&response.content_type);
-    ctx.set_response_header("Cache-Control", &cache_control)
-        .await;
 }
 
 async fn handle_range_request(ctx: &Context, response: &StaticFileResponse, range_header: &str) {
@@ -122,8 +92,6 @@ async fn handle_range_request(ctx: &Context, response: &StaticFileResponse, rang
                     &format!("bytes {}-{}/{}", range.start, range.end, response.file_size),
                 )
                 .await;
-
-                set_cache_headers(ctx, response).await;
             } else {
                 send_success_response(ctx, response).await;
             }
@@ -134,25 +102,6 @@ async fn handle_range_request(ctx: &Context, response: &StaticFileResponse, rang
                 .await;
         }
     }
-}
-
-async fn set_cache_headers(ctx: &Context, response: &StaticFileResponse) {
-    if let Some(etag) = &response.etag {
-        ctx.set_response_header("ETag", etag).await;
-    }
-
-    if let Some(last_modified) = &response.last_modified {
-        let formatted_date: String = format_http_date_rfc2822(*last_modified);
-        ctx.set_response_header("Last-Modified", &formatted_date)
-            .await;
-    }
-
-    let cache_control: String = get_cache_control_header(&response.content_type);
-    ctx.set_response_header("Cache-Control", &cache_control)
-        .await;
-
-    let expires: String = get_expires_header(&response.content_type);
-    ctx.set_response_header("Expires", &expires).await;
 }
 
 async fn handle_static_file_error(ctx: &Context, error: StaticFileError) {

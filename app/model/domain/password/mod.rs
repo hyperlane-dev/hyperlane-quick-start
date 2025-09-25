@@ -1,9 +1,7 @@
-pub mod error;
-pub mod service;
-pub mod strength;
+pub mod r#enum;
+pub mod r#struct;
 
-pub use error::*;
-pub use service::*;
-pub use strength::*;
+pub use r#enum::*;
+pub use r#struct::*;
 
-use super::*;
+use thiserror::Error;

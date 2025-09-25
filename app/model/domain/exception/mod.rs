@@ -4,4 +4,4 @@ pub mod database;
 pub use auth::*;
 pub use database::*;
 
-use super::*;
+use thiserror::Error;

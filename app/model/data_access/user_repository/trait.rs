@@ -1,7 +1,5 @@
 use super::*;
-use crate::model::persistent::user::*;
-use hyperlane_config::framework::database::ConnectionPoolError;
-use thiserror::Error;
+
 
 #[async_trait::async_trait]
 pub trait UserRepository: Send + Sync {

@@ -6,3 +6,6 @@ pub use r#struct::*;
 pub use r#trait::*;
 
 use super::*;
+use crate::model::persistent::user::*;
+
+use thiserror::Error;

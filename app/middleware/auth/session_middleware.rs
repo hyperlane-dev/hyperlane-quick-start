@@ -1,7 +1,4 @@
 use super::*;
-use crate::service::auth::*;
-use hyperlane::*;
-use std::sync::Arc;
 
 pub struct SessionMiddleware {
     auth_service: Arc<AuthService>,
@@ -22,7 +19,8 @@ impl SessionMiddleware {
 
     /// Validate session and set user context
     pub async fn validate_session(&self, ctx: &Context) -> Result<SessionInfo, AuthError> {
-        let session_id = Self::extract_session_id(ctx).await
+        let session_id = Self::extract_session_id(ctx)
+            .await
             .ok_or_else(|| AuthError::SessionError(SessionError::InvalidSessionId))?;
 
         self.auth_service.validate_session(&session_id)
@@ -42,14 +40,15 @@ impl SessionMiddleware {
 /// Helper function to create unauthorized response
 pub async fn unauthorized_response(ctx: &Context, message: &str) {
     ctx.set_response_status_code(401).await;
-    ctx.set_response_header("Content-Type", "application/json").await;
-    
+    ctx.set_response_header("Content-Type", "application/json")
+        .await;
+
     let error_response = serde_json::json!({
         "error": "Unauthorized",
         "message": message,
         "timestamp": chrono::Utc::now().to_rfc3339()
     });
-    
+
     let response_body = serde_json::to_vec(&error_response).unwrap_or_default();
     ctx.set_response_body(&response_body).await;
 }
@@ -57,14 +56,15 @@ pub async fn unauthorized_response(ctx: &Context, message: &str) {
 /// Helper function to create forbidden response
 pub async fn forbidden_response(ctx: &Context, message: &str) {
     ctx.set_response_status_code(403).await;
-    ctx.set_response_header("Content-Type", "application/json").await;
-    
+    ctx.set_response_header("Content-Type", "application/json")
+        .await;
+
     let error_response = serde_json::json!({
         "error": "Forbidden",
         "message": message,
         "timestamp": chrono::Utc::now().to_rfc3339()
     });
-    
+
     let response_body = serde_json::to_vec(&error_response).unwrap_or_default();
     ctx.set_response_body(&response_body).await;
 }

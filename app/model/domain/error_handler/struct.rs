@@ -1,5 +1,3 @@
-use super::*;
-
 pub struct ErrorHandler;
 
 pub struct ErrorResponse {

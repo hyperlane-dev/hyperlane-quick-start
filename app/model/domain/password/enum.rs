@@ -1,5 +1,4 @@
 use super::*;
-use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum PasswordError {
@@ -20,4 +19,12 @@ pub enum PasswordError {
 
     #[error("Password verification failed: {0}")]
     VerificationFailed(String),
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum PasswordStrengthLevel {
+    Weak,
+    Medium,
+    Strong,
+    VeryStrong,
 }

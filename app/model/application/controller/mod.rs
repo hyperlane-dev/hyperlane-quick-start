@@ -2,4 +2,6 @@ pub mod auth;
 
 pub use auth::*;
 
-use super::*;
+use crate::model::domain::auth::AuthService;
+
+use std::sync::Arc;

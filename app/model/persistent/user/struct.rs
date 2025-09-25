@@ -1,7 +1,4 @@
 use super::*;
-use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
-use thiserror::Error;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct User {

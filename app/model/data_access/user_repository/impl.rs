@@ -182,10 +182,7 @@ impl UserRepository for PostgresUserRepository {
         let mut query_parts = Vec::new();
         let mut param_count = 1;
 
-        // Build the query dynamically
-        let mut query = "UPDATE users SET ".to_string();
-
-        if let Some(ref email) = request.email {
+        if let Some(ref _email) = request.email {
             if !query_parts.is_empty() {
                 query_parts.push(", ".to_string());
             }
