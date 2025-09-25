@@ -50,7 +50,7 @@ pub async fn system_info(ctx: Context) {
 // #[utoipa::path(
 //     get,
 //     post,
-//     path = "/monitor",   
+//     path = "/monitor",
 //     responses(
 //         (status = 200, description = "Server monitoring dashboard interface", body = String)
 //     )

@@ -101,7 +101,7 @@ impl CacheStrategy {
             CacheStrategy::Custom(seconds) => *seconds,
         }
     }
-    
+
     /// 获取 Cache-Control 头值
     pub fn get_cache_control(&self) -> String {
         match self {
@@ -135,7 +135,7 @@ impl ResourceType {
             _ => None,
         }
     }
-    
+
     /// 转换为字符串
     pub fn as_str(&self) -> &'static str {
         match self {
@@ -145,7 +145,7 @@ impl ResourceType {
             ResourceType::Public => "public",
         }
     }
-    
+
     /// 获取基础目录
     pub fn get_base_dir(&self) -> &'static str {
         match self {
@@ -155,7 +155,7 @@ impl ResourceType {
             ResourceType::Public => "resources/public",
         }
     }
-    
+
     /// 获取最大文件大小
     pub fn get_max_file_size(&self) -> u64 {
         match self {
@@ -165,7 +165,7 @@ impl ResourceType {
             ResourceType::Public => 10 * 1024 * 1024,   // 10MB
         }
     }
-    
+
     /// 获取缓存策略
     pub fn get_cache_strategy(&self) -> CacheStrategy {
         match self {

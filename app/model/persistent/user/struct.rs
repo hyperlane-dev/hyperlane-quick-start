@@ -35,14 +35,12 @@ pub struct UpdateUserRequest {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 pub struct LoginRequest {
     pub username: String,
     pub password: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 pub struct LoginResponse {
     pub success: bool,
     pub message: String,

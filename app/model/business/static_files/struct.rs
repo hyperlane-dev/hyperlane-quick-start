@@ -1,7 +1,7 @@
 use super::*;
+use std::collections::HashMap;
 use std::path::PathBuf;
 use std::time::SystemTime;
-use std::collections::HashMap;
 
 /// 静态文件响应结构
 #[derive(Debug, Clone, ToSchema)]
@@ -36,7 +36,7 @@ impl StaticFileResponse {
             file_size,
         }
     }
-    
+
     /// 创建空响应
     pub fn empty() -> Self {
         Self {
@@ -47,12 +47,12 @@ impl StaticFileResponse {
             file_size: 0,
         }
     }
-    
+
     /// 检查是否为空
     pub fn is_empty(&self) -> bool {
         self.content.is_empty()
     }
-    
+
     /// 获取内容长度
     pub fn content_length(&self) -> usize {
         self.content.len()
@@ -85,7 +85,7 @@ impl ResourceConfig {
             cache_strategy: CacheStrategy::LongTerm,
         }
     }
-    
+
     /// 创建前端资源配置
     pub fn assets() -> Self {
         Self {
@@ -96,7 +96,7 @@ impl ResourceConfig {
             cache_strategy: CacheStrategy::LongTerm,
         }
     }
-    
+
     /// 创建上传文件配置
     pub fn uploads() -> Self {
         Self {
@@ -107,18 +107,18 @@ impl ResourceConfig {
             cache_strategy: CacheStrategy::ShortTerm,
         }
     }
-    
+
     /// 创建公共资源配置
     pub fn public_resources() -> Self {
         Self {
             resource_type: "public".to_string(),
             base_dir: "resources/public".to_string(),
             allow_directory_listing: false,
-            max_file_size: 10 * 1024 * 1024, // 10MB
+            max_file_size: 10 * 1024 * 1024,             // 10MB
             cache_strategy: CacheStrategy::Custom(3600), // 1小时
         }
     }
-    
+
     /// 获取完整的基础路径
     pub fn get_full_base_path(&self) -> PathBuf {
         PathBuf::from(&self.base_dir)
@@ -210,11 +210,15 @@ impl TypeStats {
             avg_size: 0,
         }
     }
-    
+
     pub fn add_file(&mut self, size: u64) {
         self.count += 1;
         self.size += size;
-        self.avg_size = if self.count > 0 { self.size / self.count } else { 0 };
+        self.avg_size = if self.count > 0 {
+            self.size / self.count
+        } else {
+            0
+        };
     }
 }
 
@@ -252,7 +256,7 @@ impl ResourceResponse {
         let mut headers = HashMap::new();
         headers.insert("Content-Type".to_string(), content_type);
         headers.insert("Content-Length".to_string(), body.len().to_string());
-        
+
         Self {
             status_code: 200,
             headers,
@@ -260,7 +264,7 @@ impl ResourceResponse {
             is_partial: false,
         }
     }
-    
+
     /// 创建 304 Not Modified 响应
     pub fn not_modified() -> Self {
         Self {
@@ -270,12 +274,15 @@ impl ResourceResponse {
             is_partial: false,
         }
     }
-    
+
     /// 创建错误响应
     pub fn error(status_code: u16, message: &str) -> Self {
         let mut headers = HashMap::new();
-        headers.insert("Content-Type".to_string(), "text/plain; charset=utf-8".to_string());
-        
+        headers.insert(
+            "Content-Type".to_string(),
+            "text/plain; charset=utf-8".to_string(),
+        );
+
         Self {
             status_code,
             headers,
@@ -283,14 +290,14 @@ impl ResourceResponse {
             is_partial: false,
         }
     }
-    
+
     /// 创建部分内容响应
     pub fn partial_content(body: Vec<u8>, content_type: String, range: &str) -> Self {
         let mut headers = HashMap::new();
         headers.insert("Content-Type".to_string(), content_type);
         headers.insert("Content-Length".to_string(), body.len().to_string());
         headers.insert("Content-Range".to_string(), range.to_string());
-        
+
         Self {
             status_code: 206,
             headers,

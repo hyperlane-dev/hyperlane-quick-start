@@ -5,7 +5,7 @@ pub use session::*;
 
 use super::*;
 use crate::controller::auth::*;
-use crate::model::data_access::*;
+use crate::model::data_access::user_repository::*;
 use crate::model::domain::auth::*;
 use crate::model::domain::password::*;
 

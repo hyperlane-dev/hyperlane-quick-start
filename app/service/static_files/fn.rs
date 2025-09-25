@@ -56,8 +56,9 @@ fn generate_unified_etag(metadata: &std::fs::Metadata, path: &Path) -> Option<St
     // 使用文件大小和修改时间生成 ETag
     if let Ok(modified) = metadata.modified() {
         if let Ok(duration) = modified.duration_since(SystemTime::UNIX_EPOCH) {
-            let etag = format!("\"{}-{}-{}\"", 
-                duration.as_secs(), 
+            let etag = format!(
+                "\"{}-{}-{}\"",
+                duration.as_secs(),
                 metadata.len(),
                 simple_hash(&path.to_string_lossy())
             );
@@ -115,12 +116,12 @@ pub async fn batch_check_files_exist(
     paths: &[String],
 ) -> Vec<(String, bool)> {
     let mut results = Vec::new();
-    
+
     for path in paths {
         let exists = file_exists_unified(config, path).await;
         results.push((path.clone(), exists));
     }
-    
+
     results
 }
 
@@ -132,16 +133,16 @@ pub async fn list_directory_files(
     if !config.allow_directory_listing {
         return Err(StaticFileError::Forbidden);
     }
-    
+
     let safe_path = validate_unified_path_security(config, path)?;
-    
+
     if !safe_path.is_dir() {
         return Err(StaticFileError::NotFound);
     }
-    
+
     let mut entries = fs::read_dir(&safe_path).await?;
     let mut files = Vec::new();
-    
+
     while let Some(entry) = entries.next_entry().await? {
         if let Ok(metadata) = entry.metadata().await {
             if metadata.is_file() {
@@ -151,7 +152,7 @@ pub async fn list_directory_files(
             }
         }
     }
-    
+
     files.sort();
     Ok(files)
 }

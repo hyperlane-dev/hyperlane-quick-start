@@ -46,7 +46,10 @@ async fn handle_login(ctx: &Context) -> LoginResponse {
                 Ok(service) => service,
                 Err(e) => {
                     ctx.set_response_status_code(500).await;
-                    return LoginResponse::failure(format!("Service unavailable: {}", e.to_user_message()));
+                    return LoginResponse::failure(format!(
+                        "Service unavailable: {}",
+                        e.to_user_message()
+                    ));
                 }
             };
 

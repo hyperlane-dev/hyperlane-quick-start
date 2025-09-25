@@ -1,6 +1,5 @@
 use super::*;
 
-
 impl PasswordService {
     /// Hash a password using bcrypt with default cost
     pub fn hash_password(password: &str) -> Result<String, PasswordError> {
