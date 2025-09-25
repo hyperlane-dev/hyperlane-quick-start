@@ -1,6 +1,6 @@
-pub mod auth;
+pub mod r#struct;
 
-pub use auth::*;
+pub use r#struct::*;
 
 use crate::model::domain::auth::AuthService;
 

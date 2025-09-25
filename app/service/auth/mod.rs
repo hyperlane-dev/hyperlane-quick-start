@@ -1,6 +1,8 @@
+pub mod r#fn;
 pub mod r#impl;
 pub mod session;
 
+pub use r#fn::*;
 pub use session::*;
 
 use super::*;
