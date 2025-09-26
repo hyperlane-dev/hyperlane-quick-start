@@ -1,48 +1,22 @@
 use super::*;
 
-#[route("/{ws_dir:^chat.*}")]
+#[route("/chat")]
 #[utoipa::path(
     get,
     post,
-    path = "/chat/*",   
+    path = "/chat",   
     responses(
         (status = 200, description = "Chat frontend interface", body = String)
     )
 )]
 #[prologue_hooks(
     methods(get, post),
-    route_param(WS_DIR_KEY => request_path_opt),
-    response_header(LOCATION => INDEX_HTML_URL_PATH)
+    response_status_code(200),
+    response_body(CHAT_HTML),
+    response_header(CONTENT_ENCODING => GZIP)
 )]
-#[epilogue_hooks(
-    response_header(LOCATION => file_path)
-)]
-pub async fn html(ctx: Context) {
-    let request_path: String = request_path_opt.unwrap_or_default();
-    if request_path.len() <= 5 {
-        ctx.set_response_status_code(301)
-            .await
-            .set_response_header(LOCATION, INDEX_HTML_URL_PATH)
-            .await
-            .set_response_body(&vec![])
-            .await;
-        return;
-    }
-    let file_path: String = format!("./chat/{request_path}");
-    let extension_name: String = FileExtension::get_extension_name(&file_path);
-    let content_type: &str = FileExtension::parse(&extension_name).get_content_type();
-    let res: Option<ResponseBody> = async_read_from_file(&file_path).await.ok();
-    if res.is_none() {
-        return;
-    }
-    let body: ResponseBody = res.unwrap_or_default();
-    ctx.set_response_header(CONTENT_ENCODING, GZIP)
-        .await
-        .set_response_header(CONTENT_TYPE, content_type)
-        .await
-        .set_response_body(&body)
-        .await;
-}
+
+pub async fn html(ctx: Context) {}
 
 #[route("/api/chat")]
 #[utoipa::path(
