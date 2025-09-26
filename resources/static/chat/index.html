@@ -287,19 +287,28 @@
 
       .chat-input {
         display: flex;
+        flex-wrap: wrap;
         padding: 0 12px;
         margin: 0 12px 12px;
         background-color: #ffffff;
         border: 1px solid #dee2e6;
         border-radius: 8px;
+        position: sticky;
+        bottom: 0;
+        z-index: 10;
+        width: calc(100% - 24px);
+        box-sizing: border-box;
         align-items: center;
+        position: relative;
         min-height: 60px;
       }
 
       .chat-input textarea {
         flex: 1;
+        min-width: 200px;
         padding: 8px 10px;
         border: none;
+        border-radius: 4px;
         outline: none;
         margin: 8px 0;
         font-size: 0.9375rem;
@@ -307,9 +316,47 @@
         color: #2c3e50;
         line-height: 1.4;
         resize: none;
+        overflow-y: hidden;
+        overflow-x: hidden;
         font-family: inherit;
         min-height: 20px;
         max-height: 40px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        /* Firefox滚动条样式 */
+        scrollbar-width: thin;
+        scrollbar-color: rgba(0, 0, 0, 0.2) rgba(0, 0, 0, 0.05);
+      }
+
+      /* 自定义滚动条样式 */
+      .chat-input textarea::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .chat-input textarea::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 3px;
+      }
+
+      .chat-input textarea::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+        transition: background 0.2s ease;
+      }
+
+      .chat-input textarea::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.3);
+      }
+
+      /* 移动端样式 */
+      @media (max-width: 768px) {
+        .chat-input textarea {
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          max-height: 20px;
+          height: 20px;
+        }
       }
 
       .chat-input textarea::placeholder {
@@ -329,28 +376,67 @@
         border: none;
         border-radius: 8px;
         cursor: pointer;
+        transition: all 0.3s ease;
         margin-left: 12px;
         font-weight: 600;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 0.9375rem;
+        box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .chat-input button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        transition: left 0.5s ease;
       }
 
       .chat-input button:hover:not(:disabled) {
         background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+        transform: translateY(-1px);
+      }
+
+      .chat-input button:hover:not(:disabled)::before {
+        left: 100%;
+      }
+
+      .chat-input button:active:not(:disabled) {
+        background: linear-gradient(135deg, #004085 0%, #003366 100%);
+        transform: translateY(0);
+        box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
       }
 
       .chat-input button:disabled {
-        background: #6c757d;
+        background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
         cursor: not-allowed;
         opacity: 0.6;
+        box-shadow: none;
+        transform: none;
       }
 
       .send-icon {
         font-style: normal;
         font-size: 1.3em;
         margin-left: 6px;
+        transition: transform 0.2s ease;
+      }
+
+      .chat-input button:hover:not(:disabled) .send-icon {
+        transform: translateX(2px);
       }
 
       .scroll-to-bottom {
@@ -516,7 +602,179 @@
         display: none !important;
       }
 
-      @media (max-width: 768px) {
+      /* 艾特功能下拉框样式 */
+      .mention-dropdown {
+        position: absolute;
+        background: #ffffff;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        width: 280px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        bottom: 100%;
+        margin-bottom: 6px;
+        left: 0;
+      }
+
+      .mention-header {
+        padding: 8px 12px;
+        background: #f8f9fa;
+        color: #6c757d;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        border-bottom: 1px solid #dee2e6;
+      }
+
+      .mention-list {
+        flex: 1;
+        overflow-y: auto;
+        min-height: 0; /* 允许flex子元素收缩 */
+      }
+
+      .mention-item {
+        display: flex;
+        align-items: center;
+        padding: 10px 12px;
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+      }
+
+      .mention-item:hover,
+      .mention-item.active {
+        background: #007bff;
+      }
+
+      .user-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.875rem;
+        font-weight: 700;
+        margin-right: 12px;
+        flex-shrink: 0;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+        line-height: 1;
+        text-align: center;
+      }
+
+      .user-info {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .user-name {
+        color: #2c3e50;
+        font-size: 0.875rem;
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .mention-item.active .user-name {
+        color: white;
+      }
+
+      .mention-item.gpt-user {
+        background: rgba(0, 123, 255, 0.05);
+        border-left: 3px solid #007bff;
+      }
+
+      .mention-item.gpt-user.active {
+        background: #007bff;
+      }
+
+      .user-avatar.gpt-avatar {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        font-size: 1rem;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .user-avatar.other-user-avatar {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .user-name.gpt-name {
+        color: #007bff;
+        font-weight: 600;
+      }
+
+      .mention-item.gpt-user.active .user-name.gpt-name {
+        color: white;
+      }
+
+      .no-users {
+        padding: 16px 12px;
+        text-align: center;
+        color: #6c757d;
+        font-size: 0.875rem;
+      }
+
+      .loading-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px 12px;
+        gap: 8px;
+      }
+
+      .loading-spinner {
+        width: 20px;
+        height: 20px;
+        border: 2px solid #e9ecef;
+        border-top: 2px solid #007bff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      .loading-text {
+        color: #6c757d;
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .mention-list::-webkit-scrollbar {
+        width: 4px;
+      }
+
+      .mention-list::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      .mention-list::-webkit-scrollbar-thumb {
+        background: #dee2e6;
+        border-radius: 2px;
+      }
+
+      .mention-list::-webkit-scrollbar-thumb:hover {
+        background: #adb5bd;
+      }
+
+      @media (max-width: 600px) {
         .nav-bar {
           padding: 0 12px;
         }
@@ -536,18 +794,68 @@
           min-height: 40px;
         }
 
-        .chat-input button {
-          padding: 4px 8px;
-          height: 26px;
-          background: #007bff !important;
+        .chat-input textarea {
+          min-width: 0;
+          padding: 6px 8px;
         }
 
-        .toast {
-          top: 10px;
-          right: 10px;
-          left: 10px;
-          min-width: auto;
-          max-width: none;
+        .chat-input button {
+          padding: 4px 8px;
+          margin-left: 6px;
+          height: 26px;
+          /* 移动端保持简洁样式 */
+          background: #007bff !important;
+          box-shadow: none !important;
+          border-radius: 4px !important;
+          transform: none !important;
+          font-weight: 500 !important;
+        }
+
+        .chat-input button::before {
+          display: none;
+        }
+
+        .chat-input button:hover:not(:disabled) {
+          background: #0056b3 !important;
+          box-shadow: none !important;
+          transform: none !important;
+        }
+
+        .chat-input button:active:not(:disabled) {
+          background: #004085 !important;
+          transform: none !important;
+          box-shadow: none !important;
+        }
+
+        .chat-input button:disabled {
+          background: #6c757d !important;
+          opacity: 0.5 !important;
+          box-shadow: none !important;
+          transform: none !important;
+        }
+
+        .send-icon {
+          font-size: 1.2em !important;
+          margin-left: 4px !important;
+        }
+
+        .chat-input button:hover:not(:disabled) .send-icon {
+          transform: none !important;
+        }
+
+        .mention-dropdown {
+          width: calc(100% - 20px);
+          max-width: 280px;
+        }
+      }
+
+      @media (max-height: 400px) {
+        .mention-dropdown {
+          max-height: 150px !important;
+        }
+
+        .mention-list {
+          max-height: 100px;
         }
       }
     </style>
@@ -588,7 +896,7 @@
           <div>连接已断开，正在尝试重连...</div>
         </div>
 
-        <div class="chat-input">
+        <div class="chat-input" id="chatInputContainer">
           <textarea
             id="messageInput"
             placeholder="(use @name to mention users, ctrl+enter or shift+enter for new line)"
@@ -599,6 +907,12 @@
             <span>Send</span>
             <i class="send-icon">➤</i>
           </button>
+
+          <!-- 艾特功能下拉框 -->
+          <div class="mention-dropdown hidden" id="mentionDropdown">
+            <div class="mention-header">Select User</div>
+            <div class="mention-list" id="mentionList"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -620,6 +934,12 @@
       let sendId = null;
       let isMobile = false;
       let md = null;
+      let onlineUsers = [];
+      let showMentionDropdown = false;
+      let mentionFilter = '';
+      let mentionStartIndex = -1;
+      let loadingUsers = false;
+      let selectedIndex = 0;
 
       // 消息类型
       const MessageType = {
@@ -1145,6 +1465,7 @@
         isNearBottom = true;
         sendWebSocketMessage(messageData);
         input.value = '';
+        closeMentionDropdown();
         autoResize();
       }
 
@@ -1187,6 +1508,15 @@
 
       // 处理键盘事件
       function handleKeyDown(event) {
+        // 如果下拉框显示，处理下拉框的键盘事件
+        if (showMentionDropdown) {
+          if (['ArrowDown', 'ArrowUp', 'Enter', 'Escape'].includes(event.key)) {
+            event.preventDefault();
+            handleMentionKeyDown(event);
+            return;
+          }
+        }
+
         if (event.key === 'Enter') {
           if (!isMobile && (event.ctrlKey || event.shiftKey)) {
             event.preventDefault();
@@ -1204,6 +1534,258 @@
             sendMessage();
           }
         }
+      }
+
+      // 处理输入事件
+      function handleInput() {
+        checkMentionTrigger();
+        autoResize();
+      }
+
+      // 检查提及触发
+      function checkMentionTrigger() {
+        const input = document.getElementById('messageInput');
+        const cursorPos = input.selectionStart;
+        const text = input.value;
+
+        // 查找最近的@符号
+        let atIndex = -1;
+        for (let i = cursorPos - 1; i >= 0; i--) {
+          if (text[i] === '@') {
+            atIndex = i;
+            break;
+          }
+          if (text[i] === ' ' || text[i] === '\n') {
+            break;
+          }
+        }
+
+        if (atIndex !== -1) {
+          // 找到@符号，提取过滤文本
+          const filterText = text.substring(atIndex + 1, cursorPos);
+          mentionFilter = filterText;
+          mentionStartIndex = atIndex;
+
+          if (!showMentionDropdown) {
+            showMentionDropdown = true;
+            fetchOnlineUsers();
+          }
+
+          // 计算下拉框位置
+          calculateDropdownPosition(input, atIndex);
+        } else {
+          closeMentionDropdown();
+        }
+      }
+
+      // 计算下拉框位置
+      function calculateDropdownPosition(input, atIndex) {
+        const container = document.getElementById('chatInputContainer');
+        const containerRect = container.getBoundingClientRect();
+        const inputRect = input.getBoundingClientRect();
+
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        const computedStyle = window.getComputedStyle(input);
+        context.font = `${computedStyle.fontSize} ${computedStyle.fontFamily}`;
+        const availableHeight = inputRect.top - 20;
+        const maxHeight = Math.max(120, Math.min(250, availableHeight - 6));
+
+        const dropdownWidth = 280;
+        const containerWidth = containerRect.width;
+
+        const inputPaddingLeft = 12;
+        let xPosition = inputPaddingLeft;
+
+        if (xPosition + dropdownWidth > containerWidth) {
+          xPosition = containerWidth - dropdownWidth;
+        }
+
+        if (xPosition < 0) {
+          xPosition = 0;
+        }
+
+        const dropdown = document.getElementById('mentionDropdown');
+        dropdown.style.left = xPosition + 'px';
+        dropdown.style.maxHeight = maxHeight + 'px';
+        dropdown.classList.remove('hidden');
+      }
+
+      // 获取在线用户
+      async function fetchOnlineUsers() {
+        if (loadingUsers) return; // 防止重复请求
+
+        loadingUsers = true;
+        try {
+          const protocol = window.location.protocol;
+          const host =
+            window.location.hostname === 'localhost' ||
+            window.location.hostname === '127.0.0.1'
+              ? 'localhost:65002'
+              : window.location.host;
+
+          const response = await fetch(`${protocol}//${host}/api/users/online`);
+          if (response.ok) {
+            const data = await response.json();
+            // 直接使用后端返回的用户列表（已包含GPT）
+            onlineUsers = data.users || [];
+          } else {
+            onlineUsers = [];
+          }
+        } catch (error) {
+          console.error('Failed to fetch online users list:', error);
+          onlineUsers = [];
+        } finally {
+          loadingUsers = false;
+          renderMentionList();
+        }
+      }
+
+      // 渲染提及列表
+      function renderMentionList() {
+        const mentionList = document.getElementById('mentionList');
+        mentionList.innerHTML = '';
+
+        if (loadingUsers) {
+          mentionList.innerHTML = `
+            <div class="loading-container">
+              <div class="loading-spinner"></div>
+              <div class="loading-text">Loading users...</div>
+            </div>
+          `;
+          return;
+        }
+
+        let filteredUsers = onlineUsers;
+        if (mentionFilter) {
+          const filterLower = mentionFilter.toLowerCase();
+          filteredUsers = onlineUsers.filter((user) =>
+            user.username.toLowerCase().includes(filterLower)
+          );
+        }
+
+        if (filteredUsers.length === 0) {
+          mentionList.innerHTML = `
+            <div class="no-users">No matching users found</div>
+          `;
+          return;
+        }
+
+        selectedIndex = 0;
+        filteredUsers.forEach((user, index) => {
+          const isActive = index === selectedIndex;
+          const isGptUser = user.username === 'gpt';
+
+          const avatarClass = isGptUser
+            ? 'user-avatar gpt-avatar'
+            : 'user-avatar other-user-avatar';
+
+          const nameClass = isGptUser ? 'user-name gpt-name' : 'user-name';
+
+          const itemClass = `mention-item ${isActive ? 'active' : ''} ${
+            isGptUser ? 'gpt-user' : ''
+          }`;
+
+          const avatarText = isGptUser ? '🤖' : user.username.charAt(0);
+
+          const item = document.createElement('div');
+          item.className = itemClass;
+          item.dataset.index = index;
+          item.innerHTML = `
+            <div class="${avatarClass}">${avatarText}</div>
+            <div class="user-info">
+              <div class="${nameClass}">${user.username}</div>
+            </div>
+          `;
+
+          // 为每个用户项添加点击事件监听器，并正确传递用户数据
+          item.addEventListener('click', () => selectMentionUser(user));
+          item.addEventListener('mouseenter', () => {
+            selectedIndex = index;
+            renderMentionList(); // 重新渲染以更新选中状态
+          });
+
+          mentionList.appendChild(item);
+        });
+      }
+
+      // 处理提及键盘事件
+      function handleMentionKeyDown(event) {
+        if (!showMentionDropdown) return;
+
+        let filteredUsers = onlineUsers;
+        if (mentionFilter) {
+          const filterLower = mentionFilter.toLowerCase();
+          filteredUsers = onlineUsers.filter((user) =>
+            user.username.toLowerCase().includes(filterLower)
+          );
+        }
+
+        switch (event.key) {
+          case 'ArrowDown':
+            event.preventDefault();
+            selectedIndex = Math.min(
+              selectedIndex + 1,
+              filteredUsers.length - 1
+            );
+            renderMentionList();
+            break;
+          case 'ArrowUp':
+            event.preventDefault();
+            selectedIndex = Math.max(selectedIndex - 1, 0);
+            renderMentionList();
+            break;
+          case 'Enter':
+            event.preventDefault();
+            if (filteredUsers[selectedIndex]) {
+              selectMentionUser(filteredUsers[selectedIndex]);
+            }
+            break;
+          case 'Escape':
+            event.preventDefault();
+            closeMentionDropdown();
+            break;
+        }
+      }
+
+      // 选择提及用户
+      function selectMentionUser(user) {
+        if (!user) return;
+
+        const input = document.getElementById('messageInput');
+        const beforeMention = input.value.substring(0, mentionStartIndex);
+        const afterMention = input.value.substring(input.selectionStart);
+
+        input.value = beforeMention + `@${user.username} ` + afterMention;
+        closeMentionDropdown();
+
+        // 设置光标位置
+        const newCursorPos = beforeMention.length + user.username.length + 2;
+        input.setSelectionRange(newCursorPos, newCursorPos);
+        input.focus();
+      }
+
+      // 关闭提及下拉框
+      function closeMentionDropdown() {
+        showMentionDropdown = false;
+        mentionFilter = '';
+        mentionStartIndex = -1;
+        const dropdown = document.getElementById('mentionDropdown');
+        dropdown.classList.add('hidden');
+      }
+
+      // 添加提及
+      function addMention(username) {
+        const mention = `@${username} `;
+        const input = document.getElementById('messageInput');
+        if (input.value.trim()) {
+          input.value += ' ' + mention;
+        } else {
+          input.value = mention;
+        }
+        // 聚焦到输入框
+        input.focus();
+        input.setSelectionRange(input.value.length, input.value.length);
       }
 
       // 初始化
@@ -1226,7 +1808,21 @@
 
         const input = document.getElementById('messageInput');
         input.addEventListener('keydown', handleKeyDown);
-        input.addEventListener('input', autoResize);
+        input.addEventListener('input', handleInput);
+        input.addEventListener('keyup', checkMentionTrigger);
+
+        // 点击其他地方关闭提及下拉框
+        document.addEventListener('click', (event) => {
+          const dropdown = document.getElementById('mentionDropdown');
+          const inputContainer = document.getElementById('chatInputContainer');
+
+          if (
+            !inputContainer.contains(event.target) &&
+            !dropdown.contains(event.target)
+          ) {
+            closeMentionDropdown();
+          }
+        });
 
         connect();
 
