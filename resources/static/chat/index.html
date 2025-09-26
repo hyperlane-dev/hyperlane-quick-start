@@ -1568,7 +1568,11 @@
 
           if (!showMentionDropdown) {
             showMentionDropdown = true;
+            selectedIndex = 0; // 重置选中索引
             fetchOnlineUsers();
+          } else {
+            // 如果下拉框已经显示，重新渲染以更新过滤结果
+            renderMentionList();
           }
 
           // 计算下拉框位置
@@ -1640,7 +1644,6 @@
           renderMentionList();
         }
       }
-
       // 渲染提及列表
       function renderMentionList() {
         const mentionList = document.getElementById('mentionList');
@@ -1648,21 +1651,21 @@
 
         if (loadingUsers) {
           mentionList.innerHTML = `
-            <div class="loading-container">
-              <div class="loading-spinner"></div>
-              <div class="loading-text">Loading users...</div>
-            </div>
-          `;
+      <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading users...</div>
+      </div>
+    `;
           return;
         }
 
-        let filteredUsers = onlineUsers;
-        if (mentionFilter) {
-          const filterLower = mentionFilter.toLowerCase();
-          filteredUsers = onlineUsers.filter((user) =>
-            user.username.toLowerCase().includes(filterLower)
-          );
-        }
+        // 过滤用户列表
+        const filteredUsers = onlineUsers.filter((user) => {
+          if (!mentionFilter) return true;
+          return user.username
+            .toLowerCase()
+            .includes(mentionFilter.toLowerCase());
+        });
 
         if (filteredUsers.length === 0) {
           mentionList.innerHTML = `
@@ -1671,7 +1674,11 @@
           return;
         }
 
-        selectedIndex = 0;
+        // 只有在selectedIndex超出范围时才重置为0
+        if (selectedIndex >= filteredUsers.length || selectedIndex < 0) {
+          selectedIndex = 0;
+        }
+
         filteredUsers.forEach((user, index) => {
           const isActive = index === selectedIndex;
           const isGptUser = user.username === 'gpt';
@@ -1699,7 +1706,18 @@
           `;
 
           // 为每个用户项添加点击事件监听器，并正确传递用户数据
-          item.addEventListener('click', () => selectMentionUser(user));
+          // 使用闭包确保正确的用户数据被传递
+          item.addEventListener(
+            'click',
+            (function (userCopy) {
+              return function (e) {
+                e.stopPropagation();
+                selectMentionUser(userCopy);
+              };
+            })(user)
+          );
+
+          // 处理鼠标悬停事件
           item.addEventListener('mouseenter', () => {
             selectedIndex = index;
             renderMentionList(); // 重新渲染以更新选中状态
@@ -1713,13 +1731,19 @@
       function handleMentionKeyDown(event) {
         if (!showMentionDropdown) return;
 
-        let filteredUsers = onlineUsers;
-        if (mentionFilter) {
-          const filterLower = mentionFilter.toLowerCase();
-          filteredUsers = onlineUsers.filter((user) =>
-            user.username.toLowerCase().includes(filterLower)
-          );
-        }
+        // 过滤用户列表
+        const filteredUsers = onlineUsers.filter((user) => {
+          if (!mentionFilter) return true;
+          return user.username
+            .toLowerCase()
+            .includes(mentionFilter.toLowerCase());
+        });
+
+        // 如果没有用户，直接返回
+        if (filteredUsers.length === 0) return;
+
+        // 保存当前选中索引，用于比较变化
+        const previousIndex = selectedIndex;
 
         switch (event.key) {
           case 'ArrowDown':
@@ -1728,12 +1752,18 @@
               selectedIndex + 1,
               filteredUsers.length - 1
             );
-            renderMentionList();
+            // 只有在选中索引发生变化时才重新渲染
+            if (selectedIndex !== previousIndex) {
+              renderMentionList();
+            }
             break;
           case 'ArrowUp':
             event.preventDefault();
             selectedIndex = Math.max(selectedIndex - 1, 0);
-            renderMentionList();
+            // 只有在选中索引发生变化时才重新渲染
+            if (selectedIndex !== previousIndex) {
+              renderMentionList();
+            }
             break;
           case 'Enter':
             event.preventDefault();
