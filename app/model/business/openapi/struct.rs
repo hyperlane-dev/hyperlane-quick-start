@@ -35,11 +35,11 @@ use super::*;
         controller::users::online_users,
         controller::chat::html,
         controller::chat::handle,
-        controller::server_status::status_sse,
-        controller::server_status::system_info,
-        controller::server_status::monitor_dashboard,
-        controller::server_status::network_capture_data,
-        controller::server_status::network_capture_stream,
+        controller::monitor::status_sse,
+        controller::monitor::system_info,
+        controller::monitor::monitor_dashboard,
+        controller::monitor::network_capture_data,
+        controller::monitor::network_capture_stream,
     )
 )]
 pub struct ApiDoc;
