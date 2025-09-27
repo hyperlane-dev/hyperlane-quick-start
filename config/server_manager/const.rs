@@ -1,1 +1,1 @@
-pub const PID_FILE_PATH: &str = "./tmp/process/hyperlane.pid";
+pub const PID_FILE_PATH: &'static str = "./tmp/process/hyperlane.pid";

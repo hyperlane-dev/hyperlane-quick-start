@@ -1,1 +1,1 @@
-pub const NAME_KEY: &str = "name";
+pub const NAME_KEY: &'static str = "name";
