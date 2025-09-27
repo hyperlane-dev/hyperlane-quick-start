@@ -8,7 +8,7 @@ use super::*;
         (status = 200, description = "View info level logs", body = String)
     )
 )]
-#[prologue_hooks(
+#[prologue_macros(
     get,
     response_status_code(200),
     response_header(CONTENT_TYPE => ContentType::format_content_type_with_charset(TEXT_PLAIN, UTF8))
@@ -26,7 +26,7 @@ pub async fn info(ctx: Context) {
         (status = 200, description = "View warn level logs", body = String)
     )
 )]
-#[prologue_hooks(
+#[prologue_macros(
     get,
     response_status_code(200),
     response_header(CONTENT_TYPE => ContentType::format_content_type_with_charset(TEXT_PLAIN, UTF8))
@@ -44,7 +44,7 @@ pub async fn warn(ctx: Context) {
         (status = 200, description = "View error level logs", body = String)
     )
 )]
-#[prologue_hooks(
+#[prologue_macros(
     get,
     response_status_code(200),
     response_header(CONTENT_TYPE => ContentType::format_content_type_with_charset(TEXT_PLAIN, UTF8))

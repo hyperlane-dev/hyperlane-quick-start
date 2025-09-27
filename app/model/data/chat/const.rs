@@ -1,1 +1,1 @@
-pub const GPT: &str = "gpt";
+pub const GPT: &'static str = "gpt";

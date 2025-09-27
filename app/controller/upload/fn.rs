@@ -10,7 +10,7 @@ use super::*;
         (status = 206, description = "Partial content", body = String)
     )
 )]
-#[prologue_hooks(
+#[prologue_macros(
     methods(get, post),
     route_param(UPLOAD_DIR_KEY => dir_opt),
     route_param(UPLOAD_FILE_KEY => file_opt),
@@ -71,7 +71,7 @@ pub async fn static_file(ctx: Context) {
         (status = 200, description = "File chunk upload frontend interface", body = String)
     )
 )]
-#[prologue_hooks(
+#[prologue_macros(
     methods(get, post),
     response_status_code(200),
     response_body(UPLOAD_HTML),
@@ -106,7 +106,7 @@ pub async fn register(ctx: Context) {
         (status = 200, description = "File chunk upload - save API", body = UploadResponse)
     )
 )]
-#[prologue_hooks(
+#[prologue_macros(
     post,
     request_header(CHUNKIFY_FILE_ID_HEADER => file_id_opt),
     request_header(CHUNKIFY_CHUNK_INDEX_HEADER => chunk_index_opt)
@@ -139,7 +139,7 @@ pub async fn save(ctx: Context) {
         (status = 200, description = "File chunk upload - merge API", body = UploadResponse)
     )
 )]
-#[prologue_hooks(
+#[prologue_macros(
     post,
     request_header(CHUNKIFY_FILE_ID_HEADER => file_id_opt)
 )]

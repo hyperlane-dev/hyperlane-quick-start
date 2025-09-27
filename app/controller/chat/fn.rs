@@ -9,7 +9,7 @@ use super::*;
         (status = 200, description = "Chat frontend interface", body = String)
     )
 )]
-#[prologue_hooks(
+#[prologue_macros(
     methods(get, post),
     response_status_code(200),
     response_body(CHAT_HTML),
@@ -26,7 +26,7 @@ pub async fn html(ctx: Context) {}
         (status = 200, description = "Chat API", body = WebSocketRespData)
     )
 )]
-#[prologue_hooks(ws, get)]
+#[prologue_macros(ws, get)]
 pub async fn handle(ctx: Context) {
     let websocket: &WebSocket = get_global_websocket();
     let path: String = ctx.get_request_path().await;

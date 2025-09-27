@@ -8,7 +8,7 @@ use super::*;
         (status = 200, description = "Get online users list", body = UserListResponse)
     )
 )]
-#[prologue_hooks(
+#[prologue_macros(
     get,
     response_status_code(200),
     response_header(CONTENT_TYPE => APPLICATION_JSON)

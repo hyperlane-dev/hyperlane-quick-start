@@ -1,20 +1,20 @@
-pub const HEADER_X_CLIENT_ADDR: &str = "X-Client-Addr";
+pub const HEADER_X_CLIENT_ADDR: &'static str = "X-Client-Addr";
 
 pub const MENTION_PREFIX: char = '@';
 
-pub const GPT_MENTION_UPPER: &str = "@GPT";
-pub const GPT_MENTION_FULL: &str = "@GPT Assistant";
-pub const GPT_MENTION_LOWER: &str = "@gpt";
+pub const GPT_MENTION_UPPER: &'static str = "@GPT";
+pub const GPT_MENTION_FULL: &'static str = "@GPT Assistant";
+pub const GPT_MENTION_LOWER: &'static str = "@gpt";
 
-pub const ROLE_USER: &str = "user";
-pub const ROLE_ASSISTANT: &str = "assistant";
+pub const ROLE_USER: &'static str = "user";
+pub const ROLE_ASSISTANT: &'static str = "assistant";
 
-pub const JSON_FIELD_ROLE: &str = "role";
-pub const JSON_FIELD_CONTENT: &str = "content";
-pub const JSON_FIELD_RESULT: &str = "result";
-pub const JSON_FIELD_RESPONSE: &str = "response";
-pub const JSON_FIELD_CHOICES: &str = "choices";
-pub const JSON_FIELD_MESSAGE: &str = "message";
-pub const JSON_FIELD_MESSAGES: &str = "messages";
-pub const JSON_FIELD_ERRORS: &str = "errors";
-pub const GPT_MODEL: &str = "model";
+pub const JSON_FIELD_ROLE: &'static str = "role";
+pub const JSON_FIELD_CONTENT: &'static str = "content";
+pub const JSON_FIELD_RESULT: &'static str = "result";
+pub const JSON_FIELD_RESPONSE: &'static str = "response";
+pub const JSON_FIELD_CHOICES: &'static str = "choices";
+pub const JSON_FIELD_MESSAGE: &'static str = "message";
+pub const JSON_FIELD_MESSAGES: &'static str = "messages";
+pub const JSON_FIELD_ERRORS: &'static str = "errors";
+pub const GPT_MODEL: &'static str = "model";
