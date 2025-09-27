@@ -1,7 +1,8 @@
 use super::*;
 
 #[panic_hook]
-#[epilogue_hooks(
+#[epilogue_macros(
+    clear_response_headers,
     response_status_code(500),
     response_body(&response_body),
     response_header(SERVER => HYPERLANE),
@@ -15,5 +16,4 @@ pub async fn panic_hook(ctx: Context) {
     log_error(&response_body).await;
     println_error!(response_body);
     let content_type: String = ContentType::format_content_type_with_charset(TEXT_PLAIN, UTF8);
-    let _ = ctx.clear_response_headers().await;
 }
