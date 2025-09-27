@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -324,12 +324,10 @@
         white-space: pre-wrap;
         word-wrap: break-word;
         overflow-wrap: break-word;
-        /* Firefox滚动条样式 */
         scrollbar-width: thin;
         scrollbar-color: rgba(0, 0, 0, 0.2) rgba(0, 0, 0, 0.05);
       }
 
-      /* 自定义滚动条样式 */
       .chat-input textarea::-webkit-scrollbar {
         width: 6px;
       }
@@ -349,7 +347,6 @@
         background: rgba(0, 0, 0, 0.3);
       }
 
-      /* 移动端样式 */
       @media (max-width: 768px) {
         .chat-input textarea {
           white-space: nowrap;
@@ -602,7 +599,6 @@
         display: none !important;
       }
 
-      /* 艾特功能下拉框样式 */
       .mention-dropdown {
         position: absolute;
         background: #ffffff;
@@ -632,7 +628,7 @@
       .mention-list {
         flex: 1;
         overflow-y: auto;
-        min-height: 0; /* 允许flex子元素收缩 */
+        min-height: 0;
       }
 
       .mention-item {
@@ -803,7 +799,6 @@
           padding: 4px 8px;
           margin-left: 6px;
           height: 26px;
-          /* 移动端保持简洁样式 */
           background: #007bff !important;
           box-shadow: none !important;
           border-radius: 4px !important;
@@ -893,7 +888,7 @@
         </button>
 
         <div class="connection-status hidden" id="connectionStatus">
-          <div>连接已断开，正在尝试重连...</div>
+          <div>Connection lost, trying to reconnect...</div>
         </div>
 
         <div class="chat-input" id="chatInputContainer">
@@ -908,7 +903,6 @@
             <i class="send-icon">➤</i>
           </button>
 
-          <!-- 艾特功能下拉框 -->
           <div class="mention-dropdown hidden" id="mentionDropdown">
             <div class="mention-header">Select User</div>
             <div class="mention-list" id="mentionList"></div>
@@ -920,7 +914,6 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <script>
-      // 全局变量
       let socket = null;
       let connectionStatus = 'disconnected';
       let messages = [];
@@ -941,13 +934,11 @@
       let loadingUsers = false;
       let selectedIndex = 0;
 
-      // 消息类型
       const MessageType = {
         OnlineCount: 'OnlineCount',
         GptResponse: 'GptResponse',
       };
 
-      // 简单的UUID生成函数
       function generateUUID() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
           /[xy]/g,
@@ -959,7 +950,6 @@
         );
       }
 
-      // UUID工具函数
       function getPersistentUUID() {
         const KEY = 'browser_uuid';
         let uuid = localStorage.getItem(KEY);
@@ -970,13 +960,11 @@
         return uuid;
       }
 
-      // 生成用户名
       function generateUsername() {
         const uuid = getPersistentUUID();
         return `User${uuid}`;
       }
 
-      // 获取头像颜色
       function getAvatarColor(name) {
         const colors = [
           '#FF6B6B',
@@ -997,7 +985,6 @@
         return colors[Math.abs(hash) % colors.length];
       }
 
-      // 获取头像文本
       function getAvatarText(name) {
         if (name === 'gpt') return 'AI';
         if (name.startsWith('User')) {
@@ -1006,7 +993,6 @@
         return name.charAt(0).toUpperCase();
       }
 
-      // Toast功能
       const toast = {
         show: function (message, type = 'warning', duration = 1000) {
           const container = document.getElementById('toastContainer');
@@ -1034,7 +1020,6 @@
         },
       };
 
-      // 初始化Markdown解析器
       function initMarkdown() {
         if (typeof window.markdownit !== 'undefined') {
           md = window.markdownit({
@@ -1056,7 +1041,6 @@
             },
           });
 
-          // 自定义链接渲染
           const defaultLinkRender =
             md.renderer.rules.link_open ||
             function (tokens, idx, options, env, renderer) {
@@ -1078,7 +1062,6 @@
         }
       }
 
-      // 渲染Markdown
       function renderMarkdown(text) {
         try {
           if (md) {
@@ -1091,7 +1074,6 @@
         }
       }
 
-      // 格式化提及
       function formatMentions(text) {
         const currentUuid = getPersistentUUID();
         const currentUsername = `User${currentUuid}`;
@@ -1113,7 +1095,6 @@
         });
       }
 
-      // 检查是否是当前用户
       function isCurrentUser(mentionedUsername, currentUuid, currentUsername) {
         const possibleMatches = [
           currentUuid,
@@ -1129,18 +1110,15 @@
         );
       }
 
-      // 格式化消息文本
       function formatMessageText(text) {
         const markdownRendered = renderMarkdown(text);
         return formatMentions(markdownRendered);
       }
 
-      // 检查是否是自己的消息
       function isMe(data) {
         return data?.name === getPersistentUUID();
       }
 
-      // 创建消息元素
       function createMessageElement(message) {
         const messageEl = document.createElement('div');
         const isSelf = isMe(message);
@@ -1225,7 +1203,6 @@
         return messageEl;
       }
 
-      // 处理提及用户
       function handleMentionUser(username) {
         const input = document.getElementById('messageInput');
         const mention = `@${username} `;
@@ -1238,7 +1215,6 @@
         input.setSelectionRange(input.value.length, input.value.length);
       }
 
-      // 添加消息到列表
       function addMessage(message) {
         const messageList = document.getElementById('messageList');
         const messageEl = createMessageElement(message);
@@ -1257,7 +1233,6 @@
         }
       }
 
-      // 滚动到底部
       function scrollToBottom() {
         const messageList = document.getElementById('messageList');
         messageList.scrollTop = messageList.scrollHeight;
@@ -1267,7 +1242,6 @@
         isNearBottom = true;
       }
 
-      // 更新滚动按钮
       function updateScrollButton() {
         const scrollBtn = document.getElementById('scrollToBottomBtn');
         const unreadBadge = document.getElementById('unreadBadge');
@@ -1286,7 +1260,6 @@
         }
       }
 
-      // 处理滚动事件
       function handleScroll() {
         const messageList = document.getElementById('messageList');
         const scrollTop = messageList.scrollTop;
@@ -1303,7 +1276,6 @@
         }
       }
 
-      // 更新连接状态
       function updateConnectionStatus(status) {
         connectionStatus = status;
         const indicator = document.getElementById('connectionIndicator');
@@ -1336,7 +1308,6 @@
         }
       }
 
-      // WebSocket连接
       function connect() {
         updateConnectionStatus('connecting');
         const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
@@ -1385,11 +1356,10 @@
 
         socket.onerror = (error) => {
           updateConnectionStatus('disconnected');
-          console.error('WebSocket错误:', error);
+          console.error('WebSocket error:', error);
         };
       }
 
-      // 重连
       function reconnect() {
         if (reconnectAttempts < maxReconnectAttempts) {
           reconnectAttempts++;
@@ -1397,11 +1367,12 @@
             connect();
           }, reconnectInterval);
         } else {
-          console.error('达到最大重连次数，停止重连');
+          console.error(
+            'Maximum reconnection attempts reached, stopping reconnection'
+          );
         }
       }
 
-      // 发送WebSocket消息
       function sendWebSocketMessage(message) {
         if (socket && socket.readyState === WebSocket.OPEN) {
           socket.send(JSON.stringify(message));
@@ -1410,7 +1381,6 @@
         return false;
       }
 
-      // 处理接收到的消息
       function handleMessage(data) {
         const isSelf = data.name === username;
         const isGptResponse = data.type === MessageType.GptResponse;
@@ -1431,7 +1401,6 @@
         addMessage(message);
       }
 
-      // 更新输入框占位符
       function updatePlaceholder(onlineCountText) {
         const input = document.getElementById('messageInput');
         const basePlaceholder = isMobile
@@ -1445,7 +1414,6 @@
         }
       }
 
-      // 发送消息
       function sendMessage() {
         const input = document.getElementById('messageInput');
         const message = input.value.trim();
@@ -1469,7 +1437,6 @@
         autoResize();
       }
 
-      // 自动调整输入框高度
       function autoResize() {
         const textarea = document.getElementById('messageInput');
         if (textarea) {
@@ -1495,7 +1462,6 @@
         }
       }
 
-      // 检查是否是移动端
       function checkMobile() {
         const wasMobile = isMobile;
         isMobile = window.innerWidth <= 768;
@@ -1506,9 +1472,7 @@
         }
       }
 
-      // 处理键盘事件
       function handleKeyDown(event) {
-        // 如果下拉框显示，处理下拉框的键盘事件
         if (showMentionDropdown) {
           if (['ArrowDown', 'ArrowUp', 'Enter', 'Escape'].includes(event.key)) {
             event.preventDefault();
@@ -1536,19 +1500,16 @@
         }
       }
 
-      // 处理输入事件
       function handleInput() {
         checkMentionTrigger();
         autoResize();
       }
 
-      // 检查提及触发
       function checkMentionTrigger() {
         const input = document.getElementById('messageInput');
         const cursorPos = input.selectionStart;
         const text = input.value;
 
-        // 查找最近的@符号
         let atIndex = -1;
         for (let i = cursorPos - 1; i >= 0; i--) {
           if (text[i] === '@') {
@@ -1561,28 +1522,24 @@
         }
 
         if (atIndex !== -1) {
-          // 找到@符号，提取过滤文本
           const filterText = text.substring(atIndex + 1, cursorPos);
           mentionFilter = filterText;
           mentionStartIndex = atIndex;
 
           if (!showMentionDropdown) {
             showMentionDropdown = true;
-            selectedIndex = 0; // 重置选中索引
+            selectedIndex = 0;
             fetchOnlineUsers();
           } else {
-            // 如果下拉框已经显示，重新渲染以更新过滤结果
             renderMentionList();
           }
 
-          // 计算下拉框位置
           calculateDropdownPosition(input, atIndex);
         } else {
           closeMentionDropdown();
         }
       }
 
-      // 计算下拉框位置
       function calculateDropdownPosition(input, atIndex) {
         const container = document.getElementById('chatInputContainer');
         const containerRect = container.getBoundingClientRect();
@@ -1615,9 +1572,8 @@
         dropdown.classList.remove('hidden');
       }
 
-      // 获取在线用户
       async function fetchOnlineUsers() {
-        if (loadingUsers) return; // 防止重复请求
+        if (loadingUsers) return;
 
         loadingUsers = true;
         try {
@@ -1631,7 +1587,6 @@
           const response = await fetch(`${protocol}//${host}/api/users/online`);
           if (response.ok) {
             const data = await response.json();
-            // 直接使用后端返回的用户列表（已包含GPT）
             onlineUsers = data.users || [];
           } else {
             onlineUsers = [];
@@ -1644,7 +1599,7 @@
           renderMentionList();
         }
       }
-      // 渲染提及列表
+
       function renderMentionList() {
         const mentionList = document.getElementById('mentionList');
         mentionList.innerHTML = '';
@@ -1659,7 +1614,6 @@
           return;
         }
 
-        // 过滤用户列表
         const filteredUsers = onlineUsers.filter((user) => {
           if (!mentionFilter) return true;
           return user.username
@@ -1674,7 +1628,6 @@
           return;
         }
 
-        // 只有在selectedIndex超出范围时才重置为0
         if (selectedIndex >= filteredUsers.length || selectedIndex < 0) {
           selectedIndex = 0;
         }
@@ -1705,8 +1658,6 @@
             </div>
           `;
 
-          // 为每个用户项添加点击事件监听器，并正确传递用户数据
-          // 使用闭包确保正确的用户数据被传递
           item.addEventListener(
             'click',
             (function (userCopy) {
@@ -1717,21 +1668,18 @@
             })(user)
           );
 
-          // 处理鼠标悬停事件
           item.addEventListener('mouseenter', () => {
             selectedIndex = index;
-            renderMentionList(); // 重新渲染以更新选中状态
+            renderMentionList();
           });
 
           mentionList.appendChild(item);
         });
       }
 
-      // 处理提及键盘事件
       function handleMentionKeyDown(event) {
         if (!showMentionDropdown) return;
 
-        // 过滤用户列表
         const filteredUsers = onlineUsers.filter((user) => {
           if (!mentionFilter) return true;
           return user.username
@@ -1739,10 +1687,8 @@
             .includes(mentionFilter.toLowerCase());
         });
 
-        // 如果没有用户，直接返回
         if (filteredUsers.length === 0) return;
 
-        // 保存当前选中索引，用于比较变化
         const previousIndex = selectedIndex;
 
         switch (event.key) {
@@ -1752,7 +1698,6 @@
               selectedIndex + 1,
               filteredUsers.length - 1
             );
-            // 只有在选中索引发生变化时才重新渲染
             if (selectedIndex !== previousIndex) {
               renderMentionList();
             }
@@ -1760,7 +1705,6 @@
           case 'ArrowUp':
             event.preventDefault();
             selectedIndex = Math.max(selectedIndex - 1, 0);
-            // 只有在选中索引发生变化时才重新渲染
             if (selectedIndex !== previousIndex) {
               renderMentionList();
             }
@@ -1778,7 +1722,6 @@
         }
       }
 
-      // 选择提及用户
       function selectMentionUser(user) {
         if (!user) return;
 
@@ -1789,13 +1732,11 @@
         input.value = beforeMention + `@${user.username} ` + afterMention;
         closeMentionDropdown();
 
-        // 设置光标位置
         const newCursorPos = beforeMention.length + user.username.length + 2;
         input.setSelectionRange(newCursorPos, newCursorPos);
         input.focus();
       }
 
-      // 关闭提及下拉框
       function closeMentionDropdown() {
         showMentionDropdown = false;
         mentionFilter = '';
@@ -1804,7 +1745,6 @@
         dropdown.classList.add('hidden');
       }
 
-      // 添加提及
       function addMention(username) {
         const mention = `@${username} `;
         const input = document.getElementById('messageInput');
@@ -1813,12 +1753,10 @@
         } else {
           input.value = mention;
         }
-        // 聚焦到输入框
         input.focus();
         input.setSelectionRange(input.value.length, input.value.length);
       }
 
-      // 初始化
       function init() {
         username = generateUsername();
 
@@ -1841,7 +1779,6 @@
         input.addEventListener('input', handleInput);
         input.addEventListener('keyup', checkMentionTrigger);
 
-        // 点击其他地方关闭提及下拉框
         document.addEventListener('click', (event) => {
           const dropdown = document.getElementById('mentionDropdown');
           const inputContainer = document.getElementById('chatInputContainer');

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>服务器监控大屏</title>
+    <title>Server Monitoring Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
@@ -551,38 +551,38 @@
   <body>
     <div class="connection-status" id="connectionStatus">
       <span class="status-indicator"></span>
-      <span>连接中...</span>
+      <span>Connecting...</span>
     </div>
 
     <div class="container">
       <div class="header">
-        <h1>服务器监控大屏</h1>
+        <h1>Server Monitoring Dashboard</h1>
         <p class="subtitle">REAL-TIME SYSTEM MONITORING</p>
       </div>
 
       <div class="system-overview">
         <div class="system-info-item">
-          <div class="system-info-label">主机名</div>
+          <div class="system-info-label">Hostname</div>
           <div class="system-info-value" id="hostname">-</div>
         </div>
         <div class="system-info-item">
-          <div class="system-info-label">操作系统</div>
+          <div class="system-info-label">Operating System</div>
           <div class="system-info-value" id="osName">-</div>
         </div>
         <div class="system-info-item">
-          <div class="system-info-label">CPU 型号</div>
+          <div class="system-info-label">CPU Model</div>
           <div class="system-info-value" id="cpuModel">-</div>
         </div>
         <div class="system-info-item">
-          <div class="system-info-label">CPU 核心数</div>
+          <div class="system-info-label">CPU Cores</div>
           <div class="system-info-value" id="cpuCores">-</div>
         </div>
         <div class="system-info-item">
-          <div class="system-info-label">总内存</div>
+          <div class="system-info-label">Total Memory</div>
           <div class="system-info-value" id="totalMemory">-</div>
         </div>
         <div class="system-info-item">
-          <div class="system-info-label">总磁盘</div>
+          <div class="system-info-label">Total Disk</div>
           <div class="system-info-value" id="totalDisk">-</div>
         </div>
       </div>
@@ -591,7 +591,7 @@
         <div class="metric-card">
           <div class="metric-title">
             <span class="metric-icon">🖥️</span>
-            CPU 使用率
+            CPU Usage
           </div>
           <div class="metric-value" id="cpuUsage">
             0<span class="metric-unit">%</span>
@@ -604,7 +604,7 @@
         <div class="metric-card">
           <div class="metric-title">
             <span class="metric-icon">💾</span>
-            内存使用率
+            Memory Usage
           </div>
           <div class="metric-value" id="memoryUsage">
             0<span class="metric-unit">%</span>
@@ -621,7 +621,7 @@
         <div class="metric-card">
           <div class="metric-title">
             <span class="metric-icon">💿</span>
-            磁盘使用率
+            Disk Usage
           </div>
           <div class="metric-value" id="diskUsage">
             0<span class="metric-unit">%</span>
@@ -634,20 +634,20 @@
         <div class="metric-card">
           <div class="metric-title">
             <span class="metric-icon">🌐</span>
-            网络流量
+            Network Traffic
           </div>
           <div class="metric-value" id="networkRx">
             0<span class="metric-unit">MB</span>
           </div>
           <div style="font-size: 1.2rem; color: #888; margin-top: 10px">
-            上传: <span id="networkTx">0 MB</span>
+            Upload: <span id="networkTx">0 MB</span>
           </div>
         </div>
 
         <div class="metric-card">
           <div class="metric-title">
             <span class="metric-icon">⚡</span>
-            系统负载
+            System Load
           </div>
           <div class="metric-value" id="loadAverage">0.00</div>
         </div>
@@ -655,7 +655,7 @@
         <div class="metric-card">
           <div class="metric-title">
             <span class="metric-icon">🔗</span>
-            活跃连接
+            Active Connections
           </div>
           <div class="metric-value" id="activeConnections">0</div>
         </div>
@@ -663,17 +663,17 @@
         <div class="metric-card">
           <div class="metric-title">
             <span class="metric-icon">⏱️</span>
-            运行时间
+            Uptime
           </div>
           <div class="metric-value" id="uptime">
-            0<span class="metric-unit">天</span>
+            0<span class="metric-unit">days</span>
           </div>
         </div>
 
         <div class="metric-card">
           <div class="metric-title">
             <span class="metric-icon">📊</span>
-            进程数量
+            Process Count
           </div>
           <div class="metric-value" id="processCount">0</div>
         </div>
@@ -682,19 +682,19 @@
       <div class="charts-section">
         <div class="charts-grid">
           <div class="chart-card">
-            <div class="chart-title">CPU 使用率趋势</div>
+            <div class="chart-title">CPU Usage Trend</div>
             <canvas id="cpuChart"></canvas>
           </div>
           <div class="chart-card">
-            <div class="chart-title">内存使用率趋势</div>
+            <div class="chart-title">Memory Usage Trend</div>
             <canvas id="memoryChart"></canvas>
           </div>
           <div class="chart-card">
-            <div class="chart-title">磁盘使用率趋势</div>
+            <div class="chart-title">Disk Usage Trend</div>
             <canvas id="diskChart"></canvas>
           </div>
           <div class="chart-card">
-            <div class="chart-title">网络流量趋势</div>
+            <div class="chart-title">Network Traffic Trend</div>
             <canvas id="networkChart"></canvas>
           </div>
         </div>
@@ -711,7 +711,6 @@
           this.maxReconnectAttempts = 5;
           this.reconnectInterval = 3000;
 
-          // 数据缓存，最多保留60个数据点
           this.maxDataPoints = 60;
           this.dataHistory = {
             cpu: [],
@@ -722,7 +721,6 @@
             timestamps: [],
           };
 
-          // 图表实例
           this.charts = {};
 
           this.init();
@@ -790,14 +788,13 @@
             },
           };
 
-          // CPU 图表
           this.charts.cpu = new Chart(document.getElementById('cpuChart'), {
             type: 'line',
             data: {
               labels: [],
               datasets: [
                 {
-                  label: 'CPU 使用率 (%)',
+                  label: 'CPU Usage (%)',
                   data: [],
                   borderColor: '#00ffff',
                   backgroundColor: 'rgba(0, 255, 255, 0.1)',
@@ -819,7 +816,6 @@
             },
           });
 
-          // 内存图表
           this.charts.memory = new Chart(
             document.getElementById('memoryChart'),
             {
@@ -828,7 +824,7 @@
                 labels: [],
                 datasets: [
                   {
-                    label: '内存使用率 (%)',
+                    label: 'Memory Usage (%)',
                     data: [],
                     borderColor: '#ff00ff',
                     backgroundColor: 'rgba(255, 0, 255, 0.1)',
@@ -851,14 +847,13 @@
             }
           );
 
-          // 磁盘图表
           this.charts.disk = new Chart(document.getElementById('diskChart'), {
             type: 'line',
             data: {
               labels: [],
               datasets: [
                 {
-                  label: '磁盘使用率 (%)',
+                  label: 'Disk Usage (%)',
                   data: [],
                   borderColor: '#ffff00',
                   backgroundColor: 'rgba(255, 255, 0, 0.1)',
@@ -880,7 +875,6 @@
             },
           });
 
-          // 网络图表
           this.charts.network = new Chart(
             document.getElementById('networkChart'),
             {
@@ -889,7 +883,7 @@
                 labels: [],
                 datasets: [
                   {
-                    label: '下载 (MB)',
+                    label: 'Download (MB)',
                     data: [],
                     borderColor: '#00ff88',
                     backgroundColor: 'rgba(0, 255, 136, 0.1)',
@@ -897,7 +891,7 @@
                     borderWidth: 3,
                   },
                   {
-                    label: '上传 (MB)',
+                    label: 'Upload (MB)',
                     data: [],
                     borderColor: '#ff8800',
                     backgroundColor: 'rgba(255, 136, 0, 0.1)',
@@ -912,14 +906,14 @@
         }
 
         connectSSE() {
-          this.updateConnectionStatus('连接中...', false);
+          this.updateConnectionStatus('Connecting...', false);
 
           this.eventSource = new EventSource('/api/server/status');
 
           this.eventSource.onopen = () => {
             this.isConnected = true;
             this.reconnectAttempts = 0;
-            this.updateConnectionStatus('已连接', true);
+            this.updateConnectionStatus('Connected', true);
           };
 
           this.eventSource.onmessage = (event) => {
@@ -933,7 +927,7 @@
 
           this.eventSource.onerror = () => {
             this.isConnected = false;
-            this.updateConnectionStatus('连接断开', false);
+            this.updateConnectionStatus('Disconnected', false);
             this.eventSource.close();
             this.reconnect();
           };
@@ -943,7 +937,7 @@
           if (this.reconnectAttempts < this.maxReconnectAttempts) {
             this.reconnectAttempts++;
             this.updateConnectionStatus(
-              `重连中... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`,
+              `Reconnecting... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`,
               false
             );
 
@@ -951,7 +945,7 @@
               this.connectSSE();
             }, this.reconnectInterval);
           } else {
-            this.updateConnectionStatus('连接失败', false);
+            this.updateConnectionStatus('Connection failed', false);
           }
         }
 
@@ -964,7 +958,6 @@
         }
 
         updateServerStatus(data) {
-          // 更新实时数据显示
           document.getElementById(
             'cpuUsage'
           ).innerHTML = `${data.cpu_usage.toFixed(
@@ -1008,12 +1001,11 @@
           const hours = Math.floor((data.uptime % 86400) / 3600);
           document.getElementById(
             'uptime'
-          ).innerHTML = `${days}<span class="metric-unit">天</span>`;
+          ).innerHTML = `${days}<span class="metric-unit">days</span>`;
 
           document.getElementById('processCount').textContent =
             data.process_count;
 
-          // 系统信息
           document.getElementById('hostname').textContent = data.hostname;
           document.getElementById('osName').textContent = data.os_name;
           document.getElementById('cpuModel').textContent = data.cpu_model;
@@ -1025,7 +1017,6 @@
             data.disk_total
           );
 
-          // 更新图表数据
           this.updateChartData(data);
         }
 
@@ -1033,7 +1024,6 @@
           const now = new Date();
           const timeLabel = now.toLocaleTimeString();
 
-          // 添加新数据到缓存
           this.dataHistory.timestamps.push(timeLabel);
           this.dataHistory.cpu.push(data.cpu_usage);
           this.dataHistory.memory.push(data.memory_usage);
@@ -1041,7 +1031,6 @@
           this.dataHistory.networkRx.push(data.network_rx / 1024 / 1024);
           this.dataHistory.networkTx.push(data.network_tx / 1024 / 1024);
 
-          // 保持最多60个数据点
           if (this.dataHistory.timestamps.length > this.maxDataPoints) {
             this.dataHistory.timestamps.shift();
             this.dataHistory.cpu.shift();
@@ -1051,7 +1040,6 @@
             this.dataHistory.networkTx.shift();
           }
 
-          // 更新图表
           this.updateChart('cpu', this.dataHistory.cpu);
           this.updateChart('memory', this.dataHistory.memory);
           this.updateChart('disk', this.dataHistory.disk);
@@ -1100,13 +1088,11 @@
         }
       }
 
-      // 初始化监控器
       let monitor;
       document.addEventListener('DOMContentLoaded', () => {
         monitor = new ServerMonitor();
       });
 
-      // 页面卸载时清理
       window.addEventListener('beforeunload', () => {
         if (monitor) {
           monitor.destroy();

@@ -907,7 +907,7 @@
         statusEl.textContent = message;
         statusEl.className = 'status ' + type;
         statusEl.style.display = 'flex';
-        setTimeout(resetStatus, 3000); // 3秒后自动隐藏
+        setTimeout(resetStatus, 3000);
       }
       function generateUniqueId() {
         return (
@@ -924,7 +924,6 @@
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
       }
 
-      // Add export functionality
       document
         .getElementById('exportBtn')
         .addEventListener('click', async () => {
@@ -946,7 +945,6 @@
           }
         });
 
-      // Add import functionality
       document
         .getElementById('importFile')
         .addEventListener('change', async (event) => {
@@ -965,14 +963,12 @@
             const store = transaction.objectStore(STORE_NAME);
 
             for (const record of importData) {
-              // 检查记录是否已存在
               const existingRecord = await new Promise((resolve) => {
                 const request = store.get(record.id);
                 request.onsuccess = () => resolve(request.result);
                 request.onerror = () => resolve(null);
               });
 
-              // 如果记录不存在，则添加
               if (!existingRecord) {
                 await new Promise((resolve, reject) => {
                   const request = store.put(record);
@@ -988,7 +984,7 @@
             showStatus('Import failed: ' + error.message, 'error');
           }
 
-          event.target.value = ''; // Reset file input
+          event.target.value = '';
         });
     </script>
   </body>
