@@ -3,9 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Server Monitoring Dashboard</title>
+    <title>服务器监控大屏</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+      @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
       * {
         margin: 0;
         padding: 0;
@@ -17,22 +19,95 @@
       }
 
       body {
-        font-family: 'Microsoft YaHei', Arial, sans-serif;
-        background: linear-gradient(
-          135deg,
-          #0c1022 0%,
-          #1a1a2e 50%,
-          #16213e 100%
-        );
+        font-family: 'Rajdhani', 'Microsoft YaHei', Arial, sans-serif;
+        background: radial-gradient(
+            circle at 20% 80%,
+            rgba(120, 119, 198, 0.3) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 20%,
+            rgba(255, 119, 198, 0.3) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 40% 40%,
+            rgba(120, 219, 255, 0.2) 0%,
+            transparent 50%
+          ),
+          linear-gradient(
+            135deg,
+            #0a0a0a 0%,
+            #1a0a2e 25%,
+            #16213e 50%,
+            #0f3460 75%,
+            #0a1a2a 100%
+          );
         color: #ffffff;
         overflow-x: hidden;
         min-height: 100vh;
+        position: relative;
+      }
+
+      body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 255, 255, 0.03) 2px,
+            rgba(0, 255, 255, 0.03) 4px
+          ),
+          repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 255, 255, 0.03) 2px,
+            rgba(0, 255, 255, 0.03) 4px
+          );
+        pointer-events: none;
+        z-index: 1;
       }
 
       .container {
-        padding: 20px;
+        position: relative;
+        z-index: 2;
+      }
+
+      .section {
+        min-height: 100vh;
+        padding: 40px 20px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .section-content {
         max-width: 1920px;
         margin: 0 auto;
+        position: relative;
+        z-index: 2;
+      }
+
+      .section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(
+          circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+          rgba(0, 255, 255, 0.1) 0%,
+          transparent 50%
+        );
+        pointer-events: none;
+        z-index: 1;
+        transition: all 0.3s ease;
       }
 
       .header {
@@ -42,96 +117,232 @@
       }
 
       .header h1 {
-        font-size: 2.5rem;
-        background: linear-gradient(45deg, #00d4ff, #00ff88);
+        font-family: 'Orbitron', monospace;
+        font-size: 3.5rem;
+        font-weight: 900;
+        background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00, #00ffff);
+        background-size: 400% 400%;
         -webkit-text-fill-color: transparent;
-        text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
-        margin-bottom: 10px;
+        text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+        margin-bottom: 15px;
+        animation: gradientShift 3s ease-in-out infinite;
+        letter-spacing: 3px;
+      }
+
+      @keyframes gradientShift {
+        0%,
+        100% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
       }
 
       .header .subtitle {
-        font-size: 1.2rem;
-        color: #8892b0;
-        opacity: 0.8;
+        font-size: 1.4rem;
+        color: #00ffff;
+        opacity: 0.9;
+        font-weight: 300;
+        letter-spacing: 2px;
+        text-transform: uppercase;
       }
 
-      .grid {
+      .system-overview {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
         gap: 20px;
-        margin-bottom: 30px;
+        margin-bottom: 40px;
+        padding: 30px;
+        background: linear-gradient(
+          135deg,
+          rgba(0, 255, 255, 0.1) 0%,
+          rgba(255, 0, 255, 0.1) 100%
+        );
+        border: 2px solid rgba(0, 255, 255, 0.3);
+        border-radius: 20px;
+        backdrop-filter: blur(20px);
+        position: relative;
+        overflow: hidden;
       }
 
-      .card {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(0, 212, 255, 0.3);
+      .system-overview::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00, #00ffff);
+        background-size: 400% 400%;
+        border-radius: 20px;
+        z-index: -1;
+        animation: borderGlow 4s ease-in-out infinite;
+      }
+
+      @keyframes borderGlow {
+        0%,
+        100% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+      }
+
+      .system-info-item {
+        text-align: center;
+        padding: 20px;
+        background: rgba(0, 0, 0, 0.3);
         border-radius: 15px;
-        padding: 25px;
-        backdrop-filter: blur(10px);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(0, 255, 255, 0.2);
         transition: all 0.3s ease;
         position: relative;
         overflow: hidden;
       }
 
-      .card::before {
+      .system-info-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(0, 255, 255, 0.2),
+          transparent
+        );
+        transition: left 0.5s ease;
+      }
+
+      .system-info-item:hover::before {
+        left: 100%;
+      }
+
+      .system-info-item:hover {
+        transform: translateY(-5px);
+        border-color: rgba(0, 255, 255, 0.6);
+        box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
+      }
+
+      .system-info-label {
+        font-size: 0.9rem;
+        color: #00ffff;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 500;
+      }
+
+      .system-info-value {
+        font-size: 1.8rem;
+        color: #ffffff;
+        font-weight: 700;
+        font-family: 'Orbitron', monospace;
+      }
+
+      .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+      }
+
+      .metric-card {
+        background: linear-gradient(
+          135deg,
+          rgba(0, 0, 0, 0.8) 0%,
+          rgba(20, 20, 40, 0.8) 100%
+        );
+        border: 2px solid transparent;
+        border-radius: 20px;
+        padding: 30px;
+        backdrop-filter: blur(15px);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s ease;
+      }
+
+      .metric-card::before {
         content: '';
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
-        height: 2px;
-        background: linear-gradient(90deg, #00d4ff, #00ff88);
-        opacity: 0.8;
+        bottom: 0;
+        background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00, #00ffff);
+        background-size: 400% 400%;
+        border-radius: 20px;
+        z-index: -1;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        animation: borderGlow 4s ease-in-out infinite;
       }
 
-      .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 40px rgba(0, 212, 255, 0.2);
-        border-color: rgba(0, 212, 255, 0.6);
+      .metric-card:hover::before {
+        opacity: 1;
       }
 
-      .card-title {
-        font-size: 1.3rem;
+      .metric-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(0, 255, 255, 0.4);
+      }
+
+      .metric-title {
+        font-size: 1.1rem;
+        color: #00ffff;
         margin-bottom: 15px;
-        color: #00d4ff;
         display: flex;
         align-items: center;
         gap: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
       }
 
-      .card-value {
-        font-size: 2.5rem;
-        font-weight: bold;
-        margin-bottom: 10px;
-        background: linear-gradient(45deg, #ffffff, #00ff88);
+      .metric-icon {
+        font-size: 1.5rem;
+        filter: drop-shadow(0 0 10px currentColor);
+      }
+
+      .metric-value {
+        font-size: 3rem;
+        font-weight: 900;
+        margin-bottom: 15px;
+        background: linear-gradient(45deg, #ffffff, #00ffff);
         -webkit-text-fill-color: transparent;
+        font-family: 'Orbitron', monospace;
+        text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
       }
 
-      .card-unit {
-        font-size: 1rem;
-        color: #8892b0;
-        margin-left: 5px;
+      .metric-unit {
+        font-size: 1.2rem;
+        color: #888;
+        margin-left: 8px;
       }
 
-      .progress-bar {
+      .progress-container {
         width: 100%;
-        height: 8px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 4px;
+        height: 12px;
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 6px;
         overflow: hidden;
         margin-top: 15px;
-      }
-
-      .progress-fill {
-        height: 100%;
-        background: linear-gradient(90deg, #00d4ff, #00ff88);
-        border-radius: 4px;
-        transition: width 0.5s ease;
         position: relative;
       }
 
-      .progress-fill::after {
+      .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #00ffff, #ff00ff);
+        border-radius: 6px;
+        transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .progress-bar::after {
         content: '';
         position: absolute;
         top: 0;
@@ -141,13 +352,13 @@
         background: linear-gradient(
           90deg,
           transparent,
-          rgba(255, 255, 255, 0.3),
+          rgba(255, 255, 255, 0.4),
           transparent
         );
-        animation: shimmer 2s infinite;
+        animation: progressShimmer 2s infinite;
       }
 
-      @keyframes shimmer {
+      @keyframes progressShimmer {
         0% {
           transform: translateX(-100%);
         }
@@ -156,132 +367,129 @@
         }
       }
 
+      .charts-section {
+        margin-bottom: 40px;
+      }
+
+      .charts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+        gap: 30px;
+      }
+
+      .chart-card {
+        background: linear-gradient(
+          135deg,
+          rgba(0, 0, 0, 0.9) 0%,
+          rgba(20, 20, 40, 0.9) 100%
+        );
+        border: 2px solid rgba(0, 255, 255, 0.3);
+        border-radius: 20px;
+        padding: 30px;
+        backdrop-filter: blur(20px);
+        position: relative;
+        overflow: hidden;
+        height: 400px;
+        transition: all 0.4s ease;
+      }
+
+      .chart-card::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00, #00ffff);
+        background-size: 400% 400%;
+        border-radius: 20px;
+        z-index: -1;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        animation: borderGlow 4s ease-in-out infinite;
+      }
+
+      .chart-card:hover::before {
+        opacity: 0.7;
+      }
+
+      .chart-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 255, 255, 0.3);
+      }
+
+      .chart-title {
+        font-size: 1.4rem;
+        color: #00ffff;
+        margin-bottom: 20px;
+        text-align: center;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-family: 'Orbitron', monospace;
+      }
+
+      .chart-card canvas {
+        width: 100% !important;
+        height: calc(100% - 60px) !important;
+      }
+
+      .connection-status {
+        position: fixed;
+        top: 30px;
+        right: 30px;
+        padding: 15px 25px;
+        border-radius: 30px;
+        background: linear-gradient(
+          135deg,
+          rgba(0, 255, 136, 0.2),
+          rgba(0, 255, 255, 0.2)
+        );
+        border: 2px solid #00ff88;
+        color: #00ff88;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        z-index: 1000;
+        backdrop-filter: blur(10px);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .connection-status.disconnected {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 0, 0, 0.2),
+          rgba(255, 100, 100, 0.2)
+        );
+        border-color: #ff0000;
+        color: #ff0000;
+      }
+
       .status-indicator {
         display: inline-block;
         width: 12px;
         height: 12px;
         border-radius: 50%;
         background: #00ff88;
-        box-shadow: 0 0 10px #00ff88;
-        animation: pulse 2s infinite;
+        box-shadow: 0 0 15px #00ff88;
+        animation: statusPulse 2s infinite;
       }
 
-      @keyframes pulse {
+      @keyframes statusPulse {
         0%,
         100% {
           opacity: 1;
+          transform: scale(1);
+          box-shadow: 0 0 15px #00ff88;
         }
         50% {
-          opacity: 0.5;
+          opacity: 0.7;
+          transform: scale(1.2);
+          box-shadow: 0 0 25px #00ff88;
         }
-      }
-
-      .chart-container {
-        grid-column: 1 / -1;
-        height: 300px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(0, 212, 255, 0.3);
-        border-radius: 15px;
-        padding: 25px;
-        backdrop-filter: blur(10px);
-      }
-
-      .charts-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-        gap: 20px;
-        margin-bottom: 30px;
-      }
-
-      .chart-card {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(0, 212, 255, 0.3);
-        border-radius: 15px;
-        padding: 25px;
-        backdrop-filter: blur(10px);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-        height: 300px;
-      }
-
-      .chart-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 2px;
-        background: linear-gradient(90deg, #00d4ff, #00ff88);
-        opacity: 0.8;
-      }
-
-      .chart-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 40px rgba(0, 212, 255, 0.2);
-        border-color: rgba(0, 212, 255, 0.6);
-      }
-
-      .chart-title {
-        font-size: 1.2rem;
-        margin-bottom: 15px;
-        color: #00d4ff;
-        text-align: center;
-        font-weight: 500;
-      }
-
-      .chart-card canvas {
-        width: 100% !important;
-        height: calc(100% - 50px) !important;
-      }
-
-      .system-info {
-        grid-column: 1 / -1;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 15px;
-      }
-
-      .info-item {
-        background: rgba(255, 255, 255, 0.03);
-        padding: 15px;
-        border-radius: 10px;
-        border-left: 3px solid #00d4ff;
-      }
-
-      .info-label {
-        font-size: 0.9rem;
-        color: #8892b0;
-        margin-bottom: 5px;
-      }
-
-      .info-value {
-        font-size: 1.1rem;
-        color: #ffffff;
-        font-weight: 500;
-      }
-
-      .connection-status {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 10px 20px;
-        border-radius: 25px;
-        background: rgba(0, 255, 136, 0.2);
-        border: 1px solid #00ff88;
-        color: #00ff88;
-        font-size: 0.9rem;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        z-index: 1000;
-      }
-
-      .connection-status.disconnected {
-        background: rgba(255, 0, 0, 0.2);
-        border-color: #ff0000;
-        color: #ff0000;
       }
 
       @media (max-width: 768px) {
@@ -290,42 +498,52 @@
         }
 
         .header h1 {
-          font-size: 2rem;
+          font-size: 2.5rem;
         }
 
-        .grid {
+        .metrics-grid {
           grid-template-columns: 1fr;
-          gap: 15px;
+          gap: 20px;
         }
 
-        .card {
+        .charts-grid {
+          grid-template-columns: 1fr;
+          gap: 20px;
+        }
+
+        .chart-card {
+          height: 300px;
           padding: 20px;
         }
 
-        .card-value {
-          font-size: 2rem;
+        .metric-value {
+          font-size: 2.5rem;
         }
 
-        .chart-container {
-          height: 250px;
-          padding: 20px;
+        .connection-status {
+          top: 15px;
+          right: 15px;
+          padding: 12px 20px;
+          font-size: 0.9rem;
         }
       }
 
       @media (max-width: 480px) {
         .header h1 {
-          font-size: 1.5rem;
+          font-size: 2rem;
+          letter-spacing: 1px;
         }
 
-        .card-value {
-          font-size: 1.8rem;
+        .metric-value {
+          font-size: 2rem;
         }
 
-        .connection-status {
-          top: 10px;
-          right: 10px;
-          padding: 8px 15px;
-          font-size: 0.8rem;
+        .system-overview {
+          padding: 20px;
+        }
+
+        .system-info-value {
+          font-size: 1.4rem;
         }
       }
     </style>
@@ -333,156 +551,152 @@
   <body>
     <div class="connection-status" id="connectionStatus">
       <span class="status-indicator"></span>
-      <span>Connecting...</span>
+      <span>连接中...</span>
     </div>
 
     <div class="container">
       <div class="header">
-        <h1>Server Monitoring Dashboard</h1>
-        <p class="subtitle">
-          Real-time System Status Monitoring · Technology Drives the Future
-        </p>
+        <h1>服务器监控大屏</h1>
+        <p class="subtitle">REAL-TIME SYSTEM MONITORING</p>
       </div>
 
-      <div class="grid">
-        <div class="card">
-          <div class="card-title">
-            <span>🖥️</span>
-            CPU Usage
+      <div class="system-overview">
+        <div class="system-info-item">
+          <div class="system-info-label">主机名</div>
+          <div class="system-info-value" id="hostname">-</div>
+        </div>
+        <div class="system-info-item">
+          <div class="system-info-label">操作系统</div>
+          <div class="system-info-value" id="osName">-</div>
+        </div>
+        <div class="system-info-item">
+          <div class="system-info-label">CPU 型号</div>
+          <div class="system-info-value" id="cpuModel">-</div>
+        </div>
+        <div class="system-info-item">
+          <div class="system-info-label">CPU 核心数</div>
+          <div class="system-info-value" id="cpuCores">-</div>
+        </div>
+        <div class="system-info-item">
+          <div class="system-info-label">总内存</div>
+          <div class="system-info-value" id="totalMemory">-</div>
+        </div>
+        <div class="system-info-item">
+          <div class="system-info-label">总磁盘</div>
+          <div class="system-info-value" id="totalDisk">-</div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-title">
+            <span class="metric-icon">🖥️</span>
+            CPU 使用率
           </div>
-          <div class="card-value" id="cpuUsage">
-            0<span class="card-unit">%</span>
+          <div class="metric-value" id="cpuUsage">
+            0<span class="metric-unit">%</span>
           </div>
-          <div class="progress-bar">
-            <div class="progress-fill" id="cpuProgress" style="width: 0%"></div>
+          <div class="progress-container">
+            <div class="progress-bar" id="cpuProgress" style="width: 0%"></div>
           </div>
         </div>
 
-        <div class="card">
-          <div class="card-title">
-            <span>💾</span>
-            Memory Usage
+        <div class="metric-card">
+          <div class="metric-title">
+            <span class="metric-icon">💾</span>
+            内存使用率
           </div>
-          <div class="card-value" id="memoryUsage">
-            0<span class="card-unit">%</span>
+          <div class="metric-value" id="memoryUsage">
+            0<span class="metric-unit">%</span>
           </div>
-          <div class="progress-bar">
+          <div class="progress-container">
             <div
-              class="progress-fill"
+              class="progress-bar"
               id="memoryProgress"
               style="width: 0%"
             ></div>
           </div>
         </div>
 
-        <div class="card">
-          <div class="card-title">
-            <span>💿</span>
-            Disk Usage
+        <div class="metric-card">
+          <div class="metric-title">
+            <span class="metric-icon">💿</span>
+            磁盘使用率
           </div>
-          <div class="card-value" id="diskUsage">
-            0<span class="card-unit">%</span>
+          <div class="metric-value" id="diskUsage">
+            0<span class="metric-unit">%</span>
           </div>
-          <div class="progress-bar">
-            <div
-              class="progress-fill"
-              id="diskProgress"
-              style="width: 0%"
-            ></div>
+          <div class="progress-container">
+            <div class="progress-bar" id="diskProgress" style="width: 0%"></div>
           </div>
         </div>
 
-        <div class="card">
-          <div class="card-title">
-            <span>🌐</span>
-            Network Traffic
+        <div class="metric-card">
+          <div class="metric-title">
+            <span class="metric-icon">🌐</span>
+            网络流量
           </div>
-          <div class="card-value" id="networkRx">
-            0<span class="card-unit">MB</span>
+          <div class="metric-value" id="networkRx">
+            0<span class="metric-unit">MB</span>
           </div>
-          <div style="font-size: 1rem; color: #8892b0; margin-top: 5px">
-            Upload: <span id="networkTx">0 MB</span>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">
-            <span>⚡</span>
-            System Load
-          </div>
-          <div class="card-value" id="loadAverage">0.00</div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">
-            <span>🔗</span>
-            Active Connections
-          </div>
-          <div class="card-value" id="activeConnections">0</div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">
-            <span>⏱️</span>
-            Uptime
-          </div>
-          <div class="card-value" id="uptime">
-            0<span class="card-unit">days</span>
+          <div style="font-size: 1.2rem; color: #888; margin-top: 10px">
+            上传: <span id="networkTx">0 MB</span>
           </div>
         </div>
 
-        <div class="card">
-          <div class="card-title">
-            <span>📊</span>
-            Process Count
+        <div class="metric-card">
+          <div class="metric-title">
+            <span class="metric-icon">⚡</span>
+            系统负载
           </div>
-          <div class="card-value" id="processCount">0</div>
+          <div class="metric-value" id="loadAverage">0.00</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-title">
+            <span class="metric-icon">🔗</span>
+            活跃连接
+          </div>
+          <div class="metric-value" id="activeConnections">0</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-title">
+            <span class="metric-icon">⏱️</span>
+            运行时间
+          </div>
+          <div class="metric-value" id="uptime">
+            0<span class="metric-unit">天</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-title">
+            <span class="metric-icon">📊</span>
+            进程数量
+          </div>
+          <div class="metric-value" id="processCount">0</div>
         </div>
       </div>
 
-      <div class="charts-grid">
-        <div class="chart-card">
-          <div class="chart-title">CPU Usage Trend</div>
-          <canvas id="cpuChart"></canvas>
-        </div>
-        <div class="chart-card">
-          <div class="chart-title">Memory Usage Trend</div>
-          <canvas id="memoryChart"></canvas>
-        </div>
-        <div class="chart-card">
-          <div class="chart-title">Disk Usage Trend</div>
-          <canvas id="diskChart"></canvas>
-        </div>
-        <div class="chart-card">
-          <div class="chart-title">Network Traffic Trend</div>
-          <canvas id="networkChart"></canvas>
-        </div>
-      </div>
-
-      <div class="system-info">
-        <div class="info-item">
-          <div class="info-label">Hostname</div>
-          <div class="info-value" id="hostname">-</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Operating System</div>
-          <div class="info-value" id="osName">-</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">CPU Model</div>
-          <div class="info-value" id="cpuModel">-</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">CPU Cores</div>
-          <div class="info-value" id="cpuCores">-</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Total Memory</div>
-          <div class="info-value" id="totalMemory">-</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Total Disk</div>
-          <div class="info-value" id="totalDisk">-</div>
+      <div class="charts-section">
+        <div class="charts-grid">
+          <div class="chart-card">
+            <div class="chart-title">CPU 使用率趋势</div>
+            <canvas id="cpuChart"></canvas>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">内存使用率趋势</div>
+            <canvas id="memoryChart"></canvas>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">磁盘使用率趋势</div>
+            <canvas id="diskChart"></canvas>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">网络流量趋势</div>
+            <canvas id="networkChart"></canvas>
+          </div>
         </div>
       </div>
     </div>
@@ -497,7 +711,7 @@
           this.maxReconnectAttempts = 5;
           this.reconnectInterval = 3000;
 
-          // Data cache, keep at most 60 data points
+          // 数据缓存，最多保留60个数据点
           this.maxDataPoints = 60;
           this.dataHistory = {
             cpu: [],
@@ -508,7 +722,7 @@
             timestamps: [],
           };
 
-          // Chart instances
+          // 图表实例
           this.charts = {};
 
           this.init();
@@ -527,9 +741,10 @@
               legend: {
                 display: true,
                 labels: {
-                  color: '#ffffff',
+                  color: '#00ffff',
                   font: {
-                    size: 12,
+                    size: 14,
+                    family: 'Rajdhani',
                   },
                 },
               },
@@ -538,20 +753,26 @@
               x: {
                 display: true,
                 grid: {
-                  color: 'rgba(255, 255, 255, 0.1)',
+                  color: 'rgba(0, 255, 255, 0.2)',
                 },
                 ticks: {
-                  color: '#8892b0',
+                  color: '#00ffff',
                   maxTicksLimit: 10,
+                  font: {
+                    family: 'Rajdhani',
+                  },
                 },
               },
               y: {
                 display: true,
                 grid: {
-                  color: 'rgba(255, 255, 255, 0.1)',
+                  color: 'rgba(0, 255, 255, 0.2)',
                 },
                 ticks: {
-                  color: '#8892b0',
+                  color: '#00ffff',
+                  font: {
+                    family: 'Rajdhani',
+                  },
                 },
               },
             },
@@ -560,8 +781,8 @@
                 tension: 0.4,
               },
               point: {
-                radius: 2,
-                hoverRadius: 4,
+                radius: 3,
+                hoverRadius: 6,
               },
             },
             animation: {
@@ -569,18 +790,19 @@
             },
           };
 
-          // CPU chart
+          // CPU 图表
           this.charts.cpu = new Chart(document.getElementById('cpuChart'), {
             type: 'line',
             data: {
               labels: [],
               datasets: [
                 {
-                  label: 'CPU Usage (%)',
+                  label: 'CPU 使用率 (%)',
                   data: [],
-                  borderColor: '#00d4ff',
-                  backgroundColor: 'rgba(0, 212, 255, 0.1)',
+                  borderColor: '#00ffff',
+                  backgroundColor: 'rgba(0, 255, 255, 0.1)',
                   fill: true,
+                  borderWidth: 3,
                 },
               ],
             },
@@ -597,7 +819,7 @@
             },
           });
 
-          // Memory chart
+          // 内存图表
           this.charts.memory = new Chart(
             document.getElementById('memoryChart'),
             {
@@ -606,11 +828,12 @@
                 labels: [],
                 datasets: [
                   {
-                    label: 'Memory Usage (%)',
+                    label: '内存使用率 (%)',
                     data: [],
-                    borderColor: '#00ff88',
-                    backgroundColor: 'rgba(0, 255, 136, 0.1)',
+                    borderColor: '#ff00ff',
+                    backgroundColor: 'rgba(255, 0, 255, 0.1)',
                     fill: true,
+                    borderWidth: 3,
                   },
                 ],
               },
@@ -628,18 +851,19 @@
             }
           );
 
-          // Disk chart
+          // 磁盘图表
           this.charts.disk = new Chart(document.getElementById('diskChart'), {
             type: 'line',
             data: {
               labels: [],
               datasets: [
                 {
-                  label: 'Disk Usage (%)',
+                  label: '磁盘使用率 (%)',
                   data: [],
-                  borderColor: '#ff6b6b',
-                  backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                  borderColor: '#ffff00',
+                  backgroundColor: 'rgba(255, 255, 0, 0.1)',
                   fill: true,
+                  borderWidth: 3,
                 },
               ],
             },
@@ -656,7 +880,7 @@
             },
           });
 
-          // Network chart
+          // 网络图表
           this.charts.network = new Chart(
             document.getElementById('networkChart'),
             {
@@ -665,18 +889,20 @@
                 labels: [],
                 datasets: [
                   {
-                    label: 'Download (MB)',
+                    label: '下载 (MB)',
                     data: [],
-                    borderColor: '#ffd93d',
-                    backgroundColor: 'rgba(255, 217, 61, 0.1)',
+                    borderColor: '#00ff88',
+                    backgroundColor: 'rgba(0, 255, 136, 0.1)',
                     fill: false,
+                    borderWidth: 3,
                   },
                   {
-                    label: 'Upload (MB)',
+                    label: '上传 (MB)',
                     data: [],
-                    borderColor: '#ff9ff3',
-                    backgroundColor: 'rgba(255, 159, 243, 0.1)',
+                    borderColor: '#ff8800',
+                    backgroundColor: 'rgba(255, 136, 0, 0.1)',
                     fill: false,
+                    borderWidth: 3,
                   },
                 ],
               },
@@ -686,14 +912,14 @@
         }
 
         connectSSE() {
-          this.updateConnectionStatus('Connecting...', false);
+          this.updateConnectionStatus('连接中...', false);
 
           this.eventSource = new EventSource('/api/server/status');
 
           this.eventSource.onopen = () => {
             this.isConnected = true;
             this.reconnectAttempts = 0;
-            this.updateConnectionStatus('Connected', true);
+            this.updateConnectionStatus('已连接', true);
           };
 
           this.eventSource.onmessage = (event) => {
@@ -707,7 +933,7 @@
 
           this.eventSource.onerror = () => {
             this.isConnected = false;
-            this.updateConnectionStatus('Disconnected', false);
+            this.updateConnectionStatus('连接断开', false);
             this.eventSource.close();
             this.reconnect();
           };
@@ -717,7 +943,7 @@
           if (this.reconnectAttempts < this.maxReconnectAttempts) {
             this.reconnectAttempts++;
             this.updateConnectionStatus(
-              `Reconnecting... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`,
+              `重连中... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`,
               false
             );
 
@@ -725,7 +951,7 @@
               this.connectSSE();
             }, this.reconnectInterval);
           } else {
-            this.updateConnectionStatus('Connection Failed', false);
+            this.updateConnectionStatus('连接失败', false);
           }
         }
 
@@ -738,12 +964,12 @@
         }
 
         updateServerStatus(data) {
-          // Update real-time data display
+          // 更新实时数据显示
           document.getElementById(
             'cpuUsage'
           ).innerHTML = `${data.cpu_usage.toFixed(
             1
-          )}<span class="card-unit">%</span>`;
+          )}<span class="metric-unit">%</span>`;
           document.getElementById(
             'cpuProgress'
           ).style.width = `${data.cpu_usage}%`;
@@ -752,7 +978,7 @@
             'memoryUsage'
           ).innerHTML = `${data.memory_usage.toFixed(
             1
-          )}<span class="card-unit">%</span>`;
+          )}<span class="metric-unit">%</span>`;
           document.getElementById(
             'memoryProgress'
           ).style.width = `${data.memory_usage}%`;
@@ -761,7 +987,7 @@
             'diskUsage'
           ).innerHTML = `${data.disk_usage.toFixed(
             1
-          )}<span class="card-unit">%</span>`;
+          )}<span class="metric-unit">%</span>`;
           document.getElementById(
             'diskProgress'
           ).style.width = `${data.disk_usage}%`;
@@ -770,7 +996,7 @@
           const txMB = (data.network_tx / 1024 / 1024).toFixed(2);
           document.getElementById(
             'networkRx'
-          ).innerHTML = `${rxMB}<span class="card-unit">MB</span>`;
+          ).innerHTML = `${rxMB}<span class="metric-unit">MB</span>`;
           document.getElementById('networkTx').textContent = `${txMB} MB`;
 
           document.getElementById('loadAverage').textContent =
@@ -782,11 +1008,12 @@
           const hours = Math.floor((data.uptime % 86400) / 3600);
           document.getElementById(
             'uptime'
-          ).innerHTML = `${days}<span class="card-unit">days</span>`;
+          ).innerHTML = `${days}<span class="metric-unit">天</span>`;
 
           document.getElementById('processCount').textContent =
             data.process_count;
 
+          // 系统信息
           document.getElementById('hostname').textContent = data.hostname;
           document.getElementById('osName').textContent = data.os_name;
           document.getElementById('cpuModel').textContent = data.cpu_model;
@@ -798,7 +1025,7 @@
             data.disk_total
           );
 
-          // Update chart data
+          // 更新图表数据
           this.updateChartData(data);
         }
 
@@ -806,13 +1033,13 @@
           const now = new Date();
           const timeLabel = now.toLocaleTimeString();
 
-          // Add new data to cache
+          // 添加新数据到缓存
           this.dataHistory.timestamps.push(timeLabel);
           this.dataHistory.cpu.push(data.cpu_usage);
           this.dataHistory.memory.push(data.memory_usage);
           this.dataHistory.disk.push(data.disk_usage);
-          this.dataHistory.networkRx.push(data.network_rx / 1024 / 1024); // Convert to MB
-          this.dataHistory.networkTx.push(data.network_tx / 1024 / 1024); // Convert to MB
+          this.dataHistory.networkRx.push(data.network_rx / 1024 / 1024);
+          this.dataHistory.networkTx.push(data.network_tx / 1024 / 1024);
 
           // 保持最多60个数据点
           if (this.dataHistory.timestamps.length > this.maxDataPoints) {
@@ -824,7 +1051,7 @@
             this.dataHistory.networkTx.shift();
           }
 
-          // Update charts
+          // 更新图表
           this.updateChart('cpu', this.dataHistory.cpu);
           this.updateChart('memory', this.dataHistory.memory);
           this.updateChart('disk', this.dataHistory.disk);
@@ -836,7 +1063,7 @@
           if (chart) {
             chart.data.labels = [...this.dataHistory.timestamps];
             chart.data.datasets[0].data = [...data];
-            chart.update('none'); // No animation update for better performance
+            chart.update('none');
           }
         }
 
@@ -848,19 +1075,6 @@
             chart.data.datasets[1].data = [...this.dataHistory.networkTx];
             chart.update('none');
           }
-        }
-
-        updateSystemInfo(info) {
-          document.getElementById('hostname').textContent = info.hostname;
-          document.getElementById('osName').textContent = info.os_name;
-          document.getElementById('cpuModel').textContent = info.cpu_model;
-          document.getElementById('cpuCores').textContent = info.cpu_cores;
-          document.getElementById('totalMemory').textContent = this.formatBytes(
-            info.total_memory
-          );
-          document.getElementById('totalDisk').textContent = this.formatBytes(
-            info.total_disk
-          );
         }
 
         formatBytes(bytes) {
@@ -878,7 +1092,6 @@
             this.eventSource.close();
           }
 
-          // Destroy chart instances
           Object.values(this.charts).forEach((chart) => {
             if (chart) {
               chart.destroy();
@@ -887,13 +1100,13 @@
         }
       }
 
-      // Initialize monitor when page loads
+      // 初始化监控器
       let monitor;
       document.addEventListener('DOMContentLoaded', () => {
         monitor = new ServerMonitor();
       });
 
-      // Cleanup on page unload
+      // 页面卸载时清理
       window.addEventListener('beforeunload', () => {
         if (monitor) {
           monitor.destroy();
