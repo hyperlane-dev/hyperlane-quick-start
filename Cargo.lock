@@ -907,9 +907,9 @@ dependencies = [
 
 [[package]]
 name = "http-type"
-version = "5.4.3"
+version = "5.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "30aba9d0d56c9b62634b3074d8450d164f9f99b829df1942884491654368ad92"
+checksum = "063a939c0353308b3ea2b27c676b8dcb5efe121fe34899de7bc1fe5e8944bb77"
 dependencies = [
  "hex",
  "http-compress",
@@ -937,9 +937,9 @@ checksum = "df3b46402a9d5adb4c86a0cf463f42e19994e3ee891101b1841f30a545cb49a9"
 
 [[package]]
 name = "hyperlane"
-version = "9.4.4"
+version = "9.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5be294cf7ebe0164f6bff1d1b5ea1a26ce4b1b5d98c84b7013ba886c777eb8bd"
+checksum = "e132d66f36a5905f3594effaeb74aaa5bacdfb4c6e059db9676dbe52f093f90e"
 dependencies = [
  "http-type",
  "inventory",
@@ -972,9 +972,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-macros"
-version = "9.0.0"
+version = "9.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4e70fa544568ff22e5a270e6b2e6af496900648415f1c1ea0a610121141a3c25"
+checksum = "2b3db6c87fdcd4a14d2c8ae4c7729bf7c9a49ff85eb3eb2a0376cb29ba0ec556"
 dependencies = [
  "inventory",
  "proc-macro2",
@@ -984,9 +984,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-plugin-websocket"
-version = "2.2.63"
+version = "2.2.64"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "40113146edee831decb9e8b1eef9840af5f038ea50ae8871a5656b9bdc309c1a"
+checksum = "7c5c9e20787a74fad98dcb16a9a2e12175b47ee4b0058cc571d0cdc26fc57794"
 dependencies = [
  "hyperlane",
  "hyperlane-broadcast",
@@ -994,7 +994,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "7.0.1"
+version = "7.0.2"
 dependencies = [
  "hyperlane_init",
 ]
@@ -1007,9 +1007,9 @@ checksum = "19b7a0bcb6105d14602c6777b955605fd0abee9c3fd412b4af4712db8a61e358"
 
 [[package]]
 name = "hyperlane-utils"
-version = "11.0.0"
+version = "11.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a1f5e4e3bffa03c4a3471272926bb2d3e0f2ed3886b1049a710e11721a998f69"
+checksum = "21f3d96a5ba461cf101244712782a9a7d7bd2b0cc325cf278766357e54116816"
 dependencies = [
  "ahash",
  "bin-encode-decode",
@@ -1616,9 +1616,9 @@ dependencies = [
 
 [[package]]
 name = "regex"
-version = "1.11.2"
+version = "1.11.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "23d7fd106d8c02486a8d64e778353d1cffe08ce79ac2e82f540c86d0facf6912"
+checksum = "8b5288124840bee7b386bc413c487869b360b2b4ec421ea56425128692f2a82c"
 dependencies = [
  "aho-corasick",
  "memchr",
@@ -1628,8 +1628,10 @@ dependencies = [
 
 [[package]]
 name = "regex-automata"
+version = "0.4.11"
 version = "0.4.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "833eb9ce86d40ef33cb1306d8accf7bc8ec2bfea4355cbdebb3df68b40925cad"
 checksum = "6b9458fa0bfeeac22b5ca447c63aaf45f28439a709ccd244698632f9aa6394d6"
 dependencies = [
  "aho-corasick",
@@ -1774,9 +1776,9 @@ checksum = "94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49"
 
 [[package]]
 name = "serde"
-version = "1.0.227"
+version = "1.0.228"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "80ece43fc6fbed4eb5392ab50c07334d3e577cbf40997ee896fe7af40bba4245"
+checksum = "9a8e94ea7f378bd32cbbd37198a4a91436180c5bb472411e48b5ec2e2124ae9e"
 dependencies = [
  "serde_core",
  "serde_derive",
@@ -1796,18 +1798,18 @@ dependencies = [
 
 [[package]]
 name = "serde_core"
-version = "1.0.227"
+version = "1.0.228"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7a576275b607a2c86ea29e410193df32bc680303c82f31e275bbfcafe8b33be5"
+checksum = "41d385c7d4ca58e59fc732af25c3983b67ac852c1a25000afe1175de458b67ad"
 dependencies = [
  "serde_derive",
 ]
 
 [[package]]
 name = "serde_derive"
-version = "1.0.227"
+version = "1.0.228"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "51e694923b8824cf0e9b382adf0f60d4e05f348f357b38833a3fa5ed7c2ede04"
+checksum = "d540f220d3187173da220f885ab66608367b6574e925011a9353e4badda91d79"
 dependencies = [
  "proc-macro2",
  "quote",
