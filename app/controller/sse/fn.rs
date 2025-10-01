@@ -5,8 +5,9 @@ use super::*;
     get,
     post,
     path = "/sse",
+    description = "Server-Sent Events endpoint",
     responses(
-        (status = 200, description = "SSE", body = String)
+        (status = 200, description = "Successfully established SSE connection", body = String)
     )
 )]
 #[prologue_macros(

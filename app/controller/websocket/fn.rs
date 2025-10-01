@@ -5,8 +5,9 @@ use super::*;
     get,
     post,
     path = "/websocket",
+    description = "Handles incoming WebSocket connections and bidirectional communication",
     responses(
-        (status = 200, description = "websocket", body = String)
+        (status = 200, description = "Successfully established WebSocket connection", body = String)
     )
 )]
 #[ws]

@@ -4,8 +4,9 @@ use super::*;
 #[utoipa::path(
     get,
     path = "/log/info",
+    description = "View information level logs",
     responses(
-        (status = 200, description = "View info level logs", body = String)
+        (status = 200, description = "Successfully retrieved info level logs", body = String)
     )
 )]
 #[prologue_macros(
@@ -22,8 +23,9 @@ pub async fn info(ctx: Context) {
 #[utoipa::path(
     get,
     path = "/log/warn",
+    description = "View warning level logs",
     responses(
-        (status = 200, description = "View warn level logs", body = String)
+        (status = 200, description = "Successfully retrieved warning level logs", body = String)
     )
 )]
 #[prologue_macros(
@@ -40,8 +42,9 @@ pub async fn warn(ctx: Context) {
 #[utoipa::path(
     get,
     path = "/log/error",
+    description = "View error level logs",
     responses(
-        (status = 200, description = "View error level logs", body = String)
+        (status = 200, description = "Successfully retrieved error level logs", body = String)
     )
 )]
 #[prologue_macros(

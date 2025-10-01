@@ -4,8 +4,9 @@ use super::*;
 #[utoipa::path(
     get,
     path = "/api/server/status",
+    description = "Stream server real-time status via Server-Sent Events",
     responses(
-        (status = 200, description = "Server real-time status SSE stream", body = String)
+        (status = 200, description = "Successfully streaming server status", body = String)
     )
 )]
 #[get]
@@ -30,8 +31,9 @@ pub async fn status_sse(ctx: Context) {
 #[utoipa::path(
     get,
     path = "/api/server/info",
+    description = "Get server system information",
     responses(
-        (status = 200, description = "Server system information", body = String)
+        (status = 200, description = "Successfully retrieved server system information", body = String)
     )
 )]
 #[prologue_macros(
@@ -50,8 +52,9 @@ pub async fn system_info(ctx: Context) {
     get,
     post,
     path = "/monitor",
+    description = "Server monitoring dashboard interface",
     responses(
-        (status = 200, description = "Server monitoring dashboard interface", body = String)
+        (status = 200, description = "Successfully served monitoring dashboard", body = String)
     )
 )]
 #[prologue_macros(
@@ -66,8 +69,9 @@ pub async fn monitor_dashboard(ctx: Context) {}
     get,
     post,
     path = "/api/network/capture",
+    description = "Get network capture data",
     responses(
-        (status = 200, description = "Network capture data", body = String)
+        (status = 200, description = "Successfully retrieved network capture data", body = String)
     )
 )]
 #[methods(get, post)]
@@ -80,8 +84,9 @@ pub async fn network_capture_data(ctx: Context) {
     get,
     post,
     path = "/api/network/capture/stream",
+    description = "Stream network capture data",
     responses(
-        (status = 200, description = "Network capture stream", body = String)
+        (status = 200, description = "Successfully streaming network capture data", body = String)
     )
 )]
 #[prologue_macros(

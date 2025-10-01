@@ -5,8 +5,9 @@ use super::*;
     get,
     post,
     path = "/hello/{name}",
+    description = "Greet user with name parameter",
     responses(
-        (status = 200, description = "Hello", body = String)
+        (status = 200, description = "Successfully returned greeting message", body = String)
     )
 )]
 #[prologue_macros(

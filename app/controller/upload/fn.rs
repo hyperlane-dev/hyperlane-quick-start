@@ -5,9 +5,10 @@ use super::*;
     get,
     post,
     path = "/static/{upload_dir}/{upload_file}",
+    description = "Serve static files with optional range requests",
     responses(
-        (status = 200, description = "Static resources", body = String),
-        (status = 206, description = "Partial content", body = String)
+        (status = 200, description = "Successfully served static file", body = String),
+        (status = 206, description = "Partial content served", body = String)
     )
 )]
 #[prologue_macros(
@@ -83,8 +84,9 @@ pub async fn html(ctx: Context) {}
 #[utoipa::path(
     post,
     path = "/api/upload/register",
+    description = "Register file chunk upload session",
     responses(
-        (status = 200, description = "File chunk upload - register API", body = UploadResponse)
+        (status = 200, description = "Successfully registered upload session", body = UploadResponse)
     )
 )]
 #[post]

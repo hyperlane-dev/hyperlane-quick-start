@@ -5,8 +5,9 @@ use super::*;
     get,
     post,
     path = "/chat",
+    description = "Chat frontend interface",
     responses(
-        (status = 200, description = "Chat frontend interface", body = String)
+        (status = 200, description = "Successfully served chat frontend interface", body = String)
     )
 )]
 #[prologue_macros(
@@ -22,8 +23,9 @@ pub async fn html(ctx: Context) {}
 #[utoipa::path(
     get,
     path = "/api/chat",
+    description = "WebSocket API for chat functionality",
     responses(
-        (status = 200, description = "Chat API", body = WebSocketRespData)
+        (status = 200, description = "Successfully established chat WebSocket connection", body = WebSocketRespData)
     )
 )]
 #[prologue_macros(ws, get)]

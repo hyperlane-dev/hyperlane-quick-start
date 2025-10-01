@@ -4,8 +4,9 @@ use super::*;
 #[utoipa::path(
     get,
     path = "/openapi/openapi.json",
+    description = "Get OpenAPI specification data",
     responses(
-        (status = 200, description = "OpenAPI data", body = String)
+        (status = 200, description = "Successfully retrieved OpenAPI specification", body = String)
     )
 )]
 #[prologue_macros(methods(get, post), response_status_code(200))]
@@ -19,8 +20,9 @@ pub async fn json(ctx: Context) {
 #[utoipa::path(
     get,
     path = "/openapi",
+    description = "OpenAPI documentation interface",
     responses(
-        (status = 200, description = "OpenAPI documentation", body = String)
+        (status = 200, description = "Successfully served OpenAPI documentation", body = String)
     )
 )]
 #[prologue_macros(

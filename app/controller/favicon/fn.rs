@@ -3,8 +3,9 @@ use super::*;
 #[utoipa::path(
     get,
     path = "/favicon.ico",
+    description = "Favicon for the application",
     responses(
-        (status = 200, description = "Icon", body = String)
+        (status = 200, description = "Application icon", body = String)
     )
 )]
 #[route("/favicon.ico")]
