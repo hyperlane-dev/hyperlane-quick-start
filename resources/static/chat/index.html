@@ -48,6 +48,14 @@
         padding: 0;
       }
 
+      .btn-upload.disabled {
+        background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+        cursor: not-allowed;
+        opacity: 0.6;
+        box-shadow: none;
+        transform: none;
+      }
+
       .upload-icon {
         font-size: 20px;
         line-height: 1;
@@ -1042,7 +1050,11 @@
         </div>
 
         <div class="chat-input" id="chatInputContainer">
-          <label for="file-input" class="btn btn-upload upload-button">
+          <label
+            for="file-input"
+            class="btn btn-upload upload-button"
+            id="uploadButton"
+          >
             <span class="upload-icon">+</span>
           </label>
           <input type="file" id="file-input" class="file-input" multiple />
@@ -1452,18 +1464,25 @@
             statusEl.classList.add('hidden');
             input.disabled = false;
             button.disabled = false;
+            document
+              .getElementById('uploadButton')
+              .classList.remove('disabled');
             break;
           case 'connecting':
             text.textContent = 'Connecting';
             statusEl.classList.add('hidden');
             input.disabled = true;
             button.disabled = true;
+            document.getElementById('uploadButton').classList.add('disabled');
+            document.querySelector('.btn-upload').disabled = true;
             break;
           case 'disconnected':
             text.textContent = 'Offline';
             statusEl.classList.remove('hidden');
             input.disabled = true;
             button.disabled = true;
+            document.getElementById('uploadButton').classList.add('disabled');
+            document.querySelector('.btn-upload').disabled = true;
             break;
         }
       }
@@ -1491,6 +1510,7 @@
             });
           }, 8888);
           reconnectAttempts = 0;
+          document.getElementById('uploadButton').classList.remove('disabled');
         };
 
         socket.onmessage = (event) => {
@@ -1938,7 +1958,7 @@
         input.addEventListener('keydown', handleKeyDown);
         input.addEventListener('input', handleInput);
         input.addEventListener('keyup', checkMentionTrigger);
-
+        document.getElementById('uploadButton').classList.add('disabled');
         fileInput.addEventListener('change', (e) => {
           const files = Array.from(e.target.files);
           files.forEach((file) => {
