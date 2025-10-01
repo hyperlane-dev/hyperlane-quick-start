@@ -2,7 +2,7 @@ use super::*;
 
 #[utoipa::path(
     get,
-    path = "/favicon.ico",   
+    path = "/favicon.ico",
     responses(
         (status = 200, description = "Icon", body = String)
     )

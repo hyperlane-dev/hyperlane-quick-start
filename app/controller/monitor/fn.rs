@@ -3,7 +3,7 @@ use super::*;
 #[route("/api/server/status")]
 #[utoipa::path(
     get,
-    path = "/api/server/status",   
+    path = "/api/server/status",
     responses(
         (status = 200, description = "Server real-time status SSE stream", body = String)
     )
@@ -29,7 +29,7 @@ pub async fn status_sse(ctx: Context) {
 #[route("/api/server/info")]
 #[utoipa::path(
     get,
-    path = "/api/server/info",   
+    path = "/api/server/info",
     responses(
         (status = 200, description = "Server system information", body = String)
     )
@@ -49,7 +49,7 @@ pub async fn system_info(ctx: Context) {
 #[utoipa::path(
     get,
     post,
-    path = "/monitor",   
+    path = "/monitor",
     responses(
         (status = 200, description = "Server monitoring dashboard interface", body = String)
     )

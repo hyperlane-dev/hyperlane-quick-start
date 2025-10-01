@@ -4,7 +4,7 @@ use super::*;
 #[utoipa::path(
     get,
     post,
-    path = "/hello/{name}",   
+    path = "/hello/{name}",
     responses(
         (status = 200, description = "Hello", body = String)
     )

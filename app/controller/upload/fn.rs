@@ -66,7 +66,7 @@ pub async fn static_file(ctx: Context) {
 #[utoipa::path(
     get,
     post,
-    path = "/upload/index.html",   
+    path = "/upload",
     responses(
         (status = 200, description = "File chunk upload frontend interface", body = String)
     )
@@ -82,7 +82,7 @@ pub async fn html(ctx: Context) {}
 #[route("/api/upload/register")]
 #[utoipa::path(
     post,
-    path = "/api/upload/register",   
+    path = "/api/upload/register",
     responses(
         (status = 200, description = "File chunk upload - register API", body = UploadResponse)
     )
@@ -101,7 +101,7 @@ pub async fn register(ctx: Context) {
 #[route("/api/upload/save")]
 #[utoipa::path(
     post,
-    path = "/api/upload/save",   
+    path = "/api/upload/save",
     responses(
         (status = 200, description = "File chunk upload - save API", body = UploadResponse)
     )
@@ -134,7 +134,7 @@ pub async fn save(ctx: Context) {
 #[route("/api/upload/merge")]
 #[utoipa::path(
     post,
-    path = "/api/upload/merge",   
+    path = "/api/upload/merge",
     responses(
         (status = 200, description = "File chunk upload - merge API", body = UploadResponse)
     )

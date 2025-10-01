@@ -3,7 +3,7 @@ use super::*;
 #[route("/log/info")]
 #[utoipa::path(
     get,
-    path = "/log/info",   
+    path = "/log/info",
     responses(
         (status = 200, description = "View info level logs", body = String)
     )
@@ -21,7 +21,7 @@ pub async fn info(ctx: Context) {
 #[route("/log/warn")]
 #[utoipa::path(
     get,
-    path = "/log/warn",   
+    path = "/log/warn",
     responses(
         (status = 200, description = "View warn level logs", body = String)
     )
@@ -39,7 +39,7 @@ pub async fn warn(ctx: Context) {
 #[route("/log/error")]
 #[utoipa::path(
     get,
-    path = "/log/error",   
+    path = "/log/error",
     responses(
         (status = 200, description = "View error level logs", body = String)
     )

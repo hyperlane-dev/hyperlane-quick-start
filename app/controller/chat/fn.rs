@@ -4,7 +4,7 @@ use super::*;
 #[utoipa::path(
     get,
     post,
-    path = "/chat",   
+    path = "/chat",
     responses(
         (status = 200, description = "Chat frontend interface", body = String)
     )
@@ -21,7 +21,7 @@ pub async fn html(ctx: Context) {}
 #[route("/api/chat")]
 #[utoipa::path(
     get,
-    path = "/api/chat",   
+    path = "/api/chat",
     responses(
         (status = 200, description = "Chat API", body = WebSocketRespData)
     )
