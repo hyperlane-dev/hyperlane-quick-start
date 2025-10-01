@@ -49,5 +49,5 @@ pub fn run() {
         println_error!(e);
     }
     println_success!("Environment configuration loaded successfully");
-    runtime().block_on(server_manager::create(create_server));
+    runtime().block_on(process::create(create_server));
 }
