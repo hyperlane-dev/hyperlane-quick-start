@@ -6,6 +6,6 @@ use super::{shutdown::*, *};
 #[allow(unused_imports)]
 use hyperlane_app::*;
 use hyperlane_config::framework::*;
-use hyperlane_plugin::server_manager;
+use hyperlane_plugin::process;
 
 use tokio::runtime::{Builder, Runtime};

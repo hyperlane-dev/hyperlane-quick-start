@@ -1,4 +1,4 @@
 pub mod log;
-pub mod server_manager;
+pub mod process;
 
 use hyperlane_utils::*;
