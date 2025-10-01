@@ -1,4 +1,4 @@
-pub mod favicon_ico;
+pub mod favicon;
 pub mod hello;
 pub mod websocket;
 
