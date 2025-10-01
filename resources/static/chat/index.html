@@ -26,6 +26,74 @@
         -moz-user-select: none;
       }
 
+      .btn-upload {
+        padding: 8px 16px;
+        height: 40px;
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-left: 12px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9375rem;
+        box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+        position: relative;
+        overflow: hidden;
+        width: 40px;
+        padding: 0;
+      }
+
+      .upload-icon {
+        font-size: 20px;
+        line-height: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        margin-top: -6px;
+      }
+
+      .btn-upload::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        transition: left 0.5s ease;
+      }
+
+      .btn-upload:hover:not(:disabled) {
+        background: linear-gradient(135deg, #0056b3, #004085);
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+        transform: translateY(-1px);
+      }
+
+      .btn-upload:hover:not(:disabled)::before {
+        left: 100%;
+      }
+
+      .btn-upload:active:not(:disabled) {
+        background: linear-gradient(135deg, #004085, #003366);
+        transform: translateY(0);
+        box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
+      }
+
+      .file-input {
+        display: none;
+      }
+
       .message-text,
       .message-text * {
         user-select: text !important;
@@ -303,6 +371,12 @@
         min-height: 60px;
       }
 
+      .upload-button {
+        order: -1;
+        margin-right: 12px;
+        margin-left: 0;
+      }
+
       .chat-input textarea {
         flex: 1;
         min-width: 200px;
@@ -385,6 +459,10 @@
         overflow: hidden;
       }
 
+      .send-button {
+        margin-left: 12px;
+      }
+
       .chat-input button::before {
         content: '';
         position: absolute;
@@ -430,6 +508,11 @@
         font-size: 1.3em;
         margin-left: 6px;
         transition: transform 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        margin-top: -4px;
       }
 
       .chat-input button:hover:not(:disabled) .send-icon {
@@ -485,6 +568,61 @@
         border-radius: 8px;
         text-align: center;
         z-index: 30;
+      }
+
+      .upload-status {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 300px;
+        max-width: 500px;
+        background: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        border-left: 4px solid;
+        overflow: hidden;
+        pointer-events: auto;
+        margin-bottom: 10px;
+        animation: slideIn 0.3s ease;
+      }
+
+      .upload-status.success {
+        border-left-color: #2f855a;
+        background-color: #f0fff4;
+        color: #2f855a;
+      }
+
+      .upload-status.error {
+        border-left-color: #c53030;
+        background-color: #fff5f5;
+        color: #c53030;
+      }
+
+      .upload-status-content {
+        display: flex;
+        align-items: center;
+        padding: 16px 20px;
+        gap: 12px;
+      }
+
+      .upload-status-message {
+        flex: 1;
+        font-size: 14px;
+        line-height: 1.4;
+        color: #2c3e50;
+        font-weight: 500;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
 
       .toast-container {
@@ -842,6 +980,18 @@
           width: calc(100% - 20px);
           max-width: 280px;
         }
+
+        .upload-button {
+          margin-right: 6px;
+          margin-left: 0;
+          width: 30px;
+          height: 30px;
+          padding: 0;
+        }
+
+        .upload-icon {
+          font-size: 16px;
+        }
       }
 
       @media (max-height: 400px) {
@@ -892,17 +1042,19 @@
         </div>
 
         <div class="chat-input" id="chatInputContainer">
+          <label for="file-input" class="btn btn-upload upload-button">
+            <span class="upload-icon">+</span>
+          </label>
+          <input type="file" id="file-input" class="file-input" multiple />
           <textarea
             id="messageInput"
             placeholder="(use @name to mention users, ctrl+enter or shift+enter for new line)"
             rows="1"
             disabled
           ></textarea>
-          <button id="sendButton" disabled>
-            <span>Send</span>
+          <button id="sendButton" disabled class="send-button">
             <i class="send-icon">➤</i>
           </button>
-
           <div class="mention-dropdown hidden" id="mentionDropdown">
             <div class="mention-header">Select User</div>
             <div class="mention-list" id="mentionList"></div>
@@ -912,6 +1064,7 @@
     </div>
 
     <div class="toast-container" id="toastContainer"></div>
+    <div class="upload-status-container" id="uploadStatusContainer"></div>
 
     <script>
       let socket = null;
@@ -933,6 +1086,13 @@
       let mentionStartIndex = -1;
       let loadingUsers = false;
       let selectedIndex = 0;
+      const CHUNK_SIZE = 512 * 1024;
+      const MAX_RETRIES = 88888888;
+      const UPLOAD_REGISTER_URL = '/api/upload/register';
+      const UPLOAD_SAVE_URL = '/api/upload/save';
+      const UPLOAD_MERGE_URL = '/api/upload/merge';
+      const MAX_CONCURRENT_UPLOADS = 6;
+      const fileInput = document.getElementById('file-input');
 
       const MessageType = {
         OnlineCount: 'OnlineCount',
@@ -1779,13 +1939,26 @@
         input.addEventListener('input', handleInput);
         input.addEventListener('keyup', checkMentionTrigger);
 
+        fileInput.addEventListener('change', (e) => {
+          const files = Array.from(e.target.files);
+          files.forEach((file) => {
+            const fileId = generateUniqueId();
+            uploadFile(file, fileId);
+          });
+          e.target.value = '';
+        });
+
         document.addEventListener('click', (event) => {
           const dropdown = document.getElementById('mentionDropdown');
           const inputContainer = document.getElementById('chatInputContainer');
+          const uploadStatusContainer = document.getElementById(
+            'uploadStatusContainer'
+          );
 
           if (
             !inputContainer.contains(event.target) &&
-            !dropdown.contains(event.target)
+            !dropdown.contains(event.target) &&
+            !uploadStatusContainer.contains(event.target)
           ) {
             closeMentionDropdown();
           }
@@ -1794,6 +1967,227 @@
         connect();
 
         setTimeout(autoResize, 100);
+      }
+
+      function showUploadStatus(message, type) {
+        const container = document.getElementById('uploadStatusContainer');
+        container.innerHTML = '';
+        const statusEl = document.createElement('div');
+        statusEl.className = `upload-status upload-status-${type}`;
+        statusEl.innerHTML = `
+          <div class="upload-status-content">
+            <span class="upload-status-message">${message}</span>
+          </div>
+        `;
+        container.appendChild(statusEl);
+        setTimeout(() => {
+          if (statusEl.parentNode) {
+            statusEl.parentNode.removeChild(statusEl);
+          }
+        }, 3000);
+      }
+
+      function generateUniqueId() {
+        return (
+          Date.now().toString(36) +
+          Math.random().toString(36).substr(2) +
+          Math.random().toString(36).substr(2)
+        );
+      }
+
+      function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+      }
+
+      async function uploadFile(file, fileId) {
+        const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+        const fileCopy = new File([file], file.name, { type: file.type });
+        let uploadQueue = [];
+        let currentIndex = 0;
+        let completedChunks = 0;
+        let lastProgressUpdate = 0;
+
+        const uploadChunk = async (chunk, index, totalChunks, fileId, file) => {
+          try {
+            const response = await fetch(UPLOAD_SAVE_URL, {
+              method: 'POST',
+              headers: {
+                'X-File-Id': fileId,
+                'X-Chunk-Index': index,
+              },
+              body: chunk,
+            });
+            const data = await response.json();
+            if (data.code == 200) {
+              return data;
+            } else if (data.code === 0) {
+              showUploadStatus(`Upload failed: ${data.msg}`, 'error');
+              throw new Error(data.msg);
+            }
+            const progress = Math.floor(((index + 1) / totalChunks) * 100);
+            return data;
+          } catch (error) {
+            throw error;
+          }
+        };
+
+        const updateProgress = async () => {
+          const currentProgress = Math.floor(
+            (completedChunks / totalChunks) * 100
+          );
+          if (currentProgress >= lastProgressUpdate) {
+            lastProgressUpdate = currentProgress;
+          }
+        };
+
+        const processQueue = async () => {
+          const headers = {
+            'X-File-Id': fileId,
+          };
+          let registerSuccess = false;
+          let registerSuccessfulUploads = null;
+          while (!registerSuccess) {
+            try {
+              const response = await fetch(UPLOAD_REGISTER_URL, {
+                method: 'POST',
+                headers: {
+                  ...headers,
+                  'X-Total-Chunks': totalChunks,
+                  'X-File-Name': encodeURIComponent(file.name),
+                },
+              });
+              registerSuccessfulUploads = await response.json();
+              if (registerSuccessfulUploads.code == 200) {
+                registerSuccess = true;
+              }
+            } catch (error) {
+              registerSuccess = false;
+              await new Promise((resolve) =>
+                setTimeout(resolve, 1000 * retries)
+              );
+            }
+          }
+          const tasks = [];
+          for (let i = 0; i < totalChunks; i++) {
+            const start = i * CHUNK_SIZE;
+            const end = Math.min(start + CHUNK_SIZE, fileCopy.size);
+            const chunk = fileCopy.slice(start, end);
+            tasks.push({
+              chunk,
+              index: i,
+              totalChunks,
+              fileId,
+              file: fileCopy,
+            });
+          }
+          async function processTasksWithConcurrencyLimit(
+            tasks,
+            concurrencyLimit
+          ) {
+            const results = [];
+            const runningTasks = new Set();
+            async function runTask(task) {
+              try {
+                const result = await uploadChunk(
+                  task.chunk,
+                  task.index,
+                  task.totalChunks,
+                  task.fileId,
+                  task.file
+                );
+                completedChunks++;
+                await updateProgress();
+                return result;
+              } catch (error) {
+                let retries = 0;
+                while (retries < MAX_RETRIES) {
+                  try {
+                    const result = await uploadChunk(
+                      task.chunk,
+                      task.index,
+                      task.totalChunks,
+                      task.fileId,
+                      task.file
+                    );
+                    completedChunks++;
+                    await updateProgress();
+                    return result;
+                  } catch (retryError) {
+                    retries++;
+                    if (retries === MAX_RETRIES) throw retryError;
+                    await new Promise((resolve) =>
+                      setTimeout(resolve, 1000 * retries)
+                    );
+                  }
+                }
+              }
+            }
+            while (tasks.length > 0 || runningTasks.size > 0) {
+              while (runningTasks.size < concurrencyLimit && tasks.length > 0) {
+                const task = tasks.shift();
+                const promise = runTask(task).then((result) => {
+                  runningTasks.delete(promise);
+                  results.push(result);
+                  return result;
+                });
+                runningTasks.add(promise);
+              }
+              if (runningTasks.size > 0) {
+                await Promise.race(Array.from(runningTasks));
+              }
+            }
+            return results;
+          }
+          const results = await processTasksWithConcurrencyLimit(
+            tasks,
+            MAX_CONCURRENT_UPLOADS
+          );
+          let mergeSuccess = false;
+          let mergeSuccessfulUploads = null;
+          while (!mergeSuccess) {
+            try {
+              const response = await fetch(UPLOAD_MERGE_URL, {
+                method: 'POST',
+                headers: {
+                  'X-File-Id': fileId,
+                },
+              });
+              mergeSuccessfulUploads = await response.json();
+              if (registerSuccessfulUploads.code == 200) {
+                mergeSuccess = true;
+              }
+            } catch (error) {
+              mergeSuccess = false;
+              await new Promise((resolve) =>
+                setTimeout(resolve, 1000 * retries)
+              );
+            }
+          }
+          if (mergeSuccessfulUploads) {
+            uploadQueue = [];
+            return mergeSuccessfulUploads;
+          } else {
+            throw new Error('Some chunks failed to upload, please try again');
+          }
+        };
+
+        try {
+          await updateProgress();
+          const lastChunkResponse = await processQueue();
+          const data = lastChunkResponse || { url: '' };
+          const messageData = {
+            type: 'Text',
+            data: `[${file.name}](${data.url})`,
+          };
+          isNearBottom = true;
+          sendWebSocketMessage(messageData);
+        } catch (error) {
+          showUploadStatus('Upload failed: ' + error.message, 'error');
+        }
       }
 
       document.addEventListener('DOMContentLoaded', init);
