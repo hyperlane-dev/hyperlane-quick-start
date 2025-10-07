@@ -36,6 +36,7 @@ serde = "1.0.228"
 hyperlane = "9.4.5"
 http-request = "8.91.27"
 hyperlane-utils = "11.0.2"
+uuid = { version = "1.18.1", features = ["v4"] }
 
 [dependencies]
 hyperlane_init = { workspace = true }

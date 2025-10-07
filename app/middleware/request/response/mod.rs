@@ -4,3 +4,5 @@ pub use r#fn::*;
 
 use super::*;
 use hyperlane_config::business::templates::*;
+
+use uuid::Uuid;
