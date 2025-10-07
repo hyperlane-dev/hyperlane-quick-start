@@ -16,7 +16,6 @@ use super::*;
     response_body(CHAT_HTML),
     response_header(CONTENT_ENCODING => GZIP)
 )]
-
 pub async fn html(ctx: Context) {}
 
 #[route("/api/chat")]
