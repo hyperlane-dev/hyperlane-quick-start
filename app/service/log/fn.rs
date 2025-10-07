@@ -88,22 +88,66 @@ pub async fn search_trace(trace: &str) -> String {
     if !log_dir.exists() {
         return format!("Log directory not found: {}", log_dir.display());
     }
-    let level_dirs: Vec<String> = get_sorted_dirs(&log_dir);
-    for level_dir in level_dirs {
-        let level_path: PathBuf = log_dir.join(&level_dir);
-        let date_dirs: Vec<String> = get_sorted_dirs(&level_path);
-        for date_dir in date_dirs.iter().take(MAX_DATE_DIRS) {
-            let date_path: PathBuf = level_path.join(date_dir);
-            let log_files: Vec<String> = get_sorted_log_files(&date_path);
-            for log_file_name in log_files.iter().take(MAX_LOG_FILES_PER_DATE) {
-                let full_path: PathBuf = date_path.join(log_file_name);
-                if let Ok(content) = read_and_reverse_log_file(&full_path).await {
-                    if content.contains(trace) {
-                        return content;
+    let re: Regex =
+        Regex::new(r"(?s)\$(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\$ \$$([A-Za-z]+)\$ => (.*?);")
+            .unwrap();
+    let mut results: Vec<String> = Vec::new();
+    let mut dir_queue: VecDeque<PathBuf> = VecDeque::new();
+    dir_queue.push_back(log_dir.to_path_buf());
+    while let Some(current_path) = dir_queue.pop_front() {
+        if let Ok(entries) = fs::read_dir(&current_path) {
+            for entry in entries.filter_map(Result::ok) {
+                let path: PathBuf = entry.path();
+                if path.is_dir() {
+                    dir_queue.push_back(path);
+                } else if path
+                    .extension()
+                    .and_then(|s| s.to_str())
+                    .map_or(false, |ext| {
+                        ext == LOG_FILE_EXTENSION.trim_start_matches('.')
+                    })
+                {
+                    if let Ok(content) = read_and_reverse_log_file(&path).await {
+                        for entry in content.lines().collect::<Vec<&str>>() {
+                            if let Some(caps) = re.captures(entry) {
+                                let timestamp_str: &str =
+                                    caps.get(1).map_or("", |m| m.as_str().trim_end());
+                                let entry_type: &str =
+                                    caps.get(2).map_or("", |m| m.as_str().trim_end());
+                                let content: &str =
+                                    caps.get(3).map_or("", |m| m.as_str().trim_end());
+                                if entry_type == "Request" || entry_type == "Response" {
+                                    if let Ok(trace_re) = Regex::new(trace) {
+                                        if trace_re.is_match(content) {
+                                            results.push(format!(
+                                                "Found trace in {}:\nTime: {}\nType: {}\nContent: {}",
+                                                path.display(),
+                                                timestamp_str,
+                                                entry_type,
+                                                content
+                                            ));
+                                        }
+                                    } else if content.contains(trace) {
+                                        results.push(format!(
+                                            "Found trace in {}:\nTime: {}\nType: {}\nContent: {}",
+                                            path.display(),
+                                            timestamp_str,
+                                            entry_type,
+                                            content
+                                        ));
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
     }
-    format!("Trace {} not found", trace)
+
+    if results.is_empty() {
+        format!("Trace {} not found", trace)
+    } else {
+        results.join("\n\n")
+    }
 }

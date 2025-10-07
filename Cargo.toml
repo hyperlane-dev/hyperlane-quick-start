@@ -32,7 +32,9 @@ hyperlane_config = { path = "config", version = "0.1.0" }
 hyperlane_init = { path = "init", version = "0.1.0" }
 hyperlane_plugin = { path = "plugin", version = "0.1.0" }
 
+regex = "1.11.3"
 serde = "1.0.228"
+chrono = "0.4.42"
 hyperlane = "9.4.5"
 http-request = "8.91.27"
 hyperlane-utils = "11.0.2"

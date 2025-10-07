@@ -1,7 +1,7 @@
 use super::*;
 
 #[request_middleware(2)]
-#[response_header(TRACE => Uuid::new_v4().to_string())]
+#[response_header("trace" => Uuid::new_v4().to_string())]
 #[response_header(DATE => gmt())]
 #[response_header(SERVER => HYPERLANE)]
 #[response_header(CONNECTION => KEEP_ALIVE)]

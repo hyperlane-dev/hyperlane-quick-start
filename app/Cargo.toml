@@ -11,7 +11,9 @@ hyperlane_config = { workspace = true }
 hyperlane_plugin = { workspace = true }
 
 uuid = { workspace = true }
+regex = { workspace = true }
 serde = { workspace = true }
+chrono = { workspace = true }
 hyperlane = { workspace = true }
 http-request = { workspace = true }
 hyperlane-utils = { workspace = true }
