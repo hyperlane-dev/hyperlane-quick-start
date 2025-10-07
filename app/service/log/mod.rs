@@ -6,6 +6,6 @@ use super::*;
 use model::business::log::r#const::*;
 
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use hyperlane_config::framework::*;

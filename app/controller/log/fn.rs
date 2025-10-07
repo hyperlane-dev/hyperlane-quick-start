@@ -1,5 +1,30 @@
 use super::*;
 
+#[route("/log/trace/{trace}")]
+#[utoipa::path(
+    get,
+    path = "/log/trace/{trace}",
+    description = "Search for a specific trace in log files",
+    responses(
+        (status = 200, description = "Successfully found trace", body = String),
+        (status = 404, description = "Trace not found")
+    ),
+    params(
+        ("trace" = String, description = "The trace ID to search for")
+    )
+)]
+#[prologue_macros(
+    get,
+    response_status_code(200),
+    response_header(CONTENT_TYPE => ContentType::format_content_type_with_charset(TEXT_PLAIN, UTF8)),
+    route_param(TRACE => trace_opt)
+)]
+pub async fn trace(ctx: Context) {
+    let trace: String = trace_opt.unwrap_or_default();
+    let result: String = service::log::search_trace(&trace).await;
+    ctx.set_response_body(&result).await;
+}
+
 #[route("/log/info")]
 #[utoipa::path(
     get,

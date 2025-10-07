@@ -51,11 +51,11 @@ async fn read_and_reverse_log_file(full_path: &Path) -> Result<String, String> {
 }
 
 async fn process_date_directory(log_dir: &Path, date_dir: &str) -> Vec<String> {
-    let date_path: std::path::PathBuf = log_dir.join(date_dir);
+    let date_path: PathBuf = log_dir.join(date_dir);
     let log_files: Vec<String> = get_sorted_log_files(&date_path);
     let mut logs: Vec<String> = Vec::new();
     for log_file_name in log_files.iter().take(MAX_LOG_FILES_PER_DATE) {
-        let full_path: std::path::PathBuf = date_path.join(log_file_name);
+        let full_path: PathBuf = date_path.join(log_file_name);
         if let Ok(content) = read_and_reverse_log_file(&full_path).await {
             if !content.is_empty() {
                 logs.push(content);
@@ -66,7 +66,7 @@ async fn process_date_directory(log_dir: &Path, date_dir: &str) -> Vec<String> {
 }
 
 pub async fn read_log_file(level: &str) -> String {
-    let log_dir: std::path::PathBuf = Path::new(SERVER_LOG_DIR).join(level);
+    let log_dir: PathBuf = Path::new(SERVER_LOG_DIR).join(level);
     if !log_dir.exists() {
         return format!("Log directory not found: {}", log_dir.display());
     }
@@ -81,4 +81,29 @@ pub async fn read_log_file(level: &str) -> String {
     } else {
         all_logs.join(BR)
     }
+}
+
+pub async fn search_trace(trace: &str) -> String {
+    let log_dir: &Path = Path::new(SERVER_LOG_DIR);
+    if !log_dir.exists() {
+        return format!("Log directory not found: {}", log_dir.display());
+    }
+    let level_dirs: Vec<String> = get_sorted_dirs(&log_dir);
+    for level_dir in level_dirs {
+        let level_path: PathBuf = log_dir.join(&level_dir);
+        let date_dirs: Vec<String> = get_sorted_dirs(&level_path);
+        for date_dir in date_dirs.iter().take(MAX_DATE_DIRS) {
+            let date_path: PathBuf = level_path.join(date_dir);
+            let log_files: Vec<String> = get_sorted_log_files(&date_path);
+            for log_file_name in log_files.iter().take(MAX_LOG_FILES_PER_DATE) {
+                let full_path: PathBuf = date_path.join(log_file_name);
+                if let Ok(content) = read_and_reverse_log_file(&full_path).await {
+                    if content.contains(trace) {
+                        return content;
+                    }
+                }
+            }
+        }
+    }
+    format!("Trace {} not found", trace)
 }

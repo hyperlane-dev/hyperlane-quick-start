@@ -6,4 +6,5 @@ pub mod monitor;
 pub mod not_found;
 pub mod root;
 pub mod templates;
+pub mod trace;
 pub mod upload;

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trace Query</title>
+    <script>
+      async function searchTrace() {
+        const traceId = document.getElementById('traceId').value;
+        const response = await fetch(`/log/trace/${traceId}`);
+        const result = document.getElementById('result');
+
+        if (response.ok) {
+          const data = await response.text();
+          result.textContent = data;
+        } else {
+          result.textContent = 'Trace not found';
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Trace Query</h1>
+    <input type="text" id="traceId" placeholder="Enter trace ID" />
+    <button onclick="searchTrace()">Search</button>
+    <pre id="result"></pre>
+  </body>
+</html>
