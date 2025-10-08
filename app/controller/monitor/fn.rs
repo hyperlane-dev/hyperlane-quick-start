@@ -22,7 +22,7 @@ pub async fn status_sse(ctx: Context) {
         if send_result.is_err() {
             break;
         }
-        sleep(Duration::from_millis(360)).await;
+        sleep(Duration::from_millis(1000)).await;
     }
     let _ = ctx.closed().await;
 }
