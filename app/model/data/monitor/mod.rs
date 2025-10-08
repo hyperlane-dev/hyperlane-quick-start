@@ -9,7 +9,7 @@ pub use r#fn::*;
 pub use r#static::*;
 
 use super::*;
-use model::business::network_capture::*;
+use model::business::monitor::*;
 
 use std::{
     collections::HashMap,

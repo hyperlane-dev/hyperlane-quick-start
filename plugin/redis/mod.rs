@@ -5,7 +5,7 @@ pub use r#fn::*;
 pub use r#static::*;
 
 use super::*;
-use hyperlane_app::model::data::env::*;
+use env::*;
 
 use std::sync::Arc;
 
