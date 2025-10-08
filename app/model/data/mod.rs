@@ -1,6 +1,6 @@
 pub mod chat;
 pub mod env;
-pub mod network_capture;
+pub mod monitor;
 pub mod upload;
 
 use super::*;

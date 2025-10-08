@@ -3,8 +3,10 @@ mod r#fn;
 pub use r#fn::*;
 
 use super::*;
-use model::business::network_capture::*;
-use model::data::network_capture::*;
+use model::{
+    business::{network_capture::*, server_status::*},
+    data::monitor::*,
+};
 
 use std::collections::HashMap;
 use std::process::Command;
