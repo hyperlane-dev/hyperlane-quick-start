@@ -44,20 +44,24 @@ pub async fn static_file(ctx: Context) {
     if let Ok((partial_content, content_type)) =
         serve_static_file_with_range(&dir, &file, range_request).await
     {
-        ctx.set_response_body(&partial_content.data).await;
-        ctx.set_response_header(CONTENT_TYPE, &content_type).await;
-        ctx.set_response_header(ACCEPT_RANGES, BYTES).await;
-        ctx.set_response_header(CACHE_CONTROL, CACHE_CONTROL_STATIC_ASSETS)
-            .await;
-        ctx.set_response_header(EXPIRES, EXPIRES_FAR_FUTURE).await;
-        ctx.set_response_header(CONTENT_LENGTH, &partial_content.total_size.to_string())
+        ctx.set_response_body(&partial_content.data)
+            .await
+            .set_response_header(CONTENT_TYPE, &content_type)
+            .await
+            .set_response_header(ACCEPT_RANGES, BYTES)
+            .await
+            .set_response_header(CACHE_CONTROL, CACHE_CONTROL_STATIC_ASSETS)
+            .await
+            .set_response_header(EXPIRES, EXPIRES_FAR_FUTURE)
+            .await
+            .set_response_header(CONTENT_LENGTH, &partial_content.total_size.to_string())
             .await;
         if has_range_request {
             ctx.set_response_status_code(HttpStatus::PartialContent.code())
-                .await;
-            ctx.set_response_header(CONTENT_RANGE, &partial_content.content_range)
-                .await;
-            ctx.set_response_header(CONTENT_LENGTH, &partial_content.content_length.to_string())
+                .await
+                .set_response_header(CONTENT_RANGE, &partial_content.content_range)
+                .await
+                .set_response_header(CONTENT_LENGTH, &partial_content.content_length.to_string())
                 .await;
         }
     }
@@ -123,7 +127,7 @@ pub async fn save(ctx: Context) {
     let chunk_data: Vec<u8> = ctx.get_request_body().await;
     match save_file_chunk(&file_chunk_data, chunk_data).await {
         Ok(save_upload_dir) => {
-            ctx.set_response_header("X-File-Path", save_upload_dir)
+            ctx.set_response_header("save_upload_dir", save_upload_dir)
                 .await;
             set_common_success_response_body(&ctx, EMPTY_STR).await;
         }
@@ -154,7 +158,8 @@ pub async fn merge(ctx: Context) {
     let file_chunk_data: FileChunkData = file_chunk_data_opt.unwrap_or_default();
     match merge_file_chunks(&file_chunk_data).await {
         Ok((save_upload_dir, url)) => {
-            ctx.set_response_header("file", save_upload_dir).await;
+            ctx.set_response_header("save_upload_dir", save_upload_dir)
+                .await;
             set_common_success_response_body(&ctx, &url).await;
         }
         Err(error) => {
