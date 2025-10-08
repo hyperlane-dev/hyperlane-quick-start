@@ -1,7 +1,7 @@
 use super::*;
 
 #[hyperlane(config: ServerConfig)]
-async fn configure_config(server: &Server) {
+async fn init_config(server: &Server) {
     config.host(SERVER_HOST).await;
     config.port(SERVER_PORT).await;
     config.ttl(SERVER_TTI).await;
@@ -24,7 +24,7 @@ fn runtime() -> Runtime {
 
 #[hyperlane(server: Server)]
 async fn create_server() {
-    configure_config(&server).await;
+    init_config(&server).await;
     println_success!("Server initialization successful");
     let server_result: ServerResult<ServerHook> = server.run().await;
     match server_result {
@@ -40,5 +40,5 @@ async fn create_server() {
 }
 
 pub fn run() {
-    runtime().block_on(process::create(create_server));
+    runtime().block_on(create(create_server));
 }
