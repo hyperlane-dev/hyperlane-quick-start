@@ -39,7 +39,7 @@ use super::*;
         controller::mysql::handle,
         controller::openapi::json,
         controller::openapi::html,
-        controller::postgre_sql::handle,
+        controller::postgresql::handle,
         controller::redis::handle,
         controller::sse::handle,
         controller::upload::static_file,

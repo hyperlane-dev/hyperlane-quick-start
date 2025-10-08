@@ -9,11 +9,7 @@ pub use r#struct::*;
 
 use super::*;
 
-use model::{
-    data::{chat::*, env::*},
-    data_transfer::chat::*,
-    param::chat::*,
-};
+use model::{data::chat::*, data_transfer::chat::*, param::chat::*};
 
 use std::{
     collections::HashMap,

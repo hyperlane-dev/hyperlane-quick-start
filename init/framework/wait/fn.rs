@@ -45,7 +45,7 @@ async fn create_server() {
 }
 
 pub fn run() {
-    if let Err(e) = model::business::chat::init_env_config() {
+    if let Err(e) = init_env_config() {
         println_error!(e);
     }
     println_success!("Environment configuration loaded successfully");
