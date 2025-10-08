@@ -1,1 +1,17 @@
 pub const ENV_FILE_PATH: &'static str = "/shell/env";
+pub const ENV_KEY_GPT_API_URL: &'static str = "GPT_API_URL";
+pub const ENV_KEY_GPT_MODEL: &'static str = "GPT_MODEL";
+pub const ENV_KEY_MYSQL_HOST: &'static str = "MYSQL_HOST";
+pub const ENV_KEY_MYSQL_PORT: &'static str = "MYSQL_PORT";
+pub const ENV_KEY_MYSQL_DATABASE: &'static str = "MYSQL_DATABASE";
+pub const ENV_KEY_MYSQL_USERNAME: &'static str = "MYSQL_USERNAME";
+pub const ENV_KEY_MYSQL_PASSWORD: &'static str = "MYSQL_PASSWORD";
+pub const ENV_KEY_REDIS_HOST: &'static str = "REDIS_HOST";
+pub const ENV_KEY_REDIS_PORT: &'static str = "REDIS_PORT";
+pub const ENV_KEY_REDIS_USERNAME: &'static str = "REDIS_USERNAME";
+pub const ENV_KEY_REDIS_PASSWORD: &'static str = "REDIS_PASSWORD";
+pub const ENV_KEY_POSTGRES_HOST: &'static str = "POSTGRES_HOST";
+pub const ENV_KEY_POSTGRES_PORT: &'static str = "POSTGRES_PORT";
+pub const ENV_KEY_POSTGRES_DATABASE: &'static str = "POSTGRES_DATABASE";
+pub const ENV_KEY_POSTGRES_USERNAME: &'static str = "POSTGRES_USERNAME";
+pub const ENV_KEY_POSTGRES_PASSWORD: &'static str = "POSTGRES_PASSWORD";
