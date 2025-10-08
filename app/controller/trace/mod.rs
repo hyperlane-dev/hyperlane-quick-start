@@ -4,3 +4,4 @@ pub use r#fn::*;
 
 use super::*;
 use hyperlane_config::business::trace::*;
+use service::log::*;

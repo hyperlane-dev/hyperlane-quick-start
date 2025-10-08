@@ -7,7 +7,7 @@
     <script>
       async function searchTrace() {
         const traceId = document.getElementById('traceId').value;
-        const response = await fetch(`/log/trace/${traceId}`);
+        const response = await fetch(`/trace/${traceId}`);
         const result = document.getElementById('result');
 
         if (response.ok) {
