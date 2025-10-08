@@ -12,6 +12,7 @@ use super::*;
 )]
 #[prologue_macros(
     methods(get, post),
+    response_body(EMPTY_STR),
     response_header(CONTENT_TYPE => TEXT_EVENT_STREAM)
 )]
 pub async fn handle(ctx: Context) {
@@ -23,5 +24,5 @@ pub async fn handle(ctx: Context) {
             .send_body()
             .await;
     }
-    let _ = ctx.closed().await;
+    ctx.closed().await;
 }
