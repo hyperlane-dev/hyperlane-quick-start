@@ -15,7 +15,7 @@ use super::*;
     response_header(CONTENT_TYPE => ContentType::format_content_type_with_charset(TEXT_PLAIN, UTF8))
 )]
 pub async fn info(ctx: Context) {
-    let log_content: String = read_log_file("info").await;
+    let log_content: String = read_log_file(SERVER_LOG_LEVEL[0]).await;
     ctx.set_response_body(&log_content).await;
 }
 
@@ -34,7 +34,7 @@ pub async fn info(ctx: Context) {
     response_header(CONTENT_TYPE => ContentType::format_content_type_with_charset(TEXT_PLAIN, UTF8))
 )]
 pub async fn warn(ctx: Context) {
-    let log_content: String = read_log_file("warn").await;
+    let log_content: String = read_log_file(SERVER_LOG_LEVEL[1]).await;
     ctx.set_response_body(&log_content).await;
 }
 
@@ -53,6 +53,6 @@ pub async fn warn(ctx: Context) {
     response_header(CONTENT_TYPE => ContentType::format_content_type_with_charset(TEXT_PLAIN, UTF8))
 )]
 pub async fn error(ctx: Context) {
-    let log_content: String = read_log_file("error").await;
+    let log_content: String = read_log_file(SERVER_LOG_LEVEL[2]).await;
     ctx.set_response_body(log_content).await;
 }
