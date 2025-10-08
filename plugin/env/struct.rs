@@ -6,7 +6,7 @@ pub struct EnvConfig {
     /// MySQL database host address
     pub mysql_host: String,
     /// MySQL database port number
-    pub mysql_port: u16,
+    pub mysql_port: usize,
     /// MySQL database name
     pub mysql_database: String,
     /// MySQL database username
@@ -16,7 +16,7 @@ pub struct EnvConfig {
     /// Redis server host address
     pub redis_host: String,
     /// Redis server port number
-    pub redis_port: u16,
+    pub redis_port: usize,
     /// Redis database username
     pub redis_username: String,
     /// Redis authentication password
@@ -24,7 +24,7 @@ pub struct EnvConfig {
     /// PostgreSQL database host address
     pub postgresql_host: String,
     /// PostgreSQL database port number
-    pub postgresql_port: u16,
+    pub postgresql_port: usize,
     /// PostgreSQL database name
     pub postgresql_database: String,
     /// PostgreSQL database username

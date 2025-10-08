@@ -6,8 +6,8 @@ pub struct NetworkPacket {
     pub protocol: String,
     pub src_ip: String,
     pub dst_ip: String,
-    pub src_port: u16,
-    pub dst_port: u16,
+    pub src_port: usize,
+    pub dst_port: usize,
     pub size: u32,
     pub direction: String,
 }
@@ -24,7 +24,7 @@ pub struct NetworkStats {
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct ConnectionInfo {
     pub remote_ip: String,
-    pub port: u16,
+    pub port: usize,
     pub protocol: String,
     pub packets: u64,
     pub bytes: u64,
@@ -34,7 +34,7 @@ pub struct ConnectionInfo {
 pub struct NetworkCaptureRequest {
     pub duration_seconds: Option<u64>,
     pub filter_protocol: Option<String>,
-    pub filter_port: Option<u16>,
+    pub filter_port: Option<usize>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]

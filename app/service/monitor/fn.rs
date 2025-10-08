@@ -100,7 +100,7 @@ fn generate_sample_packets() -> Vec<NetworkPacket> {
             .to_string(),
             src_ip: format!("{}{}", SAMPLE_IP_PREFIX_A, 100 + i),
             dst_ip: format!("{}{}", SAMPLE_IP_PREFIX_B, 8 + i % 2),
-            src_port: SAMPLE_BASE_SRC_PORT + i as u16,
+            src_port: SAMPLE_BASE_SRC_PORT + i as usize,
             dst_port: if i % 2 == 0 {
                 SAMPLE_DST_PORT_A
             } else {
@@ -184,20 +184,20 @@ async fn capture_linux_network() -> Option<NetworkStats> {
 }
 
 #[cfg(target_os = "windows")]
-fn parse_connection_line(parts: &[&str]) -> Option<((String, u16), (String, u16))> {
+fn parse_connection_line(parts: &[&str]) -> Option<((String, usize), (String, usize))> {
     if parts.len() < 3 {
         return None;
     }
-    let local: (String, u16) = parse_address(parts[1])?;
-    let remote: (String, u16) = parse_address(parts[2])?;
+    let local: (String, usize) = parse_address(parts[1])?;
+    let remote: (String, usize) = parse_address(parts[2])?;
     Some((local, remote))
 }
 
 #[cfg(target_os = "windows")]
-fn parse_address(addr: &str) -> Option<(String, u16)> {
+fn parse_address(addr: &str) -> Option<(String, usize)> {
     let colon_pos: usize = addr.rfind(':')?;
     let ip: String = addr[..colon_pos].to_string();
-    let port: u16 = addr[colon_pos + 1..].parse::<u16>().ok()?;
+    let port: usize = addr[colon_pos + 1..].parse::<usize>().ok()?;
     Some((ip, port))
 }
 
@@ -212,7 +212,7 @@ pub async fn get_network_capture_data(ctx: Context) {
 pub async fn get_network_capture_stream(ctx: Context) {
     let response_data: NetworkStats = get_network_stats().unwrap_or_default();
     if let Ok(json) = serde_json::to_string(&response_data) {
-        let event: String = format!("{}{}{}", SSE_DATA_PREFIX, json, SSE_EVENT_SUFFIX);
+        let event: String = format!("{}{}{}", SSE_DATA_PREFIX, json, DOUBLE_BR);
         ctx.set_response_body(&event).await;
     }
 }

@@ -24,9 +24,9 @@ pub const SAMPLE_PACKET_BASE_SIZE: u32 = 1024;
 pub const SAMPLE_PACKET_SIZE_MULTIPLIER: u32 = 100;
 pub const SAMPLE_IP_PREFIX_A: &'static str = "192.168.1.";
 pub const SAMPLE_IP_PREFIX_B: &'static str = "8.8.8.";
-pub const SAMPLE_BASE_SRC_PORT: u16 = 50000;
-pub const SAMPLE_DST_PORT_A: u16 = 80;
-pub const SAMPLE_DST_PORT_B: u16 = 443;
+pub const SAMPLE_BASE_SRC_PORT: usize = 50000;
+pub const SAMPLE_DST_PORT_A: usize = 80;
+pub const SAMPLE_DST_PORT_B: usize = 443;
 pub const PROTOCOL_TCP: &'static str = "TCP";
 pub const PROTOCOL_UDP: &'static str = "UDP";
 pub const PROTOCOL_ICMP: &'static str = "ICMP";
@@ -34,4 +34,3 @@ pub const DIRECTION_IN: &'static str = "in";
 pub const DIRECTION_OUT: &'static str = "out";
 
 pub const SSE_DATA_PREFIX: &'static str = "data: ";
-pub const SSE_EVENT_SUFFIX: &'static str = "\n\n";

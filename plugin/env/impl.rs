@@ -55,7 +55,7 @@ impl EnvConfig {
                 .get(ENV_KEY_MYSQL_PORT)
                 .cloned()
                 .unwrap_or_default()
-                .parse::<u16>()
+                .parse::<usize>()
                 .map_err(|_| "MYSQL_PORT must be a valid 16-bit unsigned integer")?,
             mysql_database: config_map
                 .get(ENV_KEY_MYSQL_DATABASE)
@@ -77,7 +77,7 @@ impl EnvConfig {
                 .get(ENV_KEY_REDIS_PORT)
                 .cloned()
                 .unwrap_or_default()
-                .parse::<u16>()
+                .parse::<usize>()
                 .map_err(|_| "REDIS_PORT must be a valid 16-bit unsigned integer")?,
             redis_username: config_map
                 .get(ENV_KEY_REDIS_USERNAME)
@@ -95,7 +95,7 @@ impl EnvConfig {
                 .get(ENV_KEY_POSTGRES_PORT)
                 .cloned()
                 .unwrap_or_default()
-                .parse::<u16>()
+                .parse::<usize>()
                 .map_err(|_| "POSTGRES_PORT must be a valid 16-bit unsigned integer")?,
             postgresql_database: config_map
                 .get(ENV_KEY_POSTGRES_DATABASE)
