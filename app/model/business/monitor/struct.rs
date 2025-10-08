@@ -43,3 +43,39 @@ pub struct NetworkCaptureResponse {
     pub message: String,
     pub data: Option<NetworkStats>,
 }
+
+#[derive(Debug, Default, Clone, Serialize, Deserialize, ToSchema)]
+pub struct ServerStatus {
+    pub timestamp: u64,
+    pub cpu_usage: f64,
+    pub memory_usage: f64,
+    pub memory_total: u64,
+    pub memory_used: u64,
+    pub disk_usage: f64,
+    pub disk_total: u64,
+    pub disk_used: u64,
+    pub network_rx: u64,
+    pub network_tx: u64,
+    pub uptime: u64,
+    pub load_average: f64,
+    pub active_connections: u32,
+    pub process_count: u32,
+    pub hostname: String,
+    pub os_name: String,
+    pub os_version: String,
+    pub kernel_version: String,
+    pub cpu_cores: u32,
+    pub cpu_model: String,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize, ToSchema)]
+pub struct SystemInfo {
+    pub hostname: String,
+    pub os_name: String,
+    pub os_version: String,
+    pub kernel_version: String,
+    pub cpu_cores: u32,
+    pub cpu_model: String,
+    pub total_memory: u64,
+    pub total_disk: u64,
+}
