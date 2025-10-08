@@ -105,7 +105,6 @@ pub async fn search_trace(trace: &str) -> String {
     if !base_dir.exists() {
         return format!("Log directory not found: {}", base_dir.display());
     }
-    let mut result: String = String::new();
     let mut prev_line: Option<String> = None;
     for level in SERVER_LOG_LEVEL {
         let log_dir: PathBuf = base_dir.join(level);
@@ -124,11 +123,11 @@ pub async fn search_trace(trace: &str) -> String {
                     let content_str: String = String::from_utf8_lossy(&content).to_string();
                     for line in content_str.lines() {
                         if line.trim().contains(&format!("\"trace\": [\"{trace}\"]")) {
-                            if let Some(prev) = &prev_line {
-                                result.push_str(&format!("{prev}{BR}{line}{BR}"));
+                            return if let Some(prev) = &prev_line {
+                                format!("{prev}{BR}{line}{BR}")
                             } else {
-                                result.push_str(&format!("{line}{BR}"));
-                            }
+                                format!("{line}{BR}")
+                            };
                         }
                         prev_line = Some(line.to_string());
                     }
@@ -136,9 +135,5 @@ pub async fn search_trace(trace: &str) -> String {
             }
         }
     }
-    if result.is_empty() {
-        format!("No trace found with value: {}", trace)
-    } else {
-        result.trim_end().to_string()
-    }
+    format!("No trace found with value: {trace}")
 }
