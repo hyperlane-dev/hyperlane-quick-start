@@ -8,7 +8,7 @@ where
     let args: Vec<String> = args().collect();
     let mut manager: ServerManager = ServerManager::new();
     manager
-        .set_pid_file(PID_FILE_PATH)
+        .set_pid_file(SERVER_PID_FILE_PATH)
         .set_server_hook(server_hook);
     let is_daemon: bool = args.len() >= 3 && args[2].to_lowercase() == "-d";
     let start_server = || async {
