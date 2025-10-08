@@ -18,6 +18,25 @@ use super::*;
 )]
 pub async fn html(ctx: Context) {}
 
+#[route("/chat/users/online")]
+#[utoipa::path(
+    get,
+    path = "/chat/users/online",
+    responses(
+        (status = 200, description = "Get online users list", body = UserListResponse)
+    )
+)]
+#[prologue_macros(
+    get,
+    response_status_code(200),
+    response_header(CONTENT_TYPE => APPLICATION_JSON)
+)]
+pub async fn online_users(ctx: Context) {
+    let user_list: UserListResponse = get_online_users_list();
+    let response_json: ResponseBody = serde_json::to_vec(&user_list).unwrap_or_default();
+    ctx.set_response_body(&response_json).await;
+}
+
 #[route("/api/chat")]
 #[utoipa::path(
     get,

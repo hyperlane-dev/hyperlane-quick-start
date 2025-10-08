@@ -24,6 +24,7 @@ use super::*;
     ),
     paths(
         controller::chat::html,
+        controller::chat::online_users,
         controller::chat::handle,
         controller::favicon::handle,
         controller::hello::handle,
@@ -43,7 +44,6 @@ use super::*;
         controller::upload::register,
         controller::upload::merge,
         controller::upload::save,
-        controller::users::online_users,
         controller::websocket::handle,
     )
 )]

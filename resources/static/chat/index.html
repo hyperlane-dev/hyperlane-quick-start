@@ -1765,7 +1765,9 @@
               ? 'localhost:65002'
               : window.location.host;
 
-          const response = await fetch(`${protocol}//${host}/api/users/online`);
+          const response = await fetch(
+            `${protocol}//${host}/chat/users/online`
+          );
           if (response.ok) {
             const data = await response.json();
             onlineUsers = data.users || [];
