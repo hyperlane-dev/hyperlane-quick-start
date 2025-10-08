@@ -83,71 +83,62 @@ pub async fn read_log_file(level: &str) -> String {
     }
 }
 
+/// Searches for log entries containing the specified trace value
+///
+/// This function scans through log files in the info, warn, and error
+/// subdirectories under the server log directory, looking for entries
+/// that contain the specified trace value in the format "trace": ["value"].
+/// When a matching line is found, it also includes the previous line
+/// in the result for context.
+///
+/// # Arguments
+///
+/// - `trace`: The trace value to search for in log entries
+///
+/// # Returns
+///
+/// Returns a formatted string containing matching log entries with their
+/// preceding context lines. If no matches are found, returns a message
+/// indicating the trace was not found.
 pub async fn search_trace(trace: &str) -> String {
-    let log_dir: &Path = Path::new(SERVER_LOG_DIR);
-    if !log_dir.exists() {
-        return format!("Log directory not found: {}", log_dir.display());
+    let base_dir: &Path = Path::new(SERVER_LOG_DIR);
+    if !base_dir.exists() {
+        return format!("Log directory not found: {}", base_dir.display());
     }
-    let re: Regex =
-        Regex::new(r"(?s)\$(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\$ \$$([A-Za-z]+)\$ => (.*?);")
-            .unwrap();
-    let mut results: Vec<String> = Vec::new();
-    let mut dir_queue: VecDeque<PathBuf> = VecDeque::new();
-    dir_queue.push_back(log_dir.to_path_buf());
-    while let Some(current_path) = dir_queue.pop_front() {
-        if let Ok(entries) = fs::read_dir(&current_path) {
-            for entry in entries.filter_map(Result::ok) {
-                let path: PathBuf = entry.path();
-                if path.is_dir() {
-                    dir_queue.push_back(path);
-                } else if path
-                    .extension()
-                    .and_then(|s| s.to_str())
-                    .map_or(false, |ext| {
-                        ext == LOG_FILE_EXTENSION.trim_start_matches('.')
-                    })
+    let mut result: String = String::new();
+    let mut prev_line: Option<String> = None;
+    for level in SERVER_LOG_LEVEL {
+        let log_dir: PathBuf = base_dir.join(level);
+        if !log_dir.exists() {
+            continue;
+        }
+        let date_dirs: Vec<String> = get_sorted_dirs(&log_dir);
+        for date_dir in date_dirs.iter().take(MAX_DATE_DIRS) {
+            let date_path: PathBuf = log_dir.join(date_dir);
+            let log_files: Vec<String> = get_sorted_log_files(&date_path);
+            for log_file_name in log_files.iter().take(MAX_LOG_FILES_PER_DATE) {
+                let full_path: PathBuf = date_path.join(log_file_name);
+                if let Ok(content) =
+                    async_read_from_file::<Vec<u8>>(&full_path.to_str().unwrap_or_default()).await
                 {
-                    if let Ok(content) = read_and_reverse_log_file(&path).await {
-                        for entry in content.lines().collect::<Vec<&str>>() {
-                            if let Some(caps) = re.captures(entry) {
-                                let timestamp_str: &str =
-                                    caps.get(1).map_or("", |m| m.as_str().trim_end());
-                                let entry_type: &str =
-                                    caps.get(2).map_or("", |m| m.as_str().trim_end());
-                                let content: &str =
-                                    caps.get(3).map_or("", |m| m.as_str().trim_end());
-                                if entry_type == "Request" || entry_type == "Response" {
-                                    if let Ok(trace_re) = Regex::new(trace) {
-                                        if trace_re.is_match(content) {
-                                            results.push(format!(
-                                                "Found trace in {}:\nTime: {}\nType: {}\nContent: {}",
-                                                path.display(),
-                                                timestamp_str,
-                                                entry_type,
-                                                content
-                                            ));
-                                        }
-                                    } else if content.contains(trace) {
-                                        results.push(format!(
-                                            "Found trace in {}:\nTime: {}\nType: {}\nContent: {}",
-                                            path.display(),
-                                            timestamp_str,
-                                            entry_type,
-                                            content
-                                        ));
-                                    }
-                                }
+                    let content_str: String = String::from_utf8_lossy(&content).to_string();
+                    for line in content_str.lines() {
+                        if line.trim().contains(&format!("\"trace\": [\"{trace}\"]")) {
+                            if let Some(prev) = &prev_line {
+                                result.push_str(&format!("{prev}{BR}{line}{BR}"));
+                            } else {
+                                result.push_str(&format!("{line}{BR}"));
                             }
                         }
+                        prev_line = Some(line.to_string());
                     }
                 }
             }
         }
     }
-
-    if results.is_empty() {
-        format!("Trace {} not found", trace)
+    if result.is_empty() {
+        format!("No trace found with value: {}", trace)
     } else {
-        results.join("\n\n")
+        result.trim_end().to_string()
     }
 }
