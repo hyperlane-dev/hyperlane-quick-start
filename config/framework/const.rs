@@ -12,6 +12,7 @@ pub const SERVER_NODELAY: bool = false;
 pub const SERVER_LINGER: OptionDuration = None;
 pub const SERVER_TTI: u32 = 128;
 
+pub const PID_FILE_PATH: &'static str = "/shell/process/hyperlane.pid";
 pub const CACHE_CONTROL_STATIC_ASSETS: &'static str = "public, max-age=31536000, immutable";
 pub const CACHE_CONTROL_SHORT_TERM: &'static str = "public, max-age=3600";
 pub const EXPIRES_FAR_FUTURE: &'static str = "Wed, 1 Apr 8888 00:00:00 GMT";
