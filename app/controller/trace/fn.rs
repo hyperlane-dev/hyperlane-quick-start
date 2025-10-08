@@ -13,7 +13,8 @@ use super::*;
 #[prologue_macros(
     methods(get, post),
     response_status_code(200),
-    response_body(TRACE_HTML)
+    response_body(TRACE_HTML),
+    response_header(CONTENT_ENCODING => GZIP)
 )]
 pub async fn monitor_dashboard(ctx: Context) {}
 

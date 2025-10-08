@@ -1,11 +1,13 @@
 use super::*;
 
 #[request_middleware(2)]
-#[response_header("trace" => Uuid::new_v4().to_string())]
-#[response_header(DATE => gmt())]
-#[response_header(SERVER => HYPERLANE)]
-#[response_header(CONNECTION => KEEP_ALIVE)]
-#[response_header(CONTENT_TYPE => TEXT_HTML)]
+#[prologue_macros(
+    response_header(DATE => gmt()),
+    response_header(SERVER => HYPERLANE),
+    response_header(CONNECTION => KEEP_ALIVE),
+    response_header("trace" => Uuid::new_v4().to_string()),
+    response_header(CONTENT_TYPE => TEXT_HTML)
+)]
 pub async fn response_header(ctx: Context) {
     let socket_addr_string: String = ctx.get_socket_addr_string().await;
     let content_type: String = ContentType::format_content_type_with_charset(TEXT_HTML, UTF8);
