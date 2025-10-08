@@ -136,7 +136,6 @@
             successMsg.style.margin = '10px 0';
             successMsg.textContent = 'Search completed successfully';
             result.parentNode.insertBefore(successMsg, result);
-            setTimeout(() => successMsg.remove(), 3000);
             console.log('Query completed');
           } else if (response.status === 404) {
             result.textContent = 'Trace record not found';
@@ -147,7 +146,6 @@
             errorMsg.style.margin = '10px 0';
             errorMsg.textContent = 'Search failed: Trace record not found';
             result.parentNode.insertBefore(errorMsg, result);
-            setTimeout(() => errorMsg.remove(), 3000);
           } else {
             result.textContent = `Request failed: ${response.status} ${response.statusText}`;
             result.className = 'empty-result';
@@ -157,7 +155,6 @@
             errorMsg.style.margin = '10px 0';
             errorMsg.textContent = `Search failed: ${response.status} ${response.statusText}`;
             result.parentNode.insertBefore(errorMsg, result);
-            setTimeout(() => errorMsg.remove(), 3000);
           }
         } catch (error) {
           result.textContent = `Network request error: ${error.message}`;
@@ -168,7 +165,6 @@
           errorMsg.style.margin = '10px 0';
           errorMsg.textContent = `Search failed: Network request error - ${error.message}`;
           result.parentNode.insertBefore(errorMsg, result);
-          setTimeout(() => errorMsg.remove(), 3000);
         }
       }
 
