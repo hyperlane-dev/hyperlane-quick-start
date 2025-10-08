@@ -1,11 +1,5 @@
 use super::*;
 
-#[derive(Debug, Clone, Default)]
-pub struct EnvConfig {
-    pub gpt_api_url: String,
-    pub gtp_model: String,
-}
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ChatMessage {
     pub role: String,
