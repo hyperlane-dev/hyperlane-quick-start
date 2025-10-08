@@ -222,7 +222,6 @@ pub async fn get_server_status() -> ServerStatus {
         .duration_since(UNIX_EPOCH)
         .unwrap_or_default()
         .as_secs();
-
     let cpu_usage: f64 = get_cpu_usage().await;
     let (memory_used, memory_total, memory_usage) = get_memory_info().await;
     let (disk_used, disk_total, disk_usage) = get_disk_info().await;
