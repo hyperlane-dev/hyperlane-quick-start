@@ -38,6 +38,9 @@ pub async fn monitor_dashboard(ctx: Context) {}
 )]
 pub async fn trace(ctx: Context) {
     let trace: String = trace_opt.unwrap_or_default();
-    let result: String = search_trace(&trace).await;
+    let decoded_trace: String = decode(&trace)
+        .unwrap_or_else(|_| trace.clone().into())
+        .into_owned();
+    let result: String = search_trace(&decoded_trace).await;
     ctx.set_response_body(&result).await;
 }

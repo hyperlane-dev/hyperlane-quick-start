@@ -103,7 +103,7 @@
         }
         
         if (!traceId) {
-          result.textContent = '请输入有效的 Trace ID';
+          result.textContent = 'Please enter a valid Trace ID';
           result.className = 'empty-result';
           return;
         }
@@ -115,7 +115,7 @@
         urlElement.id = 'requestUrl';
         urlElement.className = 'request-url';
         urlElement.textContent = requestUrl;
-        urlElement.title = '点击在新窗口打开请求地址';
+        urlElement.title = 'Click to open request URL in new window';
         urlElement.onclick = function() {
           window.open(requestUrl, '_blank');
         };
@@ -127,33 +127,41 @@
           if (response.ok) {
             const data = await response.text();
             result.textContent = data;
+            // Add query completion message to console
+            console.log('Query completed');
           } else if (response.status === 404) {
-            result.textContent = '未找到指定的 Trace 记录';
+            result.textContent = 'Trace record not found';
             result.className = 'empty-result';
           } else {
-            result.textContent = `请求失败: ${response.status} ${response.statusText}`;
+            result.textContent = `Request failed: ${response.status} ${response.statusText}`;
             result.className = 'empty-result';
           }
         } catch (error) {
-          result.textContent = `网络请求出错: ${error.message}`;
+          result.textContent = `Network request error: ${error.message}`;
           result.className = 'empty-result';
         }
       }
 
       // Allow Enter key to trigger search
-      document.getElementById('traceId').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-          searchTrace();
+      document.addEventListener('DOMContentLoaded', function() {
+        const traceIdInput = document.getElementById('traceId');
+        if (traceIdInput) {
+          traceIdInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              searchTrace();
+            }
+          });
         }
       });
     </script>
   </head>
   <body>
-    <h1>Trace 查询</h1>
+    <h1>Trace Query</h1>
     <div class="search-container">
-      <input type="text" id="traceId" placeholder="请输入 Trace ID" />
-      <button onclick="searchTrace()">查询</button>
+      <input type="text" id="traceId" placeholder="Enter Trace ID" />
+      <button onclick="searchTrace()">Search</button>
     </div>
-    <pre id="result" class="empty-result">请输入 Trace ID 并点击查询按钮</pre>
+    <pre id="result" class="empty-result">Please enter a Trace ID and click the search button</pre>
   </body>
 </html>
