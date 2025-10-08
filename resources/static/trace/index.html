@@ -64,7 +64,7 @@
         min-height: 100px;
         max-height: 600px;
         overflow-y: auto;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       }
       .empty-result {
         color: #7f8c8d;
@@ -95,20 +95,23 @@
         const traceId = document.getElementById('traceId').value.trim();
         const result = document.getElementById('result');
         const urlContainer = document.getElementById('requestUrl');
-        
-        // Reset result styling
+
+        const existingMessages = result.parentNode.querySelectorAll(
+          'div[style*="color: green"], div[style*="color: red"]'
+        );
+        existingMessages.forEach((msg) => msg.remove());
+
         result.className = '';
         if (urlContainer) {
           urlContainer.remove();
         }
-        
+
         if (!traceId) {
           result.textContent = 'Please enter a valid Trace ID';
           result.className = 'empty-result';
           return;
         }
-        
-        // Create and display request URL
+
         const baseUrl = window.location.origin;
         const requestUrl = `${baseUrl}/trace/${encodeURIComponent(traceId)}`;
         const urlElement = document.createElement('div');
@@ -116,37 +119,63 @@
         urlElement.className = 'request-url';
         urlElement.textContent = requestUrl;
         urlElement.title = 'Click to open request URL in new window';
-        urlElement.onclick = function() {
+        urlElement.onclick = function () {
           window.open(requestUrl, '_blank');
         };
         result.parentNode.insertBefore(urlElement, result);
-        
+
         try {
           const response = await fetch(requestUrl);
-          
+
           if (response.ok) {
             const data = await response.text();
             result.textContent = data;
-            // Add query completion message to console
+            const successMsg = document.createElement('div');
+            successMsg.style.color = 'green';
+            successMsg.style.fontWeight = 'bold';
+            successMsg.style.margin = '10px 0';
+            successMsg.textContent = 'Search completed successfully';
+            result.parentNode.insertBefore(successMsg, result);
+            setTimeout(() => successMsg.remove(), 3000);
             console.log('Query completed');
           } else if (response.status === 404) {
             result.textContent = 'Trace record not found';
             result.className = 'empty-result';
+            const errorMsg = document.createElement('div');
+            errorMsg.style.color = 'red';
+            errorMsg.style.fontWeight = 'bold';
+            errorMsg.style.margin = '10px 0';
+            errorMsg.textContent = 'Search failed: Trace record not found';
+            result.parentNode.insertBefore(errorMsg, result);
+            setTimeout(() => errorMsg.remove(), 3000);
           } else {
             result.textContent = `Request failed: ${response.status} ${response.statusText}`;
             result.className = 'empty-result';
+            const errorMsg = document.createElement('div');
+            errorMsg.style.color = 'red';
+            errorMsg.style.fontWeight = 'bold';
+            errorMsg.style.margin = '10px 0';
+            errorMsg.textContent = `Search failed: ${response.status} ${response.statusText}`;
+            result.parentNode.insertBefore(errorMsg, result);
+            setTimeout(() => errorMsg.remove(), 3000);
           }
         } catch (error) {
           result.textContent = `Network request error: ${error.message}`;
           result.className = 'empty-result';
+          const errorMsg = document.createElement('div');
+          errorMsg.style.color = 'red';
+          errorMsg.style.fontWeight = 'bold';
+          errorMsg.style.margin = '10px 0';
+          errorMsg.textContent = `Search failed: Network request error - ${error.message}`;
+          result.parentNode.insertBefore(errorMsg, result);
+          setTimeout(() => errorMsg.remove(), 3000);
         }
       }
 
-      // Allow Enter key to trigger search
-      document.addEventListener('DOMContentLoaded', function() {
+      document.addEventListener('DOMContentLoaded', function () {
         const traceIdInput = document.getElementById('traceId');
         if (traceIdInput) {
-          traceIdInput.addEventListener('keydown', function(e) {
+          traceIdInput.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') {
               e.preventDefault();
               searchTrace();
@@ -162,6 +191,8 @@
       <input type="text" id="traceId" placeholder="Enter Trace ID" />
       <button onclick="searchTrace()">Search</button>
     </div>
-    <pre id="result" class="empty-result">Please enter a Trace ID and click the search button</pre>
+    <pre id="result" class="empty-result">
+Please enter a Trace ID and click the search button</pre
+    >
   </body>
 </html>

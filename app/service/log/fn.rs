@@ -83,23 +83,6 @@ pub async fn read_log_file(level: &str) -> String {
     }
 }
 
-/// Searches for log entries containing the specified trace value
-///
-/// This function scans through log files in the info, warn, and error
-/// subdirectories under the server log directory, looking for entries
-/// that contain the specified trace value in the format "trace": ["value"].
-/// When a matching line is found, it also includes the previous line
-/// in the result for context.
-///
-/// # Arguments
-///
-/// - `trace`: The trace value to search for in log entries
-///
-/// # Returns
-///
-/// Returns a formatted string containing matching log entries with their
-/// preceding context lines. If no matches are found, returns a message
-/// indicating the trace was not found.
 pub async fn search_trace(trace: &str) -> String {
     let base_dir: &Path = Path::new(SERVER_LOG_DIR);
     if !base_dir.exists() {
