@@ -12,7 +12,8 @@ use super::*;
 #[prologue_macros(
     get,
     response_status_code(200),
-    response_header(CONTENT_TYPE => ContentType::format_content_type_with_charset(TEXT_PLAIN, UTF8))
+    response_header(CONTENT_TYPE => ContentType::format_content_type_with_charset(TEXT_PLAIN, UTF8)),
+    response_header(CONTENT_ENCODING => GZIP)
 )]
 pub async fn info(ctx: Context) {
     let log_content: String = read_log_file(SERVER_LOG_LEVEL[0]).await;
@@ -31,7 +32,8 @@ pub async fn info(ctx: Context) {
 #[prologue_macros(
     get,
     response_status_code(200),
-    response_header(CONTENT_TYPE => ContentType::format_content_type_with_charset(TEXT_PLAIN, UTF8))
+    response_header(CONTENT_TYPE => ContentType::format_content_type_with_charset(TEXT_PLAIN, UTF8)),
+    response_header(CONTENT_ENCODING => GZIP)
 )]
 pub async fn warn(ctx: Context) {
     let log_content: String = read_log_file(SERVER_LOG_LEVEL[1]).await;
@@ -50,7 +52,8 @@ pub async fn warn(ctx: Context) {
 #[prologue_macros(
     get,
     response_status_code(200),
-    response_header(CONTENT_TYPE => ContentType::format_content_type_with_charset(TEXT_PLAIN, UTF8))
+    response_header(CONTENT_TYPE => ContentType::format_content_type_with_charset(TEXT_PLAIN, UTF8)),
+    response_header(CONTENT_ENCODING => GZIP)
 )]
 pub async fn error(ctx: Context) {
     let log_content: String = read_log_file(SERVER_LOG_LEVEL[2]).await;
