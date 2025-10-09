@@ -66,11 +66,19 @@ cargo run restart -d
 
 ### WeChat Pay
 
-<img src="https://docs.ltpp.vip/img/wechat-pay.png" width="200">
+<img src="https://docs.ltpp.vip/img/wechatpay.png" width="200">
 
 ### Alipay
 
-<img src="https://docs.ltpp.vip/img/alipay-pay.jpg" width="200">
+<img src="https://docs.ltpp.vip/img/alipay.png" width="200">
+
+### Virtual Currency Pay
+
+| Virtual Currency | Address                                    |
+| ---------------- | ------------------------------------------ |
+| BTC              | 3QndxCJTf3mEniTgyRRQ1jcNTJajm9qSCy         |
+| ETH              | 0x8EB3794f67897ED397584d3a1248a79e0B8e97A6 |
+| BSC              | 0x8EB3794f67897ED397584d3a1248a79e0B8e97A6 |
 
 ## License
 
