@@ -74,7 +74,7 @@ cargo run restart -d
 
 ### Virtual Currency Pay
 
-| Virtual Currency | Address                                    |
+| Virtual Currency | Virtual Currency Address                   |
 | ---------------- | ------------------------------------------ |
 | BTC              | 3QndxCJTf3mEniTgyRRQ1jcNTJajm9qSCy         |
 | ETH              | 0x8EB3794f67897ED397584d3a1248a79e0B8e97A6 |

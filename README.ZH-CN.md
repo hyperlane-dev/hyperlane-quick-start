@@ -74,7 +74,7 @@ cargo run restart -d
 
 ### 虚拟货币支付
 
-| 虚拟货币 | 地址                                       |
+| 虚拟货币 | 虚拟货币地址                               |
 | -------- | ------------------------------------------ |
 | BTC      | 3QndxCJTf3mEniTgyRRQ1jcNTJajm9qSCy         |
 | ETH      | 0x8EB3794f67897ED397584d3a1248a79e0B8e97A6 |
