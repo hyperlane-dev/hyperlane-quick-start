@@ -21,7 +21,10 @@ impl EnvConfig {
                      {ENV_KEY_POSTGRES_PORT}=\n\
                      {ENV_KEY_POSTGRES_DATABASE}=\n\
                      {ENV_KEY_POSTGRES_USERNAME}=\n\
-                     {ENV_KEY_POSTGRES_PASSWORD}=\n",
+                     {ENV_KEY_POSTGRES_PASSWORD}=\n\
+                     {ENV_KEY_ENABLE_MYSQL}=\n\
+                     {ENV_KEY_ENABLE_REDIS}=\n\
+                     {ENV_KEY_ENABLE_POSTGRESQL}=\n",
                 );
                 let _ = write_to_file(ENV_FILE_PATH, data.as_bytes())
                     .map_err(|e| format!("Failed to create example env file: {}", e))?;
@@ -42,6 +45,24 @@ impl EnvConfig {
             gpt_api_url: config_map
                 .get(ENV_KEY_GPT_API_URL)
                 .cloned()
+                .unwrap_or_default(),
+            enable_mysql: config_map
+                .get(ENV_KEY_ENABLE_MYSQL)
+                .cloned()
+                .unwrap_or_default()
+                .parse::<bool>()
+                .unwrap_or(false),
+            enable_redis: config_map
+                .get(ENV_KEY_ENABLE_REDIS)
+                .cloned()
+                .unwrap_or_default()
+                .parse::<bool>()
+                .unwrap_or(false),
+            enable_postgresql: config_map
+                .get(ENV_KEY_ENABLE_POSTGRESQL)
+                .cloned()
+                .unwrap_or_default()
+                .parse::<bool>()
                 .unwrap_or_default(),
             gtp_model: config_map
                 .get(ENV_KEY_GPT_MODEL)

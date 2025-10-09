@@ -15,6 +15,19 @@ async fn init_network_capture() {
     start_network_capture().await;
 }
 
+async fn init_db() {
+    let env: &EnvConfig = get_global_env_config();
+    if env.enable_mysql {
+        connection_mysql_db().await;
+    }
+    if env.enable_redis {
+        connection_redis_db().await;
+    }
+    if env.enable_postgresql {
+        connection_postgresql_db().await;
+    }
+}
+
 fn runtime() -> Runtime {
     Builder::new_multi_thread()
         .worker_threads(num_cpus::get_physical() << 1)
@@ -30,6 +43,7 @@ fn runtime() -> Runtime {
 async fn create_server() {
     init_config(&server).await;
     init_network_capture().await;
+    init_db().await;
     println_success!("Server initialization successful");
     let server_result: ServerResult<ServerHook> = server.run().await;
     match server_result {

@@ -15,3 +15,6 @@ pub const ENV_KEY_POSTGRES_PORT: &'static str = "POSTGRES_PORT";
 pub const ENV_KEY_POSTGRES_DATABASE: &'static str = "POSTGRES_DATABASE";
 pub const ENV_KEY_POSTGRES_USERNAME: &'static str = "POSTGRES_USERNAME";
 pub const ENV_KEY_POSTGRES_PASSWORD: &'static str = "POSTGRES_PASSWORD";
+pub const ENV_KEY_ENABLE_MYSQL: &'static str = "ENABLE_MYSQL";
+pub const ENV_KEY_ENABLE_REDIS: &'static str = "ENABLE_REDIS";
+pub const ENV_KEY_ENABLE_POSTGRESQL: &'static str = "ENABLE_POSTGRESQL";

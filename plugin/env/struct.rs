@@ -1,6 +1,12 @@
 #[derive(Debug, Clone, Default)]
 pub struct EnvConfig {
     pub gpt_api_url: String,
+    /// Whether to enable MySQL database
+    pub enable_mysql: bool,
+    /// Whether to enable Redis database
+    pub enable_redis: bool,
+    /// Whether to enable PostgreSQL database
+    pub enable_postgresql: bool,
     /// GPT model identifier
     pub gtp_model: String,
     /// MySQL database host address
