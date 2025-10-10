@@ -11,7 +11,10 @@ use super::*;
 #[route("/api/postgresql/update")]
 #[prologue_macros(get)]
 pub async fn get_records(ctx: Context) {
-    get_all_postgresql_records(ctx).await;
+    match get_all_postgresql_records().await {
+        Ok(records) => ctx.set_response_body(format!("{records:?}")).await,
+        Err(e) => ctx.set_response_body(&e).await,
+    };
 }
 
 #[utoipa::path(
@@ -27,7 +30,10 @@ pub async fn get_records(ctx: Context) {
 #[route("/api/postgresql/list")]
 #[prologue_macros(post)]
 pub async fn create_record(ctx: Context) {
-    create_postgresql_record(ctx).await;
+    match create_postgresql_record(&ctx).await {
+        Ok(_) => ctx.set_response_body("Record created successfully").await,
+        Err(e) => ctx.set_response_body(&e).await,
+    };
 }
 
 #[utoipa::path(
@@ -44,7 +50,10 @@ pub async fn create_record(ctx: Context) {
 #[route("/api/postgresql/create")]
 #[prologue_macros(put)]
 pub async fn update_record(ctx: Context) {
-    update_postgresql_record(ctx).await;
+    match update_postgresql_record(&ctx).await {
+        Ok(_) => ctx.set_response_body("Record updated successfully").await,
+        Err(e) => ctx.set_response_body(&e).await,
+    };
 }
 
 #[utoipa::path(
@@ -62,5 +71,8 @@ pub async fn update_record(ctx: Context) {
 #[route("/api/postgresql/delete")]
 #[prologue_macros(delete)]
 pub async fn delete_record(ctx: Context) {
-    delete_postgresql_record(ctx).await;
+    match delete_postgresql_record(&ctx).await {
+        Ok(_) => ctx.set_response_body("Record deleted successfully").await,
+        Err(e) => ctx.set_response_body(&e).await,
+    };
 }
