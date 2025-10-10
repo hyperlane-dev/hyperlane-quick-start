@@ -2,12 +2,107 @@ use super::*;
 
 #[utoipa::path(
     get,
-    path = "/redis",
-    description = "",
+    path = "/api/redis",
+    description = "Get all Redis records",
     responses(
-        (status = 200, description = "", body = String)
+        (status = 200, description = "List of Redis records", body = Vec<RedisRecord>)
     )
 )]
-#[route("/redis")]
+#[route("/api/redis")]
 #[prologue_macros(get)]
-pub async fn handle(ctx: Context) {}
+pub async fn get_records(ctx: Context) {
+    let querys: RequestQuerys = ctx.get_request_querys().await;
+    let keys: Vec<String> = match querys.get("keys") {
+        Some(k) => k.split(',').map(|s| s.to_string()).collect(),
+        None => {
+            ctx.set_response_body("Keys parameter is required").await;
+            return;
+        }
+    };
+    match get_all_redis_records(keys).await {
+        Ok(records) => ctx.set_response_body(format!("{records:?}")).await,
+        Err(e) => ctx.set_response_body(&e).await,
+    };
+}
+
+#[utoipa::path(
+    post,
+    path = "/api/redis",
+    description = "Create a new Redis record",
+    request_body = RedisRecord,
+    responses(
+        (status = 200, description = "Record created successfully"),
+        (status = 400, description = "Invalid request data")
+    )
+)]
+#[route("/api/redis")]
+#[prologue_macros(post)]
+pub async fn create_record(ctx: Context) {
+    let record: RedisRecord = match ctx.get_request_body_json().await {
+        Ok(r) => r,
+        Err(e) => {
+            ctx.set_response_body(&e.to_string()).await;
+            return;
+        }
+    };
+    match create_redis_record(record).await {
+        Ok(_) => ctx.set_response_body("Record created successfully").await,
+        Err(e) => ctx.set_response_body(&e).await,
+    };
+}
+
+#[utoipa::path(
+    put,
+    path = "/api/redis",
+    description = "Update an existing Redis record",
+    request_body = RedisRecord,
+    responses(
+        (status = 200, description = "Record updated successfully"),
+        (status = 400, description = "Invalid request data"),
+        (status = 404, description = "Record not found")
+    )
+)]
+#[route("/api/redis")]
+#[prologue_macros(put)]
+pub async fn update_record(ctx: Context) {
+    let record: RedisRecord = match ctx.get_request_body_json().await {
+        Ok(r) => r,
+        Err(e) => {
+            ctx.set_response_body(&e.to_string()).await;
+            return;
+        }
+    };
+    match update_redis_record(record).await {
+        Ok(_) => ctx.set_response_body("Record updated successfully").await,
+        Err(e) => ctx.set_response_body(&e).await,
+    };
+}
+
+#[utoipa::path(
+    delete,
+    path = "/api/redis",
+    description = "Delete a Redis record by key",
+    params(
+        ("key" = String, Path, description = "Key of the record to delete")
+    ),
+    responses(
+        (status = 200, description = "Record deleted successfully"),
+        (status = 404, description = "Record not found")
+    )
+)]
+#[route("/api/redis")]
+#[prologue_macros(delete)]
+pub async fn delete_record(ctx: Context) {
+    let querys: RequestQuerys = ctx.get_request_querys().await;
+    let key: &String = match querys.get("key") {
+        Some(k) => k,
+        None => {
+            ctx.set_response_body("Key parameter is required").await;
+            return;
+        }
+    };
+    match delete_redis_record(key).await {
+        Ok(_) => ctx.set_response_body("Record deleted successfully").await,
+        Err(e) => ctx.set_response_body(&e).await,
+    };
+}

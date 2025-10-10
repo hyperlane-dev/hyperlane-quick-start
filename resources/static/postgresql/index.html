@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PostgreSQL Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+  </head>
+  <body class="bg-gray-100">
+    <div class="container mx-auto p-4">
+      <h1 class="text-3xl font-bold mb-6 text-center">PostgreSQL Management</h1>
+      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-4">Add New Record</h2>
+        <form hx-post="/api/postgresql" hx-target="#records" class="space-y-4">
+          <input
+            type="text"
+            name="key"
+            placeholder="Key"
+            class="w-full p-2 border rounded"
+            required
+          />
+          <input
+            type="text"
+            name="value"
+            placeholder="Value"
+            class="w-full p-2 border rounded"
+            required
+          />
+          <button
+            type="submit"
+            class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            Add
+          </button>
+        </form>
+      </div>
+
+      <div
+        id="records"
+        hx-get="/api/postgresql"
+        hx-trigger="load, every 5s"
+        class="bg-white rounded-lg shadow-md p-6"
+      >
+        <h2 class="text-xl font-semibold mb-4">Records</h2>
+        <div class="space-y-2">
+          <!-- Records will be loaded here by htmx -->
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

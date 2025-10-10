@@ -18,4 +18,6 @@ use hyperlane_plugin::log::*;
 
 use hyperlane::*;
 use hyperlane_utils::*;
-use serde::*;
+
+use serde::Deserialize;
+use serde::Serialize;
