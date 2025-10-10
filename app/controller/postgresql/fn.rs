@@ -30,7 +30,14 @@ pub async fn get_records(ctx: Context) {
 #[route("/api/postgresql/list")]
 #[prologue_macros(post)]
 pub async fn create_record(ctx: Context) {
-    match create_postgresql_record(&ctx).await {
+    let record: PostgresqlRecord = match ctx.get_request_body_json().await {
+        Ok(r) => r,
+        Err(e) => {
+            ctx.set_response_body(&e.to_string()).await;
+            return;
+        }
+    };
+    match create_postgresql_record(record).await {
         Ok(_) => ctx.set_response_body("Record created successfully").await,
         Err(e) => ctx.set_response_body(&e).await,
     };
@@ -50,7 +57,14 @@ pub async fn create_record(ctx: Context) {
 #[route("/api/postgresql/create")]
 #[prologue_macros(put)]
 pub async fn update_record(ctx: Context) {
-    match update_postgresql_record(&ctx).await {
+    let record: PostgresqlRecord = match ctx.get_request_body_json().await {
+        Ok(r) => r,
+        Err(e) => {
+            ctx.set_response_body(&e.to_string()).await;
+            return;
+        }
+    };
+    match update_postgresql_record(record).await {
         Ok(_) => ctx.set_response_body("Record updated successfully").await,
         Err(e) => ctx.set_response_body(&e).await,
     };
@@ -71,7 +85,14 @@ pub async fn update_record(ctx: Context) {
 #[route("/api/postgresql/delete")]
 #[prologue_macros(delete)]
 pub async fn delete_record(ctx: Context) {
-    match delete_postgresql_record(&ctx).await {
+    let key: String = match ctx.get_request_querys().await.get("key").cloned() {
+        Some(k) => k,
+        None => {
+            ctx.set_response_body("Key parameter is required").await;
+            return;
+        }
+    };
+    match delete_postgresql_record(&key).await {
         Ok(_) => ctx.set_response_body("Record deleted successfully").await,
         Err(e) => ctx.set_response_body(&e).await,
     };

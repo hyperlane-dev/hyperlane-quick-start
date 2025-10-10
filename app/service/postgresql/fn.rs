@@ -13,12 +13,8 @@ async fn get_postgresql_connection() -> Result<DatabaseConnection, String> {
     Database::connect(&db_url).await.map_err(|e| e.to_string())
 }
 
-pub async fn create_postgresql_record(ctx: &Context) -> Result<(), String> {
+pub async fn create_postgresql_record(record: PostgresqlRecord) -> Result<(), String> {
     let db: DatabaseConnection = get_postgresql_connection().await?;
-    let record: PostgresqlRecord = ctx
-        .get_request_body_json()
-        .await
-        .map_err(|e| e.to_string())?;
     let active_model: ActiveModel = ActiveModel {
         key: sea_orm::ActiveValue::Set(record.key),
         value: sea_orm::ActiveValue::Set(record.value),
@@ -41,12 +37,8 @@ pub async fn get_all_postgresql_records() -> Result<Vec<PostgresqlRecord>, Strin
     Ok(result)
 }
 
-pub async fn update_postgresql_record(ctx: &Context) -> Result<(), String> {
+pub async fn update_postgresql_record(record: PostgresqlRecord) -> Result<(), String> {
     let db: DatabaseConnection = get_postgresql_connection().await?;
-    let record: PostgresqlRecord = ctx
-        .get_request_body_json()
-        .await
-        .map_err(|e| e.to_string())?;
     Entity::update_many()
         .filter(Column::Key.eq(&record.key))
         .col_expr(Column::Value, Expr::value(record.value))
@@ -56,10 +48,8 @@ pub async fn update_postgresql_record(ctx: &Context) -> Result<(), String> {
     Ok(())
 }
 
-pub async fn delete_postgresql_record(ctx: &Context) -> Result<(), String> {
+pub async fn delete_postgresql_record(key: &str) -> Result<(), String> {
     let db: DatabaseConnection = get_postgresql_connection().await?;
-    let querys: RequestQuerys = ctx.get_request_querys().await;
-    let key: &String = querys.get("key").ok_or("Key parameter is required")?;
     Entity::delete_many()
         .filter(Column::Key.eq(key))
         .exec(&db)
