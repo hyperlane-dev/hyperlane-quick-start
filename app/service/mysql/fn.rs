@@ -16,10 +16,8 @@ pub async fn create_mysql_record(record: MysqlRecord) -> Result<(), String> {
         value: sea_orm::ActiveValue::Set(record.value),
         id: sea_orm::ActiveValue::NotSet,
     };
-    match active_model.insert(&db).await {
-        Ok(_) => Ok(()),
-        Err(e) => Err(e.to_string()),
-    }
+    active_model.insert(&db).await.map_err(|e| e.to_string())?;
+    Ok(())
 }
 
 pub async fn get_all_mysql_records() -> Result<Vec<MysqlRecord>, String> {
@@ -36,25 +34,21 @@ pub async fn get_all_mysql_records() -> Result<Vec<MysqlRecord>, String> {
 
 pub async fn update_mysql_record(record: MysqlRecord) -> Result<(), String> {
     let db: DatabaseConnection = get_mysql_connection().await?;
-    match Entity::update_many()
+    Entity::update_many()
         .filter(Column::Key.eq(&record.key))
         .col_expr(Column::Value, Expr::value(record.value))
         .exec(&db)
         .await
-    {
-        Ok(_) => Ok(()),
-        Err(e) => Err(e.to_string()),
-    }
+        .map_err(|e| e.to_string())?;
+    Ok(())
 }
 
 pub async fn delete_mysql_record(key: &str) -> Result<(), String> {
     let db: DatabaseConnection = get_mysql_connection().await?;
-    match Entity::delete_many()
+    Entity::delete_many()
         .filter(Column::Key.eq(key))
         .exec(&db)
         .await
-    {
-        Ok(_) => Ok(()),
-        Err(e) => Err(e.to_string()),
-    }
+        .map_err(|e| e.to_string())?;
+    Ok(())
 }
