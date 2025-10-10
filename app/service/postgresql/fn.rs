@@ -38,7 +38,6 @@ pub async fn get_all_postgresql_records() -> Result<Vec<PostgresqlRecord>, Strin
             value: r.value,
         })
         .collect();
-
     Ok(result)
 }
 
@@ -66,6 +65,5 @@ pub async fn delete_postgresql_record(ctx: &Context) -> Result<(), String> {
         .exec(&db)
         .await
         .map_err(|e| e.to_string())?;
-
     Ok(())
 }
