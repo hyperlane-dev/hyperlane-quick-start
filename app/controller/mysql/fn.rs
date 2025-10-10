@@ -2,13 +2,13 @@ use super::*;
 
 #[utoipa::path(
     get,
-    path = "/api/mysql",
+    path = "/api/mysql/delete",
     description = "Get all MySQL records",
     responses(
         (status = 200, description = "List of MySQL records", body = Vec<MysqlRecord>)
     )
 )]
-#[route("/api/mysql")]
+#[route("/api/mysql/delete")]
 #[prologue_macros(get)]
 pub async fn get_records(ctx: Context) {
     match get_all_mysql_records().await {
@@ -19,7 +19,7 @@ pub async fn get_records(ctx: Context) {
 
 #[utoipa::path(
     post,
-    path = "/api/mysql",
+    path = "/api/mysql/create",
     description = "Create a new MySQL record",
     request_body = MysqlRecord,
     responses(
@@ -27,7 +27,7 @@ pub async fn get_records(ctx: Context) {
         (status = 400, description = "Invalid request data")
     )
 )]
-#[route("/api/mysql")]
+#[route("/api/mysql/create")]
 #[prologue_macros(post)]
 pub async fn create_record(ctx: Context) {
     let record: MysqlRecord = match ctx.get_request_body_json().await {
@@ -45,7 +45,7 @@ pub async fn create_record(ctx: Context) {
 
 #[utoipa::path(
     put,
-    path = "/api/mysql",
+    path = "/api/mysql/list",
     description = "Update an existing MySQL record",
     request_body = MysqlRecord,
     responses(
@@ -54,7 +54,7 @@ pub async fn create_record(ctx: Context) {
         (status = 404, description = "Record not found")
     )
 )]
-#[route("/api/mysql")]
+#[route("/api/mysql/list")]
 #[prologue_macros(put)]
 pub async fn update_record(ctx: Context) {
     let record: MysqlRecord = match ctx.get_request_body_json().await {
@@ -72,7 +72,7 @@ pub async fn update_record(ctx: Context) {
 
 #[utoipa::path(
     delete,
-    path = "/api/mysql",
+    path = "/api/mysql/update",
     description = "Delete a MySQL record by key",
     params(
         ("key" = String, Path, description = "Key of the record to delete")
@@ -82,7 +82,7 @@ pub async fn update_record(ctx: Context) {
         (status = 404, description = "Record not found")
     )
 )]
-#[route("/api/mysql")]
+#[route("/api/mysql/update")]
 #[prologue_macros(delete)]
 pub async fn delete_record(ctx: Context) {
     let querys: RequestQuerys = ctx.get_request_querys().await;

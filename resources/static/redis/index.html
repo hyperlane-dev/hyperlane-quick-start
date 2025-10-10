@@ -12,7 +12,11 @@
       <h1 class="text-3xl font-bold mb-6 text-center">Redis Management</h1>
       <div class="bg-white rounded-lg shadow-md p-6 mb-6">
         <h2 class="text-xl font-semibold mb-4">Add New Record</h2>
-        <form hx-post="/api/redis" hx-target="#records" class="space-y-4">
+        <form
+          hx-post="/api/redis/create"
+          hx-target="#records"
+          class="space-y-4"
+        >
           <input
             type="text"
             name="key"
@@ -43,10 +47,103 @@
         class="bg-white rounded-lg shadow-md p-6"
       >
         <h2 class="text-xl font-semibold mb-4">Records</h2>
-        <div class="space-y-2">
-          <!-- Records will be loaded here by htmx -->
+        <div
+          hx-get="/api/redis/list"
+          hx-trigger="load, every 5s"
+          class="space-y-2"
+        >
+          <template id="record-template">
+            <div class="flex justify-between items-center p-2 border-b">
+              <div>
+                <span class="font-medium">Key:</span> <span class="key"></span
+                ><br />
+                <span class="font-medium">Value:</span>
+                <span class="value"></span>
+              </div>
+              <div class="space-x-2">
+                <button
+                  type="button"
+                  class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 edit-btn"
+                  hx-get="/api/redis/list"
+                  hx-target="#edit-modal"
+                >
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 delete-btn"
+                  hx-delete="/api/redis/delete"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </template>
+
+          <div
+            id="edit-modal"
+            class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50"
+          >
+            <div class="bg-white p-6 rounded shadow-lg w-96">
+              <h3 class="text-xl font-semibold mb-4">Edit Record</h3>
+              <form
+                hx-put="/api/redis/update"
+                hx-target="#records"
+                class="space-y-4"
+              >
+                <input type="hidden" name="key" id="edit-key" />
+                <div>
+                  <label class="block text-sm font-medium text-gray-700"
+                    >Value</label
+                  >
+                  <input
+                    type="text"
+                    name="value"
+                    id="edit-value"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div class="flex justify-end space-x-2">
+                  <button
+                    type="button"
+                    onclick="toggleModal(false)"
+                    class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                  >
+                    Save
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+    <script>
+      function toggleModal(show, key, value) {
+        const modal = document.getElementById('edit-modal');
+        if (show) {
+          document.getElementById('edit-key').value = key;
+          document.getElementById('edit-value').value = value;
+          modal.classList.remove('hidden');
+        } else {
+          modal.classList.add('hidden');
+        }
+      }
+
+      document.querySelectorAll('.edit-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const key = btn.closest('[data-key]').getAttribute('data-key');
+          const value = btn.closest('[data-value]').getAttribute('data-value');
+          toggleModal(true, key, value);
+        });
+      });
+    </script>
   </body>
 </html>

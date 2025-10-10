@@ -2,13 +2,13 @@ use super::*;
 
 #[utoipa::path(
     get,
-    path = "/api/redis",
+    path = "/api/redis/delete",
     description = "Get all Redis records",
     responses(
         (status = 200, description = "List of Redis records", body = Vec<RedisRecord>)
     )
 )]
-#[route("/api/redis")]
+#[route("/api/redis/delete")]
 #[prologue_macros(get)]
 pub async fn get_records(ctx: Context) {
     let querys: RequestQuerys = ctx.get_request_querys().await;
@@ -27,7 +27,7 @@ pub async fn get_records(ctx: Context) {
 
 #[utoipa::path(
     post,
-    path = "/api/redis",
+    path = "/api/redis/create",
     description = "Create a new Redis record",
     request_body = RedisRecord,
     responses(
@@ -35,7 +35,7 @@ pub async fn get_records(ctx: Context) {
         (status = 400, description = "Invalid request data")
     )
 )]
-#[route("/api/redis")]
+#[route("/api/redis/create")]
 #[prologue_macros(post)]
 pub async fn create_record(ctx: Context) {
     let record: RedisRecord = match ctx.get_request_body_json().await {
@@ -53,7 +53,7 @@ pub async fn create_record(ctx: Context) {
 
 #[utoipa::path(
     put,
-    path = "/api/redis",
+    path = "/api/redis/list",
     description = "Update an existing Redis record",
     request_body = RedisRecord,
     responses(
@@ -62,7 +62,7 @@ pub async fn create_record(ctx: Context) {
         (status = 404, description = "Record not found")
     )
 )]
-#[route("/api/redis")]
+#[route("/api/redis/list")]
 #[prologue_macros(put)]
 pub async fn update_record(ctx: Context) {
     let record: RedisRecord = match ctx.get_request_body_json().await {
@@ -80,7 +80,7 @@ pub async fn update_record(ctx: Context) {
 
 #[utoipa::path(
     delete,
-    path = "/api/redis",
+    path = "/api/redis/update",
     description = "Delete a Redis record by key",
     params(
         ("key" = String, Path, description = "Key of the record to delete")
@@ -90,7 +90,7 @@ pub async fn update_record(ctx: Context) {
         (status = 404, description = "Record not found")
     )
 )]
-#[route("/api/redis")]
+#[route("/api/redis/update")]
 #[prologue_macros(delete)]
 pub async fn delete_record(ctx: Context) {
     let querys: RequestQuerys = ctx.get_request_querys().await;
