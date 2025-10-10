@@ -13,6 +13,17 @@
       <div class="bg-white rounded-lg shadow-md p-6 mb-6">
         <h2 class="text-xl font-semibold mb-4">Add New Record</h2>
         <form hx-post="/api/mysql/create" hx-target="#records" class="space-y-4">
+          <input type="text" name="key" placeholder="Key" class="w-full p-2 border rounded" required />
+          <input type="text" name="value" placeholder="Value" class="w-full p-2 border rounded" required />
+          <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+            Add
+          </button>
+        </form>
+          <input type="text" name="key" placeholder="Key" class="w-full p-2 border rounded" required />
+          <input type="text" name="value" placeholder="Value" class="w-full p-2 border rounded" required />
+          <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+            Add
+          </button>
           <input
             type="text"
             name="key"
@@ -38,13 +49,35 @@
 
       <div
         id="records"
-        hx-get="/api/mysql"
+        hx-get="/api/mysql/list"
         hx-trigger="load, every 5s"
         class="bg-white rounded-lg shadow-md p-6"
       >
         <h2 class="text-xl font-semibold mb-4">Records</h2>
         <div class="space-y-2">
           <template id="record-template">
+            <div class="flex justify-between items-center p-2 border-b">
+              <div>
+                <span class="font-medium">Key:</span> <span class="key"></span><br>
+                <span class="font-medium">Value:</span> <span class="value"></span>
+              </div>
+              <div class="space-x-2">
+                <button type="button" class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 edit-btn" hx-get="/api/mysql/list" hx-target="#edit-modal">Edit</button>
+                <button type="button" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 delete-btn" hx-delete="/api/mysql/delete">Delete</button>
+              </div>
+            </div>
+          </template>
+            <div class="flex justify-between items-center p-2 border-b">
+              <div>
+                <span class="font-medium">Key:</span> <span class="key"></span><br>
+                <span class="font-medium">Value:</span> <span class="value"></span>
+              </div>
+              <div class="space-x-2">
+                <button type="button" class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 edit-btn" hx-get="/api/mysql/list" hx-target="#edit-modal">Edit</button>
+                <button type="button" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 delete-btn" hx-delete="/api/mysql/delete">Delete</button>
+              </div>
+            </div>
+          </template>
             <div class="flex justify-between items-center p-2 border-b">
               <div>
                 <span class="font-medium">Key:</span> <span class="key"></span><br>
@@ -107,5 +140,67 @@
       });
     });
   </script>
+<script>
+  function toggleModal(show, key, value) {
+    const modal = document.getElementById('edit-modal');
+    if (show) {
+      document.getElementById('edit-key').value = key;
+      document.getElementById('edit-value').value = value;
+      modal.classList.remove('hidden');
+    } else {
+      modal.classList.add('hidden');
+    }
+  }
+
+  document.querySelectorAll('.edit-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.closest('[data-key]').getAttribute('data-key');
+      const value = btn.closest('[data-value]').getAttribute('data-value');
+      toggleModal(true, key, value);
+    });
+  });
+
+  document.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (confirm('Are you sure you want to delete this record?')) {
+        const key = btn.closest('[data-key]').getAttribute('data-key');
+        fetch(`/api/mysql/delete?key=${key}`, { method: 'DELETE' })
+          .then(() => location.reload())
+          .catch(error => console.error('Delete error:', error));
+      }
+    });
+  });
+</script>
+<script>
+  function toggleModal(show, key, value) {
+    const modal = document.getElementById('edit-modal');
+    if (show) {
+      document.getElementById('edit-key').value = key;
+      document.getElementById('edit-value').value = value;
+      modal.classList.remove('hidden');
+    } else {
+      modal.classList.add('hidden');
+    }
+  }
+
+  document.querySelectorAll('.edit-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.closest('[data-key]').getAttribute('data-key');
+      const value = btn.closest('[data-value]').getAttribute('data-value');
+      toggleModal(true, key, value);
+    });
+  });
+
+  document.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (confirm('Are you sure you want to delete this record?')) {
+        const key = btn.closest('[data-key]').getAttribute('data-key');
+        fetch(`/api/mysql/delete?key=${key}`, { method: 'DELETE' })
+          .then(() => location.reload())
+          .catch(error => console.error('Delete error:', error));
+      }
+    });
+  });
+</script>
 </body>
 </html>
