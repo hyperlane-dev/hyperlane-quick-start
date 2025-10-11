@@ -11,11 +11,9 @@ pub mod utils;
 pub mod view;
 
 use hyperlane_config;
-use hyperlane_plugin;
+use hyperlane_plugin::{self, log::*};
 
 use std::*;
-
-use hyperlane_plugin::log::*;
 
 use hyperlane::*;
 use hyperlane_utils::*;
