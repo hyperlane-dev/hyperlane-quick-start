@@ -4,6 +4,6 @@ pub use r#fn::*;
 
 use super::*;
 use crate::{
-    model::{business::chat::*, data::chat::*},
+    model::{domain::chat::*, persistent::chat::*},
     service::chat::*,
 };

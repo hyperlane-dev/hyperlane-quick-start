@@ -9,7 +9,7 @@ pub use r#fn::*;
 pub use r#static::*;
 
 use super::*;
-use model::business::monitor::*;
+use model::domain::chat::*;
 
 use std::{
     collections::HashMap,

@@ -4,7 +4,7 @@ pub use r#fn::*;
 
 use super::*;
 
-use model::business::redis::RedisRecord;
+use model::domain::redis::*;
 use service::redis::{
     create_redis_record, delete_redis_record, get_all_redis_records, update_redis_record,
 };

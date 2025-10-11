@@ -10,7 +10,7 @@ pub struct ChatMessage {
 pub struct ChatSession {
     pub session_id: String,
     pub messages: Vec<ChatMessage>,
-    pub last_activity: std::time::Instant,
+    pub last_activity: Instant,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]

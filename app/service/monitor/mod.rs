@@ -3,7 +3,7 @@ mod r#fn;
 pub use r#fn::*;
 
 use super::*;
-use model::{business::monitor::*, data::monitor::*};
+use model::{domain::monitor::*, persistent::monitor::*};
 
 use std::{
     collections::HashMap,

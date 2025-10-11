@@ -5,4 +5,4 @@ pub use super::*;
 pub use r#fn::*;
 
 use hyperlane_config::business::{charset::*, upload::*};
-use model::{business::upload::*, data::upload::*, data_transfer::upload::*};
+use model::{data_transfer::upload::*, domain::upload::*, persistent::upload::*};
