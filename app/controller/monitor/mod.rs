@@ -3,7 +3,7 @@ mod r#fn;
 pub use r#fn::*;
 
 use super::*;
-use hyperlane_config::business::monitor::*;
+use hyperlane_config::application::monitor::*;
 use model::application::monitor::*;
 use service::monitor::*;
 
