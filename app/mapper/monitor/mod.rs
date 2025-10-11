@@ -7,7 +7,7 @@ pub use r#fn::*;
 pub use r#static::*;
 
 use super::*;
-use model::domain::chat::*;
+use model::application::monitor::*;
 
 use std::{
     collections::HashMap,

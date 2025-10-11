@@ -1,8 +1,11 @@
+mod r#enum;
 mod r#struct;
 
+pub use r#enum::*;
 pub use r#struct::*;
 
 use super::*;
-use model::application::chat::*;
+
+use std::time::Instant;
 
 use utoipa::ToSchema;

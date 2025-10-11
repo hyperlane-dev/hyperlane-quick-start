@@ -4,7 +4,7 @@ pub use r#struct::*;
 
 use super::*;
 use model::{
+    application::{chat::*, monitor::*, upload::*},
     data_transfer::{chat::*, upload::*},
-    domain::{chat::*, monitor::*, upload::*},
     param::chat::*,
 };

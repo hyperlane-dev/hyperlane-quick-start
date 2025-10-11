@@ -3,6 +3,8 @@ mod r#fn;
 pub use r#fn::*;
 
 use super::*;
+use domain::chat::*;
 use hyperlane_config::{business::chat::*, framework::*};
-use model::{data_transfer::chat::*, domain::chat::*, persistent::chat::*};
+use mapper::chat::*;
+use model::data_transfer::chat::*;
 use service::chat::*;

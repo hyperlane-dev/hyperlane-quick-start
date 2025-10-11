@@ -5,7 +5,8 @@ pub use r#fn::*;
 use super::*;
 
 use hyperlane_plugin::env::*;
-use model::{param::mysql::*, persistent::mysql::*};
+use mapper::mysql::*;
+use model::param::mysql::*;
 
 use sea_orm::{
     ActiveModelTrait, ColumnTrait, Database, DatabaseConnection, EntityTrait, QueryFilter,

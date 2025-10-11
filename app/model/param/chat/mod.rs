@@ -3,6 +3,6 @@ mod r#struct;
 pub use r#struct::*;
 
 use super::*;
-use model::domain::chat::*;
+use model::application::chat::*;
 
 use utoipa::ToSchema;

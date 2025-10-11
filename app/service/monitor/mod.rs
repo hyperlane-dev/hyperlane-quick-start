@@ -3,7 +3,8 @@ mod r#fn;
 pub use r#fn::*;
 
 use super::*;
-use model::{domain::monitor::*, persistent::monitor::*};
+use mapper::monitor::*;
+use model::application::monitor::*;
 
 use std::{
     collections::HashMap,

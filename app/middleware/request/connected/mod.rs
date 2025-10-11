@@ -3,7 +3,6 @@ mod r#fn;
 pub use r#fn::*;
 
 use super::*;
-use crate::{
-    model::{domain::chat::*, persistent::chat::*},
-    service::chat::*,
-};
+use domain::chat::*;
+use mapper::chat::*;
+use service::chat::*;

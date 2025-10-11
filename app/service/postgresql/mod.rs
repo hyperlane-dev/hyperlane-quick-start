@@ -5,7 +5,8 @@ pub use r#fn::*;
 use super::*;
 
 use hyperlane_plugin::env::*;
-use model::{param::postgresql::*, persistent::postgresql::*};
+use mapper::postgresql::*;
+use model::param::postgresql::*;
 
 use sea_orm::{
     ActiveModelTrait, ColumnTrait, Database, DatabaseConnection, EntityTrait, QueryFilter,

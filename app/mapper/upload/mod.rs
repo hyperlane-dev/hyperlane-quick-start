@@ -7,7 +7,7 @@ pub use r#static::*;
 pub use r#type::*;
 
 use super::*;
-use model::domain::upload::*;
+use model::application::upload::*;
 
 use once_cell::sync::Lazy;
 use tokio::sync::{RwLockReadGuard, RwLockWriteGuard};

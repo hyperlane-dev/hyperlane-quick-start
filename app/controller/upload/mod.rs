@@ -3,7 +3,8 @@ mod r#fn;
 pub use r#fn::*;
 
 use super::*;
-use model::{data_transfer::upload::*, domain::upload::*, persistent::upload::*};
+use mapper::upload::*;
+use model::{application::upload::*, data_transfer::upload::*};
 use service::upload::*;
 
 use hyperlane_config::business::{charset::*, upload::*};

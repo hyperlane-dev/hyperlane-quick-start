@@ -4,7 +4,7 @@ mod r#struct;
 pub use r#struct::*;
 
 use super::*;
-use model::domain::mysql::*;
+use model::application::mysql::*;
 
 use sea_orm::{
     ActiveValue, DeriveActiveModelBehavior, DeriveEntityModel, DerivePrimaryKey, EnumIter,

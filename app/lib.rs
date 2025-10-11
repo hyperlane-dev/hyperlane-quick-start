@@ -1,5 +1,6 @@
 pub mod aspect;
 pub mod controller;
+pub mod domain;
 pub mod exception;
 pub mod filter;
 pub mod mapper;
@@ -19,5 +20,4 @@ use hyperlane_plugin::log::*;
 use hyperlane::*;
 use hyperlane_utils::*;
 
-use serde::Deserialize;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
