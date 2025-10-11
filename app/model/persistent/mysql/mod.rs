@@ -1,9 +1,10 @@
-mod r#enum;
 mod r#impl;
 mod r#struct;
 
-pub use r#enum::*;
 pub use r#struct::*;
+
+use super::*;
+use model::domain::mysql::*;
 
 use sea_orm::{
     ActiveValue, DeriveActiveModelBehavior, DeriveEntityModel, DerivePrimaryKey, EnumIter,

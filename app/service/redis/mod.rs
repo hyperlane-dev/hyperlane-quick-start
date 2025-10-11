@@ -5,7 +5,7 @@ pub use r#fn::*;
 use super::*;
 
 use hyperlane_plugin::redis::*;
-use model::{domain::redis::*, persistent::redis::*};
+use model::{param::redis::*, persistent::redis::*};
 
 use std::sync::Arc;
 

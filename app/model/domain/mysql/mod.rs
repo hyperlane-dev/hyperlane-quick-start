@@ -1,8 +1,7 @@
-mod r#struct;
+mod r#enum;
 
-pub use r#struct::*;
+pub use r#enum::*;
 
 use super::*;
 
-use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
+use sea_orm::EnumIter;
