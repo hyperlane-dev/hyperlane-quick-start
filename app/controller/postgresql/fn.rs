@@ -31,10 +31,10 @@ pub async fn get_records(ctx: Context) {
     )
 )]
 #[route("/api/postgresql/list")]
-#[prologue_macros(post)]
+#[prologue_macros(post, request_body_json(record_opt: PostgresqlRecord))]
 pub async fn create_record(ctx: Context) {
-    let record: PostgresqlRecord = match ctx.get_request_body_json().await {
-        Ok(r) => r,
+    let record: PostgresqlRecord = match record_opt {
+        Ok(data) => data,
         Err(error) => {
             ctx.set_response_body(&error.to_string()).await;
             return;
@@ -58,10 +58,10 @@ pub async fn create_record(ctx: Context) {
     )
 )]
 #[route("/api/postgresql/create")]
-#[prologue_macros(put)]
+#[prologue_macros(put, request_body_json(record_opt: PostgresqlRecord))]
 pub async fn update_record(ctx: Context) {
-    let record: PostgresqlRecord = match ctx.get_request_body_json().await {
-        Ok(r) => r,
+    let record: PostgresqlRecord = match record_opt {
+        Ok(data) => data,
         Err(error) => {
             ctx.set_response_body(&error.to_string()).await;
             return;

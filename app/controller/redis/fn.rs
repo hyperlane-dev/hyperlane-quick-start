@@ -39,10 +39,10 @@ pub async fn get_records(ctx: Context) {
     )
 )]
 #[route("/api/redis/create")]
-#[prologue_macros(post)]
+#[prologue_macros(post, request_body_json(record_opt: RedisRecord))]
 pub async fn create_record(ctx: Context) {
-    let record: RedisRecord = match ctx.get_request_body_json().await {
-        Ok(r) => r,
+    let record: RedisRecord = match record_opt {
+        Ok(data) => data,
         Err(error) => {
             ctx.set_response_body(&error.to_string()).await;
             return;
@@ -66,10 +66,10 @@ pub async fn create_record(ctx: Context) {
     )
 )]
 #[route("/api/redis/list")]
-#[prologue_macros(put)]
+#[prologue_macros(put, request_body_json(record_opt: RedisRecord))]
 pub async fn update_record(ctx: Context) {
-    let record: RedisRecord = match ctx.get_request_body_json().await {
-        Ok(r) => r,
+    let record: RedisRecord = match record_opt {
+        Ok(data) => data,
         Err(error) => {
             ctx.set_response_body(&error.to_string()).await;
             return;
