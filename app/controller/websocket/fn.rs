@@ -6,6 +6,8 @@ use super::*;
 pub async fn handle(ctx: Context) {
     println_success!("WebSocket request received");
     let request_body: &RequestBody = request.get_body();
-    let _ = ctx.set_response_body(&request_body).await;
+    let body_string: String = String::from_utf8_lossy(request_body).into_owned();
+    let response: String = get_response_body(&body_string);
+    let _ = ctx.set_response_body(&response).await;
     ctx.try_get_send_body_hook().await.unwrap()(ctx.clone()).await;
 }
