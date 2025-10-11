@@ -1,7 +1,10 @@
 use super::*;
 
-pub fn get_response_body(body: &str) -> String {
+pub fn get_response_body(body: &WebSocketMessage) -> Result<String, String> {
+    if body.is_valid() {
+        return Err("Invalid message".to_string());
+    }
     let mut response: MessageResponse = MessageResponse::default();
-    response.set_message(body.to_owned()).set_time(date());
-    serde_json::to_string(&response).unwrap_or_default()
+    response.set_message(body.message.clone()).set_time(date());
+    serde_json::to_string(&response).map_err(|err| err.to_string())
 }
