@@ -16,7 +16,7 @@ pub async fn get_records(ctx: Context) {
             let data: ResponseBody = serde_json::to_vec(&records).unwrap_or_default();
             ctx.set_response_body(&data).await
         }
-        Err(e) => ctx.set_response_body(&e).await,
+        Err(error) => ctx.set_response_body(&error).await,
     };
 }
 
@@ -35,14 +35,14 @@ pub async fn get_records(ctx: Context) {
 pub async fn create_record(ctx: Context) {
     let record: MysqlRecord = match ctx.get_request_body_json().await {
         Ok(r) => r,
-        Err(e) => {
-            ctx.set_response_body(&e.to_string()).await;
+        Err(error) => {
+            ctx.set_response_body(&error.to_string()).await;
             return;
         }
     };
     match create_mysql_record(record).await {
         Ok(_) => ctx.set_response_body("Record created successfully").await,
-        Err(e) => ctx.set_response_body(&e).await,
+        Err(error) => ctx.set_response_body(&error).await,
     };
 }
 
@@ -62,14 +62,14 @@ pub async fn create_record(ctx: Context) {
 pub async fn update_record(ctx: Context) {
     let record: MysqlRecord = match ctx.get_request_body_json().await {
         Ok(r) => r,
-        Err(e) => {
-            ctx.set_response_body(&e.to_string()).await;
+        Err(error) => {
+            ctx.set_response_body(&error.to_string()).await;
             return;
         }
     };
     match update_mysql_record(record).await {
         Ok(_) => ctx.set_response_body("Record updated successfully").await,
-        Err(e) => ctx.set_response_body(&e).await,
+        Err(error) => ctx.set_response_body(&error).await,
     };
 }
 
@@ -98,6 +98,6 @@ pub async fn delete_record(ctx: Context) {
     };
     match delete_mysql_record(key).await {
         Ok(_) => ctx.set_response_body("Record deleted successfully").await,
-        Err(e) => ctx.set_response_body(&e).await,
+        Err(error) => ctx.set_response_body(&error).await,
     };
 }

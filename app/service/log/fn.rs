@@ -5,8 +5,8 @@ pub fn get_sorted_dirs(path: &Path) -> Vec<String> {
         .map(|entries| {
             let mut dirs: Vec<String> = entries
                 .filter_map(Result::ok)
-                .filter(|e| e.file_type().map_or(false, |ft| ft.is_dir()))
-                .filter_map(|e| e.file_name().into_string().ok())
+                .filter(|error| error.file_type().map_or(false, |ft| ft.is_dir()))
+                .filter_map(|error| error.file_name().into_string().ok())
                 .collect();
             dirs.sort();
             dirs.reverse();
@@ -20,8 +20,8 @@ pub fn get_sorted_log_files(path: &Path) -> Vec<String> {
         .map(|entries| {
             let mut files: Vec<String> = entries
                 .filter_map(Result::ok)
-                .filter(|e| e.file_type().map_or(false, |ft| ft.is_file()))
-                .filter_map(|e| e.file_name().into_string().ok())
+                .filter(|error| error.file_type().map_or(false, |ft| ft.is_file()))
+                .filter_map(|error| error.file_name().into_string().ok())
                 .filter(|name| name.ends_with(LOG_FILE_EXTENSION))
                 .collect();
             files.sort();
@@ -77,7 +77,7 @@ pub async fn read_log_file(level: &str) -> String {
         all_logs.extend(logs);
     }
     if all_logs.is_empty() {
-        format!("No {} logs found in {}", level, log_dir.display())
+        format!("No {level} logs found in {}", log_dir.display())
     } else {
         all_logs.join(BR)
     }

@@ -6,7 +6,9 @@ async fn get_mysql_connection() -> Result<DatabaseConnection, String> {
         "mysql://{}:{}@{}:{}/{}",
         env.mysql_username, env.mysql_password, env.mysql_host, env.mysql_port, env.mysql_database
     );
-    Database::connect(&db_url).await.map_err(|e| e.to_string())
+    Database::connect(&db_url)
+        .await
+        .map_err(|error| error.to_string())
 }
 
 pub async fn create_mysql_record(record: MysqlRecord) -> Result<(), String> {
@@ -16,13 +18,19 @@ pub async fn create_mysql_record(record: MysqlRecord) -> Result<(), String> {
         value: sea_orm::ActiveValue::Set(record.value),
         id: sea_orm::ActiveValue::NotSet,
     };
-    active_model.insert(&db).await.map_err(|e| e.to_string())?;
+    active_model
+        .insert(&db)
+        .await
+        .map_err(|error| error.to_string())?;
     Ok(())
 }
 
 pub async fn get_all_mysql_records() -> Result<Vec<MysqlRecord>, String> {
     let db: DatabaseConnection = get_mysql_connection().await?;
-    let records: Vec<Model> = Entity::find().all(&db).await.map_err(|e| e.to_string())?;
+    let records: Vec<Model> = Entity::find()
+        .all(&db)
+        .await
+        .map_err(|error| error.to_string())?;
     Ok(records
         .into_iter()
         .map(|r| MysqlRecord {
@@ -39,7 +47,7 @@ pub async fn update_mysql_record(record: MysqlRecord) -> Result<(), String> {
         .col_expr(Column::Value, Expr::value(record.value))
         .exec(&db)
         .await
-        .map_err(|e| e.to_string())?;
+        .map_err(|error| error.to_string())?;
     Ok(())
 }
 
@@ -49,6 +57,6 @@ pub async fn delete_mysql_record(key: &str) -> Result<(), String> {
         .filter(Column::Key.eq(key))
         .exec(&db)
         .await
-        .map_err(|e| e.to_string())?;
+        .map_err(|error| error.to_string())?;
     Ok(())
 }

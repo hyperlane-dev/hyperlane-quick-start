@@ -59,8 +59,8 @@ async fn create_server() {
 }
 
 pub fn run() {
-    if let Err(e) = init_env_config() {
-        println_error!(e);
+    if let Err(error) = init_env_config() {
+        println_error!(error);
     }
     println_success!("Environment configuration loaded successfully");
     runtime().block_on(create(create_server));

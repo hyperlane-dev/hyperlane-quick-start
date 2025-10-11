@@ -98,8 +98,8 @@ fn generate_sample_packets() -> Vec<NetworkPacket> {
                 _ => PROTOCOL_ICMP,
             }
             .to_string(),
-            src_ip: format!("{}{}", SAMPLE_IP_PREFIX_A, 100 + i),
-            dst_ip: format!("{}{}", SAMPLE_IP_PREFIX_B, 8 + i % 2),
+            src_ip: format!("{SAMPLE_IP_PREFIX_A}{}", 100 + i),
+            dst_ip: format!("{SAMPLE_IP_PREFIX_B}{}", 8 + i % 2),
             src_port: SAMPLE_BASE_SRC_PORT + i as usize,
             dst_port: if i % 2 == 0 {
                 SAMPLE_DST_PORT_A
@@ -212,7 +212,7 @@ pub async fn get_network_capture_data(ctx: Context) {
 pub async fn get_network_capture_stream(ctx: Context) {
     let response_data: NetworkStats = get_network_stats().unwrap_or_default();
     if let Ok(json) = serde_json::to_string(&response_data) {
-        let event: String = format!("{}{}{}", SSE_DATA_PREFIX, json, DOUBLE_BR);
+        let event: String = format!("{SSE_DATA_PREFIX}{json}{DOUBLE_BR}");
         ctx.set_response_body(&event).await;
     }
 }

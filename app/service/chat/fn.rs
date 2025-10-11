@@ -64,9 +64,9 @@ async fn process_gpt_request(session_id: String, message: String, ctx: Context) 
         Ok(gpt_response) => {
             session.add_message(ROLE_ASSISTANT.to_string(), gpt_response.clone());
             update_session(session);
-            format!("{}{}{}{}", MENTION_PREFIX, session_id, SPACE, gpt_response)
+            format!("{MENTION_PREFIX}{session_id}{SPACE}{gpt_response}")
         }
-        Err(error) => format!("API call failed: {}", error),
+        Err(error) => format!("API call failed: {error}"),
     };
     let gpt_resp_data: WebSocketRespData =
         WebSocketRespData::new(MessageType::GptResponse, &ctx, &api_response).await;
@@ -143,8 +143,8 @@ fn extract_error_message(response_json: &JsonValue) -> Option<String> {
         .and_then(|errors| errors.get(0))
         .and_then(|error| error.get(JSON_FIELD_MESSAGE))
         .and_then(|message| message.as_str())
-        .map(|msg| format!("API error: {}", msg))
-        .or_else(|| Some(format!("API error: {}", "Unknown error")))
+        .map(|msg| format!("API error: {msg}"))
+        .or_else(|| Some(format!("API error: Unknown error")))
 }
 
 fn handle_gpt_api_response(response_text: &str) -> Result<String, String> {
@@ -153,11 +153,8 @@ fn handle_gpt_api_response(response_text: &str) -> Result<String, String> {
             "API response is empty, possible authentication failure or network issue".to_string(),
         );
     }
-    let response_json: JsonValue = serde_json::from_str(response_text).map_err(|e| {
-        format!(
-            "JSON parsing failed: {} (response content: {})",
-            e, response_text
-        )
+    let response_json: JsonValue = serde_json::from_str(response_text).map_err(|error| {
+        format!("JSON parsing failed: {error} (response content: {response_text})",)
     })?;
     if let Some(content) = extract_response_content(&response_json) {
         return Ok(content);
@@ -165,7 +162,7 @@ fn handle_gpt_api_response(response_text: &str) -> Result<String, String> {
     if let Some(error) = extract_error_message(&response_json) {
         return Err(error);
     }
-    Err(format!("Incorrect API response format: {}", response_text))
+    Err(format!("Incorrect API response format: {response_text}"))
 }
 
 async fn call_gpt_api_with_context(session: &ChatSession) -> Result<String, String> {
@@ -189,7 +186,7 @@ async fn call_gpt_api_with_context(session: &ChatSession) -> Result<String, Stri
             let response_text: String = response.text().get_body();
             handle_gpt_api_response(&response_text)
         }
-        Err(e) => Err(format!("Request sending failed: {}", e)),
+        Err(error) => Err(format!("Request sending failed: {error}")),
     }
 }
 

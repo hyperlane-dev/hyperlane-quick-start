@@ -246,13 +246,13 @@ pub fn parse_range_header(range_header: &str, file_size: u64) -> Result<RangeReq
 pub async fn read_file_range(path: &str, start: u64, length: u64) -> Result<Vec<u8>, String> {
     use std::io::{Read, Seek, SeekFrom};
     let mut file: std::fs::File =
-        std::fs::File::open(path).map_err(|e| format!("Failed to open file: {}", e))?;
+        std::fs::File::open(path).map_err(|error| format!("Failed to open file: {error}"))?;
     file.seek(SeekFrom::Start(start))
-        .map_err(|e| format!("Failed to seek file: {}", e))?;
+        .map_err(|error| format!("Failed to seek file: {error}"))?;
     let mut buffer: Vec<u8> = vec![0; length as usize];
     let bytes_read: usize = file
         .read(&mut buffer)
-        .map_err(|e| format!("Failed to read file: {}", e))?;
+        .map_err(|error| format!("Failed to read file: {error}"))?;
     buffer.truncate(bytes_read);
     Ok(buffer)
 }
@@ -299,7 +299,7 @@ async fn handle_range_request(
     }
     let content_length: u64 = end - start + 1;
     let data: Vec<u8> = read_file_range(path, start, content_length).await?;
-    let content_range: String = format!("bytes {}-{}/{}", start, end, file_size);
+    let content_range: String = format!("bytes {start}-{end}/{file_size}");
     Ok((
         PartialContent {
             data,
@@ -320,7 +320,7 @@ async fn handle_full_file_request(
     if data.is_empty() {
         return Err("File not found or empty".to_string());
     }
-    let content_range: String = format!("bytes 0-{}/{}", file_size - 1, file_size);
+    let content_range: String = format!("bytes 0-{}/{file_size}", file_size - 1);
     Ok((
         PartialContent {
             data,
@@ -368,11 +368,11 @@ pub async fn save_file_chunk(
         *total_chunks,
         |a, b| format!("{a}.{b}"),
     )
-    .map_err(|e| e.to_string())?;
+    .map_err(|error| error.to_string())?;
     upload_strategy
         .save_chunk(&chunk_data, *chunk_index)
         .await
-        .map_err(|e| e.to_string())?;
+        .map_err(|error| error.to_string())?;
     Ok(save_upload_dir.clone())
 }
 
@@ -392,7 +392,7 @@ pub async fn merge_file_chunks(
         *total_chunks,
         |a, b| format!("{a}.{b}"),
     )
-    .map_err(|e| e.to_string())?;
+    .map_err(|error| error.to_string())?;
     let url_encode_dir: String =
         Encode::execute(CHARSETS, &format!("{base_file_dir}/{file_id}")).unwrap_or_default();
     let url_encode_dir_file_name: String =
@@ -401,7 +401,7 @@ pub async fn merge_file_chunks(
     upload_strategy
         .merge_chunks()
         .await
-        .map_err(|e| e.to_string())?;
+        .map_err(|error| error.to_string())?;
     remove_file_id_map(&file_id).await;
     Ok((save_upload_dir.clone(), url))
 }

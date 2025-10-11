@@ -10,7 +10,9 @@ async fn get_postgresql_connection() -> Result<DatabaseConnection, String> {
         env.postgresql_port,
         env.postgresql_database
     );
-    Database::connect(&db_url).await.map_err(|e| e.to_string())
+    Database::connect(&db_url)
+        .await
+        .map_err(|error| error.to_string())
 }
 
 pub async fn create_postgresql_record(record: PostgresqlRecord) -> Result<(), String> {
@@ -20,13 +22,19 @@ pub async fn create_postgresql_record(record: PostgresqlRecord) -> Result<(), St
         value: sea_orm::ActiveValue::Set(record.value),
         id: sea_orm::ActiveValue::NotSet,
     };
-    active_model.insert(&db).await.map_err(|e| e.to_string())?;
+    active_model
+        .insert(&db)
+        .await
+        .map_err(|error| error.to_string())?;
     Ok(())
 }
 
 pub async fn get_all_postgresql_records() -> Result<Vec<PostgresqlRecord>, String> {
     let db: DatabaseConnection = get_postgresql_connection().await?;
-    let records: Vec<Model> = Entity::find().all(&db).await.map_err(|e| e.to_string())?;
+    let records: Vec<Model> = Entity::find()
+        .all(&db)
+        .await
+        .map_err(|error| error.to_string())?;
     let result: Vec<PostgresqlRecord> = records
         .into_iter()
         .map(|r| PostgresqlRecord {
@@ -44,7 +52,7 @@ pub async fn update_postgresql_record(record: PostgresqlRecord) -> Result<(), St
         .col_expr(Column::Value, Expr::value(record.value))
         .exec(&db)
         .await
-        .map_err(|e| e.to_string())?;
+        .map_err(|error| error.to_string())?;
     Ok(())
 }
 
@@ -54,6 +62,6 @@ pub async fn delete_postgresql_record(key: &str) -> Result<(), String> {
         .filter(Column::Key.eq(key))
         .exec(&db)
         .await
-        .map_err(|e| e.to_string())?;
+        .map_err(|error| error.to_string())?;
     Ok(())
 }

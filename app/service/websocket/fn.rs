@@ -6,5 +6,5 @@ pub fn get_response_body(body: &WebSocketMessage) -> Result<String, String> {
     }
     let mut response: MessageResponse = MessageResponse::default();
     response.set_message(body.message.clone()).set_time(date());
-    serde_json::to_string(&response).map_err(|err| err.to_string())
+    serde_json::to_string(&response).map_err(|error| error.to_string())
 }

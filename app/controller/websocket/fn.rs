@@ -17,7 +17,7 @@ pub async fn handle(ctx: Context) {
     let request_body: WebSocketMessage = request.get_body_json().unwrap();
     match get_response_body(&request_body) {
         Ok(response) => ctx.set_response_body(&response).await,
-        Err(err) => ctx.set_response_body(&err).await,
+        Err(error) => ctx.set_response_body(&error).await,
     };
     ctx.try_get_send_body_hook().await.unwrap()(ctx.clone()).await;
 }
