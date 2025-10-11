@@ -1,5 +1,4 @@
 pub mod chat;
-pub mod favicon;
 pub mod hello;
 pub mod log;
 pub mod monitor;
