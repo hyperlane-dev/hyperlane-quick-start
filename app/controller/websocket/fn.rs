@@ -1,13 +1,13 @@
 use super::*;
 
-#[ws]
 #[route("/websocket")]
-#[ws_from_stream(request)]
+#[prologue_macros(ws, ws_from_stream(request))]
 pub async fn handle(ctx: Context) {
     println_success!("WebSocket request received");
-    let request_body: &RequestBody = request.get_body();
-    let body_string: String = String::from_utf8_lossy(request_body).into_owned();
-    let response: String = get_response_body(&body_string);
-    let _ = ctx.set_response_body(&response).await;
+    let request_body: WebSocketMessage = request.get_body_json().unwrap();
+    match get_response_body(&request_body) {
+        Ok(response) => ctx.set_response_body(&response).await,
+        Err(err) => ctx.set_response_body(&err).await,
+    };
     ctx.try_get_send_body_hook().await.unwrap()(ctx.clone()).await;
 }

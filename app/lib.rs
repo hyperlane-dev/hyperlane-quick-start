@@ -1,5 +1,6 @@
 pub mod aspect;
 pub mod controller;
+pub mod domain;
 pub mod exception;
 pub mod filter;
 pub mod mapper;
