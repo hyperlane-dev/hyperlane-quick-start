@@ -2,15 +2,15 @@ use super::*;
 
 #[utoipa::path(
     get,
-    path = "/api/mysql/delete",
+    path = "/api/mysql/list",
     description = "Get all MySQL records",
     responses(
         (status = 200, description = "List of MySQL records", body = Vec<MysqlRecord>)
     )
 )]
-#[route("/api/mysql/delete")]
+#[route("/api/mysql/list")]
 #[prologue_macros(get)]
-pub async fn get_records(ctx: Context) {
+pub async fn list_records(ctx: Context) {
     match get_all_mysql_records().await {
         Ok(records) => {
             let data: ResponseBody = serde_json::to_vec(&records).unwrap_or_default();
@@ -48,7 +48,7 @@ pub async fn create_record(ctx: Context) {
 
 #[utoipa::path(
     put,
-    path = "/api/mysql/list",
+    path = "/api/mysql/update",
     description = "Update an existing MySQL record",
     request_body = MysqlRecord,
     responses(
@@ -57,7 +57,7 @@ pub async fn create_record(ctx: Context) {
         (status = 404, description = "Record not found")
     )
 )]
-#[route("/api/mysql/list")]
+#[route("/api/mysql/update")]
 #[prologue_macros(put, request_body_json(record_opt: MysqlRecord))]
 pub async fn update_record(ctx: Context) {
     let record: MysqlRecord = match record_opt {
@@ -75,7 +75,7 @@ pub async fn update_record(ctx: Context) {
 
 #[utoipa::path(
     delete,
-    path = "/api/mysql/update",
+    path = "/api/mysql/delete",
     description = "Delete a MySQL record by key",
     params(
         ("key" = String, Path, description = "Key of the record to delete")
@@ -85,7 +85,7 @@ pub async fn update_record(ctx: Context) {
         (status = 404, description = "Record not found")
     )
 )]
-#[route("/api/mysql/update")]
+#[route("/api/mysql/delete")]
 #[prologue_macros(delete)]
 pub async fn delete_record(ctx: Context) {
     let querys: RequestQuerys = ctx.get_request_querys().await;

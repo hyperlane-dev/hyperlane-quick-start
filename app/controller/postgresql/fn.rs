@@ -2,15 +2,15 @@ use super::*;
 
 #[utoipa::path(
     get,
-    path = "/api/postgresql/update",
+    path = "/api/postgresql/list",
     description = "Get all PostgreSQL records",
     responses(
         (status = 200, description = "List of PostgreSQL records", body = Vec<PostgresqlRecord>)
     )
 )]
-#[route("/api/postgresql/update")]
+#[route("/api/postgresql/list")]
 #[prologue_macros(get)]
-pub async fn get_records(ctx: Context) {
+pub async fn list_records(ctx: Context) {
     match get_all_postgresql_records().await {
         Ok(records) => {
             let data: ResponseBody = serde_json::to_vec(&records).unwrap_or_default();
@@ -22,7 +22,7 @@ pub async fn get_records(ctx: Context) {
 
 #[utoipa::path(
     post,
-    path = "/api/postgresql/list",
+    path = "/api/postgresql/create",
     description = "Create a new PostgreSQL record",
     request_body = PostgresqlRecord,
     responses(
@@ -30,7 +30,7 @@ pub async fn get_records(ctx: Context) {
         (status = 400, description = "Invalid request data")
     )
 )]
-#[route("/api/postgresql/list")]
+#[route("/api/postgresql/create")]
 #[prologue_macros(post, request_body_json(record_opt: PostgresqlRecord))]
 pub async fn create_record(ctx: Context) {
     let record: PostgresqlRecord = match record_opt {
@@ -48,7 +48,7 @@ pub async fn create_record(ctx: Context) {
 
 #[utoipa::path(
     put,
-    path = "/api/postgresql/create",
+    path = "/api/postgresql/update",
     description = "Update an existing PostgreSQL record",
     request_body = PostgresqlRecord,
     responses(
@@ -57,7 +57,7 @@ pub async fn create_record(ctx: Context) {
         (status = 404, description = "Record not found")
     )
 )]
-#[route("/api/postgresql/create")]
+#[route("/api/postgresql/update")]
 #[prologue_macros(put, request_body_json(record_opt: PostgresqlRecord))]
 pub async fn update_record(ctx: Context) {
     let record: PostgresqlRecord = match record_opt {

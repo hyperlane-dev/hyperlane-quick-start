@@ -2,15 +2,15 @@ use super::*;
 
 #[utoipa::path(
     get,
-    path = "/api/redis/delete",
+    path = "/api/redis/list",
     description = "Get all Redis records",
     responses(
         (status = 200, description = "List of Redis records", body = Vec<RedisRecord>)
     )
 )]
-#[route("/api/redis/delete")]
+#[route("/api/redis/list")]
 #[prologue_macros(get)]
-pub async fn get_records(ctx: Context) {
+pub async fn list_records(ctx: Context) {
     let querys: RequestQuerys = ctx.get_request_querys().await;
     let keys: Vec<String> = match querys.get("keys") {
         Some(k) => k.split(',').map(|s| s.to_string()).collect(),
@@ -56,7 +56,7 @@ pub async fn create_record(ctx: Context) {
 
 #[utoipa::path(
     put,
-    path = "/api/redis/list",
+    path = "/api/redis/update",
     description = "Update an existing Redis record",
     request_body = RedisRecord,
     responses(
@@ -65,7 +65,7 @@ pub async fn create_record(ctx: Context) {
         (status = 404, description = "Record not found")
     )
 )]
-#[route("/api/redis/list")]
+#[route("/api/redis/update")]
 #[prologue_macros(put, request_body_json(record_opt: RedisRecord))]
 pub async fn update_record(ctx: Context) {
     let record: RedisRecord = match record_opt {
@@ -83,7 +83,7 @@ pub async fn update_record(ctx: Context) {
 
 #[utoipa::path(
     delete,
-    path = "/api/redis/update",
+    path = "/api/redis/delete",
     description = "Delete a Redis record by key",
     params(
         ("key" = String, Path, description = "Key of the record to delete")
@@ -93,7 +93,7 @@ pub async fn update_record(ctx: Context) {
         (status = 404, description = "Record not found")
     )
 )]
-#[route("/api/redis/update")]
+#[route("/api/redis/delete")]
 #[prologue_macros(delete)]
 pub async fn delete_record(ctx: Context) {
     let querys: RequestQuerys = ctx.get_request_querys().await;
