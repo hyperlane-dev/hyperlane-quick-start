@@ -12,7 +12,10 @@ use super::*;
 #[prologue_macros(get)]
 pub async fn get_records(ctx: Context) {
     match get_all_mysql_records().await {
-        Ok(records) => ctx.set_response_body(format!("{records:?}")).await,
+        Ok(records) => {
+            let data: ResponseBody = serde_json::to_vec(&records).unwrap_or_default();
+            ctx.set_response_body(&data).await
+        }
         Err(e) => ctx.set_response_body(&e).await,
     };
 }

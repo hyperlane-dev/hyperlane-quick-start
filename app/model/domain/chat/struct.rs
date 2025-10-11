@@ -18,9 +18,3 @@ pub struct OnlineUser {
     pub username: String,
     pub join_time: String,
 }
-
-#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
-pub struct UserListResponse {
-    pub users: Vec<OnlineUser>,
-    pub total_count: usize,
-}

@@ -7,3 +7,9 @@ pub struct WebSocketRespData {
     data: String,
     time: String,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+pub struct UserListResponse {
+    pub users: Vec<OnlineUser>,
+    pub total_count: usize,
+}
