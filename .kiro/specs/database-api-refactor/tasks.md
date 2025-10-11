@@ -1,6 +1,6 @@
 # 实施计划
 
-- [ ] 1. 创建统一的数据模型和类型定义
+- [-] 1. 创建统一的数据模型和类型定义
   - 创建DatabaseOperation泛型结构体用于统一操作请求格式
   - 创建OperationType枚举定义操作类型（Create, Read, Update, Delete）
   - 创建ApiResponse泛型结构体用于统一API响应格式
