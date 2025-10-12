@@ -1769,8 +1769,12 @@
             `${protocol}//${host}/chat/users/online`
           );
           if (response.ok) {
-            const data = await response.json();
-            onlineUsers = data.users || [];
+            const result = await response.json();
+            if (result.code === 200 && result.data) {
+              onlineUsers = result.data.users || [];
+            } else {
+              onlineUsers = [];
+            }
           } else {
             onlineUsers = [];
           }
@@ -1834,6 +1838,7 @@
           const item = document.createElement('div');
           item.className = itemClass;
           item.dataset.index = index;
+          item.dataset.username = user.username;
           item.innerHTML = `
             <div class="${avatarClass}">${avatarText}</div>
             <div class="user-info">
@@ -1841,15 +1846,20 @@
             </div>
           `;
 
-          item.addEventListener(
-            'click',
-            (function (userCopy) {
-              return function (e) {
-                e.stopPropagation();
-                selectMentionUser(userCopy);
-              };
-            })(user)
-          );
+          item.addEventListener('mousedown', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            const username = this.dataset.username;
+            const input = document.getElementById('messageInput');
+            const beforeMention = input.value.substring(0, mentionStartIndex);
+            const afterMention = input.value.substring(input.selectionStart);
+            input.value = beforeMention + `@${username} ` + afterMention;
+            closeMentionDropdown();
+            const newCursorPos = beforeMention.length + username.length + 2;
+            input.setSelectionRange(newCursorPos, newCursorPos);
+            input.focus();
+          }, true);
 
           item.addEventListener('mouseenter', () => {
             selectedIndex = index;
@@ -1906,16 +1916,23 @@
       }
 
       function selectMentionUser(user) {
-        if (!user) return;
+        console.log('selectMentionUser called with:', user);
+        if (!user) {
+          console.error('No user provided to selectMentionUser');
+          return;
+        }
+
+        const username = user.username || user;
+        console.log('Username to insert:', username);
 
         const input = document.getElementById('messageInput');
         const beforeMention = input.value.substring(0, mentionStartIndex);
         const afterMention = input.value.substring(input.selectionStart);
 
-        input.value = beforeMention + `@${user.username} ` + afterMention;
+        input.value = beforeMention + `@${username} ` + afterMention;
         closeMentionDropdown();
 
-        const newCursorPos = beforeMention.length + user.username.length + 2;
+        const newCursorPos = beforeMention.length + username.length + 2;
         input.setSelectionRange(newCursorPos, newCursorPos);
         input.focus();
       }
@@ -1971,21 +1988,31 @@
           e.target.value = '';
         });
 
-        document.addEventListener('click', (event) => {
+        document.addEventListener('keydown', (event) => {
+          if (showMentionDropdown && ['ArrowDown', 'ArrowUp', 'Enter', 'Escape'].includes(event.key)) {
+            event.preventDefault();
+            handleMentionKeyDown(event);
+          }
+        });
+
+        document.addEventListener('mousedown', (event) => {
           const dropdown = document.getElementById('mentionDropdown');
           const inputContainer = document.getElementById('chatInputContainer');
           const uploadStatusContainer = document.getElementById(
             'uploadStatusContainer'
           );
 
+          if (dropdown.contains(event.target)) {
+            return;
+          }
+
           if (
             !inputContainer.contains(event.target) &&
-            !dropdown.contains(event.target) &&
             !uploadStatusContainer.contains(event.target)
           ) {
             closeMentionDropdown();
           }
-        });
+        }, true);
 
         connect();
 
