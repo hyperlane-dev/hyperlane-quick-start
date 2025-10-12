@@ -33,7 +33,7 @@ pub async fn connection_mysql_db() -> Result<DatabaseConnection, String> {
     );
     Database::connect(&db_url)
         .await
-        .map_err(|error: sea_orm::DbErr| {
+        .map_err(|error: DbErr| {
             let error_msg: String = error.to_string();
             futures::executor::block_on(async {
                 crate::database::AutoCreationLogger::log_connection_verification(

@@ -9,5 +9,6 @@ use mapper::mysql::*;
 use model::param::mysql::*;
 
 use sea_orm::{
-    ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, prelude::Expr,
+    ActiveModelTrait, ActiveValue, ColumnTrait, DatabaseConnection, DbErr, EntityTrait,
+    QueryFilter, prelude::Expr,
 };

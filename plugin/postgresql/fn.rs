@@ -35,21 +35,19 @@ pub async fn connection_postgresql_db() -> Result<DatabaseConnection, String> {
         env.postgresql_port,
         env.postgresql_database
     );
-    Database::connect(&db_url)
-        .await
-        .map_err(|error: sea_orm::DbErr| {
-            let error_msg: String = error.to_string();
-            futures::executor::block_on(async {
-                crate::database::AutoCreationLogger::log_connection_verification(
-                    crate::database::PluginType::PostgreSQL,
-                    &env.postgresql_database,
-                    false,
-                    Some(&error_msg),
-                )
-                .await;
-            });
-            error_msg
-        })
+    Database::connect(&db_url).await.map_err(|error: DbErr| {
+        let error_msg: String = error.to_string();
+        futures::executor::block_on(async {
+            crate::database::AutoCreationLogger::log_connection_verification(
+                crate::database::PluginType::PostgreSQL,
+                &env.postgresql_database,
+                false,
+                Some(&error_msg),
+            )
+            .await;
+        });
+        error_msg
+    })
 }
 
 pub async fn get_postgresql_connection() -> Result<DatabaseConnection, String> {

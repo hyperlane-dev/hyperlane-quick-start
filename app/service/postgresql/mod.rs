@@ -9,5 +9,6 @@ use mapper::postgresql::*;
 use model::param::postgresql::*;
 
 use sea_orm::{
-    ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, prelude::Expr,
+    ActiveModelTrait, ActiveValue, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter,
+    prelude::Expr,
 };

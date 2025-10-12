@@ -15,23 +15,20 @@ impl MySqlAutoCreation {
             self.env.mysql_host,
             self.env.mysql_port
         );
-        Database::connect(&admin_url)
-            .await
-            .map_err(|error: sea_orm::DbErr| {
-                let error_msg: String = error.to_string();
-                if error_msg.contains("Access denied") || error_msg.contains("permission") {
-                    AutoCreationError::InsufficientPermissions(format!(
-                        "Cannot connect to MySQL server for database creation: {error_msg}"
-                    ))
-                } else if error_msg.contains("timeout") || error_msg.contains("Connection refused")
-                {
-                    AutoCreationError::ConnectionFailed(format!(
-                        "Cannot connect to MySQL server: {error_msg}"
-                    ))
-                } else {
-                    AutoCreationError::DatabaseError(format!("MySQL connection error: {error_msg}"))
-                }
-            })
+        Database::connect(&admin_url).await.map_err(|error: DbErr| {
+            let error_msg: String = error.to_string();
+            if error_msg.contains("Access denied") || error_msg.contains("permission") {
+                AutoCreationError::InsufficientPermissions(format!(
+                    "Cannot connect to MySQL server for database creation: {error_msg}"
+                ))
+            } else if error_msg.contains("timeout") || error_msg.contains("Connection refused") {
+                AutoCreationError::ConnectionFailed(format!(
+                    "Cannot connect to MySQL server: {error_msg}"
+                ))
+            } else {
+                AutoCreationError::DatabaseError(format!("MySQL connection error: {error_msg}"))
+            }
+        })
     }
 
     async fn database_exists(
@@ -103,14 +100,12 @@ impl MySqlAutoCreation {
             self.env.mysql_port,
             self.env.mysql_database
         );
-        Database::connect(&db_url)
-            .await
-            .map_err(|error: sea_orm::DbErr| {
-                AutoCreationError::ConnectionFailed(format!(
-                    "Cannot connect to MySQL database '{}': {}",
-                    self.env.mysql_database, error
-                ))
-            })
+        Database::connect(&db_url).await.map_err(|error: DbErr| {
+            AutoCreationError::ConnectionFailed(format!(
+                "Cannot connect to MySQL database '{}': {}",
+                self.env.mysql_database, error
+            ))
+        })
     }
 
     async fn table_exists(
