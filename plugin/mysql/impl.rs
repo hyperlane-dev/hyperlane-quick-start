@@ -114,12 +114,10 @@ impl MySqlAutoCreation {
         table_name: &str,
     ) -> Result<bool, AutoCreationError> {
         let query = format!(
-            "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{}' AND TABLE_NAME = '{}'",
-            self.env.mysql_database, table_name
+            "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{}' AND TABLE_NAME = '{table_name}'",
+            self.env.mysql_database
         );
-
-        let statement = Statement::from_string(DatabaseBackend::MySql, query);
-
+        let statement: Statement = Statement::from_string(DatabaseBackend::MySql, query);
         match connection.query_all(statement).await {
             Ok(results) => Ok(!results.is_empty()),
             Err(error) => Err(AutoCreationError::DatabaseError(format!(
@@ -133,8 +131,8 @@ impl MySqlAutoCreation {
         connection: &DatabaseConnection,
         table: &crate::database::TableSchema,
     ) -> Result<(), AutoCreationError> {
-        let statement = Statement::from_string(DatabaseBackend::MySql, table.sql.clone());
-
+        let statement: Statement =
+            Statement::from_string(DatabaseBackend::MySql, table.sql.clone());
         match connection.execute(statement).await {
             Ok(_) => Ok(()),
             Err(error) => {
@@ -159,8 +157,7 @@ impl MySqlAutoCreation {
         connection: &DatabaseConnection,
         sql: &str,
     ) -> Result<(), AutoCreationError> {
-        let statement = Statement::from_string(DatabaseBackend::MySql, sql.to_string());
-
+        let statement: Statement = Statement::from_string(DatabaseBackend::MySql, sql.to_string());
         match connection.execute(statement).await {
             Ok(_) => Ok(()),
             Err(error) => Err(AutoCreationError::DatabaseError(format!(

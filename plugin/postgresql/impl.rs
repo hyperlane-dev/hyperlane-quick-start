@@ -43,7 +43,6 @@ impl PostgreSqlAutoCreation {
             self.env.postgresql_port,
             self.env.postgresql_database
         );
-
         Database::connect(&db_url).await.map_err(|error| {
             AutoCreationError::ConnectionFailed(format!(
                 "Cannot connect to PostgreSQL database '{}': {}",
@@ -60,9 +59,7 @@ impl PostgreSqlAutoCreation {
             "SELECT 1 FROM pg_database WHERE datname = '{}'",
             self.env.postgresql_database
         );
-
-        let statement = Statement::from_string(DatabaseBackend::Postgres, query);
-
+        let statement: Statement = Statement::from_string(DatabaseBackend::Postgres, query);
         match connection.query_all(statement).await {
             Ok(results) => Ok(!results.is_empty()),
             Err(error) => Err(AutoCreationError::DatabaseError(format!(
@@ -83,14 +80,11 @@ impl PostgreSqlAutoCreation {
             .await;
             return Ok(false);
         }
-
         let create_query = format!(
             "CREATE DATABASE \"{}\" WITH ENCODING='UTF8' LC_COLLATE='en_US.UTF-8' LC_CTYPE='en_US.UTF-8'",
             self.env.postgresql_database
         );
-
-        let statement = Statement::from_string(DatabaseBackend::Postgres, create_query);
-
+        let statement: Statement = Statement::from_string(DatabaseBackend::Postgres, create_query);
         match connection.execute(statement).await {
             Ok(_) => {
                 AutoCreationLogger::log_database_created(
@@ -132,9 +126,7 @@ impl PostgreSqlAutoCreation {
         let query = format!(
             "SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = '{table_name}'"
         );
-
-        let statement = Statement::from_string(DatabaseBackend::Postgres, query);
-
+        let statement: Statement = Statement::from_string(DatabaseBackend::Postgres, query);
         match connection.query_all(statement).await {
             Ok(results) => Ok(!results.is_empty()),
             Err(error) => Err(AutoCreationError::DatabaseError(format!(
@@ -148,8 +140,8 @@ impl PostgreSqlAutoCreation {
         connection: &DatabaseConnection,
         table: &crate::database::TableSchema,
     ) -> Result<(), AutoCreationError> {
-        let statement = Statement::from_string(DatabaseBackend::Postgres, table.sql.clone());
-
+        let statement: Statement =
+            Statement::from_string(DatabaseBackend::Postgres, table.sql.clone());
         match connection.execute(statement).await {
             Ok(_) => Ok(()),
             Err(error) => {
@@ -174,8 +166,8 @@ impl PostgreSqlAutoCreation {
         connection: &DatabaseConnection,
         sql: &str,
     ) -> Result<(), AutoCreationError> {
-        let statement = Statement::from_string(DatabaseBackend::Postgres, sql.to_string());
-
+        let statement: Statement =
+            Statement::from_string(DatabaseBackend::Postgres, sql.to_string());
         match connection.execute(statement).await {
             Ok(_) => Ok(()),
             Err(error) => Err(AutoCreationError::DatabaseError(format!(
