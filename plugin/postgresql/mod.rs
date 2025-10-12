@@ -11,7 +11,7 @@ use database::*;
 use env::*;
 use r#static::*;
 
-use std::time::{Duration, Instant};
+use std::time::Instant;
 
 use futures::executor::block_on;
 use once_cell::sync::Lazy;

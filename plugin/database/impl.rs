@@ -329,38 +329,9 @@ impl AutoCreationConfig {
         crate::env::get_global_env_config()
     }
 
-    pub fn is_database_creation_enabled() -> bool {
-        Self::get_env().enable_auto_db_creation
-    }
-
-    pub fn is_table_creation_enabled() -> bool {
-        Self::get_env().enable_auto_table_creation
-    }
-
-    pub fn is_auto_creation_enabled() -> bool {
-        Self::is_database_creation_enabled() || Self::is_table_creation_enabled()
-    }
-
-    pub fn get_timeout_seconds() -> u64 {
-        Self::get_env().auto_creation_timeout_seconds
-    }
-
-    pub fn get_timeout_duration() -> Duration {
-        Duration::from_secs(Self::get_timeout_seconds())
-    }
-
     pub fn validate() -> Result<(), String> {
-        let env = Self::get_env();
-
-        if env.auto_creation_timeout_seconds == 0 {
-            return Err("Auto-creation timeout cannot be zero".to_string());
-        }
-
-        if env.auto_creation_timeout_seconds > 300 {
-            return Err("Auto-creation timeout cannot exceed 300 seconds".to_string());
-        }
-
-        if env.enable_mysql && Self::is_auto_creation_enabled() {
+        let env: &'static EnvConfig = Self::get_env();
+        if env.enable_mysql {
             if env.mysql_host.is_empty() {
                 return Err("MySQL host is required when auto-creation is enabled".to_string());
             }
@@ -373,8 +344,7 @@ impl AutoCreationConfig {
                 );
             }
         }
-
-        if env.enable_postgresql && Self::is_auto_creation_enabled() {
+        if env.enable_postgresql {
             if env.postgresql_host.is_empty() {
                 return Err("PostgreSQL host is required when auto-creation is enabled".to_string());
             }
@@ -390,40 +360,20 @@ impl AutoCreationConfig {
                 );
             }
         }
-
-        if env.enable_redis && Self::is_auto_creation_enabled() {
+        if env.enable_redis {
             if env.redis_host.is_empty() {
                 return Err("Redis host is required when auto-creation is enabled".to_string());
             }
         }
-
         Ok(())
     }
 
     pub fn get_summary() -> String {
-        let env = Self::get_env();
+        let env: &'static EnvConfig = Self::get_env();
         format!(
-            "Auto-creation config: DB={}, Tables={}, Timeout={}s, MySQL={}, PostgreSQL={}, Redis={}",
-            env.enable_auto_db_creation,
-            env.enable_auto_table_creation,
-            env.auto_creation_timeout_seconds,
-            env.enable_mysql,
-            env.enable_postgresql,
-            env.enable_redis
+            "Auto-creation config: MySQL={}, PostgreSQL={}, Redis={}",
+            env.enable_mysql, env.enable_postgresql, env.enable_redis
         )
-    }
-
-    pub fn get_defaults() -> (bool, bool, u64) {
-        (true, true, 30)
-    }
-
-    pub fn is_customized() -> bool {
-        let env = Self::get_env();
-        let (default_db, default_table, default_timeout) = Self::get_defaults();
-
-        env.enable_auto_db_creation != default_db
-            || env.enable_auto_table_creation != default_table
-            || env.auto_creation_timeout_seconds != default_timeout
     }
 
     pub fn for_plugin(plugin_name: &str) -> PluginAutoCreationConfig {
@@ -435,7 +385,7 @@ impl AutoCreationConfig {
 
 impl PluginAutoCreationConfig {
     pub fn is_plugin_enabled(&self) -> bool {
-        let env = AutoCreationConfig::get_env();
+        let env: &'static EnvConfig = AutoCreationConfig::get_env();
         if let Some(plugin_type) = PluginType::from_str(&self.plugin_name) {
             match plugin_type {
                 PluginType::MySQL => env.enable_mysql,
@@ -445,10 +395,6 @@ impl PluginAutoCreationConfig {
         } else {
             false
         }
-    }
-
-    pub fn should_run_auto_creation(&self) -> bool {
-        self.is_plugin_enabled() && AutoCreationConfig::is_auto_creation_enabled()
     }
 
     pub fn get_database_name(&self) -> String {

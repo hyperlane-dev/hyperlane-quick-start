@@ -2,28 +2,26 @@ use super::*;
 
 pub async fn connection_postgresql_db() -> Result<DatabaseConnection, String> {
     let env: &'static EnvConfig = get_global_env_config();
-    if env.enable_auto_db_creation || env.enable_auto_table_creation {
-        match perform_postgresql_auto_creation().await {
-            Ok(result) => {
-                if result.has_changes() {
-                    crate::database::AutoCreationLogger::log_auto_creation_complete(
-                        crate::database::PluginType::PostgreSQL,
-                        &result,
-                    )
-                    .await;
-                }
-            }
-            Err(error) => {
-                crate::database::AutoCreationLogger::log_auto_creation_error(
-                    &error,
-                    "Auto-creation process",
+    match perform_postgresql_auto_creation().await {
+        Ok(result) => {
+            if result.has_changes() {
+                crate::database::AutoCreationLogger::log_auto_creation_complete(
                     crate::database::PluginType::PostgreSQL,
-                    Some(&env.postgresql_database),
+                    &result,
                 )
                 .await;
-                if !error.should_continue() {
-                    return Err(error.to_string());
-                }
+            }
+        }
+        Err(error) => {
+            crate::database::AutoCreationLogger::log_auto_creation_error(
+                &error,
+                "Auto-creation process",
+                crate::database::PluginType::PostgreSQL,
+                Some(&env.postgresql_database),
+            )
+            .await;
+            if !error.should_continue() {
+                return Err(error.to_string());
             }
         }
     }
@@ -63,65 +61,40 @@ pub async fn perform_postgresql_auto_creation() -> Result<AutoCreationResult, Au
         &env.postgresql_database,
     )
     .await;
-    if !env.enable_auto_db_creation && !env.enable_auto_table_creation {
-        AutoCreationLogger::log_auto_creation_disabled(
-            crate::database::PluginType::PostgreSQL,
-            "Both database and table auto-creation are disabled",
-        )
-        .await;
-        result.duration = start_time.elapsed();
-        return Ok(result);
-    }
     let auto_creator: PostgreSqlAutoCreation = PostgreSqlAutoCreation::new();
-    if env.enable_auto_db_creation {
-        match auto_creator.create_database_if_not_exists().await {
-            Ok(created) => {
-                result.database_created = created;
-            }
-            Err(error) => {
-                AutoCreationLogger::log_auto_creation_error(
-                    &error,
-                    "Database creation",
-                    crate::database::PluginType::PostgreSQL,
-                    Some(&env.postgresql_database),
-                )
-                .await;
-                if !error.should_continue() {
-                    result.duration = start_time.elapsed();
-                    return Err(error);
-                }
-                result.errors.push(error.to_string());
-            }
+    match auto_creator.create_database_if_not_exists().await {
+        Ok(created) => {
+            result.database_created = created;
         }
-    } else {
-        AutoCreationLogger::log_auto_creation_disabled(
-            crate::database::PluginType::PostgreSQL,
-            "Database auto-creation is disabled",
-        )
-        .await;
+        Err(error) => {
+            AutoCreationLogger::log_auto_creation_error(
+                &error,
+                "Database creation",
+                crate::database::PluginType::PostgreSQL,
+                Some(&env.postgresql_database),
+            )
+            .await;
+            if !error.should_continue() {
+                result.duration = start_time.elapsed();
+                return Err(error);
+            }
+            result.errors.push(error.to_string());
+        }
     }
-    if env.enable_auto_table_creation {
-        match auto_creator.create_tables_if_not_exist().await {
-            Ok(tables) => {
-                result.tables_created = tables;
-            }
-            Err(error) => {
-                AutoCreationLogger::log_auto_creation_error(
-                    &error,
-                    "Table creation",
-                    crate::database::PluginType::PostgreSQL,
-                    Some(&env.postgresql_database),
-                )
-                .await;
-                result.errors.push(error.to_string());
-            }
+    match auto_creator.create_tables_if_not_exist().await {
+        Ok(tables) => {
+            result.tables_created = tables;
         }
-    } else {
-        AutoCreationLogger::log_auto_creation_disabled(
-            crate::database::PluginType::PostgreSQL,
-            "Table auto-creation is disabled",
-        )
-        .await;
+        Err(error) => {
+            AutoCreationLogger::log_auto_creation_error(
+                &error,
+                "Table creation",
+                crate::database::PluginType::PostgreSQL,
+                Some(&env.postgresql_database),
+            )
+            .await;
+            result.errors.push(error.to_string());
+        }
     }
     if let Err(error) = auto_creator.verify_connection().await {
         AutoCreationLogger::log_auto_creation_error(

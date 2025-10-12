@@ -223,22 +223,10 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
         &self,
     ) -> impl std::future::Future<Output = Result<bool, AutoCreationError>> + Send {
         async move {
-            let start_time = Instant::now();
-            let timeout = Duration::from_secs(self.env.auto_creation_timeout_seconds);
-
-            let admin_connection = self.create_admin_connection().await?;
-
-            if start_time.elapsed() > timeout {
-                return Err(AutoCreationError::Timeout(format!(
-                    "MySQL database creation timed out after {} seconds",
-                    self.env.auto_creation_timeout_seconds
-                )));
-            }
-
-            let result = self.create_database(&admin_connection).await;
-
+            let admin_connection: DatabaseConnection = self.create_admin_connection().await?;
+            let result: Result<bool, AutoCreationError> =
+                self.create_database(&admin_connection).await;
             let _ = admin_connection.close().await;
-
             result
         }
     }
@@ -247,10 +235,9 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
         &self,
     ) -> impl std::future::Future<Output = Result<Vec<String>, AutoCreationError>> + Send {
         async move {
-            let connection = self.create_target_connection().await?;
-            let schema = self.get_mysql_schema();
-            let mut created_tables = Vec::new();
-
+            let connection: DatabaseConnection = self.create_target_connection().await?;
+            let schema: DatabaseSchema = self.get_mysql_schema();
+            let mut created_tables: Vec<String> = Vec::new();
             for table in schema.ordered_tables() {
                 if !self.table_exists(&connection, &table.name).await? {
                     self.create_table(&connection, table).await?;
@@ -270,7 +257,6 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                     .await;
                 }
             }
-
             for index_sql in &schema.indexes {
                 if let Err(error) = self.execute_sql(&connection, index_sql).await {
                     AutoCreationLogger::log_auto_creation_error(
@@ -282,7 +268,6 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                     .await;
                 }
             }
-
             for constraint_sql in &schema.constraints {
                 if let Err(error) = self.execute_sql(&connection, constraint_sql).await {
                     AutoCreationLogger::log_auto_creation_error(
@@ -294,7 +279,6 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                     .await;
                 }
             }
-
             let _ = connection.close().await;
             AutoCreationLogger::log_tables_created(
                 &created_tables,
@@ -302,7 +286,6 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                 crate::database::PluginType::MySQL,
             )
             .await;
-
             Ok(created_tables)
         }
     }
@@ -328,7 +311,6 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
 
             let statement: Statement =
                 Statement::from_string(DatabaseBackend::MySql, "SELECT 1".to_string());
-
             match connection.query_all(statement).await {
                 Ok(_) => {
                     let _ = connection.close().await;

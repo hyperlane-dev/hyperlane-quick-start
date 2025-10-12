@@ -26,6 +26,14 @@ async fn init_db() {
     if env.enable_redis {
         let _ = connection_redis_db().await;
     }
+    match initialize_auto_creation().await {
+        Ok(_) => {
+            println_success!("Auto-creation initialization successful");
+        }
+        Err(error) => {
+            println_error!(format!("Auto-creation initialization failed: {error}"));
+        }
+    };
 }
 
 fn runtime() -> Runtime {
@@ -44,7 +52,6 @@ async fn create_server() {
     init_config(&server).await;
     init_network_capture().await;
     init_db().await;
-    let _ = initialize_auto_creation().await;
     println_success!("Server initialization successful");
     let server_result: ServerResult<ServerHook> = server.run().await;
     match server_result {

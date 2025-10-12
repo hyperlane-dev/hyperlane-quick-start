@@ -19,7 +19,4 @@ pub struct EnvConfig {
     pub postgresql_database: String,
     pub postgresql_username: String,
     pub postgresql_password: String,
-    pub enable_auto_db_creation: bool,
-    pub enable_auto_table_creation: bool,
-    pub auto_creation_timeout_seconds: u64,
 }

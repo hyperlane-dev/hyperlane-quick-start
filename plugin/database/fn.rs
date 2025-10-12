@@ -8,13 +8,9 @@ pub async fn initialize_auto_creation() -> Result<(), String> {
     }
     let summary: String = AutoCreationConfig::get_summary();
     log_info(&format!("[AUTO-CREATION] Initialization: {summary}")).await;
-    if !AutoCreationConfig::is_auto_creation_enabled() {
-        log_info("[AUTO-CREATION] Auto-creation is disabled for all plugins").await;
-        return Ok(());
-    }
     let env: &'static EnvConfig = get_global_env_config();
     let mut initialization_results: Vec<String> = Vec::new();
-    if env.enable_mysql && AutoCreationConfig::is_auto_creation_enabled() {
+    if env.enable_mysql {
         match perform_mysql_auto_creation().await {
             Ok(result) => {
                 initialization_results.push(format!(
@@ -34,7 +30,7 @@ pub async fn initialize_auto_creation() -> Result<(), String> {
             }
         }
     }
-    if env.enable_postgresql && AutoCreationConfig::is_auto_creation_enabled() {
+    if env.enable_postgresql {
         match perform_postgresql_auto_creation().await {
             Ok(result) => {
                 initialization_results.push(format!(
@@ -54,7 +50,7 @@ pub async fn initialize_auto_creation() -> Result<(), String> {
             }
         }
     }
-    if env.enable_redis && AutoCreationConfig::is_auto_creation_enabled() {
+    if env.enable_redis {
         match perform_redis_auto_creation().await {
             Ok(result) => {
                 initialization_results.push(format!(
