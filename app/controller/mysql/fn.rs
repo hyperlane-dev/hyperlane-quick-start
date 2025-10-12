@@ -2,6 +2,7 @@ use super::*;
 
 #[utoipa::path(
     get,
+    post,
     path = "/api/mysql/list",
     description = "Get all MySQL records",
     responses(
@@ -9,7 +10,7 @@ use super::*;
     )
 )]
 #[route("/api/mysql/list")]
-#[prologue_macros(get)]
+#[prologue_macros(methods(get, post))]
 pub async fn list_records(ctx: Context) {
     match get_all_mysql_records().await {
         Ok(records) => {
@@ -47,7 +48,7 @@ pub async fn create_record(ctx: Context) {
 }
 
 #[utoipa::path(
-    put,
+    post,
     path = "/api/mysql/update",
     description = "Update an existing MySQL record",
     request_body = MysqlRecord,
@@ -58,7 +59,7 @@ pub async fn create_record(ctx: Context) {
     )
 )]
 #[route("/api/mysql/update")]
-#[prologue_macros(put, request_body_json(record_opt: MysqlRecord))]
+#[prologue_macros(post, request_body_json(record_opt: MysqlRecord))]
 pub async fn update_record(ctx: Context) {
     let record: MysqlRecord = match record_opt {
         Ok(data) => data,
@@ -74,7 +75,7 @@ pub async fn update_record(ctx: Context) {
 }
 
 #[utoipa::path(
-    delete,
+    post,
     path = "/api/mysql/delete",
     description = "Delete a MySQL record by key",
     params(

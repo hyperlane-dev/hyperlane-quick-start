@@ -2,6 +2,7 @@ use super::*;
 
 #[utoipa::path(
     get,
+    post,
     path = "/api/postgresql/list",
     description = "Get all PostgreSQL records",
     responses(
@@ -9,7 +10,7 @@ use super::*;
     )
 )]
 #[route("/api/postgresql/list")]
-#[prologue_macros(get)]
+#[prologue_macros(methods(get, post))]
 pub async fn list_records(ctx: Context) {
     match get_all_postgresql_records().await {
         Ok(records) => {
@@ -47,7 +48,7 @@ pub async fn create_record(ctx: Context) {
 }
 
 #[utoipa::path(
-    put,
+    post,
     path = "/api/postgresql/update",
     description = "Update an existing PostgreSQL record",
     request_body = PostgresqlRecord,
@@ -58,7 +59,7 @@ pub async fn create_record(ctx: Context) {
     )
 )]
 #[route("/api/postgresql/update")]
-#[prologue_macros(put, request_body_json(record_opt: PostgresqlRecord))]
+#[prologue_macros(post, request_body_json(record_opt: PostgresqlRecord))]
 pub async fn update_record(ctx: Context) {
     let record: PostgresqlRecord = match record_opt {
         Ok(data) => data,
@@ -74,7 +75,7 @@ pub async fn update_record(ctx: Context) {
 }
 
 #[utoipa::path(
-    delete,
+    post,
     path = "/api/postgresql/delete",
     description = "Delete a PostgreSQL record by key",
     params(
@@ -86,7 +87,7 @@ pub async fn update_record(ctx: Context) {
     )
 )]
 #[route("/api/postgresql/delete")]
-#[prologue_macros(delete)]
+#[prologue_macros(post)]
 pub async fn delete_record(ctx: Context) {
     let key: String = match ctx.get_request_querys().await.get("key").cloned() {
         Some(k) => k,
