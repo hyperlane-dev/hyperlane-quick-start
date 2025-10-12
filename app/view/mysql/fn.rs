@@ -16,4 +16,4 @@ use super::*;
     response_body(MYSQL_HTML),
     response_header(CONTENT_ENCODING => GZIP)
 )]
-pub async fn html(ctx: Context) {}
+pub async fn handle(ctx: Context) {}

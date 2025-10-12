@@ -1,19 +1,19 @@
 use super::*;
 
-#[route("/redis")]
+#[route("/chat")]
 #[utoipa::path(
     get,
     post,
-    path = "/redis",
-    description = "Redis frontend interface",
+    path = "/chat",
+    description = "Chat frontend interface",
     responses(
-        (status = 200, description = "Successfully served Redis frontend interface", body = String)
+        (status = 200, description = "Successfully served chat frontend interface", body = String)
     )
 )]
 #[prologue_macros(
     methods(get, post),
     response_status_code(200),
-    response_body(REDIS_HTML),
+    response_body(CHAT_HTML),
     response_header(CONTENT_ENCODING => GZIP)
 )]
 pub async fn handle(ctx: Context) {}

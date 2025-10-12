@@ -4,7 +4,7 @@ pub use r#fn::*;
 
 use super::*;
 use domain::chat::*;
-use hyperlane_config::{application::chat::*, framework::*};
+use hyperlane_config::framework::*;
 use mapper::chat::*;
 use model::data_transfer::chat::*;
 use service::chat::*;

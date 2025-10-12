@@ -47,24 +47,6 @@ pub async fn system_info(ctx: Context) {
     ctx.set_response_body(&info_json).await;
 }
 
-#[route("/monitor")]
-#[utoipa::path(
-    get,
-    post,
-    path = "/monitor",
-    description = "Server monitoring dashboard interface",
-    responses(
-        (status = 200, description = "Successfully served monitoring dashboard", body = String)
-    )
-)]
-#[prologue_macros(
-    methods(get, post),
-    response_status_code(200),
-    response_body(MONITOR_DASHBOARD_HTML),
-    response_header(CONTENT_ENCODING => GZIP)
-)]
-pub async fn monitor_dashboard(ctx: Context) {}
-
 #[route("/api/network/capture")]
 #[utoipa::path(
     get,
