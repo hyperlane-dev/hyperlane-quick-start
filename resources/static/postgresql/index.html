@@ -12,32 +12,26 @@
       <h1 class="text-3xl font-bold mb-6 text-center">PostgreSQL Management</h1>
       <div class="bg-white rounded-lg shadow-md p-6 mb-6">
         <h2 class="text-xl font-semibold mb-4">Add New Record</h2>
-        <form
-          hx-post="/api/postgresql/create"
-          hx-target="#records"
-          class="space-y-4"
-        >
+        <div class="space-y-4">
           <input
             type="text"
-            name="key"
+            id="create-key"
             placeholder="Key"
             class="w-full p-2 border rounded"
-            required
           />
           <input
             type="text"
-            name="value"
+            id="create-value"
             placeholder="Value"
             class="w-full p-2 border rounded"
-            required
           />
           <button
-            type="submit"
+            id="create-btn"
             class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
           >
             Add
           </button>
-        </form>
+        </div>
       </div>
 
       <div
@@ -82,22 +76,16 @@
           >
             <div class="bg-white p-6 rounded shadow-lg w-96">
               <h3 class="text-xl font-semibold mb-4">Edit Record</h3>
-              <form
-                hx-put="/api/postgresql/update"
-                hx-target="#records"
-                class="space-y-4"
-              >
-                <input type="hidden" name="key" id="edit-key" />
+              <div class="space-y-4">
+                <input type="hidden" id="edit-key" />
                 <div>
                   <label class="block text-sm font-medium text-gray-700"
                     >Value</label
                   >
                   <input
                     type="text"
-                    name="value"
                     id="edit-value"
                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    required
                   />
                 </div>
                 <div class="flex justify-end space-x-2">
@@ -109,27 +97,88 @@
                     Cancel
                   </button>
                   <button
-                    type="submit"
+                    id="edit-btn"
                     class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                   >
                     Save
                   </button>
                 </div>
-              </form>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
     <script>
+      // Create button handler
+      document.getElementById('create-btn').addEventListener('click', async () => {
+        const key = document.getElementById('create-key').value;
+        const value = document.getElementById('create-value').value;
+        
+        if (!key || !value) {
+          alert('Please fill in all fields');
+          return;
+        }
+        
+        try {
+          const response = await fetch('/api/postgresql/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ key, value })
+          });
+          
+          if (response.ok) {
+            document.getElementById('create-key').value = '';
+            document.getElementById('create-value').value = '';
+            location.reload();
+          } else {
+            alert('Failed to create record');
+          }
+        } catch (error) {
+          console.error('Create error:', error);
+          alert('Error creating record');
+        }
+      });
+
+      // Edit button handler
+      document.getElementById('edit-btn').addEventListener('click', async () => {
+        const key = document.getElementById('edit-key').value;
+        const value = document.getElementById('edit-value').value;
+        
+        if (!key || !value) {
+          alert('Please fill in all fields');
+          return;
+        }
+        
+        try {
+          const response = await fetch('/api/postgresql/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ key, value })
+          });
+          
+          if (response.ok) {
+            toggleModal(false);
+            location.reload();
+          } else {
+            alert('Failed to update record');
+          }
+        } catch (error) {
+          console.error('Update error:', error);
+          alert('Error updating record');
+        }
+      });
+
       function toggleModal(show, key, value) {
         const modal = document.getElementById('edit-modal');
         if (show) {
           document.getElementById('edit-key').value = key;
           document.getElementById('edit-value').value = value;
           modal.classList.remove('hidden');
+          modal.classList.add('flex');
         } else {
           modal.classList.add('hidden');
+          modal.classList.remove('flex');
         }
       }
 
