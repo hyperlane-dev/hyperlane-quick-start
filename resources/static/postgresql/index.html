@@ -201,7 +201,10 @@
           if (confirm('Are you sure you want to delete this record?')) {
             const key = btn.closest('[data-key]').getAttribute('data-key');
             try {
-              const response = await fetch(`/api/postgresql/delete?key=${key}`, { method: 'POST' });
+              const response = await fetch(
+                `/api/postgresql/delete?key=${key}`,
+                { method: 'POST' }
+              );
               const result = await response.json();
               if (result.code === 200) {
                 alert('Success: ' + result.message);
