@@ -114,64 +114,66 @@
       </div>
     </div>
     <script>
-      // Create button handler
-      document.getElementById('create-btn').addEventListener('click', async () => {
-        const key = document.getElementById('create-key').value;
-        const value = document.getElementById('create-value').value;
-        
-        if (!key || !value) {
-          alert('Please fill in all fields');
-          return;
-        }
-        
-        try {
-          const response = await fetch('/api/redis/create', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ key, value })
-          });
-          
-          if (response.ok) {
-            document.getElementById('create-key').value = '';
-            document.getElementById('create-value').value = '';
-            location.reload();
-          } else {
-            alert('Failed to create record');
-          }
-        } catch (error) {
-          console.error('Create error:', error);
-          alert('Error creating record');
-        }
-      });
+      document
+        .getElementById('create-btn')
+        .addEventListener('click', async () => {
+          const key = document.getElementById('create-key').value;
+          const value = document.getElementById('create-value').value;
 
-      // Edit button handler
-      document.getElementById('edit-btn').addEventListener('click', async () => {
-        const key = document.getElementById('edit-key').value;
-        const value = document.getElementById('edit-value').value;
-        
-        if (!key || !value) {
-          alert('Please fill in all fields');
-          return;
-        }
-        
-        try {
-          const response = await fetch('/api/redis/update', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ key, value })
-          });
-          
-          if (response.ok) {
-            toggleModal(false);
-            location.reload();
-          } else {
-            alert('Failed to update record');
+          if (!key || !value) {
+            alert('Please fill in all fields');
+            return;
           }
-        } catch (error) {
-          console.error('Update error:', error);
-          alert('Error updating record');
-        }
-      });
+
+          try {
+            const response = await fetch('/api/redis/create', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ key, value }),
+            });
+
+            if (response.ok) {
+              document.getElementById('create-key').value = '';
+              document.getElementById('create-value').value = '';
+              location.reload();
+            } else {
+              alert('Failed to create record');
+            }
+          } catch (error) {
+            console.error('Create error:', error);
+            alert('Error creating record');
+          }
+        });
+
+      document
+        .getElementById('edit-btn')
+        .addEventListener('click', async () => {
+          const key = document.getElementById('edit-key').value;
+          const value = document.getElementById('edit-value').value;
+
+          if (!key || !value) {
+            alert('Please fill in all fields');
+            return;
+          }
+
+          try {
+            const response = await fetch('/api/redis/update', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ key, value }),
+            });
+
+            if (response.ok) {
+              toggleModal(false);
+              location.reload();
+            } else {
+              alert('Failed to update record');
+            }
+          } catch (error) {
+            console.error('Update error:', error);
+            alert('Error updating record');
+          }
+        });
 
       function toggleModal(show, key, value) {
         const modal = document.getElementById('edit-modal');
