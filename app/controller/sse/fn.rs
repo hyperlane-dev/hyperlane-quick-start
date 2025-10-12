@@ -15,7 +15,7 @@ use super::*;
     response_body(EMPTY_STR),
     response_header(CONTENT_TYPE => TEXT_EVENT_STREAM)
 )]
-pub async fn handle(ctx: Context) {
+pub async fn sse(ctx: Context) {
     let _ = ctx.send().await;
     for i in 0..10 {
         let _ = ctx

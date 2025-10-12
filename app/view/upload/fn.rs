@@ -15,7 +15,7 @@ use super::*;
     response_body(UPLOAD_HTML),
     response_header(CONTENT_ENCODING => GZIP)
 )]
-pub async fn handle(ctx: Context) {}
+pub async fn html(ctx: Context) {}
 
 #[route("/static/{upload_dir}/{upload_file}")]
 #[utoipa::path(

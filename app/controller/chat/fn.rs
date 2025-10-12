@@ -29,7 +29,7 @@ pub async fn online_users(ctx: Context) {
     )
 )]
 #[prologue_macros(ws, get)]
-pub async fn handle(ctx: Context) {
+pub async fn chat(ctx: Context) {
     let websocket: &WebSocket = get_global_websocket();
     let path: String = ctx.get_request_path().await;
     let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
