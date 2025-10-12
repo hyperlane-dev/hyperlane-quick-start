@@ -46,8 +46,7 @@ impl MySqlAutoCreation {
         match connection.query_all(statement).await {
             Ok(results) => Ok(!results.is_empty()),
             Err(error) => Err(AutoCreationError::DatabaseError(format!(
-                "Failed to check if database exists: {}",
-                error
+                "Failed to check if database exists: {error}"
             ))),
         }
     }
@@ -129,8 +128,7 @@ impl MySqlAutoCreation {
         match connection.query_all(statement).await {
             Ok(results) => Ok(!results.is_empty()),
             Err(error) => Err(AutoCreationError::DatabaseError(format!(
-                "Failed to check if table '{}' exists: {}",
-                table_name, error
+                "Failed to check if table '{table_name}' exists: {error}"
             ))),
         }
     }
@@ -171,8 +169,7 @@ impl MySqlAutoCreation {
         match connection.execute(statement).await {
             Ok(_) => Ok(()),
             Err(error) => Err(AutoCreationError::DatabaseError(format!(
-                "Failed to execute SQL: {}",
-                error
+                "Failed to execute SQL: {error}"
             ))),
         }
     }
@@ -319,7 +316,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
         &self,
     ) -> impl std::future::Future<Output = Result<(), AutoCreationError>> + Send {
         async move {
-            let db_url = format!(
+            let db_url: String = format!(
                 "mysql://{}:{}@{}:{}/{}",
                 self.env.mysql_username,
                 self.env.mysql_password,
@@ -327,15 +324,15 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                 self.env.mysql_port,
                 self.env.mysql_database
             );
+            let connection: DatabaseConnection =
+                Database::connect(&db_url).await.map_err(|error| {
+                    AutoCreationError::ConnectionFailed(format!(
+                        "Failed to verify MySQL connection: {error}"
+                    ))
+                })?;
 
-            let connection = Database::connect(&db_url).await.map_err(|error| {
-                AutoCreationError::ConnectionFailed(format!(
-                    "Failed to verify MySQL connection: {}",
-                    error
-                ))
-            })?;
-
-            let statement = Statement::from_string(DatabaseBackend::MySql, "SELECT 1".to_string());
+            let statement: Statement =
+                Statement::from_string(DatabaseBackend::MySql, "SELECT 1".to_string());
 
             match connection.query_all(statement).await {
                 Ok(_) => {
@@ -351,7 +348,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                 }
                 Err(error) => {
                     let _ = connection.close().await;
-                    let error_msg = error.to_string();
+                    let error_msg: String = error.to_string();
                     AutoCreationLogger::log_connection_verification(
                         crate::database::PluginType::MySQL,
                         &self.env.mysql_database,
@@ -360,8 +357,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                     )
                     .await;
                     Err(AutoCreationError::ConnectionFailed(format!(
-                        "MySQL connection verification failed: {}",
-                        error_msg
+                        "MySQL connection verification failed: {error_msg}"
                     )))
                 }
             }

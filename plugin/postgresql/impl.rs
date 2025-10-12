@@ -20,18 +20,15 @@ impl PostgreSqlAutoCreation {
             let error_msg = error.to_string();
             if error_msg.contains("authentication failed") || error_msg.contains("permission") {
                 AutoCreationError::InsufficientPermissions(format!(
-                    "Cannot connect to PostgreSQL server for database creation: {}",
-                    error_msg
+                    "Cannot connect to PostgreSQL server for database creation: {error_msg}"
                 ))
             } else if error_msg.contains("timeout") || error_msg.contains("Connection refused") {
                 AutoCreationError::ConnectionFailed(format!(
-                    "Cannot connect to PostgreSQL server: {}",
-                    error_msg
+                    "Cannot connect to PostgreSQL server: {error_msg}"
                 ))
             } else {
                 AutoCreationError::DatabaseError(format!(
-                    "PostgreSQL connection error: {}",
-                    error_msg
+                    "PostgreSQL connection error: {error_msg}"
                 ))
             }
         })
@@ -69,8 +66,7 @@ impl PostgreSqlAutoCreation {
         match connection.query_all(statement).await {
             Ok(results) => Ok(!results.is_empty()),
             Err(error) => Err(AutoCreationError::DatabaseError(format!(
-                "Failed to check if database exists: {}",
-                error
+                "Failed to check if database exists: {error}"
             ))),
         }
     }
@@ -134,8 +130,7 @@ impl PostgreSqlAutoCreation {
         table_name: &str,
     ) -> Result<bool, AutoCreationError> {
         let query = format!(
-            "SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = '{}'",
-            table_name
+            "SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = '{table_name}'"
         );
 
         let statement = Statement::from_string(DatabaseBackend::Postgres, query);
@@ -143,8 +138,7 @@ impl PostgreSqlAutoCreation {
         match connection.query_all(statement).await {
             Ok(results) => Ok(!results.is_empty()),
             Err(error) => Err(AutoCreationError::DatabaseError(format!(
-                "Failed to check if table '{}' exists: {}",
-                table_name, error
+                "Failed to check if table '{table_name}' exists: {error}"
             ))),
         }
     }
@@ -185,8 +179,7 @@ impl PostgreSqlAutoCreation {
         match connection.execute(statement).await {
             Ok(_) => Ok(()),
             Err(error) => Err(AutoCreationError::DatabaseError(format!(
-                "Failed to execute SQL: {}",
-                error
+                "Failed to execute SQL: {error}"
             ))),
         }
     }
@@ -357,8 +350,7 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
                     )
                     .await;
                     Err(AutoCreationError::ConnectionFailed(format!(
-                        "PostgreSQL connection verification failed: {}",
-                        error_msg
+                        "PostgreSQL connection verification failed: {error_msg}"
                     )))
                 }
             }

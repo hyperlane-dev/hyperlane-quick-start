@@ -132,7 +132,7 @@ impl AutoCreationErrorHandler {
         ErrorContext {
             plugin_name: plugin_type.to_string(),
             operation: operation.to_string(),
-            database_name: database_name.map(|s| s.to_string()),
+            database_name: database_name.map(|name: &str| name.to_string()),
             error_type: format!("{:?}", error)
                 .split('(')
                 .next()

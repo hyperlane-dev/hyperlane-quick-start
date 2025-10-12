@@ -3,12 +3,11 @@ use super::*;
 pub async fn initialize_auto_creation() -> Result<(), String> {
     if let Err(error) = AutoCreationConfig::validate() {
         return Err(format!(
-            "Auto-creation configuration validation failed: {}",
-            error
+            "Auto-creation configuration validation failed: {error}"
         ));
     }
     let summary: String = AutoCreationConfig::get_summary();
-    log_info(&format!("[AUTO-CREATION] Initialization: {}", summary)).await;
+    log_info(&format!("[AUTO-CREATION] Initialization: {summary}")).await;
     if !AutoCreationConfig::is_auto_creation_enabled() {
         log_info("[AUTO-CREATION] Auto-creation is disabled for all plugins").await;
         return Ok(());
@@ -29,9 +28,9 @@ pub async fn initialize_auto_creation() -> Result<(), String> {
             }
             Err(error) => {
                 if !error.should_continue() {
-                    return Err(format!("MySQL auto-creation failed: {}", error));
+                    return Err(format!("MySQL auto-creation failed: {error}"));
                 }
-                initialization_results.push(format!("MySQL: failed but continuing ({})", error));
+                initialization_results.push(format!("MySQL: failed but continuing ({error})"));
             }
         }
     }
@@ -49,10 +48,9 @@ pub async fn initialize_auto_creation() -> Result<(), String> {
             }
             Err(error) => {
                 if !error.should_continue() {
-                    return Err(format!("PostgreSQL auto-creation failed: {}", error));
+                    return Err(format!("PostgreSQL auto-creation failed: {error}"));
                 }
-                initialization_results
-                    .push(format!("PostgreSQL: failed but continuing ({})", error));
+                initialization_results.push(format!("PostgreSQL: failed but continuing ({error})"));
             }
         }
     }
@@ -70,9 +68,9 @@ pub async fn initialize_auto_creation() -> Result<(), String> {
             }
             Err(error) => {
                 if !error.should_continue() {
-                    return Err(format!("Redis auto-creation failed: {}", error));
+                    return Err(format!("Redis auto-creation failed: {error}"));
                 }
-                initialization_results.push(format!("Redis: failed but continuing ({})", error));
+                initialization_results.push(format!("Redis: failed but continuing ({error})"));
             }
         }
     }
@@ -81,8 +79,7 @@ pub async fn initialize_auto_creation() -> Result<(), String> {
     } else {
         let results_summary: String = initialization_results.join(", ");
         log_info(&format!(
-            "[AUTO-CREATION] Initialization complete: {}",
-            results_summary
+            "[AUTO-CREATION] Initialization complete: {results_summary}"
         ))
         .await;
     }

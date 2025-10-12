@@ -122,17 +122,17 @@ fn build_gpt_request_headers() -> HashMapXxHash3_64<&'static str, String> {
 fn extract_response_content(response_json: &JsonValue) -> Option<String> {
     response_json
         .get(JSON_FIELD_RESULT)
-        .and_then(|result| result.get(JSON_FIELD_RESPONSE))
-        .and_then(|response| response.as_str())
-        .filter(|s| !s.is_empty())
+        .and_then(|result: &JsonValue| result.get(JSON_FIELD_RESPONSE))
+        .and_then(|response: &JsonValue| response.as_str())
+        .filter(|data: &&str| !data.is_empty())
         .map(String::from)
         .or_else(|| {
             response_json
                 .get(JSON_FIELD_CHOICES)
-                .and_then(|choices| choices.get(0))
-                .and_then(|choice| choice.get(JSON_FIELD_MESSAGE))
-                .and_then(|message| message.get(JSON_FIELD_CONTENT))
-                .and_then(|content| content.as_str())
+                .and_then(|choices: &JsonValue| choices.get(0))
+                .and_then(|choice: &JsonValue| choice.get(JSON_FIELD_MESSAGE))
+                .and_then(|message: &JsonValue| message.get(JSON_FIELD_CONTENT))
+                .and_then(|content: &JsonValue| content.as_str())
                 .map(String::from)
         })
 }
