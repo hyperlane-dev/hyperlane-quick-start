@@ -1314,7 +1314,7 @@ dependencies = [
  "tokio-rustls",
  "tokio-tungstenite",
  "tungstenite",
- "webpki-roots",
+ "webpki-roots 1.0.3",
 ]
 
 [[package]]
@@ -1406,7 +1406,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "7.5.0"
+version = "7.6.0"
 dependencies = [
  "hyperlane_init",
 ]
@@ -1419,9 +1419,9 @@ checksum = "19b7a0bcb6105d14602c6777b955605fd0abee9c3fd412b4af4712db8a61e358"
 
 [[package]]
 name = "hyperlane-utils"
-version = "11.6.0"
+version = "11.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8b52905ca8dab2456de2772a9ea15ccd1fd05750cd448cda26c1bd75a69622a4"
+checksum = "5e8f7cbe70402c088fc9e3195d0158b3f7c83d17fb36c30a8990624cc7ebee9f"
 dependencies = [
  "ahash 0.8.12",
  "bin-encode-decode",
@@ -1776,6 +1776,7 @@ version = "0.30.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2e99fb7a497b1e3339bc746195567ed8d3e24945ecd636e3619d20b9de9e9149"
 dependencies = [
+ "cc",
  "pkg-config",
  "vcpkg",
 ]
@@ -2551,6 +2552,7 @@ dependencies = [
  "aws-lc-rs",
  "log",
  "once_cell",
+ "ring",
  "rustls-pki-types",
  "rustls-webpki",
  "subtle",
@@ -2948,6 +2950,7 @@ dependencies = [
  "once_cell",
  "percent-encoding",
  "rust_decimal",
+ "rustls",
  "serde",
  "serde_json",
  "sha2",
@@ -2959,6 +2962,7 @@ dependencies = [
  "tracing",
  "url",
  "uuid",
+ "webpki-roots 0.26.11",
 ]
 
 [[package]]
@@ -3754,6 +3758,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bad67dc8b2a1a6e5448428adec4c3e84c43e561d8c9ee8a9e5aabeb193ec41d1"
 dependencies = [
  "unicode-ident",
+]
+
+[[package]]
+name = "webpki-roots"
+version = "0.26.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "521bc38abb08001b01866da9f51eb7c5d647a19260e00054a8c7fd5f9e57f7a9"
+dependencies = [
+ "webpki-roots 1.0.3",
 ]
 
 [[package]]
