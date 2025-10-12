@@ -12,7 +12,7 @@ use super::*;
 )]
 #[ws]
 #[prologue_macros(ws, ws_from_stream(request))]
-pub async fn handle(ctx: Context) {
+pub async fn websocket(ctx: Context) {
     println_success!("WebSocket request received");
     let request_body: WebSocketMessage = request.get_body_json().unwrap();
     match get_response_body(&request_body) {
