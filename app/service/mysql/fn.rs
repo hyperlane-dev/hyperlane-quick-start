@@ -1,16 +1,5 @@
 use super::*;
 
-async fn get_mysql_connection() -> Result<DatabaseConnection, String> {
-    let env: &'static EnvConfig = get_global_env_config();
-    let db_url: String = format!(
-        "mysql://{}:{}@{}:{}/{}",
-        env.mysql_username, env.mysql_password, env.mysql_host, env.mysql_port, env.mysql_database
-    );
-    Database::connect(&db_url)
-        .await
-        .map_err(|error| error.to_string())
-}
-
 pub async fn create_mysql_record(record: MysqlRecord) -> Result<(), String> {
     let db: DatabaseConnection = get_mysql_connection().await?;
     let active_model: ActiveModel = ActiveModel {

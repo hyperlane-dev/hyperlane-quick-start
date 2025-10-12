@@ -8,5 +8,5 @@ use env::*;
 use r#static::*;
 
 use futures::executor::block_on;
-use hyperlane_utils::sqlx::{Pool, Postgres, postgres::PgPoolOptions};
 use once_cell::sync::Lazy;
+use sea_orm::{Database, DatabaseConnection};

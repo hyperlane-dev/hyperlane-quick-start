@@ -8,5 +8,5 @@ use env::*;
 use r#static::*;
 
 use futures::executor::block_on;
-use hyperlane_utils::sqlx::{MySql, Pool, mysql::MySqlPoolOptions};
 use once_cell::sync::Lazy;
+use sea_orm::{Database, DatabaseConnection};

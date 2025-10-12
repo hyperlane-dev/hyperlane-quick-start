@@ -1419,9 +1419,9 @@ checksum = "19b7a0bcb6105d14602c6777b955605fd0abee9c3fd412b4af4712db8a61e358"
 
 [[package]]
 name = "hyperlane-utils"
-version = "11.5.0"
+version = "11.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b97aa75c098ffeb5ac0cc45b9f11196e72ea002bdab18ae8578628593cd1a265"
+checksum = "8b52905ca8dab2456de2772a9ea15ccd1fd05750cd448cda26c1bd75a69622a4"
 dependencies = [
  "ahash 0.8.12",
  "bin-encode-decode",
@@ -1450,6 +1450,7 @@ dependencies = [
  "recoverable-thread-pool",
  "redis",
  "regex",
+ "sea-orm",
  "serde",
  "serde-xml-rs",
  "serde_json",
@@ -1475,7 +1476,6 @@ dependencies = [
  "hyperlane-utils",
  "hyperlane_config",
  "hyperlane_plugin",
- "sea-orm",
  "serde",
 ]
 

@@ -4,11 +4,10 @@ pub use r#fn::*;
 
 use super::*;
 
-use hyperlane_plugin::env::*;
+use hyperlane_plugin::mysql::*;
 use mapper::mysql::*;
 use model::param::mysql::*;
 
 use sea_orm::{
-    ActiveModelTrait, ColumnTrait, Database, DatabaseConnection, EntityTrait, QueryFilter,
-    prelude::Expr,
+    ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, prelude::Expr,
 };

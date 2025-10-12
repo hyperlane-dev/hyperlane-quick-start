@@ -1,20 +1,5 @@
 use super::*;
 
-async fn get_postgresql_connection() -> Result<DatabaseConnection, String> {
-    let env: &'static EnvConfig = get_global_env_config();
-    let db_url: String = format!(
-        "postgres://{}:{}@{}:{}/{}",
-        env.postgresql_username,
-        env.postgresql_password,
-        env.postgresql_host,
-        env.postgresql_port,
-        env.postgresql_database
-    );
-    Database::connect(&db_url)
-        .await
-        .map_err(|error| error.to_string())
-}
-
 pub async fn create_postgresql_record(record: PostgresqlRecord) -> Result<(), String> {
     let db: DatabaseConnection = get_postgresql_connection().await?;
     let active_model: ActiveModel = ActiveModel {

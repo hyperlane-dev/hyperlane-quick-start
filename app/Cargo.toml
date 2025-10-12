@@ -11,6 +11,5 @@ hyperlane_config = { workspace = true }
 hyperlane_plugin = { workspace = true }
 
 serde = { workspace = true }
-sea-orm = { workspace = true }
 hyperlane = { workspace = true }
 hyperlane-utils = { workspace = true }
