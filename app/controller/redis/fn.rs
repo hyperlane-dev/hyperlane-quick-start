@@ -10,7 +10,11 @@ use super::*;
     )
 )]
 #[route("/api/redis/list")]
-#[prologue_macros(methods(get, post), request_query("keys" => keys_opt))]
+#[prologue_macros(
+    methods(get, post),
+    request_query("keys" => keys_opt),
+    response_header(CONTENT_TYPE => TEXT_PLAIN)
+)]
 pub async fn list_records(ctx: Context) {
     let keys: Vec<String> = match keys_opt {
         Some(k) => k.split(',').map(|s| s.to_string()).collect(),
@@ -39,7 +43,11 @@ pub async fn list_records(ctx: Context) {
     )
 )]
 #[route("/api/redis/create")]
-#[prologue_macros(post, request_body_json(record_opt: RedisRecord))]
+#[prologue_macros(
+    post,
+    request_body_json(record_opt: RedisRecord),
+    response_header(CONTENT_TYPE => TEXT_PLAIN)
+)]
 pub async fn create_record(ctx: Context) {
     let record: RedisRecord = match record_opt {
         Ok(data) => data,
@@ -66,7 +74,11 @@ pub async fn create_record(ctx: Context) {
     )
 )]
 #[route("/api/redis/update")]
-#[prologue_macros(post, request_body_json(record_opt: RedisRecord))]
+#[prologue_macros(
+    post,
+    request_body_json(record_opt: RedisRecord),
+    response_header(CONTENT_TYPE => TEXT_PLAIN)
+)]
 pub async fn update_record(ctx: Context) {
     let record: RedisRecord = match record_opt {
         Ok(data) => data,
@@ -94,7 +106,10 @@ pub async fn update_record(ctx: Context) {
     )
 )]
 #[route("/api/redis/delete")]
-#[prologue_macros(post)]
+#[prologue_macros(
+    post,
+    response_header(CONTENT_TYPE => TEXT_PLAIN)
+)]
 pub async fn delete_record(ctx: Context) {
     let querys: RequestQuerys = ctx.get_request_querys().await;
     let key: &String = match querys.get("key") {

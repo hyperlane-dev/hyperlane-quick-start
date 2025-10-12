@@ -10,7 +10,10 @@ use super::*;
     )
 )]
 #[route("/api/mysql/list")]
-#[prologue_macros(methods(get, post))]
+#[prologue_macros(
+    methods(get, post),
+    response_header(CONTENT_TYPE => TEXT_PLAIN)
+)]
 pub async fn list_records(ctx: Context) {
     match get_all_mysql_records().await {
         Ok(records) => {
@@ -32,7 +35,11 @@ pub async fn list_records(ctx: Context) {
     )
 )]
 #[route("/api/mysql/create")]
-#[prologue_macros(post, request_body_json(record_opt: MysqlRecord))]
+#[prologue_macros(
+    post,
+    request_body_json(record_opt: MysqlRecord),
+    response_header(CONTENT_TYPE => TEXT_PLAIN)
+)]
 pub async fn create_record(ctx: Context) {
     let record: MysqlRecord = match record_opt {
         Ok(data) => data,
@@ -59,7 +66,11 @@ pub async fn create_record(ctx: Context) {
     )
 )]
 #[route("/api/mysql/update")]
-#[prologue_macros(post, request_body_json(record_opt: MysqlRecord))]
+#[prologue_macros(
+    post,
+    request_body_json(record_opt: MysqlRecord),
+    response_header(CONTENT_TYPE => TEXT_PLAIN)
+)]
 pub async fn update_record(ctx: Context) {
     let record: MysqlRecord = match record_opt {
         Ok(data) => data,
@@ -87,7 +98,10 @@ pub async fn update_record(ctx: Context) {
     )
 )]
 #[route("/api/mysql/delete")]
-#[prologue_macros(delete)]
+#[prologue_macros(
+    post,
+    response_header(CONTENT_TYPE => TEXT_PLAIN)
+)]
 pub async fn delete_record(ctx: Context) {
     let querys: RequestQuerys = ctx.get_request_querys().await;
     let key: &String = match querys.get("key") {

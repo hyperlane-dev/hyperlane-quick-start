@@ -10,7 +10,10 @@ use super::*;
     )
 )]
 #[route("/api/postgresql/list")]
-#[prologue_macros(methods(get, post))]
+#[prologue_macros(
+    methods(get, post),
+    response_header(CONTENT_TYPE => TEXT_PLAIN)
+)]
 pub async fn list_records(ctx: Context) {
     match get_all_postgresql_records().await {
         Ok(records) => {
@@ -32,7 +35,11 @@ pub async fn list_records(ctx: Context) {
     )
 )]
 #[route("/api/postgresql/create")]
-#[prologue_macros(post, request_body_json(record_opt: PostgresqlRecord))]
+#[prologue_macros(
+    post,
+    request_body_json(record_opt: PostgresqlRecord),
+    response_header(CONTENT_TYPE => TEXT_PLAIN)
+)]
 pub async fn create_record(ctx: Context) {
     let record: PostgresqlRecord = match record_opt {
         Ok(data) => data,
@@ -59,7 +66,11 @@ pub async fn create_record(ctx: Context) {
     )
 )]
 #[route("/api/postgresql/update")]
-#[prologue_macros(post, request_body_json(record_opt: PostgresqlRecord))]
+#[prologue_macros(
+    post,
+    request_body_json(record_opt: PostgresqlRecord),
+    response_header(CONTENT_TYPE => TEXT_PLAIN)
+)]
 pub async fn update_record(ctx: Context) {
     let record: PostgresqlRecord = match record_opt {
         Ok(data) => data,
@@ -87,7 +98,10 @@ pub async fn update_record(ctx: Context) {
     )
 )]
 #[route("/api/postgresql/delete")]
-#[prologue_macros(post)]
+#[prologue_macros(
+    post,
+    response_header(CONTENT_TYPE => TEXT_PLAIN)
+)]
 pub async fn delete_record(ctx: Context) {
     let key: String = match ctx.get_request_querys().await.get("key").cloned() {
         Some(k) => k,
