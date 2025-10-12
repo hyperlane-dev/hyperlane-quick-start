@@ -44,6 +44,7 @@ async fn create_server() {
     init_config(&server).await;
     init_network_capture().await;
     init_db().await;
+    let _ = initialize_auto_creation().await;
     println_success!("Server initialization successful");
     let server_result: ServerResult<ServerHook> = server.run().await;
     match server_result {

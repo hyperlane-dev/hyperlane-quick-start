@@ -24,7 +24,10 @@ impl EnvConfig {
                      {ENV_KEY_POSTGRES_PASSWORD}=\n\
                      {ENV_KEY_ENABLE_MYSQL}=\n\
                      {ENV_KEY_ENABLE_REDIS}=\n\
-                     {ENV_KEY_ENABLE_POSTGRESQL}=\n",
+                     {ENV_KEY_ENABLE_POSTGRESQL}=\n\
+                     {ENV_KEY_ENABLE_AUTO_DB_CREATION}=true\n\
+                     {ENV_KEY_ENABLE_AUTO_TABLE_CREATION}=true\n\
+                     {ENV_KEY_AUTO_CREATION_TIMEOUT_SECONDS}=30\n",
                 );
                 let _ = write_to_file(ENV_FILE_PATH, data.as_bytes())
                     .map_err(|error| format!("Failed to create example env file: {error}"))?;
@@ -130,6 +133,24 @@ impl EnvConfig {
                 .get(ENV_KEY_POSTGRES_PASSWORD)
                 .cloned()
                 .unwrap_or_default(),
+            enable_auto_db_creation: config_map
+                .get(ENV_KEY_ENABLE_AUTO_DB_CREATION)
+                .cloned()
+                .unwrap_or_else(|| "true".to_string())
+                .parse::<bool>()
+                .unwrap_or(true),
+            enable_auto_table_creation: config_map
+                .get(ENV_KEY_ENABLE_AUTO_TABLE_CREATION)
+                .cloned()
+                .unwrap_or_else(|| "true".to_string())
+                .parse::<bool>()
+                .unwrap_or(true),
+            auto_creation_timeout_seconds: config_map
+                .get(ENV_KEY_AUTO_CREATION_TIMEOUT_SECONDS)
+                .cloned()
+                .unwrap_or_else(|| "30".to_string())
+                .parse::<u64>()
+                .map_err(|_| "AUTO_CREATION_TIMEOUT_SECONDS must be a valid unsigned integer")?,
         })
     }
 }

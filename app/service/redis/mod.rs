@@ -10,4 +10,4 @@ use model::param::redis::*;
 
 use std::sync::Arc;
 
-use hyperlane_utils::redis::{Commands, Connection};
+use hyperlane_utils::redis::{Commands, Connection, RedisError};

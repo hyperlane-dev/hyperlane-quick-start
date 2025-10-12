@@ -17,7 +17,7 @@ use super::*;
 )]
 pub async fn list_records(ctx: Context) {
     let keys: Vec<String> = match keys_opt {
-        Some(k) => k.split(',').map(|s| s.to_string()).collect(),
+        Some(k) => k.split(',').map(|s: &str| s.to_string()).collect(),
         None => {
             ctx.set_response_body("Keys parameter is required").await;
             return;

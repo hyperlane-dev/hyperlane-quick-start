@@ -10,7 +10,7 @@ pub async fn create_mysql_record(record: MysqlRecord) -> Result<(), String> {
     active_model
         .insert(&db)
         .await
-        .map_err(|error| error.to_string())?;
+        .map_err(|error: sea_orm::DbErr| error.to_string())?;
     Ok(())
 }
 
@@ -19,10 +19,10 @@ pub async fn get_all_mysql_records() -> Result<Vec<MysqlRecord>, String> {
     let records: Vec<Model> = Entity::find()
         .all(&db)
         .await
-        .map_err(|error| error.to_string())?;
+        .map_err(|error: sea_orm::DbErr| error.to_string())?;
     Ok(records
         .into_iter()
-        .map(|r| MysqlRecord {
+        .map(|r: Model| MysqlRecord {
             key: r.key,
             value: r.value,
         })
@@ -36,7 +36,7 @@ pub async fn update_mysql_record(record: MysqlRecord) -> Result<(), String> {
         .col_expr(Column::Value, Expr::value(record.value))
         .exec(&db)
         .await
-        .map_err(|error| error.to_string())?;
+        .map_err(|error: sea_orm::DbErr| error.to_string())?;
     Ok(())
 }
 
@@ -46,6 +46,6 @@ pub async fn delete_mysql_record(key: &str) -> Result<(), String> {
         .filter(Column::Key.eq(key))
         .exec(&db)
         .await
-        .map_err(|error| error.to_string())?;
+        .map_err(|error: sea_orm::DbErr| error.to_string())?;
     Ok(())
 }
