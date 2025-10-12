@@ -167,51 +167,17 @@ impl MySqlAutoCreation {
     }
 
     fn get_mysql_schema(&self) -> crate::database::DatabaseSchema {
-        DatabaseSchema::new()
-            .add_table(
-                TableSchema::new(
-                    "hyperlane_config".to_string(),
-                    r#"CREATE TABLE `hyperlane_config` (
-                        `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-                        `config_key` varchar(255) NOT NULL,
-                        `config_value` text,
-                        `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-                        `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        DatabaseSchema::new().add_table(TableSchema::new(
+            "record".to_string(),
+            r#"CREATE TABLE `record` (
+                        `id` INT NOT NULL AUTO_INCREMENT,
+                        `key` VARCHAR(255) NOT NULL,
+                        `value` TEXT,
                         PRIMARY KEY (`id`),
-                        UNIQUE KEY `uk_config_key` (`config_key`)
-                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"#.to_string(),
-                )
-            )
-            .add_table(
-                TableSchema::new(
-                    "hyperlane_logs".to_string(),
-                    r#"CREATE TABLE `hyperlane_logs` (
-                        `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-                        `level` varchar(50) NOT NULL,
-                        `message` text NOT NULL,
-                        `context` json DEFAULT NULL,
-                        `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-                        PRIMARY KEY (`id`),
-                        KEY `idx_level` (`level`),
-                        KEY `idx_created_at` (`created_at`)
-                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"#.to_string(),
-                )
-            )
-            .add_table(
-                TableSchema::new(
-                    "hyperlane_sessions".to_string(),
-                    r#"CREATE TABLE `hyperlane_sessions` (
-                        `id` varchar(255) NOT NULL,
-                        `data` text,
-                        `expires_at` timestamp NULL DEFAULT NULL,
-                        `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-                        `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                        PRIMARY KEY (`id`),
-                        KEY `idx_expires_at` (`expires_at`)
-                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"#.to_string(),
-                )
-            )
-            .add_index("CREATE INDEX `idx_hyperlane_logs_level_created` ON `hyperlane_logs` (`level`, `created_at`)".to_string())
+                        UNIQUE KEY `uk_key` (`key`)
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"#
+                .to_string(),
+        ))
     }
 }
 

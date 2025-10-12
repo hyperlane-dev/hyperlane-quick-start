@@ -16,7 +16,7 @@ pub struct PostgresqlRecordDao {
     DeriveEntityModel,
     DeriveActiveModelBehavior,
 )]
-#[sea_orm(table_name = "postgresql_record", schema_name = "public")]
+#[sea_orm(table_name = "record", schema_name = "public")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = true)]
     pub id: i32,

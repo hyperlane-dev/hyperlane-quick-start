@@ -177,47 +177,15 @@ impl PostgreSqlAutoCreation {
     }
 
     fn get_postgresql_schema(&self) -> crate::database::DatabaseSchema {
-        DatabaseSchema::new()
-            .add_table(
-                TableSchema::new(
-                    "hyperlane_config".to_string(),
-                    r#"CREATE TABLE hyperlane_config (
-                        id BIGSERIAL PRIMARY KEY,
-                        config_key VARCHAR(255) NOT NULL UNIQUE,
-                        config_value TEXT,
-                        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-                        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-                    )"#.to_string(),
-                )
-            )
-            .add_table(
-                TableSchema::new(
-                    "hyperlane_logs".to_string(),
-                    r#"CREATE TABLE hyperlane_logs (
-                        id BIGSERIAL PRIMARY KEY,
-                        level VARCHAR(50) NOT NULL,
-                        message TEXT NOT NULL,
-                        context JSONB,
-                        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-                    )"#.to_string(),
-                )
-            )
-            .add_table(
-                TableSchema::new(
-                    "hyperlane_sessions".to_string(),
-                    r#"CREATE TABLE hyperlane_sessions (
-                        id VARCHAR(255) PRIMARY KEY,
-                        data TEXT,
-                        expires_at TIMESTAMP WITH TIME ZONE,
-                        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-                        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-                    )"#.to_string(),
-                )
-            )
-            .add_index("CREATE INDEX idx_hyperlane_logs_level ON hyperlane_logs (level)".to_string())
-            .add_index("CREATE INDEX idx_hyperlane_logs_created_at ON hyperlane_logs (created_at)".to_string())
-            .add_index("CREATE INDEX idx_hyperlane_logs_level_created ON hyperlane_logs (level, created_at)".to_string())
-            .add_index("CREATE INDEX idx_hyperlane_sessions_expires_at ON hyperlane_sessions (expires_at)".to_string())
+        DatabaseSchema::new().add_table(TableSchema::new(
+            "record".to_string(),
+            r#"CREATE TABLE record (
+                        id SERIAL PRIMARY KEY,
+                        key VARCHAR(255) NOT NULL UNIQUE,
+                        value TEXT
+                    )"#
+            .to_string(),
+        ))
     }
 }
 
