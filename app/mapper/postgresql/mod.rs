@@ -8,6 +8,6 @@ use model::application::postgresql::*;
 
 use sea_orm::{
     ActiveValue, DeriveActiveModelBehavior, DeriveEntityModel, DerivePrimaryKey, EnumIter,
-    PrimaryKeyTrait, RelationTrait,
+    PrimaryKeyTrait, RelationDef, RelationTrait,
 };
 use serde::{Deserialize, Serialize};

@@ -15,4 +15,4 @@ use std::time::{Duration, Instant};
 
 use futures::executor::block_on;
 use once_cell::sync::Lazy;
-use sea_orm::{ConnectionTrait, Database, DatabaseBackend, DatabaseConnection, Statement};
+use sea_orm::{ConnectionTrait, Database, DatabaseBackend, DatabaseConnection, DbErr, Statement};
