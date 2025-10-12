@@ -6,5 +6,4 @@ pub use r#struct::*;
 
 use super::*;
 
-use chrono;
 use utoipa::ToSchema;

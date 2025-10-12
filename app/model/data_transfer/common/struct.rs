@@ -22,7 +22,7 @@ where
             code: ResponseCode::Success as i32,
             message: "Success".to_string(),
             data: Some(data),
-            timestamp: Some(chrono::Utc::now().to_rfc3339()),
+            timestamp: Some(date()),
         }
     }
     pub fn success_with_message(data: T, message: impl Into<String>) -> Self {
@@ -30,7 +30,7 @@ where
             code: ResponseCode::Success as i32,
             message: message.into(),
             data: Some(data),
-            timestamp: Some(chrono::Utc::now().to_rfc3339()),
+            timestamp: Some(date()),
         }
     }
     pub fn error(message: impl Into<String>) -> Self {
@@ -38,7 +38,7 @@ where
             code: ResponseCode::InternalError as i32,
             message: message.into(),
             data: None,
-            timestamp: Some(chrono::Utc::now().to_rfc3339()),
+            timestamp: Some(date()),
         }
     }
     pub fn error_with_code(code: ResponseCode, message: impl Into<String>) -> Self {
@@ -46,7 +46,7 @@ where
             code: code as i32,
             message: message.into(),
             data: None,
-            timestamp: Some(chrono::Utc::now().to_rfc3339()),
+            timestamp: Some(date()),
         }
     }
     pub fn to_json_bytes(&self) -> Vec<u8> {
@@ -60,7 +60,7 @@ impl ApiResponse<()> {
             code: ResponseCode::Success as i32,
             message: message.into(),
             data: None,
-            timestamp: Some(chrono::Utc::now().to_rfc3339()),
+            timestamp: Some(date()),
         }
     }
 }

@@ -219,9 +219,11 @@
         0% {
           opacity: 1;
         }
+
         50% {
           opacity: 0.4;
         }
+
         100% {
           opacity: 1;
         }
@@ -269,6 +271,7 @@
           opacity: 0;
           transform: translateY(10px);
         }
+
         100% {
           opacity: 1;
           transform: translateY(0);
@@ -628,6 +631,7 @@
           opacity: 0;
           transform: translateY(-10px);
         }
+
         to {
           opacity: 1;
           transform: translateY(0);
@@ -734,9 +738,11 @@
         0% {
           background-color: rgba(255, 193, 7, 0.3);
         }
+
         50% {
           background-color: rgba(255, 193, 7, 0.1);
         }
+
         100% {
           background-color: rgba(255, 193, 7, 0.2);
         }
@@ -895,6 +901,7 @@
         0% {
           transform: rotate(0deg);
         }
+
         100% {
           transform: rotate(360deg);
         }
@@ -1014,6 +1021,7 @@
       }
     </style>
   </head>
+
   <body>
     <div class="chat-view">
       <div class="nav-bar">
@@ -1961,6 +1969,29 @@
         input.setSelectionRange(input.value.length, input.value.length);
       }
 
+      function cleanupOldUploads() {
+        try {
+          const keys = Object.keys(localStorage);
+          const uploadKeys = keys.filter((key) => key.startsWith('upload_'));
+          const now = Date.now();
+          const maxAge = 7 * 24 * 60 * 60 * 1000;
+
+          uploadKeys.forEach((key) => {
+            try {
+              const data = JSON.parse(localStorage.getItem(key));
+              if (data.timestamp && now - data.timestamp > maxAge) {
+                localStorage.removeItem(key);
+                console.log(`Cleaned up old upload record: ${key}`);
+              }
+            } catch (e) {
+              localStorage.removeItem(key);
+            }
+          });
+        } catch (e) {
+          console.error('Failed to cleanup old uploads:', e);
+        }
+      }
+
       function init() {
         username = generateUsername();
 
@@ -1968,6 +1999,7 @@
         window.addEventListener('resize', checkMobile);
 
         initMarkdown();
+        cleanupOldUploads();
 
         const messageList = document.getElementById('messageList');
         messageList.addEventListener('scroll', handleScroll);
@@ -2072,8 +2104,61 @@
         let currentIndex = 0;
         let completedChunks = 0;
         let lastProgressUpdate = 0;
+        const uploadKey = `upload_${fileId}`;
+        let uploadedChunks = new Set();
+
+        try {
+          const savedProgress = localStorage.getItem(uploadKey);
+          if (savedProgress) {
+            const progress = JSON.parse(savedProgress);
+            uploadedChunks = new Set(progress.uploadedChunks || []);
+            completedChunks = uploadedChunks.size;
+            const resumePercent = Math.floor(
+              (completedChunks / totalChunks) * 100
+            );
+            console.log(
+              `Resuming upload: ${completedChunks}/${totalChunks} chunks already uploaded (${resumePercent}%)`
+            );
+            showUploadStatus(
+              `Resuming "${file.name}" from ${resumePercent}%`,
+              'success'
+            );
+          }
+        } catch (e) {
+          console.error('Failed to load upload progress:', e);
+        }
+
+        const saveProgress = () => {
+          try {
+            localStorage.setItem(
+              uploadKey,
+              JSON.stringify({
+                fileId,
+                fileName: file.name,
+                totalChunks,
+                uploadedChunks: Array.from(uploadedChunks),
+                timestamp: Date.now(),
+              })
+            );
+          } catch (e) {
+            console.error('Failed to save upload progress:', e);
+          }
+        };
+
+        const clearProgress = () => {
+          try {
+            localStorage.removeItem(uploadKey);
+          } catch (e) {
+            console.error('Failed to clear upload progress:', e);
+          }
+        };
 
         const uploadChunk = async (chunk, index, totalChunks, fileId, file) => {
+          if (uploadedChunks.has(index)) {
+            console.log(`Chunk ${index} already uploaded, skipping`);
+            return { code: 200, message: 'Already uploaded' };
+          }
+
           try {
             const response = await fetch(UPLOAD_SAVE_URL, {
               method: 'POST',
@@ -2085,6 +2170,8 @@
             });
             const data = await response.json();
             if (data.code == 200) {
+              uploadedChunks.add(index);
+              saveProgress();
               return data;
             } else if (data.code === 0) {
               showUploadStatus(`Upload failed: ${data.msg}`, 'error');
@@ -2093,6 +2180,7 @@
             const progress = Math.floor(((index + 1) / totalChunks) * 100);
             return data;
           } catch (error) {
+            console.error(`Chunk ${index} upload failed:`, error);
             throw error;
           }
         };
@@ -2153,38 +2241,53 @@
             const results = [];
             const runningTasks = new Set();
             async function runTask(task) {
-              try {
-                const result = await uploadChunk(
-                  task.chunk,
-                  task.index,
-                  task.totalChunks,
-                  task.fileId,
-                  task.file
-                );
-                completedChunks++;
-                await updateProgress();
-                return result;
-              } catch (error) {
-                let retries = 0;
-                while (retries < MAX_RETRIES) {
-                  try {
-                    const result = await uploadChunk(
-                      task.chunk,
-                      task.index,
-                      task.totalChunks,
-                      task.fileId,
-                      task.file
-                    );
+              if (uploadedChunks.has(task.index)) {
+                console.log(`Chunk ${task.index} already completed, skipping`);
+                return { code: 200, message: 'Already uploaded' };
+              }
+
+              let retries = 0;
+              const maxRetries = 5;
+
+              while (retries <= maxRetries) {
+                try {
+                  const result = await uploadChunk(
+                    task.chunk,
+                    task.index,
+                    task.totalChunks,
+                    task.fileId,
+                    task.file
+                  );
+
+                  if (!uploadedChunks.has(task.index)) {
                     completedChunks++;
                     await updateProgress();
-                    return result;
-                  } catch (retryError) {
-                    retries++;
-                    if (retries === MAX_RETRIES) throw retryError;
-                    await new Promise((resolve) =>
-                      setTimeout(resolve, 1000 * retries)
+                  }
+
+                  return result;
+                } catch (error) {
+                  retries++;
+                  console.error(
+                    `Chunk ${task.index} failed (attempt ${retries}/${maxRetries}):`,
+                    error
+                  );
+
+                  if (retries > maxRetries) {
+                    showUploadStatus(
+                      `Chunk ${task.index} failed after ${maxRetries} retries`,
+                      'error'
+                    );
+                    throw new Error(
+                      `Chunk ${task.index} upload failed: ${error.message}`
                     );
                   }
+
+                  const delay = Math.min(
+                    1000 * Math.pow(2, retries - 1),
+                    10000
+                  );
+                  console.log(`Retrying chunk ${task.index} in ${delay}ms...`);
+                  await new Promise((resolve) => setTimeout(resolve, delay));
                 }
               }
             }
@@ -2241,14 +2344,25 @@
           await updateProgress();
           const lastChunkResponse = await processQueue();
           const data = lastChunkResponse || { url: '' };
+
+          clearProgress();
+
           const messageData = {
             type: 'Text',
             data: `[${file.name}](${data.url})`,
           };
           isNearBottom = true;
           sendWebSocketMessage(messageData);
+          showUploadStatus(
+            `File "${file.name}" uploaded successfully!`,
+            'success'
+          );
         } catch (error) {
-          showUploadStatus('Upload failed: ' + error.message, 'error');
+          console.error('Upload failed:', error);
+          showUploadStatus(
+            `Upload failed: ${error.message}. Progress saved, you can retry later.`,
+            'error'
+          );
         }
       }
 
