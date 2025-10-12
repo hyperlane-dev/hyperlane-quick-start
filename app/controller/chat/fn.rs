@@ -15,8 +15,8 @@ use super::*;
 )]
 pub async fn online_users(ctx: Context) {
     let user_list: UserListResponse = get_online_users_list();
-    let response_json: ResponseBody = serde_json::to_vec(&user_list).unwrap_or_default();
-    ctx.set_response_body(&response_json).await;
+    let response = ApiResponse::success(user_list);
+    ctx.set_response_body(&response.to_json_bytes()).await;
 }
 
 #[route("/api/chat")]

@@ -43,8 +43,8 @@ pub async fn status_sse(ctx: Context) {
 )]
 pub async fn system_info(ctx: Context) {
     let system_info: SystemInfo = get_system_info().await;
-    let info_json: ResponseBody = serde_json::to_vec(&system_info).unwrap_or_default();
-    ctx.set_response_body(&info_json).await;
+    let response = ApiResponse::success(system_info);
+    ctx.set_response_body(&response.to_json_bytes()).await;
 }
 
 #[route("/api/network/capture")]

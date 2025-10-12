@@ -4,6 +4,7 @@ pub use r#fn::*;
 
 use super::*;
 
+use model::data_transfer::common::{ApiResponse, ResponseCode};
 use model::param::postgresql::*;
 use service::postgresql::{
     create_postgresql_record, delete_postgresql_record, get_all_postgresql_records,

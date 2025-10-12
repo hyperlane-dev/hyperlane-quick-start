@@ -13,22 +13,29 @@ use super::*;
 #[prologue_macros(
     methods(get, post),
     request_query("keys" => keys_opt),
-    response_header(CONTENT_TYPE => TEXT_PLAIN)
+    response_header(CONTENT_TYPE => APPLICATION_JSON)
 )]
 pub async fn list_records(ctx: Context) {
     let keys: Vec<String> = match keys_opt {
         Some(k) => k.split(',').map(|s: &str| s.to_string()).collect(),
         None => {
-            ctx.set_response_body("Keys parameter is required").await;
+            let response = ApiResponse::<()>::error_with_code(
+                ResponseCode::BadRequest,
+                "Keys parameter is required",
+            );
+            ctx.set_response_body(&response.to_json_bytes()).await;
             return;
         }
     };
     match get_all_redis_records(keys).await {
         Ok(records) => {
-            let data: ResponseBody = serde_json::to_vec(&records).unwrap_or_default();
-            ctx.set_response_body(&data).await
+            let response = ApiResponse::success(records);
+            ctx.set_response_body(&response.to_json_bytes()).await
         }
-        Err(error) => ctx.set_response_body(&error).await,
+        Err(error) => {
+            let response = ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+            ctx.set_response_body(&response.to_json_bytes()).await
+        }
     };
 }
 
@@ -46,19 +53,27 @@ pub async fn list_records(ctx: Context) {
 #[prologue_macros(
     post,
     request_body_json(record_opt: RedisRecord),
-    response_header(CONTENT_TYPE => TEXT_PLAIN)
+    response_header(CONTENT_TYPE => APPLICATION_JSON)
 )]
 pub async fn create_record(ctx: Context) {
     let record: RedisRecord = match record_opt {
         Ok(data) => data,
         Err(error) => {
-            ctx.set_response_body(&error.to_string()).await;
+            let response =
+                ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error.to_string());
+            ctx.set_response_body(&response.to_json_bytes()).await;
             return;
         }
     };
     match create_redis_record(record).await {
-        Ok(_) => ctx.set_response_body("Record created successfully").await,
-        Err(error) => ctx.set_response_body(&error).await,
+        Ok(_) => {
+            let response = ApiResponse::<()>::success_without_data("Record created successfully");
+            ctx.set_response_body(&response.to_json_bytes()).await
+        }
+        Err(error) => {
+            let response = ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+            ctx.set_response_body(&response.to_json_bytes()).await
+        }
     };
 }
 
@@ -77,19 +92,27 @@ pub async fn create_record(ctx: Context) {
 #[prologue_macros(
     post,
     request_body_json(record_opt: RedisRecord),
-    response_header(CONTENT_TYPE => TEXT_PLAIN)
+    response_header(CONTENT_TYPE => APPLICATION_JSON)
 )]
 pub async fn update_record(ctx: Context) {
     let record: RedisRecord = match record_opt {
         Ok(data) => data,
         Err(error) => {
-            ctx.set_response_body(&error.to_string()).await;
+            let response =
+                ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error.to_string());
+            ctx.set_response_body(&response.to_json_bytes()).await;
             return;
         }
     };
     match update_redis_record(record).await {
-        Ok(_) => ctx.set_response_body("Record updated successfully").await,
-        Err(error) => ctx.set_response_body(&error).await,
+        Ok(_) => {
+            let response = ApiResponse::<()>::success_without_data("Record updated successfully");
+            ctx.set_response_body(&response.to_json_bytes()).await
+        }
+        Err(error) => {
+            let response = ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+            ctx.set_response_body(&response.to_json_bytes()).await
+        }
     };
 }
 
@@ -108,19 +131,29 @@ pub async fn update_record(ctx: Context) {
 #[route("/api/redis/delete")]
 #[prologue_macros(
     post,
-    response_header(CONTENT_TYPE => TEXT_PLAIN)
+    response_header(CONTENT_TYPE => APPLICATION_JSON)
 )]
 pub async fn delete_record(ctx: Context) {
     let querys: RequestQuerys = ctx.get_request_querys().await;
     let key: &String = match querys.get("key") {
         Some(k) => k,
         None => {
-            ctx.set_response_body("Key parameter is required").await;
+            let response = ApiResponse::<()>::error_with_code(
+                ResponseCode::BadRequest,
+                "Key parameter is required",
+            );
+            ctx.set_response_body(&response.to_json_bytes()).await;
             return;
         }
     };
     match delete_redis_record(key).await {
-        Ok(_) => ctx.set_response_body("Record deleted successfully").await,
-        Err(error) => ctx.set_response_body(&error).await,
+        Ok(_) => {
+            let response = ApiResponse::<()>::success_without_data("Record deleted successfully");
+            ctx.set_response_body(&response.to_json_bytes()).await
+        }
+        Err(error) => {
+            let response = ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+            ctx.set_response_body(&response.to_json_bytes()).await
+        }
     };
 }

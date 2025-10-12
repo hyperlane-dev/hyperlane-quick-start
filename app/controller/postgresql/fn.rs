@@ -12,15 +12,18 @@ use super::*;
 #[route("/api/postgresql/list")]
 #[prologue_macros(
     methods(get, post),
-    response_header(CONTENT_TYPE => TEXT_PLAIN)
+    response_header(CONTENT_TYPE => APPLICATION_JSON)
 )]
 pub async fn list_records(ctx: Context) {
     match get_all_postgresql_records().await {
         Ok(records) => {
-            let data: ResponseBody = serde_json::to_vec(&records).unwrap_or_default();
-            ctx.set_response_body(&data).await
+            let response = ApiResponse::success(records);
+            ctx.set_response_body(&response.to_json_bytes()).await
         }
-        Err(error) => ctx.set_response_body(&error).await,
+        Err(error) => {
+            let response = ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+            ctx.set_response_body(&response.to_json_bytes()).await
+        }
     };
 }
 
@@ -38,19 +41,27 @@ pub async fn list_records(ctx: Context) {
 #[prologue_macros(
     post,
     request_body_json(record_opt: PostgresqlRecord),
-    response_header(CONTENT_TYPE => TEXT_PLAIN)
+    response_header(CONTENT_TYPE => APPLICATION_JSON)
 )]
 pub async fn create_record(ctx: Context) {
     let record: PostgresqlRecord = match record_opt {
         Ok(data) => data,
         Err(error) => {
-            ctx.set_response_body(&error.to_string()).await;
+            let response =
+                ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error.to_string());
+            ctx.set_response_body(&response.to_json_bytes()).await;
             return;
         }
     };
     match create_postgresql_record(record).await {
-        Ok(_) => ctx.set_response_body("Record created successfully").await,
-        Err(error) => ctx.set_response_body(&error).await,
+        Ok(_) => {
+            let response = ApiResponse::<()>::success_without_data("Record created successfully");
+            ctx.set_response_body(&response.to_json_bytes()).await
+        }
+        Err(error) => {
+            let response = ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+            ctx.set_response_body(&response.to_json_bytes()).await
+        }
     };
 }
 
@@ -69,19 +80,27 @@ pub async fn create_record(ctx: Context) {
 #[prologue_macros(
     post,
     request_body_json(record_opt: PostgresqlRecord),
-    response_header(CONTENT_TYPE => TEXT_PLAIN)
+    response_header(CONTENT_TYPE => APPLICATION_JSON)
 )]
 pub async fn update_record(ctx: Context) {
     let record: PostgresqlRecord = match record_opt {
         Ok(data) => data,
         Err(error) => {
-            ctx.set_response_body(&error.to_string()).await;
+            let response =
+                ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error.to_string());
+            ctx.set_response_body(&response.to_json_bytes()).await;
             return;
         }
     };
     match update_postgresql_record(record).await {
-        Ok(_) => ctx.set_response_body("Record updated successfully").await,
-        Err(error) => ctx.set_response_body(&error).await,
+        Ok(_) => {
+            let response = ApiResponse::<()>::success_without_data("Record updated successfully");
+            ctx.set_response_body(&response.to_json_bytes()).await
+        }
+        Err(error) => {
+            let response = ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+            ctx.set_response_body(&response.to_json_bytes()).await
+        }
     };
 }
 
@@ -100,18 +119,28 @@ pub async fn update_record(ctx: Context) {
 #[route("/api/postgresql/delete")]
 #[prologue_macros(
     post,
-    response_header(CONTENT_TYPE => TEXT_PLAIN)
+    response_header(CONTENT_TYPE => APPLICATION_JSON)
 )]
 pub async fn delete_record(ctx: Context) {
     let key: String = match ctx.get_request_querys().await.get("key").cloned() {
         Some(k) => k,
         None => {
-            ctx.set_response_body("Key parameter is required").await;
+            let response = ApiResponse::<()>::error_with_code(
+                ResponseCode::BadRequest,
+                "Key parameter is required",
+            );
+            ctx.set_response_body(&response.to_json_bytes()).await;
             return;
         }
     };
     match delete_postgresql_record(&key).await {
-        Ok(_) => ctx.set_response_body("Record deleted successfully").await,
-        Err(error) => ctx.set_response_body(&error).await,
+        Ok(_) => {
+            let response = ApiResponse::<()>::success_without_data("Record deleted successfully");
+            ctx.set_response_body(&response.to_json_bytes()).await
+        }
+        Err(error) => {
+            let response = ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+            ctx.set_response_body(&response.to_json_bytes()).await
+        }
     };
 }

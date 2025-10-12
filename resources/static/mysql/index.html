@@ -128,16 +128,18 @@
               body: JSON.stringify({ key, value }),
             });
 
-            if (response.ok) {
+            const result = await response.json();
+            if (result.code === 200) {
+              alert('Success: ' + result.message);
               document.getElementById('create-key').value = '';
               document.getElementById('create-value').value = '';
               location.reload();
             } else {
-              alert('Failed to create record');
+              alert('Error (' + result.code + '): ' + result.message);
             }
           } catch (error) {
             console.error('Create error:', error);
-            alert('Error creating record');
+            alert('Network error: ' + error.message);
           }
         });
 
@@ -159,15 +161,17 @@
               body: JSON.stringify({ key, value }),
             });
 
-            if (response.ok) {
+            const result = await response.json();
+            if (result.code === 200) {
+              alert('Success: ' + result.message);
               toggleModal(false);
               location.reload();
             } else {
-              alert('Failed to update record');
+              alert('Error (' + result.code + '): ' + result.message);
             }
           } catch (error) {
             console.error('Update error:', error);
-            alert('Error updating record');
+            alert('Network error: ' + error.message);
           }
         });
 
@@ -193,12 +197,22 @@
       });
 
       document.querySelectorAll('.delete-btn').forEach((btn) => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', async () => {
           if (confirm('Are you sure you want to delete this record?')) {
             const key = btn.closest('[data-key]').getAttribute('data-key');
-            fetch(`/api/mysql/delete?key=${key}`, { method: 'DELETE' })
-              .then(() => location.reload())
-              .catch((error) => console.error('Delete error:', error));
+            try {
+              const response = await fetch(`/api/mysql/delete?key=${key}`, { method: 'POST' });
+              const result = await response.json();
+              if (result.code === 200) {
+                alert('Success: ' + result.message);
+                location.reload();
+              } else {
+                alert('Error (' + result.code + '): ' + result.message);
+              }
+            } catch (error) {
+              console.error('Delete error:', error);
+              alert('Network error: ' + error.message);
+            }
           }
         });
       });
