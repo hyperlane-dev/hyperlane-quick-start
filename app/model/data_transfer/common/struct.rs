@@ -1,53 +1,57 @@
 use super::*;
 
-#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, ToSchema, Data)]
 pub struct ApiResponse<T>
 where
-    T: Serialize,
+    T: Serialize + Default,
 {
-    pub code: i32,
-    pub message: String,
+    code: i32,
+    message: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub data: Option<T>,
+    data: Option<T>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub timestamp: Option<String>,
+    timestamp: Option<String>,
 }
 
 impl<T> ApiResponse<T>
 where
-    T: Serialize,
+    T: Serialize + Default,
 {
     pub fn success(data: T) -> Self {
-        Self {
-            code: ResponseCode::Success as i32,
-            message: "Success".to_string(),
-            data: Some(data),
-            timestamp: Some(date()),
-        }
+        let mut instance: ApiResponse<T> = Self::default();
+        instance
+            .set_code(ResponseCode::Success as i32)
+            .set_message("Success".to_string())
+            .set_data(Some(data))
+            .set_timestamp(Some(date()));
+        instance
     }
     pub fn success_with_message(data: T, message: impl Into<String>) -> Self {
-        Self {
-            code: ResponseCode::Success as i32,
-            message: message.into(),
-            data: Some(data),
-            timestamp: Some(date()),
-        }
+        let mut instance: ApiResponse<T> = Self::default();
+        instance
+            .set_code(ResponseCode::Success as i32)
+            .set_message(message.into())
+            .set_data(Some(data))
+            .set_timestamp(Some(date()));
+        instance
     }
     pub fn error(message: impl Into<String>) -> Self {
-        Self {
-            code: ResponseCode::InternalError as i32,
-            message: message.into(),
-            data: None,
-            timestamp: Some(date()),
-        }
+        let mut instance: ApiResponse<T> = Self::default();
+        instance
+            .set_code(ResponseCode::InternalError as i32)
+            .set_message(message.into())
+            .set_data(None)
+            .set_timestamp(Some(date()));
+        instance
     }
     pub fn error_with_code(code: ResponseCode, message: impl Into<String>) -> Self {
-        Self {
-            code: code as i32,
-            message: message.into(),
-            data: None,
-            timestamp: Some(date()),
-        }
+        let mut instance: ApiResponse<T> = Self::default();
+        instance
+            .set_code(code as i32)
+            .set_message(message.into())
+            .set_data(None)
+            .set_timestamp(Some(date()));
+        instance
     }
     pub fn to_json_bytes(&self) -> Vec<u8> {
         serde_json::to_vec(self).unwrap_or_default()
@@ -56,11 +60,12 @@ where
 
 impl ApiResponse<()> {
     pub fn success_without_data(message: impl Into<String>) -> Self {
-        Self {
-            code: ResponseCode::Success as i32,
-            message: message.into(),
-            data: None,
-            timestamp: Some(date()),
-        }
+        let mut instance: ApiResponse<()> = Self::default();
+        instance
+            .set_code(ResponseCode::Success as i32)
+            .set_message(message.into())
+            .set_data(None)
+            .set_timestamp(Some(date()));
+        instance
     }
 }

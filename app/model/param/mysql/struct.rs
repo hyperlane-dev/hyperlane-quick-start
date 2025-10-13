@@ -1,7 +1,7 @@
 use super::*;
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, ToSchema, Data)]
 pub struct MysqlRecord {
-    pub key: String,
-    pub value: String,
+    key: String,
+    value: String,
 }

@@ -3,8 +3,8 @@ use super::*;
 pub async fn create_postgresql_record(record: PostgresqlRecord) -> Result<(), String> {
     let db: DatabaseConnection = get_postgresql_connection().await?;
     let active_model: ActiveModel = ActiveModel {
-        key: ActiveValue::Set(record.key),
-        value: ActiveValue::Set(record.value),
+        key: ActiveValue::Set(record.get_key().clone()),
+        value: ActiveValue::Set(record.get_value().clone()),
         id: ActiveValue::NotSet,
     };
     active_model
@@ -22,9 +22,10 @@ pub async fn get_all_postgresql_records() -> Result<Vec<PostgresqlRecord>, Strin
         .map_err(|error: DbErr| error.to_string())?;
     let result: Vec<PostgresqlRecord> = records
         .into_iter()
-        .map(|r: Model| PostgresqlRecord {
-            key: r.key,
-            value: r.value,
+        .map(|r: Model| {
+            let mut record = PostgresqlRecord::default();
+            record.set_key(r.key).set_value(r.value);
+            record
         })
         .collect();
     Ok(result)
@@ -33,8 +34,8 @@ pub async fn get_all_postgresql_records() -> Result<Vec<PostgresqlRecord>, Strin
 pub async fn update_postgresql_record(record: PostgresqlRecord) -> Result<(), String> {
     let db: DatabaseConnection = get_postgresql_connection().await?;
     Entity::update_many()
-        .filter(Column::Key.eq(&record.key))
-        .col_expr(Column::Value, Expr::value(record.value))
+        .filter(Column::Key.eq(record.get_key()))
+        .col_expr(Column::Value, Expr::value(record.get_value().clone()))
         .exec(&db)
         .await
         .map_err(|error: DbErr| error.to_string())?;

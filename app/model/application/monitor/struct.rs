@@ -1,81 +1,81 @@
 use super::*;
 
-#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize, ToSchema, Data)]
 pub struct NetworkPacket {
-    pub timestamp: u64,
-    pub protocol: String,
-    pub src_ip: String,
-    pub dst_ip: String,
-    pub src_port: usize,
-    pub dst_port: usize,
-    pub size: u32,
-    pub direction: String,
+    timestamp: u64,
+    protocol: String,
+    src_ip: String,
+    dst_ip: String,
+    src_port: usize,
+    dst_port: usize,
+    size: u32,
+    direction: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default, Data)]
 pub struct NetworkStats {
-    pub total_packets: u64,
-    pub total_bytes: u64,
-    pub protocols: HashMap<String, u64>,
-    pub top_connections: Vec<ConnectionInfo>,
-    pub recent_packets: Vec<NetworkPacket>,
+    total_packets: u64,
+    total_bytes: u64,
+    protocols: HashMap<String, u64>,
+    top_connections: Vec<ConnectionInfo>,
+    recent_packets: Vec<NetworkPacket>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize, ToSchema, Data)]
 pub struct ConnectionInfo {
-    pub remote_ip: String,
-    pub port: usize,
-    pub protocol: String,
-    pub packets: u64,
-    pub bytes: u64,
+    remote_ip: String,
+    port: usize,
+    protocol: String,
+    packets: u64,
+    bytes: u64,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Data)]
 pub struct NetworkCaptureRequest {
-    pub duration_seconds: Option<u64>,
-    pub filter_protocol: Option<String>,
-    pub filter_port: Option<usize>,
+    duration_seconds: Option<u64>,
+    filter_protocol: Option<String>,
+    filter_port: Option<usize>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Data)]
 pub struct NetworkCaptureResponse {
-    pub status: String,
-    pub message: String,
-    pub data: Option<NetworkStats>,
+    status: String,
+    message: String,
+    data: Option<NetworkStats>,
 }
 
-#[derive(Debug, Default, Clone, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize, ToSchema, Data)]
 pub struct ServerStatus {
-    pub timestamp: u64,
-    pub cpu_usage: f64,
-    pub memory_usage: f64,
-    pub memory_total: u64,
-    pub memory_used: u64,
-    pub disk_usage: f64,
-    pub disk_total: u64,
-    pub disk_used: u64,
-    pub network_rx: u64,
-    pub network_tx: u64,
-    pub uptime: u64,
-    pub load_average: f64,
-    pub active_connections: u32,
-    pub process_count: u32,
-    pub hostname: String,
-    pub os_name: String,
-    pub os_version: String,
-    pub kernel_version: String,
-    pub cpu_cores: u32,
-    pub cpu_model: String,
+    timestamp: u64,
+    cpu_usage: f64,
+    memory_usage: f64,
+    memory_total: u64,
+    memory_used: u64,
+    disk_usage: f64,
+    disk_total: u64,
+    disk_used: u64,
+    network_rx: u64,
+    network_tx: u64,
+    uptime: u64,
+    load_average: f64,
+    active_connections: u32,
+    process_count: u32,
+    hostname: String,
+    os_name: String,
+    os_version: String,
+    kernel_version: String,
+    cpu_cores: u32,
+    cpu_model: String,
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, ToSchema, Data)]
 pub struct SystemInfo {
-    pub hostname: String,
-    pub os_name: String,
-    pub os_version: String,
-    pub kernel_version: String,
-    pub cpu_cores: u32,
-    pub cpu_model: String,
-    pub total_memory: u64,
-    pub total_disk: u64,
+    hostname: String,
+    os_name: String,
+    os_version: String,
+    kernel_version: String,
+    cpu_cores: u32,
+    cpu_model: String,
+    total_memory: u64,
+    total_disk: u64,
 }

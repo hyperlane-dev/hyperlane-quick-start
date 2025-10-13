@@ -102,12 +102,12 @@ pub(crate) async fn callback(ctx: Context) {
 
 fn build_gpt_request_messages(session: &ChatSession) -> Vec<JsonValue> {
     session
-        .messages
+        .get_messages()
         .iter()
         .map(|msg| {
             json_value!({
-                JSON_FIELD_ROLE: msg.role,
-                JSON_FIELD_CONTENT: msg.content
+                JSON_FIELD_ROLE: msg.get_role(),
+                JSON_FIELD_CONTENT: msg.get_content()
             })
         })
         .collect()

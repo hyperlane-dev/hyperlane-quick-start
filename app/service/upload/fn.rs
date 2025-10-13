@@ -240,7 +240,9 @@ pub fn parse_range_header(range_header: &str, file_size: u64) -> Result<RangeReq
     if start >= file_size {
         return Err("Range start exceeds file size".to_string());
     }
-    Ok(RangeRequest { start, end })
+    let mut range_request: RangeRequest = RangeRequest::default();
+    range_request.set_start(start).set_end(end);
+    Ok(range_request)
 }
 
 pub async fn read_file_range(path: &str, start: u64, length: u64) -> Result<Vec<u8>, String> {
@@ -292,23 +294,21 @@ async fn handle_range_request(
     file_size: u64,
     content_type: String,
 ) -> Result<(PartialContent, String), String> {
-    let start: u64 = range.start;
-    let end: u64 = range.end.unwrap_or(file_size - 1).min(file_size - 1);
+    let start: u64 = *range.get_start();
+    let end: u64 = range.get_end().unwrap_or(file_size - 1).min(file_size - 1);
     if start > end {
         return Err("Invalid range: start > end".to_string());
     }
     let content_length: u64 = end - start + 1;
     let data: Vec<u8> = read_file_range(path, start, content_length).await?;
     let content_range: String = format!("bytes {start}-{end}/{file_size}");
-    Ok((
-        PartialContent {
-            data,
-            content_range,
-            content_length,
-            total_size: file_size,
-        },
-        content_type,
-    ))
+    let mut partial_content: PartialContent = PartialContent::default();
+    partial_content
+        .set_data(data)
+        .set_content_range(content_range)
+        .set_content_length(content_length)
+        .set_total_size(file_size);
+    Ok((partial_content, content_type))
 }
 
 async fn handle_full_file_request(
@@ -321,15 +321,13 @@ async fn handle_full_file_request(
         return Err("File not found or empty".to_string());
     }
     let content_range: String = format!("bytes 0-{}/{file_size}", file_size - 1);
-    Ok((
-        PartialContent {
-            data,
-            content_range,
-            content_length: file_size,
-            total_size: file_size,
-        },
-        content_type,
-    ))
+    let mut partial_content: PartialContent = PartialContent::default();
+    partial_content
+        .set_data(data)
+        .set_content_range(content_range)
+        .set_content_length(file_size)
+        .set_total_size(file_size);
+    Ok((partial_content, content_type))
 }
 
 pub async fn serve_static_file_with_range(

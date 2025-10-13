@@ -9,16 +9,16 @@ pub struct FileChunkData {
     base_file_dir: String,
 }
 
-#[derive(Debug, Clone, ToSchema)]
+#[derive(Debug, Clone, ToSchema, Data, Default)]
 pub struct RangeRequest {
-    pub start: u64,
-    pub end: Option<u64>,
+    start: u64,
+    end: Option<u64>,
 }
 
-#[derive(Debug, Clone, ToSchema)]
+#[derive(Debug, Default, Clone, ToSchema, Data)]
 pub struct PartialContent {
-    pub data: Vec<u8>,
-    pub content_range: String,
-    pub content_length: u64,
-    pub total_size: u64,
+    data: Vec<u8>,
+    content_range: String,
+    content_length: u64,
+    total_size: u64,
 }

@@ -10,17 +10,29 @@ pub fn get_or_create_session(session_id: &str) -> ChatSession {
         sessions_guard.retain(|_, session| !session.is_expired(30));
         sessions_guard
             .entry(session_id.to_string())
-            .or_insert_with(|| ChatSession::new(session_id.to_string()))
+            .or_insert_with(|| {
+                let mut session = ChatSession::default();
+                session
+                    .set_session_id(session_id.to_string())
+                    .set_messages(Vec::new())
+                    .set_last_activity(std::time::Instant::now());
+                session
+            })
             .clone()
     } else {
-        ChatSession::new(session_id.to_string())
+        let mut session = ChatSession::default();
+        session
+            .set_session_id(session_id.to_string())
+            .set_messages(Vec::new())
+            .set_last_activity(std::time::Instant::now());
+        session
     }
 }
 
 pub fn update_session(session: ChatSession) {
     let sessions: &Arc<Mutex<HashMap<String, ChatSession>>> = get_global_chat_sessions();
     let mut sessions_guard = sessions.lock().unwrap();
-    sessions_guard.insert(session.session_id.clone(), session);
+    sessions_guard.insert(session.get_session_id().clone(), session);
 }
 
 pub fn get_global_online_users() -> &'static Arc<Mutex<HashMap<String, OnlineUser>>> {
@@ -30,10 +42,10 @@ pub fn get_global_online_users() -> &'static Arc<Mutex<HashMap<String, OnlineUse
 pub fn add_online_user(username: &str) {
     let users: &Arc<Mutex<HashMap<String, OnlineUser>>> = get_global_online_users();
     let mut users_guard: MutexGuard<'_, HashMap<String, OnlineUser>> = users.lock().unwrap();
-    let online_user: OnlineUser = OnlineUser {
-        username: username.to_string(),
-        join_time: time(),
-    };
+    let mut online_user: OnlineUser = OnlineUser::default();
+    online_user
+        .set_username(username.to_string())
+        .set_join_time(time());
     users_guard.insert(username.to_string(), online_user);
 }
 
@@ -50,16 +62,13 @@ pub fn get_online_users_list() -> UserListResponse {
     } else {
         Vec::new()
     };
-    let gpt_user: OnlineUser = OnlineUser {
-        username: GPT.to_string(),
-        join_time: time(),
-    };
+    let mut gpt_user: OnlineUser = OnlineUser::default();
+    gpt_user.set_username(GPT.to_string()).set_join_time(time());
     users_vec.insert(0, gpt_user);
     let total_count: usize = users_vec.len();
-    UserListResponse {
-        users: users_vec,
-        total_count,
-    }
+    let mut response = UserListResponse::default();
+    response.set_users(users_vec).set_total_count(total_count);
+    response
 }
 
 #[request_query("uuid" => uuid_opt)]

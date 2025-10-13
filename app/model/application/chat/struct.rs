@@ -1,20 +1,20 @@
 use super::*;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize, Data)]
 pub struct ChatMessage {
-    pub role: String,
-    pub content: String,
+    role: String,
+    content: String,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Data)]
 pub struct ChatSession {
-    pub session_id: String,
-    pub messages: Vec<ChatMessage>,
-    pub last_activity: Instant,
+    pub(super) session_id: String,
+    pub(super) messages: Vec<ChatMessage>,
+    pub(super) last_activity: Instant,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize, ToSchema, Data)]
 pub struct OnlineUser {
-    pub username: String,
-    pub join_time: String,
+    username: String,
+    join_time: String,
 }

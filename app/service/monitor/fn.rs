@@ -29,13 +29,7 @@ async fn capture_network_data() -> Option<NetworkStats> {
 
 #[cfg(target_os = "windows")]
 fn create_empty_network_stats() -> NetworkStats {
-    NetworkStats {
-        total_packets: 0,
-        total_bytes: 0,
-        protocols: HashMap::new(),
-        top_connections: Vec::new(),
-        recent_packets: Vec::new(),
-    }
+    NetworkStats::default()
 }
 
 #[cfg(target_os = "windows")]
@@ -53,18 +47,21 @@ fn process_netstat_output(output_str: &str) -> Vec<ConnectionInfo> {
         })
         .fold(HashMap::new(), |mut acc, remote_addr| {
             let key: String = format!("{}:{}", remote_addr.0, remote_addr.1);
-            let entry = acc.entry(key).or_insert(ConnectionInfo {
-                remote_ip: remote_addr.0,
-                port: remote_addr.1,
-                protocol: PROTOCOL_TCP.to_string(),
-                packets: 0,
-                bytes: WIN_DEFAULT_PACKET_BYTES,
+            let entry = acc.entry(key).or_insert_with(|| {
+                let mut conn = ConnectionInfo::default();
+                conn.set_remote_ip(remote_addr.0.clone())
+                    .set_port(remote_addr.1)
+                    .set_protocol(PROTOCOL_TCP.to_string())
+                    .set_packets(0)
+                    .set_bytes(WIN_DEFAULT_PACKET_BYTES);
+                conn
             });
-            entry.packets += 1;
+            let current_packets = *entry.get_packets();
+            entry.set_packets(current_packets + 1);
             acc
         });
     let mut top_connections: Vec<ConnectionInfo> = connections.into_values().collect();
-    top_connections.sort_by(|a, b| b.packets.cmp(&a.packets));
+    top_connections.sort_by(|a, b| b.get_packets().cmp(a.get_packets()));
     top_connections.truncate(TOP_CONNECTIONS_LIMIT);
     top_connections
 }
@@ -90,29 +87,36 @@ fn generate_sample_packets() -> Vec<NetworkPacket> {
         .unwrap()
         .as_secs();
     (0..SAMPLE_PACKET_COUNT)
-        .map(|i| NetworkPacket {
-            timestamp: now - i * 10,
-            protocol: match i % 3 {
-                0 => PROTOCOL_TCP,
-                1 => PROTOCOL_UDP,
-                _ => PROTOCOL_ICMP,
-            }
-            .to_string(),
-            src_ip: format!("{SAMPLE_IP_PREFIX_A}{}", 100 + i),
-            dst_ip: format!("{SAMPLE_IP_PREFIX_B}{}", 8 + i % 2),
-            src_port: SAMPLE_BASE_SRC_PORT + i as usize,
-            dst_port: if i % 2 == 0 {
-                SAMPLE_DST_PORT_A
-            } else {
-                SAMPLE_DST_PORT_B
-            },
-            size: SAMPLE_PACKET_BASE_SIZE + i as u32 * SAMPLE_PACKET_SIZE_MULTIPLIER,
-            direction: if i % 2 == 0 {
-                DIRECTION_OUT
-            } else {
-                DIRECTION_IN
-            }
-            .to_string(),
+        .map(|i| {
+            let mut packet = NetworkPacket::default();
+            packet
+                .set_timestamp(now - i * 10)
+                .set_protocol(
+                    match i % 3 {
+                        0 => PROTOCOL_TCP,
+                        1 => PROTOCOL_UDP,
+                        _ => PROTOCOL_ICMP,
+                    }
+                    .to_string(),
+                )
+                .set_src_ip(format!("{SAMPLE_IP_PREFIX_A}{}", 100 + i))
+                .set_dst_ip(format!("{SAMPLE_IP_PREFIX_B}{}", 8 + i % 2))
+                .set_src_port(SAMPLE_BASE_SRC_PORT + i as usize)
+                .set_dst_port(if i % 2 == 0 {
+                    SAMPLE_DST_PORT_A
+                } else {
+                    SAMPLE_DST_PORT_B
+                })
+                .set_size(SAMPLE_PACKET_BASE_SIZE + i as u32 * SAMPLE_PACKET_SIZE_MULTIPLIER)
+                .set_direction(
+                    if i % 2 == 0 {
+                        DIRECTION_OUT
+                    } else {
+                        DIRECTION_IN
+                    }
+                    .to_string(),
+                );
+            packet
         })
         .collect()
 }
@@ -125,27 +129,23 @@ async fn capture_windows_network() -> Option<NetworkStats> {
         .output()
     {
         let output_str: std::borrow::Cow<'_, str> = String::from_utf8_lossy(&output.stdout);
-        stats.top_connections = process_netstat_output(&output_str);
+        let top_conns = process_netstat_output(&output_str);
+        let conn_len = top_conns.len() as u64;
+        stats.set_top_connections(top_conns);
         stats
-            .protocols
-            .insert(PROTOCOL_TCP.to_string(), stats.top_connections.len() as u64);
+            .get_mut_protocols()
+            .insert(PROTOCOL_TCP.to_string(), conn_len);
     }
     let (total_packets, total_bytes) = get_network_performance_counters();
-    stats.total_packets = total_packets;
-    stats.total_bytes = total_bytes;
-    stats.recent_packets = generate_sample_packets();
+    stats.set_total_packets(total_packets);
+    stats.set_total_bytes(total_bytes);
+    stats.set_recent_packets(generate_sample_packets());
     Some(stats)
 }
 
 #[cfg(not(target_os = "windows"))]
 fn create_empty_linux_network_stats() -> NetworkStats {
-    NetworkStats {
-        total_packets: 0,
-        total_bytes: 0,
-        protocols: HashMap::new(),
-        top_connections: Vec::new(),
-        recent_packets: Vec::new(),
-    }
+    NetworkStats::default()
 }
 
 #[cfg(not(target_os = "windows"))]
@@ -177,8 +177,8 @@ async fn capture_linux_network() -> Option<NetworkStats> {
     }
     if let Ok(content) = std::fs::read_to_string(LINUX_NET_DEV_PATH) {
         let (total_bytes, total_packets) = parse_network_dev_stats(&content);
-        stats.total_bytes = total_bytes;
-        stats.total_packets = total_packets;
+        stats.set_total_bytes(total_bytes);
+        stats.set_total_packets(total_packets);
     }
     Some(stats)
 }
@@ -237,28 +237,29 @@ pub async fn get_server_status() -> ServerStatus {
     let cpu_cores: u32 = get_cpu_cores().await;
     let cpu_model: String = get_cpu_model().await;
 
-    ServerStatus {
-        timestamp,
-        cpu_usage,
-        memory_usage,
-        memory_total,
-        memory_used,
-        disk_usage,
-        disk_total,
-        disk_used,
-        network_rx,
-        network_tx,
-        uptime,
-        load_average,
-        active_connections,
-        process_count,
-        hostname,
-        os_name,
-        os_version,
-        kernel_version,
-        cpu_cores,
-        cpu_model,
-    }
+    let mut status = ServerStatus::default();
+    status
+        .set_timestamp(timestamp)
+        .set_cpu_usage(cpu_usage)
+        .set_memory_usage(memory_usage)
+        .set_memory_total(memory_total)
+        .set_memory_used(memory_used)
+        .set_disk_usage(disk_usage)
+        .set_disk_total(disk_total)
+        .set_disk_used(disk_used)
+        .set_network_rx(network_rx)
+        .set_network_tx(network_tx)
+        .set_uptime(uptime)
+        .set_load_average(load_average)
+        .set_active_connections(active_connections)
+        .set_process_count(process_count)
+        .set_hostname(hostname)
+        .set_os_name(os_name)
+        .set_os_version(os_version)
+        .set_kernel_version(kernel_version)
+        .set_cpu_cores(cpu_cores)
+        .set_cpu_model(cpu_model);
+    status
 }
 
 pub async fn get_system_info() -> SystemInfo {
@@ -271,16 +272,16 @@ pub async fn get_system_info() -> SystemInfo {
     let total_memory: u64 = get_total_memory().await;
     let total_disk: u64 = get_total_disk().await;
 
-    SystemInfo {
-        hostname,
-        os_name,
-        os_version,
-        kernel_version,
-        cpu_cores,
-        cpu_model,
-        total_memory,
-        total_disk,
-    }
+    let mut info = SystemInfo::default();
+    info.set_hostname(hostname)
+        .set_os_name(os_name)
+        .set_os_version(os_version)
+        .set_kernel_version(kernel_version)
+        .set_cpu_cores(cpu_cores)
+        .set_cpu_model(cpu_model)
+        .set_total_memory(total_memory)
+        .set_total_disk(total_disk);
+    info
 }
 
 #[cfg(target_os = "windows")]
