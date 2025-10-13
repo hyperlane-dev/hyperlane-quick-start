@@ -7,10 +7,12 @@ use mapper::monitor::*;
 use model::application::monitor::*;
 
 use std::{
-    collections::HashMap,
     process::Command,
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
 use hyperlane::{tokio::runtime::Runtime, *};
 use hyperlane_utils::serde_json;
+
+#[cfg(target_os = "windows")]
+use std::collections::HashMap;
