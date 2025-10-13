@@ -6,6 +6,5 @@ use super::*;
 use domain::chat::*;
 use hyperlane_config::framework::*;
 use mapper::chat::*;
-use model::data_transfer::chat::*;
-use model::data_transfer::common::ApiResponse;
+use model::data_transfer::{chat::*, common::*};
 use service::chat::*;
