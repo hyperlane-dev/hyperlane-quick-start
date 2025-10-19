@@ -71,7 +71,9 @@ pub fn get_online_users_list() -> UserListResponse {
     response
 }
 
-#[request_query("uuid" => uuid_opt)]
-pub async fn get_name(ctx: &Context) -> String {
-    uuid_opt.unwrap_or_default()
+impl ChatService {
+    #[request_query("uuid" => uuid_opt)]
+    pub async fn get_name(self, ctx: &Context) -> String {
+        uuid_opt.unwrap_or_default()
+    }
 }

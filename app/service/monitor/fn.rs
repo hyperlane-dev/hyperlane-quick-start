@@ -202,14 +202,14 @@ fn parse_address(addr: &str) -> Option<(String, usize)> {
 }
 
 #[response_header(CONTENT_TYPE => APPLICATION_JSON)]
-pub async fn get_network_capture_data(ctx: Context) {
+pub async fn get_network_capture_data(ctx: &Context) {
     let response_data: NetworkStats = get_network_stats().unwrap_or_default();
     if let Ok(json) = serde_json::to_vec(&response_data) {
         ctx.set_response_body(&json).await;
     }
 }
 
-pub async fn get_network_capture_stream(ctx: Context) {
+pub async fn get_network_capture_stream(ctx: &Context) {
     let response_data: NetworkStats = get_network_stats().unwrap_or_default();
     if let Ok(json) = serde_json::to_string(&response_data) {
         let event: String = format!("{SSE_DATA_PREFIX}{json}{DOUBLE_BR}");

@@ -24,7 +24,7 @@ impl WebSocketReqData {
     }
 
     pub async fn into_resp(&self, ctx: &Context) -> WebSocketRespData {
-        let name: String = get_name(&ctx).await;
+        let name: String = get_name(ctx).await;
         let mut resp: WebSocketRespData = WebSocketRespData::default();
         resp.set_type(*self.get_type())
             .set_name(name)
@@ -36,7 +36,7 @@ impl WebSocketReqData {
 
 impl WebSocketRespData {
     pub async fn new<T: ToString>(r#type: MessageType, ctx: &Context, data: T) -> Self {
-        let name: String = get_name(&ctx).await;
+        let name: String = get_name(ctx).await;
         let mut resp_data: Self = Self::default();
         resp_data
             .set_type(r#type)
