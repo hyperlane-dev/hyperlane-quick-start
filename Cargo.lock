@@ -632,9 +632,9 @@ dependencies = [
 
 [[package]]
 name = "color-output"
-version = "7.2.14"
+version = "8.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "609960df733fc970569093cf082683bdc19745dbadaadeaf659392af631fdc59"
+checksum = "4a517875989360e428619fc5ff5a62efb69a2c7a8ad28bf5379d6ebee9c1ce7c"
 dependencies = [
  "hyperlane-time",
 ]
@@ -1319,9 +1319,9 @@ checksum = "df3b46402a9d5adb4c86a0cf463f42e19994e3ee891101b1841f30a545cb49a9"
 
 [[package]]
 name = "hyperlane"
-version = "10.4.3"
+version = "10.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "735aa3e9e4ee8e439b088ea600a4acce25faebb345e87a5f50e51e10feb8249b"
+checksum = "9f96f80d25daefea9a5e7d4a26723dd6b28e3144b24c76d7290f6acd23b6bf3a"
 dependencies = [
  "http-type",
  "inventory",
@@ -1354,9 +1354,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-macros"
-version = "10.0.2"
+version = "10.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "39612b1c26325a9eb7f9850c1623ca08a0e8b6737d7af491b7c7fa49e93da438"
+checksum = "5473df540d51defddc416521670a15aa6b30c6406e82eda46a59802598d29ded"
 dependencies = [
  "inventory",
  "proc-macro2",
@@ -1366,9 +1366,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-plugin-websocket"
-version = "3.0.4"
+version = "3.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e0eb095849ea1598bd64a12f19fac933e35f2de35f9096beca37de54336f7f42"
+checksum = "41bda914c33ac1adebba3a559ab06662b2cc945197556b2cf8446f1fe7a08c26"
 dependencies = [
  "hyperlane",
  "hyperlane-broadcast",
@@ -1389,9 +1389,9 @@ checksum = "0c1902a81b87724c226187b798658dd38038afe79eb337735eff39ec5f4d3d30"
 
 [[package]]
 name = "hyperlane-utils"
-version = "11.8.0"
+version = "12.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fcd4c3232ac20c94b31f4e9e058a1028076570f6614ccdbcdfa5c95d6e449b93"
+checksum = "d70f9acc4d79d5178014519511d74e8fb844c1594833d9297a28aad10da27555"
 dependencies = [
  "ahash 0.8.12",
  "bin-encode-decode",
