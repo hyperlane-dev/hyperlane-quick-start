@@ -1,7 +1,9 @@
 mod r#impl;
+mod r#struct;
+
+pub use r#struct::*;
 
 use super::*;
-use mapper::websocket::*;
 use model::param::websocket::*;
 use service::websocket::*;
 use utils::send::*;
