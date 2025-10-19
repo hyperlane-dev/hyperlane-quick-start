@@ -1,7 +1,10 @@
 pub mod connected;
 pub mod cross;
 pub mod response;
-pub mod send;
 pub mod upgrade;
+
+pub use cross::*;
+pub use response::*;
+pub use upgrade::*;
 
 use super::*;
