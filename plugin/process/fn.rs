@@ -16,7 +16,7 @@ where
             match manager.start_daemon().await {
                 Ok(_) => println_success!("Server started in background successfully"),
                 Err(error) => {
-                    println_error!(format!("Error starting server in background: {error}"))
+                    println_error!("Error starting server in background: {error}")
                 }
             };
         } else {
@@ -27,7 +27,7 @@ where
     let stop_server = || async {
         match manager.stop().await {
             Ok(_) => println_success!("Server stopped successfully"),
-            Err(error) => println_error!(format!("Error stopping server: {error}")),
+            Err(error) => println_error!("Error stopping server: {error}"),
         };
     };
     let hot_restart_server = || async {
@@ -36,7 +36,7 @@ where
             .await
         {
             Ok(_) => println_success!("Server started successfully"),
-            Err(error) => println_error!(format!("Error starting server in background: {error}")),
+            Err(error) => println_error!("Error starting server in background: {error}"),
         }
     };
     let restart_server = || async {
@@ -54,7 +54,7 @@ where
         "restart" => restart_server().await,
         "hot" => hot_restart_server().await,
         _ => {
-            println_error!(format!("Invalid command: {command}"));
+            println_error!("Invalid command: {command}");
         }
     }
 }

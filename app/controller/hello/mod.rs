@@ -1,6 +1,5 @@
-mod r#fn;
-
-pub use r#fn::*;
+mod r#impl;
 
 use super::*;
 use hyperlane_config::application::hello::*;
+use mapper::hello::*;

@@ -1,5 +1,3 @@
-mod r#fn;
-
-pub use r#fn::*;
+mod r#impl;
 
 use super::*;
