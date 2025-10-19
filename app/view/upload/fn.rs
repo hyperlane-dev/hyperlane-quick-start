@@ -5,36 +5,36 @@ use super::*;
     get,
     post,
     path = "/upload",
+    description = "File chunk upload frontend interface (redirects to static resource)",
     responses(
-        (status = 200, description = "File chunk upload frontend interface", body = String)
+        (status = 302, description = "Redirect to static resource")
     )
 )]
 #[prologue_macros(
     methods(get, post),
-    response_status_code(200),
-    response_body(UPLOAD_HTML),
-    response_header(CONTENT_ENCODING => GZIP)
+    response_status_code(302),
+    response_header(LOCATION => "/static/upload/index.html")
 )]
 pub async fn html(ctx: Context) {}
 
-#[route("/static/{upload_dir}/{upload_file}")]
+#[route("/upload/file/{upload_dir}/{upload_file}")]
 #[utoipa::path(
     get,
-    post,
-    path = "/static/{upload_dir}/{upload_file}",
-    description = "Serve static files with optional range requests",
+    path = "/upload/file/{upload_dir}/{upload_file}",
+    description = "Serve uploaded files with optional range requests",
     responses(
-        (status = 200, description = "Successfully served static file", body = String),
-        (status = 206, description = "Partial content served", body = String)
+        (status = 200, description = "Successfully served file"),
+        (status = 206, description = "Partial content served"),
+        (status = 404, description = "File not found")
     )
 )]
 #[prologue_macros(
-    methods(get, post),
+    methods(get),
     route_param(UPLOAD_DIR_KEY => dir_opt),
     route_param(UPLOAD_FILE_KEY => file_opt),
     request_header(RANGE => range_header_opt)
 )]
-pub async fn static_file(ctx: Context) {
+pub async fn file(ctx: Context) {
     let dir: String = dir_opt.unwrap_or_default();
     let file: String = file_opt.unwrap_or_default();
     let has_range_request: bool = range_header_opt.is_some();

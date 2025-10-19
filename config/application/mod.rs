@@ -1,13 +1,8 @@
 pub mod charset;
-pub mod chat;
 pub mod hello;
 pub mod logo_img;
-pub mod monitor;
-pub mod mysql;
 pub mod not_found;
-pub mod postgresql;
-pub mod redis;
 pub mod root;
+pub mod static_resource;
 pub mod templates;
-pub mod trace;
 pub mod upload;

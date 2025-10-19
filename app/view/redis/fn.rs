@@ -5,15 +5,14 @@ use super::*;
     get,
     post,
     path = "/redis",
-    description = "Redis frontend interface",
+    description = "Redis frontend interface (redirects to static resource)",
     responses(
-        (status = 200, description = "Successfully served Redis frontend interface", body = String)
+        (status = 302, description = "Redirect to static resource")
     )
 )]
 #[prologue_macros(
     methods(get, post),
-    response_status_code(200),
-    response_body(REDIS_HTML),
-    response_header(CONTENT_ENCODING => GZIP)
+    response_status_code(302),
+    response_header(LOCATION => "/static/redis/index.html")
 )]
 pub async fn html(ctx: Context) {}
