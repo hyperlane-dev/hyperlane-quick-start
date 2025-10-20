@@ -1,7 +1,7 @@
 use super::*;
 
 pub fn get_global_env_config() -> &'static EnvConfig {
-    GLOBAL_ENV_CONFIG.get_or_init(|| EnvConfig::default())
+    GLOBAL_ENV_CONFIG.get_or_init(EnvConfig::default)
 }
 
 pub fn init_env_config() -> Result<(), String> {

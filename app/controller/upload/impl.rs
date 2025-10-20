@@ -1,32 +1,5 @@
 use super::*;
 
-#[utoipa::path(
-    post,
-    path = "/api/upload/register",
-    responses(
-        (status = 200, description = "Register file upload")
-    )
-)]
-pub async fn register() {}
-
-#[utoipa::path(
-    post,
-    path = "/api/upload/save",
-    responses(
-        (status = 200, description = "Save file chunk")
-    )
-)]
-pub async fn save() {}
-
-#[utoipa::path(
-    post,
-    path = "/api/upload/merge",
-    responses(
-        (status = 200, description = "Merge file chunks")
-    )
-)]
-pub async fn merge() {}
-
 impl ServerHook for RegisterRoute {
     async fn new(_ctx: &Context) -> Self {
         Self

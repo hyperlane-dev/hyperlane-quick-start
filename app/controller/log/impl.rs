@@ -1,32 +1,5 @@
 use super::*;
 
-#[utoipa::path(
-    get,
-    path = "/api/log/info",
-    responses(
-        (status = 200, description = "Get info logs")
-    )
-)]
-pub async fn info() {}
-
-#[utoipa::path(
-    get,
-    path = "/api/log/warn",
-    responses(
-        (status = 200, description = "Get warn logs")
-    )
-)]
-pub async fn warn() {}
-
-#[utoipa::path(
-    get,
-    path = "/api/log/error",
-    responses(
-        (status = 200, description = "Get error logs")
-    )
-)]
-pub async fn error() {}
-
 impl ServerHook for InfoLogRoute {
     async fn new(_ctx: &Context) -> Self {
         Self

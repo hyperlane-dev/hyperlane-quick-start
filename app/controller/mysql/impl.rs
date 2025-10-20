@@ -1,41 +1,5 @@
 use super::*;
 
-#[utoipa::path(
-    get,
-    path = "/api/mysql/records",
-    responses(
-        (status = 200, description = "List all mysql records")
-    )
-)]
-pub async fn list_records() {}
-
-#[utoipa::path(
-    post,
-    path = "/api/mysql/record",
-    responses(
-        (status = 200, description = "Create mysql record")
-    )
-)]
-pub async fn create_record() {}
-
-#[utoipa::path(
-    post,
-    path = "/api/mysql/record/update",
-    responses(
-        (status = 200, description = "Update mysql record")
-    )
-)]
-pub async fn update_record() {}
-
-#[utoipa::path(
-    post,
-    path = "/api/mysql/record/delete",
-    responses(
-        (status = 200, description = "Delete mysql record")
-    )
-)]
-pub async fn delete_record() {}
-
 impl ServerHook for ListRecordsRoute {
     async fn new(_ctx: &Context) -> Self {
         Self

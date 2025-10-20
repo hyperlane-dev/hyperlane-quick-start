@@ -1,14 +1,5 @@
 use super::*;
 
-#[utoipa::path(
-    get,
-    path = "/api/websocket",
-    responses(
-        (status = 101, description = "WebSocket connection")
-    )
-)]
-pub async fn websocket() {}
-
 impl ServerHook for WebSocketRoute {
     async fn new(_ctx: &Context) -> Self {
         Self

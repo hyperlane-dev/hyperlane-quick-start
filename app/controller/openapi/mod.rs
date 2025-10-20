@@ -1,10 +1,8 @@
 mod r#impl;
 mod r#struct;
 
-pub use r#impl::*;
-pub use r#struct::*;
-
 use super::*;
 use mapper::openapi::*;
+use r#struct::*;
 
 use hyperlane_utils::utoipa::OpenApi;

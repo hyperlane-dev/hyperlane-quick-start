@@ -13,4 +13,4 @@ use super::*;
 use env::*;
 use log::*;
 
-use std::time::Duration;
+use std::{str::FromStr, time::Duration};

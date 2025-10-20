@@ -1,41 +1,5 @@
 use super::*;
 
-#[utoipa::path(
-    get,
-    path = "/api/redis/records",
-    responses(
-        (status = 200, description = "List all redis records")
-    )
-)]
-pub async fn list_records() {}
-
-#[utoipa::path(
-    post,
-    path = "/api/redis/record",
-    responses(
-        (status = 200, description = "Create redis record")
-    )
-)]
-pub async fn create_record() {}
-
-#[utoipa::path(
-    post,
-    path = "/api/redis/record/update",
-    responses(
-        (status = 200, description = "Update redis record")
-    )
-)]
-pub async fn update_record() {}
-
-#[utoipa::path(
-    post,
-    path = "/api/redis/record/delete",
-    responses(
-        (status = 200, description = "Delete redis record")
-    )
-)]
-pub async fn delete_record() {}
-
 impl ServerHook for ListRecordsRoute {
     async fn new(_ctx: &Context) -> Self {
         Self

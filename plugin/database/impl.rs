@@ -8,13 +8,17 @@ impl PluginType {
             Self::Redis => "Redis",
         }
     }
+}
 
-    pub fn from_str(s: &str) -> Option<Self> {
+impl FromStr for PluginType {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "MySQL" => Some(Self::MySQL),
-            "PostgreSQL" => Some(Self::PostgreSQL),
-            "Redis" => Some(Self::Redis),
-            _ => None,
+            "MySQL" => Ok(Self::MySQL),
+            "PostgreSQL" => Ok(Self::PostgreSQL),
+            "Redis" => Ok(Self::Redis),
+            _ => Err(()),
         }
     }
 }
@@ -133,7 +137,7 @@ impl AutoCreationErrorHandler {
             plugin_name: plugin_type.to_string(),
             operation: operation.to_string(),
             database_name: database_name.map(|name: &str| name.to_string()),
-            error_type: format!("{:?}", error)
+            error_type: format!("{error:?}")
                 .split('(')
                 .next()
                 .unwrap_or("Unknown")
@@ -360,10 +364,8 @@ impl AutoCreationConfig {
                 );
             }
         }
-        if env.enable_redis {
-            if env.redis_host.is_empty() {
-                return Err("Redis host is required when auto-creation is enabled".to_string());
-            }
+        if env.enable_redis && env.redis_host.is_empty() {
+            return Err("Redis host is required when auto-creation is enabled".to_string());
         }
         Ok(())
     }
@@ -386,7 +388,7 @@ impl AutoCreationConfig {
 impl PluginAutoCreationConfig {
     pub fn is_plugin_enabled(&self) -> bool {
         let env: &'static EnvConfig = AutoCreationConfig::get_env();
-        if let Some(plugin_type) = PluginType::from_str(&self.plugin_name) {
+        if let Ok(plugin_type) = PluginType::from_str(&self.plugin_name) {
             match plugin_type {
                 PluginType::MySQL => env.enable_mysql,
                 PluginType::PostgreSQL => env.enable_postgresql,
@@ -399,7 +401,7 @@ impl PluginAutoCreationConfig {
 
     pub fn get_database_name(&self) -> String {
         let env = AutoCreationConfig::get_env();
-        if let Some(plugin_type) = PluginType::from_str(&self.plugin_name) {
+        if let Ok(plugin_type) = PluginType::from_str(&self.plugin_name) {
             match plugin_type {
                 PluginType::MySQL => env.mysql_database.clone(),
                 PluginType::PostgreSQL => env.postgresql_database.clone(),
@@ -412,7 +414,7 @@ impl PluginAutoCreationConfig {
 
     pub fn get_connection_info(&self) -> String {
         let env: &'static EnvConfig = AutoCreationConfig::get_env();
-        if let Some(plugin_type) = PluginType::from_str(&self.plugin_name) {
+        if let Ok(plugin_type) = PluginType::from_str(&self.plugin_name) {
             match plugin_type {
                 PluginType::MySQL => format!(
                     "{}:{}:{}",

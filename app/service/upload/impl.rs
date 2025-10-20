@@ -119,8 +119,8 @@ impl UploadService {
         Some(data)
     }
 
-    pub async fn get_save_file_chunk_data<'a>(
-        ctx: &'a Context,
+    pub async fn get_save_file_chunk_data(
+        ctx: &Context,
         file_id_opt: Option<String>,
         chunk_index_opt: Option<String>,
     ) -> OptionFileChunkData {
@@ -160,7 +160,7 @@ impl UploadService {
         write_file_id_map().await.remove(file_id);
     }
 
-    pub async fn get_merge_file_chunk_data<'a>(
+    pub async fn get_merge_file_chunk_data(
         ctx: &Context,
         file_id_opt: Option<String>,
     ) -> OptionFileChunkData {
@@ -175,9 +175,7 @@ impl UploadService {
                 return None;
             }
         };
-        read_file_id_map()
-            .await
-            .get(&file_id).cloned()
+        read_file_id_map().await.get(&file_id).cloned()
     }
 
     #[response_status_code(200)]

@@ -1,41 +1,5 @@
 use super::*;
 
-#[utoipa::path(
-    get,
-    path = "/api/postgresql/records",
-    responses(
-        (status = 200, description = "List all postgresql records")
-    )
-)]
-pub async fn list_records() {}
-
-#[utoipa::path(
-    post,
-    path = "/api/postgresql/record",
-    responses(
-        (status = 200, description = "Create postgresql record")
-    )
-)]
-pub async fn create_record() {}
-
-#[utoipa::path(
-    post,
-    path = "/api/postgresql/record/update",
-    responses(
-        (status = 200, description = "Update postgresql record")
-    )
-)]
-pub async fn update_record() {}
-
-#[utoipa::path(
-    post,
-    path = "/api/postgresql/record/delete",
-    responses(
-        (status = 200, description = "Delete postgresql record")
-    )
-)]
-pub async fn delete_record() {}
-
 impl ServerHook for ListRecordsRoute {
     async fn new(_ctx: &Context) -> Self {
         Self

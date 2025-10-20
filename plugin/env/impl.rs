@@ -26,7 +26,7 @@ impl EnvConfig {
                      {ENV_KEY_ENABLE_REDIS}=\n\
                      {ENV_KEY_ENABLE_POSTGRESQL}=\n",
                 );
-                let _ = write_to_file(ENV_FILE_PATH, data.as_bytes())
+                write_to_file(ENV_FILE_PATH, data.as_bytes())
                     .map_err(|error| format!("Failed to create example env file: {error}"))?;
                 return Self::load();
             }

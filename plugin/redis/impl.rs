@@ -1,5 +1,11 @@
 use super::*;
 
+impl Default for RedisAutoCreation {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl RedisAutoCreation {
     pub fn new() -> Self {
         Self {
@@ -91,7 +97,7 @@ impl RedisAutoCreation {
         let app_key: &str = "hyperlane:initialized";
         let init_value: &str = "true";
         let exists: bool = redis::cmd("EXISTS")
-            .arg(&app_key)
+            .arg(app_key)
             .query(&mut conn)
             .map_err(|error: redis::RedisError| {
                 AutoCreationError::DatabaseError(format!(
@@ -100,7 +106,7 @@ impl RedisAutoCreation {
             })?;
         if !exists {
             let _: () = redis::cmd("SET")
-                .arg(&app_key)
+                .arg(app_key)
                 .arg(init_value)
                 .query(&mut conn)
                 .map_err(|error: redis::RedisError| {
@@ -111,7 +117,7 @@ impl RedisAutoCreation {
             setup_operations.push("hyperlane:initialized".to_string());
             let config_key: &str = "hyperlane:config:version";
             let _: () = redis::cmd("SET")
-                .arg(&config_key)
+                .arg(config_key)
                 .arg("1.0.0")
                 .query(&mut conn)
                 .map_err(|error: redis::RedisError| {
@@ -126,70 +132,64 @@ impl RedisAutoCreation {
 }
 
 impl DatabaseAutoCreation for RedisAutoCreation {
-    fn create_database_if_not_exists(
+    async fn create_database_if_not_exists(
         &self,
-    ) -> impl std::future::Future<Output = Result<bool, AutoCreationError>> + Send {
-        async move {
-            self.validate_redis_server().await?;
+    ) -> Result<bool, AutoCreationError> {
+        self.validate_redis_server().await?;
 
-            AutoCreationLogger::log_database_exists("default", crate::database::PluginType::Redis)
-                .await;
+        AutoCreationLogger::log_database_exists("default", crate::database::PluginType::Redis)
+            .await;
 
-            Ok(false)
-        }
+        Ok(false)
     }
 
-    fn create_tables_if_not_exist(
+    async fn create_tables_if_not_exist(
         &self,
-    ) -> impl std::future::Future<Output = Result<Vec<String>, AutoCreationError>> + Send {
-        async move {
-            let setup_operations = self.setup_redis_namespace().await?;
+    ) -> Result<Vec<String>, AutoCreationError> {
+        let setup_operations = self.setup_redis_namespace().await?;
 
-            if !setup_operations.is_empty() {
-                AutoCreationLogger::log_tables_created(
-                    &setup_operations,
-                    "default",
+        if !setup_operations.is_empty() {
+            AutoCreationLogger::log_tables_created(
+                &setup_operations,
+                "default",
+                crate::database::PluginType::Redis,
+            )
+            .await;
+        } else {
+            AutoCreationLogger::log_tables_created(
+                &[],
+                "default",
+                crate::database::PluginType::Redis,
+            )
+            .await;
+        }
+
+        Ok(setup_operations)
+    }
+
+    async fn verify_connection(
+        &self,
+    ) -> Result<(), AutoCreationError> {
+        match self.validate_redis_server().await {
+            Ok(_) => {
+                AutoCreationLogger::log_connection_verification(
                     crate::database::PluginType::Redis,
+                    "default",
+                    true,
+                    None,
                 )
                 .await;
-            } else {
-                AutoCreationLogger::log_tables_created(
-                    &[],
-                    "default",
-                    crate::database::PluginType::Redis,
-                )
-                .await;
+                Ok(())
             }
-
-            Ok(setup_operations)
-        }
-    }
-
-    fn verify_connection(
-        &self,
-    ) -> impl std::future::Future<Output = Result<(), AutoCreationError>> + Send {
-        async move {
-            match self.validate_redis_server().await {
-                Ok(_) => {
-                    AutoCreationLogger::log_connection_verification(
-                        crate::database::PluginType::Redis,
-                        "default",
-                        true,
-                        None,
-                    )
-                    .await;
-                    Ok(())
-                }
-                Err(error) => {
-                    AutoCreationLogger::log_connection_verification(
-                        crate::database::PluginType::Redis,
-                        "default",
-                        false,
-                        Some(&error.to_string()),
-                    )
-                    .await;
-                    Err(error)
-                }
+            Err(error) => {
+                AutoCreationLogger::log_connection_verification(
+                    crate::database::PluginType::Redis,
+                    "default",
+                    false,
+                    Some(&error.to_string()),
+                )
+                .await;
+                Err(error)
             }
         }
     }

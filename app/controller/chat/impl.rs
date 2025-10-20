@@ -1,14 +1,5 @@
 use super::*;
 
-#[utoipa::path(
-    get,
-    path = "/api/chat/online-users",
-    responses(
-        (status = 200, description = "Get online users list")
-    )
-)]
-pub async fn online_users() {}
-
 impl ServerHook for OnlineUsersRoute {
     async fn new(_ctx: &Context) -> Self {
         Self
