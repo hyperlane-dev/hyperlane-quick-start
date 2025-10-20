@@ -1,5 +1,14 @@
 use super::*;
 
+#[utoipa::path(
+    get,
+    path = "/openapi/openapi.json",
+    responses(
+        (status = 200, description = "OpenAPI JSON specification")
+    )
+)]
+pub async fn json() {}
+
 impl ServerHook for OpenApiRoute {
     async fn new(_ctx: &Context) -> Self {
         Self

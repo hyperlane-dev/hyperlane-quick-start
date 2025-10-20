@@ -1,5 +1,41 @@
 use super::*;
 
+#[utoipa::path(
+    get,
+    path = "/api/postgresql/records",
+    responses(
+        (status = 200, description = "List all postgresql records")
+    )
+)]
+pub async fn list_records() {}
+
+#[utoipa::path(
+    post,
+    path = "/api/postgresql/record",
+    responses(
+        (status = 200, description = "Create postgresql record")
+    )
+)]
+pub async fn create_record() {}
+
+#[utoipa::path(
+    post,
+    path = "/api/postgresql/record/update",
+    responses(
+        (status = 200, description = "Update postgresql record")
+    )
+)]
+pub async fn update_record() {}
+
+#[utoipa::path(
+    post,
+    path = "/api/postgresql/record/delete",
+    responses(
+        (status = 200, description = "Delete postgresql record")
+    )
+)]
+pub async fn delete_record() {}
+
 impl ServerHook for ListRecordsRoute {
     async fn new(_ctx: &Context) -> Self {
         Self
@@ -10,7 +46,7 @@ impl ServerHook for ListRecordsRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     async fn handle(self, ctx: &Context) {
-        match get_all_postgresql_records().await {
+        match PostgresqlService::get_all_postgresql_records().await {
             Ok(records) => {
                 let response = ApiResponse::success(records);
                 ctx.set_response_body(&response.to_json_bytes()).await
@@ -44,7 +80,7 @@ impl ServerHook for CreateRecordRoute {
                 return;
             }
         };
-        match create_postgresql_record(record).await {
+        match PostgresqlService::create_postgresql_record(record).await {
             Ok(_) => {
                 let response =
                     ApiResponse::<()>::success_without_data("Record created successfully");
@@ -79,7 +115,7 @@ impl ServerHook for UpdateRecordRoute {
                 return;
             }
         };
-        match update_postgresql_record(record).await {
+        match PostgresqlService::update_postgresql_record(record).await {
             Ok(_) => {
                 let response =
                     ApiResponse::<()>::success_without_data("Record updated successfully");
@@ -115,7 +151,7 @@ impl ServerHook for DeleteRecordRoute {
                 return;
             }
         };
-        match delete_postgresql_record(&key).await {
+        match PostgresqlService::delete_postgresql_record(&key).await {
             Ok(_) => {
                 let response =
                     ApiResponse::<()>::success_without_data("Record deleted successfully");

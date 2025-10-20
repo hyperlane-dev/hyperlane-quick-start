@@ -13,11 +13,11 @@ impl ServerHook for ConnectedMiddleware {
         let receiver_count: String = websocket
             .receiver_count_after_increment(key.clone())
             .to_string();
-        let username: String = get_name(ctx).await;
-        add_online_user(&username);
-        let resp_data: ResponseBody = create_online_count_message(&ctx, receiver_count).await;
+        let username: String = ChatService::get_name(ctx).await;
+        ChatDomain::add_online_user(&username);
+        let resp_data: ResponseBody =
+            ChatService::create_online_count_message(&ctx, receiver_count).await;
         ctx.set_response_body(&resp_data).await;
-        ctx.try_get_send_body_hook().await.unwrap()(ctx.clone()).await;
-        broadcast_online_count(key, resp_data);
+        ChatService::broadcast_online_count(key, resp_data);
     }
 }

@@ -1,5 +1,14 @@
 use super::*;
 
+#[utoipa::path(
+    get,
+    path = "/monitor",
+    responses(
+        (status = 302, description = "Redirect to monitor page")
+    )
+)]
+pub async fn html() {}
+
 impl ServerHook for MonitorViewRoute {
     async fn new(_ctx: &Context) -> Self {
         Self

@@ -1,5 +1,14 @@
 use super::*;
 
+#[utoipa::path(
+    get,
+    path = "/upload",
+    responses(
+        (status = 302, description = "Redirect to upload page")
+    )
+)]
+pub async fn html() {}
+
 impl ServerHook for UploadViewRoute {
     async fn new(_ctx: &Context) -> Self {
         Self
@@ -38,7 +47,7 @@ impl ServerHook for UploadFileRoute {
                 match std::fs::metadata(&file_path) {
                     Ok(metadata) => {
                         let file_size: u64 = metadata.len();
-                        match parse_range_header(&range_header, file_size) {
+                        match UploadService::parse_range_header(&range_header, file_size) {
                             Ok(range) => Some(range),
                             Err(_) => None,
                         }
@@ -49,7 +58,7 @@ impl ServerHook for UploadFileRoute {
             None => None,
         };
         if let Ok((partial_content, content_type)) =
-            serve_static_file_with_range(&dir, &file, range_request).await
+            UploadService::serve_static_file_with_range(&dir, &file, range_request).await
         {
             ctx.set_response_body(partial_content.get_data())
                 .await

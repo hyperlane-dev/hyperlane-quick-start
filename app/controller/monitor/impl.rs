@@ -1,5 +1,41 @@
 use super::*;
 
+#[utoipa::path(
+    get,
+    path = "/api/monitor/status-sse",
+    responses(
+        (status = 200, description = "Server status SSE stream")
+    )
+)]
+pub async fn status_sse() {}
+
+#[utoipa::path(
+    get,
+    path = "/api/monitor/system-info",
+    responses(
+        (status = 200, description = "Get system information")
+    )
+)]
+pub async fn system_info() {}
+
+#[utoipa::path(
+    get,
+    path = "/api/monitor/network-capture-data",
+    responses(
+        (status = 200, description = "Get network capture data")
+    )
+)]
+pub async fn network_capture_data() {}
+
+#[utoipa::path(
+    get,
+    path = "/api/monitor/network-capture-stream",
+    responses(
+        (status = 200, description = "Network capture SSE stream")
+    )
+)]
+pub async fn network_capture_stream() {}
+
 impl ServerHook for ServerStatusRoute {
     async fn new(_ctx: &Context) -> Self {
         Self

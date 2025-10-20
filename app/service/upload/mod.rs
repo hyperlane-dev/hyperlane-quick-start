@@ -1,8 +1,8 @@
-mod r#fn;
 mod r#impl;
+mod r#struct;
 
 pub use super::*;
-pub use r#fn::*;
+pub use r#struct::*;
 
 use hyperlane_config::application::{charset::*, upload::*};
 use mapper::upload::*;

@@ -1,5 +1,14 @@
 use super::*;
 
+#[utoipa::path(
+    get,
+    path = "/trace",
+    responses(
+        (status = 302, description = "Redirect to trace page")
+    )
+)]
+pub async fn html() {}
+
 impl ServerHook for TraceViewRoute {
     async fn new(_ctx: &Context) -> Self {
         Self

@@ -1,12 +1,13 @@
 mod r#impl;
 mod r#struct;
 
+pub use r#impl::*;
 pub use r#struct::*;
 
 use super::*;
 
-use domain::chat::*;
+use domain::chat::ChatDomain;
 use hyperlane_config::framework::*;
 use mapper::chat::*;
 use model::data_transfer::{chat::*, common::*};
-use service::chat::*;
+use service::chat::{ChatRequestHook, ChatSendedHook};

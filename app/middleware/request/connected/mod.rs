@@ -4,6 +4,6 @@ mod r#struct;
 pub use r#struct::*;
 
 use super::*;
-use domain::chat::*;
+use domain::chat::ChatDomain;
 use mapper::chat::*;
-use service::chat::*;
+use service::chat::ChatService;

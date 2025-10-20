@@ -1,5 +1,14 @@
 use super::*;
 
+#[utoipa::path(
+    get,
+    path = "/openapi",
+    responses(
+        (status = 200, description = "OpenAPI documentation page")
+    )
+)]
+pub async fn html() {}
+
 impl ServerHook for OpenApiViewRoute {
     async fn new(_ctx: &Context) -> Self {
         Self

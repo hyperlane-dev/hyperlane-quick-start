@@ -1,5 +1,41 @@
 use super::*;
 
+#[utoipa::path(
+    get,
+    path = "/api/mysql/records",
+    responses(
+        (status = 200, description = "List all mysql records")
+    )
+)]
+pub async fn list_records() {}
+
+#[utoipa::path(
+    post,
+    path = "/api/mysql/record",
+    responses(
+        (status = 200, description = "Create mysql record")
+    )
+)]
+pub async fn create_record() {}
+
+#[utoipa::path(
+    post,
+    path = "/api/mysql/record/update",
+    responses(
+        (status = 200, description = "Update mysql record")
+    )
+)]
+pub async fn update_record() {}
+
+#[utoipa::path(
+    post,
+    path = "/api/mysql/record/delete",
+    responses(
+        (status = 200, description = "Delete mysql record")
+    )
+)]
+pub async fn delete_record() {}
+
 impl ServerHook for ListRecordsRoute {
     async fn new(_ctx: &Context) -> Self {
         Self
@@ -10,7 +46,7 @@ impl ServerHook for ListRecordsRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     async fn handle(self, ctx: &Context) {
-        match get_all_mysql_records().await {
+        match MysqlService::get_all_mysql_records().await {
             Ok(records) => {
                 let response = ApiResponse::success(records);
                 ctx.set_response_body(&response.to_json_bytes()).await
@@ -44,7 +80,7 @@ impl ServerHook for CreateRecordRoute {
                 return;
             }
         };
-        match create_mysql_record(record).await {
+        match MysqlService::create_mysql_record(record).await {
             Ok(_) => {
                 let response =
                     ApiResponse::<()>::success_without_data("Record created successfully");
@@ -79,7 +115,7 @@ impl ServerHook for UpdateRecordRoute {
                 return;
             }
         };
-        match update_mysql_record(record).await {
+        match MysqlService::update_mysql_record(record).await {
             Ok(_) => {
                 let response =
                     ApiResponse::<()>::success_without_data("Record updated successfully");
@@ -116,7 +152,7 @@ impl ServerHook for DeleteRecordRoute {
                 return;
             }
         };
-        match delete_mysql_record(key).await {
+        match MysqlService::delete_mysql_record(key).await {
             Ok(_) => {
                 let response =
                     ApiResponse::<()>::success_without_data("Record deleted successfully");

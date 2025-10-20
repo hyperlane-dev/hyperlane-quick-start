@@ -1,5 +1,14 @@
 use super::*;
 
+#[utoipa::path(
+    get,
+    path = "/api/sse",
+    responses(
+        (status = 200, description = "Server-Sent Events stream")
+    )
+)]
+pub async fn sse() {}
+
 impl ServerHook for SseRoute {
     async fn new(_ctx: &Context) -> Self {
         Self

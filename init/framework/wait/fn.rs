@@ -31,7 +31,7 @@ async fn init_db() {
             println_success!("Auto-creation initialization successful");
         }
         Err(error) => {
-            println_error!(format!("Auto-creation initialization failed: {error}"));
+            println_error!("Auto-creation initialization failed: {error}");
         }
     };
 }
@@ -68,7 +68,7 @@ async fn create_server() {
 
 pub fn run() {
     if let Err(error) = init_env_config() {
-        println_error!(error);
+        println_error!("{error}");
     }
     println_success!("Environment configuration loaded successfully");
     runtime().block_on(create(create_server));

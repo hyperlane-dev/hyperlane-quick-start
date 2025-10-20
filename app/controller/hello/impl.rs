@@ -1,5 +1,14 @@
 use super::*;
 
+#[utoipa::path(
+    get,
+    path = "/hello/{name}",
+    responses(
+        (status = 200, description = "Hello greeting")
+    )
+)]
+pub async fn hello_name() {}
+
 impl ServerHook for HelloRoute {
     async fn new(_ctx: &Context) -> Self {
         Self

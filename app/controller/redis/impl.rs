@@ -1,5 +1,41 @@
 use super::*;
 
+#[utoipa::path(
+    get,
+    path = "/api/redis/records",
+    responses(
+        (status = 200, description = "List all redis records")
+    )
+)]
+pub async fn list_records() {}
+
+#[utoipa::path(
+    post,
+    path = "/api/redis/record",
+    responses(
+        (status = 200, description = "Create redis record")
+    )
+)]
+pub async fn create_record() {}
+
+#[utoipa::path(
+    post,
+    path = "/api/redis/record/update",
+    responses(
+        (status = 200, description = "Update redis record")
+    )
+)]
+pub async fn update_record() {}
+
+#[utoipa::path(
+    post,
+    path = "/api/redis/record/delete",
+    responses(
+        (status = 200, description = "Delete redis record")
+    )
+)]
+pub async fn delete_record() {}
+
 impl ServerHook for ListRecordsRoute {
     async fn new(_ctx: &Context) -> Self {
         Self
@@ -22,7 +58,7 @@ impl ServerHook for ListRecordsRoute {
                 return;
             }
         };
-        match get_all_redis_records(keys).await {
+        match RedisService::get_all_redis_records(keys).await {
             Ok(records) => {
                 let response = ApiResponse::success(records);
                 ctx.set_response_body(&response.to_json_bytes()).await
@@ -56,7 +92,7 @@ impl ServerHook for CreateRecordRoute {
                 return;
             }
         };
-        match create_redis_record(record).await {
+        match RedisService::create_redis_record(record).await {
             Ok(_) => {
                 let response =
                     ApiResponse::<()>::success_without_data("Record created successfully");
@@ -91,7 +127,7 @@ impl ServerHook for UpdateRecordRoute {
                 return;
             }
         };
-        match update_redis_record(record).await {
+        match RedisService::update_redis_record(record).await {
             Ok(_) => {
                 let response =
                     ApiResponse::<()>::success_without_data("Record updated successfully");
@@ -128,7 +164,7 @@ impl ServerHook for DeleteRecordRoute {
                 return;
             }
         };
-        match delete_redis_record(key).await {
+        match RedisService::delete_redis_record(key).await {
             Ok(_) => {
                 let response =
                     ApiResponse::<()>::success_without_data("Record deleted successfully");

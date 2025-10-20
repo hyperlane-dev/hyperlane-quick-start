@@ -1,5 +1,14 @@
 use super::*;
 
+#[utoipa::path(
+    get,
+    path = "/api/trace/{trace}",
+    responses(
+        (status = 200, description = "Search trace logs")
+    )
+)]
+pub async fn trace() {}
+
 impl ServerHook for TraceRoute {
     async fn new(_ctx: &Context) -> Self {
         Self
@@ -16,7 +25,7 @@ impl ServerHook for TraceRoute {
         let decoded_trace: String = decode(&trace)
             .unwrap_or_else(|_| trace.clone().into())
             .into_owned();
-        let result: String = search_trace(&decoded_trace).await;
+        let result: String = TraceService::search_trace(&decoded_trace).await;
         ctx.set_response_body(&result).await;
     }
 }

@@ -1,5 +1,14 @@
 use super::*;
 
+#[utoipa::path(
+    get,
+    path = "/favicon.ico",
+    responses(
+        (status = 301, description = "Redirect to favicon")
+    )
+)]
+pub async fn ico() {}
+
 impl ServerHook for FaviconRoute {
     async fn new(_ctx: &Context) -> Self {
         Self
