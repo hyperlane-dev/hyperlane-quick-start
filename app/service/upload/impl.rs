@@ -177,8 +177,7 @@ impl UploadService {
         };
         read_file_id_map()
             .await
-            .get(&file_id)
-            .map(|data| data.clone())
+            .get(&file_id).cloned()
     }
 
     #[response_status_code(200)]
@@ -238,11 +237,7 @@ impl UploadService {
         }
         let start: u64 = if start_str.is_empty() {
             let suffix_length: u64 = end_str.parse().map_err(|_| "Invalid end range")?;
-            if suffix_length >= file_size {
-                0
-            } else {
-                file_size - suffix_length
-            }
+            file_size.saturating_sub(suffix_length)
         } else {
             start_str.parse().map_err(|_| "Invalid start range")?
         };
@@ -376,8 +371,8 @@ impl UploadService {
         let upload_strategy: ChunkStrategy = ChunkStrategy::new(
             0,
             &save_upload_dir,
-            &file_id,
-            &file_name,
+            file_id,
+            file_name,
             *total_chunks,
             |a, b| format!("{a}.{b}"),
         )
@@ -400,8 +395,8 @@ impl UploadService {
         let upload_strategy: ChunkStrategy = ChunkStrategy::new(
             0,
             &save_upload_dir,
-            &file_id,
-            &file_name,
+            file_id,
+            file_name,
             *total_chunks,
             |a, b| format!("{a}.{b}"),
         )
@@ -409,13 +404,13 @@ impl UploadService {
         let url_encode_dir: String =
             Encode::execute(CHARSETS, &format!("{base_file_dir}/{file_id}")).unwrap_or_default();
         let url_encode_dir_file_name: String =
-            Encode::execute(CHARSETS, &file_name).unwrap_or_default();
+            Encode::execute(CHARSETS, file_name).unwrap_or_default();
         let url: String = format!("/{STATIC_ROUTE}/{url_encode_dir}/{url_encode_dir_file_name}");
         upload_strategy
             .merge_chunks()
             .await
             .map_err(|error| error.to_string())?;
-        Self::remove_file_id_map(&file_id).await;
+        Self::remove_file_id_map(file_id).await;
         Ok((save_upload_dir.clone(), url))
     }
 }

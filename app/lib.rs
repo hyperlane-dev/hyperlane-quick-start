@@ -10,7 +10,6 @@ pub mod service;
 pub mod utils;
 pub mod view;
 
-use hyperlane_config;
 use hyperlane_plugin::{self, log::*};
 
 use std::*;

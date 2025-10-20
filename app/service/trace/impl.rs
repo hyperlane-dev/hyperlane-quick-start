@@ -19,7 +19,7 @@ impl TraceService {
                 for log_file_name in log_files.iter().take(MAX_LOG_FILES_PER_DATE) {
                     let full_path: PathBuf = date_path.join(log_file_name);
                     if let Ok(content) =
-                        async_read_from_file::<Vec<u8>>(&full_path.to_str().unwrap_or_default())
+                        async_read_from_file::<Vec<u8>>(full_path.to_str().unwrap_or_default())
                             .await
                     {
                         let content_str: String = String::from_utf8_lossy(&content).to_string();

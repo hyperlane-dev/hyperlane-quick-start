@@ -8,7 +8,7 @@ impl ServerHook for ChatRequestHook {
     #[request_body_json(req_data_res: WebSocketReqData)]
     async fn handle(self, ctx: &Context) {
         let req_data: WebSocketReqData = req_data_res.unwrap();
-        if ChatService::handle_ping_request(&ctx, &req_data).await {
+        if ChatService::handle_ping_request(ctx, &req_data).await {
             return;
         }
         let session_id: String = ChatService::get_name(ctx).await;
@@ -21,7 +21,7 @@ impl ServerHook for ChatRequestHook {
                 });
             }
         });
-        let resp_data: WebSocketRespData = req_data.into_resp(&ctx).await;
+        let resp_data: WebSocketRespData = req_data.into_resp(ctx).await;
         let resp_data: ResponseBody = serde_json::to_vec(&resp_data).unwrap();
         ctx.set_response_body(&resp_data).await;
     }
@@ -62,7 +62,7 @@ impl ServerHook for ChatClosedHook {
         let username: String = ChatService::get_name(ctx).await;
         ChatDomain::remove_online_user(&username);
         let resp_data: ResponseBody =
-            ChatService::create_online_count_message(&ctx, receiver_count.to_string()).await;
+            ChatService::create_online_count_message(ctx, receiver_count.to_string()).await;
         ctx.set_response_body(&resp_data).await;
     }
 }
@@ -180,7 +180,7 @@ impl ChatService {
             .and_then(|error| error.get(JSON_FIELD_MESSAGE))
             .and_then(|message| message.as_str())
             .map(|msg| format!("API error: {msg}"))
-            .or_else(|| Some(format!("API error: Unknown error")))
+            .or_else(|| Some("API error: Unknown error".to_string()))
     }
 
     fn handle_gpt_api_response(response_text: &str) -> Result<String, String> {

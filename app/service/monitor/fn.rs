@@ -70,7 +70,7 @@ fn process_netstat_output(output_str: &str) -> Vec<ConnectionInfo> {
 fn get_network_performance_counters() -> (u64, u64) {
     let result: Option<(u64, u64)> = (|| {
         let output = Command::new(WIN_POWERSHELL_COMMAND)
-            .args(&[WIN_POWERSHELL_ARG, WIN_PERF_COUNTER_SCRIPT])
+            .args([WIN_POWERSHELL_ARG, WIN_PERF_COUNTER_SCRIPT])
             .output()
             .ok()?;
         let output_str = String::from_utf8_lossy(&output.stdout);
@@ -288,7 +288,7 @@ pub async fn get_system_info() -> SystemInfo {
 fn get_cpu_usage_via_powershell() -> Option<f64> {
     use std::process::Command;
     if let Ok(output) = Command::new("powershell")
-        .args(&["-Command", "Get-WmiObject -Class Win32_Processor | Measure-Object -Property LoadPercentage -Average | Select-Object -ExpandProperty Average"])
+        .args(["-Command", "Get-WmiObject -Class Win32_Processor | Measure-Object -Property LoadPercentage -Average | Select-Object -ExpandProperty Average"])
         .output()
     {
         let output_str: String = String::from_utf8_lossy(&output.stdout).to_string();
@@ -303,7 +303,7 @@ fn get_cpu_usage_via_powershell() -> Option<f64> {
 fn get_cpu_usage_via_typeperf() -> Option<f64> {
     use std::process::Command;
     if let Ok(output) = Command::new("typeperf")
-        .args(&["-sc", "1", "\\Processor(_Total)\\% Processor Time"])
+        .args(["-sc", "1", "\\Processor(_Total)\\% Processor Time"])
         .output()
     {
         let output_str: String = String::from_utf8_lossy(&output.stdout).to_string();
@@ -352,7 +352,7 @@ async fn get_cpu_usage() -> f64 {
         if let Some(usage) = get_cpu_usage_via_typeperf() {
             return usage;
         }
-        return 25.5;
+        25.5
     }
 
     #[cfg(not(target_os = "windows"))]
@@ -397,7 +397,7 @@ fn parse_memory_from_powershell(output_str: &str) -> Option<(u64, u64, f64)> {
 fn get_memory_via_powershell() -> Option<(u64, u64, f64)> {
     use std::process::Command;
     if let Ok(output) = Command::new("powershell")
-        .args(&[
+        .args([
             "-Command",
             r#"
             $os = Get-CimInstance -ClassName Win32_OperatingSystem
@@ -418,7 +418,7 @@ fn get_memory_via_powershell() -> Option<(u64, u64, f64)> {
 fn get_total_memory_via_wmic() -> Option<u64> {
     use std::process::Command;
     if let Ok(output) = Command::new("wmic")
-        .args(&["computersystem", "get", "TotalPhysicalMemory", "/value"])
+        .args(["computersystem", "get", "TotalPhysicalMemory", "/value"])
         .output()
     {
         let output_str: String = String::from_utf8_lossy(&output.stdout).to_string();
@@ -437,7 +437,7 @@ fn get_total_memory_via_wmic() -> Option<u64> {
 fn get_free_memory_via_wmic() -> Option<u64> {
     use std::process::Command;
     if let Ok(output) = Command::new("wmic")
-        .args(&["OS", "get", "FreePhysicalMemory", "/value"])
+        .args(["OS", "get", "FreePhysicalMemory", "/value"])
         .output()
     {
         let output_str: String = String::from_utf8_lossy(&output.stdout).to_string();
@@ -538,7 +538,7 @@ async fn get_memory_info() -> (u64, u64, f64) {
             }
         }
 
-        return (0, 0, 0.0);
+        (0, 0, 0.0)
     }
 
     #[cfg(not(target_os = "windows"))]
@@ -561,7 +561,7 @@ async fn get_disk_info() -> (u64, u64, f64) {
         use std::process::Command;
 
         if let Ok(output) = Command::new("powershell")
-            .args(&["-Command", "Get-PSDrive C | Select-Object Used, Free"])
+            .args(["-Command", "Get-PSDrive C | Select-Object Used, Free"])
             .output()
         {
             let output_str: String = String::from_utf8_lossy(&output.stdout).to_string();
@@ -585,7 +585,7 @@ async fn get_disk_info() -> (u64, u64, f64) {
         }
 
         if let Ok(output) = Command::new("fsutil")
-            .args(&["volume", "diskfree", "C:"])
+            .args(["volume", "diskfree", "C:"])
             .output()
         {
             let output_str: String = String::from_utf8_lossy(&output.stdout).to_string();
@@ -614,7 +614,7 @@ async fn get_disk_info() -> (u64, u64, f64) {
                 return (used, total, usage);
             }
         }
-        return (50 * 1024 * 1024 * 1024, 100 * 1024 * 1024 * 1024, 50.0);
+        (50 * 1024 * 1024 * 1024, 100 * 1024 * 1024 * 1024, 50.0)
     }
 
     #[cfg(not(target_os = "windows"))]
@@ -648,7 +648,7 @@ async fn get_network_info() -> (u64, u64) {
         let mut tx_bytes: u64 = 0;
 
         if let Ok(output) = Command::new("powershell")
-            .args(&[
+            .args([
                 "-Command",
                 r#"
                 Get-Counter '\Network Interface(*)\Bytes Received/sec', '\Network Interface(*)\Bytes Sent/sec' -SampleInterval 1 -MaxSamples 1 |
@@ -678,7 +678,7 @@ async fn get_network_info() -> (u64, u64) {
 
         if rx_bytes == 0 && tx_bytes == 0 {
             if let Ok(output) = Command::new("powershell")
-                .args(&[
+                .args([
                     "-Command",
                     "Get-WmiObject -Class Win32_PerfRawData_Tcpip_NetworkInterface | Where-Object {$_.Name -notlike '*Loopback*' -and $_.Name -ne '_Total'} | ForEach-Object { \"$($_.BytesReceivedPerSec),$($_.BytesSentPerSec)\" }"
                 ])
@@ -728,7 +728,7 @@ async fn get_uptime() -> u64 {
     {
         use std::process::Command;
         if let Ok(output) = Command::new("wmic")
-            .args(&["os", "get", "LastBootUpTime", "/value"])
+            .args(["os", "get", "LastBootUpTime", "/value"])
             .output()
         {
             let output_str: String = String::from_utf8_lossy(&output.stdout).to_string();
@@ -746,7 +746,7 @@ async fn get_uptime() -> u64 {
                 }
             }
         }
-        return 3600 * 24 * 2;
+        3600 * 24 * 2
     }
 
     #[cfg(not(target_os = "windows"))]
@@ -767,7 +767,7 @@ async fn get_load_average() -> f64 {
     {
         use std::process::Command;
         if let Ok(output) = Command::new("wmic")
-            .args(&["cpu", "get", "loadpercentage", "/value"])
+            .args(["cpu", "get", "loadpercentage", "/value"])
             .output()
         {
             let output_str: String = String::from_utf8_lossy(&output.stdout).to_string();
@@ -779,7 +779,7 @@ async fn get_load_average() -> f64 {
                 }
             }
         }
-        return 1.25;
+        1.25
     }
 
     #[cfg(not(target_os = "windows"))]
@@ -797,7 +797,7 @@ async fn get_active_connections() -> u32 {
     #[cfg(target_os = "windows")]
     {
         use std::process::Command;
-        if let Ok(output) = Command::new("netstat").args(&["-an"]).output() {
+        if let Ok(output) = Command::new("netstat").args(["-an"]).output() {
             let output_str: String = String::from_utf8_lossy(&output.stdout).to_string();
             let count: u32 = output_str
                 .lines()
@@ -805,7 +805,7 @@ async fn get_active_connections() -> u32 {
                 .count() as u32;
             return if count > 0 { count } else { 42 };
         }
-        return 42;
+        42
     }
 
     #[cfg(not(target_os = "windows"))]
@@ -825,12 +825,12 @@ async fn get_process_count() -> u32 {
     #[cfg(target_os = "windows")]
     {
         use std::process::Command;
-        if let Ok(output) = Command::new("tasklist").args(&["/fo", "csv"]).output() {
+        if let Ok(output) = Command::new("tasklist").args(["/fo", "csv"]).output() {
             let output_str: String = String::from_utf8_lossy(&output.stdout).to_string();
             let count: u32 = output_str.lines().skip(1).count() as u32;
             return if count > 0 { count } else { 156 };
         }
-        return 156;
+        156
     }
 
     #[cfg(not(target_os = "windows"))]
@@ -874,7 +874,7 @@ async fn get_os_name() -> String {
     {
         use std::process::Command;
         if let Ok(output) = Command::new("wmic")
-            .args(&["os", "get", "Caption", "/value"])
+            .args(["os", "get", "Caption", "/value"])
             .output()
         {
             let output_str: String = String::from_utf8_lossy(&output.stdout).to_string();
@@ -937,7 +937,7 @@ async fn get_cpu_cores() -> u32 {
     {
         use std::process::Command;
         if let Ok(output) = Command::new("powershell")
-            .args(&["-Command", "Get-WmiObject -Class Win32_Processor | Select-Object -ExpandProperty NumberOfCores"])
+            .args(["-Command", "Get-WmiObject -Class Win32_Processor | Select-Object -ExpandProperty NumberOfCores"])
             .output()
         {
             let output_str: String = String::from_utf8_lossy(&output.stdout).to_string();
@@ -952,7 +952,7 @@ async fn get_cpu_cores() -> u32 {
                 return cores;
             }
         }
-        return 8;
+        8
     }
 
     #[cfg(not(target_os = "windows"))]
@@ -972,7 +972,7 @@ async fn get_cpu_model() -> String {
     {
         use std::process::Command;
         if let Ok(output) = Command::new("powershell")
-            .args(&[
+            .args([
                 "-Command",
                 "Get-WmiObject -Class Win32_Processor | Select-Object -ExpandProperty Name",
             ])
@@ -986,7 +986,7 @@ async fn get_cpu_model() -> String {
         }
 
         if let Ok(output) = Command::new("wmic")
-            .args(&["cpu", "get", "Name", "/format:list"])
+            .args(["cpu", "get", "Name", "/format:list"])
             .output()
         {
             let output_str: String = String::from_utf8_lossy(&output.stdout).to_string();
@@ -1020,7 +1020,7 @@ async fn get_total_memory() -> u64 {
         use std::process::Command;
 
         if let Ok(output) = Command::new("wmic")
-            .args(&["computersystem", "get", "TotalPhysicalMemory", "/value"])
+            .args(["computersystem", "get", "TotalPhysicalMemory", "/value"])
             .output()
         {
             let output_str: String = String::from_utf8_lossy(&output.stdout).to_string();
@@ -1056,7 +1056,7 @@ async fn get_total_disk() -> u64 {
         use std::process::Command;
 
         if let Ok(output) = Command::new("powershell")
-            .args(&[
+            .args([
                 "-Command",
                 "Get-PSDrive C | Select-Object -ExpandProperty Size",
             ])
@@ -1069,7 +1069,7 @@ async fn get_total_disk() -> u64 {
         }
 
         if let Ok(output) = Command::new("fsutil")
-            .args(&["volume", "diskfree", "C:"])
+            .args(["volume", "diskfree", "C:"])
             .output()
         {
             let output_str: String = String::from_utf8_lossy(&output.stdout).to_string();

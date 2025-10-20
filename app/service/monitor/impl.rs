@@ -1,6 +1,3 @@
 use super::*;
 
-
-
-impl MonitorService {
-}
+impl MonitorService {}

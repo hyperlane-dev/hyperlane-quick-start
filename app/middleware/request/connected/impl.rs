@@ -16,7 +16,7 @@ impl ServerHook for ConnectedMiddleware {
         let username: String = ChatService::get_name(ctx).await;
         ChatDomain::add_online_user(&username);
         let resp_data: ResponseBody =
-            ChatService::create_online_count_message(&ctx, receiver_count).await;
+            ChatService::create_online_count_message(ctx, receiver_count).await;
         ctx.set_response_body(&resp_data).await;
         ChatService::broadcast_online_count(key, resp_data);
     }

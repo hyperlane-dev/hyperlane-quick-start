@@ -6,7 +6,7 @@ impl LogService {
             .map(|entries| {
                 let mut dirs: Vec<String> = entries
                     .filter_map(Result::ok)
-                    .filter(|error| error.file_type().map_or(false, |ft| ft.is_dir()))
+                    .filter(|error| error.file_type().is_ok_and(|ft| ft.is_dir()))
                     .filter_map(|error| error.file_name().into_string().ok())
                     .collect();
                 dirs.sort();
@@ -21,7 +21,7 @@ impl LogService {
             .map(|entries| {
                 let mut files: Vec<String> = entries
                     .filter_map(Result::ok)
-                    .filter(|error| error.file_type().map_or(false, |ft| ft.is_file()))
+                    .filter(|error| error.file_type().is_ok_and(|ft| ft.is_file()))
                     .filter_map(|error| error.file_name().into_string().ok())
                     .filter(|name| name.ends_with(LOG_FILE_EXTENSION))
                     .collect();
