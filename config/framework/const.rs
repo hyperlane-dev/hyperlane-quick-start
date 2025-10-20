@@ -3,7 +3,7 @@ use super::*;
 pub const SERVER_PORT: usize = 65002;
 pub const SERVER_HOST: &str = "0.0.0.0";
 pub const SERVER_BUFFER: usize = 4096;
-pub const SERVER_LOG_SIZE: usize = 10_002_400;
+pub const SERVER_LOG_SIZE: usize = 100_024_000;
 pub const SERVER_LOG_DIR: &str = "/shell/logs";
 pub const SERVER_LOG_LEVEL: [&str; 3] = ["info", "warn", "error"];
 pub const SERVER_INNER_PRINT: bool = true;
