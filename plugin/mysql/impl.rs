@@ -188,19 +188,14 @@ impl MySqlAutoCreation {
 }
 
 impl DatabaseAutoCreation for MySqlAutoCreation {
-    async fn create_database_if_not_exists(
-        &self,
-    ) -> Result<bool, AutoCreationError> {
+    async fn create_database_if_not_exists(&self) -> Result<bool, AutoCreationError> {
         let admin_connection: DatabaseConnection = self.create_admin_connection().await?;
-        let result: Result<bool, AutoCreationError> =
-            self.create_database(&admin_connection).await;
+        let result: Result<bool, AutoCreationError> = self.create_database(&admin_connection).await;
         let _ = admin_connection.close().await;
         result
     }
 
-    async fn create_tables_if_not_exist(
-        &self,
-    ) -> Result<Vec<String>, AutoCreationError> {
+    async fn create_tables_if_not_exist(&self) -> Result<Vec<String>, AutoCreationError> {
         let connection: DatabaseConnection = self.create_target_connection().await?;
         let schema: DatabaseSchema = self.get_mysql_schema();
         let mut created_tables: Vec<String> = Vec::new();
@@ -255,9 +250,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
         Ok(created_tables)
     }
 
-    async fn verify_connection(
-        &self,
-    ) -> Result<(), AutoCreationError> {
+    async fn verify_connection(&self) -> Result<(), AutoCreationError> {
         let db_url: String = format!(
             "mysql://{}:{}@{}:{}/{}",
             self.env.mysql_username,
@@ -266,12 +259,11 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
             self.env.mysql_port,
             self.env.mysql_database
         );
-        let connection: DatabaseConnection =
-            Database::connect(&db_url).await.map_err(|error| {
-                AutoCreationError::ConnectionFailed(format!(
-                    "Failed to verify MySQL connection: {error}"
-                ))
-            })?;
+        let connection: DatabaseConnection = Database::connect(&db_url).await.map_err(|error| {
+            AutoCreationError::ConnectionFailed(format!(
+                "Failed to verify MySQL connection: {error}"
+            ))
+        })?;
 
         let statement: Statement =
             Statement::from_string(DatabaseBackend::MySql, "SELECT 1".to_string());

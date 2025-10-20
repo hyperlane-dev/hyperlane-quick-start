@@ -196,19 +196,14 @@ impl PostgreSqlAutoCreation {
 }
 
 impl DatabaseAutoCreation for PostgreSqlAutoCreation {
-    async fn create_database_if_not_exists(
-        &self,
-    ) -> Result<bool, AutoCreationError> {
+    async fn create_database_if_not_exists(&self) -> Result<bool, AutoCreationError> {
         let admin_connection: DatabaseConnection = self.create_admin_connection().await?;
-        let result: Result<bool, AutoCreationError> =
-            self.create_database(&admin_connection).await;
+        let result: Result<bool, AutoCreationError> = self.create_database(&admin_connection).await;
         let _ = admin_connection.close().await;
         result
     }
 
-    async fn create_tables_if_not_exist(
-        &self,
-    ) -> Result<Vec<String>, AutoCreationError> {
+    async fn create_tables_if_not_exist(&self) -> Result<Vec<String>, AutoCreationError> {
         let connection: DatabaseConnection = self.create_target_connection().await?;
         let schema: DatabaseSchema = self.get_postgresql_schema();
         let mut created_tables: Vec<String> = Vec::new();
@@ -264,9 +259,7 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
         Ok(created_tables)
     }
 
-    async fn verify_connection(
-        &self,
-    ) -> Result<(), AutoCreationError> {
+    async fn verify_connection(&self) -> Result<(), AutoCreationError> {
         let connection: DatabaseConnection = self.create_target_connection().await?;
         let statement: Statement =
             Statement::from_string(DatabaseBackend::Postgres, "SELECT 1".to_string());
