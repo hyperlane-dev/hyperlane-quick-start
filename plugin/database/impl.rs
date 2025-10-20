@@ -288,11 +288,11 @@ impl DatabaseSchema {
     }
 
     pub fn ordered_tables(&self) -> Vec<&TableSchema> {
-        let mut ordered = Vec::new();
+        let mut ordered: Vec<&TableSchema> = Vec::new();
         let mut remaining: Vec<&TableSchema> = self.tables.iter().collect();
 
         while !remaining.is_empty() {
-            let mut added_any = false;
+            let mut added_any: bool = false;
 
             remaining.retain(|table| {
                 let dependencies_satisfied = table.dependencies.iter().all(|dep| {
@@ -400,7 +400,7 @@ impl PluginAutoCreationConfig {
     }
 
     pub fn get_database_name(&self) -> String {
-        let env = AutoCreationConfig::get_env();
+        let env: &'static EnvConfig = AutoCreationConfig::get_env();
         if let Ok(plugin_type) = PluginType::from_str(&self.plugin_name) {
             match plugin_type {
                 PluginType::MySQL => env.mysql_database.clone(),
