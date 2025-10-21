@@ -13,7 +13,7 @@ impl ServerHook for ServerStatusRoute {
     async fn handle(self, ctx: &Context) {
         let _ = ctx.send().await;
         loop {
-            let server_status: ServerStatus = get_server_status().await;
+            let server_status: ServerStatus = MonitorService::get_server_status().await;
             let status_json: String = serde_json::to_string(&server_status).unwrap_or_default();
             let sse_data: String = format!("data: {status_json}{DOUBLE_BR}");
             let send_result: ResponseResult =
@@ -38,7 +38,7 @@ impl ServerHook for SystemInfoRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     async fn handle(self, ctx: &Context) {
-        let system_info: SystemInfo = get_system_info().await;
+        let system_info: SystemInfo = MonitorService::get_system_info().await;
         let response = ApiResponse::success(system_info);
         ctx.set_response_body(&response.to_json_bytes()).await;
     }
@@ -51,7 +51,7 @@ impl ServerHook for NetworkCaptureRoute {
 
     #[prologue_macros(methods(get, post))]
     async fn handle(self, ctx: &Context) {
-        get_network_capture_data(ctx).await;
+        MonitorService::get_network_capture_data(ctx).await;
     }
 }
 
@@ -67,6 +67,6 @@ impl ServerHook for NetworkCaptureStreamRoute {
         response_header(ACCESS_CONTROL_ALLOW_ORIGIN => WILDCARD_ANY)
     )]
     async fn handle(self, ctx: &Context) {
-        get_network_capture_stream(ctx).await;
+        MonitorService::get_network_capture_stream(ctx).await;
     }
 }

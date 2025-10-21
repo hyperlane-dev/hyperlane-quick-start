@@ -12,7 +12,7 @@ async fn init_config(server: &Server) {
 }
 
 async fn init_network_capture() {
-    start_network_capture().await;
+    MonitorService::start_network_capture().await;
 }
 
 async fn init_db() {
