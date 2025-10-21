@@ -1,3 +1,6 @@
+#[cfg(not(target_os = "windows"))]
+use super::*;
+
 pub struct MonitorService;
 
 #[cfg(not(target_os = "windows"))]
