@@ -1,4 +1,4 @@
 use super::*;
 
-#[route("/static/{path...}")]
+#[route("/static/{path:.*}")]
 pub struct StaticResourceRoute;
