@@ -1,7 +1,7 @@
 pub struct MonitorService;
 
 #[cfg(not(target_os = "windows"))]
-struct LinuxMemoryInfo {
+pub struct LinuxMemoryInfo {
     total: u64,
     available: u64,
     free: u64,
