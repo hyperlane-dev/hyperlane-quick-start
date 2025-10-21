@@ -9,21 +9,21 @@ impl Modify for PathsModifier {
             || ResponseBuilder::new().description("Internal Server Error");
 
         let path_item = |method: &str, summary: &str, description: Option<&str>| -> PathItem {
-            let mut responses = ResponsesBuilder::new();
+            let mut responses: ResponsesBuilder = ResponsesBuilder::new();
             responses = responses
                 .response("200", success_response())
                 .response("400", bad_request_response())
                 .response("404", not_found_response())
                 .response("500", internal_error_response());
 
-            let mut op = OperationBuilder::new();
+            let mut op: OperationBuilder = OperationBuilder::new();
             op = op.summary(Some(summary));
             if let Some(desc) = description {
                 op = op.description(Some(desc));
             }
             op = op.responses(responses);
 
-            let operation = op.build();
+            let operation: Operation = op.build();
 
             match method {
                 "get" => PathItem::new(HttpMethod::Get, operation),
@@ -37,33 +37,33 @@ impl Modify for PathsModifier {
                                    description: Option<&str>,
                                    schema_ref: &str|
          -> PathItem {
-            let mut responses = ResponsesBuilder::new();
+            let mut responses: ResponsesBuilder = ResponsesBuilder::new();
             responses = responses
                 .response("200", success_response())
                 .response("400", bad_request_response())
                 .response("404", not_found_response())
                 .response("500", internal_error_response());
 
-            let request_body = RequestBodyBuilder::new()
-                .description(Some("Request body"))
-                .content(
-                    "application/json",
-                    ContentBuilder::new()
-                        .schema(Some(Ref::from_schema_name(schema_ref)))
-                        .build(),
-                )
-                .required(Some(Required::True))
-                .build();
-
-            let mut op = OperationBuilder::new();
+            let mut op: OperationBuilder = OperationBuilder::new();
             op = op.summary(Some(summary));
             if let Some(desc) = description {
                 op = op.description(Some(desc));
             }
-            op = op.request_body(Some(request_body));
+            op = op.request_body(Some(
+                RequestBodyBuilder::new()
+                    .description(Some("Request body"))
+                    .content(
+                        "application/json",
+                        ContentBuilder::new()
+                            .schema(Some(Ref::from_schema_name(schema_ref)))
+                            .build(),
+                    )
+                    .required(Some(Required::True))
+                    .build(),
+            ));
             op = op.responses(responses);
 
-            let operation = op.build();
+            let operation: Operation = op.build();
 
             match method {
                 "get" => PathItem::new(HttpMethod::Get, operation),
@@ -77,28 +77,29 @@ impl Modify for PathsModifier {
                                        description: Option<&str>,
                                        response_schema: &str|
          -> PathItem {
-            let success_resp = ResponseBuilder::new().description("Success").content(
-                "application/json",
-                ContentBuilder::new()
-                    .schema(Some(Ref::from_schema_name(response_schema)))
-                    .build(),
-            );
-
-            let mut responses = ResponsesBuilder::new();
+            let mut responses: ResponsesBuilder = ResponsesBuilder::new();
             responses = responses
-                .response("200", success_resp)
+                .response(
+                    "200",
+                    ResponseBuilder::new().description("Success").content(
+                        "application/json",
+                        ContentBuilder::new()
+                            .schema(Some(Ref::from_schema_name(response_schema)))
+                            .build(),
+                    ),
+                )
                 .response("400", bad_request_response())
                 .response("404", not_found_response())
                 .response("500", internal_error_response());
 
-            let mut op = OperationBuilder::new();
+            let mut op: OperationBuilder = OperationBuilder::new();
             op = op.summary(Some(summary));
             if let Some(desc) = description {
                 op = op.description(Some(desc));
             }
             op = op.responses(responses);
 
-            let operation = op.build();
+            let operation: Operation = op.build();
 
             match method {
                 "get" => PathItem::new(HttpMethod::Get, operation),
@@ -120,7 +121,7 @@ impl Modify for PathsModifier {
                 .response("404", not_found_response())
                 .response("500", internal_error_response());
 
-            let parameter = ParameterBuilder::new()
+            let parameter: Parameter = ParameterBuilder::new()
                 .name(param_name)
                 .parameter_in(ParameterIn::Path)
                 .description(Some(param_desc))
@@ -140,7 +141,7 @@ impl Modify for PathsModifier {
             op = op.parameter(parameter);
             op = op.responses(responses);
 
-            let operation = op.build();
+            let operation: Operation = op.build();
 
             match method {
                 "get" => PathItem::new(HttpMethod::Get, operation),

@@ -17,7 +17,7 @@ use utoipa::{
     openapi::{
         ContentBuilder, HttpMethod, ObjectBuilder, OpenApi, PathItem, Ref, Required,
         ResponseBuilder, ResponsesBuilder, Type,
-        path::{OperationBuilder, ParameterBuilder, ParameterIn},
+        path::{Operation, OperationBuilder, Parameter, ParameterBuilder, ParameterIn},
         request_body::RequestBodyBuilder,
         schema::SchemaType,
     },
