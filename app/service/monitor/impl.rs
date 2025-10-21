@@ -1052,52 +1052,52 @@ impl MonitorService {
 #[cfg(not(target_os = "windows"))]
 impl LinuxMemoryInfo {
     fn new() -> Self {
-        Self {
-            total: 0,
-            available: 0,
-            free: 0,
-            buffers: 0,
-            cached: 0,
-        }
+        let mut info = Self::default();
+        info.set_total(0)
+            .set_available(0)
+            .set_free(0)
+            .set_buffers(0)
+            .set_cached(0);
+        info
     }
 
     fn parse_meminfo_line(&mut self, line: &str) {
         if line.starts_with("MemTotal:") {
             if let Some(value) = line.split_whitespace().nth(1) {
-                self.total = value.parse::<u64>().unwrap_or(0) * 1024;
+                self.set_total(value.parse::<u64>().unwrap_or(0) * 1024);
             }
         } else if line.starts_with("MemAvailable:") {
             if let Some(value) = line.split_whitespace().nth(1) {
-                self.available = value.parse::<u64>().unwrap_or(0) * 1024;
+                self.set_available(value.parse::<u64>().unwrap_or(0) * 1024);
             }
         } else if line.starts_with("MemFree:") {
             if let Some(value) = line.split_whitespace().nth(1) {
-                self.free = value.parse::<u64>().unwrap_or(0) * 1024;
+                self.set_free(value.parse::<u64>().unwrap_or(0) * 1024);
             }
         } else if line.starts_with("Buffers:") {
             if let Some(value) = line.split_whitespace().nth(1) {
-                self.buffers = value.parse::<u64>().unwrap_or(0) * 1024;
+                self.set_buffers(value.parse::<u64>().unwrap_or(0) * 1024);
             }
         } else if line.starts_with("Cached:") {
             if let Some(value) = line.split_whitespace().nth(1) {
-                self.cached = value.parse::<u64>().unwrap_or(0) * 1024;
+                self.set_cached(value.parse::<u64>().unwrap_or(0) * 1024);
             }
         }
     }
 
     fn calculate_usage(&self) -> (u64, u64, f64) {
-        let available: u64 = if self.available == 0 && self.total > 0 {
-            self.free + self.buffers + self.cached
+        let available: u64 = if *self.get_available() == 0 && *self.get_total() > 0 {
+            *self.get_free() + *self.get_buffers() + *self.get_cached()
         } else {
-            self.available
+            *self.get_available()
         };
 
-        let used: u64 = self.total.saturating_sub(available);
-        let usage: f64 = if self.total > 0 {
-            (used as f64 / self.total as f64) * 100.0
+        let used: u64 = self.get_total().saturating_sub(available);
+        let usage: f64 = if *self.get_total() > 0 {
+            (used as f64 / *self.get_total() as f64) * 100.0
         } else {
             0.0
         };
-        (used, self.total, usage)
+        (used, *self.get_total(), usage)
     }
 }

@@ -1,6 +1,7 @@
 pub struct MonitorService;
 
 #[cfg(not(target_os = "windows"))]
+#[derive(Data)]
 pub struct LinuxMemoryInfo {
     total: u64,
     available: u64,
