@@ -31,9 +31,10 @@ impl ServerHook for ChatRoute {
             .set_context(ctx.clone())
             .set_broadcast_type(key)
             .set_buffer_size(SERVER_BUFFER)
+            .set_connected_hook::<ChatConnectedHook>()
             .set_request_hook::<ChatRequestHook>()
             .set_sended_hook::<ChatSendedHook>()
-            .set_closed_hook::<ChatSendedHook>();
+            .set_closed_hook::<ChatClosedHook>();
         websocket.run(cfg).await;
     }
 }

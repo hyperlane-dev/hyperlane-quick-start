@@ -1,5 +1,21 @@
 use super::*;
 
+impl ServerHook for ChatConnectedHook {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    async fn handle(self, ctx: &Context) {
+        let websocket: &WebSocket = get_global_websocket();
+        let path: String = ctx.get_request_path().await;
+        let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
+        let receiver_count: ReceiverCount = websocket.receiver_count(key.clone());
+        let resp_data: ResponseBody =
+            ChatService::create_online_count_message(ctx, receiver_count.to_string()).await;
+        ChatService::broadcast_online_count(key, resp_data);
+    }
+}
+
 impl ServerHook for ChatRequestHook {
     async fn new(_ctx: &Context) -> Self {
         Self
@@ -58,7 +74,7 @@ impl ServerHook for ChatClosedHook {
         let websocket: &WebSocket = get_global_websocket();
         let path: String = ctx.get_request_path().await;
         let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
-        let receiver_count: ReceiverCount = websocket.receiver_count_after_decrement(key);
+        let receiver_count: ReceiverCount = websocket.receiver_count_after_closed(key);
         let username: String = ChatService::get_name(ctx).await;
         ChatDomain::remove_online_user(&username);
         let resp_data: ResponseBody =

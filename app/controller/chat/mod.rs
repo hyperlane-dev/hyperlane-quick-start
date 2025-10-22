@@ -4,8 +4,8 @@ mod r#struct;
 use super::*;
 use r#struct::*;
 
-use domain::chat::ChatDomain;
+use domain::chat::*;
 use hyperlane_config::framework::*;
 use mapper::chat::*;
 use model::data_transfer::{chat::*, common::*};
-use service::chat::{ChatRequestHook, ChatSendedHook};
+use service::chat::*;
