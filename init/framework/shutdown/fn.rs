@@ -1,7 +1,7 @@
 use super::*;
 
 pub fn set_shutdown(shutdown: SharedAsyncTaskFactory<()>) {
-    let _ = SHUTDOWN.set(shutdown);
+    let _: Result<(), SharedAsyncTaskFactory<()>> = SHUTDOWN.set(shutdown);
 }
 
 pub fn shutdown() -> SharedAsyncTaskFactory<()> {

@@ -14,7 +14,7 @@ impl PostgreSqlAutoCreation {
     }
 
     async fn create_admin_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
-        let admin_url = format!(
+        let admin_url: String = format!(
             "postgres://{}:{}@{}:{}/postgres",
             self.env.postgresql_username,
             self.env.postgresql_password,
@@ -22,8 +22,8 @@ impl PostgreSqlAutoCreation {
             self.env.postgresql_port
         );
 
-        Database::connect(&admin_url).await.map_err(|error| {
-            let error_msg = error.to_string();
+        Database::connect(&admin_url).await.map_err(|error: DbErr| {
+            let error_msg: String = error.to_string();
             if error_msg.contains("authentication failed") || error_msg.contains("permission") {
                 AutoCreationError::InsufficientPermissions(format!(
                     "Cannot connect to PostgreSQL server for database creation: {error_msg}"
@@ -41,7 +41,7 @@ impl PostgreSqlAutoCreation {
     }
 
     async fn create_target_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
-        let db_url = format!(
+        let db_url: String = format!(
             "postgres://{}:{}@{}:{}/{}",
             self.env.postgresql_username,
             self.env.postgresql_password,
@@ -49,7 +49,7 @@ impl PostgreSqlAutoCreation {
             self.env.postgresql_port,
             self.env.postgresql_database
         );
-        Database::connect(&db_url).await.map_err(|error| {
+        Database::connect(&db_url).await.map_err(|error: DbErr| {
             AutoCreationError::ConnectionFailed(format!(
                 "Cannot connect to PostgreSQL database '{}': {}",
                 self.env.postgresql_database, error
@@ -61,7 +61,7 @@ impl PostgreSqlAutoCreation {
         &self,
         connection: &DatabaseConnection,
     ) -> Result<bool, AutoCreationError> {
-        let query = format!(
+        let query: String = format!(
             "SELECT 1 FROM pg_database WHERE datname = '{}'",
             self.env.postgresql_database
         );
@@ -86,7 +86,7 @@ impl PostgreSqlAutoCreation {
             .await;
             return Ok(false);
         }
-        let create_query = format!(
+        let create_query: String = format!(
             "CREATE DATABASE \"{}\" WITH ENCODING='UTF8' LC_COLLATE='en_US.UTF-8' LC_CTYPE='en_US.UTF-8'",
             self.env.postgresql_database
         );
@@ -101,7 +101,7 @@ impl PostgreSqlAutoCreation {
                 Ok(true)
             }
             Err(error) => {
-                let error_msg = error.to_string();
+                let error_msg: String = error.to_string();
                 if error_msg.contains("permission denied") || error_msg.contains("must be owner") {
                     Err(AutoCreationError::InsufficientPermissions(format!(
                         "Cannot create PostgreSQL database '{}': {}",
@@ -129,7 +129,7 @@ impl PostgreSqlAutoCreation {
         connection: &DatabaseConnection,
         table_name: &str,
     ) -> Result<bool, AutoCreationError> {
-        let query = format!(
+        let query: String = format!(
             "SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = '{table_name}'"
         );
         let statement: Statement = Statement::from_string(DatabaseBackend::Postgres, query);
@@ -151,7 +151,7 @@ impl PostgreSqlAutoCreation {
         match connection.execute(statement).await {
             Ok(_) => Ok(()),
             Err(error) => {
-                let error_msg = error.to_string();
+                let error_msg: String = error.to_string();
                 if error_msg.contains("permission denied") {
                     Err(AutoCreationError::InsufficientPermissions(format!(
                         "Cannot create PostgreSQL table '{}': {}",
@@ -199,7 +199,7 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
     async fn create_database_if_not_exists(&self) -> Result<bool, AutoCreationError> {
         let admin_connection: DatabaseConnection = self.create_admin_connection().await?;
         let result: Result<bool, AutoCreationError> = self.create_database(&admin_connection).await;
-        let _ = admin_connection.close().await;
+        let _: Result<(), DbErr> = admin_connection.close().await;
         result
     }
 
@@ -248,7 +248,7 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
                 .await;
             }
         }
-        let _ = connection.close().await;
+        let _: Result<(), DbErr> = connection.close().await;
         AutoCreationLogger::log_tables_created(
             &created_tables,
             &self.env.postgresql_database,
@@ -265,7 +265,7 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
             Statement::from_string(DatabaseBackend::Postgres, "SELECT 1".to_string());
         match connection.query_all(statement).await {
             Ok(_) => {
-                let _ = connection.close().await;
+                let _: Result<(), DbErr> = connection.close().await;
                 AutoCreationLogger::log_connection_verification(
                     crate::database::PluginType::PostgreSQL,
                     &self.env.postgresql_database,
@@ -276,7 +276,7 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
                 Ok(())
             }
             Err(error) => {
-                let _ = connection.close().await;
+                let _: Result<(), DbErr> = connection.close().await;
                 let error_msg: String = error.to_string();
                 AutoCreationLogger::log_connection_verification(
                     crate::database::PluginType::PostgreSQL,

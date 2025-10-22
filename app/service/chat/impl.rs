@@ -87,7 +87,7 @@ impl ChatService {
 
     pub fn broadcast_online_count(key: BroadcastType<String>, message: ResponseBody) {
         let websocket: &WebSocket = get_global_websocket();
-        let _ = websocket.send(key, message);
+        let _: BroadcastMapSendResult<Vec<u8>> = websocket.send(key, message);
     }
 
     fn remove_mentions(text: &str) -> String {
@@ -132,7 +132,7 @@ impl ChatService {
         let websocket: &WebSocket = get_global_websocket();
         let path: String = ctx.get_request_path().await;
         let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
-        let _ = websocket.send(key, gpt_resp_json.clone());
+        let _: BroadcastMapSendResult<Vec<u8>> = websocket.send(key, gpt_resp_json.clone());
         ctx.set_response_body(&gpt_resp_json).await;
     }
 
@@ -150,7 +150,7 @@ impl ChatService {
     }
 
     fn build_gpt_request_headers() -> HashMapXxHash3_64<&'static str, String> {
-        let mut headers: HashMapXxHash3_64<&str, String> = hash_map_xx_hash3_64();
+        let mut headers: HashMapXxHash3_64<&'static str, String> = hash_map_xx_hash3_64();
         headers.insert(CONTENT_TYPE, APPLICATION_JSON.to_string());
         headers
     }

@@ -187,7 +187,7 @@ impl UploadService {
         };
         data.set_code(200).set_msg(OK).set_url(url);
         let data_json: ResponseBody = serde_json::to_vec(&data).unwrap_or_default();
-        let _ = ctx.set_response_body(&data_json).await;
+        let _: &Context = ctx.set_response_body(&data_json).await;
     }
 
     #[response_status_code(200)]
@@ -199,7 +199,7 @@ impl UploadService {
         };
         data.set_msg(&error);
         let data_json: ResponseBody = serde_json::to_vec(&data).unwrap_or_default();
-        let _ = ctx.set_response_body(&data_json).await;
+        let _: &Context = ctx.set_response_body(&data_json).await;
     }
 
     pub async fn serve_static_file(dir: &str, file: &str) -> Result<(Vec<u8>, String), String> {

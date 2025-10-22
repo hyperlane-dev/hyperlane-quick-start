@@ -119,7 +119,7 @@ impl MySqlAutoCreation {
         connection: &DatabaseConnection,
         table_name: &str,
     ) -> Result<bool, AutoCreationError> {
-        let query = format!(
+        let query: String = format!(
             "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{}' AND TABLE_NAME = '{table_name}'",
             self.env.mysql_database
         );
@@ -142,7 +142,7 @@ impl MySqlAutoCreation {
         match connection.execute(statement).await {
             Ok(_) => Ok(()),
             Err(error) => {
-                let error_msg = error.to_string();
+                let error_msg: String = error.to_string();
                 if error_msg.contains("Access denied") || error_msg.contains("permission") {
                     Err(AutoCreationError::InsufficientPermissions(format!(
                         "Cannot create MySQL table '{}': {}",
@@ -191,7 +191,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
     async fn create_database_if_not_exists(&self) -> Result<bool, AutoCreationError> {
         let admin_connection: DatabaseConnection = self.create_admin_connection().await?;
         let result: Result<bool, AutoCreationError> = self.create_database(&admin_connection).await;
-        let _ = admin_connection.close().await;
+        let _: Result<(), DbErr> = admin_connection.close().await;
         result
     }
 
@@ -240,7 +240,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                 .await;
             }
         }
-        let _ = connection.close().await;
+        let _: Result<(), DbErr> = connection.close().await;
         AutoCreationLogger::log_tables_created(
             &created_tables,
             &self.env.mysql_database,
@@ -269,7 +269,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
             Statement::from_string(DatabaseBackend::MySql, "SELECT 1".to_string());
         match connection.query_all(statement).await {
             Ok(_) => {
-                let _ = connection.close().await;
+                let _: Result<(), DbErr> = connection.close().await;
                 AutoCreationLogger::log_connection_verification(
                     crate::database::PluginType::MySQL,
                     &self.env.mysql_database,
@@ -280,7 +280,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                 Ok(())
             }
             Err(error) => {
-                let _ = connection.close().await;
+                let _: Result<(), DbErr> = connection.close().await;
                 let error_msg: String = error.to_string();
                 AutoCreationLogger::log_connection_verification(
                     crate::database::PluginType::MySQL,

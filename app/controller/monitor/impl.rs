@@ -11,7 +11,7 @@ impl ServerHook for ServerStatusRoute {
         response_header(CONTENT_TYPE => TEXT_EVENT_STREAM)
     )]
     async fn handle(self, ctx: &Context) {
-        let _ = ctx.send().await;
+        let _: ResponseResult = ctx.send().await;
         loop {
             let server_status: ServerStatus = MonitorService::get_server_status().await;
             let status_json: String = serde_json::to_string(&server_status).unwrap_or_default();
@@ -23,7 +23,7 @@ impl ServerHook for ServerStatusRoute {
             }
             sleep(Duration::from_millis(1000)).await;
         }
-        let _ = ctx.closed().await;
+        ctx.closed().await;
     }
 }
 
@@ -39,7 +39,7 @@ impl ServerHook for SystemInfoRoute {
     )]
     async fn handle(self, ctx: &Context) {
         let system_info: SystemInfo = MonitorService::get_system_info().await;
-        let response = ApiResponse::success(system_info);
+        let response: ApiResponse<SystemInfo> = ApiResponse::success(system_info);
         ctx.set_response_body(&response.to_json_bytes()).await;
     }
 }

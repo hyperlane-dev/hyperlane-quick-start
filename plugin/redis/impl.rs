@@ -96,14 +96,14 @@ impl RedisAutoCreation {
         let mut conn: Connection = self.create_mutable_connection().await?;
         let app_key: &str = "hyperlane:initialized";
         let init_value: &str = "true";
-        let exists: bool = redis::cmd("EXISTS").arg(app_key).query(&mut conn).map_err(
+        let exists: i32 = redis::cmd("EXISTS").arg(app_key).query(&mut conn).map_err(
             |error: redis::RedisError| {
                 AutoCreationError::DatabaseError(format!(
                     "Failed to check Redis key existence: {error}"
                 ))
             },
         )?;
-        if !exists {
+        if exists == 0 {
             let _: () = redis::cmd("SET")
                 .arg(app_key)
                 .arg(init_value)
@@ -141,7 +141,7 @@ impl DatabaseAutoCreation for RedisAutoCreation {
     }
 
     async fn create_tables_if_not_exist(&self) -> Result<Vec<String>, AutoCreationError> {
-        let setup_operations = self.setup_redis_namespace().await?;
+        let setup_operations: Vec<String> = self.setup_redis_namespace().await?;
 
         if !setup_operations.is_empty() {
             AutoCreationLogger::log_tables_created(

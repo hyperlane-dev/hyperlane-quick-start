@@ -517,7 +517,7 @@ impl AutoCreationLogger {
     }
 
     pub async fn log_auto_creation_start(plugin_type: PluginType, database_name: &str) {
-        let message = format!(
+        let message: String = format!(
             "[AUTO-CREATION] Starting auto-creation process for {plugin_type} plugin, database '{database_name}'"
         );
         log_debug(&message).await;
@@ -556,7 +556,7 @@ impl AutoCreationLogger {
         success: bool,
         error: Option<&str>,
     ) {
-        let message = if success {
+        let message: String = if success {
             format!(
                 "[AUTO-CREATION] Connection verification successful for {plugin_type} plugin, database '{database_name}'"
             )
@@ -580,7 +580,7 @@ impl AutoCreationLogger {
         database_name: &str,
         error_details: &str,
     ) {
-        let message = format!(
+        let message: String = format!(
             "[AUTO-CREATION] Insufficient permissions for {operation} in {plugin_type} plugin, database '{database_name}': {error_details} - Continuing with existing resources"
         );
         log_error(&message).await;
