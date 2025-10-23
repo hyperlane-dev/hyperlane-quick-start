@@ -1,5 +1,20 @@
 use super::*;
 
+impl ResponseCode {
+    pub fn default_message(&self) -> &'static str {
+        match self {
+            Self::Success => "Operation successful",
+            Self::BadRequest => "Invalid request parameters",
+            Self::Unauthorized => "Unauthorized access",
+            Self::Forbidden => "Access forbidden",
+            Self::NotFound => "Resource not found",
+            Self::InternalError => "Internal server error",
+            Self::DatabaseError => "Database operation failed",
+            Self::BusinessError => "Business logic error",
+        }
+    }
+}
+
 impl<T> ApiResponse<T>
 where
     T: Serialize + Default,

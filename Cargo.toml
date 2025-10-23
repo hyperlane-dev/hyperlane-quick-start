@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane-quick-start"
-version = "8.0.0"
+version = "8.2.0"
 readme = "README.md"
 edition = "2024"
 authors = ["root@ltpp.vip"]
@@ -51,7 +51,7 @@ opt-level = 1
 lto = false
 panic = "unwind"
 debug = false
-codegen-units = 1
+codegen-units = 16
 strip = "none"
 
 [profile.release]
