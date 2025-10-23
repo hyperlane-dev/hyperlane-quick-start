@@ -335,36 +335,36 @@ impl AutoCreationConfig {
 
     pub fn validate() -> Result<(), String> {
         let env: &'static EnvConfig = Self::get_env();
-        if env.enable_mysql {
-            if env.mysql_host.is_empty() {
+        if *env.get_enable_mysql() {
+            if env.get_mysql_host().is_empty() {
                 return Err("MySQL host is required when auto-creation is enabled".to_string());
             }
-            if env.mysql_username.is_empty() {
+            if env.get_mysql_username().is_empty() {
                 return Err("MySQL username is required when auto-creation is enabled".to_string());
             }
-            if env.mysql_database.is_empty() {
+            if env.get_mysql_database().is_empty() {
                 return Err(
                     "MySQL database name is required when auto-creation is enabled".to_string(),
                 );
             }
         }
-        if env.enable_postgresql {
-            if env.postgresql_host.is_empty() {
+        if *env.get_enable_postgresql() {
+            if env.get_postgresql_host().is_empty() {
                 return Err("PostgreSQL host is required when auto-creation is enabled".to_string());
             }
-            if env.postgresql_username.is_empty() {
+            if env.get_postgresql_username().is_empty() {
                 return Err(
                     "PostgreSQL username is required when auto-creation is enabled".to_string(),
                 );
             }
-            if env.postgresql_database.is_empty() {
+            if env.get_postgresql_database().is_empty() {
                 return Err(
                     "PostgreSQL database name is required when auto-creation is enabled"
                         .to_string(),
                 );
             }
         }
-        if env.enable_redis && env.redis_host.is_empty() {
+        if *env.get_enable_redis() && env.get_redis_host().is_empty() {
             return Err("Redis host is required when auto-creation is enabled".to_string());
         }
         Ok(())
@@ -374,7 +374,9 @@ impl AutoCreationConfig {
         let env: &'static EnvConfig = Self::get_env();
         format!(
             "Auto-creation config: MySQL={}, PostgreSQL={}, Redis={}",
-            env.enable_mysql, env.enable_postgresql, env.enable_redis
+            env.get_enable_mysql(),
+            env.get_enable_postgresql(),
+            env.get_enable_redis()
         )
     }
 
@@ -389,11 +391,12 @@ impl PluginAutoCreationConfig {
     pub fn is_plugin_enabled(&self) -> bool {
         let env: &'static EnvConfig = AutoCreationConfig::get_env();
         if let Ok(plugin_type) = PluginType::from_str(&self.plugin_name) {
-            match plugin_type {
-                PluginType::MySQL => env.enable_mysql,
-                PluginType::PostgreSQL => env.enable_postgresql,
-                PluginType::Redis => env.enable_redis,
-            }
+            let is_enabled: &bool = match plugin_type {
+                PluginType::MySQL => env.get_enable_mysql(),
+                PluginType::PostgreSQL => env.get_enable_postgresql(),
+                PluginType::Redis => env.get_enable_redis(),
+            };
+            *is_enabled
         } else {
             false
         }
@@ -403,8 +406,8 @@ impl PluginAutoCreationConfig {
         let env: &'static EnvConfig = AutoCreationConfig::get_env();
         if let Ok(plugin_type) = PluginType::from_str(&self.plugin_name) {
             match plugin_type {
-                PluginType::MySQL => env.mysql_database.clone(),
-                PluginType::PostgreSQL => env.postgresql_database.clone(),
+                PluginType::MySQL => env.get_mysql_database().clone(),
+                PluginType::PostgreSQL => env.get_postgresql_database().clone(),
                 PluginType::Redis => "default".to_string(),
             }
         } else {
@@ -418,13 +421,17 @@ impl PluginAutoCreationConfig {
             match plugin_type {
                 PluginType::MySQL => format!(
                     "{}:{}:{}",
-                    env.mysql_host, env.mysql_port, env.mysql_database
+                    env.get_mysql_host(),
+                    env.get_mysql_port(),
+                    env.get_mysql_database()
                 ),
                 PluginType::PostgreSQL => format!(
                     "{}:{}:{}",
-                    env.postgresql_host, env.postgresql_port, env.postgresql_database
+                    env.get_postgresql_host(),
+                    env.get_postgresql_port(),
+                    env.get_postgresql_database()
                 ),
-                PluginType::Redis => format!("{}:{}", env.redis_host, env.redis_port),
+                PluginType::Redis => format!("{}:{}", env.get_redis_host(), env.get_redis_port()),
             }
         } else {
             "unknown".to_string()

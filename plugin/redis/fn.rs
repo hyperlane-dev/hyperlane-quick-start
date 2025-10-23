@@ -27,7 +27,10 @@ pub async fn connection_redis_db() -> Result<Arc<Connection>, String> {
     }
     let db_url: String = format!(
         "redis://{}:{}@{}:{}",
-        env.redis_username, env.redis_password, env.redis_host, env.redis_port,
+        env.get_redis_username(),
+        env.get_redis_password(),
+        env.get_redis_host(),
+        env.get_redis_port(),
     );
     let client: Client = Client::open(db_url).map_err(|error: redis::RedisError| {
         let error_msg: String = error.to_string();

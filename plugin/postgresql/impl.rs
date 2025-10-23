@@ -16,10 +16,10 @@ impl PostgreSqlAutoCreation {
     async fn create_admin_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
         let admin_url: String = format!(
             "postgres://{}:{}@{}:{}/postgres",
-            self.env.postgresql_username,
-            self.env.postgresql_password,
-            self.env.postgresql_host,
-            self.env.postgresql_port
+            self.env.get_postgresql_username(),
+            self.env.get_postgresql_password(),
+            self.env.get_postgresql_host(),
+            self.env.get_postgresql_port()
         );
 
         Database::connect(&admin_url).await.map_err(|error: DbErr| {
@@ -43,16 +43,16 @@ impl PostgreSqlAutoCreation {
     async fn create_target_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
         let db_url: String = format!(
             "postgres://{}:{}@{}:{}/{}",
-            self.env.postgresql_username,
-            self.env.postgresql_password,
-            self.env.postgresql_host,
-            self.env.postgresql_port,
-            self.env.postgresql_database
+            self.env.get_postgresql_username(),
+            self.env.get_postgresql_password(),
+            self.env.get_postgresql_host(),
+            self.env.get_postgresql_port(),
+            self.env.get_postgresql_database()
         );
         Database::connect(&db_url).await.map_err(|error: DbErr| {
             AutoCreationError::ConnectionFailed(format!(
-                "Cannot connect to PostgreSQL database '{}': {}",
-                self.env.postgresql_database, error
+                "Cannot connect to PostgreSQL database '{}': {error}",
+                self.env.get_postgresql_database(),
             ))
         })
     }
@@ -63,7 +63,7 @@ impl PostgreSqlAutoCreation {
     ) -> Result<bool, AutoCreationError> {
         let query: String = format!(
             "SELECT 1 FROM pg_database WHERE datname = '{}'",
-            self.env.postgresql_database
+            self.env.get_postgresql_database()
         );
         let statement: Statement = Statement::from_string(DatabaseBackend::Postgres, query);
         match connection.query_all(statement).await {
@@ -80,7 +80,7 @@ impl PostgreSqlAutoCreation {
     ) -> Result<bool, AutoCreationError> {
         if self.database_exists(connection).await? {
             AutoCreationLogger::log_database_exists(
-                &self.env.postgresql_database,
+                self.env.get_postgresql_database(),
                 crate::database::PluginType::PostgreSQL,
             )
             .await;
@@ -88,13 +88,13 @@ impl PostgreSqlAutoCreation {
         }
         let create_query: String = format!(
             "CREATE DATABASE \"{}\" WITH ENCODING='UTF8' LC_COLLATE='en_US.UTF-8' LC_CTYPE='en_US.UTF-8'",
-            self.env.postgresql_database
+            self.env.get_postgresql_database()
         );
         let statement: Statement = Statement::from_string(DatabaseBackend::Postgres, create_query);
         match connection.execute(statement).await {
             Ok(_) => {
                 AutoCreationLogger::log_database_created(
-                    &self.env.postgresql_database,
+                    self.env.get_postgresql_database(),
                     crate::database::PluginType::PostgreSQL,
                 )
                 .await;
@@ -105,11 +105,12 @@ impl PostgreSqlAutoCreation {
                 if error_msg.contains("permission denied") || error_msg.contains("must be owner") {
                     Err(AutoCreationError::InsufficientPermissions(format!(
                         "Cannot create PostgreSQL database '{}': {}",
-                        self.env.postgresql_database, error_msg
+                        self.env.get_postgresql_database(),
+                        error_msg
                     )))
                 } else if error_msg.contains("already exists") {
                     AutoCreationLogger::log_database_exists(
-                        &self.env.postgresql_database,
+                        self.env.get_postgresql_database(),
                         crate::database::PluginType::PostgreSQL,
                     )
                     .await;
@@ -117,7 +118,8 @@ impl PostgreSqlAutoCreation {
                 } else {
                     Err(AutoCreationError::DatabaseError(format!(
                         "Failed to create PostgreSQL database '{}': {}",
-                        self.env.postgresql_database, error_msg
+                        self.env.get_postgresql_database(),
+                        error_msg
                     )))
                 }
             }
@@ -213,14 +215,14 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
                 created_tables.push(table.name.clone());
                 AutoCreationLogger::log_table_created(
                     &table.name,
-                    &self.env.postgresql_database,
+                    self.env.get_postgresql_database(),
                     crate::database::PluginType::PostgreSQL,
                 )
                 .await;
             } else {
                 AutoCreationLogger::log_table_exists(
                     &table.name,
-                    &self.env.postgresql_database,
+                    self.env.get_postgresql_database(),
                     crate::database::PluginType::PostgreSQL,
                 )
                 .await;
@@ -232,7 +234,7 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
                     &error,
                     "Index creation",
                     crate::database::PluginType::PostgreSQL,
-                    Some(&self.env.postgresql_database),
+                    Some(self.env.get_postgresql_database()),
                 )
                 .await;
             }
@@ -243,7 +245,7 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
                     &error,
                     "Constraint creation",
                     crate::database::PluginType::PostgreSQL,
-                    Some(&self.env.postgresql_database),
+                    Some(self.env.get_postgresql_database()),
                 )
                 .await;
             }
@@ -251,7 +253,7 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
         let _: Result<(), DbErr> = connection.close().await;
         AutoCreationLogger::log_tables_created(
             &created_tables,
-            &self.env.postgresql_database,
+            self.env.get_postgresql_database(),
             crate::database::PluginType::PostgreSQL,
         )
         .await;
@@ -268,7 +270,7 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
                 let _: Result<(), DbErr> = connection.close().await;
                 AutoCreationLogger::log_connection_verification(
                     crate::database::PluginType::PostgreSQL,
-                    &self.env.postgresql_database,
+                    self.env.get_postgresql_database(),
                     true,
                     None,
                 )
@@ -280,7 +282,7 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
                 let error_msg: String = error.to_string();
                 AutoCreationLogger::log_connection_verification(
                     crate::database::PluginType::PostgreSQL,
-                    &self.env.postgresql_database,
+                    self.env.get_postgresql_database(),
                     false,
                     Some(&error_msg),
                 )

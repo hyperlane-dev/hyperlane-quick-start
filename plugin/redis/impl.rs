@@ -16,10 +16,10 @@ impl RedisAutoCreation {
     async fn create_mutable_connection(&self) -> Result<Connection, AutoCreationError> {
         let db_url: String = format!(
             "redis://{}:{}@{}:{}",
-            self.env.redis_username,
-            self.env.redis_password,
-            self.env.redis_host,
-            self.env.redis_port
+            self.env.get_redis_username(),
+            self.env.get_redis_password(),
+            self.env.get_redis_host(),
+            self.env.get_redis_port()
         );
         let client: Client = Client::open(db_url).map_err(|error: redis::RedisError| {
             let error_msg: String = error.to_string();

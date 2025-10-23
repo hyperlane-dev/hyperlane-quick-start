@@ -10,7 +10,7 @@ pub async fn initialize_auto_creation() -> Result<(), String> {
     log_info(&format!("[AUTO-CREATION] Initialization: {summary}")).await;
     let env: &'static EnvConfig = get_global_env_config();
     let mut initialization_results: Vec<String> = Vec::new();
-    if env.enable_mysql {
+    if *env.get_enable_mysql() {
         match perform_mysql_auto_creation().await {
             Ok(result) => {
                 initialization_results.push(format!(
@@ -30,7 +30,7 @@ pub async fn initialize_auto_creation() -> Result<(), String> {
             }
         }
     }
-    if env.enable_postgresql {
+    if *env.get_enable_postgresql() {
         match perform_postgresql_auto_creation().await {
             Ok(result) => {
                 initialization_results.push(format!(
@@ -50,7 +50,7 @@ pub async fn initialize_auto_creation() -> Result<(), String> {
             }
         }
     }
-    if env.enable_redis {
+    if *env.get_enable_redis() {
         match perform_redis_auto_creation().await {
             Ok(result) => {
                 initialization_results.push(format!(

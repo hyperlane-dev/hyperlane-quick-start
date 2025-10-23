@@ -16,10 +16,10 @@ impl MySqlAutoCreation {
     async fn create_admin_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
         let admin_url: String = format!(
             "mysql://{}:{}@{}:{}",
-            self.env.mysql_username,
-            self.env.mysql_password,
-            self.env.mysql_host,
-            self.env.mysql_port
+            self.env.get_mysql_username(),
+            self.env.get_mysql_password(),
+            self.env.get_mysql_host(),
+            self.env.get_mysql_port()
         );
         Database::connect(&admin_url).await.map_err(|error: DbErr| {
             let error_msg: String = error.to_string();
@@ -43,7 +43,7 @@ impl MySqlAutoCreation {
     ) -> Result<bool, AutoCreationError> {
         let query: String = format!(
             "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '{}'",
-            self.env.mysql_database
+            self.env.get_mysql_database()
         );
         let statement: Statement = Statement::from_string(DatabaseBackend::MySql, query);
         match connection.query_all(statement).await {
@@ -60,7 +60,7 @@ impl MySqlAutoCreation {
     ) -> Result<bool, AutoCreationError> {
         if self.database_exists(connection).await? {
             AutoCreationLogger::log_database_exists(
-                &self.env.mysql_database,
+                self.env.get_mysql_database(),
                 crate::database::PluginType::MySQL,
             )
             .await;
@@ -68,13 +68,13 @@ impl MySqlAutoCreation {
         }
         let create_query: String = format!(
             "CREATE DATABASE IF NOT EXISTS `{}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
-            self.env.mysql_database
+            self.env.get_mysql_database()
         );
         let statement: Statement = Statement::from_string(DatabaseBackend::MySql, create_query);
         match connection.execute(statement).await {
             Ok(_) => {
                 AutoCreationLogger::log_database_created(
-                    &self.env.mysql_database,
+                    self.env.get_mysql_database(),
                     crate::database::PluginType::MySQL,
                 )
                 .await;
@@ -85,12 +85,14 @@ impl MySqlAutoCreation {
                 if error_msg.contains("Access denied") || error_msg.contains("permission") {
                     Err(AutoCreationError::InsufficientPermissions(format!(
                         "Cannot create MySQL database '{}': {}",
-                        self.env.mysql_database, error_msg
+                        self.env.get_mysql_database(),
+                        error_msg
                     )))
                 } else {
                     Err(AutoCreationError::DatabaseError(format!(
                         "Failed to create MySQL database '{}': {}",
-                        self.env.mysql_database, error_msg
+                        self.env.get_mysql_database(),
+                        error_msg
                     )))
                 }
             }
@@ -100,16 +102,17 @@ impl MySqlAutoCreation {
     async fn create_target_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
         let db_url: String = format!(
             "mysql://{}:{}@{}:{}/{}",
-            self.env.mysql_username,
-            self.env.mysql_password,
-            self.env.mysql_host,
-            self.env.mysql_port,
-            self.env.mysql_database
+            self.env.get_mysql_username(),
+            self.env.get_mysql_password(),
+            self.env.get_mysql_host(),
+            self.env.get_mysql_port(),
+            self.env.get_mysql_database()
         );
         Database::connect(&db_url).await.map_err(|error: DbErr| {
             AutoCreationError::ConnectionFailed(format!(
                 "Cannot connect to MySQL database '{}': {}",
-                self.env.mysql_database, error
+                self.env.get_mysql_database(),
+                error
             ))
         })
     }
@@ -121,7 +124,7 @@ impl MySqlAutoCreation {
     ) -> Result<bool, AutoCreationError> {
         let query: String = format!(
             "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{}' AND TABLE_NAME = '{table_name}'",
-            self.env.mysql_database
+            self.env.get_mysql_database()
         );
         let statement: Statement = Statement::from_string(DatabaseBackend::MySql, query);
         match connection.query_all(statement).await {
@@ -205,14 +208,14 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                 created_tables.push(table.name.clone());
                 AutoCreationLogger::log_table_created(
                     &table.name,
-                    &self.env.mysql_database,
+                    self.env.get_mysql_database(),
                     crate::database::PluginType::MySQL,
                 )
                 .await;
             } else {
                 AutoCreationLogger::log_table_exists(
                     &table.name,
-                    &self.env.mysql_database,
+                    self.env.get_mysql_database(),
                     crate::database::PluginType::MySQL,
                 )
                 .await;
@@ -224,7 +227,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                     &error,
                     "Index creation",
                     crate::database::PluginType::MySQL,
-                    Some(&self.env.mysql_database),
+                    Some(self.env.get_mysql_database()),
                 )
                 .await;
             }
@@ -235,7 +238,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                     &error,
                     "Constraint creation",
                     crate::database::PluginType::MySQL,
-                    Some(&self.env.mysql_database),
+                    Some(self.env.get_mysql_database()),
                 )
                 .await;
             }
@@ -243,7 +246,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
         let _: Result<(), DbErr> = connection.close().await;
         AutoCreationLogger::log_tables_created(
             &created_tables,
-            &self.env.mysql_database,
+            self.env.get_mysql_database(),
             crate::database::PluginType::MySQL,
         )
         .await;
@@ -253,11 +256,11 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
     async fn verify_connection(&self) -> Result<(), AutoCreationError> {
         let db_url: String = format!(
             "mysql://{}:{}@{}:{}/{}",
-            self.env.mysql_username,
-            self.env.mysql_password,
-            self.env.mysql_host,
-            self.env.mysql_port,
-            self.env.mysql_database
+            self.env.get_mysql_username(),
+            self.env.get_mysql_password(),
+            self.env.get_mysql_host(),
+            self.env.get_mysql_port(),
+            self.env.get_mysql_database()
         );
         let connection: DatabaseConnection = Database::connect(&db_url).await.map_err(|error| {
             AutoCreationError::ConnectionFailed(format!(
@@ -272,7 +275,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                 let _: Result<(), DbErr> = connection.close().await;
                 AutoCreationLogger::log_connection_verification(
                     crate::database::PluginType::MySQL,
-                    &self.env.mysql_database,
+                    self.env.get_mysql_database(),
                     true,
                     None,
                 )
@@ -284,7 +287,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                 let error_msg: String = error.to_string();
                 AutoCreationLogger::log_connection_verification(
                     crate::database::PluginType::MySQL,
-                    &self.env.mysql_database,
+                    self.env.get_mysql_database(),
                     false,
                     Some(&error_msg),
                 )

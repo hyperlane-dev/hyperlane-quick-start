@@ -17,13 +17,13 @@ async fn init_network_capture() {
 
 async fn init_db() {
     let env: &EnvConfig = get_global_env_config();
-    if env.enable_mysql {
+    if *env.get_enable_mysql() {
         let _ = connection_mysql_db().await;
     }
-    if env.enable_postgresql {
+    if *env.get_enable_postgresql() {
         let _ = connection_postgresql_db().await;
     }
-    if env.enable_redis {
+    if *env.get_enable_redis() {
         let _ = connection_redis_db().await;
     }
     match initialize_auto_creation().await {

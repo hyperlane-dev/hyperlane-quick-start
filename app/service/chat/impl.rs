@@ -228,7 +228,7 @@ impl ChatService {
 
     async fn call_gpt_api_with_context(session: &ChatSession) -> Result<String, String> {
         let config: &EnvConfig = get_global_env_config();
-        let gtp_model: &str = &config.gtp_model;
+        let gtp_model: &str = config.get_gtp_model();
         let messages: Vec<JsonValue> = Self::build_gpt_request_messages(session);
         let body: JsonValue = json_value!({
             GPT_MODEL: gtp_model,
@@ -236,7 +236,7 @@ impl ChatService {
         });
         let headers: HashMapXxHash3_64<&str, String> = Self::build_gpt_request_headers();
         let mut request_builder: BoxAsyncRequestTrait = RequestBuilder::new()
-            .post(&config.gpt_api_url)
+            .post(config.get_gpt_api_url())
             .json(body)
             .headers(headers)
             .redirect()

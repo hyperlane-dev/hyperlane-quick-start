@@ -17,7 +17,7 @@ pub async fn connection_mysql_db() -> Result<DatabaseConnection, String> {
                 &error,
                 "Auto-creation process",
                 crate::database::PluginType::MySQL,
-                Some(&env.mysql_database),
+                Some(env.get_mysql_database()),
             )
             .await;
             if !error.should_continue() {
@@ -27,14 +27,18 @@ pub async fn connection_mysql_db() -> Result<DatabaseConnection, String> {
     }
     let db_url: String = format!(
         "mysql://{}:{}@{}:{}/{}",
-        env.mysql_username, env.mysql_password, env.mysql_host, env.mysql_port, env.mysql_database
+        env.get_mysql_username(),
+        env.get_mysql_password(),
+        env.get_mysql_host(),
+        env.get_mysql_port(),
+        env.get_mysql_database()
     );
     Database::connect(&db_url).await.map_err(|error: DbErr| {
         let error_msg: String = error.to_string();
         futures::executor::block_on(async {
             crate::database::AutoCreationLogger::log_connection_verification(
                 crate::database::PluginType::MySQL,
-                &env.mysql_database,
+                env.get_mysql_database(),
                 false,
                 Some(&error_msg),
             )
@@ -54,7 +58,7 @@ pub async fn perform_mysql_auto_creation() -> Result<AutoCreationResult, AutoCre
     let mut result: AutoCreationResult = AutoCreationResult::new();
     AutoCreationLogger::log_auto_creation_start(
         crate::database::PluginType::MySQL,
-        &env.mysql_database,
+        env.get_mysql_database(),
     )
     .await;
     let auto_creator: MySqlAutoCreation = MySqlAutoCreation::new();
@@ -67,7 +71,7 @@ pub async fn perform_mysql_auto_creation() -> Result<AutoCreationResult, AutoCre
                 &error,
                 "Database creation",
                 crate::database::PluginType::MySQL,
-                Some(&env.mysql_database),
+                Some(env.get_mysql_database()),
             )
             .await;
             if !error.should_continue() {
@@ -86,7 +90,7 @@ pub async fn perform_mysql_auto_creation() -> Result<AutoCreationResult, AutoCre
                 &error,
                 "Table creation",
                 crate::database::PluginType::MySQL,
-                Some(&env.mysql_database),
+                Some(env.get_mysql_database()),
             )
             .await;
             result.errors.push(error.to_string());
@@ -97,7 +101,7 @@ pub async fn perform_mysql_auto_creation() -> Result<AutoCreationResult, AutoCre
             &error,
             "Connection verification",
             crate::database::PluginType::MySQL,
-            Some(&env.mysql_database),
+            Some(env.get_mysql_database()),
         )
         .await;
         if !error.should_continue() {
