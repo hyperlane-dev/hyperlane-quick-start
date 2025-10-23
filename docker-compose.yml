@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: hyperlane_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: hyperlane
+      MYSQL_DATABASE: hyperlane
+      MYSQL_USER: hyperlane
+      MYSQL_PASSWORD: hyperlane
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./tmp/mysql_data:/var/lib/mysql
+    networks:
+      - hyperlane_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-phyperlane"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgresql:
+    image: postgres:17
+    container_name: hyperlane_postgresql
+    restart: always
+    environment:
+      POSTGRES_DB: hyperlane
+      POSTGRES_USER: hyperlane
+      POSTGRES_PASSWORD: hyperlane
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./tmp/postgres_data:/var/lib/postgresql/data
+    networks:
+      - hyperlane_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hyperlane"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: hyperlane_redis
+    restart: always
+    command: redis-server --requirepass hyperlane
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./tmp/redis_data:/data
+    networks:
+      - hyperlane_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "hyperlane", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql_data:
+    driver: local
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  hyperlane_network:
+    driver: bridge

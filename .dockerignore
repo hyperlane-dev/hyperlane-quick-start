@@ -1,0 +1,8 @@
+target/
+tmp/
+.git/
+.gitignore
+.kiro/
+.vscode/
+*.md
+LICENSE
