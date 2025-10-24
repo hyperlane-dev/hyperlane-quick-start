@@ -9,6 +9,7 @@ impl ServerHook for ResponseHeaderMiddleware {
     #[response_header(SERVER => HYPERLANE)]
     #[response_header(CONNECTION => KEEP_ALIVE)]
     #[response_header(CONTENT_TYPE => TEXT_HTML)]
+    #[response_header(TRACE => uuid::Uuid::new_v4().to_string())]
     async fn handle(self, ctx: &Context) {
         let socket_addr_string: String = ctx.get_socket_addr_string().await;
         let content_type: String = ContentType::format_content_type_with_charset(TEXT_HTML, UTF8);
