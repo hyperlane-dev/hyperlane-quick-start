@@ -8,12 +8,11 @@ impl ChatHistoryMapper {
         message_type: &str,
         content: &str,
     ) -> Result<(), String> {
-        let connection: sea_orm::DatabaseConnection =
-            hyperlane_plugin::mysql::get_mysql_connection()
-                .await
-                .map_err(|e| format!("Failed to get database connection: {e}"))?;
-        let statement: sea_orm::Statement = sea_orm::Statement::from_sql_and_values(
-            sea_orm::DatabaseBackend::MySql,
+        let connection: DatabaseConnection = get_mysql_connection()
+            .await
+            .map_err(|e| format!("Failed to get database connection: {e}"))?;
+        let statement: Statement = Statement::from_sql_and_values(
+            DatabaseBackend::MySql,
             "INSERT INTO chat_history (session_id, sender_name, sender_type, message_type, content, created_at) VALUES (?, ?, ?, ?, ?, NOW())",
             vec![
                 session_id.into(),
@@ -42,19 +41,15 @@ impl ChatHistoryMapper {
         offset: i64,
         limit: i64,
     ) -> Result<Vec<ChatHistory>, String> {
-        let connection: sea_orm::DatabaseConnection =
-            hyperlane_plugin::mysql::get_mysql_connection()
-                .await
-                .map_err(|e| format!("Failed to get database connection: {e}"))?;
-
-        // 使用参数化查询
-        let statement: sea_orm::Statement = sea_orm::Statement::from_sql_and_values(
-            sea_orm::DatabaseBackend::MySql,
+        let connection: DatabaseConnection = get_mysql_connection()
+            .await
+            .map_err(|e| format!("Failed to get database connection: {e}"))?;
+        let statement: Statement = Statement::from_sql_and_values(
+            DatabaseBackend::MySql,
             "SELECT id, session_id, sender_name, sender_type, message_type, content, DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') as created_at FROM chat_history WHERE session_id = ? ORDER BY id DESC LIMIT ? OFFSET ?",
             vec![session_id.into(), limit.into(), offset.into()],
         );
-
-        let results: Vec<sea_orm::QueryResult> = connection
+        let results: Vec<QueryResult> = connection
             .query_all(statement)
             .await
             .map_err(|e| {
@@ -75,7 +70,6 @@ impl ChatHistoryMapper {
             let message_type: String = row.try_get("", "message_type").unwrap_or_default();
             let content: String = row.try_get("", "content").unwrap_or_default();
             let created_at: String = row.try_get("", "created_at").unwrap_or_default();
-
             messages.push(ChatHistory {
                 id,
                 session_id,
@@ -91,19 +85,15 @@ impl ChatHistoryMapper {
     }
 
     pub async fn count_messages(session_id: &str) -> Result<i64, String> {
-        let connection: sea_orm::DatabaseConnection =
-            hyperlane_plugin::mysql::get_mysql_connection()
-                .await
-                .map_err(|e| format!("Failed to get database connection: {e}"))?;
-
-        // 使用参数化查询
-        let statement: sea_orm::Statement = sea_orm::Statement::from_sql_and_values(
-            sea_orm::DatabaseBackend::MySql,
+        let connection: DatabaseConnection = get_mysql_connection()
+            .await
+            .map_err(|e| format!("Failed to get database connection: {e}"))?;
+        let statement: Statement = Statement::from_sql_and_values(
+            DatabaseBackend::MySql,
             "SELECT COUNT(*) as total FROM chat_history WHERE session_id = ?",
             vec![session_id.into()],
         );
-
-        let result: Option<sea_orm::QueryResult> = connection
+        let result: Option<QueryResult> = connection
             .query_one(statement)
             .await
             .map_err(|e| {

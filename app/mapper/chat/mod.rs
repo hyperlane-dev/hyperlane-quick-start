@@ -10,6 +10,7 @@ pub use r#static::*;
 pub use r#struct::*;
 
 use super::*;
+use hyperlane_plugin::mysql::*;
 use model::application::chat::*;
 
 use std::{
@@ -17,4 +18,6 @@ use std::{
     sync::{Arc, Mutex, OnceLock},
 };
 
-use hyperlane_utils::sea_orm::ConnectionTrait;
+use hyperlane_utils::sea_orm::{
+    ConnectionTrait, DatabaseBackend, DatabaseConnection, QueryResult, Statement,
+};

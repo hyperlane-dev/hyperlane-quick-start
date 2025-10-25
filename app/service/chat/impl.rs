@@ -31,20 +31,20 @@ impl ServerHook for ChatRequestHook {
         let sender_name: String = session_id.clone();
         let message_type: String = format!("{:?}", req_data.get_type());
         let content: String = req_data.get_data().clone();
-
-        // 异步保存消息，不阻塞响应
         clone!(session_id, sender_name, message_type, content => {
             spawn(async move {
-                let _: Result<(), String> = ChatService::save_message(
+                 let save_res: Result<(), String> =  ChatService::save_message(
                     &session_id,
                     &sender_name,
                     "user",
                     &message_type,
                     &content
                 ).await;
+                if save_res.is_err(){
+                    log_error(&format!("Failed to save chat message for session {}: {}", session_id, save_res.err().unwrap_or_default())).await;
+                }
             });
         });
-
         clone!(req_data, ctx, session_id => {
             let req_msg: &String = req_data.get_data();
             if ChatService::is_gpt_mentioned(req_msg) {
@@ -155,21 +155,25 @@ impl ChatService {
             Ok(gpt_response) => {
                 session.add_message(ROLE_ASSISTANT.to_string(), gpt_response.clone());
                 ChatDomain::update_session(session);
-
-                // 异步保存GPT响应，不阻塞消息发送
                 clone!(session_id, gpt_response => {
                     spawn(async move {
-                        let _: Result<(), String> = Self::save_message(
+                        match Self::save_message(
                             &session_id,
                             "GPT Assistant",
                             "assistant",
                             "GptResponse",
                             &gpt_response,
                         )
-                        .await;
+                        .await {
+                            Ok(_) => {
+                                log_info(&format!("GPT response saved successfully for session: {}", session_id)).await;
+                            }
+                            Err(e) => {
+                                log_error(&format!("Failed to save GPT response for session {}: {}", session_id, e)).await;
+                            }
+                        }
                     });
                 });
-
                 format!("{MENTION_PREFIX}{session_id}{SPACE}{gpt_response}")
             }
             Err(error) => format!("API call failed: {error}"),
