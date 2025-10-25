@@ -28,10 +28,18 @@ impl ServerHook for ChatRequestHook {
             return;
         }
         let session_id: String = ChatService::get_name(ctx).await;
+        let sender_name: String = session_id.clone();
+        let message_type: String = format!("{:?}", req_data.get_type());
+        let content: String = req_data.get_data().clone();
+
+        let _: Result<(), String> =
+            ChatService::save_message(&session_id, &sender_name, "user", &message_type, &content)
+                .await;
+
         clone!(req_data, ctx, session_id => {
             let req_msg: &String = req_data.get_data();
             if ChatService::is_gpt_mentioned(req_msg) {
-                let req_msg_clone = req_msg.clone();
+                let req_msg_clone: String = req_msg.clone();
                 spawn(async move {
                     ChatService::process_gpt_request(session_id, req_msg_clone, ctx).await;
                 });
@@ -138,6 +146,16 @@ impl ChatService {
             Ok(gpt_response) => {
                 session.add_message(ROLE_ASSISTANT.to_string(), gpt_response.clone());
                 ChatDomain::update_session(session);
+
+                let _: Result<(), String> = Self::save_message(
+                    &session_id,
+                    "GPT Assistant",
+                    "assistant",
+                    "GptResponse",
+                    &gpt_response,
+                )
+                .await;
+
                 format!("{MENTION_PREFIX}{session_id}{SPACE}{gpt_response}")
             }
             Err(error) => format!("API call failed: {error}"),
@@ -249,5 +267,39 @@ impl ChatService {
             }
             Err(error) => Err(format!("Request sending failed: {error}")),
         }
+    }
+
+    pub async fn save_message(
+        session_id: &str,
+        sender_name: &str,
+        sender_type: &str,
+        message_type: &str,
+        content: &str,
+    ) -> Result<(), String> {
+        ChatHistoryMapper::insert_message(
+            session_id,
+            sender_name,
+            sender_type,
+            message_type,
+            content,
+        )
+        .await
+    }
+
+    pub async fn get_chat_history(
+        session_id: &str,
+        offset: i64,
+        limit: i64,
+    ) -> Result<ChatHistoryResponse, String> {
+        let messages: Vec<ChatHistory> =
+            ChatHistoryMapper::get_history(session_id, offset, limit).await?;
+        let total: i64 = ChatHistoryMapper::count_messages(session_id).await?;
+        let has_more: bool = (offset + limit) < total;
+
+        Ok(ChatHistoryResponse {
+            messages,
+            total: total as usize,
+            has_more,
+        })
     }
 }

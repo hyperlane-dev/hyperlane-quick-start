@@ -18,3 +18,14 @@ pub struct OnlineUser {
     username: String,
     join_time: String,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Data)]
+pub struct ChatHistory {
+    pub id: i64,
+    pub session_id: String,
+    pub sender_name: String,
+    pub sender_type: String,
+    pub message_type: String,
+    pub content: String,
+    pub created_at: String,
+}

@@ -6,6 +6,9 @@ edition = "2024"
 [lib]
 path = "lib.rs"
 
+[lints]
+workspace = true
+
 [dependencies]
 hyperlane_app = { workspace = true }
 hyperlane_config = { workspace = true }

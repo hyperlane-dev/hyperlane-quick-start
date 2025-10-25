@@ -16,7 +16,7 @@ impl ServerHook for StaticResourceRoute {
             return;
         }
         let file_path: String = format!("{STATIC_RESOURCES_DIR}/{path}");
-        let canonical_path = match std::fs::canonicalize(&file_path) {
+        let canonical_path: std::path::PathBuf = match std::fs::canonicalize(&file_path) {
             Ok(p) => p,
             Err(_) => {
                 ctx.set_response_status_code(404).await;

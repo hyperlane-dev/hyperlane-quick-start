@@ -17,7 +17,7 @@ impl ChatSession {
         self.get_mut_messages().push(message);
         self.set_last_activity(std::time::Instant::now());
         if self.get_messages().len() > 20 {
-            let len = self.get_messages().len();
+            let len: usize = self.get_messages().len();
             self.get_mut_messages().drain(0..len - 20);
         }
     }

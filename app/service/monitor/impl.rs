@@ -49,7 +49,7 @@ impl MonitorService {
             .fold(HashMap::new(), |mut acc, remote_addr| {
                 let key: String = format!("{}:{}", remote_addr.0, remote_addr.1);
                 let entry = acc.entry(key).or_insert_with(|| {
-                    let mut conn = ConnectionInfo::default();
+                    let mut conn: ConnectionInfo = ConnectionInfo::default();
                     conn.set_remote_ip(remote_addr.0.clone())
                         .set_port(remote_addr.1)
                         .set_protocol(PROTOCOL_TCP.to_string())
@@ -57,7 +57,7 @@ impl MonitorService {
                         .set_bytes(WIN_DEFAULT_PACKET_BYTES);
                     conn
                 });
-                let current_packets = *entry.get_packets();
+                let current_packets: u64 = *entry.get_packets();
                 entry.set_packets(current_packets + 1);
                 acc
             });
@@ -70,12 +70,12 @@ impl MonitorService {
     #[cfg(target_os = "windows")]
     fn get_network_performance_counters() -> (u64, u64) {
         let result: Option<(u64, u64)> = (|| {
-            let output = Command::new(WIN_POWERSHELL_COMMAND)
+            let output: std::process::Output = Command::new(WIN_POWERSHELL_COMMAND)
                 .args([WIN_POWERSHELL_ARG, WIN_PERF_COUNTER_SCRIPT])
                 .output()
                 .ok()?;
-            let output_str = String::from_utf8_lossy(&output.stdout);
-            let total = output_str.trim().parse::<u64>().ok()?;
+            let output_str: String = String::from_utf8_lossy(&output.stdout).to_string();
+            let total: u64 = output_str.trim().parse::<u64>().ok()?;
             Some((total, total * WIN_DEFAULT_PACKET_BYTES))
         })();
         result.unwrap_or((0, 0))
@@ -130,8 +130,8 @@ impl MonitorService {
             .output()
         {
             let output_str: std::borrow::Cow<'_, str> = String::from_utf8_lossy(&output.stdout);
-            let top_conns = Self::process_netstat_output(&output_str);
-            let conn_len = top_conns.len() as u64;
+            let top_conns: Vec<ConnectionInfo> = Self::process_netstat_output(&output_str);
+            let conn_len: u64 = top_conns.len() as u64;
             stats.set_top_connections(top_conns);
             stats
                 .get_mut_protocols()
@@ -159,10 +159,10 @@ impl MonitorService {
                 if parts.len() < 11 {
                     return None;
                 }
-                let rx_bytes = parts[1].parse::<u64>().ok()?;
-                let tx_bytes = parts[9].parse::<u64>().ok()?;
-                let rx_packets = parts[2].parse::<u64>().ok()?;
-                let tx_packets = parts[10].parse::<u64>().ok()?;
+                let rx_bytes: u64 = parts[1].parse::<u64>().ok()?;
+                let tx_bytes: u64 = parts[9].parse::<u64>().ok()?;
+                let rx_packets: u64 = parts[2].parse::<u64>().ok()?;
+                let tx_packets: u64 = parts[10].parse::<u64>().ok()?;
                 Some((rx_bytes + tx_bytes, rx_packets + tx_packets))
             })
             .fold((0, 0), |(acc_bytes, acc_packets), (bytes, packets)| {
@@ -238,7 +238,7 @@ impl MonitorService {
         let cpu_cores: u32 = Self::get_cpu_cores().await;
         let cpu_model: String = Self::get_cpu_model().await;
 
-        let mut status = ServerStatus::default();
+        let mut status: ServerStatus = ServerStatus::default();
         status
             .set_timestamp(timestamp)
             .set_cpu_usage(cpu_usage)
@@ -273,7 +273,7 @@ impl MonitorService {
         let total_memory: u64 = Self::get_total_memory().await;
         let total_disk: u64 = Self::get_total_disk().await;
 
-        let mut info = SystemInfo::default();
+        let mut info: SystemInfo = SystemInfo::default();
         info.set_hostname(hostname)
             .set_os_name(os_name)
             .set_os_version(os_version)
@@ -1052,13 +1052,7 @@ impl MonitorService {
 #[cfg(not(target_os = "windows"))]
 impl LinuxMemoryInfo {
     fn new() -> Self {
-        let mut info = Self::default();
-        info.set_total(0)
-            .set_available(0)
-            .set_free(0)
-            .set_buffers(0)
-            .set_cached(0);
-        info
+        Self::default()
     }
 
     fn parse_meminfo_line(&mut self, line: &str) {

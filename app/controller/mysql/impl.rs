@@ -12,7 +12,7 @@ impl ServerHook for ListRecordsRoute {
     async fn handle(self, ctx: &Context) {
         match MysqlService::get_all_mysql_records().await {
             Ok(records) => {
-                let response = ApiResponse::success(records);
+                let response: ApiResponse<Vec<MysqlRecord>> = ApiResponse::success(records);
                 ctx.set_response_body(&response.to_json_bytes()).await
             }
             Err(error) => {
@@ -108,7 +108,7 @@ impl ServerHook for DeleteRecordRoute {
         let key: &String = match querys.get("key") {
             Some(k) => k,
             None => {
-                let response = ApiResponse::<()>::error_with_code(
+                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
                     ResponseCode::BadRequest,
                     "Key parameter is required",
                 );

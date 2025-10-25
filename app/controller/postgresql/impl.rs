@@ -12,7 +12,7 @@ impl ServerHook for ListRecordsRoute {
     async fn handle(self, ctx: &Context) {
         match PostgresqlService::get_all_postgresql_records().await {
             Ok(records) => {
-                let response = ApiResponse::success(records);
+                let response: ApiResponse<Vec<PostgresqlRecord>> = ApiResponse::success(records);
                 ctx.set_response_body(&response.to_json_bytes()).await
             }
             Err(error) => {
@@ -107,7 +107,7 @@ impl ServerHook for DeleteRecordRoute {
         let key: String = match ctx.get_request_querys().await.get("key").cloned() {
             Some(k) => k,
             None => {
-                let response = ApiResponse::<()>::error_with_code(
+                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
                     ResponseCode::BadRequest,
                     "Key parameter is required",
                 );

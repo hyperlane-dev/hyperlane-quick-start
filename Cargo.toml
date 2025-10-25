@@ -62,3 +62,7 @@ panic = "unwind"
 debug = false
 codegen-units = 1
 strip = "debuginfo"
+
+[workspace.lints.clippy]
+# 禁止使用 _ 作为类型占位符，要求明确指定类型
+let_underscore_untyped = "deny"

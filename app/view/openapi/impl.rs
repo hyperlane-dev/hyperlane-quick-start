@@ -23,6 +23,6 @@ impl ServerHook for OpenApiViewRoute {
         SwaggerUi::new("/openapi/{file}").url("/openapi/openapi.json", ApiDoc::openapi());
         let res: String =
             RapiDoc::with_openapi("/openapi/openapi.json", ApiDoc::openapi()).to_html();
-        let _ = ctx.set_response_body(&res).await;
+        ctx.set_response_body(&res).await;
     }
 }

@@ -77,7 +77,7 @@ impl ChatDomain {
             sessions_guard
                 .entry(session_id.to_string())
                 .or_insert_with(|| {
-                    let mut session = ChatSession::default();
+                    let mut session: ChatSession = ChatSession::default();
                     session
                         .set_session_id(session_id.to_string())
                         .set_messages(Vec::new())
@@ -86,7 +86,7 @@ impl ChatDomain {
                 })
                 .clone()
         } else {
-            let mut session = ChatSession::default();
+            let mut session: ChatSession = ChatSession::default();
             session
                 .set_session_id(session_id.to_string())
                 .set_messages(Vec::new())
@@ -97,7 +97,8 @@ impl ChatDomain {
 
     pub fn update_session(session: ChatSession) {
         let sessions: &Arc<Mutex<HashMap<String, ChatSession>>> = Self::get_global_chat_sessions();
-        let mut sessions_guard = sessions.lock().unwrap();
+        let mut sessions_guard: std::sync::MutexGuard<HashMap<String, ChatSession>> =
+            sessions.lock().unwrap();
         sessions_guard.insert(session.get_session_id().clone(), session);
     }
 
@@ -132,7 +133,7 @@ impl ChatDomain {
         gpt_user.set_username(GPT.to_string()).set_join_time(time());
         users_vec.insert(0, gpt_user);
         let total_count: usize = users_vec.len();
-        let mut response = UserListResponse::default();
+        let mut response: UserListResponse = UserListResponse::default();
         response.set_users(users_vec).set_total_count(total_count);
         response
     }

@@ -1,9 +1,12 @@
 use super::*;
 
 pub fn init_network_capture_globals() {
-    let _ = NETWORK_CAPTURE_STATS.set(Arc::new(Mutex::new(None)));
-    let _ = CAPTURE_STATUS.set(Arc::new(Mutex::new(CaptureStatus::Stopped)));
-    let _ = ACTIVE_CONNECTIONS.set(Arc::new(Mutex::new(HashMap::new())));
+    let _: Result<(), Arc<Mutex<Option<NetworkStats>>>> =
+        NETWORK_CAPTURE_STATS.set(Arc::new(Mutex::new(None)));
+    let _: Result<(), Arc<Mutex<CaptureStatus>>> =
+        CAPTURE_STATUS.set(Arc::new(Mutex::new(CaptureStatus::Stopped)));
+    let _: Result<(), Arc<Mutex<HashMap<String, ConnectionInfo>>>> =
+        ACTIVE_CONNECTIONS.set(Arc::new(Mutex::new(HashMap::new())));
 }
 
 pub fn get_network_stats() -> Option<NetworkStats> {

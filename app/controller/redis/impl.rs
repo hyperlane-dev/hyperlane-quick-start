@@ -14,7 +14,7 @@ impl ServerHook for ListRecordsRoute {
         let keys: Vec<String> = match keys_opt {
             Some(k) => k.split(',').map(|s: &str| s.to_string()).collect(),
             None => {
-                let response = ApiResponse::<()>::error_with_code(
+                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
                     ResponseCode::BadRequest,
                     "Keys parameter is required",
                 );
@@ -24,7 +24,7 @@ impl ServerHook for ListRecordsRoute {
         };
         match RedisService::get_all_redis_records(keys).await {
             Ok(records) => {
-                let response = ApiResponse::success(records);
+                let response: ApiResponse<Vec<RedisRecord>> = ApiResponse::success(records);
                 ctx.set_response_body(&response.to_json_bytes()).await
             }
             Err(error) => {
@@ -120,7 +120,7 @@ impl ServerHook for DeleteRecordRoute {
         let key: &String = match querys.get("key") {
             Some(k) => k,
             None => {
-                let response = ApiResponse::<()>::error_with_code(
+                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
                     ResponseCode::BadRequest,
                     "Key parameter is required",
                 );

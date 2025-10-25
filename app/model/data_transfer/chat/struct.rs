@@ -13,3 +13,10 @@ pub struct UserListResponse {
     users: Vec<OnlineUser>,
     total_count: usize,
 }
+
+#[derive(Debug, Default, Clone, Serialize, Deserialize, ToSchema, Data)]
+pub struct ChatHistoryResponse {
+    pub messages: Vec<ChatHistory>,
+    pub total: usize,
+    pub has_more: bool,
+}
