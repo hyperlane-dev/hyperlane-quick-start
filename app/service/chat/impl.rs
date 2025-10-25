@@ -32,9 +32,18 @@ impl ServerHook for ChatRequestHook {
         let message_type: String = format!("{:?}", req_data.get_type());
         let content: String = req_data.get_data().clone();
 
-        let _: Result<(), String> =
-            ChatService::save_message(&session_id, &sender_name, "user", &message_type, &content)
-                .await;
+        // 异步保存消息，不阻塞响应
+        clone!(session_id, sender_name, message_type, content => {
+            spawn(async move {
+                let _: Result<(), String> = ChatService::save_message(
+                    &session_id,
+                    &sender_name,
+                    "user",
+                    &message_type,
+                    &content
+                ).await;
+            });
+        });
 
         clone!(req_data, ctx, session_id => {
             let req_msg: &String = req_data.get_data();
@@ -147,14 +156,19 @@ impl ChatService {
                 session.add_message(ROLE_ASSISTANT.to_string(), gpt_response.clone());
                 ChatDomain::update_session(session);
 
-                let _: Result<(), String> = Self::save_message(
-                    &session_id,
-                    "GPT Assistant",
-                    "assistant",
-                    "GptResponse",
-                    &gpt_response,
-                )
-                .await;
+                // 异步保存GPT响应，不阻塞消息发送
+                clone!(session_id, gpt_response => {
+                    spawn(async move {
+                        let _: Result<(), String> = Self::save_message(
+                            &session_id,
+                            "GPT Assistant",
+                            "assistant",
+                            "GptResponse",
+                            &gpt_response,
+                        )
+                        .await;
+                    });
+                });
 
                 format!("{MENTION_PREFIX}{session_id}{SPACE}{gpt_response}")
             }

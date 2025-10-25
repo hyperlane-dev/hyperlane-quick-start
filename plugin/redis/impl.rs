@@ -14,13 +14,22 @@ impl RedisAutoCreation {
     }
 
     async fn create_mutable_connection(&self) -> Result<Connection, AutoCreationError> {
-        let db_url: String = format!(
-            "redis://{}:{}@{}:{}",
-            self.env.get_redis_username(),
-            self.env.get_redis_password(),
-            self.env.get_redis_host(),
-            self.env.get_redis_port()
-        );
+        let db_url: String = if self.env.get_redis_username().is_empty() {
+            format!(
+                "redis://:{}@{}:{}",
+                self.env.get_redis_password(),
+                self.env.get_redis_host(),
+                self.env.get_redis_port()
+            )
+        } else {
+            format!(
+                "redis://{}:{}@{}:{}",
+                self.env.get_redis_username(),
+                self.env.get_redis_password(),
+                self.env.get_redis_host(),
+                self.env.get_redis_port()
+            )
+        };
         let client: Client = Client::open(db_url).map_err(|error: redis::RedisError| {
             let error_msg: String = error.to_string();
             if error_msg.contains("authentication failed") || error_msg.contains("NOAUTH") {

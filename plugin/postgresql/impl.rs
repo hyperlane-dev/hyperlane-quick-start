@@ -184,32 +184,25 @@ impl PostgreSqlAutoCreation {
         }
     }
 
-    fn get_postgresql_schema(&self) -> crate::database::DatabaseSchema {
-        DatabaseSchema::new()
+    fn get_postgresql_schema(&self) -> DatabaseSchema {
+        let indexes: Vec<String> = POSTGRESQL_INDEXES_SQL
+            .lines()
+            .filter(|line| !line.trim().is_empty())
+            .map(|line| line.trim().to_string())
+            .collect();
+        let mut schema: DatabaseSchema = DatabaseSchema::new()
             .add_table(TableSchema::new(
                 "record".to_string(),
-                r#"CREATE TABLE record (
-                        id SERIAL PRIMARY KEY,
-                        key VARCHAR(255) NOT NULL UNIQUE,
-                        value TEXT
-                    )"#
-                .to_string(),
+                POSTGRESQL_RECORD_SQL.to_string(),
             ))
             .add_table(TableSchema::new(
                 "chat_history".to_string(),
-                r#"CREATE TABLE chat_history (
-                        id BIGSERIAL PRIMARY KEY,
-                        session_id VARCHAR(255) NOT NULL,
-                        sender_name VARCHAR(255) NOT NULL,
-                        sender_type VARCHAR(50) NOT NULL,
-                        message_type VARCHAR(50) NOT NULL,
-                        content TEXT NOT NULL,
-                        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-                    )"#
-                    .to_string(),
-            ))
-            .add_index("CREATE INDEX IF NOT EXISTS idx_chat_history_session_id ON chat_history(session_id)".to_string())
-            .add_index("CREATE INDEX IF NOT EXISTS idx_chat_history_created_at ON chat_history(created_at)".to_string())
+                POSTGRESQL_CHAT_HISTORY_SQL.to_string(),
+            ));
+        for index in indexes {
+            schema = schema.add_index(index);
+        }
+        schema
     }
 }
 

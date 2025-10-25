@@ -25,13 +25,22 @@ pub async fn connection_redis_db() -> Result<Arc<Connection>, String> {
             }
         }
     }
-    let db_url: String = format!(
-        "redis://{}:{}@{}:{}",
-        env.get_redis_username(),
-        env.get_redis_password(),
-        env.get_redis_host(),
-        env.get_redis_port(),
-    );
+    let db_url: String = if env.get_redis_username().is_empty() {
+        format!(
+            "redis://:{}@{}:{}",
+            env.get_redis_password(),
+            env.get_redis_host(),
+            env.get_redis_port(),
+        )
+    } else {
+        format!(
+            "redis://{}:{}@{}:{}",
+            env.get_redis_username(),
+            env.get_redis_password(),
+            env.get_redis_host(),
+            env.get_redis_port(),
+        )
+    };
     let client: Client = Client::open(db_url).map_err(|error: redis::RedisError| {
         let error_msg: String = error.to_string();
         futures::executor::block_on(async {

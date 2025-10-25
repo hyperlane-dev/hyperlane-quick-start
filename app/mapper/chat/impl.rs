@@ -12,23 +12,28 @@ impl ChatHistoryMapper {
             hyperlane_plugin::mysql::get_mysql_connection()
                 .await
                 .map_err(|e| format!("Failed to get database connection: {e}"))?;
-
-        let sql: String = format!(
-            "INSERT INTO chat_history (session_id, sender_name, sender_type, message_type, content, created_at) VALUES ('{}', '{}', '{}', '{}', '{}', NOW())",
-            session_id.replace("'", "''"),
-            sender_name.replace("'", "''"),
-            sender_type.replace("'", "''"),
-            message_type.replace("'", "''"),
-            content.replace("'", "''")
+        let statement: sea_orm::Statement = sea_orm::Statement::from_sql_and_values(
+            sea_orm::DatabaseBackend::MySql,
+            "INSERT INTO chat_history (session_id, sender_name, sender_type, message_type, content, created_at) VALUES (?, ?, ?, ?, ?, NOW())",
+            vec![
+                session_id.into(),
+                sender_name.into(),
+                sender_type.into(),
+                message_type.into(),
+                content.into(),
+            ],
         );
-
-        let statement: sea_orm::Statement =
-            sea_orm::Statement::from_string(sea_orm::DatabaseBackend::MySql, sql);
         connection
             .execute(statement)
             .await
-            .map_err(|e| format!("Failed to insert chat message: {e}"))?;
-
+            .map_err(|e| {
+                let error_msg = e.to_string();
+                if error_msg.contains("doesn't exist") || error_msg.contains("Table") && error_msg.contains("not found") {
+                    format!("Table 'chat_history' does not exist. Please ensure database initialization completed successfully: {error_msg}")
+                } else {
+                    format!("Failed to insert chat message: {error_msg}")
+                }
+            })?;
         Ok(())
     }
 
@@ -42,19 +47,24 @@ impl ChatHistoryMapper {
                 .await
                 .map_err(|e| format!("Failed to get database connection: {e}"))?;
 
-        let sql: String = format!(
-            "SELECT id, session_id, sender_name, sender_type, message_type, content, DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') as created_at FROM chat_history WHERE session_id = '{}' ORDER BY id DESC LIMIT {} OFFSET {}",
-            session_id.replace("'", "''"),
-            limit,
-            offset
+        // 使用参数化查询
+        let statement: sea_orm::Statement = sea_orm::Statement::from_sql_and_values(
+            sea_orm::DatabaseBackend::MySql,
+            "SELECT id, session_id, sender_name, sender_type, message_type, content, DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') as created_at FROM chat_history WHERE session_id = ? ORDER BY id DESC LIMIT ? OFFSET ?",
+            vec![session_id.into(), limit.into(), offset.into()],
         );
 
-        let statement: sea_orm::Statement =
-            sea_orm::Statement::from_string(sea_orm::DatabaseBackend::MySql, sql);
         let results: Vec<sea_orm::QueryResult> = connection
             .query_all(statement)
             .await
-            .map_err(|e| format!("Failed to query chat history: {e}"))?;
+            .map_err(|e| {
+                let error_msg = e.to_string();
+                if error_msg.contains("doesn't exist") || error_msg.contains("Table") && error_msg.contains("not found") {
+                    format!("Table 'chat_history' does not exist. Please ensure database initialization completed successfully: {error_msg}")
+                } else {
+                    format!("Failed to query chat history: {error_msg}")
+                }
+            })?;
 
         let mut messages: Vec<ChatHistory> = Vec::new();
         for row in results {
@@ -86,17 +96,24 @@ impl ChatHistoryMapper {
                 .await
                 .map_err(|e| format!("Failed to get database connection: {e}"))?;
 
-        let sql: String = format!(
-            "SELECT COUNT(*) as total FROM chat_history WHERE session_id = '{}'",
-            session_id.replace("'", "''")
+        // 使用参数化查询
+        let statement: sea_orm::Statement = sea_orm::Statement::from_sql_and_values(
+            sea_orm::DatabaseBackend::MySql,
+            "SELECT COUNT(*) as total FROM chat_history WHERE session_id = ?",
+            vec![session_id.into()],
         );
 
-        let statement: sea_orm::Statement =
-            sea_orm::Statement::from_string(sea_orm::DatabaseBackend::MySql, sql);
         let result: Option<sea_orm::QueryResult> = connection
             .query_one(statement)
             .await
-            .map_err(|e| format!("Failed to count messages: {e}"))?;
+            .map_err(|e| {
+                let error_msg = e.to_string();
+                if error_msg.contains("doesn't exist") || error_msg.contains("Table") && error_msg.contains("not found") {
+                    format!("Table 'chat_history' does not exist. Please ensure database initialization completed successfully: {error_msg}")
+                } else {
+                    format!("Failed to count messages: {error_msg}")
+                }
+            })?;
 
         if let Some(row) = result {
             let total: i64 = row.try_get("", "total").unwrap_or(0);
