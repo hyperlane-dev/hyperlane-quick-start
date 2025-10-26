@@ -18,7 +18,6 @@ impl ServerHook for PanicHook {
         let error: Panic = ctx.try_get_panic().await.unwrap_or_default();
         let error_message: String = error.to_string();
         log_error(&error_message).await;
-        println_error!("{error_message}");
         let api_response: ApiResponse<()> =
             ApiResponse::error_with_code(ResponseCode::InternalError, error_message);
         let response_body: Vec<u8> = api_response.to_json_bytes();
