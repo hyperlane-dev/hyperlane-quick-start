@@ -7,7 +7,6 @@ impl ServerHook for WebSocketRoute {
 
     #[prologue_macros(ws, ws_from_stream(request))]
     async fn handle(self, ctx: &Context) {
-        println_success!("WebSocket request received");
         let request_body: WebSocketMessage = request.get_body_json().unwrap();
         match WebSocketService::get_response_body(&request_body) {
             Ok(response) => ctx.set_response_body(&response).await,
