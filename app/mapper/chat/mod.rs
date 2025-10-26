@@ -15,7 +15,7 @@ use model::application::chat::*;
 
 use std::{
     collections::HashMap,
-    sync::{Arc, Mutex, OnceLock},
+    sync::{Arc, OnceLock, RwLock},
 };
 
 use hyperlane_utils::sea_orm::{

@@ -66,13 +66,13 @@ impl ChatSession {
 }
 
 impl ChatDomain {
-    pub fn get_global_chat_sessions() -> &'static Arc<Mutex<HashMap<String, ChatSession>>> {
-        GLOBAL_CHAT_SESSIONS.get_or_init(|| Arc::new(Mutex::new(HashMap::new())))
+    pub fn get_global_chat_sessions() -> &'static Arc<RwLock<HashMap<String, ChatSession>>> {
+        GLOBAL_CHAT_SESSIONS.get_or_init(|| Arc::new(RwLock::new(HashMap::new())))
     }
 
     pub fn get_or_create_session(session_id: &str) -> ChatSession {
-        let sessions: &Arc<Mutex<HashMap<String, ChatSession>>> = Self::get_global_chat_sessions();
-        if let Ok(mut sessions_guard) = sessions.lock() {
+        let sessions: &Arc<RwLock<HashMap<String, ChatSession>>> = Self::get_global_chat_sessions();
+        if let Ok(mut sessions_guard) = sessions.write() {
             sessions_guard.retain(|_, session| !session.is_expired(30));
             sessions_guard
                 .entry(session_id.to_string())
@@ -96,19 +96,20 @@ impl ChatDomain {
     }
 
     pub fn update_session(session: ChatSession) {
-        let sessions: &Arc<Mutex<HashMap<String, ChatSession>>> = Self::get_global_chat_sessions();
-        let mut sessions_guard: std::sync::MutexGuard<HashMap<String, ChatSession>> =
-            sessions.lock().unwrap();
+        let sessions: &Arc<RwLock<HashMap<String, ChatSession>>> = Self::get_global_chat_sessions();
+        let mut sessions_guard: std::sync::RwLockWriteGuard<HashMap<String, ChatSession>> =
+            sessions.write().unwrap();
         sessions_guard.insert(session.get_session_id().clone(), session);
     }
 
-    pub fn get_global_online_users() -> &'static Arc<Mutex<HashMap<String, OnlineUser>>> {
-        GLOBAL_ONLINE_USERS.get_or_init(|| Arc::new(Mutex::new(HashMap::new())))
+    pub fn get_global_online_users() -> &'static Arc<RwLock<HashMap<String, OnlineUser>>> {
+        GLOBAL_ONLINE_USERS.get_or_init(|| Arc::new(RwLock::new(HashMap::new())))
     }
 
     pub fn add_online_user(username: &str) {
-        let users: &Arc<Mutex<HashMap<String, OnlineUser>>> = Self::get_global_online_users();
-        let mut users_guard: MutexGuard<'_, HashMap<String, OnlineUser>> = users.lock().unwrap();
+        let users: &Arc<RwLock<HashMap<String, OnlineUser>>> = Self::get_global_online_users();
+        let mut users_guard: RwLockWriteGuard<'_, HashMap<String, OnlineUser>> =
+            users.write().unwrap();
         let mut online_user: OnlineUser = OnlineUser::default();
         online_user
             .set_username(username.to_string())
@@ -117,14 +118,15 @@ impl ChatDomain {
     }
 
     pub fn remove_online_user(username: &str) {
-        let users: &Arc<Mutex<HashMap<String, OnlineUser>>> = Self::get_global_online_users();
-        let mut users_guard: MutexGuard<'_, HashMap<String, OnlineUser>> = users.lock().unwrap();
+        let users: &Arc<RwLock<HashMap<String, OnlineUser>>> = Self::get_global_online_users();
+        let mut users_guard: RwLockWriteGuard<'_, HashMap<String, OnlineUser>> =
+            users.write().unwrap();
         users_guard.remove(username);
     }
 
     pub fn get_online_users_list() -> UserListResponse {
-        let users: &Arc<Mutex<HashMap<String, OnlineUser>>> = Self::get_global_online_users();
-        let mut users_vec: Vec<OnlineUser> = if let Ok(users_guard) = users.lock() {
+        let users: &Arc<RwLock<HashMap<String, OnlineUser>>> = Self::get_global_online_users();
+        let mut users_vec: Vec<OnlineUser> = if let Ok(users_guard) = users.read() {
             users_guard.values().cloned().collect()
         } else {
             Vec::new()

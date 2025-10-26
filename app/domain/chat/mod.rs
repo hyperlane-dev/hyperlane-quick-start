@@ -10,5 +10,5 @@ use service::chat::*;
 
 use std::{
     collections::HashMap,
-    sync::{Arc, Mutex, MutexGuard},
+    sync::{Arc, RwLock, RwLockWriteGuard},
 };
