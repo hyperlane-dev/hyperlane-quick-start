@@ -19,7 +19,7 @@ use std::{
 };
 
 use hyperlane_utils::sea_orm::{
-    ActiveModelBehavior, ActiveModelTrait, ActiveValue, DatabaseConnection, DbErr,
+    ActiveModelBehavior, ActiveModelTrait, ActiveValue, Database, DatabaseConnection, DbErr,
     DeriveEntityModel, DerivePrimaryKey, DeriveRelation, EntityTrait, EnumIter, PaginatorTrait,
     PrimaryKeyTrait, QueryOrder, QuerySelect,
 };
