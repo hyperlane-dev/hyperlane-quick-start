@@ -315,16 +315,10 @@ impl ChatService {
         .await
     }
 
-    pub async fn get_chat_history(
-        session_id: &str,
-        offset: i64,
-        limit: i64,
-    ) -> Result<ChatHistoryResponse, String> {
-        let messages: Vec<ChatHistory> =
-            ChatHistoryMapper::get_history(session_id, offset, limit).await?;
-        let total: i64 = ChatHistoryMapper::count_messages(session_id).await?;
+    pub async fn get_chat_history(offset: i64, limit: i64) -> Result<ChatHistoryResponse, String> {
+        let messages: Vec<ChatHistory> = ChatHistoryMapper::get_history(offset, limit).await?;
+        let total: i64 = ChatHistoryMapper::count_messages().await?;
         let has_more: bool = (offset + limit) < total;
-
         Ok(ChatHistoryResponse {
             messages,
             total: total as usize,

@@ -112,31 +112,22 @@ impl ChatHistoryMapper {
         Ok(())
     }
 
-    pub async fn get_history(
-        session_id: &str,
-        offset: i64,
-        limit: i64,
-    ) -> Result<Vec<ChatHistory>, String> {
-        match Self::get_history_from_mysql(session_id, offset, limit).await {
+    pub async fn get_history(offset: i64, limit: i64) -> Result<Vec<ChatHistory>, String> {
+        match Self::get_history_from_mysql(offset, limit).await {
             Ok(history) => Ok(history),
             Err(mysql_err) => {
                 log_error(&format!(
                     "MySQL query failed, trying PostgreSQL: {mysql_err}"
                 ))
                 .await;
-                Self::get_history_from_postgresql(session_id, offset, limit).await
+                Self::get_history_from_postgresql(offset, limit).await
             }
         }
     }
 
-    async fn get_history_from_mysql(
-        session_id: &str,
-        offset: i64,
-        limit: i64,
-    ) -> Result<Vec<ChatHistory>, String> {
+    async fn get_history_from_mysql(offset: i64, limit: i64) -> Result<Vec<ChatHistory>, String> {
         let db: DatabaseConnection = get_mysql_connection().await?;
         let records: Vec<Model> = Entity::find()
-            .filter(Column::SessionId.eq(session_id))
             .order_by_asc(Column::Id)
             .offset(offset as u64)
             .limit(limit as u64)
@@ -161,13 +152,11 @@ impl ChatHistoryMapper {
     }
 
     async fn get_history_from_postgresql(
-        session_id: &str,
         offset: i64,
         limit: i64,
     ) -> Result<Vec<ChatHistory>, String> {
         let db: DatabaseConnection = get_postgresql_connection().await?;
         let records: Vec<Model> = Entity::find()
-            .filter(Column::SessionId.eq(session_id))
             .order_by_asc(Column::Id)
             .offset(offset as u64)
             .limit(limit as u64)
@@ -191,33 +180,31 @@ impl ChatHistoryMapper {
             .collect())
     }
 
-    pub async fn count_messages(session_id: &str) -> Result<i64, String> {
-        match Self::count_messages_from_mysql(session_id).await {
+    pub async fn count_messages() -> Result<i64, String> {
+        match Self::count_messages_from_mysql().await {
             Ok(count) => Ok(count),
             Err(mysql_err) => {
                 log_error(&format!(
                     "MySQL count failed, trying PostgreSQL: {mysql_err}"
                 ))
                 .await;
-                Self::count_messages_from_postgresql(session_id).await
+                Self::count_messages_from_postgresql().await
             }
         }
     }
 
-    async fn count_messages_from_mysql(session_id: &str) -> Result<i64, String> {
+    async fn count_messages_from_mysql() -> Result<i64, String> {
         let db: DatabaseConnection = get_mysql_connection().await?;
         let count: u64 = Entity::find()
-            .filter(Column::SessionId.eq(session_id))
             .count(&db)
             .await
             .map_err(|error: DbErr| format!("Failed to count from MySQL: {error}"))?;
         Ok(count as i64)
     }
 
-    async fn count_messages_from_postgresql(session_id: &str) -> Result<i64, String> {
+    async fn count_messages_from_postgresql() -> Result<i64, String> {
         let db: DatabaseConnection = get_postgresql_connection().await?;
         let count: u64 = Entity::find()
-            .filter(Column::SessionId.eq(session_id))
             .count(&db)
             .await
             .map_err(|error: DbErr| format!("Failed to count from PostgreSQL: {error}"))?;
