@@ -50,9 +50,14 @@ impl ServerHook for ChatHistoryRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     async fn handle(self, ctx: &Context) {
-        #[request_query("offset" => offset_opt)]
-        async fn get_offset(_ctx: &Context) -> Option<String> {
-            offset_opt
+        #[request_query("session_id" => session_id_opt)]
+        async fn get_session_id(_ctx: &Context) -> Option<String> {
+            session_id_opt
+        }
+
+        #[request_query("before_id" => before_id_opt)]
+        async fn get_before_id(_ctx: &Context) -> Option<String> {
+            before_id_opt
         }
 
         #[request_query("limit" => limit_opt)]
@@ -60,16 +65,16 @@ impl ServerHook for ChatHistoryRoute {
             limit_opt
         }
 
-        let offset: i64 = get_offset(ctx)
+        let session_id: String = get_session_id(ctx)
             .await
-            .and_then(|s| s.parse::<i64>().ok())
-            .unwrap_or(0);
+            .unwrap_or_else(|| "default".to_string());
+        let before_id: Option<i64> = get_before_id(ctx).await.and_then(|s| s.parse::<i64>().ok());
         let limit: i64 = get_limit(ctx)
             .await
             .and_then(|s| s.parse::<i64>().ok())
-            .unwrap_or(100);
+            .unwrap_or(20);
 
-        match ChatService::get_chat_history(offset, limit).await {
+        match ChatService::get_chat_history(&session_id, before_id, limit).await {
             Ok(history) => {
                 let response: ApiResponse<ChatHistoryResponse> = ApiResponse::success(history);
                 ctx.set_response_body(&response.to_json_bytes()).await;

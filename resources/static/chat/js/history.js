@@ -1,9 +1,10 @@
 const ChatHistory = {
-  offset: 0,
-  limit: 100,
+  beforeId: null,
+  limit: 20,
   loading: false,
   hasMore: true,
   sessionId: '',
+  oldestMessageId: null,
 
   init: function (sessionId) {
     this.sessionId = sessionId;
@@ -29,11 +30,15 @@ const ChatHistory = {
     this.showLoadingIndicator();
 
     try {
-      const response = await fetch(
-        `/api/chat/history?session_id=${encodeURIComponent(
-          this.sessionId
-        )}&offset=${this.offset}&limit=${this.limit}`
-      );
+      let url = `/api/chat/history?session_id=${encodeURIComponent(
+        this.sessionId
+      )}&limit=${this.limit}`;
+      
+      if (this.beforeId !== null) {
+        url += `&before_id=${this.beforeId}`;
+      }
+
+      const response = await fetch(url);
 
       if (!response.ok) {
         throw new Error('Failed to load history');
@@ -46,7 +51,7 @@ const ChatHistory = {
 
         if (messages && messages.length > 0) {
           this.prependMessages(messages);
-          this.offset += messages.length;
+          this.beforeId = messages[0].id;
           this.hasMore = has_more;
         } else {
           this.hasMore = false;

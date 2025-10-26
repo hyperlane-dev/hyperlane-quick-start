@@ -14,7 +14,6 @@ impl ServerHook for ChatConnectedHook {
             ChatService::create_online_count_message(ctx, receiver_count.to_string()).await;
         ctx.set_response_body(resp_data.clone()).await;
         ChatService::broadcast_online_count(key, resp_data.clone());
-        ChatService::save_message_from_response(&path, &resp_data).await;
     }
 }
 
@@ -51,13 +50,13 @@ impl ServerHook for ChatSendedHook {
     }
 
     async fn handle(self, ctx: &Context) {
-        let path: String = ctx.get_request_path().await;
         let request_string: String = ctx.get_request().await.get_body_string();
         let request: String = ctx.get_request().await.get_string();
         let response: String = ctx.get_response().await.get_string();
         log_info(&format!("{request}{BR}{request_string}{BR}{response}")).await;
         let response_body: ResponseBody = ctx.get_response().await.get_body().clone();
-        ChatService::save_message_from_response(&path, &response_body).await;
+        let session_id: String = ChatService::get_name(ctx).await;
+        ChatService::save_message_from_response(&session_id, &response_body).await;
     }
 }
 
@@ -76,7 +75,6 @@ impl ServerHook for ChatClosedHook {
         let resp_data: ResponseBody =
             ChatService::create_online_count_message(ctx, receiver_count.to_string()).await;
         ctx.set_response_body(&resp_data).await;
-        ChatService::save_message_from_response(&path, &resp_data).await;
     }
 }
 
@@ -248,7 +246,7 @@ impl ChatService {
         }
     }
 
-    pub async fn save_message_from_response(path: &str, response_body: &ResponseBody) {
+    pub async fn save_message_from_response(session_id: &str, response_body: &ResponseBody) {
         let response_body_string: String = String::from_utf8_lossy(response_body).into_owned();
         if let Ok(resp_data) = serde_json::from_str::<serde_json::Value>(&response_body_string) {
             let message_type: String = resp_data
@@ -269,7 +267,7 @@ impl ChatService {
                 .and_then(|v| v.as_str())
                 .unwrap_or("")
                 .to_string();
-            let session_id: String = path.trim_start_matches("/chat/").to_string();
+            let session_id: String = session_id.to_string();
             let sender_type: &str = if sender_name == "System" {
                 "system"
             } else if sender_name == "GPT Assistant" || message_type == "GptResponse" {
@@ -315,10 +313,15 @@ impl ChatService {
         .await
     }
 
-    pub async fn get_chat_history(offset: i64, limit: i64) -> Result<ChatHistoryResponse, String> {
-        let messages: Vec<ChatHistory> = ChatHistoryMapper::get_history(offset, limit).await?;
+    pub async fn get_chat_history(
+        session_id: &str,
+        before_id: Option<i64>,
+        limit: i64,
+    ) -> Result<ChatHistoryResponse, String> {
+        let messages: Vec<ChatHistory> =
+            ChatHistoryMapper::get_history(session_id, before_id, limit).await?;
         let total: i64 = ChatHistoryMapper::count_messages().await?;
-        let has_more: bool = (offset + limit) < total;
+        let has_more: bool = messages.len() as i64 == limit;
         Ok(ChatHistoryResponse {
             messages,
             total: total as usize,

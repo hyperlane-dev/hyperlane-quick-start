@@ -112,28 +112,41 @@ impl ChatHistoryMapper {
         Ok(())
     }
 
-    pub async fn get_history(offset: i64, limit: i64) -> Result<Vec<ChatHistory>, String> {
-        match Self::get_history_from_mysql(offset, limit).await {
+    pub async fn get_history(
+        session_id: &str,
+        before_id: Option<i64>,
+        limit: i64,
+    ) -> Result<Vec<ChatHistory>, String> {
+        match Self::get_history_from_mysql(session_id, before_id, limit).await {
             Ok(history) => Ok(history),
             Err(mysql_err) => {
                 log_error(&format!(
                     "MySQL query failed, trying PostgreSQL: {mysql_err}"
                 ))
                 .await;
-                Self::get_history_from_postgresql(offset, limit).await
+                Self::get_history_from_postgresql(session_id, before_id, limit).await
             }
         }
     }
 
-    async fn get_history_from_mysql(offset: i64, limit: i64) -> Result<Vec<ChatHistory>, String> {
+    async fn get_history_from_mysql(
+        session_id: &str,
+        before_id: Option<i64>,
+        limit: i64,
+    ) -> Result<Vec<ChatHistory>, String> {
         let db: DatabaseConnection = get_mysql_connection().await?;
-        let records: Vec<Model> = Entity::find()
-            .order_by_asc(Column::Id)
-            .offset(offset as u64)
+        let mut query: sea_orm::Select<Entity> = Entity::find();
+        query = query.filter(Column::SessionId.eq(session_id));
+        if let Some(id) = before_id {
+            query = query.filter(Column::Id.lt(id));
+        }
+        let mut records: Vec<Model> = query
+            .order_by_desc(Column::Id)
             .limit(limit as u64)
             .all(&db)
             .await
             .map_err(|error: DbErr| format!("Failed to query from MySQL: {error}"))?;
+        records.reverse();
         Ok(records
             .into_iter()
             .map(|r: Model| ChatHistory {
@@ -152,17 +165,23 @@ impl ChatHistoryMapper {
     }
 
     async fn get_history_from_postgresql(
-        offset: i64,
+        session_id: &str,
+        before_id: Option<i64>,
         limit: i64,
     ) -> Result<Vec<ChatHistory>, String> {
         let db: DatabaseConnection = get_postgresql_connection().await?;
-        let records: Vec<Model> = Entity::find()
-            .order_by_asc(Column::Id)
-            .offset(offset as u64)
+        let mut query: sea_orm::Select<Entity> = Entity::find();
+        query = query.filter(Column::SessionId.eq(session_id));
+        if let Some(id) = before_id {
+            query = query.filter(Column::Id.lt(id));
+        }
+        let mut records: Vec<Model> = query
+            .order_by_desc(Column::Id)
             .limit(limit as u64)
             .all(&db)
             .await
             .map_err(|error: DbErr| format!("Failed to query from PostgreSQL: {error}"))?;
+        records.reverse();
         Ok(records
             .into_iter()
             .map(|r: Model| ChatHistory {
