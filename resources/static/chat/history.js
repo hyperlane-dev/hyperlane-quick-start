@@ -68,18 +68,21 @@ const ChatHistory = {
     const messageList = document.getElementById('messageList');
     if (!messageList) return;
     const currentScrollHeight = messageList.scrollHeight;
-    const reversedMessages = messages.reverse();
-    reversedMessages.forEach((msg) => {
+    const fragment = document.createDocumentFragment();
+    messages.forEach((msg) => {
       const messageEl = this.createMessageElement(msg);
-      messageList.insertBefore(messageEl, messageList.firstChild);
+      fragment.appendChild(messageEl);
     });
+    messageList.insertBefore(fragment, messageList.firstChild);
     const newScrollHeight = messageList.scrollHeight;
     messageList.scrollTop = newScrollHeight - currentScrollHeight;
   },
 
   createMessageElement: function (msg) {
     const messageDiv = document.createElement('div');
-    const isSelf = msg.sender_name === username;
+    const currentUuid =
+      typeof getPersistentUUID === 'function' ? getPersistentUUID() : '';
+    const isSelf = msg.session_id === currentUuid && msg.sender_type === 'user';
     const isGpt = msg.sender_type === 'assistant';
 
     messageDiv.className = `message ${
@@ -134,8 +137,11 @@ const ChatHistory = {
         return md.render(content);
       }
     }
+    const currentUuid =
+      typeof getPersistentUUID === 'function' ? getPersistentUUID() : '';
+    const currentUsername = typeof username !== 'undefined' ? username : '';
     content = content.replace(/@(\w+)/g, (match, name) => {
-      const isSelfMention = name === username;
+      const isSelfMention = name === currentUsername || name === currentUuid;
       const mentionClass = isSelfMention ? 'mention-self' : 'mention-other';
       return `<span class="mention ${mentionClass}">${match}</span>`;
     });

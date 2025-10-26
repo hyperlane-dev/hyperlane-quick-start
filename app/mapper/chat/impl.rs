@@ -140,7 +140,7 @@ impl ChatHistoryMapper {
         let db: DatabaseConnection = get_mysql_connection().await?;
         let records: Vec<Model> = Entity::find()
             .filter(Column::SessionId.eq(session_id))
-            .order_by_desc(Column::Id)
+            .order_by_asc(Column::Id)
             .offset(offset as u64)
             .limit(limit as u64)
             .all(&db)
@@ -171,7 +171,7 @@ impl ChatHistoryMapper {
         let db: DatabaseConnection = get_postgresql_connection().await?;
         let records: Vec<Model> = Entity::find()
             .filter(Column::SessionId.eq(session_id))
-            .order_by_desc(Column::Id)
+            .order_by_asc(Column::Id)
             .offset(offset as u64)
             .limit(limit as u64)
             .all(&db)

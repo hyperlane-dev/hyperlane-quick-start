@@ -1522,7 +1522,8 @@
           document.getElementById('uploadButton').classList.remove('disabled');
 
           if (typeof ChatHistory !== 'undefined') {
-            ChatHistory.init(username);
+            const uuid = getPersistentUUID();
+            ChatHistory.init(uuid);
             ChatHistory.loadHistory();
           }
         };
