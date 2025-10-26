@@ -8,11 +8,13 @@ impl ServerHook for ChatConnectedHook {
     async fn handle(self, ctx: &Context) {
         let websocket: &WebSocket = get_global_websocket();
         let path: String = ctx.get_request_path().await;
-        let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
+        let key: BroadcastType<String> = BroadcastType::PointToGroup(path.clone());
         let receiver_count: ReceiverCount = websocket.receiver_count(key.clone());
         let resp_data: ResponseBody =
             ChatService::create_online_count_message(ctx, receiver_count.to_string()).await;
-        ChatService::broadcast_online_count(key, resp_data);
+        ctx.set_response_body(resp_data.clone()).await;
+        ChatService::broadcast_online_count(key, resp_data.clone());
+        ChatService::save_message_from_response(&path, &resp_data).await;
     }
 }
 
@@ -27,24 +29,10 @@ impl ServerHook for ChatRequestHook {
         if ChatService::handle_ping_request(ctx, &req_data).await {
             return;
         }
+        let resp_data: WebSocketRespData = req_data.into_resp(ctx).await;
+        let resp_data: ResponseBody = serde_json::to_vec(&resp_data).unwrap();
+        ctx.set_response_body(&resp_data).await;
         let session_id: String = ChatService::get_name(ctx).await;
-        let sender_name: String = session_id.clone();
-        let message_type: String = format!("{:?}", req_data.get_type());
-        let content: String = req_data.get_data().clone();
-        clone!(session_id, sender_name, message_type, content => {
-            spawn(async move {
-                 let save_res: Result<(), String> =  ChatService::save_message(
-                    &session_id,
-                    &sender_name,
-                    "user",
-                    &message_type,
-                    &content
-                ).await;
-                if save_res.is_err(){
-                    log_error(&format!("Failed to save chat message for session {}: {}", session_id, save_res.err().unwrap_or_default())).await;
-                }
-            });
-        });
         clone!(req_data, ctx, session_id => {
             let req_msg: &String = req_data.get_data();
             if ChatService::is_gpt_mentioned(req_msg) {
@@ -54,9 +42,6 @@ impl ServerHook for ChatRequestHook {
                 });
             }
         });
-        let resp_data: WebSocketRespData = req_data.into_resp(ctx).await;
-        let resp_data: ResponseBody = serde_json::to_vec(&resp_data).unwrap();
-        ctx.set_response_body(&resp_data).await;
     }
 }
 
@@ -66,14 +51,13 @@ impl ServerHook for ChatSendedHook {
     }
 
     async fn handle(self, ctx: &Context) {
+        let path: String = ctx.get_request_path().await;
         let request_string: String = ctx.get_request().await.get_body_string();
-        let response_string: String = ctx.get_response().await.get_body_string();
         let request: String = ctx.get_request().await.get_string();
         let response: String = ctx.get_response().await.get_string();
-        log_info(&format!(
-            "{request}{BR}{request_string}{BR}{response}{BR}{response_string}"
-        ))
-        .await;
+        log_info(&format!("{request}{BR}{request_string}{BR}{response}")).await;
+        let response_body: ResponseBody = ctx.get_response().await.get_body().clone();
+        ChatService::save_message_from_response(&path, &response_body).await;
     }
 }
 
@@ -85,13 +69,14 @@ impl ServerHook for ChatClosedHook {
     async fn handle(self, ctx: &Context) {
         let websocket: &WebSocket = get_global_websocket();
         let path: String = ctx.get_request_path().await;
-        let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
+        let key: BroadcastType<String> = BroadcastType::PointToGroup(path.clone());
         let receiver_count: ReceiverCount = websocket.receiver_count_after_closed(key);
         let username: String = ChatService::get_name(ctx).await;
         ChatDomain::remove_online_user(&username);
         let resp_data: ResponseBody =
             ChatService::create_online_count_message(ctx, receiver_count.to_string()).await;
         ctx.set_response_body(&resp_data).await;
+        ChatService::save_message_from_response(&path, &resp_data).await;
     }
 }
 
@@ -150,25 +135,6 @@ impl ChatService {
             Ok(gpt_response) => {
                 session.add_message(ROLE_ASSISTANT.to_string(), gpt_response.clone());
                 ChatDomain::update_session(session);
-                clone!(session_id, gpt_response => {
-                    spawn(async move {
-                        match Self::save_message(
-                            &session_id,
-                            "GPT Assistant",
-                            "assistant",
-                            "GptResponse",
-                            &gpt_response,
-                        )
-                        .await {
-                            Ok(_) => {
-                                log_info(&format!("GPT response saved successfully for session: {session_id}")).await;
-                            }
-                            Err(e) => {
-                                log_error(&format!("Failed to save GPT response for session {session_id}: {e}")).await;
-                            }
-                        }
-                    });
-                });
                 format!("{MENTION_PREFIX}{session_id}{SPACE}{gpt_response}")
             }
             Err(error) => format!("API call failed: {error}"),
@@ -279,6 +245,56 @@ impl ChatService {
                 Self::handle_gpt_api_response(&response_text)
             }
             Err(error) => Err(format!("Request sending failed: {error}")),
+        }
+    }
+
+    pub async fn save_message_from_response(path: &str, response_body: &ResponseBody) {
+        let response_body_string: String = String::from_utf8_lossy(response_body).into_owned();
+        if let Ok(resp_data) = serde_json::from_str::<serde_json::Value>(&response_body_string) {
+            let message_type: String = resp_data
+                .get("type")
+                .and_then(|v| v.as_str())
+                .unwrap_or("Unknown")
+                .to_string();
+            if message_type == "Ping" || message_type == "Pang" {
+                return;
+            }
+            let sender_name: String = resp_data
+                .get("name")
+                .and_then(|v| v.as_str())
+                .unwrap_or("Unknown")
+                .to_string();
+            let content: String = resp_data
+                .get("data")
+                .and_then(|v| v.as_str())
+                .unwrap_or("")
+                .to_string();
+            let session_id: String = path.trim_start_matches("/chat/").to_string();
+            let sender_type: &str = if sender_name == "System" {
+                "system"
+            } else if sender_name == "GPT Assistant" || message_type == "GptResponse" {
+                "assistant"
+            } else {
+                "user"
+            };
+            spawn(async move {
+                let save_res: Result<(), String> = Self::save_message(
+                    &session_id,
+                    &sender_name,
+                    sender_type,
+                    &message_type,
+                    &content,
+                )
+                .await;
+                if save_res.is_err() {
+                    log_error(&format!(
+                        "Failed to save message for session {}: {}",
+                        session_id,
+                        save_res.err().unwrap_or_default()
+                    ))
+                    .await;
+                }
+            });
         }
     }
 

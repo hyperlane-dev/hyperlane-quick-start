@@ -38,10 +38,7 @@ impl ChatHistoryMapper {
                 log_error(&format!("PostgreSQL insert failed: {pg_err}")).await;
                 Ok(())
             }
-            (Ok(_), Ok(_)) => {
-                log_error(&"Successfully inserted to both databases".to_string()).await;
-                Ok(())
-            }
+            (Ok(_), Ok(_)) => Ok(()),
         }
     }
 
