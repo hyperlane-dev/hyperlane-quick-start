@@ -16,14 +16,14 @@ impl ServerHook for StaticResourceRoute {
             return;
         }
         let file_path: String = format!("{STATIC_RESOURCES_DIR}/{path}");
-        let canonical_path: std::path::PathBuf = match std::fs::canonicalize(&file_path) {
+        let canonical_path: PathBuf = match fs::canonicalize(&file_path) {
             Ok(p) => p,
             Err(_) => {
                 ctx.set_response_status_code(404).await;
                 return;
             }
         };
-        let base_canonical: path::PathBuf = match std::fs::canonicalize(STATIC_RESOURCES_DIR) {
+        let base_canonical: PathBuf = match fs::canonicalize(STATIC_RESOURCES_DIR) {
             Ok(p) => p,
             Err(_) => {
                 ctx.set_response_status_code(500).await;
@@ -34,9 +34,11 @@ impl ServerHook for StaticResourceRoute {
             ctx.set_response_status_code(403).await;
             return;
         }
-        match std::fs::read(&file_path) {
+        match fs::read(&file_path) {
             Ok(content) => {
-                let content_type: &'static str = FileExtension::parse(&path).get_content_type();
+                let extension: String = FileExtension::get_extension_name(&path);
+                let content_type: &'static str =
+                    FileExtension::parse(&extension).get_content_type();
                 ctx.set_response_body(&content)
                     .await
                     .set_response_status_code(200)
