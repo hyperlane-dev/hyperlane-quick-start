@@ -166,15 +166,3 @@ const ChatHistory = {
     }
   },
 };
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    if (typeof username !== 'undefined') {
-      ChatHistory.init(username);
-    }
-  });
-} else {
-  if (typeof username !== 'undefined') {
-    ChatHistory.init(username);
-  }
-}
