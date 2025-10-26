@@ -10,7 +10,7 @@ pub use r#static::*;
 pub use r#struct::*;
 
 use super::*;
-use hyperlane_plugin::mysql::*;
+use hyperlane_plugin::{env::*, log::*, mysql::*, postgresql::*};
 use model::application::chat::*;
 
 use std::{
@@ -19,5 +19,7 @@ use std::{
 };
 
 use hyperlane_utils::sea_orm::{
-    ConnectionTrait, DatabaseBackend, DatabaseConnection, QueryResult, Statement,
+    ActiveModelBehavior, ActiveModelTrait, ActiveValue, ColumnTrait, Database, DatabaseConnection,
+    DbErr, DeriveEntityModel, DerivePrimaryKey, DeriveRelation, EntityTrait, EnumIter,
+    PaginatorTrait, PrimaryKeyTrait, QueryFilter, QueryOrder, QuerySelect,
 };

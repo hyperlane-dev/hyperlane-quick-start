@@ -70,11 +70,6 @@ impl ServerHook for ChatSendedHook {
         let response_string: String = ctx.get_response().await.get_body_string();
         let request: String = ctx.get_request().await.get_string();
         let response: String = ctx.get_response().await.get_string();
-        if *ctx.get_response().await.get_status_code() == 200 {
-            println_success!("{request}{BR}{request_string}{BR}{response}{BR}{response_string}");
-        } else {
-            println_warning!("{request}{BR}{request_string}{BR}{response}{BR}{response_string}");
-        }
         log_info(&format!(
             "{request}{BR}{request_string}{BR}{response}{BR}{response_string}"
         ))
@@ -166,10 +161,10 @@ impl ChatService {
                         )
                         .await {
                             Ok(_) => {
-                                log_info(&format!("GPT response saved successfully for session: {}", session_id)).await;
+                                log_info(&format!("GPT response saved successfully for session: {session_id}")).await;
                             }
                             Err(e) => {
-                                log_error(&format!("Failed to save GPT response for session {}: {}", session_id, e)).await;
+                                log_error(&format!("Failed to save GPT response for session {session_id}: {e}")).await;
                             }
                         }
                     });
