@@ -21,5 +21,5 @@ use std::{
 use hyperlane_utils::sea_orm::{
     ActiveModelBehavior, ActiveModelTrait, ActiveValue, DatabaseConnection, DbErr,
     DeriveEntityModel, DerivePrimaryKey, DeriveRelation, EntityTrait, EnumIter, PaginatorTrait,
-    PrimaryKeyTrait, QueryOrder,
+    PrimaryKeyTrait, QueryOrder, QuerySelect,
 };
