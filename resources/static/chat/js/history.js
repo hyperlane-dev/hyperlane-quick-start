@@ -33,7 +33,7 @@ const ChatHistory = {
       let url = `/api/chat/history?session_id=${encodeURIComponent(
         this.sessionId
       )}&limit=${this.limit}`;
-      
+
       if (this.beforeId !== null) {
         url += `&before_id=${this.beforeId}`;
       }
@@ -137,20 +137,21 @@ const ChatHistory = {
   },
 
   processMessageContent: function (content, messageType) {
-    if (messageType === 'GptResponse' || messageType === 'Markdown') {
-      if (typeof md !== 'undefined') {
-        return md.render(content);
-      }
-    }
     const currentUuid =
       typeof getPersistentUUID === 'function' ? getPersistentUUID() : '';
     const currentUsername = typeof username !== 'undefined' ? username : '';
-    content = content.replace(/@(\w+)/g, (match, name) => {
+    let processedContent = content;
+    if (typeof md !== 'undefined') {
+      processedContent = md.render(content);
+    } else {
+      processedContent = content.replace(/\n/g, '<br>');
+    }
+    processedContent = processedContent.replace(/@(\w+)/g, (match, name) => {
       const isSelfMention = name === currentUsername || name === currentUuid;
       const mentionClass = isSelfMention ? 'mention-self' : 'mention-other';
       return `<span class="mention ${mentionClass}">${match}</span>`;
     });
-    return content.replace(/\n/g, '<br>');
+    return processedContent;
   },
 
   showLoadingIndicator: function () {
