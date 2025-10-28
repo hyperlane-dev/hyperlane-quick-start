@@ -55,6 +55,12 @@ impl ServerHook for ChatSendedHook {
         let response: String = ctx.get_response().await.get_string();
         log_info(&format!("{request}{BR}{request_string}{BR}{response}")).await;
         let response_body: ResponseBody = ctx.get_response().await.get_body().clone();
+        if let Ok(resp_data) = serde_json::from_slice::<WebSocketRespData>(&response_body) {
+            if *resp_data.get_type() == MessageType::OnlineCount {
+                ctx.aborted().await;
+                return;
+            }
+        }
         let session_id: String = ChatService::get_name(ctx).await;
         ChatService::save_message_from_response(&session_id, &response_body).await;
     }
@@ -145,6 +151,26 @@ impl ChatService {
         let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
         let _: BroadcastMapSendResult<Vec<u8>> = websocket.send(key, gpt_resp_json.clone());
         ctx.set_response_body(&gpt_resp_json).await;
+        let session_id_clone: String = session_id.clone();
+        let api_response_clone: String = api_response.clone();
+        spawn(async move {
+            let save_res: Result<(), String> = Self::save_message(
+                &session_id_clone,
+                "GPT Assistant",
+                "assistant",
+                "GptResponse",
+                &api_response_clone,
+            )
+            .await;
+            if save_res.is_err() {
+                log_error(&format!(
+                    "Failed to save GPT response for session {}: {}",
+                    session_id_clone,
+                    save_res.err().unwrap_or_default()
+                ))
+                .await;
+            }
+        });
     }
 
     fn build_gpt_request_messages(session: &ChatSession) -> Vec<JsonValue> {

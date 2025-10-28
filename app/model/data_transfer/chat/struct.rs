@@ -1,6 +1,6 @@
 use super::*;
 
-#[derive(Data, Default, Serialize, ToSchema)]
+#[derive(Data, Default, Serialize, Deserialize, ToSchema)]
 pub struct WebSocketRespData {
     r#type: MessageType,
     name: String,
