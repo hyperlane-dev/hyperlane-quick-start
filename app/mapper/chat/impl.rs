@@ -113,30 +113,27 @@ impl ChatHistoryMapper {
     }
 
     pub async fn get_history(
-        session_id: &str,
         before_id: Option<i64>,
         limit: i64,
     ) -> Result<Vec<ChatHistory>, String> {
-        match Self::get_history_from_mysql(session_id, before_id, limit).await {
+        match Self::get_history_from_mysql(before_id, limit).await {
             Ok(history) => Ok(history),
             Err(mysql_err) => {
                 log_error(&format!(
                     "MySQL query failed, trying PostgreSQL: {mysql_err}"
                 ))
                 .await;
-                Self::get_history_from_postgresql(session_id, before_id, limit).await
+                Self::get_history_from_postgresql(before_id, limit).await
             }
         }
     }
 
     async fn get_history_from_mysql(
-        session_id: &str,
         before_id: Option<i64>,
         limit: i64,
     ) -> Result<Vec<ChatHistory>, String> {
         let db: DatabaseConnection = get_mysql_connection().await?;
         let mut query: sea_orm::Select<Entity> = Entity::find();
-        query = query.filter(Column::SessionId.eq(session_id));
         if let Some(id) = before_id {
             query = query.filter(Column::Id.lt(id));
         }
@@ -165,13 +162,11 @@ impl ChatHistoryMapper {
     }
 
     async fn get_history_from_postgresql(
-        session_id: &str,
         before_id: Option<i64>,
         limit: i64,
     ) -> Result<Vec<ChatHistory>, String> {
         let db: DatabaseConnection = get_postgresql_connection().await?;
         let mut query: sea_orm::Select<Entity> = Entity::find();
-        query = query.filter(Column::SessionId.eq(session_id));
         if let Some(id) = before_id {
             query = query.filter(Column::Id.lt(id));
         }
