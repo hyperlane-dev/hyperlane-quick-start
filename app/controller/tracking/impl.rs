@@ -14,7 +14,7 @@ impl ServerHook for TrackingReportRoute {
         let body: RequestBody = ctx.get_request_body().await;
         match TrackingService::save_tracking_record(ctx, &body).await {
             Ok(_) => {
-                let response: ApiResponse<Vec<u8>> = ApiResponse::default_success();
+                let response: ApiResponse<()> = ApiResponse::default_success();
                 ctx.set_response_body(&response.to_json_bytes()).await;
             }
             Err(error) => {
@@ -41,7 +41,7 @@ impl ServerHook for TrackingQueryRoute {
             Ok(req) => req,
             Err(error) => {
                 let error_response: ApiResponse<()> =
-                    ApiResponse::error(&format!("Invalid request body: {error}"));
+                    ApiResponse::error(format!("Invalid request body: {error}"));
                 ctx.set_response_body(&error_response.to_json_bytes()).await;
                 return;
             }
