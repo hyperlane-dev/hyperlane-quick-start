@@ -19,6 +19,16 @@ impl<T> ApiResponse<T>
 where
     T: Serialize + Default,
 {
+    pub fn default_success() -> Self {
+        let mut instance: ApiResponse<T> = Self::default();
+        instance
+            .set_code(ResponseCode::Success as i32)
+            .set_message("Success".to_string())
+            .set_data(None)
+            .set_timestamp(Some(date()));
+        instance
+    }
+
     pub fn success(data: T) -> Self {
         let mut instance: ApiResponse<T> = Self::default();
         instance
@@ -35,6 +45,16 @@ where
             .set_code(ResponseCode::Success as i32)
             .set_message(message.into())
             .set_data(Some(data))
+            .set_timestamp(Some(date()));
+        instance
+    }
+
+    pub fn default_error() -> Self {
+        let mut instance: ApiResponse<T> = Self::default();
+        instance
+            .set_code(ResponseCode::InternalError as i32)
+            .set_message("Internal server error".to_string())
+            .set_data(None)
             .set_timestamp(Some(date()));
         instance
     }

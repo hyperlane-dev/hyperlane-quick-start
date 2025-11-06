@@ -5,6 +5,7 @@ pub mod mysql;
 pub mod postgresql;
 pub mod redis;
 pub mod trace;
+pub mod tracking;
 pub mod upload;
 pub mod websocket;
 

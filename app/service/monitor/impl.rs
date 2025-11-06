@@ -22,6 +22,7 @@ impl MonitorService {
         {
             Self::capture_windows_network().await
         }
+
         #[cfg(not(target_os = "windows"))]
         {
             Self::capture_linux_network().await

@@ -185,6 +185,10 @@ impl MySqlAutoCreation {
                 "chat_history".to_string(),
                 MYSQL_CHAT_HISTORY_SQL.to_string(),
             ))
+            .add_table(TableSchema::new(
+                "tracking_record".to_string(),
+                MYSQL_TRACKING_RECORD_SQL.to_string(),
+            ))
     }
 }
 
