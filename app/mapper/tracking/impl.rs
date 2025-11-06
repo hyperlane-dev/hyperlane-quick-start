@@ -36,7 +36,7 @@ impl TrackingMapper {
             query = query.filter(Column::Timestamp.lte(end));
         }
         if let Some(addr) = socket_addr {
-            query = query.filter(Column::SocketAddr.eq(addr));
+            query = query.filter(Column::SocketAddr.contains(&addr));
         }
         let total: i64 = query.clone().count(db).await? as i64;
         let records: Vec<Model> = query
@@ -51,25 +51,61 @@ impl TrackingMapper {
     pub async fn query_by_header(
         header_key: String,
         header_value: Option<String>,
+        start_time: Option<i64>,
+        end_time: Option<i64>,
+        socket_addr: Option<String>,
         page: i64,
         page_size: i64,
     ) -> Result<(Vec<Model>, i64), DbErr> {
         let db: &DatabaseConnection = get_tracking_db_connection();
-        let all_records: Vec<Model> = Entity::find()
-            .order_by_desc(Column::CreatedAt)
-            .all(db)
-            .await?;
+        let mut query: Select<Entity> = Entity::find();
+        if let Some(start) = start_time {
+            query = query.filter(Column::Timestamp.gte(start));
+        }
+        if let Some(end) = end_time {
+            query = query.filter(Column::Timestamp.lte(end));
+        }
+        if let Some(addr) = socket_addr {
+            query = query.filter(Column::SocketAddr.contains(&addr));
+        }
+        let all_records: Vec<Model> = query.order_by_desc(Column::CreatedAt).all(db).await?;
+        let header_key_lower: String = header_key.to_lowercase();
         let filtered_records: Vec<Model> = all_records
             .into_iter()
             .filter(|record| {
                 if let Ok(headers) =
+                    serde_json::from_str::<HashMap<String, Vec<String>>>(&record.headers)
+                {
+                    for (key, values) in headers.iter() {
+                        if key.to_lowercase().contains(&header_key_lower) {
+                            if let Some(ref expected_value) = header_value {
+                                let expected_lower = expected_value.to_lowercase();
+                                for value in values {
+                                    if value.to_lowercase().contains(&expected_lower) {
+                                        return true;
+                                    }
+                                }
+                            } else {
+                                return true;
+                            }
+                        }
+                    }
+                } else if let Ok(headers) =
                     serde_json::from_str::<HashMap<String, String>>(&record.headers)
                 {
-                    if let Some(value) = headers.get(&header_key) {
-                        if let Some(ref expected_value) = header_value {
-                            return value.contains(expected_value);
+                    for (key, value) in headers.iter() {
+                        if key.to_lowercase().contains(&header_key_lower) {
+                            if let Some(ref expected_value) = header_value {
+                                if value
+                                    .to_lowercase()
+                                    .contains(&expected_value.to_lowercase())
+                                {
+                                    return true;
+                                }
+                            } else {
+                                return true;
+                            }
                         }
-                        return true;
                     }
                 }
                 false
@@ -88,14 +124,24 @@ impl TrackingMapper {
 
     pub async fn query_by_body_content(
         content: String,
+        start_time: Option<i64>,
+        end_time: Option<i64>,
+        socket_addr: Option<String>,
         page: i64,
         page_size: i64,
     ) -> Result<(Vec<Model>, i64), DbErr> {
         let db: &DatabaseConnection = get_tracking_db_connection();
-        let all_records: Vec<Model> = Entity::find()
-            .order_by_desc(Column::CreatedAt)
-            .all(db)
-            .await?;
+        let mut query: Select<Entity> = Entity::find();
+        if let Some(start) = start_time {
+            query = query.filter(Column::Timestamp.gte(start));
+        }
+        if let Some(end) = end_time {
+            query = query.filter(Column::Timestamp.lte(end));
+        }
+        if let Some(addr) = socket_addr {
+            query = query.filter(Column::SocketAddr.contains(&addr));
+        }
+        let all_records: Vec<Model> = query.order_by_desc(Column::CreatedAt).all(db).await?;
         let filtered_records: Vec<Model> = all_records
             .into_iter()
             .filter(|record| record.body.contains(&content))

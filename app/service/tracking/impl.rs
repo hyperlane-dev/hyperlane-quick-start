@@ -31,14 +31,29 @@ impl TrackingService {
         }
         let (models, total): (Vec<Model>, i64) = if request.header_key.is_some() {
             let header_key: String = request.header_key.unwrap();
-            TrackingMapper::query_by_header(header_key, request.header_value, page, page_size)
-                .await
-                .map_err(|error| format!("Failed to query by header: {error}"))?
+            TrackingMapper::query_by_header(
+                header_key,
+                request.header_value,
+                request.start_time,
+                request.end_time,
+                request.socket_addr,
+                page,
+                page_size,
+            )
+            .await
+            .map_err(|error| format!("Failed to query by header: {error}"))?
         } else if request.body_content.is_some() {
             let content: String = request.body_content.unwrap();
-            TrackingMapper::query_by_body_content(content, page, page_size)
-                .await
-                .map_err(|error| format!("Failed to query by body content: {error}"))?
+            TrackingMapper::query_by_body_content(
+                content,
+                request.start_time,
+                request.end_time,
+                request.socket_addr,
+                page,
+                page_size,
+            )
+            .await
+            .map_err(|error| format!("Failed to query by body content: {error}"))?
         } else {
             TrackingMapper::query(
                 request.start_time,
