@@ -25,7 +25,7 @@ pub struct TrackingQueryResponse {
 pub struct TrackingRecordDTO {
     pub id: i64,
     pub socket_addr: String,
-    pub headers: HashMap<String, String>,
+    pub headers: String,
     pub body: String,
     pub timestamp: i64,
     pub created_at: String,

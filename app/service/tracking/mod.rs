@@ -7,6 +7,4 @@ use super::*;
 use mapper::tracking::*;
 use model::{application::tracking::*, data_transfer::tracking::*};
 
-use std::collections::HashMap;
-
 use chrono::Utc;

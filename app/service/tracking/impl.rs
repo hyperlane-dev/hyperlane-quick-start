@@ -52,20 +52,16 @@ impl TrackingService {
         };
         let records: Vec<TrackingRecordDTO> = models
             .into_iter()
-            .map(|model| {
-                let headers: HashMap<String, String> =
-                    serde_json::from_str(&model.headers).unwrap_or_default();
-                TrackingRecordDTO {
-                    id: model.id,
-                    socket_addr: model.socket_addr,
-                    headers,
-                    body: model.body,
-                    timestamp: model.timestamp,
-                    created_at: model
-                        .created_at
-                        .map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string())
-                        .unwrap_or_default(),
-                }
+            .map(|model| TrackingRecordDTO {
+                id: model.id,
+                socket_addr: model.socket_addr,
+                headers: model.headers,
+                body: model.body,
+                timestamp: model.timestamp,
+                created_at: model
+                    .created_at
+                    .map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string())
+                    .unwrap_or_default(),
             })
             .collect();
         Ok(TrackingQueryResponse {

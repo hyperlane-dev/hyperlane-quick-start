@@ -387,7 +387,8 @@
             border: 2px solid rgba(0, 255, 255, 0.5);
             border-radius: 20px;
             padding: 30px;
-            max-width: 800px;
+            max-width: 1200px;
+            width: 90%;
             max-height: 80vh;
             overflow-y: auto;
             position: relative;
@@ -779,6 +780,8 @@
                 const record = this.cachedRecords.find((r) => r.id === recordId);
                 if (!record) return;
 
+                document.body.style.overflow = 'hidden';
+
                 let html = `
             <div class="detail-section">
               <div class="detail-label">ID</div>
@@ -812,6 +815,7 @@
 
             closeModal () {
                 document.getElementById('detailModal').classList.remove('active');
+                document.body.style.overflow = '';
             }
 
             formatJson (str) {
@@ -859,6 +863,10 @@
         }
 
         const app = new TrackingApp();
+
+        window.addEventListener('DOMContentLoaded', () => {
+            app.search();
+        });
 
         document.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
