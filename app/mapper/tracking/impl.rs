@@ -1,19 +1,17 @@
-use hyperlane::tokio::spawn;
-
 use super::*;
 
 impl TrackingMapper {
     pub async fn insert(record: TrackingRecord) -> Result<(), DbErr> {
         let headers_json: String = serde_json::to_string(&record.headers)
             .map_err(|error| DbErr::Custom(format!("Failed to serialize headers: {error}")))?;
-        let active_model: ActiveModel = ActiveModel {
-            socket_addr: ActiveValue::Set(record.socket_addr),
-            headers: ActiveValue::Set(headers_json),
-            body: ActiveValue::Set(record.body),
-            timestamp: ActiveValue::Set(record.timestamp),
-            ..Default::default()
-        };
         spawn(async move {
+            let active_model: ActiveModel = ActiveModel {
+                socket_addr: ActiveValue::Set(record.socket_addr),
+                headers: ActiveValue::Set(headers_json),
+                body: ActiveValue::Set(record.body),
+                timestamp: ActiveValue::Set(record.timestamp),
+                ..Default::default()
+            };
             let db: &DatabaseConnection = get_tracking_db_connection();
             Entity::insert(active_model).exec(db).await.unwrap();
         });
