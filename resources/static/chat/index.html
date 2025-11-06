@@ -1,18 +1,16 @@
 <!DOCTYPE html>
+
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta
-      name="viewport"
-      content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"
-    />
-    <link rel="icon" href="https://docs.ltpp.vip/img/hyperlane.png" />
-    <title>Hyperlane Chat</title>
-    <script src="./js/markdown-it.min.js"></script>
-    <script src="./js/highlight.min.js"></script>
-    <link rel="stylesheet" href="./css/github.min.css" />
-    <style>
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" name="viewport"/>
+<link href="./img/hyperlane.png" rel="icon"/>
+<title>Hyperlane Chat</title>
+<script src="./js/markdown-it.min.js"></script>
+<script src="./js/highlight.min.js"></script>
+<link href="./css/github.min.css" rel="stylesheet"/>
+<style>
       * {
         margin: 0;
         padding: 0;
@@ -1015,74 +1013,51 @@
         }
       }
     </style>
-  </head>
-
-  <body>
-    <div class="chat-view">
-      <div class="nav-bar">
-        <div class="nav-left">
-          <img
-            src="https://docs.ltpp.vip/img/hyperlane.png"
-            alt=""
-            class="nav-logo"
-          />
-          <h1 class="nav-title">
-            <a
-              href="https://github.com/hyperlane-dev/hyperlane"
-              target="_blank"
-            >
+</head>
+<body>
+<div class="chat-view">
+<div class="nav-bar">
+<div class="nav-left">
+<img alt="" class="nav-logo" src="./img/hyperlane.png"/>
+<h1 class="nav-title">
+<a href="https://github.com/hyperlane-dev/hyperlane" target="_blank">
               Hyperlane Chat
             </a>
-          </h1>
-        </div>
-        <div class="connection-indicator disconnected" id="connectionIndicator">
-          <span class="status-dot"></span>
-          <span id="connectionText">Offline</span>
-        </div>
-      </div>
-
-      <div class="chat-container">
-        <div class="chat-messages" id="messageList"></div>
-
-        <button class="scroll-to-bottom hidden" id="scrollToBottomBtn">
-          <span id="unreadBadge" class="unread-badge hidden">0</span>
+</h1>
+</div>
+<div class="connection-indicator disconnected" id="connectionIndicator">
+<span class="status-dot"></span>
+<span id="connectionText">Offline</span>
+</div>
+</div>
+<div class="chat-container">
+<div class="chat-messages" id="messageList"></div>
+<button class="scroll-to-bottom hidden" id="scrollToBottomBtn">
+<span class="unread-badge hidden" id="unreadBadge">0</span>
           ↓
         </button>
-
-        <div class="connection-status hidden" id="connectionStatus">
-          <div>Connection lost, trying to reconnect...</div>
-        </div>
-
-        <div class="chat-input" id="chatInputContainer">
-          <label
-            for="file-input"
-            class="btn btn-upload upload-button"
-            id="uploadButton"
-          >
-            <span class="upload-icon">+</span>
-          </label>
-          <input type="file" id="file-input" class="file-input" multiple />
-          <textarea
-            id="messageInput"
-            placeholder="(use @name to mention users, ctrl+enter or shift+enter for new line)"
-            rows="1"
-            disabled
-          ></textarea>
-          <button id="sendButton" disabled class="send-button">
-            <i class="send-icon">➤</i>
-          </button>
-          <div class="mention-dropdown hidden" id="mentionDropdown">
-            <div class="mention-header">Select User</div>
-            <div class="mention-list" id="mentionList"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="toast-container" id="toastContainer"></div>
-    <div class="upload-status-container" id="uploadStatusContainer"></div>
-
-    <script>
+<div class="connection-status hidden" id="connectionStatus">
+<div>Connection lost, trying to reconnect...</div>
+</div>
+<div class="chat-input" id="chatInputContainer">
+<label class="btn btn-upload upload-button" for="file-input" id="uploadButton">
+<span class="upload-icon">+</span>
+</label>
+<input class="file-input" id="file-input" multiple="" type="file"/>
+<textarea disabled="" id="messageInput" placeholder="(use @name to mention users, ctrl+enter or shift+enter for new line)" rows="1"></textarea>
+<button class="send-button" disabled="" id="sendButton">
+<i class="send-icon">➤</i>
+</button>
+<div class="mention-dropdown hidden" id="mentionDropdown">
+<div class="mention-header">Select User</div>
+<div class="mention-list" id="mentionList"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="toast-container" id="toastContainer"></div>
+<div class="upload-status-container" id="uploadStatusContainer"></div>
+<script>
       let socket = null;
       let connectionStatus = 'disconnected';
       let messages = [];
@@ -2375,6 +2350,6 @@
         }
       });
     </script>
-    <script src="./js/history.js"></script>
-  </body>
+<script src="./js/history.js"></script>
+</body>
 </html>

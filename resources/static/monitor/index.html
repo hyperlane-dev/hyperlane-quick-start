@@ -1,12 +1,13 @@
 <!DOCTYPE html>
+
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Server Monitoring Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-      @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Server Monitoring Dashboard</title>
+<script src="./js/chart.js"></script>
+<style>
+      @import url('./css/css2');
 
       * {
         margin: 0;
@@ -555,161 +556,145 @@
         }
       }
     </style>
-  </head>
-  <body>
-    <div class="connection-status" id="connectionStatus">
-      <span class="status-indicator"></span>
-      <span>Connecting...</span>
-    </div>
-
-    <div class="container">
-      <div class="header">
-        <h1>Server Monitoring Dashboard</h1>
-        <p class="subtitle">REAL-TIME SYSTEM MONITORING</p>
-      </div>
-
-      <div class="system-overview">
-        <div class="system-info-item">
-          <div class="system-info-label">Hostname</div>
-          <div class="system-info-value" id="hostname">-</div>
-        </div>
-        <div class="system-info-item">
-          <div class="system-info-label">Operating System</div>
-          <div class="system-info-value" id="osName">-</div>
-        </div>
-        <div class="system-info-item">
-          <div class="system-info-label">CPU Model</div>
-          <div class="system-info-value" id="cpuModel">-</div>
-        </div>
-        <div class="system-info-item">
-          <div class="system-info-label">CPU Cores</div>
-          <div class="system-info-value" id="cpuCores">-</div>
-        </div>
-        <div class="system-info-item">
-          <div class="system-info-label">Total Memory</div>
-          <div class="system-info-value" id="totalMemory">-</div>
-        </div>
-        <div class="system-info-item">
-          <div class="system-info-label">Total Disk</div>
-          <div class="system-info-value" id="totalDisk">-</div>
-        </div>
-      </div>
-
-      <div class="metrics-grid">
-        <div class="metric-card">
-          <div class="metric-title">
-            <span class="metric-icon">🖥️</span>
+</head>
+<body>
+<div class="connection-status" id="connectionStatus">
+<span class="status-indicator"></span>
+<span>Connecting...</span>
+</div>
+<div class="container">
+<div class="header">
+<h1>Server Monitoring Dashboard</h1>
+<p class="subtitle">REAL-TIME SYSTEM MONITORING</p>
+</div>
+<div class="system-overview">
+<div class="system-info-item">
+<div class="system-info-label">Hostname</div>
+<div class="system-info-value" id="hostname">-</div>
+</div>
+<div class="system-info-item">
+<div class="system-info-label">Operating System</div>
+<div class="system-info-value" id="osName">-</div>
+</div>
+<div class="system-info-item">
+<div class="system-info-label">CPU Model</div>
+<div class="system-info-value" id="cpuModel">-</div>
+</div>
+<div class="system-info-item">
+<div class="system-info-label">CPU Cores</div>
+<div class="system-info-value" id="cpuCores">-</div>
+</div>
+<div class="system-info-item">
+<div class="system-info-label">Total Memory</div>
+<div class="system-info-value" id="totalMemory">-</div>
+</div>
+<div class="system-info-item">
+<div class="system-info-label">Total Disk</div>
+<div class="system-info-value" id="totalDisk">-</div>
+</div>
+</div>
+<div class="metrics-grid">
+<div class="metric-card">
+<div class="metric-title">
+<span class="metric-icon">🖥️</span>
             CPU Usage
           </div>
-          <div class="metric-value" id="cpuUsage">
+<div class="metric-value" id="cpuUsage">
             0<span class="metric-unit">%</span>
-          </div>
-          <div class="progress-container">
-            <div class="progress-bar" id="cpuProgress" style="width: 0%"></div>
-          </div>
-        </div>
-
-        <div class="metric-card">
-          <div class="metric-title">
-            <span class="metric-icon">💾</span>
+</div>
+<div class="progress-container">
+<div class="progress-bar" id="cpuProgress" style="width: 0%"></div>
+</div>
+</div>
+<div class="metric-card">
+<div class="metric-title">
+<span class="metric-icon">💾</span>
             Memory Usage
           </div>
-          <div class="metric-value" id="memoryUsage">
+<div class="metric-value" id="memoryUsage">
             0<span class="metric-unit">%</span>
-          </div>
-          <div class="progress-container">
-            <div
-              class="progress-bar"
-              id="memoryProgress"
-              style="width: 0%"
-            ></div>
-          </div>
-        </div>
-
-        <div class="metric-card">
-          <div class="metric-title">
-            <span class="metric-icon">💿</span>
+</div>
+<div class="progress-container">
+<div class="progress-bar" id="memoryProgress" style="width: 0%"></div>
+</div>
+</div>
+<div class="metric-card">
+<div class="metric-title">
+<span class="metric-icon">💿</span>
             Disk Usage
           </div>
-          <div class="metric-value" id="diskUsage">
+<div class="metric-value" id="diskUsage">
             0<span class="metric-unit">%</span>
-          </div>
-          <div class="progress-container">
-            <div class="progress-bar" id="diskProgress" style="width: 0%"></div>
-          </div>
-        </div>
-
-        <div class="metric-card">
-          <div class="metric-title">
-            <span class="metric-icon">🌐</span>
+</div>
+<div class="progress-container">
+<div class="progress-bar" id="diskProgress" style="width: 0%"></div>
+</div>
+</div>
+<div class="metric-card">
+<div class="metric-title">
+<span class="metric-icon">🌐</span>
             Network Traffic
           </div>
-          <div class="metric-value" id="networkRx">
+<div class="metric-value" id="networkRx">
             0<span class="metric-unit">MB</span>
-          </div>
-          <div style="font-size: 1.2rem; color: #888; margin-top: 10px">
+</div>
+<div style="font-size: 1.2rem; color: #888; margin-top: 10px">
             Upload: <span id="networkTx">0 MB</span>
-          </div>
-        </div>
-
-        <div class="metric-card">
-          <div class="metric-title">
-            <span class="metric-icon">⚡</span>
+</div>
+</div>
+<div class="metric-card">
+<div class="metric-title">
+<span class="metric-icon">⚡</span>
             System Load
           </div>
-          <div class="metric-value" id="loadAverage">0.00</div>
-        </div>
-
-        <div class="metric-card">
-          <div class="metric-title">
-            <span class="metric-icon">🔗</span>
+<div class="metric-value" id="loadAverage">0.00</div>
+</div>
+<div class="metric-card">
+<div class="metric-title">
+<span class="metric-icon">🔗</span>
             Active Connections
           </div>
-          <div class="metric-value" id="activeConnections">0</div>
-        </div>
-
-        <div class="metric-card">
-          <div class="metric-title">
-            <span class="metric-icon">⏱️</span>
+<div class="metric-value" id="activeConnections">0</div>
+</div>
+<div class="metric-card">
+<div class="metric-title">
+<span class="metric-icon">⏱️</span>
             Uptime
           </div>
-          <div class="metric-value" id="uptime">
+<div class="metric-value" id="uptime">
             0<span class="metric-unit">days</span>
-          </div>
-        </div>
-
-        <div class="metric-card">
-          <div class="metric-title">
-            <span class="metric-icon">📊</span>
+</div>
+</div>
+<div class="metric-card">
+<div class="metric-title">
+<span class="metric-icon">📊</span>
             Process Count
           </div>
-          <div class="metric-value" id="processCount">0</div>
-        </div>
-      </div>
-
-      <div class="charts-section">
-        <div class="charts-grid">
-          <div class="chart-card">
-            <div class="chart-title">CPU Usage Trend</div>
-            <canvas id="cpuChart"></canvas>
-          </div>
-          <div class="chart-card">
-            <div class="chart-title">Memory Usage Trend</div>
-            <canvas id="memoryChart"></canvas>
-          </div>
-          <div class="chart-card">
-            <div class="chart-title">Disk Usage Trend</div>
-            <canvas id="diskChart"></canvas>
-          </div>
-          <div class="chart-card">
-            <div class="chart-title">Network Traffic Trend</div>
-            <canvas id="networkChart"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <script>
+<div class="metric-value" id="processCount">0</div>
+</div>
+</div>
+<div class="charts-section">
+<div class="charts-grid">
+<div class="chart-card">
+<div class="chart-title">CPU Usage Trend</div>
+<canvas id="cpuChart"></canvas>
+</div>
+<div class="chart-card">
+<div class="chart-title">Memory Usage Trend</div>
+<canvas id="memoryChart"></canvas>
+</div>
+<div class="chart-card">
+<div class="chart-title">Disk Usage Trend</div>
+<canvas id="diskChart"></canvas>
+</div>
+<div class="chart-card">
+<div class="chart-title">Network Traffic Trend</div>
+<canvas id="networkChart"></canvas>
+</div>
+</div>
+</div>
+</div>
+<script>
       class ServerMonitor {
         constructor() {
           this.eventSource = null;
@@ -1105,5 +1090,5 @@
         }
       });
     </script>
-  </body>
+</body>
 </html>
