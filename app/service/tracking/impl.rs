@@ -55,7 +55,7 @@ impl TrackingService {
             .map(|model| TrackingRecordDTO {
                 id: model.id,
                 socket_addr: model.socket_addr,
-                headers: model.headers,
+                headers: serde_json::from_str(&model.headers).unwrap_or_default(),
                 body: model.body,
                 timestamp: model.timestamp,
                 created_at: model
