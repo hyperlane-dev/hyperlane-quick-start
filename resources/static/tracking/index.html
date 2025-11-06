@@ -852,13 +852,7 @@
                 document.getElementById('bodyContent').value = '';
                 document.getElementById('pageSize').value = '20';
 
-                document.getElementById('resultsContainer').innerHTML =
-                    '<div class="no-data">Please set search criteria and click the search button</div>';
-
-                document.getElementById('totalRecords').textContent = '0';
-                document.getElementById('currentPage').textContent = '1';
-                document.getElementById('totalPages').textContent = '0';
-                document.getElementById('pageSizeDisplay').textContent = '20';
+                this.search();
             }
         }
 
