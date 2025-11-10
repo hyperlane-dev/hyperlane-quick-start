@@ -31,7 +31,7 @@ impl ServerHook for OnlineClosedHook {
 impl OnlineService {
     pub async fn broadcast_online_count(key: BroadcastType<String>, count: ReceiverCount) {
         let websocket: &WebSocket = get_global_websocket();
-        let message: String = format!(r#"{{"type":"online_count","count":{}}}"#, count);
+        let message: String = format!(r#"{{"type":"online_count","count":{count}}}"#);
         let message_bytes: Vec<u8> = message.into_bytes();
         let _: BroadcastMapSendResult<Vec<u8>> = websocket.send(key, message_bytes);
     }
