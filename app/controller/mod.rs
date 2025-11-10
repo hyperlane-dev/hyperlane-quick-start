@@ -3,6 +3,7 @@ pub mod hello;
 pub mod log;
 pub mod monitor;
 pub mod mysql;
+pub mod online;
 pub mod openapi;
 pub mod postgresql;
 pub mod redis;
