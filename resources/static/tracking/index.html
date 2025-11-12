@@ -1,17 +1,21 @@
 <!DOCTYPE html>
 
 <html lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Event Tracking Query Dashboard</title>
-<style>
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Event Tracking Query Dashboard</title>
+    <style>
       @import url('./css/css2');
 
       * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
       }
 
       body {
@@ -529,89 +533,117 @@
         }
       }
     </style>
-</head>
-<body>
-<div class="container">
-<div class="header">
-<h1>Event Tracking Query Dashboard</h1>
-<p class="subtitle">Real-time Event Monitoring System</p>
-</div>
-<div class="search-panel">
-<div class="search-title">🔍 Search Criteria</div>
-<div class="search-grid">
-<div class="form-group">
-<label class="form-label">Start Time</label>
-<input class="form-input" id="startTime" type="datetime-local"/>
-</div>
-<div class="form-group">
-<label class="form-label">End Time</label>
-<input class="form-input" id="endTime" type="datetime-local"/>
-</div>
-<div class="form-group">
-<label class="form-label">Socket Address</label>
-<input class="form-input" id="socketAddr" placeholder="e.g: 127.0.0.1:8080" type="text"/>
-</div>
-<div class="form-group">
-<label class="form-label">Header Key</label>
-<input class="form-input" id="headerKey" placeholder="e.g: User-Agent" type="text"/>
-</div>
-<div class="form-group">
-<label class="form-label">Header Value</label>
-<input class="form-input" id="headerValue" placeholder="e.g: Mozilla" type="text"/>
-</div>
-<div class="form-group">
-<label class="form-label">Body Content</label>
-<input class="form-input" id="bodyContent" placeholder="Search keyword" type="text"/>
-</div>
-<div class="form-group">
-<label class="form-label">Page Size</label>
-<input class="form-input" id="pageSize" max="100" min="1" type="number" value="20"/>
-</div>
-</div>
-<div class="button-group">
-<button class="btn btn-primary" onclick="app.search()">
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Event Tracking Query Dashboard</h1>
+        <p class="subtitle">Real-time Event Monitoring System</p>
+      </div>
+      <div class="search-panel">
+        <div class="search-title">🔍 Search Criteria</div>
+        <div class="search-grid">
+          <div class="form-group">
+            <label class="form-label">Start Time</label>
+            <input class="form-input" id="startTime" type="datetime-local" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">End Time</label>
+            <input class="form-input" id="endTime" type="datetime-local" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Socket Address</label>
+            <input
+              class="form-input"
+              id="socketAddr"
+              placeholder="e.g: 127.0.0.1:8080"
+              type="text"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Header Key</label>
+            <input
+              class="form-input"
+              id="headerKey"
+              placeholder="e.g: User-Agent"
+              type="text"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Header Value</label>
+            <input
+              class="form-input"
+              id="headerValue"
+              placeholder="e.g: Mozilla"
+              type="text"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Body Content</label>
+            <input
+              class="form-input"
+              id="bodyContent"
+              placeholder="Search keyword"
+              type="text"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Page Size</label>
+            <input
+              class="form-input"
+              id="pageSize"
+              max="100"
+              min="1"
+              type="number"
+              value="20"
+            />
+          </div>
+        </div>
+        <div class="button-group">
+          <button class="btn btn-primary" onclick="app.search()">
             🔍 Search
           </button>
-<button class="btn btn-secondary" onclick="app.reset()">
+          <button class="btn btn-secondary" onclick="app.reset()">
             🔄 Reset
           </button>
-</div>
-</div>
-<div class="stats-panel">
-<div class="stat-card">
-<div class="stat-label">Total Records</div>
-<div class="stat-value" id="totalRecords">0</div>
-</div>
-<div class="stat-card">
-<div class="stat-label">Current Page</div>
-<div class="stat-value" id="currentPage">1</div>
-</div>
-<div class="stat-card">
-<div class="stat-label">Total Pages</div>
-<div class="stat-value" id="totalPages">0</div>
-</div>
-<div class="stat-card">
-<div class="stat-label">Page Size</div>
-<div class="stat-value" id="pageSizeDisplay">20</div>
-</div>
-</div>
-<div class="results-panel">
-<div class="results-title">📊 Query Results</div>
-<div id="resultsContainer">
-<div class="no-data">
+        </div>
+      </div>
+      <div class="stats-panel">
+        <div class="stat-card">
+          <div class="stat-label">Total Records</div>
+          <div class="stat-value" id="totalRecords">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Current Page</div>
+          <div class="stat-value" id="currentPage">1</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Pages</div>
+          <div class="stat-value" id="totalPages">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Page Size</div>
+          <div class="stat-value" id="pageSizeDisplay">20</div>
+        </div>
+      </div>
+      <div class="results-panel">
+        <div class="results-title">📊 Query Results</div>
+        <div id="resultsContainer">
+          <div class="no-data">
             Please set search criteria and click the search button
           </div>
-</div>
-</div>
-</div>
-<div class="modal" id="detailModal">
-<div class="modal-content">
-<div class="modal-close" onclick="app.closeModal()">×</div>
-<div class="modal-title">Detail Information</div>
-<div id="modalContent"></div>
-</div>
-</div>
-<script>
+        </div>
+      </div>
+    </div>
+    <div class="modal" id="detailModal">
+      <div class="modal-content">
+        <div class="modal-close" onclick="app.closeModal()">×</div>
+        <div class="modal-title">Detail Information</div>
+        <div id="modalContent"></div>
+      </div>
+    </div>
+    <script>
       class TrackingApp {
         constructor() {
           this.currentPage = 1;
@@ -915,5 +947,5 @@
         }
       });
     </script>
-</body>
+  </body>
 </html>

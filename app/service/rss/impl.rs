@@ -86,12 +86,17 @@ impl RssService {
         Some(file_info)
     }
 
-    pub async fn generate_rss_feed(base_url: &str, limit: Option<usize>) -> String {
+    pub async fn generate_rss_feed(
+        base_url: &str,
+        limit: Option<usize>,
+        offset: Option<usize>,
+    ) -> String {
         let files: Vec<UploadedFile> = Self::get_uploaded_files().await;
+        let offset_value: usize = offset.unwrap_or(0);
         let limited_files: Vec<UploadedFile> = if let Some(limit) = limit {
-            files.into_iter().take(limit).collect()
+            files.into_iter().skip(offset_value).take(limit).collect()
         } else {
-            files
+            files.into_iter().skip(offset_value).collect()
         };
         let mut items: Vec<RssItem> = Vec::new();
         for file in limited_files {
@@ -109,7 +114,7 @@ impl RssService {
                 title: file.get_file_name().to_string(),
                 link: full_url.clone(),
                 description: format!(
-                    "File: {}, Size: {} bytes, Upload Time: {}",
+                    "File: {}, Size: {} bytes, Upload Time: {}.",
                     file.get_file_name(),
                     file.get_file_size(),
                     file.get_upload_time()

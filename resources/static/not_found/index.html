@@ -5,14 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>404 Not Found</title>
     <style>
+      * {
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+      }
+
       .center-text {
         text-align: center;
       }
+
       a {
         color: #1e90ff;
         text-decoration: none;
         transition: color 0.3s, border-bottom-color 0.3s;
       }
+
       a:hover,
       a:focus {
         color: pink;
@@ -22,6 +31,7 @@
       }
     </style>
   </head>
+
   <body>
     <h1 class="center-text">404 Not Found</h1>
     <hr />
