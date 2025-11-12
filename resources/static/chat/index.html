@@ -9,6 +9,7 @@
       name="viewport"
     />
     <title>Hyperlane Chat</title>
+    <link rel="icon" href="https://docs.ltpp.vip/img/hyperlane.png" />
     <script src="./js/markdown-it.min.js"></script>
     <script src="./js/highlight.min.js"></script>
     <link href="./css/github.min.css" rel="stylesheet" />
@@ -165,10 +166,42 @@
       .nav-title a {
         color: #2c3e50;
         text-decoration: none;
+        position: relative;
+        display: inline-block;
       }
 
-      .nav-title a:hover {
-        color: #3498db;
+      .nav-title a .text {
+        background: linear-gradient(90deg, #2c3e50, #667eea, #2c3e50, #667eea);
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: shimmer 3s linear infinite;
+      }
+
+      .nav-title a::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -2px;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+        transition: width 0.4s ease;
+      }
+
+      .nav-title a:hover::after {
+        width: 100%;
+      }
+
+      @keyframes shimmer {
+        0% {
+          background-position: 0% center;
+        }
+
+        100% {
+          background-position: 200% center;
+        }
       }
 
       .connection-indicator {
@@ -235,7 +268,6 @@
       .chat-messages {
         flex: 1;
         padding: 16px;
-        background-color: #f8f9fa;
         overflow-y: auto;
         scrollbar-width: thin;
       }
@@ -709,6 +741,51 @@
         border-radius: 0;
       }
 
+      .message-text a {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: 500;
+        position: relative;
+        transition: all 0.3s ease;
+        border-bottom: 1px solid transparent;
+        padding-bottom: 1px;
+      }
+
+      .message-text a:hover {
+        color: #0056b3;
+        border-bottom-color: #0056b3;
+      }
+
+      .message-text a:active {
+        color: #004085;
+      }
+
+      .message-text a::before {
+        content: '🔗';
+        margin-right: 4px;
+        font-size: 0.85em;
+        opacity: 0.7;
+      }
+
+      .message-content.gpt-response a {
+        color: #0066cc;
+        font-weight: 600;
+      }
+
+      .message-content.gpt-response a:hover {
+        color: #004999;
+        border-bottom-color: #004999;
+      }
+
+      .message-content.self a {
+        color: #1976d2;
+      }
+
+      .message-content.self a:hover {
+        color: #115293;
+        border-bottom-color: #115293;
+      }
+
       .mention {
         font-weight: 600;
         padding: 3px 6px;
@@ -1023,12 +1100,9 @@
         <div class="nav-left">
           <img alt="" class="nav-logo" src="./img/hyperlane.png" />
           <h1 class="nav-title">
-            <a
-              href="https://github.com/hyperlane-dev/hyperlane"
-              target="_blank"
+            <a href="https://github.com/hyperlane-dev/hyperlane" target="_blank"
+              ><span class="text">Hyperlane Chat</span></a
             >
-              Hyperlane Chat
-            </a>
           </h1>
         </div>
         <div class="connection-indicator disconnected" id="connectionIndicator">

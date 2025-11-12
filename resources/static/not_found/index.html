@@ -1,46 +1,230 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hyperlane - 404 Not Found</title>
+    <link rel="icon" href="https://docs.ltpp.vip/img/hyperlane.png" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+      }
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>404 Not Found</title>
-  <style>
-    * {
-      user-select: none;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-    }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+          sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
 
-    .center-text {
-      text-align: center;
-    }
+      .container {
+        text-align: center;
+        animation: fadeInUp 0.6s ease;
+      }
 
-    a {
-      color: #1e90ff;
-      text-decoration: none;
-      transition: color 0.3s, border-bottom-color 0.3s;
-    }
+      .error-code {
+        font-size: 8rem;
+        font-weight: 900;
+        color: white;
+        text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        margin-bottom: 20px;
+        animation: bounce 2s ease-in-out infinite;
+      }
 
-    a:hover,
-    a:focus {
-      color: pink;
-      border-bottom-color: pink;
-      outline: none;
-      cursor: pointer;
-    }
-  </style>
-</head>
+      .error-message {
+        background: white;
+        border-radius: 12px;
+        padding: 40px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        max-width: 500px;
+        margin: 0 auto;
+      }
 
-<body>
-  <h1 class="center-text"><a href="https://github.com/hyperlane-dev/hyperlane" target="_blank"
-      style="color: inherit; text-decoration: none;">404 Not Found</a></h1>
-  <hr />
-  <p class="center-text">
-    Server:
-    <a href="https://github.com/hyperlane-dev/hyperlane" target="_blank">Hyperlane</a>
-  </p>
-</body>
+      h1 {
+        font-size: 2rem;
+        color: #2c3e50;
+        margin-bottom: 16px;
+        font-weight: 700;
+      }
 
+      h1 a {
+        color: inherit;
+        text-decoration: none;
+        position: relative;
+        display: inline-block;
+      }
+
+      h1 a .text {
+        background: linear-gradient(90deg, #2c3e50, #667eea, #2c3e50, #667eea);
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: shimmer 3s linear infinite;
+      }
+
+      h1 a::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -2px;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+        transition: width 0.4s ease;
+      }
+
+      h1 a:hover::after {
+        width: 100%;
+      }
+
+      @keyframes shimmer {
+        0% {
+          background-position: 0% center;
+        }
+
+        100% {
+          background-position: 200% center;
+        }
+      }
+
+      p {
+        color: #6c757d;
+        font-size: 1.1rem;
+        margin-bottom: 24px;
+        line-height: 1.6;
+      }
+
+      .server-info {
+        padding: 16px;
+        background: linear-gradient(
+          135deg,
+          rgba(102, 126, 234, 0.1) 0%,
+          rgba(118, 75, 162, 0.1) 100%
+        );
+        border-radius: 8px;
+        margin-bottom: 24px;
+      }
+
+      .server-info a {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+        position: relative;
+        display: inline-block;
+      }
+
+      .server-info a .text {
+        background: linear-gradient(90deg, #667eea, #764ba2, #667eea, #764ba2);
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: shimmer 3s linear infinite;
+      }
+
+      .server-info a::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -2px;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+        transition: width 0.4s ease;
+      }
+
+      .server-info a:hover::after {
+        width: 100%;
+      }
+
+      .btn-home {
+        display: inline-block;
+        padding: 12px 32px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      }
+
+      .btn-home:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+
+        50% {
+          transform: translateY(-20px);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .error-code {
+          font-size: 5rem;
+        }
+
+        h1 {
+          font-size: 1.5rem;
+        }
+
+        .error-message {
+          padding: 30px 20px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="error-code">404</div>
+      <div class="error-message">
+        <h1>
+          <a href="https://github.com/hyperlane-dev/hyperlane" target="_blank"
+            ><span class="text">Hyperlane - Page Not Found</span></a
+          >
+        </h1>
+        <p>
+          The page you are looking for might have been removed, had its name
+          changed, or is temporarily unavailable.
+        </p>
+        <div class="server-info">
+          Server:
+          <a href="https://github.com/hyperlane-dev/hyperlane" target="_blank"
+            ><span class="text">Hyperlane</span></a
+          >
+        </div>
+        <a href="/" class="btn-home">← Back to Home</a>
+      </div>
+    </div>
+  </body>
 </html>

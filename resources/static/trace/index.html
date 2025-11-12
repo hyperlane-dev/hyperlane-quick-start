@@ -1,223 +1,416 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trace Query</title>
-  <style>
-    * {
-      user-select: none;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-    }
-
-    input,
-    textarea {
-      user-select: text !important;
-      -webkit-user-select: text !important;
-      -moz-user-select: text !important;
-      -ms-user-select: text !important;
-    }
-
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-      background-color: #f5f5f5;
-      color: #333;
-    }
-
-    h1 {
-      color: #2c3e50;
-      text-align: center;
-      margin-bottom: 30px;
-      font-weight: 600;
-    }
-
-    .search-container {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    #traceId {
-      flex: 1;
-      padding: 10px;
-      border: 2px solid #ddd;
-      border-radius: 6px;
-      font-size: 16px;
-      transition: border-color 0.3s ease;
-    }
-
-    #traceId:focus {
-      outline: none;
-      border-color: #3498db;
-    }
-
-    button {
-      background-color: #3498db;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: 500;
-      transition: background-color 0.3s ease;
-    }
-
-    button:hover {
-      background-color: #2980b9;
-    }
-
-    #result {
-      background-color: #fff;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      padding: 15px;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-      overflow-wrap: break-word;
-      font-family: 'Courier New', monospace;
-      font-size: 14px;
-      line-height: 1.5;
-      min-height: 100px;
-      max-height: 600px;
-      overflow-y: auto;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .empty-result {
-      color: #7f8c8d;
-      font-style: italic;
-    }
-
-    .request-url {
-      margin: 10px 0;
-      padding: 8px 12px;
-      background-color: #f8f9fa;
-      border: 1px solid #dee2e6;
-      border-radius: 4px;
-      font-family: 'Courier New', monospace;
-      font-size: 12px;
-      word-break: break-all;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .request-url:hover {
-      background-color: #e9ecef;
-      border-color: #adb5bd;
-    }
-
-    .request-url:active {
-      transform: translateY(1px);
-    }
-  </style>
-  <script>
-    async function searchTrace () {
-      const traceId = document.getElementById('traceId').value.trim();
-      const result = document.getElementById('result');
-      const urlContainer = document.getElementById('requestUrl');
-
-      const existingMessages = result.parentNode.querySelectorAll(
-        'div[style*="color: green"], div[style*="color: red"]'
-      );
-      existingMessages.forEach((msg) => msg.remove());
-
-      result.className = '';
-      if (urlContainer) {
-        urlContainer.remove();
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hyperlane - Trace Query</title>
+    <link rel="icon" href="https://docs.ltpp.vip/img/hyperlane.png" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
       }
 
-      if (!traceId) {
-        result.textContent = 'Please enter a valid Trace ID';
-        result.className = 'empty-result';
-        return;
+      input,
+      textarea {
+        user-select: text !important;
+        -webkit-user-select: text !important;
+        -moz-user-select: text !important;
+        -ms-user-select: text !important;
       }
 
-      const baseUrl = window.location.origin;
-      const requestUrl = `${baseUrl}/trace/${encodeURIComponent(traceId)}`;
-      const urlElement = document.createElement('div');
-      urlElement.id = 'requestUrl';
-      urlElement.className = 'request-url';
-      urlElement.textContent = requestUrl;
-      urlElement.title = 'Click to open request URL in new window';
-      urlElement.onclick = function () {
-        window.open(requestUrl, '_blank');
-      };
-      result.parentNode.insertBefore(urlElement, result);
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+          sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
 
-      try {
-        const response = await fetch(requestUrl);
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+      }
 
-        if (response.ok) {
-          const data = await response.text();
-          result.textContent = data;
-          const successMsg = document.createElement('div');
-          successMsg.style.color = 'green';
-          successMsg.style.fontWeight = 'bold';
-          successMsg.style.margin = '10px 0';
-          successMsg.textContent = 'Search completed successfully';
-          result.parentNode.insertBefore(successMsg, result);
-          console.log('Query completed');
-        } else if (response.status === 404) {
-          result.textContent = 'Trace record not found';
-          result.className = 'empty-result';
-          const errorMsg = document.createElement('div');
-          errorMsg.style.color = 'red';
-          errorMsg.style.fontWeight = 'bold';
-          errorMsg.style.margin = '10px 0';
-          errorMsg.textContent = 'Search failed: Trace record not found';
-          result.parentNode.insertBefore(errorMsg, result);
-        } else {
-          result.textContent = `Request failed: ${response.status} ${response.statusText}`;
-          result.className = 'empty-result';
-          const errorMsg = document.createElement('div');
-          errorMsg.style.color = 'red';
-          errorMsg.style.fontWeight = 'bold';
-          errorMsg.style.margin = '10px 0';
-          errorMsg.textContent = `Search failed: ${response.status} ${response.statusText}`;
-          result.parentNode.insertBefore(errorMsg, result);
+      .header {
+        text-align: center;
+        color: white;
+        margin-bottom: 40px;
+        animation: fadeInDown 0.6s ease;
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      .header h1 a {
+        color: inherit;
+        text-decoration: none;
+        position: relative;
+        display: inline-block;
+      }
+
+      .header h1 a .icon {
+        display: inline-block;
+        margin-right: 8px;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        background: none !important;
+        -webkit-background-clip: unset !important;
+        -webkit-text-fill-color: unset !important;
+        background-clip: unset !important;
+        color: inherit;
+      }
+
+      .header h1 a .text {
+        background: linear-gradient(90deg, #fff, #ffd700, #fff, #ffd700);
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: shimmer 3s linear infinite;
+      }
+
+      .header h1 a::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -2px;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #ffd700, #fff, #ffd700);
+        transition: width 0.4s ease;
+      }
+
+      .header h1 a:hover::after {
+        width: 100%;
+      }
+
+      @keyframes shimmer {
+        0% {
+          background-position: 0% center;
         }
-      } catch (error) {
-        result.textContent = `Network request error: ${error.message}`;
-        result.className = 'empty-result';
-        const errorMsg = document.createElement('div');
-        errorMsg.style.color = 'red';
-        errorMsg.style.fontWeight = 'bold';
-        errorMsg.style.margin = '10px 0';
-        errorMsg.textContent = `Search failed: Network request error - ${error.message}`;
-        result.parentNode.insertBefore(errorMsg, result);
-      }
-    }
 
-    document.addEventListener('DOMContentLoaded', function () {
-      const traceIdInput = document.getElementById('traceId');
-      if (traceIdInput) {
-        traceIdInput.addEventListener('keydown', function (e) {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            searchTrace();
+        100% {
+          background-position: 200% center;
+        }
+      }
+
+      .header p {
+        font-size: 1.1rem;
+        opacity: 0.95;
+      }
+
+      .search-card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        animation: fadeInUp 0.6s ease;
+      }
+
+      .search-container {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 0;
+      }
+
+      #traceId {
+        flex: 1;
+        padding: 12px 16px;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        font-family: 'Courier New', monospace;
+      }
+
+      #traceId:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px 32px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      }
+
+      button:active {
+        transform: translateY(0);
+      }
+
+      .result-card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        animation: fadeInUp 0.6s ease 0.1s both;
+      }
+
+      .request-url {
+        margin-bottom: 16px;
+        padding: 12px 16px;
+        background: linear-gradient(
+          135deg,
+          rgba(102, 126, 234, 0.1) 0%,
+          rgba(118, 75, 162, 0.1) 100%
+        );
+        border: 1px solid rgba(102, 126, 234, 0.2);
+        border-radius: 8px;
+        font-family: 'Courier New', monospace;
+        font-size: 13px;
+        word-break: break-all;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: #667eea;
+        font-weight: 500;
+      }
+
+      .request-url:hover {
+        background: linear-gradient(
+          135deg,
+          rgba(102, 126, 234, 0.15) 0%,
+          rgba(118, 75, 162, 0.15) 100%
+        );
+        border-color: rgba(102, 126, 234, 0.4);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+      }
+
+      .status-message {
+        padding: 12px 16px;
+        border-radius: 8px;
+        margin-bottom: 16px;
+        font-weight: 600;
+        animation: fadeIn 0.3s ease;
+      }
+
+      .status-message.success {
+        background: #d4edda;
+        color: #155724;
+        border-left: 4px solid #28a745;
+      }
+
+      .status-message.error {
+        background: #f8d7da;
+        color: #721c24;
+        border-left: 4px solid #dc3545;
+      }
+
+      #result {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 16px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        line-height: 1.6;
+        min-height: 100px;
+        max-height: 600px;
+        overflow-y: auto;
+        color: #2c3e50;
+      }
+
+      #result::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      #result::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+      }
+
+      #result::-webkit-scrollbar-thumb {
+        background: rgba(102, 126, 234, 0.3);
+        border-radius: 3px;
+      }
+
+      .empty-result {
+        color: #6c757d;
+        font-style: italic;
+        text-align: center;
+        padding: 40px 20px;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes fadeInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .header h1 {
+          font-size: 2rem;
+        }
+
+        .search-container {
+          flex-direction: column;
+        }
+
+        button {
+          width: 100%;
+        }
+      }
+    </style>
+    <script>
+      async function searchTrace() {
+        const traceId = document.getElementById('traceId').value.trim();
+        const result = document.getElementById('result');
+        const resultCard = result.parentElement;
+
+        const existingMessages = resultCard.querySelectorAll(
+          '.status-message, .request-url'
+        );
+        existingMessages.forEach((msg) => msg.remove());
+
+        result.className = '';
+
+        if (!traceId) {
+          result.textContent = 'Please enter a valid Trace ID';
+          result.className = 'empty-result';
+          return;
+        }
+
+        const baseUrl = window.location.origin;
+        const requestUrl = `${baseUrl}/trace/${encodeURIComponent(traceId)}`;
+        const urlElement = document.createElement('div');
+        urlElement.className = 'request-url';
+        urlElement.textContent = requestUrl;
+        urlElement.title = 'Click to open request URL in new window';
+        urlElement.onclick = function () {
+          window.open(requestUrl, '_blank');
+        };
+        resultCard.insertBefore(urlElement, result);
+
+        try {
+          const response = await fetch(requestUrl);
+
+          if (response.ok) {
+            const data = await response.text();
+            result.textContent = data;
+            const successMsg = document.createElement('div');
+            successMsg.className = 'status-message success';
+            successMsg.textContent = '✓ Search completed successfully';
+            resultCard.insertBefore(successMsg, result);
+            console.log('Query completed');
+          } else if (response.status === 404) {
+            result.textContent = 'Trace record not found';
+            result.className = 'empty-result';
+            const errorMsg = document.createElement('div');
+            errorMsg.className = 'status-message error';
+            errorMsg.textContent = '✗ Search failed: Trace record not found';
+            resultCard.insertBefore(errorMsg, result);
+          } else {
+            result.textContent = `Request failed: ${response.status} ${response.statusText}`;
+            result.className = 'empty-result';
+            const errorMsg = document.createElement('div');
+            errorMsg.className = 'status-message error';
+            errorMsg.textContent = `✗ Search failed: ${response.status} ${response.statusText}`;
+            resultCard.insertBefore(errorMsg, result);
           }
-        });
+        } catch (error) {
+          result.textContent = `Network request error: ${error.message}`;
+          result.className = 'empty-result';
+          const errorMsg = document.createElement('div');
+          errorMsg.className = 'status-message error';
+          errorMsg.textContent = `✗ Search failed: Network request error - ${error.message}`;
+          resultCard.insertBefore(errorMsg, result);
+        }
       }
-    });
-  </script>
-</head>
 
-<body>
-  <h1><a href="https://github.com/hyperlane-dev/hyperlane" target="_blank"
-      style="color: inherit; text-decoration: none;">Trace Query</a></h1>
-  <div class="search-container">
-    <input type="text" id="traceId" placeholder="Enter Trace ID" />
-    <button onclick="searchTrace()">Search</button>
-  </div>
-  <pre id="result" class="empty-result">
-Please enter a Trace ID and click the search button</pre>
-</body>
+      document.addEventListener('DOMContentLoaded', function () {
+        const traceIdInput = document.getElementById('traceId');
+        if (traceIdInput) {
+          traceIdInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              searchTrace();
+            }
+          });
+        }
+      });
+    </script>
+  </head>
 
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>
+          <a
+            href="https://github.com/hyperlane-dev/hyperlane"
+            target="_blank"
+            style="color: inherit; text-decoration: none"
+            ><span class="icon">🔍</span
+            ><span class="text">Hyperlane Trace Query</span></a
+          >
+        </h1>
+        <p>Search and analyze trace records</p>
+      </div>
+
+      <div class="search-card">
+        <div class="search-container">
+          <input type="text" id="traceId" placeholder="Enter Trace ID" />
+          <button onclick="searchTrace()">Search</button>
+        </div>
+      </div>
+
+      <div class="result-card">
+        <pre id="result" class="empty-result">
+Please enter a Trace ID and click the search button</pre
+        >
+      </div>
+    </div>
+  </body>
 </html>
