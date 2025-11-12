@@ -464,7 +464,6 @@
         return;
       }
 
-      // Check if there are more items
       hasMoreItems = items.length > pageSize;
       if (hasMoreItems) {
         items = items.slice(0, pageSize);
@@ -482,7 +481,6 @@
 
       updatePagination(page);
 
-      // Scroll to top
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
