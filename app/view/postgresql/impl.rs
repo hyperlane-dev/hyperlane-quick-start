@@ -1,14 +1,5 @@
 use super::*;
 
-#[utoipa::path(
-    get,
-    path = "/postgresql",
-    responses(
-        (status = 302, description = "Redirect to postgresql page")
-    )
-)]
-pub async fn html() {}
-
 impl ServerHook for PostgresqlViewRoute {
     async fn new(_ctx: &Context) -> Self {
         Self

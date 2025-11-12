@@ -1,14 +1,5 @@
 use super::*;
 
-#[utoipa::path(
-    get,
-    path = "/upload",
-    responses(
-        (status = 302, description = "Redirect to upload page")
-    )
-)]
-pub async fn html() {}
-
 impl ServerHook for UploadViewRoute {
     async fn new(_ctx: &Context) -> Self {
         Self

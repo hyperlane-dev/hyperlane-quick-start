@@ -2,7 +2,6 @@ mod r#impl;
 mod r#static;
 mod r#struct;
 
-pub use r#impl::*;
 pub use r#struct::*;
 
 use super::*;

@@ -1,14 +1,5 @@
 use super::*;
 
-#[utoipa::path(
-    get,
-    path = "/tracking",
-    responses(
-        (status = 302, description = "Redirect to tracking page")
-    )
-)]
-pub async fn html() {}
-
 impl ServerHook for TrackingViewRoute {
     async fn new(_ctx: &Context) -> Self {
         Self

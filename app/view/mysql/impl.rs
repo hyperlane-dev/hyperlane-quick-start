@@ -1,14 +1,5 @@
 use super::*;
 
-#[utoipa::path(
-    get,
-    path = "/mysql",
-    responses(
-        (status = 302, description = "Redirect to mysql page")
-    )
-)]
-pub async fn html() {}
-
 impl ServerHook for MysqlViewRoute {
     async fn new(_ctx: &Context) -> Self {
         Self
