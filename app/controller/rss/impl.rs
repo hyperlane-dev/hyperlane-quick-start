@@ -20,12 +20,7 @@ impl ServerHook for RssFeedRoute {
     async fn handle(self, ctx: &Context) {
         let limit: Option<usize> = limit_opt.and_then(|l| l.parse().ok());
         let host: String = host_opt.unwrap_or_else(|| LOCALHOST.to_string());
-        let scheme: String = if host.contains(LOCALHOST) || host.starts_with(LOOPBACK) {
-            HTTP_LOWERCASE.to_string()
-        } else {
-            HTTPS_LOWERCASE.to_string()
-        };
-        let base_url: String = format!("{scheme}://{host}");
+        let base_url: String = format!("{HTTP_LOWERCASE}://{host}");
         let rss_xml: String = RssService::generate_rss_feed(&base_url, limit).await;
     }
 }
