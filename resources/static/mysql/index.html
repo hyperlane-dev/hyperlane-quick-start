@@ -1,239 +1,203 @@
 <!DOCTYPE html>
 
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>MySQL Management</title>
-    <script src="./css/3fa48481"></script>
-    <script src="./lib/htmx.org@1.9.6"></script>
-    <style>
-      * {
-        user-select: none;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-      }
 
-      input,
-      textarea {
-        user-select: text !important;
-        -webkit-user-select: text !important;
-        -moz-user-select: text !important;
-        -ms-user-select: text !important;
-      }
-    </style>
-  </head>
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>MySQL Management</title>
+  <script src="./css/3fa48481"></script>
+  <script src="./lib/htmx.org@1.9.6"></script>
+  <style>
+    * {
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+    }
 
-  <body class="bg-gray-100">
-    <div class="container mx-auto p-4">
-      <h1 class="text-3xl font-bold mb-6 text-center">MySQL Management</h1>
-      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 class="text-xl font-semibold mb-4">Add New Record</h2>
-        <div class="space-y-4">
-          <input
-            class="w-full p-2 border rounded"
-            id="create-key"
-            placeholder="Key"
-            type="text"
-          />
-          <input
-            class="w-full p-2 border rounded"
-            id="create-value"
-            placeholder="Value"
-            type="text"
-          />
-          <button
-            class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            id="create-btn"
-          >
-            Add
-          </button>
-        </div>
+    input,
+    textarea {
+      user-select: text !important;
+      -webkit-user-select: text !important;
+      -moz-user-select: text !important;
+      -ms-user-select: text !important;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100">
+  <div class="container mx-auto p-4">
+    <h1 class="text-3xl font-bold mb-6 text-center"><a href="https://github.com/hyperlane-dev/hyperlane" target="_blank"
+        style="color: inherit; text-decoration: none;">MySQL Management</a></h1>
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+      <h2 class="text-xl font-semibold mb-4">Add New Record</h2>
+      <div class="space-y-4">
+        <input class="w-full p-2 border rounded" id="create-key" placeholder="Key" type="text" />
+        <input class="w-full p-2 border rounded" id="create-value" placeholder="Value" type="text" />
+        <button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" id="create-btn">
+          Add
+        </button>
       </div>
-      <div
-        class="bg-white rounded-lg shadow-md p-6"
-        hx-get="/api/mysql/list"
-        hx-trigger="load, every 5s"
-        id="records"
-      >
-        <h2 class="text-xl font-semibold mb-4">Records</h2>
-        <div class="space-y-2">
-          <template id="record-template">
-            <div class="flex justify-between items-center p-2 border-b">
-              <div>
-                <span class="font-medium">Key:</span> <span class="key"></span
-                ><br />
-                <span class="font-medium">Value:</span>
-                <span class="value"></span>
-              </div>
-              <div class="space-x-2">
-                <button
-                  class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 edit-btn"
-                  hx-get="/api/mysql/list"
-                  hx-target="#edit-modal"
-                  type="button"
-                >
-                  Edit
-                </button>
-                <button
-                  class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 delete-btn"
-                  hx-delete="/api/mysql/delete"
-                  type="button"
-                >
-                  Delete
-                </button>
-              </div>
+    </div>
+    <div class="bg-white rounded-lg shadow-md p-6" hx-get="/api/mysql/list" hx-trigger="load, every 5s" id="records">
+      <h2 class="text-xl font-semibold mb-4">Records</h2>
+      <div class="space-y-2">
+        <template id="record-template">
+          <div class="flex justify-between items-center p-2 border-b">
+            <div>
+              <span class="font-medium">Key:</span> <span class="key"></span><br />
+              <span class="font-medium">Value:</span>
+              <span class="value"></span>
             </div>
-          </template>
-          <div
-            class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50"
-            id="edit-modal"
-          >
-            <div class="bg-white p-6 rounded shadow-lg w-96">
-              <h3 class="text-xl font-semibold mb-4">Edit Record</h3>
-              <div class="space-y-4">
-                <input id="edit-key" type="hidden" />
-                <div>
-                  <label class="block text-sm font-medium text-gray-700"
-                    >Value</label
-                  >
-                  <input
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    id="edit-value"
-                    type="text"
-                  />
-                </div>
-                <div class="flex justify-end space-x-2">
-                  <button
-                    class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-                    onclick="toggleModal(false)"
-                    type="button"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                    id="edit-btn"
-                  >
-                    Save
-                  </button>
-                </div>
+            <div class="space-x-2">
+              <button class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 edit-btn"
+                hx-get="/api/mysql/list" hx-target="#edit-modal" type="button">
+                Edit
+              </button>
+              <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 delete-btn"
+                hx-delete="/api/mysql/delete" type="button">
+                Delete
+              </button>
+            </div>
+          </div>
+        </template>
+        <div class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50" id="edit-modal">
+          <div class="bg-white p-6 rounded shadow-lg w-96">
+            <h3 class="text-xl font-semibold mb-4">Edit Record</h3>
+            <div class="space-y-4">
+              <input id="edit-key" type="hidden" />
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Value</label>
+                <input
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  id="edit-value" type="text" />
+              </div>
+              <div class="flex justify-end space-x-2">
+                <button class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600" onclick="toggleModal(false)"
+                  type="button">
+                  Cancel
+                </button>
+                <button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" id="edit-btn">
+                  Save
+                </button>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <script>
-      document
-        .getElementById('create-btn')
-        .addEventListener('click', async () => {
-          const key = document.getElementById('create-key').value;
-          const value = document.getElementById('create-value').value;
+  </div>
+  <script>
+    document
+      .getElementById('create-btn')
+      .addEventListener('click', async () => {
+        const key = document.getElementById('create-key').value;
+        const value = document.getElementById('create-value').value;
 
-          if (!key || !value) {
-            alert('Please fill in all fields');
-            return;
-          }
-
-          try {
-            const response = await fetch('/api/mysql/create', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ key, value }),
-            });
-
-            const result = await response.json();
-            if (result.code === 200) {
-              alert('Success: ' + result.message);
-              document.getElementById('create-key').value = '';
-              document.getElementById('create-value').value = '';
-              location.reload();
-            } else {
-              alert('Error (' + result.code + '): ' + result.message);
-            }
-          } catch (error) {
-            console.error('Create error:', error);
-            alert('Network error: ' + error.message);
-          }
-        });
-
-      document
-        .getElementById('edit-btn')
-        .addEventListener('click', async () => {
-          const key = document.getElementById('edit-key').value;
-          const value = document.getElementById('edit-value').value;
-
-          if (!key || !value) {
-            alert('Please fill in all fields');
-            return;
-          }
-
-          try {
-            const response = await fetch('/api/mysql/update', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ key, value }),
-            });
-
-            const result = await response.json();
-            if (result.code === 200) {
-              alert('Success: ' + result.message);
-              toggleModal(false);
-              location.reload();
-            } else {
-              alert('Error (' + result.code + '): ' + result.message);
-            }
-          } catch (error) {
-            console.error('Update error:', error);
-            alert('Network error: ' + error.message);
-          }
-        });
-
-      function toggleModal(show, key, value) {
-        const modal = document.getElementById('edit-modal');
-        if (show) {
-          document.getElementById('edit-key').value = key;
-          document.getElementById('edit-value').value = value;
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
-        } else {
-          modal.classList.add('hidden');
-          modal.classList.remove('flex');
+        if (!key || !value) {
+          alert('Please fill in all fields');
+          return;
         }
-      }
 
-      document.querySelectorAll('.edit-btn').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const key = btn.closest('[data-key]').getAttribute('data-key');
-          const value = btn.closest('[data-value]').getAttribute('data-value');
-          toggleModal(true, key, value);
-        });
-      });
+        try {
+          const response = await fetch('/api/mysql/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ key, value }),
+          });
 
-      document.querySelectorAll('.delete-btn').forEach((btn) => {
-        btn.addEventListener('click', async () => {
-          if (confirm('Are you sure you want to delete this record?')) {
-            const key = btn.closest('[data-key]').getAttribute('data-key');
-            try {
-              const response = await fetch(`/api/mysql/delete?key=${key}`, {
-                method: 'POST',
-              });
-              const result = await response.json();
-              if (result.code === 200) {
-                alert('Success: ' + result.message);
-                location.reload();
-              } else {
-                alert('Error (' + result.code + '): ' + result.message);
-              }
-            } catch (error) {
-              console.error('Delete error:', error);
-              alert('Network error: ' + error.message);
-            }
+          const result = await response.json();
+          if (result.code === 200) {
+            alert('Success: ' + result.message);
+            document.getElementById('create-key').value = '';
+            document.getElementById('create-value').value = '';
+            location.reload();
+          } else {
+            alert('Error (' + result.code + '): ' + result.message);
           }
-        });
+        } catch (error) {
+          console.error('Create error:', error);
+          alert('Network error: ' + error.message);
+        }
       });
-    </script>
-  </body>
+
+    document
+      .getElementById('edit-btn')
+      .addEventListener('click', async () => {
+        const key = document.getElementById('edit-key').value;
+        const value = document.getElementById('edit-value').value;
+
+        if (!key || !value) {
+          alert('Please fill in all fields');
+          return;
+        }
+
+        try {
+          const response = await fetch('/api/mysql/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ key, value }),
+          });
+
+          const result = await response.json();
+          if (result.code === 200) {
+            alert('Success: ' + result.message);
+            toggleModal(false);
+            location.reload();
+          } else {
+            alert('Error (' + result.code + '): ' + result.message);
+          }
+        } catch (error) {
+          console.error('Update error:', error);
+          alert('Network error: ' + error.message);
+        }
+      });
+
+    function toggleModal (show, key, value) {
+      const modal = document.getElementById('edit-modal');
+      if (show) {
+        document.getElementById('edit-key').value = key;
+        document.getElementById('edit-value').value = value;
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      } else {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    document.querySelectorAll('.edit-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const key = btn.closest('[data-key]').getAttribute('data-key');
+        const value = btn.closest('[data-value]').getAttribute('data-value');
+        toggleModal(true, key, value);
+      });
+    });
+
+    document.querySelectorAll('.delete-btn').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        if (confirm('Are you sure you want to delete this record?')) {
+          const key = btn.closest('[data-key]').getAttribute('data-key');
+          try {
+            const response = await fetch(`/api/mysql/delete?key=${key}`, {
+              method: 'POST',
+            });
+            const result = await response.json();
+            if (result.code === 200) {
+              alert('Success: ' + result.message);
+              location.reload();
+            } else {
+              alert('Error (' + result.code + '): ' + result.message);
+            }
+          } catch (error) {
+            console.error('Delete error:', error);
+            alert('Network error: ' + error.message);
+          }
+        }
+      });
+    });
+  </script>
+</body>
+
 </html>

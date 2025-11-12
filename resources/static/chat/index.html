@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 
 <html lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
-<meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" name="viewport"/>
-<link href="./img/hyperlane.png" rel="icon"/>
-<title>Hyperlane Chat</title>
-<script src="./js/markdown-it.min.js"></script>
-<script src="./js/highlight.min.js"></script>
-<link href="./css/github.min.css" rel="stylesheet"/>
-<style>
+  <head>
+    <meta charset="utf-8" />
+    <meta content="IE=edge" http-equiv="X-UA-Compatible" />
+    <meta
+      content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"
+      name="viewport"
+    />
+    <title>Hyperlane Chat</title>
+    <script src="./js/markdown-it.min.js"></script>
+    <script src="./js/highlight.min.js"></script>
+    <link href="./css/github.min.css" rel="stylesheet" />
+    <style>
       * {
         margin: 0;
         padding: 0;
@@ -77,8 +79,8 @@
       }
 
       .btn-upload:hover:not(:disabled) {
-        background: linear-gradient(135deg, #0056b3, #004085);
-        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+        background: #218838;
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
         transform: translateY(-1px);
       }
 
@@ -125,7 +127,7 @@
         flex-direction: column;
         height: 100vh;
         width: 100%;
-        background-color: #f8f9fa;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: #2c3e50;
       }
 
@@ -1013,51 +1015,64 @@
         }
       }
     </style>
-</head>
-<body>
-<div class="chat-view">
-<div class="nav-bar">
-<div class="nav-left">
-<img alt="" class="nav-logo" src="./img/hyperlane.png"/>
-<h1 class="nav-title">
-<a href="https://github.com/hyperlane-dev/hyperlane" target="_blank">
+  </head>
+
+  <body>
+    <div class="chat-view">
+      <div class="nav-bar">
+        <div class="nav-left">
+          <img alt="" class="nav-logo" src="./img/hyperlane.png" />
+          <h1 class="nav-title">
+            <a
+              href="https://github.com/hyperlane-dev/hyperlane"
+              target="_blank"
+            >
               Hyperlane Chat
             </a>
-</h1>
-</div>
-<div class="connection-indicator disconnected" id="connectionIndicator">
-<span class="status-dot"></span>
-<span id="connectionText">Offline</span>
-</div>
-</div>
-<div class="chat-container">
-<div class="chat-messages" id="messageList"></div>
-<button class="scroll-to-bottom hidden" id="scrollToBottomBtn">
-<span class="unread-badge hidden" id="unreadBadge">0</span>
+          </h1>
+        </div>
+        <div class="connection-indicator disconnected" id="connectionIndicator">
+          <span class="status-dot"></span>
+          <span id="connectionText">Offline</span>
+        </div>
+      </div>
+      <div class="chat-container">
+        <div class="chat-messages" id="messageList"></div>
+        <button class="scroll-to-bottom hidden" id="scrollToBottomBtn">
+          <span class="unread-badge hidden" id="unreadBadge">0</span>
           ↓
         </button>
-<div class="connection-status hidden" id="connectionStatus">
-<div>Connection lost, trying to reconnect...</div>
-</div>
-<div class="chat-input" id="chatInputContainer">
-<label class="btn btn-upload upload-button" for="file-input" id="uploadButton">
-<span class="upload-icon">+</span>
-</label>
-<input class="file-input" id="file-input" multiple="" type="file"/>
-<textarea disabled="" id="messageInput" placeholder="(use @name to mention users, ctrl+enter or shift+enter for new line)" rows="1"></textarea>
-<button class="send-button" disabled="" id="sendButton">
-<i class="send-icon">➤</i>
-</button>
-<div class="mention-dropdown hidden" id="mentionDropdown">
-<div class="mention-header">Select User</div>
-<div class="mention-list" id="mentionList"></div>
-</div>
-</div>
-</div>
-</div>
-<div class="toast-container" id="toastContainer"></div>
-<div class="upload-status-container" id="uploadStatusContainer"></div>
-<script>
+        <div class="connection-status hidden" id="connectionStatus">
+          <div>Connection lost, trying to reconnect...</div>
+        </div>
+        <div class="chat-input" id="chatInputContainer">
+          <label
+            class="btn btn-upload upload-button"
+            for="file-input"
+            id="uploadButton"
+          >
+            <span class="upload-icon">+</span>
+          </label>
+          <input class="file-input" id="file-input" multiple="" type="file" />
+          <textarea
+            disabled=""
+            id="messageInput"
+            placeholder="(use @name to mention users, ctrl+enter or shift+enter for new line)"
+            rows="1"
+          ></textarea>
+          <button class="send-button" disabled="" id="sendButton">
+            <i class="send-icon">➤</i>
+          </button>
+          <div class="mention-dropdown hidden" id="mentionDropdown">
+            <div class="mention-header">Select User</div>
+            <div class="mention-list" id="mentionList"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="toast-container" id="toastContainer"></div>
+    <div class="upload-status-container" id="uploadStatusContainer"></div>
+    <script>
       let socket = null;
       let connectionStatus = 'disconnected';
       let messages = [];
@@ -1469,14 +1484,11 @@
       function connect() {
         updateConnectionStatus('connecting');
         const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-        const host =
-          window.location.hostname === 'localhost' ||
-          window.location.hostname === '127.0.0.1'
-            ? 'localhost:65002'
-            : window.location.host;
 
         socket = new WebSocket(
-          `${protocol}://${host}/api/chat?uuid=${getPersistentUUID()}`
+          `${protocol}://${
+            window.location.host
+          }/api/chat?uuid=${getPersistentUUID()}`
         );
 
         socket.onopen = () => {
@@ -1743,14 +1755,9 @@
         loadingUsers = true;
         try {
           const protocol = window.location.protocol;
-          const host =
-            window.location.hostname === 'localhost' ||
-            window.location.hostname === '127.0.0.1'
-              ? 'localhost:65002'
-              : window.location.host;
 
           const response = await fetch(
-            `${protocol}//${host}/chat/users/online`
+            `${protocol}//${window.location.host}/chat/users/online`
           );
           if (response.ok) {
             const result = await response.json();
@@ -2350,6 +2357,6 @@
         }
       });
     </script>
-<script src="./js/history.js"></script>
-</body>
+    <script src="./js/history.js"></script>
+  </body>
 </html>

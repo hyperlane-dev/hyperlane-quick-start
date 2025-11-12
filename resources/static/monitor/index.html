@@ -1,796 +1,813 @@
 <!DOCTYPE html>
 
 <html lang="en">
+
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Server Monitoring Dashboard</title>
-<script src="./js/chart.js"></script>
-<style>
-      @import url('./css/css2');
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Server Monitoring Dashboard</title>
+  <script src="./js/chart.js"></script>
+  <style>
+    @import url('./css/css2');
 
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        user-select: none;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-      }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+    }
 
-      body {
-        font-family: 'Rajdhani', 'Microsoft YaHei', Arial, sans-serif;
-        background: radial-gradient(
-            circle at 20% 80%,
-            rgba(120, 119, 198, 0.3) 0%,
-            transparent 50%
-          ),
-          radial-gradient(
-            circle at 80% 20%,
-            rgba(255, 119, 198, 0.3) 0%,
-            transparent 50%
-          ),
-          radial-gradient(
-            circle at 40% 40%,
-            rgba(120, 219, 255, 0.2) 0%,
-            transparent 50%
-          ),
-          linear-gradient(
-            135deg,
-            #0a0a0a 0%,
-            #1a0a2e 25%,
-            #16213e 50%,
-            #0f3460 75%,
-            #0a1a2a 100%
-          );
-        color: #ffffff;
-        overflow-x: hidden;
-        min-height: 100vh;
-        position: relative;
-      }
+    body {
+      font-family: 'Rajdhani', 'Microsoft YaHei', Arial, sans-serif;
+      background: radial-gradient(circle at 20% 80%,
+          rgba(120, 119, 198, 0.3) 0%,
+          transparent 50%),
+        radial-gradient(circle at 80% 20%,
+          rgba(255, 119, 198, 0.3) 0%,
+          transparent 50%),
+        radial-gradient(circle at 40% 40%,
+          rgba(120, 219, 255, 0.2) 0%,
+          transparent 50%),
+        linear-gradient(135deg,
+          #0a0a0a 0%,
+          #1a0a2e 25%,
+          #16213e 50%,
+          #0f3460 75%,
+          #0a1a2a 100%);
+      color: #ffffff;
+      overflow-x: hidden;
+      min-height: 100vh;
+      position: relative;
+    }
 
-      body::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: repeating-linear-gradient(
-            90deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 255, 255, 0.03) 2px,
-            rgba(0, 255, 255, 0.03) 4px
-          ),
-          repeating-linear-gradient(
-            0deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 255, 255, 0.03) 2px,
-            rgba(0, 255, 255, 0.03) 4px
-          );
-        pointer-events: none;
-        z-index: 1;
-      }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(90deg,
+          transparent,
+          transparent 2px,
+          rgba(0, 255, 255, 0.03) 2px,
+          rgba(0, 255, 255, 0.03) 4px),
+        repeating-linear-gradient(0deg,
+          transparent,
+          transparent 2px,
+          rgba(0, 255, 255, 0.03) 2px,
+          rgba(0, 255, 255, 0.03) 4px);
+      pointer-events: none;
+      z-index: 1;
+    }
 
-      .container {
-        position: relative;
-        z-index: 2;
-        padding: 0 20px;
-      }
+    .container {
+      position: relative;
+      z-index: 2;
+      padding: 0 20px;
+    }
 
-      .section {
-        min-height: 100vh;
-        padding: 40px 20px;
-        position: relative;
-        overflow: hidden;
-      }
+    .section {
+      min-height: 100vh;
+      padding: 40px 20px;
+      position: relative;
+      overflow: hidden;
+    }
 
-      .section-content {
-        max-width: 1920px;
-        margin: 0 auto;
-        position: relative;
-        z-index: 2;
-      }
+    .section-content {
+      max-width: 1920px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
 
-      .section::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: radial-gradient(
-          circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    .section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
           rgba(0, 255, 255, 0.1) 0%,
-          transparent 50%
-        );
-        pointer-events: none;
-        z-index: 1;
-        transition: all 0.3s ease;
+          transparent 50%);
+      pointer-events: none;
+      z-index: 1;
+      transition: all 0.3s ease;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      position: relative;
+    }
+
+    .header h1 {
+      font-family: 'Orbitron', monospace;
+      font-size: 3.5rem;
+      font-weight: 900;
+      color: #ffffff;
+      text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+      margin-bottom: 15px;
+      animation: gradientShift 3s ease-in-out infinite;
+      letter-spacing: 3px;
+      cursor: pointer;
+    }
+
+    .header h1 a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    @keyframes gradientShift {
+
+      0%,
+      100% {
+        background-position: 0% 50%;
       }
 
-      .header {
-        text-align: center;
-        margin-bottom: 30px;
-        position: relative;
+      50% {
+        background-position: 100% 50%;
+      }
+    }
+
+    .header .subtitle {
+      font-size: 1.4rem;
+      color: #00ffff;
+      opacity: 0.9;
+      font-weight: 300;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .system-overview {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 40px;
+      padding: 30px;
+      background: linear-gradient(135deg,
+          rgba(0, 255, 255, 0.1) 0%,
+          rgba(255, 0, 255, 0.1) 100%);
+      border: 2px solid rgba(0, 255, 255, 0.3);
+      border-radius: 20px;
+      backdrop-filter: blur(20px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .system-overview::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00, #00ffff);
+      background-size: 400% 400%;
+      border-radius: 20px;
+      z-index: -1;
+      animation: borderGlow 4s ease-in-out infinite;
+    }
+
+    @keyframes borderGlow {
+
+      0%,
+      100% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+    }
+
+    .system-info-item {
+      text-align: center;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 15px;
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .system-info-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg,
+          transparent,
+          rgba(0, 255, 255, 0.2),
+          transparent);
+      transition: left 0.5s ease;
+    }
+
+    .system-info-item:hover::before {
+      left: 100%;
+    }
+
+    .system-info-item:hover {
+      transform: translateY(-5px);
+      border-color: rgba(0, 255, 255, 0.6);
+      box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
+    }
+
+    .system-info-label {
+      font-size: 0.9rem;
+      color: #00ffff;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 500;
+    }
+
+    .system-info-value {
+      font-size: 1.8rem;
+      color: #ffffff;
+      font-weight: 700;
+      font-family: 'Orbitron', monospace;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 25px;
+      margin-bottom: 40px;
+    }
+
+    .metric-card {
+      background: linear-gradient(135deg,
+          rgba(0, 0, 0, 0.8) 0%,
+          rgba(20, 20, 40, 0.8) 100%);
+      border: 2px solid transparent;
+      border-radius: 20px;
+      padding: 30px;
+      backdrop-filter: blur(15px);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s ease;
+    }
+
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00, #00ffff);
+      background-size: 400% 400%;
+      border-radius: 20px;
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      animation: borderGlow 4s ease-in-out infinite;
+    }
+
+    .metric-card:hover::before {
+      opacity: 1;
+    }
+
+    .metric-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 20px 40px rgba(0, 255, 255, 0.4);
+    }
+
+    .metric-title {
+      font-size: 1.1rem;
+      color: #00ffff;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .metric-icon {
+      font-size: 1.5rem;
+      filter: drop-shadow(0 0 10px currentColor);
+    }
+
+    .metric-value {
+      font-size: 3rem;
+      font-weight: 900;
+      margin-bottom: 15px;
+      color: #ffffff;
+      font-family: 'Orbitron', monospace;
+      text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    }
+
+    .metric-unit {
+      font-size: 1.2rem;
+      color: #888;
+      margin-left: 8px;
+    }
+
+    .progress-container {
+      width: 100%;
+      height: 12px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-top: 15px;
+      position: relative;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #00ffff, #ff00ff);
+      border-radius: 6px;
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .progress-bar::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg,
+          transparent,
+          rgba(255, 255, 255, 0.4),
+          transparent);
+      animation: progressShimmer 2s infinite;
+    }
+
+    @keyframes progressShimmer {
+      0% {
+        transform: translateX(-100%);
+      }
+
+      100% {
+        transform: translateX(100%);
+      }
+    }
+
+    .charts-section {
+      margin-bottom: 40px;
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 30px;
+    }
+
+    .chart-card {
+      background: linear-gradient(135deg,
+          rgba(0, 0, 0, 0.9) 0%,
+          rgba(20, 20, 40, 0.9) 100%);
+      border: 2px solid rgba(0, 255, 255, 0.3);
+      border-radius: 20px;
+      padding: 30px;
+      backdrop-filter: blur(20px);
+      position: relative;
+      overflow: hidden;
+      height: 400px;
+      transition: all 0.4s ease;
+    }
+
+    .chart-card::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00, #00ffff);
+      background-size: 400% 400%;
+      border-radius: 20px;
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      animation: borderGlow 4s ease-in-out infinite;
+    }
+
+    .chart-card:hover::before {
+      opacity: 0.7;
+    }
+
+    .chart-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0, 255, 255, 0.3);
+    }
+
+    .chart-title {
+      font-size: 1.4rem;
+      color: #00ffff;
+      margin-bottom: 20px;
+      text-align: center;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-family: 'Orbitron', monospace;
+    }
+
+    .chart-card canvas {
+      width: 100% !important;
+      height: calc(100% - 60px) !important;
+    }
+
+    .connection-status {
+      position: fixed;
+      top: 30px;
+      right: 30px;
+      padding: 15px 25px;
+      border-radius: 30px;
+      background: linear-gradient(135deg,
+          rgba(0, 255, 136, 0.2),
+          rgba(0, 255, 255, 0.2));
+      border: 2px solid #00ff88;
+      color: #00ff88;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .connection-status.disconnected {
+      background: linear-gradient(135deg,
+          rgba(255, 0, 0, 0.2),
+          rgba(255, 100, 100, 0.2));
+      border-color: #ff0000;
+      color: #ff0000;
+    }
+
+    .status-indicator {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #00ff88;
+      box-shadow: 0 0 15px #00ff88;
+      animation: statusPulse 2s infinite;
+    }
+
+    @keyframes statusPulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+        box-shadow: 0 0 15px #00ff88;
+      }
+
+      50% {
+        opacity: 0.7;
+        transform: scale(1.2);
+        box-shadow: 0 0 25px #00ff88;
+      }
+    }
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .charts-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
       }
 
       .header h1 {
-        font-family: 'Orbitron', monospace;
-        font-size: 3.5rem;
-        font-weight: 900;
-        color: #ffffff;
-        text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
-        margin-bottom: 15px;
-        animation: gradientShift 3s ease-in-out infinite;
-        letter-spacing: 3px;
-      }
-
-      @keyframes gradientShift {
-        0%,
-        100% {
-          background-position: 0% 50%;
-        }
-        50% {
-          background-position: 100% 50%;
-        }
-      }
-
-      .header .subtitle {
-        font-size: 1.4rem;
-        color: #00ffff;
-        opacity: 0.9;
-        font-weight: 300;
-        letter-spacing: 2px;
-        text-transform: uppercase;
+        font-size: 2.5rem;
       }
 
       .system-overview {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
-        margin-bottom: 40px;
-        padding: 30px;
-        background: linear-gradient(
-          135deg,
-          rgba(0, 255, 255, 0.1) 0%,
-          rgba(255, 0, 255, 0.1) 100%
-        );
-        border: 2px solid rgba(0, 255, 255, 0.3);
-        border-radius: 20px;
-        backdrop-filter: blur(20px);
-        position: relative;
-        overflow: hidden;
-      }
-
-      .system-overview::before {
-        content: '';
-        position: absolute;
-        top: -2px;
-        left: -2px;
-        right: -2px;
-        bottom: -2px;
-        background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00, #00ffff);
-        background-size: 400% 400%;
-        border-radius: 20px;
-        z-index: -1;
-        animation: borderGlow 4s ease-in-out infinite;
-      }
-
-      @keyframes borderGlow {
-        0%,
-        100% {
-          background-position: 0% 50%;
-        }
-        50% {
-          background-position: 100% 50%;
-        }
-      }
-
-      .system-info-item {
-        text-align: center;
-        padding: 20px;
-        background: rgba(0, 0, 0, 0.3);
-        border-radius: 15px;
-        border: 1px solid rgba(0, 255, 255, 0.2);
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-      }
-
-      .system-info-item::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          rgba(0, 255, 255, 0.2),
-          transparent
-        );
-        transition: left 0.5s ease;
-      }
-
-      .system-info-item:hover::before {
-        left: 100%;
-      }
-
-      .system-info-item:hover {
-        transform: translateY(-5px);
-        border-color: rgba(0, 255, 255, 0.6);
-        box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
-      }
-
-      .system-info-label {
-        font-size: 0.9rem;
-        color: #00ffff;
-        margin-bottom: 8px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        font-weight: 500;
-      }
-
-      .system-info-value {
-        font-size: 1.8rem;
-        color: #ffffff;
-        font-weight: 700;
-        font-family: 'Orbitron', monospace;
+        grid-template-columns: 1fr;
       }
 
       .metrics-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 25px;
-        margin-bottom: 40px;
-      }
-
-      .metric-card {
-        background: linear-gradient(
-          135deg,
-          rgba(0, 0, 0, 0.8) 0%,
-          rgba(20, 20, 40, 0.8) 100%
-        );
-        border: 2px solid transparent;
-        border-radius: 20px;
-        padding: 30px;
-        backdrop-filter: blur(15px);
-        position: relative;
-        overflow: hidden;
-        transition: all 0.4s ease;
-      }
-
-      .metric-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00, #00ffff);
-        background-size: 400% 400%;
-        border-radius: 20px;
-        z-index: -1;
-        opacity: 0;
-        transition: opacity 0.4s ease;
-        animation: borderGlow 4s ease-in-out infinite;
-      }
-
-      .metric-card:hover::before {
-        opacity: 1;
-      }
-
-      .metric-card:hover {
-        transform: translateY(-10px) scale(1.02);
-        box-shadow: 0 20px 40px rgba(0, 255, 255, 0.4);
-      }
-
-      .metric-title {
-        font-size: 1.1rem;
-        color: #00ffff;
-        margin-bottom: 15px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-      }
-
-      .metric-icon {
-        font-size: 1.5rem;
-        filter: drop-shadow(0 0 10px currentColor);
-      }
-
-      .metric-value {
-        font-size: 3rem;
-        font-weight: 900;
-        margin-bottom: 15px;
-        color: #ffffff;
-        font-family: 'Orbitron', monospace;
-        text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
-      }
-
-      .metric-unit {
-        font-size: 1.2rem;
-        color: #888;
-        margin-left: 8px;
-      }
-
-      .progress-container {
-        width: 100%;
-        height: 12px;
-        background: rgba(0, 0, 0, 0.5);
-        border-radius: 6px;
-        overflow: hidden;
-        margin-top: 15px;
-        position: relative;
-      }
-
-      .progress-bar {
-        height: 100%;
-        background: linear-gradient(90deg, #00ffff, #ff00ff);
-        border-radius: 6px;
-        transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        overflow: hidden;
-      }
-
-      .progress-bar::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          rgba(255, 255, 255, 0.4),
-          transparent
-        );
-        animation: progressShimmer 2s infinite;
-      }
-
-      @keyframes progressShimmer {
-        0% {
-          transform: translateX(-100%);
-        }
-        100% {
-          transform: translateX(100%);
-        }
-      }
-
-      .charts-section {
-        margin-bottom: 40px;
+        grid-template-columns: 1fr;
+        gap: 20px;
       }
 
       .charts-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 30px;
+        grid-template-columns: 1fr;
+        gap: 20px;
       }
 
       .chart-card {
-        background: linear-gradient(
-          135deg,
-          rgba(0, 0, 0, 0.9) 0%,
-          rgba(20, 20, 40, 0.9) 100%
-        );
-        border: 2px solid rgba(0, 255, 255, 0.3);
-        border-radius: 20px;
-        padding: 30px;
-        backdrop-filter: blur(20px);
-        position: relative;
-        overflow: hidden;
-        height: 400px;
-        transition: all 0.4s ease;
+        height: 300px;
+        padding: 20px;
       }
 
-      .chart-card::before {
-        content: '';
-        position: absolute;
-        top: -2px;
-        left: -2px;
-        right: -2px;
-        bottom: -2px;
-        background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00, #00ffff);
-        background-size: 400% 400%;
-        border-radius: 20px;
-        z-index: -1;
-        opacity: 0;
-        transition: opacity 0.4s ease;
-        animation: borderGlow 4s ease-in-out infinite;
-      }
-
-      .chart-card:hover::before {
-        opacity: 0.7;
-      }
-
-      .chart-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 35px rgba(0, 255, 255, 0.3);
-      }
-
-      .chart-title {
-        font-size: 1.4rem;
-        color: #00ffff;
-        margin-bottom: 20px;
-        text-align: center;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        font-family: 'Orbitron', monospace;
-      }
-
-      .chart-card canvas {
-        width: 100% !important;
-        height: calc(100% - 60px) !important;
+      .metric-value {
+        font-size: 2.5rem;
       }
 
       .connection-status {
-        position: fixed;
-        top: 30px;
-        right: 30px;
-        padding: 15px 25px;
-        border-radius: 30px;
-        background: linear-gradient(
-          135deg,
-          rgba(0, 255, 136, 0.2),
-          rgba(0, 255, 255, 0.2)
-        );
-        border: 2px solid #00ff88;
-        color: #00ff88;
-        font-size: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        z-index: 1000;
-        backdrop-filter: blur(10px);
-        font-weight: 600;
-        text-transform: uppercase;
+        top: 15px;
+        right: 15px;
+        padding: 12px 20px;
+        font-size: 0.9rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header h1 {
+        font-size: 2rem;
         letter-spacing: 1px;
       }
 
-      .connection-status.disconnected {
-        background: linear-gradient(
-          135deg,
-          rgba(255, 0, 0, 0.2),
-          rgba(255, 100, 100, 0.2)
-        );
-        border-color: #ff0000;
-        color: #ff0000;
+      .metric-value {
+        font-size: 2rem;
       }
 
-      .status-indicator {
-        display: inline-block;
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        background: #00ff88;
-        box-shadow: 0 0 15px #00ff88;
-        animation: statusPulse 2s infinite;
+      .system-overview {
+        padding: 20px;
       }
 
-      @keyframes statusPulse {
-        0%,
-        100% {
-          opacity: 1;
-          transform: scale(1);
-          box-shadow: 0 0 15px #00ff88;
-        }
-        50% {
-          opacity: 0.7;
-          transform: scale(1.2);
-          box-shadow: 0 0 25px #00ff88;
-        }
+      .system-info-value {
+        font-size: 1.4rem;
       }
-
-      @media (min-width: 769px) and (max-width: 1024px) {
-        .charts-grid {
-          grid-template-columns: repeat(2, 1fr);
-        }
-      }
-
-      @media (max-width: 768px) {
-        .container {
-          padding: 15px;
-        }
-
-        .header h1 {
-          font-size: 2.5rem;
-        }
-
-        .system-overview {
-          grid-template-columns: 1fr;
-        }
-
-        .metrics-grid {
-          grid-template-columns: 1fr;
-          gap: 20px;
-        }
-
-        .charts-grid {
-          grid-template-columns: 1fr;
-          gap: 20px;
-        }
-
-        .chart-card {
-          height: 300px;
-          padding: 20px;
-        }
-
-        .metric-value {
-          font-size: 2.5rem;
-        }
-
-        .connection-status {
-          top: 15px;
-          right: 15px;
-          padding: 12px 20px;
-          font-size: 0.9rem;
-        }
-      }
-
-      @media (max-width: 480px) {
-        .header h1 {
-          font-size: 2rem;
-          letter-spacing: 1px;
-        }
-
-        .metric-value {
-          font-size: 2rem;
-        }
-
-        .system-overview {
-          padding: 20px;
-        }
-
-        .system-info-value {
-          font-size: 1.4rem;
-        }
-      }
-    </style>
+    }
+  </style>
 </head>
+
 <body>
-<div class="connection-status" id="connectionStatus">
-<span class="status-indicator"></span>
-<span>Connecting...</span>
-</div>
-<div class="container">
-<div class="header">
-<h1>Server Monitoring Dashboard</h1>
-<p class="subtitle">REAL-TIME SYSTEM MONITORING</p>
-</div>
-<div class="system-overview">
-<div class="system-info-item">
-<div class="system-info-label">Hostname</div>
-<div class="system-info-value" id="hostname">-</div>
-</div>
-<div class="system-info-item">
-<div class="system-info-label">Operating System</div>
-<div class="system-info-value" id="osName">-</div>
-</div>
-<div class="system-info-item">
-<div class="system-info-label">CPU Model</div>
-<div class="system-info-value" id="cpuModel">-</div>
-</div>
-<div class="system-info-item">
-<div class="system-info-label">CPU Cores</div>
-<div class="system-info-value" id="cpuCores">-</div>
-</div>
-<div class="system-info-item">
-<div class="system-info-label">Total Memory</div>
-<div class="system-info-value" id="totalMemory">-</div>
-</div>
-<div class="system-info-item">
-<div class="system-info-label">Total Disk</div>
-<div class="system-info-value" id="totalDisk">-</div>
-</div>
-</div>
-<div class="metrics-grid">
-<div class="metric-card">
-<div class="metric-title">
-<span class="metric-icon">🖥️</span>
-            CPU Usage
-          </div>
-<div class="metric-value" id="cpuUsage">
-            0<span class="metric-unit">%</span>
-</div>
-<div class="progress-container">
-<div class="progress-bar" id="cpuProgress" style="width: 0%"></div>
-</div>
-</div>
-<div class="metric-card">
-<div class="metric-title">
-<span class="metric-icon">💾</span>
-            Memory Usage
-          </div>
-<div class="metric-value" id="memoryUsage">
-            0<span class="metric-unit">%</span>
-</div>
-<div class="progress-container">
-<div class="progress-bar" id="memoryProgress" style="width: 0%"></div>
-</div>
-</div>
-<div class="metric-card">
-<div class="metric-title">
-<span class="metric-icon">💿</span>
-            Disk Usage
-          </div>
-<div class="metric-value" id="diskUsage">
-            0<span class="metric-unit">%</span>
-</div>
-<div class="progress-container">
-<div class="progress-bar" id="diskProgress" style="width: 0%"></div>
-</div>
-</div>
-<div class="metric-card">
-<div class="metric-title">
-<span class="metric-icon">🌐</span>
-            Network Traffic
-          </div>
-<div class="metric-value" id="networkRx">
-            0<span class="metric-unit">MB</span>
-</div>
-<div style="font-size: 1.2rem; color: #888; margin-top: 10px">
-            Upload: <span id="networkTx">0 MB</span>
-</div>
-</div>
-<div class="metric-card">
-<div class="metric-title">
-<span class="metric-icon">⚡</span>
-            System Load
-          </div>
-<div class="metric-value" id="loadAverage">0.00</div>
-</div>
-<div class="metric-card">
-<div class="metric-title">
-<span class="metric-icon">🔗</span>
-            Active Connections
-          </div>
-<div class="metric-value" id="activeConnections">0</div>
-</div>
-<div class="metric-card">
-<div class="metric-title">
-<span class="metric-icon">⏱️</span>
-            Uptime
-          </div>
-<div class="metric-value" id="uptime">
-            0<span class="metric-unit">days</span>
-</div>
-</div>
-<div class="metric-card">
-<div class="metric-title">
-<span class="metric-icon">📊</span>
-            Process Count
-          </div>
-<div class="metric-value" id="processCount">0</div>
-</div>
-</div>
-<div class="charts-section">
-<div class="charts-grid">
-<div class="chart-card">
-<div class="chart-title">CPU Usage Trend</div>
-<canvas id="cpuChart"></canvas>
-</div>
-<div class="chart-card">
-<div class="chart-title">Memory Usage Trend</div>
-<canvas id="memoryChart"></canvas>
-</div>
-<div class="chart-card">
-<div class="chart-title">Disk Usage Trend</div>
-<canvas id="diskChart"></canvas>
-</div>
-<div class="chart-card">
-<div class="chart-title">Network Traffic Trend</div>
-<canvas id="networkChart"></canvas>
-</div>
-</div>
-</div>
-</div>
-<script>
-      class ServerMonitor {
-        constructor() {
-          this.eventSource = null;
-          this.connectionStatus = document.getElementById('connectionStatus');
-          this.isConnected = false;
-          this.reconnectAttempts = 0;
-          this.maxReconnectAttempts = 5;
-          this.reconnectInterval = 3000;
+  <div class="connection-status" id="connectionStatus">
+    <span class="status-indicator"></span>
+    <span>Connecting...</span>
+  </div>
+  <div class="container">
+    <div class="header">
+      <h1><a href="https://github.com/hyperlane-dev/hyperlane" target="_blank">Server Monitoring Dashboard</a></h1>
+      <p class="subtitle">REAL-TIME SYSTEM MONITORING</p>
+    </div>
+    <div class="system-overview">
+      <div class="system-info-item">
+        <div class="system-info-label">Hostname</div>
+        <div class="system-info-value" id="hostname">-</div>
+      </div>
+      <div class="system-info-item">
+        <div class="system-info-label">Operating System</div>
+        <div class="system-info-value" id="osName">-</div>
+      </div>
+      <div class="system-info-item">
+        <div class="system-info-label">CPU Model</div>
+        <div class="system-info-value" id="cpuModel">-</div>
+      </div>
+      <div class="system-info-item">
+        <div class="system-info-label">CPU Cores</div>
+        <div class="system-info-value" id="cpuCores">-</div>
+      </div>
+      <div class="system-info-item">
+        <div class="system-info-label">Total Memory</div>
+        <div class="system-info-value" id="totalMemory">-</div>
+      </div>
+      <div class="system-info-item">
+        <div class="system-info-label">Total Disk</div>
+        <div class="system-info-value" id="totalDisk">-</div>
+      </div>
+    </div>
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-title">
+          <span class="metric-icon">🖥️</span>
+          CPU Usage
+        </div>
+        <div class="metric-value" id="cpuUsage">
+          0<span class="metric-unit">%</span>
+        </div>
+        <div class="progress-container">
+          <div class="progress-bar" id="cpuProgress" style="width: 0%"></div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-title">
+          <span class="metric-icon">💾</span>
+          Memory Usage
+        </div>
+        <div class="metric-value" id="memoryUsage">
+          0<span class="metric-unit">%</span>
+        </div>
+        <div class="progress-container">
+          <div class="progress-bar" id="memoryProgress" style="width: 0%"></div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-title">
+          <span class="metric-icon">💿</span>
+          Disk Usage
+        </div>
+        <div class="metric-value" id="diskUsage">
+          0<span class="metric-unit">%</span>
+        </div>
+        <div class="progress-container">
+          <div class="progress-bar" id="diskProgress" style="width: 0%"></div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-title">
+          <span class="metric-icon">🌐</span>
+          Network Traffic
+        </div>
+        <div class="metric-value" id="networkRx">
+          0<span class="metric-unit">MB</span>
+        </div>
+        <div style="font-size: 1.2rem; color: #888; margin-top: 10px">
+          Upload: <span id="networkTx">0 MB</span>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-title">
+          <span class="metric-icon">⚡</span>
+          System Load
+        </div>
+        <div class="metric-value" id="loadAverage">0.00</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-title">
+          <span class="metric-icon">🔗</span>
+          Active Connections
+        </div>
+        <div class="metric-value" id="activeConnections">0</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-title">
+          <span class="metric-icon">⏱️</span>
+          Uptime
+        </div>
+        <div class="metric-value" id="uptime">
+          0<span class="metric-unit">days</span>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-title">
+          <span class="metric-icon">📊</span>
+          Process Count
+        </div>
+        <div class="metric-value" id="processCount">0</div>
+      </div>
+    </div>
+    <div class="charts-section">
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-title">CPU Usage Trend</div>
+          <canvas id="cpuChart"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Memory Usage Trend</div>
+          <canvas id="memoryChart"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Disk Usage Trend</div>
+          <canvas id="diskChart"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Network Traffic Trend</div>
+          <canvas id="networkChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    class ServerMonitor {
+      constructor() {
+        this.eventSource = null;
+        this.connectionStatus = document.getElementById('connectionStatus');
+        this.isConnected = false;
+        this.reconnectAttempts = 0;
+        this.maxReconnectAttempts = 5;
+        this.reconnectInterval = 3000;
 
-          this.maxDataPoints = 60;
-          this.dataHistory = {
-            cpu: [],
-            memory: [],
-            disk: [],
-            networkRx: [],
-            networkTx: [],
-            timestamps: [],
-          };
+        this.maxDataPoints = 60;
+        this.dataHistory = {
+          cpu: [],
+          memory: [],
+          disk: [],
+          networkRx: [],
+          networkTx: [],
+          timestamps: [],
+        };
 
-          this.charts = {};
+        this.charts = {};
 
-          this.init();
-        }
+        this.init();
+      }
 
-        init() {
-          this.initCharts();
-          this.connectSSE();
-        }
+      init () {
+        this.initCharts();
+        this.connectSSE();
+      }
 
-        initCharts() {
-          const chartOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: {
-                display: true,
-                labels: {
-                  color: '#00ffff',
-                  font: {
-                    size: 14,
-                    family: 'Rajdhani',
-                  },
+      initCharts () {
+        const chartOptions = {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              labels: {
+                color: '#00ffff',
+                font: {
+                  size: 14,
+                  family: 'Rajdhani',
                 },
               },
             },
+          },
+          scales: {
+            x: {
+              display: true,
+              grid: {
+                color: 'rgba(0, 255, 255, 0.2)',
+              },
+              ticks: {
+                color: '#00ffff',
+                maxTicksLimit: 10,
+                font: {
+                  family: 'Rajdhani',
+                },
+              },
+            },
+            y: {
+              display: true,
+              grid: {
+                color: 'rgba(0, 255, 255, 0.2)',
+              },
+              ticks: {
+                color: '#00ffff',
+                font: {
+                  family: 'Rajdhani',
+                },
+              },
+            },
+          },
+          elements: {
+            line: {
+              tension: 0.4,
+            },
+            point: {
+              radius: 3,
+              hoverRadius: 6,
+            },
+          },
+          animation: {
+            duration: 300,
+          },
+        };
+
+        this.charts.cpu = new Chart(document.getElementById('cpuChart'), {
+          type: 'line',
+          data: {
+            labels: [],
+            datasets: [
+              {
+                label: 'CPU Usage (%)',
+                data: [],
+                borderColor: '#00ffff',
+                backgroundColor: 'rgba(0, 255, 255, 0.1)',
+                fill: true,
+                borderWidth: 3,
+              },
+            ],
+          },
+          options: {
+            ...chartOptions,
             scales: {
-              x: {
-                display: true,
-                grid: {
-                  color: 'rgba(0, 255, 255, 0.2)',
-                },
-                ticks: {
-                  color: '#00ffff',
-                  maxTicksLimit: 10,
-                  font: {
-                    family: 'Rajdhani',
-                  },
-                },
-              },
+              ...chartOptions.scales,
               y: {
-                display: true,
-                grid: {
-                  color: 'rgba(0, 255, 255, 0.2)',
-                },
-                ticks: {
-                  color: '#00ffff',
-                  font: {
-                    family: 'Rajdhani',
-                  },
-                },
+                ...chartOptions.scales.y,
+                min: 0,
+                max: 100,
               },
             },
-            elements: {
-              line: {
-                tension: 0.4,
-              },
-              point: {
-                radius: 3,
-                hoverRadius: 6,
-              },
-            },
-            animation: {
-              duration: 300,
-            },
-          };
+          },
+        });
 
-          this.charts.cpu = new Chart(document.getElementById('cpuChart'), {
+        this.charts.memory = new Chart(
+          document.getElementById('memoryChart'),
+          {
             type: 'line',
             data: {
               labels: [],
               datasets: [
                 {
-                  label: 'CPU Usage (%)',
+                  label: 'Memory Usage (%)',
                   data: [],
-                  borderColor: '#00ffff',
-                  backgroundColor: 'rgba(0, 255, 255, 0.1)',
+                  borderColor: '#ff00ff',
+                  backgroundColor: 'rgba(255, 0, 255, 0.1)',
                   fill: true,
                   borderWidth: 3,
                 },
@@ -807,288 +824,259 @@
                 },
               },
             },
-          });
+          }
+        );
 
-          this.charts.memory = new Chart(
-            document.getElementById('memoryChart'),
-            {
-              type: 'line',
-              data: {
-                labels: [],
-                datasets: [
-                  {
-                    label: 'Memory Usage (%)',
-                    data: [],
-                    borderColor: '#ff00ff',
-                    backgroundColor: 'rgba(255, 0, 255, 0.1)',
-                    fill: true,
-                    borderWidth: 3,
-                  },
-                ],
+        this.charts.disk = new Chart(document.getElementById('diskChart'), {
+          type: 'line',
+          data: {
+            labels: [],
+            datasets: [
+              {
+                label: 'Disk Usage (%)',
+                data: [],
+                borderColor: '#ffff00',
+                backgroundColor: 'rgba(255, 255, 0, 0.1)',
+                fill: true,
+                borderWidth: 3,
               },
-              options: {
-                ...chartOptions,
-                scales: {
-                  ...chartOptions.scales,
-                  y: {
-                    ...chartOptions.scales.y,
-                    min: 0,
-                    max: 100,
-                  },
-                },
+            ],
+          },
+          options: {
+            ...chartOptions,
+            scales: {
+              ...chartOptions.scales,
+              y: {
+                ...chartOptions.scales.y,
+                min: 0,
+                max: 100,
               },
-            }
-          );
+            },
+          },
+        });
 
-          this.charts.disk = new Chart(document.getElementById('diskChart'), {
+        this.charts.network = new Chart(
+          document.getElementById('networkChart'),
+          {
             type: 'line',
             data: {
               labels: [],
               datasets: [
                 {
-                  label: 'Disk Usage (%)',
+                  label: 'Download (MB)',
                   data: [],
-                  borderColor: '#ffff00',
-                  backgroundColor: 'rgba(255, 255, 0, 0.1)',
-                  fill: true,
+                  borderColor: '#00ff88',
+                  backgroundColor: 'rgba(0, 255, 136, 0.1)',
+                  fill: false,
+                  borderWidth: 3,
+                },
+                {
+                  label: 'Upload (MB)',
+                  data: [],
+                  borderColor: '#ff8800',
+                  backgroundColor: 'rgba(255, 136, 0, 0.1)',
+                  fill: false,
                   borderWidth: 3,
                 },
               ],
             },
-            options: {
-              ...chartOptions,
-              scales: {
-                ...chartOptions.scales,
-                y: {
-                  ...chartOptions.scales.y,
-                  min: 0,
-                  max: 100,
-                },
-              },
-            },
-          });
-
-          this.charts.network = new Chart(
-            document.getElementById('networkChart'),
-            {
-              type: 'line',
-              data: {
-                labels: [],
-                datasets: [
-                  {
-                    label: 'Download (MB)',
-                    data: [],
-                    borderColor: '#00ff88',
-                    backgroundColor: 'rgba(0, 255, 136, 0.1)',
-                    fill: false,
-                    borderWidth: 3,
-                  },
-                  {
-                    label: 'Upload (MB)',
-                    data: [],
-                    borderColor: '#ff8800',
-                    backgroundColor: 'rgba(255, 136, 0, 0.1)',
-                    fill: false,
-                    borderWidth: 3,
-                  },
-                ],
-              },
-              options: chartOptions,
-            }
-          );
-        }
-
-        connectSSE() {
-          this.updateConnectionStatus('Connecting...', false);
-          this.eventSource = new EventSource('/api/server/status');
-          this.eventSource.onopen = () => {
-            this.isConnected = true;
-            this.reconnectAttempts = 0;
-            this.updateConnectionStatus('Connected', true);
-          };
-
-          this.eventSource.onmessage = (event) => {
-            try {
-              const data = JSON.parse(event.data);
-              this.updateServerStatus(data);
-            } catch (error) {
-              console.error('Failed to parse server status:', error);
-            }
-          };
-
-          this.eventSource.onerror = () => {
-            this.isConnected = false;
-            this.updateConnectionStatus('Disconnected', false);
-            this.eventSource.close();
-            this.reconnect();
-          };
-        }
-
-        reconnect() {
-          if (this.reconnectAttempts < this.maxReconnectAttempts) {
-            this.reconnectAttempts++;
-            this.updateConnectionStatus(
-              `Reconnecting... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`,
-              false
-            );
-
-            setTimeout(() => {
-              this.connectSSE();
-            }, this.reconnectInterval);
-          } else {
-            this.updateConnectionStatus('Connection failed', false);
+            options: chartOptions,
           }
-        }
+        );
+      }
 
-        updateConnectionStatus(text, connected) {
-          this.connectionStatus.querySelector('span:last-child').textContent =
-            text;
-          this.connectionStatus.className = connected
-            ? 'connection-status'
-            : 'connection-status disconnected';
-        }
+      connectSSE () {
+        this.updateConnectionStatus('Connecting...', false);
+        this.eventSource = new EventSource('/api/server/status');
+        this.eventSource.onopen = () => {
+          this.isConnected = true;
+          this.reconnectAttempts = 0;
+          this.updateConnectionStatus('Connected', true);
+        };
 
-        updateServerStatus(data) {
-          document.getElementById(
-            'cpuUsage'
-          ).innerHTML = `${data.cpu_usage.toFixed(
-            1
-          )}<span class="metric-unit">%</span>`;
-          document.getElementById(
-            'cpuProgress'
-          ).style.width = `${data.cpu_usage}%`;
+        this.eventSource.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            this.updateServerStatus(data);
+          } catch (error) {
+            console.error('Failed to parse server status:', error);
+          }
+        };
 
-          document.getElementById(
-            'memoryUsage'
-          ).innerHTML = `${data.memory_usage.toFixed(
-            1
-          )}<span class="metric-unit">%</span>`;
-          document.getElementById(
-            'memoryProgress'
-          ).style.width = `${data.memory_usage}%`;
+        this.eventSource.onerror = () => {
+          this.isConnected = false;
+          this.updateConnectionStatus('Disconnected', false);
+          this.eventSource.close();
+          this.reconnect();
+        };
+      }
 
-          document.getElementById(
-            'diskUsage'
-          ).innerHTML = `${data.disk_usage.toFixed(
-            1
-          )}<span class="metric-unit">%</span>`;
-          document.getElementById(
-            'diskProgress'
-          ).style.width = `${data.disk_usage}%`;
-
-          const rxMB = (data.network_rx / 1024 / 1024).toFixed(2);
-          const txMB = (data.network_tx / 1024 / 1024).toFixed(2);
-          document.getElementById(
-            'networkRx'
-          ).innerHTML = `${rxMB}<span class="metric-unit">MB</span>`;
-          document.getElementById('networkTx').textContent = `${txMB} MB`;
-
-          document.getElementById('loadAverage').textContent =
-            data.load_average.toFixed(2);
-          document.getElementById('activeConnections').textContent =
-            data.active_connections;
-
-          const days = Math.floor(data.uptime / 86400);
-          const hours = Math.floor((data.uptime % 86400) / 3600);
-          document.getElementById(
-            'uptime'
-          ).innerHTML = `${days}<span class="metric-unit">days</span>`;
-
-          document.getElementById('processCount').textContent =
-            data.process_count;
-
-          document.getElementById('hostname').textContent = data.hostname;
-          document.getElementById('osName').textContent = data.os_name;
-          document.getElementById('cpuModel').textContent = data.cpu_model;
-          document.getElementById('cpuCores').textContent = data.cpu_cores;
-          document.getElementById('totalMemory').textContent = this.formatBytes(
-            data.memory_total
-          );
-          document.getElementById('totalDisk').textContent = this.formatBytes(
-            data.disk_total
+      reconnect () {
+        if (this.reconnectAttempts < this.maxReconnectAttempts) {
+          this.reconnectAttempts++;
+          this.updateConnectionStatus(
+            `Reconnecting... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`,
+            false
           );
 
-          this.updateChartData(data);
-        }
-
-        updateChartData(data) {
-          const now = new Date();
-          const timeLabel = now.toLocaleTimeString();
-
-          this.dataHistory.timestamps.push(timeLabel);
-          this.dataHistory.cpu.push(data.cpu_usage);
-          this.dataHistory.memory.push(data.memory_usage);
-          this.dataHistory.disk.push(data.disk_usage);
-          this.dataHistory.networkRx.push(data.network_rx / 1024 / 1024);
-          this.dataHistory.networkTx.push(data.network_tx / 1024 / 1024);
-
-          if (this.dataHistory.timestamps.length > this.maxDataPoints) {
-            this.dataHistory.timestamps.shift();
-            this.dataHistory.cpu.shift();
-            this.dataHistory.memory.shift();
-            this.dataHistory.disk.shift();
-            this.dataHistory.networkRx.shift();
-            this.dataHistory.networkTx.shift();
-          }
-
-          this.updateChart('cpu', this.dataHistory.cpu);
-          this.updateChart('memory', this.dataHistory.memory);
-          this.updateChart('disk', this.dataHistory.disk);
-          this.updateNetworkChart();
-        }
-
-        updateChart(chartName, data) {
-          const chart = this.charts[chartName];
-          if (chart) {
-            chart.data.labels = [...this.dataHistory.timestamps];
-            chart.data.datasets[0].data = [...data];
-            chart.update('none');
-          }
-        }
-
-        updateNetworkChart() {
-          const chart = this.charts.network;
-          if (chart) {
-            chart.data.labels = [...this.dataHistory.timestamps];
-            chart.data.datasets[0].data = [...this.dataHistory.networkRx];
-            chart.data.datasets[1].data = [...this.dataHistory.networkTx];
-            chart.update('none');
-          }
-        }
-
-        formatBytes(bytes) {
-          if (bytes === 0) return '0 B';
-          const k = 1024;
-          const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-          const i = Math.floor(Math.log(bytes) / Math.log(k));
-          return (
-            parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
-          );
-        }
-
-        destroy() {
-          if (this.eventSource) {
-            this.eventSource.close();
-          }
-
-          Object.values(this.charts).forEach((chart) => {
-            if (chart) {
-              chart.destroy();
-            }
-          });
+          setTimeout(() => {
+            this.connectSSE();
+          }, this.reconnectInterval);
+        } else {
+          this.updateConnectionStatus('Connection failed', false);
         }
       }
 
-      let monitor;
-      document.addEventListener('DOMContentLoaded', () => {
-        monitor = new ServerMonitor();
-      });
+      updateConnectionStatus (text, connected) {
+        this.connectionStatus.querySelector('span:last-child').textContent =
+          text;
+        this.connectionStatus.className = connected
+          ? 'connection-status'
+          : 'connection-status disconnected';
+      }
 
-      window.addEventListener('beforeunload', () => {
-        if (monitor) {
-          monitor.destroy();
+      updateServerStatus (data) {
+        document.getElementById(
+          'cpuUsage'
+        ).innerHTML = `${data.cpu_usage.toFixed(
+          1
+        )}<span class="metric-unit">%</span>`;
+        document.getElementById(
+          'cpuProgress'
+        ).style.width = `${data.cpu_usage}%`;
+
+        document.getElementById(
+          'memoryUsage'
+        ).innerHTML = `${data.memory_usage.toFixed(
+          1
+        )}<span class="metric-unit">%</span>`;
+        document.getElementById(
+          'memoryProgress'
+        ).style.width = `${data.memory_usage}%`;
+
+        document.getElementById(
+          'diskUsage'
+        ).innerHTML = `${data.disk_usage.toFixed(
+          1
+        )}<span class="metric-unit">%</span>`;
+        document.getElementById(
+          'diskProgress'
+        ).style.width = `${data.disk_usage}%`;
+
+        const rxMB = (data.network_rx / 1024 / 1024).toFixed(2);
+        const txMB = (data.network_tx / 1024 / 1024).toFixed(2);
+        document.getElementById(
+          'networkRx'
+        ).innerHTML = `${rxMB}<span class="metric-unit">MB</span>`;
+        document.getElementById('networkTx').textContent = `${txMB} MB`;
+
+        document.getElementById('loadAverage').textContent =
+          data.load_average.toFixed(2);
+        document.getElementById('activeConnections').textContent =
+          data.active_connections;
+
+        const days = Math.floor(data.uptime / 86400);
+        const hours = Math.floor((data.uptime % 86400) / 3600);
+        document.getElementById(
+          'uptime'
+        ).innerHTML = `${days}<span class="metric-unit">days</span>`;
+
+        document.getElementById('processCount').textContent =
+          data.process_count;
+
+        document.getElementById('hostname').textContent = data.hostname;
+        document.getElementById('osName').textContent = data.os_name;
+        document.getElementById('cpuModel').textContent = data.cpu_model;
+        document.getElementById('cpuCores').textContent = data.cpu_cores;
+        document.getElementById('totalMemory').textContent = this.formatBytes(
+          data.memory_total
+        );
+        document.getElementById('totalDisk').textContent = this.formatBytes(
+          data.disk_total
+        );
+
+        this.updateChartData(data);
+      }
+
+      updateChartData (data) {
+        const now = new Date();
+        const timeLabel = now.toLocaleTimeString();
+
+        this.dataHistory.timestamps.push(timeLabel);
+        this.dataHistory.cpu.push(data.cpu_usage);
+        this.dataHistory.memory.push(data.memory_usage);
+        this.dataHistory.disk.push(data.disk_usage);
+        this.dataHistory.networkRx.push(data.network_rx / 1024 / 1024);
+        this.dataHistory.networkTx.push(data.network_tx / 1024 / 1024);
+
+        if (this.dataHistory.timestamps.length > this.maxDataPoints) {
+          this.dataHistory.timestamps.shift();
+          this.dataHistory.cpu.shift();
+          this.dataHistory.memory.shift();
+          this.dataHistory.disk.shift();
+          this.dataHistory.networkRx.shift();
+          this.dataHistory.networkTx.shift();
         }
-      });
-    </script>
+
+        this.updateChart('cpu', this.dataHistory.cpu);
+        this.updateChart('memory', this.dataHistory.memory);
+        this.updateChart('disk', this.dataHistory.disk);
+        this.updateNetworkChart();
+      }
+
+      updateChart (chartName, data) {
+        const chart = this.charts[chartName];
+        if (chart) {
+          chart.data.labels = [...this.dataHistory.timestamps];
+          chart.data.datasets[0].data = [...data];
+          chart.update('none');
+        }
+      }
+
+      updateNetworkChart () {
+        const chart = this.charts.network;
+        if (chart) {
+          chart.data.labels = [...this.dataHistory.timestamps];
+          chart.data.datasets[0].data = [...this.dataHistory.networkRx];
+          chart.data.datasets[1].data = [...this.dataHistory.networkTx];
+          chart.update('none');
+        }
+      }
+
+      formatBytes (bytes) {
+        if (bytes === 0) return '0 B';
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return (
+          parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+        );
+      }
+
+      destroy () {
+        if (this.eventSource) {
+          this.eventSource.close();
+        }
+
+        Object.values(this.charts).forEach((chart) => {
+          if (chart) {
+            chart.destroy();
+          }
+        });
+      }
+    }
+
+    let monitor;
+    document.addEventListener('DOMContentLoaded', () => {
+      monitor = new ServerMonitor();
+    });
+
+    window.addEventListener('beforeunload', () => {
+      if (monitor) {
+        monitor.destroy();
+      }
+    });
+  </script>
 </body>
+
 </html>

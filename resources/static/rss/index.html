@@ -77,15 +77,21 @@
     .feed-items {
       display: grid;
       gap: 20px;
+      margin-bottom: 20px;
     }
 
     .feed-item {
       background: white;
       border-radius: 12px;
       padding: 24px;
+      margin-bottom: 20px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       transition: all 0.3s ease;
       animation: fadeInUp 0.6s ease both;
+    }
+
+    .feed-item:last-child {
+      margin-bottom: 0;
     }
 
     .feed-item:hover {
@@ -370,7 +376,8 @@
 <body>
   <div class="container">
     <div class="header">
-      <h1>📡 RSS Feed Reader</h1>
+      <h1><a href="https://github.com/hyperlane-dev/hyperlane" target="_blank"
+          style="color: inherit; text-decoration: none;">📡 RSS Feed Reader</a></h1>
       <p><a href="/upload" target="_blank"
           style="color: white; text-decoration: none; border-bottom: 2px solid rgba(255,255,255,0.5); transition: border-color 0.3s;"
           onmouseover="this.style.borderColor='white'"
@@ -452,7 +459,8 @@
 
       if (items.length === 0 && page === 1) {
         showEmptyState();
-        document.getElementById('pagination').style.display = 'none';
+        const pagination = document.getElementById('pagination');
+        if (pagination) pagination.style.display = 'none';
         return;
       }
 
@@ -463,6 +471,8 @@
       }
 
       const feedItemsContainer = document.getElementById('feedItems');
+      if (!feedItemsContainer) return;
+
       feedItemsContainer.innerHTML = '';
 
       items.forEach((item, index) => {
@@ -478,10 +488,15 @@
 
     function updatePagination (page) {
       currentPage = page;
-      document.getElementById('pageInfo').textContent = `Page ${page}`;
-      document.getElementById('prevBtn').disabled = page === 1;
-      document.getElementById('nextBtn').disabled = !hasMoreItems;
-      document.getElementById('pagination').style.display = 'flex';
+      const pageInfo = document.getElementById('pageInfo');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const pagination = document.getElementById('pagination');
+
+      if (pageInfo) pageInfo.textContent = `Page ${page}`;
+      if (prevBtn) prevBtn.disabled = page === 1;
+      if (nextBtn) nextBtn.disabled = !hasMoreItems;
+      if (pagination) pagination.style.display = 'flex';
     }
 
     function previousPage () {
