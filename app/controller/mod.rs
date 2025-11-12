@@ -7,6 +7,7 @@ pub mod online;
 pub mod openapi;
 pub mod postgresql;
 pub mod redis;
+pub mod rss;
 pub mod sse;
 pub mod trace;
 pub mod tracking;

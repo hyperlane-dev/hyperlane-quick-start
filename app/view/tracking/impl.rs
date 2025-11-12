@@ -16,7 +16,6 @@ impl ServerHook for TrackingViewRoute {
 
     #[prologue_macros(
         get,
-        response_status_code(200),
         response_header(CONTENT_TYPE => TEXT_HTML)
     )]
     async fn handle(self, ctx: &Context) {

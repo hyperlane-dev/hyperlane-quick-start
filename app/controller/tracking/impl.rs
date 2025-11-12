@@ -7,7 +7,6 @@ impl ServerHook for TrackingReportRoute {
 
     #[prologue_macros(
         post,
-        response_status_code(200),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     async fn handle(self, ctx: &Context) {
@@ -32,7 +31,6 @@ impl ServerHook for TrackingQueryRoute {
 
     #[prologue_macros(
         post,
-        response_status_code(200),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     async fn handle(self, ctx: &Context) {

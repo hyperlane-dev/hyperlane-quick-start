@@ -7,7 +7,6 @@ impl ServerHook for ServerStatusRoute {
 
     #[prologue_macros(
         get,
-        response_status_code(200),
         response_header(CONTENT_TYPE => TEXT_EVENT_STREAM)
     )]
     async fn handle(self, ctx: &Context) {
@@ -34,7 +33,6 @@ impl ServerHook for SystemInfoRoute {
 
     #[prologue_macros(
         get,
-        response_status_code(200),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     async fn handle(self, ctx: &Context) {

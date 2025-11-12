@@ -7,7 +7,6 @@ impl ServerHook for TraceRoute {
 
     #[prologue_macros(
         get,
-        response_status_code(200),
         response_header(CONTENT_TYPE => ContentType::format_content_type_with_charset(TEXT_PLAIN, UTF8)),
         route_param("trace" => trace_opt)
     )]

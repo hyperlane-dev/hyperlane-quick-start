@@ -7,7 +7,6 @@ impl ServerHook for OnlineUsersRoute {
 
     #[prologue_macros(
         get,
-        response_status_code(200),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     async fn handle(self, ctx: &Context) {
@@ -46,7 +45,6 @@ impl ServerHook for ChatHistoryRoute {
 
     #[prologue_macros(
         get,
-        response_status_code(200),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     async fn handle(self, ctx: &Context) {

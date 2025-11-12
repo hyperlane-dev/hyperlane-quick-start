@@ -16,7 +16,6 @@ impl ServerHook for OpenApiViewRoute {
 
     #[prologue_macros(
         methods(get, post),
-        response_status_code(200),
         response_header(CONTENT_TYPE => TEXT_HTML)
     )]
     async fn handle(self, ctx: &Context) {
