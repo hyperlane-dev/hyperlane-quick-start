@@ -1467,16 +1467,16 @@
 
       function getAvatarColor(name) {
         const colors = [
-          '#FF6B6B',
-          '#4ECDC4',
-          '#45B7D1',
-          '#96CEB4',
-          '#FFEAA7',
-          '#DDA0DD',
-          '#98D8C8',
-          '#F7DC6F',
-          '#BB8FCE',
-          '#85C1E9',
+          '#E53935',
+          '#00ACC1',
+          '#1E88E5',
+          '#43A047',
+          '#FB8C00',
+          '#8E24AA',
+          '#039BE5',
+          '#FDD835',
+          '#D81B60',
+          '#3949AB',
         ];
         let hash = 0;
         for (let i = 0; i < name.length; i++) {
@@ -1486,34 +1486,23 @@
       }
 
       function getAvatarGradient(name) {
-        const gradients = [
-          ['#E63946', '#C1121F'],
-          ['#06D6A0', '#118AB2'],
-          ['#3A86FF', '#0466C8'],
-          ['#2D9CDB', '#1B6CA8'],
-          ['#F77F00', '#D62828'],
-          ['#9D4EDD', '#7209B7'],
-          ['#06B6D4', '#0891B2'],
-          ['#F59E0B', '#D97706'],
-          ['#8B5CF6', '#6D28D9'],
-          ['#3B82F6', '#1D4ED8'],
-          ['#5B21B6', '#4C1D95'],
-          ['#EC4899', '#DB2777'],
-          ['#0EA5E9', '#0284C7'],
-          ['#10B981', '#059669'],
-          ['#F43F5E', '#E11D48'],
-          ['#8B5CF6', '#7C3AED'],
-          ['#14B8A6', '#0D9488'],
-          ['#F97316', '#EA580C'],
-          ['#A855F7', '#9333EA'],
-          ['#EF4444', '#DC2626'],
+        const colors = [
+          '#E53935',
+          '#00ACC1',
+          '#1E88E5',
+          '#43A047',
+          '#FB8C00',
+          '#8E24AA',
+          '#039BE5',
+          '#FDD835',
+          '#D81B60',
+          '#3949AB',
         ];
         let hash = 0;
         for (let i = 0; i < name.length; i++) {
           hash = name.charCodeAt(i) + ((hash << 5) - hash);
         }
-        const gradient = gradients[Math.abs(hash) % gradients.length];
-        return `linear-gradient(135deg, ${gradient[0]}, ${gradient[1]})`;
+        return colors[Math.abs(hash) % colors.length];
       }
 
       function getAvatarText(name) {
@@ -2046,9 +2035,9 @@
         let messageInfoClass = 'message-info';
 
         if (isGptResponse) {
-          const avatarGradient = 'linear-gradient(135deg, #5B21B6, #7C3AED)';
+          const avatarColor = '#8E24AA';
           const avatarText = getAvatarText('gpt');
-          avatarHtml = `<div class="message-avatar" style="background: ${avatarGradient};">${avatarText}</div>`;
+          avatarHtml = `<div class="message-avatar" style="background: ${avatarColor};">${avatarText}</div>`;
 
           messageEl.innerHTML = `
                     ${avatarHtml}
@@ -2065,9 +2054,9 @@
                     </div>
                 `;
         } else if (!isSelf) {
-          const avatarGradient = getAvatarGradient(message.name);
+          const avatarColor = getAvatarColor(message.name);
           const avatarText = getAvatarText(message.name);
-          avatarHtml = `<div class="message-avatar" style="background: ${avatarGradient};">${avatarText}</div>`;
+          avatarHtml = `<div class="message-avatar" style="background: ${avatarColor};">${avatarText}</div>`;
 
           messageEl.innerHTML = `
                     ${avatarHtml}
@@ -2087,9 +2076,9 @@
                 `;
         } else {
           messageInfoClass += ' self';
-          const avatarGradient = getAvatarGradient(message.name);
+          const avatarColor = getAvatarColor(message.name);
           const avatarText = getAvatarText(message.name);
-          avatarHtml = `<div class="message-avatar" style="background: ${avatarGradient};">${avatarText}</div>`;
+          avatarHtml = `<div class="message-avatar" style="background: ${avatarColor};">${avatarText}</div>`;
 
           messageEl.innerHTML = `
                     <div class="${messageInfoClass}">
