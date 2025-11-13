@@ -161,28 +161,78 @@
         gap: 20px;
         margin-bottom: 40px;
         padding: 30px;
-        background: white;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.95) 0%,
+          rgba(248, 249, 250, 0.95) 100%
+        );
         border-radius: 12px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         position: relative;
         overflow: hidden;
       }
 
+      .system-overview::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border: 2px solid rgba(102, 126, 234, 0.2);
+        border-radius: 12px;
+        pointer-events: none;
+      }
+
       .system-info-item {
         text-align: center;
         padding: 20px;
-        background: #f8f9fa;
+        background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);
         border-radius: 8px;
-        border: 1px solid #e9ecef;
         transition: all 0.3s ease;
         position: relative;
         overflow: hidden;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.08);
+      }
+
+      .system-info-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border: 2px solid rgba(102, 126, 234, 0.15);
+        border-radius: 8px;
+        pointer-events: none;
+        transition: border-color 0.3s ease;
+      }
+
+      .system-info-item::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        border-radius: 8px 8px 0 0;
       }
 
       .system-info-item:hover {
         transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(102, 126, 234, 0.25);
+        background: linear-gradient(135deg, #ffffff 0%, #e8f0ff 100%);
+      }
+
+      .system-info-item:hover::before {
         border-color: #667eea;
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+      }
+
+      .system-info-item:hover::after {
+        opacity: 1;
       }
 
       .system-info-label {
@@ -208,20 +258,48 @@
       }
 
       .metric-card {
-        background: white;
-        border: 1px solid #e9ecef;
+        background: linear-gradient(135deg, #ffffff 0%, #faf8ff 100%);
+        border: 2px solid rgba(118, 75, 162, 0.15);
         border-radius: 12px;
         padding: 24px;
         position: relative;
         overflow: hidden;
         transition: all 0.3s ease;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 3px 12px rgba(118, 75, 162, 0.1);
+      }
+
+      .metric-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 80px;
+        height: 80px;
+        background: radial-gradient(
+          circle,
+          rgba(102, 126, 234, 0.1) 0%,
+          transparent 70%
+        );
+        border-radius: 50%;
+        transform: translate(30%, -30%);
+        transition: all 0.3s ease;
       }
 
       .metric-card:hover {
         transform: translateY(-4px);
-        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
-        border-color: #667eea;
+        box-shadow: 0 8px 24px rgba(118, 75, 162, 0.25);
+        border-color: #764ba2;
+        background: linear-gradient(135deg, #ffffff 0%, #f5f0ff 100%);
+      }
+
+      .metric-card:hover::after {
+        width: 100px;
+        height: 100px;
+        background: radial-gradient(
+          circle,
+          rgba(102, 126, 234, 0.15) 0%,
+          transparent 70%
+        );
       }
 
       .metric-title {
@@ -310,20 +388,64 @@
       }
 
       .chart-card {
-        background: white;
-        border: 1px solid #e9ecef;
+        background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%);
         border-radius: 12px;
         padding: 24px;
         position: relative;
         overflow: hidden;
         height: 400px;
         transition: all 0.3s ease;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 16px rgba(102, 126, 234, 0.12);
+      }
+
+      .chart-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border: 2px solid rgba(102, 126, 234, 0.2);
+        border-radius: 12px;
+        pointer-events: none;
+        transition: border-color 0.3s ease;
+      }
+
+      .chart-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(
+          90deg,
+          #667eea 0%,
+          #764ba2 50%,
+          #667eea 100%
+        );
+        background-size: 200% 100%;
+        animation: borderFlow 3s linear infinite;
+        border-radius: 12px 12px 0 0;
+      }
+
+      @keyframes borderFlow {
+        0% {
+          background-position: 0% 0%;
+        }
+
+        100% {
+          background-position: 200% 0%;
+        }
       }
 
       .chart-card:hover {
         transform: translateY(-4px);
-        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+        box-shadow: 0 8px 28px rgba(102, 126, 234, 0.25);
+        background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);
+      }
+
+      .chart-card:hover::before {
         border-color: #667eea;
       }
 
@@ -641,10 +763,12 @@
               legend: {
                 display: true,
                 labels: {
-                  color: '#00ffff',
+                  color: '#2c3e50',
                   font: {
-                    size: 14,
-                    family: 'Rajdhani',
+                    size: 13,
+                    family:
+                      '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif',
+                    weight: '500',
                   },
                 },
               },
@@ -653,25 +777,29 @@
               x: {
                 display: true,
                 grid: {
-                  color: 'rgba(0, 255, 255, 0.2)',
+                  color: 'rgba(102, 126, 234, 0.1)',
                 },
                 ticks: {
-                  color: '#00ffff',
+                  color: '#6c757d',
                   maxTicksLimit: 10,
                   font: {
-                    family: 'Rajdhani',
+                    family:
+                      '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif',
+                    size: 11,
                   },
                 },
               },
               y: {
                 display: true,
                 grid: {
-                  color: 'rgba(0, 255, 255, 0.2)',
+                  color: 'rgba(102, 126, 234, 0.1)',
                 },
                 ticks: {
-                  color: '#00ffff',
+                  color: '#6c757d',
                   font: {
-                    family: 'Rajdhani',
+                    family:
+                      '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif',
+                    size: 11,
                   },
                 },
               },
@@ -698,10 +826,10 @@
                 {
                   label: 'CPU Usage (%)',
                   data: [],
-                  borderColor: '#00ffff',
-                  backgroundColor: 'rgba(0, 255, 255, 0.1)',
+                  borderColor: '#667eea',
+                  backgroundColor: 'rgba(102, 126, 234, 0.1)',
                   fill: true,
-                  borderWidth: 3,
+                  borderWidth: 2,
                 },
               ],
             },
@@ -728,10 +856,10 @@
                   {
                     label: 'Memory Usage (%)',
                     data: [],
-                    borderColor: '#ff00ff',
-                    backgroundColor: 'rgba(255, 0, 255, 0.1)',
+                    borderColor: '#764ba2',
+                    backgroundColor: 'rgba(118, 75, 162, 0.1)',
                     fill: true,
-                    borderWidth: 3,
+                    borderWidth: 2,
                   },
                 ],
               },
@@ -757,10 +885,10 @@
                 {
                   label: 'Disk Usage (%)',
                   data: [],
-                  borderColor: '#ffff00',
-                  backgroundColor: 'rgba(255, 255, 0, 0.1)',
+                  borderColor: '#f59e0b',
+                  backgroundColor: 'rgba(245, 158, 11, 0.1)',
                   fill: true,
-                  borderWidth: 3,
+                  borderWidth: 2,
                 },
               ],
             },
@@ -787,18 +915,18 @@
                   {
                     label: 'Download (MB)',
                     data: [],
-                    borderColor: '#00ff88',
-                    backgroundColor: 'rgba(0, 255, 136, 0.1)',
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
                     fill: false,
-                    borderWidth: 3,
+                    borderWidth: 2,
                   },
                   {
                     label: 'Upload (MB)',
                     data: [],
-                    borderColor: '#ff8800',
-                    backgroundColor: 'rgba(255, 136, 0, 0.1)',
+                    borderColor: '#ef4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
                     fill: false,
-                    borderWidth: 3,
+                    borderWidth: 2,
                   },
                 ],
               },
