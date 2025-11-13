@@ -344,7 +344,6 @@
             successMsg.className = 'status-message success';
             successMsg.textContent = '✓ Search completed successfully';
             resultCard.insertBefore(successMsg, result);
-            console.log('Query completed');
           } else if (response.status === 404) {
             result.textContent = 'Trace record not found';
             result.className = 'empty-result';

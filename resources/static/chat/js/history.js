@@ -81,6 +81,13 @@ const ChatHistory = {
     messageList.insertBefore(fragment, messageList.firstChild);
     const newScrollHeight = messageList.scrollHeight;
     messageList.scrollTop = newScrollHeight - currentScrollHeight;
+
+    messages.forEach((msg, index) => {
+      const messageEl = messageList.children[index];
+      if (messageEl && typeof processLinksInMessage === 'function') {
+        processLinksInMessage(messageEl);
+      }
+    });
   },
 
   createMessageElement: function (msg) {
@@ -94,7 +101,12 @@ const ChatHistory = {
       isSelf ? 'self-message' : 'other-message'
     }`;
 
-    const avatarColor = getAvatarColor(msg.sender_name);
+    const avatarGradient =
+      typeof getAvatarGradient === 'function'
+        ? getAvatarGradient(msg.sender_name)
+        : `linear-gradient(135deg, ${getAvatarColor(
+            msg.sender_name
+          )}, ${getAvatarColor(msg.sender_name)})`;
     const avatarText = getAvatarText(msg.sender_name);
 
     let contentClass = 'message-content';
@@ -112,7 +124,7 @@ const ChatHistory = {
     messageDiv.innerHTML = `
             ${
               !isSelf
-                ? `<div class="message-avatar" style="background-color: ${avatarColor}">${avatarText}</div>`
+                ? `<div class="message-avatar" style="background: ${avatarGradient}">${avatarText}</div>`
                 : ''
             }
             <div class="message-info ${isSelf ? 'self' : ''}">
@@ -128,7 +140,7 @@ const ChatHistory = {
             </div>
             ${
               isSelf
-                ? `<div class="message-avatar" style="background-color: ${avatarColor}">${avatarText}</div>`
+                ? `<div class="message-avatar" style="background: ${avatarGradient}">${avatarText}</div>`
                 : ''
             }
         `;

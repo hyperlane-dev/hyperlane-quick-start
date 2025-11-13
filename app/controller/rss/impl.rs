@@ -14,7 +14,7 @@ impl ServerHook for RssFeedRoute {
     #[epilogue_macros(
         response_header(
             CONTENT_TYPE,
-            ContentType::format_content_type_with_charset(APPLICATION_RSS_XML, UTF8)
+            ContentType::format_content_type_with_charset(APPLICATION_XML, UTF8)
         ),
         response_body(rss_xml)
     )]
