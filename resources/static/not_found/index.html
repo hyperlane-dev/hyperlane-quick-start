@@ -14,6 +14,12 @@
         -webkit-user-select: none;
         -moz-user-select: none;
         -ms-user-select: none;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+
+      *::-webkit-scrollbar {
+        display: none;
       }
 
       body {
@@ -189,16 +195,39 @@
       }
 
       @media (max-width: 768px) {
+        body {
+          padding: 15px;
+        }
+
         .error-code {
-          font-size: 5rem;
+          font-size: 4rem;
         }
 
         h1 {
           font-size: 1.5rem;
         }
 
+        p {
+          font-size: 1rem;
+        }
+
         .error-message {
           padding: 30px 20px;
+        }
+
+        .btn-home {
+          padding: 10px 24px;
+          font-size: 0.95rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .error-code {
+          font-size: 3rem;
+        }
+
+        h1 {
+          font-size: 1.25rem;
         }
       }
     </style>
@@ -223,7 +252,7 @@
             ><span class="text">Hyperlane</span></a
           >
         </div>
-        <a href="/" class="btn-home">← Back to Home</a>
+        <a href="/" class="btn-home">Back to Home</a>
       </div>
     </div>
   </body>

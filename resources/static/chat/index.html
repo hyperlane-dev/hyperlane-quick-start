@@ -20,6 +20,12 @@
         user-select: none;
         -webkit-user-select: none;
         -moz-user-select: none;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+
+      *::-webkit-scrollbar {
+        display: none;
       }
 
       .btn-upload {
@@ -326,8 +332,8 @@
         margin: 0 8px;
         flex-shrink: 0;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15),
-          0 0 0 3px rgba(255, 255, 255, 0.8);
-        border: 2px solid rgba(255, 255, 255, 0.9);
+          0 0 0 1.5px rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.9);
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         transition: all 0.3s ease;
         position: relative;
@@ -341,16 +347,16 @@
       .message-avatar:hover {
         transform: scale(1.1);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25),
-          0 0 0 3px rgba(255, 255, 255, 0.9);
+          0 0 0 1.5px rgba(255, 255, 255, 0.9);
       }
 
       .message-avatar::before {
         content: '';
         position: absolute;
-        top: -2px;
-        left: -2px;
-        right: -2px;
-        bottom: -2px;
+        top: -1px;
+        left: -1px;
+        right: -1px;
+        bottom: -1px;
         border-radius: 50%;
         background: linear-gradient(
           135deg,
@@ -1137,7 +1143,7 @@
         margin-right: 12px;
         flex-shrink: 0;
         box-shadow: 0 2px 10px rgba(91, 33, 182, 0.4);
-        border: 2px solid rgba(255, 255, 255, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.5);
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         line-height: 1;
         text-align: center;
@@ -1180,13 +1186,13 @@
         background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%);
         font-size: 1.125rem;
         box-shadow: 0 3px 12px rgba(91, 33, 182, 0.5);
-        border: 2px solid rgba(255, 255, 255, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.6);
       }
 
       .user-avatar.other-user-avatar {
         background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%);
         box-shadow: 0 2px 10px rgba(91, 33, 182, 0.4);
-        border: 2px solid rgba(255, 255, 255, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.5);
       }
 
       .user-name.gpt-name {
@@ -1256,72 +1262,68 @@
         background: #adb5bd;
       }
 
-      @media (max-width: 600px) {
+      @media (max-width: 768px) {
         .nav-bar {
-          padding: 0 12px;
+          padding: 0 10px;
+          height: 44px;
+        }
+
+        .nav-logo {
+          width: 28px;
+          height: 28px;
+        }
+
+        .nav-title {
+          font-size: 0.9rem;
+        }
+
+        .connection-indicator {
+          font-size: 0.8rem;
         }
 
         .chat-messages {
-          padding: 8px;
+          padding: 10px;
+        }
+
+        .message-avatar {
+          width: 36px;
+          height: 36px;
+          font-size: 0.9rem;
+        }
+
+        .message-name {
+          font-size: 0.8rem;
+          max-width: 150px;
         }
 
         .message-content {
-          padding: 6px 10px;
+          padding: 8px 12px;
           font-size: 0.875rem;
         }
 
         .chat-input {
-          margin: 0 6px 8px;
-          padding: 0 6px;
-          min-height: 40px;
+          margin: 0 8px 10px;
+          padding: 0 8px;
+          min-height: 50px;
         }
 
         .chat-input textarea {
           min-width: 0;
-          padding: 6px 8px;
+          padding: 8px 10px;
+          font-size: 0.9rem;
         }
 
         .chat-input button {
-          padding: 4px 8px;
-          margin-left: 6px;
-          height: 26px;
-          background: #007bff !important;
-          box-shadow: none !important;
-          border-radius: 4px !important;
-          transform: none !important;
-          font-weight: 500 !important;
+          padding: 6px 12px;
+          margin-left: 8px;
+          height: 34px;
         }
 
-        .chat-input button::before {
-          display: none;
-        }
-
-        .chat-input button:hover:not(:disabled) {
-          background: #0056b3 !important;
-          box-shadow: none !important;
-          transform: none !important;
-        }
-
-        .chat-input button:active:not(:disabled) {
-          background: #004085 !important;
-          transform: none !important;
-          box-shadow: none !important;
-        }
-
-        .chat-input button:disabled {
-          background: #6c757d !important;
-          opacity: 0.5 !important;
-          box-shadow: none !important;
-          transform: none !important;
-        }
-
-        .send-icon {
-          font-size: 1.2em !important;
-          margin-left: 4px !important;
-        }
-
-        .chat-input button:hover:not(:disabled) .send-icon {
-          transform: none !important;
+        .scroll-to-bottom {
+          bottom: 70px;
+          right: 15px;
+          width: 44px;
+          height: 44px;
         }
 
         .mention-dropdown {
@@ -1330,11 +1332,64 @@
         }
 
         .upload-button {
-          margin-right: 6px;
+          margin-right: 8px;
           margin-left: 0;
+          width: 34px;
+          height: 34px;
+          padding: 0;
+        }
+
+        .upload-icon {
+          font-size: 18px;
+        }
+
+        .upload-status,
+        .toast {
+          min-width: 250px;
+          max-width: calc(100% - 40px);
+          top: 10px;
+          right: 10px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .nav-bar {
+          padding: 0 8px;
+        }
+
+        .nav-title {
+          font-size: 0.85rem;
+        }
+
+        .chat-messages {
+          padding: 8px;
+        }
+
+        .message-content {
+          padding: 6px 10px;
+          font-size: 0.85rem;
+        }
+
+        .chat-input {
+          margin: 0 6px 8px;
+          padding: 0 6px;
+          min-height: 44px;
+        }
+
+        .chat-input textarea {
+          padding: 6px 8px;
+          font-size: 0.85rem;
+        }
+
+        .chat-input button {
+          padding: 4px 10px;
+          margin-left: 6px;
+          height: 30px;
+        }
+
+        .upload-button {
           width: 30px;
           height: 30px;
-          padding: 0;
         }
 
         .upload-icon {
@@ -1761,8 +1816,27 @@
 
         const contentType = previewData.contentType.toLowerCase();
         const displayName = linkText || url.split('/').pop() || 'File';
+        const urlLower = url.toLowerCase();
 
-        if (contentType.startsWith('image/')) {
+        const isImage =
+          contentType.startsWith('image/') ||
+          /\.(jpg|jpeg|png|gif|bmp|webp|svg|ico)(\?.*)?$/i.test(urlLower);
+
+        const isVideo =
+          contentType.startsWith('video/') ||
+          /\.(mp4|webm|ogg|mov|avi|wmv|flv|mkv|m4v)(\?.*)?$/i.test(urlLower);
+
+        const isAudio =
+          contentType.startsWith('audio/') ||
+          /\.(mp3|wav|ogg|m4a|aac|flac|wma)(\?.*)?$/i.test(urlLower);
+
+        const isPDF = contentType.includes('pdf') || urlLower.endsWith('.pdf');
+
+        const isMarkdown =
+          contentType.includes('markdown') ||
+          /\.(md|markdown)(\?.*)?$/i.test(urlLower);
+
+        if (isImage) {
           const wrapper = document.createElement('div');
           wrapper.className = 'link-preview-image-wrapper';
 
@@ -1787,14 +1861,16 @@
 
           wrapper.appendChild(img);
           container.appendChild(wrapper);
-        } else if (contentType.startsWith('video/')) {
+        } else if (isVideo) {
           const video = document.createElement('video');
           video.className = 'link-preview-video';
           video.src = url;
           video.controls = true;
           video.preload = 'metadata';
+          video.style.maxWidth = '100%';
+          video.style.display = 'block';
           container.appendChild(video);
-        } else if (contentType.startsWith('audio/')) {
+        } else if (isAudio) {
           const audioWrapper = document.createElement('div');
           audioWrapper.className = 'link-preview-audio';
 
@@ -1805,7 +1881,7 @@
 
           audioWrapper.appendChild(audio);
           container.appendChild(audioWrapper);
-        } else if (contentType.includes('pdf')) {
+        } else if (isPDF) {
           const pdfPreview = document.createElement('div');
           pdfPreview.className = 'link-preview-pdf';
           pdfPreview.onclick = () => window.open(url, '_blank');
@@ -1830,7 +1906,7 @@
           pdfPreview.appendChild(icon);
           pdfPreview.appendChild(info);
           container.appendChild(pdfPreview);
-        } else if (contentType.includes('markdown') || url.endsWith('.md')) {
+        } else if (isMarkdown) {
           container.className += ' loading';
           container.innerHTML =
             '<div class="link-preview-spinner"></div> Loading markdown...';

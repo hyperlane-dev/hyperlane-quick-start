@@ -18,6 +18,12 @@
         -webkit-user-select: none;
         -moz-user-select: none;
         -ms-user-select: none;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+
+      *::-webkit-scrollbar {
+        display: none;
       }
 
       body {
@@ -516,21 +522,43 @@
       }
 
       @media (max-width: 768px) {
+        body {
+          padding: 10px;
+        }
+
         .container {
-          padding: 15px;
+          padding: 10px;
         }
 
         .header h1 {
-          font-size: 2.5rem;
+          font-size: 1.75rem;
+        }
+
+        .header .subtitle {
+          font-size: 1rem;
         }
 
         .system-overview {
           grid-template-columns: 1fr;
+          padding: 20px;
+          gap: 15px;
+        }
+
+        .system-info-item {
+          padding: 15px;
+        }
+
+        .system-info-value {
+          font-size: 1.5rem;
         }
 
         .metrics-grid {
           grid-template-columns: 1fr;
-          gap: 20px;
+          gap: 15px;
+        }
+
+        .metric-card {
+          padding: 20px;
         }
 
         .charts-grid {
@@ -544,29 +572,38 @@
         }
 
         .metric-value {
-          font-size: 2.5rem;
+          font-size: 2rem;
         }
 
         .connection-status {
-          top: 15px;
-          right: 15px;
-          padding: 12px 20px;
-          font-size: 0.9rem;
+          top: 10px;
+          right: 10px;
+          padding: 10px 16px;
+          font-size: 0.85rem;
         }
       }
 
       @media (max-width: 480px) {
         .header h1 {
-          font-size: 2rem;
+          font-size: 1.5rem;
           letter-spacing: 1px;
         }
 
         .metric-value {
-          font-size: 2rem;
+          font-size: 1.75rem;
         }
 
         .system-overview {
-          padding: 20px;
+          padding: 15px;
+        }
+
+        .system-info-value {
+          font-size: 1.25rem;
+        }
+
+        .chart-card {
+          height: 250px;
+          padding: 15px;
         }
 
         .system-info-value {

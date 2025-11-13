@@ -17,6 +17,12 @@
         -webkit-user-select: none;
         -moz-user-select: none;
         -ms-user-select: none;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+
+      *::-webkit-scrollbar {
+        display: none;
       }
 
       body {
@@ -561,6 +567,10 @@
         overflow-y: auto;
         position: relative;
         box-shadow: 0 8px 40px rgba(102, 126, 234, 0.3);
+        user-select: text !important;
+        -webkit-user-select: text !important;
+        -moz-user-select: text !important;
+        -ms-user-select: text !important;
       }
 
       .modal-content::before {
@@ -616,6 +626,10 @@
         color: #2c3e50;
         margin-bottom: 20px;
         font-weight: 600;
+        user-select: text !important;
+        -webkit-user-select: text !important;
+        -moz-user-select: text !important;
+        -ms-user-select: text !important;
       }
 
       .detail-section {
@@ -627,6 +641,10 @@
         font-weight: 600;
         margin-bottom: 10px;
         font-size: 0.9rem;
+        user-select: text !important;
+        -webkit-user-select: text !important;
+        -moz-user-select: text !important;
+        -ms-user-select: text !important;
       }
 
       .detail-value {
@@ -639,6 +657,10 @@
         word-break: break-all;
         box-shadow: inset 0 2px 4px rgba(102, 126, 234, 0.05);
         position: relative;
+        user-select: text !important;
+        -webkit-user-select: text !important;
+        -moz-user-select: text !important;
+        -ms-user-select: text !important;
       }
 
       .detail-value::before {
@@ -689,30 +711,86 @@
       }
 
       @media (max-width: 768px) {
+        body {
+          padding: 10px;
+        }
+
         .header h1 {
-          font-size: 2rem;
+          font-size: 1.75rem;
+        }
+
+        .header .subtitle {
+          font-size: 1rem;
+        }
+
+        .search-panel,
+        .results-panel {
+          padding: 20px;
         }
 
         .search-grid {
           grid-template-columns: 1fr;
+          gap: 15px;
         }
 
         .stats-panel {
           grid-template-columns: repeat(2, 1fr);
+          gap: 15px;
         }
 
         .table-container {
           font-size: 0.85rem;
+          overflow-x: auto;
         }
 
         th,
         td {
           padding: 10px 5px;
+          font-size: 0.85rem;
+        }
+
+        .pagination {
+          flex-wrap: wrap;
+          gap: 8px;
+        }
+
+        .page-btn {
+          padding: 6px 12px;
+          font-size: 0.85rem;
         }
 
         .modal-content {
           margin: 20px;
           max-width: calc(100% - 40px);
+          padding: 20px;
+        }
+
+        .detail-section {
+          margin-bottom: 15px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .header h1 {
+          font-size: 1.5rem;
+        }
+
+        .stats-panel {
+          grid-template-columns: 1fr;
+        }
+
+        .stat-value {
+          font-size: 1.5rem;
+        }
+
+        .table-container {
+          font-size: 0.8rem;
+        }
+
+        th,
+        td {
+          padding: 8px 4px;
+          font-size: 0.8rem;
         }
       }
     </style>
@@ -972,13 +1050,21 @@
 
           container.innerHTML = html;
 
+          setTimeout(() => {
+            const paginationEl = container.querySelector('.pagination');
+            if (paginationEl && totalPages > 1) {
+              paginationEl.style.display = 'flex';
+            }
+          }, 100);
+
           this.cachedRecords = data.records;
         }
 
         renderPagination(currentPage, totalPages) {
-          if (totalPages <= 1) return '';
+          if (totalPages <= 1)
+            return '<div class="pagination" style="display: none;"></div>';
 
-          let html = '<div class="pagination">';
+          let html = '<div class="pagination" style="display: none;">';
 
           html += `
             <button class="page-btn" ${currentPage === 1 ? 'disabled' : ''} 

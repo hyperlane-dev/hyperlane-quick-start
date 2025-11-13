@@ -1,697 +1,762 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hyperlane - RSS Feed Reader</title>
-  <link rel="icon" href="https://docs.ltpp.vip/img/hyperlane.png" />
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      user-select: none;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-    }
-
-    .feed-item h3,
-    .feed-item h3 a {
-      user-select: text !important;
-      -webkit-user-select: text !important;
-      -moz-user-select: text !important;
-      -ms-user-select: text !important;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
-        sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      padding: 20px;
-    }
-
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    .header {
-      text-align: center;
-      color: white;
-      margin-bottom: 40px;
-      animation: fadeInDown 0.6s ease;
-    }
-
-    .header h1 {
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin-bottom: 10px;
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    }
-
-    .header h1 a {
-      position: relative;
-      display: inline-block;
-      text-decoration: none;
-    }
-
-    .header h1 a .icon {
-      display: inline-block;
-      margin-right: 8px;
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-      background: none !important;
-      -webkit-background-clip: unset !important;
-      -webkit-text-fill-color: unset !important;
-      background-clip: unset !important;
-      color: inherit;
-    }
-
-    .header h1 a .text {
-      background: linear-gradient(90deg, #fff, #ffd700, #fff, #ffd700);
-      background-size: 200% auto;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: shimmer 3s linear infinite;
-    }
-
-    .header h1 a::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      bottom: -2px;
-      width: 0;
-      height: 2px;
-      background: linear-gradient(90deg, #ffd700, #fff, #ffd700);
-      transition: width 0.4s ease;
-    }
-
-    .header h1 a:hover::after {
-      width: 100%;
-    }
-
-    @keyframes shimmer {
-      0% {
-        background-position: 0% center;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hyperlane - RSS Feed Reader</title>
+    <link rel="icon" href="https://docs.ltpp.vip/img/hyperlane.png" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
       }
 
-      100% {
-        background-position: 200% center;
-      }
-    }
-
-    .header p {
-      font-size: 1.1rem;
-      opacity: 0.95;
-    }
-
-    .loading {
-      text-align: center;
-      color: white;
-      font-size: 1.2rem;
-      padding: 40px;
-    }
-
-    .spinner {
-      border: 3px solid rgba(255, 255, 255, 0.3);
-      border-top: 3px solid white;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 20px;
-    }
-
-    .feed-items {
-      display: grid;
-      gap: 20px;
-      margin-bottom: 20px;
-    }
-
-    .feed-item {
-      background: white;
-      border-radius: 12px;
-      padding: 24px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      transition: all 0.3s ease;
-      animation: fadeInUp 0.6s ease both;
-    }
-
-    .feed-item:last-child {
-      margin-bottom: 0;
-    }
-
-    .feed-item:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-    }
-
-    .feed-item h3 {
-      color: #2c3e50;
-      font-size: 1.3rem;
-      margin-bottom: 12px;
-      word-break: break-word;
-    }
-
-    .feed-item h3 a {
-      color: #007bff;
-      text-decoration: none;
-      transition: color 0.3s ease;
-    }
-
-    .feed-item h3 a:hover {
-      color: #0056b3;
-    }
-
-    .feed-meta {
-      display: flex;
-      gap: 20px;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
-    }
-
-    .meta-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: #6c757d;
-      font-size: 0.9rem;
-    }
-
-    .meta-icon {
-      font-size: 1rem;
-    }
-
-    .feed-description {
-      color: #495057;
-      line-height: 1.6;
-      margin-bottom: 16px;
-    }
-
-    .file-preview {
-      background: #f8f9fa;
-      border: 1px solid #dee2e6;
-      border-radius: 8px;
-      padding: 12px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .file-icon {
-      width: 48px;
-      height: 48px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 1.5rem;
-      flex-shrink: 0;
-    }
-
-    .file-details {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .file-name {
-      font-weight: 600;
-      color: #2c3e50;
-      margin-bottom: 4px;
-      word-break: break-all;
-    }
-
-    .file-size {
-      color: #6c757d;
-      font-size: 0.85rem;
-    }
-
-    .download-btn {
-      background: #28a745;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-      text-decoration: none;
-      display: inline-block;
-      transition: all 0.3s ease;
-    }
-
-    .download-btn:hover {
-      background: #218838;
-      transform: translateY(-1px);
-    }
-
-    .empty-state {
-      text-align: center;
-      color: white;
-      padding: 60px 20px;
-      animation: fadeIn 0.6s ease;
-    }
-
-    .empty-state h2 {
-      font-size: 2rem;
-      margin-bottom: 10px;
-    }
-
-    .empty-state p {
-      font-size: 1.1rem;
-      opacity: 0.9;
-    }
-
-    .error-message {
-      background: #fff3cd;
-      border: 1px solid #ffc107;
-      border-radius: 8px;
-      padding: 16px;
-      color: #856404;
-      text-align: center;
-      animation: fadeIn 0.6s ease;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
+      *::-webkit-scrollbar {
+        display: none;
       }
 
-      to {
-        opacity: 1;
-      }
-    }
-
-    @keyframes fadeInDown {
-      from {
-        opacity: 0;
-        transform: translateY(-20px);
+      .feed-item h3,
+      .feed-item h3 a {
+        user-select: text !important;
+        -webkit-user-select: text !important;
+        -moz-user-select: text !important;
+        -ms-user-select: text !important;
       }
 
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+          sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
       }
 
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes spin {
-      0% {
-        transform: rotate(0deg);
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
       }
 
-      100% {
-        transform: rotate(360deg);
+      .header {
+        text-align: center;
+        color: white;
+        margin-bottom: 40px;
+        animation: fadeInDown 0.6s ease;
       }
-    }
 
-    .pagination {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 12px;
-      margin-top: 40px;
-      animation: fadeIn 0.6s ease;
-    }
-
-    .pagination-btn {
-      background: white;
-      color: #667eea;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 0.95rem;
-      transition: all 0.3s ease;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .pagination-btn:hover:not(:disabled) {
-      background: #667eea;
-      color: white;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    .pagination-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .pagination-info {
-      color: white;
-      font-weight: 600;
-      font-size: 1rem;
-      padding: 0 12px;
-    }
-
-    .page-size-selector {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: white;
-      font-weight: 600;
-    }
-
-    .page-size-selector select {
-      background: white;
-      color: #667eea;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 0.95rem;
-      outline: none;
-    }
-
-    @media (max-width: 768px) {
       .header h1 {
-        font-size: 2rem;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      .header h1 a {
+        position: relative;
+        display: inline-block;
+        text-decoration: none;
+      }
+
+      .header h1 a .icon {
+        display: inline-block;
+        margin-right: 8px;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        background: none !important;
+        -webkit-background-clip: unset !important;
+        -webkit-text-fill-color: unset !important;
+        background-clip: unset !important;
+        color: inherit;
+      }
+
+      .header h1 a .text {
+        background: linear-gradient(90deg, #fff, #ffd700, #fff, #ffd700);
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: shimmer 3s linear infinite;
+      }
+
+      .header h1 a::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -2px;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #ffd700, #fff, #ffd700);
+        transition: width 0.4s ease;
+      }
+
+      .header h1 a:hover::after {
+        width: 100%;
+      }
+
+      @keyframes shimmer {
+        0% {
+          background-position: 0% center;
+        }
+
+        100% {
+          background-position: 200% center;
+        }
+      }
+
+      .header p {
+        font-size: 1.1rem;
+        opacity: 0.95;
+      }
+
+      .loading {
+        text-align: center;
+        color: white;
+        font-size: 1.2rem;
+        padding: 40px;
+      }
+
+      .spinner {
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top: 3px solid white;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+      }
+
+      .feed-items {
+        display: grid;
+        gap: 20px;
+        margin-bottom: 20px;
       }
 
       .feed-item {
-        padding: 16px;
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.6s ease both;
+      }
+
+      .feed-item:last-child {
+        margin-bottom: 0;
+      }
+
+      .feed-item:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+      }
+
+      .feed-item h3 {
+        color: #2c3e50;
+        font-size: 1.3rem;
+        margin-bottom: 12px;
+        word-break: break-word;
+      }
+
+      .feed-item h3 a {
+        color: #007bff;
+        text-decoration: none;
+        transition: color 0.3s ease;
+      }
+
+      .feed-item h3 a:hover {
+        color: #0056b3;
       }
 
       .feed-meta {
-        flex-direction: column;
-        gap: 8px;
+        display: flex;
+        gap: 20px;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+      }
+
+      .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: #6c757d;
+        font-size: 0.9rem;
+      }
+
+      .meta-icon {
+        font-size: 1rem;
+      }
+
+      .feed-description {
+        color: #495057;
+        line-height: 1.6;
+        margin-bottom: 16px;
       }
 
       .file-preview {
-        flex-direction: column;
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 12px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .file-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+      }
+
+      .file-details {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .file-name {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 4px;
+        word-break: break-all;
+      }
+
+      .file-size {
+        color: #6c757d;
+        font-size: 0.85rem;
+      }
+
+      .download-btn {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+      }
+
+      .download-btn:hover {
+        background: #218838;
+        transform: translateY(-1px);
+      }
+
+      .empty-state {
         text-align: center;
+        color: white;
+        padding: 60px 20px;
+        animation: fadeIn 0.6s ease;
+      }
+
+      .empty-state h2 {
+        font-size: 2rem;
+        margin-bottom: 10px;
+      }
+
+      .empty-state p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+      }
+
+      .error-message {
+        background: #fff3cd;
+        border: 1px solid #ffc107;
+        border-radius: 8px;
+        padding: 16px;
+        color: #856404;
+        text-align: center;
+        animation: fadeIn 0.6s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes fadeInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+
+        100% {
+          transform: rotate(360deg);
+        }
       }
 
       .pagination {
-        flex-wrap: wrap;
-        gap: 8px;
-      }
-
-      .page-size-selector {
-        width: 100%;
+        display: flex;
         justify-content: center;
-        order: -1;
+        align-items: center;
+        gap: 12px;
+        margin-top: 40px;
+        animation: fadeIn 0.6s ease;
       }
 
       .pagination-btn {
-        padding: 8px 16px;
-        font-size: 0.9rem;
+        background: white;
+        color: #667eea;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .pagination-btn:hover:not(:disabled) {
+        background: #667eea;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .pagination-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
       }
 
       .pagination-info {
-        font-size: 0.9rem;
+        color: white;
+        font-weight: 600;
+        font-size: 1rem;
+        padding: 0 12px;
       }
-    }
-  </style>
-</head>
 
-<body>
-  <div class="container">
-    <div class="header">
-      <h1><a href="https://github.com/hyperlane-dev/hyperlane" target="_blank"
-          style="color: inherit; text-decoration: none;"><span class="icon">📡</span><span class="text">Hyperlane RSS
-            Feed Reader</span></a></h1>
-      <p><a href="/upload" target="_blank"
-          style="color: white; text-decoration: none; border-bottom: 2px solid rgba(255,255,255,0.5); transition: border-color 0.3s;"
-          onmouseover="this.style.borderColor='white'"
-          onmouseout="this.style.borderColor='rgba(255,255,255,0.5)'">Subscribe to the latest uploaded resources</a></p>
-    </div>
+      .page-size-selector {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: white;
+        font-weight: 600;
+      }
 
-    <div id="loading" class="loading">
-      <div class="spinner"></div>
-      <p>Loading feed...</p>
-    </div>
+      .page-size-selector select {
+        background: white;
+        color: #667eea;
+        border: none;
+        padding: 8px 32px 8px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.95rem;
+        outline: none;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23667eea' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 16px;
+      }
 
-    <div id="error" style="display: none"></div>
-    <div id="emptyState" style="display: none"></div>
-    <div id="feedItems" class=n-btn" id="prevBtn" onclick="previousPage()">Previous</button>
-      <span class="pagination-info" id="pageInfo">Page 1</span>
-      <button class="pagination-btn" id="nextBtn" onclick="nextPage()">Next</button>
-      <div class="page-size-selector">
-        <label>Items per page:</label>
-        <select id="pageSize" onchange="changePageSize()">
-          <option value="10">10</option>
-          <option value="20" selected>20</option>
-          <option value="50">50</option>
-          <option value="100">100</option>
-        </select>
+      @media (max-width: 768px) {
+        body {
+          padding: 15px;
+        }
+
+        .header h1 {
+          font-size: 1.75rem;
+        }
+
+        .header p {
+          font-size: 1rem;
+        }
+
+        .feed-item {
+          padding: 16px;
+        }
+
+        .feed-item h3 {
+          font-size: 1.1rem;
+        }
+
+        .feed-meta {
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .file-preview {
+          flex-direction: column;
+          text-align: center;
+        }
+
+        .pagination {
+          flex-wrap: wrap;
+          gap: 8px;
+          padding: 0 10px;
+        }
+
+        .page-size-selector {
+          width: 100%;
+          justify-content: center;
+          order: -1;
+          margin-bottom: 10px;
+        }
+
+        .pagination-btn {
+          padding: 8px 16px;
+          font-size: 0.9rem;
+        }
+
+        .pagination-info {
+          font-size: 0.9rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .header h1 {
+          font-size: 1.5rem;
+        }
+
+        .feed-item h3 {
+          font-size: 1rem;
+        }
+
+        .pagination-btn {
+          padding: 6px 12px;
+          font-size: 0.85rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>
+          <a
+            href="https://github.com/hyperlane-dev/hyperlane"
+            target="_blank"
+            style="color: inherit; text-decoration: none"
+            ><span class="icon">📡</span
+            ><span class="text">Hyperlane RSS Feed Reader</span></a
+          >
+        </h1>
+        <p>
+          <a
+            href="/upload"
+            target="_blank"
+            style="
+              color: white;
+              text-decoration: none;
+              border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+              transition: border-color 0.3s;
+            "
+            onmouseover="this.style.borderColor='white'"
+            onmouseout="this.style.borderColor='rgba(255,255,255,0.5)'"
+            >Subscribe to the latest uploaded resources</a
+          >
+        </p>
       </div>
-      <button class="pagination-btn" id="prevBtn" onclick="previousPage()">← Previous</button>
-      <span class="pagination-info" id="pageInfo">Page 1</span>
-      <button class="pagination-btn" id="nextBtn" onclick="nextPage()">Next →</button>
+
+      <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Loading feed...</p>
+      </div>
+
+      <div id="error" style="display: none"></div>
+      <div id="emptyState" style="display: none"></div>
+      <div id="feedItems" class="feed-items"></div>
+
+      <div class="pagination" id="pagination" style="display: none">
+        <div class="page-size-selector">
+          <label>Items per page:</label>
+          <select id="pageSize" onchange="changePageSize()">
+            <option value="10">10</option>
+            <option value="20" selected>20</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+        <button class="pagination-btn" id="prevBtn" onclick="previousPage()">
+          Previous
+        </button>
+        <span class="pagination-info" id="pageInfo">Page 1</span>
+        <button class="pagination-btn" id="nextBtn" onclick="nextPage()">
+          Next
+        </button>
+      </div>
     </div>
-  </div>
 
-  <script>
-    let currentPage = 1;
-    let pageSize = 20;
-    let totalItems = 0;
-    let hasMoreItems = true;
+    <script>
+      let currentPage = 1;
+      let pageSize = 20;
+      let totalItems = 0;
+      let hasMoreItems = true;
 
-    const feedUrl = `${window.location.protocol}//${window.location.host}/api/rss/feed`;
+      const feedUrl = `${window.location.protocol}//${window.location.host}/api/rss/feed`;
 
-    async function loadFeed (page = 1) {
-      try {
-        document.getElementById('loading').style.display = 'block';
-        document.getElementById('error').style.display = 'none';
-        document.getElementById('emptyState').style.display = 'none';
+      async function loadFeed(page = 1) {
+        try {
+          document.getElementById('loading').style.display = 'block';
+          document.getElementById('error').style.display = 'none';
+          document.getElementById('emptyState').style.display = 'none';
 
-        const offset = (page - 1) * pageSize;
-        const url = `${feedUrl}?limit=${pageSize + 1}&offset=${offset}`;
+          const offset = (page - 1) * pageSize;
+          const url = `${feedUrl}?limit=${pageSize + 1}&offset=${offset}`;
 
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error('Failed to load RSS feed');
+          const response = await fetch(url);
+          if (!response.ok) {
+            throw new Error('Failed to load RSS feed');
+          }
+
+          const xmlText = await response.text();
+          const parser = new DOMParser();
+          const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+
+          const parseError = xmlDoc.querySelector('parsererror');
+          if (parseError) {
+            throw new Error('Invalid RSS feed format');
+          }
+
+          displayFeed(xmlDoc, page);
+        } catch (error) {
+          showError(error.message);
+        } finally {
+          document.getElementById('loading').style.display = 'none';
         }
-
-        const xmlText = await response.text();
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
-
-        const parseError = xmlDoc.querySelector('parsererror');
-        if (parseError) {
-          throw new Error('Invalid RSS feed format');
-        }
-
-        displayFeed(xmlDoc, page);
-      } catch (error) {
-        showError(error.message);
-      } finally {
-        document.getElementById('loading').style.display = 'none';
-      }
-    }
-
-    function displayFeed (xmlDoc, page) {
-      const channel = xmlDoc.querySelector('channel');
-      if (!channel) {
-        showError('Invalid RSS feed structure');
-        return;
       }
 
-      let items = Array.from(channel.querySelectorAll('item'));
+      function displayFeed(xmlDoc, page) {
+        const channel = xmlDoc.querySelector('channel');
+        if (!channel) {
+          showError('Invalid RSS feed structure');
+          return;
+        }
 
-      if (items.length === 0 && page === 1) {
-        showEmptyState();
+        let items = Array.from(channel.querySelectorAll('item'));
+
+        if (items.length === 0 && page === 1) {
+          showEmptyState();
+          const pagination = document.getElementById('pagination');
+          if (pagination) pagination.style.display = 'none';
+          return;
+        }
+
+        hasMoreItems = items.length > pageSize;
+        if (hasMoreItems) {
+          items = items.slice(0, pageSize);
+        }
+
+        const feedItemsContainer = document.getElementById('feedItems');
+        if (!feedItemsContainer) return;
+
+        feedItemsContainer.innerHTML = '';
+
+        items.forEach((item, index) => {
+          const itemElement = createFeedItem(item, index);
+          feedItemsContainer.appendChild(itemElement);
+        });
+
+        updatePagination(page);
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      function updatePagination(page) {
+        currentPage = page;
+        const pageInfo = document.getElementById('pageInfo');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
         const pagination = document.getElementById('pagination');
-        if (pagination) pagination.style.display = 'none';
-        return;
+
+        if (pageInfo) pageInfo.textContent = `Page ${page}`;
+        if (prevBtn) prevBtn.disabled = page === 1;
+        if (nextBtn) nextBtn.disabled = !hasMoreItems;
+        if (pagination) pagination.style.display = 'flex';
       }
 
-      hasMoreItems = items.length > pageSize;
-      if (hasMoreItems) {
-        items = items.slice(0, pageSize);
+      function previousPage() {
+        if (currentPage > 1) {
+          loadFeed(currentPage - 1);
+        }
       }
 
-      const feedItemsContainer = document.getElementById('feedItems');
-      if (!feedItemsContainer) return;
-
-      feedItemsContainer.innerHTML = '';
-
-      items.forEach((item, index) => {
-        const itemElement = createFeedItem(item, index);
-        feedItemsContainer.appendChild(itemElement);
-      });
-
-      updatePagination(page);
-
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function updatePagination (page) {
-      currentPage = page;
-      const pageInfo = document.getElementById('pageInfo');
-      const prevBtn = document.getElementById('prevBtn');
-      const nextBtn = document.getElementById('nextBtn');
-      const pagination = document.getElementById('pagination');
-
-      if (pageInfo) pageInfo.textContent = `Page ${page}`;
-      if (prevBtn) prevBtn.disabled = page === 1;
-      if (nextBtn) nextBtn.disabled = !hasMoreItems;
-      if (pagination) pagination.style.display = 'flex';
-    }
-
-    function previousPage () {
-      if (currentPage > 1) {
-        loadFeed(currentPage - 1);
+      function nextPage() {
+        if (hasMoreItems) {
+          loadFeed(currentPage + 1);
+        }
       }
-    }
 
-    function nextPage () {
-      if (hasMoreItems) {
-        loadFeed(currentPage + 1);
+      function changePageSize() {
+        pageSize = parseInt(document.getElementById('pageSize').value);
+        loadFeed(1);
       }
-    }
 
-    function changePageSize () {
-      pageSize = parseInt(document.getElementById('pageSize').value);
-      loadFeed(1);
-    }
+      function createFeedItem(item, index) {
+        const title = item.querySelector('title')?.textContent || 'Untitled';
+        const link = item.querySelector('link')?.textContent || '#';
+        const description =
+          item.querySelector('description')?.textContent || '';
+        const pubDate = item.querySelector('pubDate')?.textContent || '';
+        const enclosure = item.querySelector('enclosure');
 
-    function createFeedItem (item, index) {
-      const title = item.querySelector('title')?.textContent || 'Untitled';
-      const link = item.querySelector('link')?.textContent || '#';
-      const description =
-        item.querySelector('description')?.textContent || '';
-      const pubDate = item.querySelector('pubDate')?.textContent || '';
-      const enclosure = item.querySelector('enclosure');
+        const div = document.createElement('div');
+        div.className = 'feed-item';
+        div.style.animationDelay = `${index * 0.1}s`;
 
-      const div = document.createElement('div');
-      div.className = 'feed-item';
-      div.style.animationDelay = `${index * 0.1}s`;
+        const fileSize = enclosure
+          ? formatFileSize(parseInt(enclosure.getAttribute('length') || '0'))
+          : '';
+        const fileType = enclosure ? enclosure.getAttribute('type') || '' : '';
+        const fileIcon = getFileIcon(fileType);
 
-      const fileSize = enclosure
-        ? formatFileSize(parseInt(enclosure.getAttribute('length') || '0'))
-        : '';
-      const fileType = enclosure ? enclosure.getAttribute('type') || '' : '';
-      const fileIcon = getFileIcon(fileType);
-
-      div.innerHTML = `
+        div.innerHTML = `
                 <h3><a href="${escapeHtml(link)}" target="_blank">${escapeHtml(
-        title
-      )}</a></h3>
+          title
+        )}</a></h3>
                 <div class="feed-meta">
-                    ${pubDate
-          ? `<div class="meta-item"><span class="meta-icon">📅</span>${escapeHtml(
-            pubDate
-          )}</div>`
-          : ''
-        }
-                    ${fileSize
-          ? `<div class="meta-item"><span class="meta-icon">📦</span>${fileSize}</div>`
-          : ''
-        }
-                    ${fileType
-          ? `<div class="meta-item"><span class="meta-icon">📄</span>${getFileTypeName(
-            fileType
-          )}</div>`
-          : ''
-        }
+                    ${
+                      pubDate
+                        ? `<div class="meta-item"><span class="meta-icon">📅</span>${escapeHtml(
+                            pubDate
+                          )}</div>`
+                        : ''
+                    }
+                    ${
+                      fileSize
+                        ? `<div class="meta-item"><span class="meta-icon">📦</span>${fileSize}</div>`
+                        : ''
+                    }
+                    ${
+                      fileType
+                        ? `<div class="meta-item"><span class="meta-icon">📄</span>${getFileTypeName(
+                            fileType
+                          )}</div>`
+                        : ''
+                    }
                 </div>
                 <div class="feed-description">${escapeHtml(description)}</div>
-                ${enclosure
-          ? `
+                ${
+                  enclosure
+                    ? `
                 <div class="file-preview">
                     <div class="file-icon">${fileIcon}</div>
                     <div class="file-details">
                         <div class="file-name">${escapeHtml(title)}</div>
                         <div class="file-size">${fileSize} • ${getFileTypeName(
-            fileType
-          )}</div>
+                        fileType
+                      )}</div>
                     </div>
                     <a href="${escapeHtml(
-            link
-          )}" class="download-btn" download="${escapeHtml(
-            title
-          )}">Download</a>
+                      link
+                    )}" class="download-btn" download="${escapeHtml(
+                        title
+                      )}">Download</a>
                 </div>
                 `
-          : ''
-        }
+                    : ''
+                }
             `;
 
-      return div;
-    }
-
-    function getFileIcon (mimeType) {
-      if (mimeType.startsWith('image/')) return '🖼️';
-      if (mimeType.startsWith('video/')) return '🎬';
-      if (mimeType.startsWith('audio/')) return '🎵';
-      if (mimeType.includes('pdf')) return '📕';
-      if (mimeType.includes('zip') || mimeType.includes('compressed'))
-        return '🗜️';
-      if (mimeType.includes('text')) return '📝';
-      return '📄';
-    }
-
-    function getFileTypeName (mimeType) {
-      const types = {
-        'image/': 'Image',
-        'video/': 'Video',
-        'audio/': 'Audio',
-        'application/pdf': 'PDF',
-        'application/zip': 'Archive',
-        'text/': 'Text',
-      };
-
-      for (const [key, value] of Object.entries(types)) {
-        if (mimeType.includes(key)) return value;
+        return div;
       }
 
-      return mimeType.split('/')[1]?.toUpperCase() || 'File';
-    }
+      function getFileIcon(mimeType) {
+        if (mimeType.startsWith('image/')) return '🖼️';
+        if (mimeType.startsWith('video/')) return '🎬';
+        if (mimeType.startsWith('audio/')) return '🎵';
+        if (mimeType.includes('pdf')) return '📕';
+        if (mimeType.includes('zip') || mimeType.includes('compressed'))
+          return '🗜️';
+        if (mimeType.includes('text')) return '📝';
+        return '📄';
+      }
 
-    function formatFileSize (bytes) {
-      if (bytes === 0) return '0 Bytes';
-      const k = 1024;
-      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-      const i = Math.floor(Math.log(bytes) / Math.log(k));
-      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-    }
+      function getFileTypeName(mimeType) {
+        const types = {
+          'image/': 'Image',
+          'video/': 'Video',
+          'audio/': 'Audio',
+          'application/pdf': 'PDF',
+          'application/zip': 'Archive',
+          'text/': 'Text',
+        };
 
-    function escapeHtml (text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    }
+        for (const [key, value] of Object.entries(types)) {
+          if (mimeType.includes(key)) return value;
+        }
 
-    function showError (message) {
-      const errorDiv = document.getElementById('error');
-      errorDiv.className = 'error-message';
-      errorDiv.innerHTML = `<strong>Error:</strong> ${escapeHtml(message)}`;
-      errorDiv.style.display = 'block';
-    }
+        return mimeType.split('/')[1]?.toUpperCase() || 'File';
+      }
 
-    function showEmptyState () {
-      const emptyDiv = document.getElementById('emptyState');
-      emptyDiv.className = 'empty-state';
-      emptyDiv.innerHTML = `
+      function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      function showError(message) {
+        const errorDiv = document.getElementById('error');
+        errorDiv.className = 'error-message';
+        errorDiv.innerHTML = `<strong>Error:</strong> ${escapeHtml(message)}`;
+        errorDiv.style.display = 'block';
+      }
+
+      function showEmptyState() {
+        const emptyDiv = document.getElementById('emptyState');
+        emptyDiv.className = 'empty-state';
+        emptyDiv.innerHTML = `
                 <h2>📭 No Items Yet</h2>
                 <p>There are no items in this feed. Check back later!</p>
             `;
-      emptyDiv.style.display = 'block';
-    }
+        emptyDiv.style.display = 'block';
+      }
 
-    loadFeed(1);
-  </script>
-</body>
-
+      loadFeed(1);
+    </script>
+  </body>
 </html>

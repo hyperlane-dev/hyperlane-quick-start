@@ -2,17 +2,44 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes"
+    />
     <title>Hyperlane</title>
     <style>
+      * {
+        box-sizing: border-box;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+
+      *::-webkit-scrollbar {
+        display: none;
+      }
+
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+          sans-serif;
+      }
+
       .center-text {
         text-align: center;
       }
+
+      h1 {
+        font-size: clamp(1.5rem, 5vw, 2.5rem);
+        word-wrap: break-word;
+      }
+
       a {
         color: #1e90ff;
         text-decoration: none;
         transition: color 0.3s, border-bottom-color 0.3s;
       }
+
       a:hover,
       a:focus {
         color: pink;
@@ -20,8 +47,15 @@
         outline: none;
         cursor: pointer;
       }
+
+      @media (max-width: 768px) {
+        body {
+          padding: 15px;
+        }
+      }
     </style>
   </head>
+
   <body>
     <h1 class="center-text">Hello hyperlane: {{ time }}</h1>
     <hr />
