@@ -1417,7 +1417,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "8.6.3"
+version = "8.7.0"
 dependencies = [
  "hyperlane_init",
 ]
@@ -3771,6 +3771,23 @@ dependencies = [
 ]
 
 [[package]]
+<<<<<<< HEAD
+=======
+name = "wasm-bindgen-backend"
+version = "0.2.104"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "671c9a5a66f49d8a47345ab942e2cb93c7d1d0339065d4f8139c486121b43b19"
+dependencies = [
+ "bumpalo",
+ "log",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.111",
+ "wasm-bindgen-shared",
+]
+
+[[package]]
+>>>>>>> master
 name = "wasm-bindgen-macro"
 version = "0.2.105"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3790,6 +3807,10 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.111",
+<<<<<<< HEAD
+=======
+ "wasm-bindgen-backend",
+>>>>>>> master
  "wasm-bindgen-shared",
 ]
 
