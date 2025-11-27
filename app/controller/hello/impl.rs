@@ -9,7 +9,7 @@ impl ServerHook for HelloRoute {
         methods(get, post),
         route_param(NAME_KEY => name_opt),
         request_cookie("time" => time_opt),
-        response_body(format!("Hello {} ! The time is {}.", name_opt.unwrap_or_default(), time_opt.unwrap_or_default()))
+        response_body(format!("Hello {} ! The time is {}.", name_opt.unwrap_or_default(), time_opt.unwrap_or(time())))
     )]
     #[epilogue_macros(response_header(SET_COOKIE => cookie_value))]
     async fn handle(self, ctx: &Context) {
