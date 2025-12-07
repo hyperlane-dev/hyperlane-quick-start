@@ -1,11 +1,11 @@
 use super::*;
 
 #[cfg(debug_assertions)]
-pub const SERVER_PORT: usize = 80;
+pub const SERVER_PORT: usize = DEFAULT_WEB_PORT;
 #[cfg(not(debug_assertions))]
 pub const SERVER_PORT: usize = 65002;
-pub const SERVER_HOST: &str = "0.0.0.0";
-pub const SERVER_BUFFER: usize = 4096;
+pub const SERVER_HOST: &str = DEFAULT_HOST;
+pub const SERVER_BUFFER: usize = DEFAULT_BUFFER_SIZE;
 pub const SERVER_LOG_SIZE: usize = 100_024_000;
 pub const SERVER_LOG_DIR: &str = "/shell/logs";
 pub const SERVER_LOG_LEVEL: [&str; 3] = ["info", "warn", "error"];
