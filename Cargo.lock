@@ -1462,7 +1462,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "8.8.2"
+version = "8.8.3"
 dependencies = [
  "hyperlane_init",
 ]
