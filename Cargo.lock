@@ -583,9 +583,9 @@ dependencies = [
 
 [[package]]
 name = "chunkify"
-version = "0.6.37"
+version = "0.6.38"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "90064e0892b845e0abbb2ba146a5ae3dbdf7bd7dc155ea419bfd498de0109e29"
+checksum = "bf29fedf09305ea978561e4e37848690d386f7e0c611496901c629d4f3656e5e"
 dependencies = [
  "dashmap",
  "file-operation",
@@ -1404,9 +1404,9 @@ checksum = "df3b46402a9d5adb4c86a0cf463f42e19994e3ee891101b1841f30a545cb49a9"
 
 [[package]]
 name = "hyperlane"
-version = "10.14.3"
+version = "10.14.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "08f9d04168827967202475d6e170545049d06f2952a13c5eb274d7afbc564a52"
+checksum = "fb3dc2f795efca082ba002d06e839ae61643513adc7273c24840e5a71063b743"
 dependencies = [
  "aho-corasick",
  "http-type",
@@ -1440,9 +1440,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-macros"
-version = "10.6.16"
+version = "10.6.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f0e74e2978e670f19db1d849d5dd807000787f36f4d8bb627cd17e5c36b4fb0b"
+checksum = "afb3eedf6ef78f6bb981a9976a70608f53455658943049cf5eb556132c1b53e0"
 dependencies = [
  "inventory",
  "proc-macro2",
@@ -1452,9 +1452,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-plugin-websocket"
-version = "3.1.20"
+version = "3.1.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0a8e66760f81b10cbaa949457ba247ca3ade6d03dbfda63f4ab2ef1b85075dbf"
+checksum = "77c81a8994e8a7392a2acc02a40c2059cae106f2902f35d9fd3f8e5ea8862290"
 dependencies = [
  "hyperlane",
  "hyperlane-broadcast",
@@ -1462,7 +1462,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "8.8.1"
+version = "8.8.2"
 dependencies = [
  "hyperlane_init",
 ]
@@ -1475,9 +1475,9 @@ checksum = "61e7c68e8542d8172d0dbcc071e13a3be02328b97d9adec8d0f5e9007b17a02c"
 
 [[package]]
 name = "hyperlane-utils"
-version = "12.8.2"
+version = "12.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ba18078fae5348e7c37f3017c08d14af95899470e11359c38e1d36540ab13521"
+checksum = "8504d50c808e4c5479757079506861280fcd18539cc353701bd9307993307ab2"
 dependencies = [
  "ahash 0.8.12",
  "bin-encode-decode",
