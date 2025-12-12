@@ -52,7 +52,7 @@ where
         "start" => start_server().await,
         "stop" => stop_server().await,
         "restart" => restart_server().await,
-        "hot" => hot_restart_server().await,
+        "hot-restart" => hot_restart_server().await,
         _ => {
             println_error!("Invalid command: {command}");
         }
