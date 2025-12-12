@@ -16,13 +16,13 @@
 
 > 这是一个轻量级、高性能且跨平台的 Rust HTTP 服务器库，基于 Tokio 构建。它通过提供中间件、WebSocket、服务器推送事件(SSE)和原始 TCP 通信的内置支持，简化了现代 Web 服务的开发。凭借在 Windows、Linux 和 macOS 上统一且符合人体工程学的 API，它使开发者能够以最小的开销和最大的灵活性构建强大、可扩展且事件驱动的网络应用程序。
 
-## API 文档
-
-- [API 文档](https://docs.rs/hyperlane/latest/hyperlane/)
-
 ## 官方文档
 
 - [官方文档](https://docs.ltpp.vip/hyperlane/)
+
+## API 文档
+
+- [API 文档](https://docs.rs/hyperlane/latest/hyperlane/)
 
 ## 运行
 
@@ -30,6 +30,12 @@
 
 ```sh
 cargo run
+```
+
+### 热重启
+
+```sh
+cargo run hot-restart
 ```
 
 ### 在后台运行
