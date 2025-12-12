@@ -1,5 +1,7 @@
 use super::*;
 
+impl ActiveModelBehavior for ActiveModel {}
+
 impl ChatHistoryMapper {
     pub async fn insert_message(
         session_id: &str,

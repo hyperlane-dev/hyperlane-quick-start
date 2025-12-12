@@ -14,8 +14,3 @@ pub struct Model {
     pub content: String,
     pub created_at: Option<chrono::NaiveDateTime>,
 }
-
-#[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
-pub enum Relation {}
-
-impl ActiveModelBehavior for ActiveModel {}

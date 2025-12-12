@@ -1,5 +1,7 @@
 use super::*;
 
+impl ActiveModelBehavior for ActiveModel {}
+
 impl TrackingMapper {
     pub async fn insert(record: TrackingRecord) -> Result<(), DbErr> {
         let headers_json: String = serde_json::to_string(&record.headers)
