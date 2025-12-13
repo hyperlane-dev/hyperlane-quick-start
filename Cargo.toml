@@ -21,8 +21,8 @@ hyperlane_init = { path = "init", version = "0.1.0" }
 hyperlane_plugin = { path = "plugin", version = "0.1.0" }
 
 serde = "1.0.228"
-hyperlane = "10.14.5"
-hyperlane-utils = "12.8.7"
+hyperlane = "10.14.7"
+hyperlane-utils = "12.8.8"
 
 [dependencies]
 hyperlane_init = { workspace = true }
