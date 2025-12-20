@@ -329,8 +329,8 @@ impl Default for DatabaseSchema {
 }
 
 impl AutoCreationConfig {
-    pub fn get_env() -> &'static crate::env::EnvConfig {
-        crate::env::get_global_env_config()
+    pub fn get_env() -> &'static env::EnvConfig {
+        env::get_global_env_config()
     }
 
     pub fn validate() -> Result<(), String> {

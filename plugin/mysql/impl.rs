@@ -61,7 +61,7 @@ impl MySqlAutoCreation {
         if self.database_exists(connection).await? {
             AutoCreationLogger::log_database_exists(
                 self.env.get_mysql_database(),
-                crate::database::PluginType::MySQL,
+                database::PluginType::MySQL,
             )
             .await;
             return Ok(false);
@@ -75,7 +75,7 @@ impl MySqlAutoCreation {
             Ok(_) => {
                 AutoCreationLogger::log_database_created(
                     self.env.get_mysql_database(),
-                    crate::database::PluginType::MySQL,
+                    database::PluginType::MySQL,
                 )
                 .await;
                 Ok(true)
@@ -138,7 +138,7 @@ impl MySqlAutoCreation {
     async fn create_table(
         &self,
         connection: &DatabaseConnection,
-        table: &crate::database::TableSchema,
+        table: &database::TableSchema,
     ) -> Result<(), AutoCreationError> {
         let statement: Statement =
             Statement::from_string(DatabaseBackend::MySql, table.sql.clone());
@@ -175,7 +175,7 @@ impl MySqlAutoCreation {
         }
     }
 
-    fn get_mysql_schema(&self) -> crate::database::DatabaseSchema {
+    fn get_mysql_schema(&self) -> database::DatabaseSchema {
         DatabaseSchema::new()
             .add_table(TableSchema::new(
                 "record".to_string(),
@@ -211,14 +211,14 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                 AutoCreationLogger::log_table_created(
                     &table.name,
                     self.env.get_mysql_database(),
-                    crate::database::PluginType::MySQL,
+                    database::PluginType::MySQL,
                 )
                 .await;
             } else {
                 AutoCreationLogger::log_table_exists(
                     &table.name,
                     self.env.get_mysql_database(),
-                    crate::database::PluginType::MySQL,
+                    database::PluginType::MySQL,
                 )
                 .await;
             }
@@ -228,7 +228,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                 AutoCreationLogger::log_auto_creation_error(
                     &error,
                     "Index creation",
-                    crate::database::PluginType::MySQL,
+                    database::PluginType::MySQL,
                     Some(self.env.get_mysql_database()),
                 )
                 .await;
@@ -239,7 +239,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                 AutoCreationLogger::log_auto_creation_error(
                     &error,
                     "Constraint creation",
-                    crate::database::PluginType::MySQL,
+                    database::PluginType::MySQL,
                     Some(self.env.get_mysql_database()),
                 )
                 .await;
@@ -249,7 +249,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
         AutoCreationLogger::log_tables_created(
             &created_tables,
             self.env.get_mysql_database(),
-            crate::database::PluginType::MySQL,
+            database::PluginType::MySQL,
         )
         .await;
         Ok(created_tables)
@@ -276,7 +276,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
             Ok(_) => {
                 let _: Result<(), DbErr> = connection.close().await;
                 AutoCreationLogger::log_connection_verification(
-                    crate::database::PluginType::MySQL,
+                    database::PluginType::MySQL,
                     self.env.get_mysql_database(),
                     true,
                     None,
@@ -288,7 +288,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                 let _: Result<(), DbErr> = connection.close().await;
                 let error_msg: String = error.to_string();
                 AutoCreationLogger::log_connection_verification(
-                    crate::database::PluginType::MySQL,
+                    database::PluginType::MySQL,
                     self.env.get_mysql_database(),
                     false,
                     Some(&error_msg),

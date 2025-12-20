@@ -5,18 +5,18 @@ pub async fn connection_redis_db() -> Result<Arc<Connection>, String> {
     match perform_redis_auto_creation().await {
         Ok(result) => {
             if result.has_changes() {
-                crate::database::AutoCreationLogger::log_auto_creation_complete(
-                    crate::database::PluginType::Redis,
+                database::AutoCreationLogger::log_auto_creation_complete(
+                    database::PluginType::Redis,
                     &result,
                 )
                 .await;
             }
         }
         Err(error) => {
-            crate::database::AutoCreationLogger::log_auto_creation_error(
+            database::AutoCreationLogger::log_auto_creation_error(
                 &error,
                 "Auto-creation process",
-                crate::database::PluginType::Redis,
+                database::PluginType::Redis,
                 Some("default"),
             )
             .await;
@@ -44,8 +44,8 @@ pub async fn connection_redis_db() -> Result<Arc<Connection>, String> {
     let client: Client = Client::open(db_url).map_err(|error: redis::RedisError| {
         let error_msg: String = error.to_string();
         futures::executor::block_on(async {
-            crate::database::AutoCreationLogger::log_connection_verification(
-                crate::database::PluginType::Redis,
+            database::AutoCreationLogger::log_connection_verification(
+                database::PluginType::Redis,
                 "default",
                 false,
                 Some(&error_msg),
@@ -59,8 +59,8 @@ pub async fn connection_redis_db() -> Result<Arc<Connection>, String> {
         .map_err(|error: redis::RedisError| {
             let error_msg: String = error.to_string();
             futures::executor::block_on(async {
-                crate::database::AutoCreationLogger::log_connection_verification(
-                    crate::database::PluginType::Redis,
+                database::AutoCreationLogger::log_connection_verification(
+                    database::PluginType::Redis,
                     "default",
                     false,
                     Some(&error_msg),
@@ -79,8 +79,7 @@ pub async fn get_redis_connection() -> Result<Arc<Connection>, String> {
 pub async fn perform_redis_auto_creation() -> Result<AutoCreationResult, AutoCreationError> {
     let start_time: Instant = Instant::now();
     let mut result: AutoCreationResult = AutoCreationResult::new();
-    AutoCreationLogger::log_auto_creation_start(crate::database::PluginType::Redis, "default")
-        .await;
+    AutoCreationLogger::log_auto_creation_start(database::PluginType::Redis, "default").await;
     let auto_creator: RedisAutoCreation = RedisAutoCreation::new();
     match auto_creator.create_database_if_not_exists().await {
         Ok(created) => {
@@ -90,7 +89,7 @@ pub async fn perform_redis_auto_creation() -> Result<AutoCreationResult, AutoCre
             AutoCreationLogger::log_auto_creation_error(
                 &error,
                 "Database validation",
-                crate::database::PluginType::Redis,
+                database::PluginType::Redis,
                 Some("default"),
             )
             .await;
@@ -109,7 +108,7 @@ pub async fn perform_redis_auto_creation() -> Result<AutoCreationResult, AutoCre
             AutoCreationLogger::log_auto_creation_error(
                 &error,
                 "Namespace setup",
-                crate::database::PluginType::Redis,
+                database::PluginType::Redis,
                 Some("default"),
             )
             .await;
@@ -120,7 +119,7 @@ pub async fn perform_redis_auto_creation() -> Result<AutoCreationResult, AutoCre
         AutoCreationLogger::log_auto_creation_error(
             &error,
             "Connection verification",
-            crate::database::PluginType::Redis,
+            database::PluginType::Redis,
             Some("default"),
         )
         .await;
@@ -131,7 +130,6 @@ pub async fn perform_redis_auto_creation() -> Result<AutoCreationResult, AutoCre
         result.errors.push(error.to_string());
     }
     result.duration = start_time.elapsed();
-    AutoCreationLogger::log_auto_creation_complete(crate::database::PluginType::Redis, &result)
-        .await;
+    AutoCreationLogger::log_auto_creation_complete(database::PluginType::Redis, &result).await;
     Ok(result)
 }

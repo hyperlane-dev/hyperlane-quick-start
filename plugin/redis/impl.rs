@@ -90,7 +90,7 @@ impl RedisAutoCreation {
         )?;
         if info.contains("redis_version:") {
             AutoCreationLogger::log_connection_verification(
-                crate::database::PluginType::Redis,
+                database::PluginType::Redis,
                 "default",
                 true,
                 None,
@@ -143,8 +143,7 @@ impl DatabaseAutoCreation for RedisAutoCreation {
     async fn create_database_if_not_exists(&self) -> Result<bool, AutoCreationError> {
         self.validate_redis_server().await?;
 
-        AutoCreationLogger::log_database_exists("default", crate::database::PluginType::Redis)
-            .await;
+        AutoCreationLogger::log_database_exists("default", database::PluginType::Redis).await;
 
         Ok(false)
     }
@@ -156,16 +155,12 @@ impl DatabaseAutoCreation for RedisAutoCreation {
             AutoCreationLogger::log_tables_created(
                 &setup_operations,
                 "default",
-                crate::database::PluginType::Redis,
+                database::PluginType::Redis,
             )
             .await;
         } else {
-            AutoCreationLogger::log_tables_created(
-                &[],
-                "default",
-                crate::database::PluginType::Redis,
-            )
-            .await;
+            AutoCreationLogger::log_tables_created(&[], "default", database::PluginType::Redis)
+                .await;
         }
 
         Ok(setup_operations)
@@ -175,7 +170,7 @@ impl DatabaseAutoCreation for RedisAutoCreation {
         match self.validate_redis_server().await {
             Ok(_) => {
                 AutoCreationLogger::log_connection_verification(
-                    crate::database::PluginType::Redis,
+                    database::PluginType::Redis,
                     "default",
                     true,
                     None,
@@ -185,7 +180,7 @@ impl DatabaseAutoCreation for RedisAutoCreation {
             }
             Err(error) => {
                 AutoCreationLogger::log_connection_verification(
-                    crate::database::PluginType::Redis,
+                    database::PluginType::Redis,
                     "default",
                     false,
                     Some(&error.to_string()),

@@ -5,18 +5,18 @@ pub async fn connection_postgresql_db() -> Result<DatabaseConnection, String> {
     match perform_postgresql_auto_creation().await {
         Ok(result) => {
             if result.has_changes() {
-                crate::database::AutoCreationLogger::log_auto_creation_complete(
-                    crate::database::PluginType::PostgreSQL,
+                database::AutoCreationLogger::log_auto_creation_complete(
+                    database::PluginType::PostgreSQL,
                     &result,
                 )
                 .await;
             }
         }
         Err(error) => {
-            crate::database::AutoCreationLogger::log_auto_creation_error(
+            database::AutoCreationLogger::log_auto_creation_error(
                 &error,
                 "Auto-creation process",
-                crate::database::PluginType::PostgreSQL,
+                database::PluginType::PostgreSQL,
                 Some(env.get_postgresql_database()),
             )
             .await;
@@ -36,8 +36,8 @@ pub async fn connection_postgresql_db() -> Result<DatabaseConnection, String> {
     Database::connect(&db_url).await.map_err(|error: DbErr| {
         let error_msg: String = error.to_string();
         futures::executor::block_on(async {
-            crate::database::AutoCreationLogger::log_connection_verification(
-                crate::database::PluginType::PostgreSQL,
+            database::AutoCreationLogger::log_connection_verification(
+                database::PluginType::PostgreSQL,
                 env.get_postgresql_database(),
                 false,
                 Some(&error_msg),
@@ -57,7 +57,7 @@ pub async fn perform_postgresql_auto_creation() -> Result<AutoCreationResult, Au
     let env: &'static EnvConfig = get_global_env_config();
     let mut result: AutoCreationResult = AutoCreationResult::new();
     AutoCreationLogger::log_auto_creation_start(
-        crate::database::PluginType::PostgreSQL,
+        database::PluginType::PostgreSQL,
         env.get_postgresql_database(),
     )
     .await;
@@ -70,7 +70,7 @@ pub async fn perform_postgresql_auto_creation() -> Result<AutoCreationResult, Au
             AutoCreationLogger::log_auto_creation_error(
                 &error,
                 "Database creation",
-                crate::database::PluginType::PostgreSQL,
+                database::PluginType::PostgreSQL,
                 Some(env.get_postgresql_database()),
             )
             .await;
@@ -89,7 +89,7 @@ pub async fn perform_postgresql_auto_creation() -> Result<AutoCreationResult, Au
             AutoCreationLogger::log_auto_creation_error(
                 &error,
                 "Table creation",
-                crate::database::PluginType::PostgreSQL,
+                database::PluginType::PostgreSQL,
                 Some(env.get_postgresql_database()),
             )
             .await;
@@ -100,7 +100,7 @@ pub async fn perform_postgresql_auto_creation() -> Result<AutoCreationResult, Au
         AutoCreationLogger::log_auto_creation_error(
             &error,
             "Connection verification",
-            crate::database::PluginType::PostgreSQL,
+            database::PluginType::PostgreSQL,
             Some(env.get_postgresql_database()),
         )
         .await;
@@ -111,10 +111,6 @@ pub async fn perform_postgresql_auto_creation() -> Result<AutoCreationResult, Au
         result.errors.push(error.to_string());
     }
     result.duration = start_time.elapsed();
-    AutoCreationLogger::log_auto_creation_complete(
-        crate::database::PluginType::PostgreSQL,
-        &result,
-    )
-    .await;
+    AutoCreationLogger::log_auto_creation_complete(database::PluginType::PostgreSQL, &result).await;
     Ok(result)
 }
