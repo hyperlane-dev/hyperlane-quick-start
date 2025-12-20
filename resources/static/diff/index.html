@@ -501,7 +501,6 @@
         }
       }
 
-      /* 自定义样式 */
       .input-section {
         background: white;
         border-radius: 8px;
@@ -533,22 +532,39 @@
         color: #374151;
       }
 
-      textarea {
+      .textarea-container {
+        position: relative;
         width: 100%;
-        height: 200px;
-        padding: 16px;
+        min-height: 200px;
         border: 2px solid #e5e7eb;
         border-radius: 6px;
-        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-        font-size: 14px;
-        resize: none;
         transition: border-color 0.2s;
-        overflow-y: auto;
+        background: white;
       }
 
-      textarea:focus {
+      .textarea-container:focus-within {
         outline: none;
         border-color: #2563eb;
+      }
+
+      .textarea-container.focused {
+        border-color: #2563eb;
+      }
+
+      .textarea-editable {
+        width: 100%;
+        min-height: 200px;
+        padding: 20px;
+        border: none;
+        outline: none;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        font-size: 14px;
+        line-height: 1.6;
+        resize: none;
+        overflow: hidden;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        background: transparent;
       }
 
       .controls {
@@ -734,10 +750,13 @@
                   Copy
                 </button>
               </div>
-              <textarea
-                id="text1"
-                placeholder="Enter the first text..."
-              ></textarea>
+              <div class="textarea-container">
+                <div
+                  id="text1"
+                  class="textarea-editable"
+                  contenteditable="true"
+                ></div>
+              </div>
             </div>
 
             <div class="input-group">
@@ -751,10 +770,13 @@
                   Copy
                 </button>
               </div>
-              <textarea
-                id="text2"
-                placeholder="Enter the second text..."
-              ></textarea>
+              <div class="textarea-container">
+                <div
+                  id="text2"
+                  class="textarea-editable"
+                  contenteditable="true"
+                ></div>
+              </div>
             </div>
           </div>
 
@@ -805,14 +827,60 @@
         }
 
         diffWords(text1, text2) {
-          const words1 = text1.split(/(\s+)/);
-          const words2 = text2.split(/(\s+)/);
+          const normalizeText = (text) => {
+            return text.replace(/\s+/g, ' ').trim();
+          };
+
+          const normalized1 = normalizeText(text1);
+          const normalized2 = normalizeText(text2);
+
+          if (!normalized1 && !normalized2) {
+            return [];
+          }
+
+          if (!normalized1) {
+            return [{ type: 'added', value: text2 }];
+          }
+          if (!normalized2) {
+            return [{ type: 'removed', value: text1 }];
+          }
+
+          const words1 = normalized1.split(' ');
+          const words2 = normalized2.split(' ');
+
+          if (normalized1 === normalized2) {
+            return [];
+          }
+
           return this.diffArrays(words1, words2);
         }
 
         diffChars(text1, text2) {
-          const chars1 = text1.split('');
-          const chars2 = text2.split('');
+          const normalizeText = (text) => {
+            return text.trim();
+          };
+
+          const normalized1 = normalizeText(text1);
+          const normalized2 = normalizeText(text2);
+
+          if (!normalized1 && !normalized2) {
+            return [];
+          }
+
+          if (!normalized1) {
+            return [{ type: 'added', value: text2 }];
+          }
+          if (!normalized2) {
+            return [{ type: 'removed', value: text1 }];
+          }
+
+          const chars1 = normalized1.split('');
+          const chars2 = normalized2.split('');
+
+          if (normalized1 === normalized2) {
+            return [];
+          }
+
           return this.diffArrays(chars1, chars2);
         }
 
@@ -827,7 +895,9 @@
             arr2.length,
             result
           );
-          return result.reverse();
+          const diffResult = result.reverse();
+
+          return this.mergeConsecutiveOperations(diffResult);
         }
 
         buildLCSMatrix(arr1, arr2) {
@@ -850,18 +920,51 @@
           return matrix;
         }
 
+        mergeConsecutiveOperations(diffResult) {
+          if (diffResult.length === 0) {
+            return diffResult;
+          }
+
+          const merged = [];
+          let current = diffResult[0];
+
+          for (let i = 1; i < diffResult.length; i++) {
+            const next = diffResult[i];
+
+            if (current.type === next.type) {
+              current.value += next.value;
+            } else {
+              merged.push(current);
+              current = next;
+            }
+          }
+
+          merged.push(current);
+          return merged;
+        }
+
         backtrackLCS(matrix, arr1, arr2, i, j, result) {
           if (i === 0 && j === 0) {
             return;
           }
 
           if (i === 0) {
-            result.push({ type: 'added', value: arr2[j - 1] });
-            this.backtrackLCS(matrix, arr1, arr2, i, j - 1, result);
-          } else if (j === 0) {
-            result.push({ type: 'removed', value: arr1[i - 1] });
-            this.backtrackLCS(matrix, arr1, arr2, i - 1, j, result);
-          } else if (arr1[i - 1] === arr2[j - 1]) {
+            while (j > 0) {
+              result.push({ type: 'added', value: arr2[j - 1] });
+              j--;
+            }
+            return;
+          }
+
+          if (j === 0) {
+            while (i > 0) {
+              result.push({ type: 'removed', value: arr1[i - 1] });
+              i--;
+            }
+            return;
+          }
+
+          if (arr1[i - 1] === arr2[j - 1]) {
             result.push({ type: 'unchanged', value: arr1[i - 1] });
             this.backtrackLCS(matrix, arr1, arr2, i - 1, j - 1, result);
           } else if (matrix[i - 1][j] >= matrix[i][j - 1]) {
@@ -922,8 +1025,17 @@
       };
 
       function initEventListeners() {
-        elements.text1.addEventListener('input', debounce(updateDiff, 300));
-        elements.text2.addEventListener('input', debounce(updateDiff, 300));
+        elements.text1.addEventListener('input', handleInput);
+        elements.text1.addEventListener('paste', handlePaste);
+        elements.text1.addEventListener('keydown', handleKeyDown);
+        elements.text1.addEventListener('focus', handleFocus);
+        elements.text1.addEventListener('blur', handleBlur);
+
+        elements.text2.addEventListener('input', handleInput);
+        elements.text2.addEventListener('paste', handlePaste);
+        elements.text2.addEventListener('keydown', handleKeyDown);
+        elements.text2.addEventListener('focus', handleFocus);
+        elements.text2.addEventListener('blur', handleBlur);
 
         window.addEventListener('load', updateDiff);
       }
@@ -941,8 +1053,8 @@
       }
 
       function updateDiff() {
-        const text1 = elements.text1.value;
-        const text2 = elements.text2.value;
+        const text1 = elements.text1.textContent || '';
+        const text2 = elements.text2.textContent || '';
 
         const diffResult = diffTool.compare(text1, text2, currentDiffMode);
         const stats = diffTool.getStats(diffResult);
@@ -1007,24 +1119,67 @@
       }
 
       function copyText(textId) {
-        const textarea = document.getElementById(textId);
-        textarea.select();
-        document.execCommand('copy');
+        const element = document.getElementById(textId);
+        const text = element.textContent || '';
 
-        const originalText = textarea.placeholder;
-        textarea.placeholder = 'Copied!';
+        const tempTextarea = document.createElement('textarea');
+        tempTextarea.value = text;
+        document.body.appendChild(tempTextarea);
+        tempTextarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempTextarea);
+      }
+
+      function autoResizeTextarea(element) {
+        element.style.height = 'auto';
+        element.style.height = element.scrollHeight + 'px';
+      }
+
+      function handlePaste(e) {
+        e.preventDefault();
+        const text = (e.clipboardData || window.clipboardData).getData(
+          'text/plain'
+        );
+        document.execCommand('insertText', false, text);
+      }
+
+      function handleKeyDown(e) {
+        if (e.key === 'Tab') {
+          e.preventDefault();
+          document.execCommand('insertText', false, '  ');
+        }
+
         setTimeout(() => {
-          textarea.placeholder = originalText;
-        }, 1000);
+          autoResizeTextarea(e.target);
+        }, 10);
+      }
+
+      function handleFocus(e) {
+        const container = e.target.parentElement;
+        container.classList.add('focused');
+      }
+
+      function handleInput(e) {
+        autoResizeTextarea(e.target);
+
+        debounce(updateDiff, 300)();
+      }
+
+      function handleBlur(e) {
+        const container = e.target.parentElement;
+        container.classList.remove('focused');
       }
 
       function clearAll() {
-        elements.text1.value = '';
-        elements.text2.value = '';
+        elements.text1.textContent = '';
+        elements.text2.textContent = '';
         elements.diffResult.innerHTML = 'Enter text to compare';
         elements.addedCount.textContent = '0';
         elements.removedCount.textContent = '0';
         elements.unchangedCount.textContent = '0';
+
+        elements.text1.style.height = 'auto';
+        elements.text2.style.height = 'auto';
       }
 
       document.addEventListener('DOMContentLoaded', function () {
