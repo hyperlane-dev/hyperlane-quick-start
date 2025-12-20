@@ -620,7 +620,7 @@
       }
 
       .icon {
-        font-size: 14px;
+        font-size: inherit;
       }
 
       .diff-section {
@@ -629,36 +629,6 @@
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         overflow: hidden;
         margin-top: 20px;
-      }
-
-      .diff-tabs {
-        display: flex;
-        border-bottom: 1px solid #e5e7eb;
-      }
-
-      .tab-btn {
-        flex: 1;
-        padding: 12px 20px;
-        border: none;
-        background: #f9fafb;
-        color: #6b7280;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s;
-      }
-
-      .tab-btn.active {
-        background: white;
-        color: #2563eb;
-        border-bottom: 2px solid #2563eb;
-      }
-
-      .tab-btn:hover:not(.active) {
-        background: #f3f4f6;
-        color: #374151;
-      }
-
-      .diff-content {
         padding: 20px;
       }
 
@@ -709,18 +679,6 @@
           justify-content: center;
           flex-wrap: wrap;
         }
-
-        .diff-tabs {
-          flex-direction: column;
-        }
-
-        .tab-btn {
-          border-bottom: 1px solid #e5e7eb;
-        }
-
-        .tab-btn.active {
-          border-bottom: 2px solid #2563eb;
-        }
       }
     </style>
   </head>
@@ -733,7 +691,6 @@
             <span class="text">Smart Text Diff Tool</span>
           </a>
         </h1>
-        <p>Precise word-level intelligent difference analysis</p>
       </header>
 
       <main class="main-content">
@@ -800,20 +757,7 @@
         </div>
 
         <div class="diff-section">
-          <div class="diff-tabs">
-            <button class="tab-btn active" onclick="switchMode('words')">
-              Word Level
-            </button>
-            <button class="tab-btn" onclick="switchMode('chars')">
-              Character Level
-            </button>
-          </div>
-
-          <div class="diff-content">
-            <div id="diff-result" class="diff-result">
-              Enter text to compare
-            </div>
-          </div>
+          <div id="diff-result" class="diff-result">Enter text to compare</div>
         </div>
       </main>
     </div>
@@ -1012,7 +956,7 @@
       }
 
       const diffTool = new DiffTool();
-      let currentDiffMode = 'words';
+      let currentDiffMode = 'chars';
 
       const elements = {
         text1: document.getElementById('text1'),
@@ -1021,7 +965,6 @@
         addedCount: document.getElementById('added-count'),
         removedCount: document.getElementById('removed-count'),
         unchangedCount: document.getElementById('unchanged-count'),
-        tabBtns: document.querySelectorAll('.tab-btn'),
       };
 
       function initEventListeners() {
@@ -1102,22 +1045,6 @@
         return div.innerHTML;
       }
 
-      function switchMode(mode) {
-        currentDiffMode = mode;
-
-        elements.tabBtns.forEach((btn) => {
-          if (
-            btn.textContent.includes(mode === 'words' ? 'Word' : 'Character')
-          ) {
-            btn.classList.add('active');
-          } else {
-            btn.classList.remove('active');
-          }
-        });
-
-        updateDiff();
-      }
-
       function copyText(textId) {
         const element = document.getElementById(textId);
         const text = element.textContent || '';
@@ -1188,7 +1115,6 @@
 
       window.copyText = copyText;
       window.clearAll = clearAll;
-      window.switchMode = switchMode;
     </script>
   </body>
 </html>
