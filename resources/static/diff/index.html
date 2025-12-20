@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Online Text Diff Tool</title>
+    <link rel="stylesheet" href="/static/diff/css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">
+        <h1>Online Text Diff Tool</h1>
+        <p class="subtitle">
+          Compare differences between two texts with multiple comparison modes
+        </p>
+      </header>
+      <main class="main">
+        <div class="controls">
+          <div class="control-group">
+            <label for="diffMode">Comparison Mode:</label>
+            <select id="diffMode" class="mode-select">
+              <option value="character">Character Level</option>
+              <option value="word">Word Level</option>
+              <option value="line">Line Level</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <button id="swapBtn" class="btn btn-secondary">Swap Text</button>
+            <button id="clearBtn" class="btn btn-secondary">Clear</button>
+            <button id="compareBtn" class="btn btn-primary">Compare</button>
+          </div>
+        </div>
+
+        <div class="editor-container">
+          <div class="editor-panel">
+            <div class="panel-header">
+              <h3>Original</h3>
+              <div class="panel-controls">
+                <button class="upload-btn" data-target="original">
+                  Upload File
+                </button>
+                <input
+                  type="file"
+                  id="originalFile"
+                  accept=".txt,.md,.json,.xml,.html,.js,.ts,.css,.py,.java,.rs"
+                  hidden
+                />
+              </div>
+            </div>
+            <textarea
+              id="originalText"
+              class="text-editor"
+              placeholder="Enter original text here, or drag file to upload..."
+            ></textarea>
+          </div>
+
+          <div class="editor-panel">
+            <div class="panel-header">
+              <h3>Modified</h3>
+              <div class="panel-controls">
+                <button class="upload-btn" data-target="modified">
+                  Upload File
+                </button>
+                <input
+                  type="file"
+                  id="modifiedFile"
+                  accept=".txt,.md,.json,.xml,.html,.js,.ts,.css,.py,.java,.rs"
+                  hidden
+                />
+              </div>
+            </div>
+            <textarea
+              id="modifiedText"
+              class="text-editor"
+              placeholder="Enter modified text here, or drag file to upload..."
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="stats-container" id="statsContainer" style="display: none">
+          <div class="stats-card">
+            <div class="stats-label">Added</div>
+            <div class="stats-value added" id="addedCount">0</div>
+          </div>
+          <div class="stats-card">
+            <div class="stats-label">Removed</div>
+            <div class="stats-value removed" id="removedCount">0</div>
+          </div>
+          <div class="stats-card">
+            <div class="stats-label">Similarity</div>
+            <div class="stats-value" id="similarityPercent">100%</div>
+          </div>
+        </div>
+
+        <div
+          class="result-container"
+          id="resultContainer"
+          style="display: none"
+        >
+          <div class="result-header">
+            <h3>Comparison Result</h3>
+            <div class="result-controls">
+              <button id="copyBtn" class="btn btn-small">Copy Result</button>
+              <button id="downloadBtn" class="btn btn-small">
+                Download Result
+              </button>
+            </div>
+          </div>
+          <div class="diff-container" id="diffResult"></div>
+        </div>
+      </main>
+
+      <footer class="footer">
+        <p>
+          © 2025 Hyperlane Online Diff Tool | Multiple file formats supported
+        </p>
+      </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/diff/5.1.0/diff.min.js"></script>
+    <script src="/static/diff/js/diff.js"></script>
+  </body>
+</html>
