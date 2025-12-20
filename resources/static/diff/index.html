@@ -1063,12 +1063,12 @@
         elements.removedCount.textContent = stats.removed;
         elements.unchangedCount.textContent = stats.unchanged;
 
-        renderDiffResult(diffResult);
+        renderDiffResult(diffResult, text1);
       }
 
-      function renderDiffResult(diffResult) {
+      function renderDiffResult(diffResult, text) {
         if (diffResult.length === 0) {
-          elements.diffResult.innerHTML = 'Enter text to compare';
+          elements.diffResult.innerHTML = text || 'Enter text to compare';
           return;
         }
 
