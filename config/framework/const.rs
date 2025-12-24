@@ -1,9 +1,9 @@
 use super::*;
 
 #[cfg(debug_assertions)]
-pub const SERVER_PORT: usize = DEFAULT_WEB_PORT;
+pub const SERVER_PORT: u16 = DEFAULT_WEB_PORT;
 #[cfg(not(debug_assertions))]
-pub const SERVER_PORT: usize = 65002;
+pub const SERVER_PORT: u16 = 65002;
 pub const SERVER_HOST: &str = DEFAULT_HOST;
 pub const SERVER_BUFFER: usize = DEFAULT_BUFFER_SIZE;
 pub const SERVER_LOG_SIZE: usize = 100_024_000;
