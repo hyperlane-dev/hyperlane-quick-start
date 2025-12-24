@@ -31,7 +31,7 @@ impl ServerHook for CreateRecordRoute {
 
     #[prologue_macros(
         post,
-        request_body_json(record_opt: PostgresqlRecord),
+        request_body_json_result(record_opt: PostgresqlRecord),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     async fn handle(self, ctx: &Context) {
@@ -66,7 +66,7 @@ impl ServerHook for UpdateRecordRoute {
 
     #[prologue_macros(
         post,
-        request_body_json(record_opt: PostgresqlRecord),
+        request_body_json_result(record_opt: PostgresqlRecord),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     async fn handle(self, ctx: &Context) {

@@ -7,9 +7,9 @@ impl ServerHook for RssFeedRoute {
 
     #[prologue_macros(
         get,
-        request_query("limit" => limit_opt),
-        request_query("offset" => offset_opt),
-        request_header(HOST => host_opt),
+        request_query_option("limit" => limit_opt),
+        request_query_option("offset" => offset_opt),
+        request_header_option(HOST => host_opt),
     )]
     #[epilogue_macros(
         response_header(

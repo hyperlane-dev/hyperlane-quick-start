@@ -7,7 +7,7 @@ impl ServerHook for StaticResourceRoute {
 
     #[prologue_macros(
         methods(get),
-        route_param(PATH_KEY => path_opt)
+        route_param_option(PATH_KEY => path_opt)
     )]
     async fn handle(self, ctx: &Context) {
         let path: String = path_opt.unwrap_or_default();

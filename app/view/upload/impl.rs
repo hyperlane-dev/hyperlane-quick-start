@@ -20,9 +20,9 @@ impl ServerHook for UploadFileRoute {
 
     #[prologue_macros(
         methods(get),
-        route_param(UPLOAD_DIR_KEY => dir_opt),
-        route_param(UPLOAD_FILE_KEY => file_opt),
-        request_header(RANGE => range_header_opt)
+        route_param_option(UPLOAD_DIR_KEY => dir_opt),
+        route_param_option(UPLOAD_FILE_KEY => file_opt),
+        request_header_option(RANGE => range_header_opt)
     )]
     async fn handle(self, ctx: &Context) {
         let dir: String = dir_opt.unwrap_or_default();

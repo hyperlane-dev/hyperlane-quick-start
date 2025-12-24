@@ -25,8 +25,8 @@ impl ServerHook for SaveRoute {
 
     #[prologue_macros(
         post,
-        request_header(CHUNKIFY_FILE_ID_HEADER => file_id_opt),
-        request_header(CHUNKIFY_CHUNK_INDEX_HEADER => chunk_index_opt)
+        request_header_option(CHUNKIFY_FILE_ID_HEADER => file_id_opt),
+        request_header_option(CHUNKIFY_CHUNK_INDEX_HEADER => chunk_index_opt)
     )]
     async fn handle(self, ctx: &Context) {
         let file_chunk_data_opt: OptionFileChunkData =
@@ -56,7 +56,7 @@ impl ServerHook for MergeRoute {
 
     #[prologue_macros(
         post,
-        request_header(CHUNKIFY_FILE_ID_HEADER => file_id_opt)
+        request_header_option(CHUNKIFY_FILE_ID_HEADER => file_id_opt)
     )]
     async fn handle(self, ctx: &Context) {
         let file_chunk_data_opt: OptionFileChunkData =

@@ -22,7 +22,7 @@ impl ServerHook for ChatRequestHook {
         Self
     }
 
-    #[request_body_json(req_data_res: WebSocketReqData)]
+    #[request_body_json_result(req_data_res: WebSocketReqData)]
     async fn handle(self, ctx: &Context) {
         let req_data: WebSocketReqData = req_data_res.unwrap();
         if ChatService::handle_ping_request(ctx, &req_data).await {
@@ -240,7 +240,7 @@ impl ChatService {
     }
 
     pub async fn get_name(ctx: &Context) -> String {
-        #[request_query("uuid" => uuid_opt)]
+        #[request_query_option("uuid" => uuid_opt)]
         async fn inner(_ctx: &Context) -> String {
             uuid_opt.unwrap_or_default()
         }

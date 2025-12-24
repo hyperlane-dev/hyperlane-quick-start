@@ -8,7 +8,7 @@ impl ServerHook for TraceRoute {
     #[prologue_macros(
         get,
         response_header(CONTENT_TYPE => ContentType::format_content_type_with_charset(TEXT_PLAIN, UTF8)),
-        route_param("trace" => trace_opt)
+        route_param_option("trace" => trace_opt)
     )]
     async fn handle(self, ctx: &Context) {
         let trace: String = trace_opt.unwrap_or_default();

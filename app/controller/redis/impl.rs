@@ -7,7 +7,7 @@ impl ServerHook for ListRecordsRoute {
 
     #[prologue_macros(
         methods(get, post),
-        request_query("keys" => keys_opt),
+        request_query_option("keys" => keys_opt),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     async fn handle(self, ctx: &Context) {
@@ -43,7 +43,7 @@ impl ServerHook for CreateRecordRoute {
 
     #[prologue_macros(
         post,
-        request_body_json(record_opt: RedisRecord),
+        request_body_json_result(record_opt: RedisRecord),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     async fn handle(self, ctx: &Context) {
@@ -78,7 +78,7 @@ impl ServerHook for UpdateRecordRoute {
 
     #[prologue_macros(
         post,
-        request_body_json(record_opt: RedisRecord),
+        request_body_json_result(record_opt: RedisRecord),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     async fn handle(self, ctx: &Context) {

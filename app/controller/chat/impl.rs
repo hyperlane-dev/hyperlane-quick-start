@@ -48,12 +48,12 @@ impl ServerHook for ChatHistoryRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     async fn handle(self, ctx: &Context) {
-        #[request_query("before_id" => before_id_opt)]
+        #[request_query_option("before_id" => before_id_opt)]
         async fn get_before_id(ctx: &Context) -> Option<String> {
             before_id_opt
         }
 
-        #[request_query("limit" => limit_opt)]
+        #[request_query_option("limit" => limit_opt)]
         async fn get_limit(_tx: &Context) -> Option<String> {
             limit_opt
         }
