@@ -620,9 +620,9 @@ dependencies = [
 
 [[package]]
 name = "color-output"
-version = "8.1.2"
+version = "8.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "20edf43c79b39853c0e1b43fcfd0eaada058a31df15f1a4db0a0616b4805fbec"
+checksum = "45ea27d210fdd76ea66742a90e22a8dba1de0b6a0e343bac8769be6029741d8e"
 dependencies = [
  "hyperlane-time",
 ]
@@ -1490,7 +1490,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "8.10.0"
+version = "8.11.0"
 dependencies = [
  "hyperlane_init",
 ]
@@ -1503,9 +1503,9 @@ checksum = "dfe36686e48cccf57cc1f5bb165c960d63abbb1670abc08149ea686917da5ac1"
 
 [[package]]
 name = "hyperlane-utils"
-version = "12.10.0"
+version = "12.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f6a7620b2ea5fe78be875e98247ffa6010770e2fc5809cffed97a0dec69bab20"
+checksum = "e6f1b66a1c34317cb9ed2ad87124fdefa9da862befb7b9b1e4790908eb529a92"
 dependencies = [
  "ahash 0.8.12",
  "bin-encode-decode",
@@ -1548,6 +1548,7 @@ dependencies = [
  "snafu",
  "sqlx",
  "std-macro-extensions",
+ "tracing",
  "twox-hash",
  "url",
  "urlencoding",
@@ -2497,9 +2498,9 @@ dependencies = [
 
 [[package]]
 name = "redis"
-version = "1.0.1"
+version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e2dc509b442812959ab125c74be2a930dd9b603038b6da9df9ec013aa23a4e9c"
+checksum = "5dfe20977fe93830c0e9817a16fbf1ed1cfd8d4bba366087a1841d2c6033c251"
 dependencies = [
  "arcstr",
  "combine",
