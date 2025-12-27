@@ -620,9 +620,9 @@ dependencies = [
 
 [[package]]
 name = "color-output"
-version = "8.2.2"
+version = "8.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "45ea27d210fdd76ea66742a90e22a8dba1de0b6a0e343bac8769be6029741d8e"
+checksum = "e869f176ff2870cbd5f3cb5f9f465e85c5e835abfa64dec3cd95d5ec88829678"
 dependencies = [
  "hyperlane-time",
 ]
@@ -1503,9 +1503,9 @@ checksum = "dfe36686e48cccf57cc1f5bb165c960d63abbb1670abc08149ea686917da5ac1"
 
 [[package]]
 name = "hyperlane-utils"
-version = "12.12.0"
+version = "12.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e6f1b66a1c34317cb9ed2ad87124fdefa9da862befb7b9b1e4790908eb529a92"
+checksum = "2c3b877cb2a264f66783002a210c485749196f9387667d10b1115e5da247bc89"
 dependencies = [
  "ahash 0.8.12",
  "bin-encode-decode",
