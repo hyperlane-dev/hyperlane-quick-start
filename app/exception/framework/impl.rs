@@ -10,7 +10,7 @@ impl ServerHook for PanicHook {
         response_status_code(500),
         response_body(&response_body),
         response_header(SERVER => HYPERLANE),
-        response_version(HttpVersion::HTTP1_1),
+        response_version(HttpVersion::Http1_1),
         response_header(CONTENT_TYPE, &content_type),
         send
     )]
