@@ -20,3 +20,4 @@ pub const CACHE_CONTROL_STATIC_ASSETS: &str = "public, max-age=31536000, immutab
 pub const CACHE_CONTROL_SHORT_TERM: &str = "public, max-age=3600";
 pub const EXPIRES_FAR_FUTURE: &str = "Wed, 1 Apr 8888 00:00:00 GMT";
 pub const HTTP_READ_TIMEOUT_MS: u64 = 60000;
+pub const MAX_BODY_SIZE: usize = MB_100;

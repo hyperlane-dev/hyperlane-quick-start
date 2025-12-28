@@ -3,7 +3,9 @@ use super::*;
 #[hyperlane(config: ServerConfig)]
 async fn init_config(server: &Server) {
     let mut request_config: RequestConfig = RequestConfig::default();
-    request_config.set_http_read_timeout_ms(HTTP_READ_TIMEOUT_MS);
+    request_config
+        .set_max_body_size(MAX_BODY_SIZE)
+        .set_http_read_timeout_ms(HTTP_READ_TIMEOUT_MS);
     config.host(SERVER_HOST).await;
     config.port(SERVER_PORT).await;
     config.ttl(SERVER_TTI).await;
