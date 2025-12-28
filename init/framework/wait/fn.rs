@@ -2,12 +2,14 @@ use super::*;
 
 #[hyperlane(config: ServerConfig)]
 async fn init_config(server: &Server) {
+    let mut request_config: RequestConfig = RequestConfig::default();
+    request_config.set_http_read_timeout_ms(HTTP_READ_TIMEOUT_MS);
     config.host(SERVER_HOST).await;
     config.port(SERVER_PORT).await;
     config.ttl(SERVER_TTI).await;
     config.linger(SERVER_LINGER).await;
     config.nodelay(SERVER_NODELAY).await;
-    config.request_config(RequestConfig::default()).await;
+    config.request_config(request_config).await;
     server.config(config).await;
 }
 
