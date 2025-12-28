@@ -11,7 +11,7 @@ pub const SERVER_LOG_DIR: &str = "/shell/logs";
 pub const SERVER_INNER_PRINT: bool = true;
 pub const SERVER_INNER_LOG: bool = true;
 pub const SERVER_NODELAY: bool = false;
-pub const SERVER_LINGER: OptionDuration = None;
+pub const SERVER_LINGER: Option<Duration> = None;
 pub const SERVER_TTI: u32 = 128;
 pub const SERVER_PID_FILE_PATH: &str = "./tmp/process/hyperlane.pid";
 

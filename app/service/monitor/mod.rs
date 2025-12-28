@@ -13,7 +13,6 @@ use std::{
 };
 
 use hyperlane::{tokio::runtime::Runtime, *};
-use hyperlane_utils::serde_json;
 
 #[cfg(target_os = "windows")]
 use std::collections::HashMap;

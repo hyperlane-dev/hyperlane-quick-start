@@ -13,7 +13,7 @@ impl ServerHook for OnlineRoute {
         let cfg: WebSocketConfig<String> = WebSocketConfig::new()
             .set_context(ctx.clone())
             .set_broadcast_type(key)
-            .set_buffer_size(SERVER_BUFFER)
+            .set_request_config(RequestConfig::default())
             .set_connected_hook::<OnlineConnectedHook>()
             .set_closed_hook::<OnlineClosedHook>();
         websocket.run(cfg).await;

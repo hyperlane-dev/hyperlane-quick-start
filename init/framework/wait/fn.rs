@@ -7,7 +7,7 @@ async fn init_config(server: &Server) {
     config.ttl(SERVER_TTI).await;
     config.linger(SERVER_LINGER).await;
     config.nodelay(SERVER_NODELAY).await;
-    config.buffer(SERVER_BUFFER).await;
+    config.request_config(RequestConfig::default()).await;
     server.config(config).await;
 }
 
@@ -71,7 +71,7 @@ async fn create_server() {
     init_network_capture().await;
     init_db().await;
     println_success!("Server initialization successful");
-    let server_result: ServerResult<ServerControlHook> = server.run().await;
+    let server_result: Result<ServerControlHook, ServerError> = server.run().await;
     match server_result {
         Ok(server_hook) => {
             let host_port: String = format!("{SERVER_HOST}:{SERVER_PORT}");

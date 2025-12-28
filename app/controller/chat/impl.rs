@@ -29,7 +29,7 @@ impl ServerHook for ChatRoute {
         let cfg: WebSocketConfig<String> = WebSocketConfig::new()
             .set_context(ctx.clone())
             .set_broadcast_type(key)
-            .set_buffer_size(SERVER_BUFFER)
+            .set_request_config(RequestConfig::default())
             .set_connected_hook::<ChatConnectedHook>()
             .set_request_hook::<ChatRequestHook>()
             .set_sended_hook::<ChatSendedHook>()
