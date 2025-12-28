@@ -6,8 +6,9 @@ impl ServerHook for PanicHook {
     }
 
     #[epilogue_macros(
-        clear_response_headers,
+        response_version(HttpVersion::Http1_1),
         response_status_code(500),
+        clear_response_headers,
         response_body(&response_body),
         response_header(SERVER => HYPERLANE),
         response_version(HttpVersion::Http1_1),

@@ -1433,9 +1433,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane"
-version = "10.21.1"
+version = "10.21.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9442f108566b124ffb3714d9ad49c4f1168b436391d5fb5400668fcbd80a1f14"
+checksum = "3e32a35c1bf6546f0f5863a87924ccac6bdff806237f12078aa3b001280a885b"
 dependencies = [
  "http-type",
  "inventory",
@@ -1467,9 +1467,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-macros"
-version = "10.9.4"
+version = "10.9.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c7ada9adb6ede73c6f312cc9f500f7ea3e0c9411d39530775ebd9f9243a63a1e"
+checksum = "be42fee48eaf05cc3111673a6da098e9a355d04de62eead42019c1135315c3ad"
 dependencies = [
  "hyperlane",
  "proc-macro2",
@@ -1479,9 +1479,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-plugin-websocket"
-version = "3.1.30"
+version = "3.1.31"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "395329c66c603343cc5751038d9f7fb61e670a870ff12a32f857e066f5b66596"
+checksum = "165a59a20705d763696617afe85b539d979705ed9562ecf7bcdf8602f1c84b26"
 dependencies = [
  "hyperlane",
  "hyperlane-broadcast",
@@ -1502,9 +1502,9 @@ checksum = "d7604538534f747992bc1b74bab91f4b5d74dbfed987854d2bf4b0313e694a2e"
 
 [[package]]
 name = "hyperlane-utils"
-version = "12.13.1"
+version = "12.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "693ede80b6e54040e232d81f9cbd9142f024e289368f668e4b16334ca957945a"
+checksum = "4bc42b9dc3c0dff90edc02d97fa1ea434239498ade061aaaf68b9d970ae56fb5"
 dependencies = [
  "ahash 0.8.12",
  "bin-encode-decode",
