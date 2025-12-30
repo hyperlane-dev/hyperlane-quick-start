@@ -1394,9 +1394,9 @@ dependencies = [
 
 [[package]]
 name = "http-type"
-version = "5.26.0"
+version = "5.26.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6d0a1f8d020f929d13d5e095fa61f07c0b4d13474a95658ab6ffbe8144d8306d"
+checksum = "0a6318004b422e63ac965a662de8810c5df2c8a1fee15bad87e69b53b54d5094"
 dependencies = [
  "hex",
  "http-compress",
@@ -1433,9 +1433,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane"
-version = "10.23.3"
+version = "10.23.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8566ba21ba6db318d3826d6a846e9ae92a86ba6bf1e8d30ef633e48544b1969d"
+checksum = "ed2bb0815fca7e5f15786ad32ec48c8797a93819cb1d6ea9dae8bf31bce8cb63"
 dependencies = [
  "http-type",
  "inventory",
@@ -1467,9 +1467,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-macros"
-version = "10.9.8"
+version = "10.9.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "41303eae5f833d428d1a64cf5eac303c81b6aa0d0193964e29689a1b74a4ccd5"
+checksum = "b6dacc0960fd0f7b61f6f44f416cdfe1e57c3111c3410a166cc1c57215298074"
 dependencies = [
  "hyperlane",
  "proc-macro2",
@@ -1479,9 +1479,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-plugin-websocket"
-version = "3.1.37"
+version = "3.1.38"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fe06f9b2074ff77d697d708d51b154d8f925d865395c7bdef34289c33780bab4"
+checksum = "06b3cafcdfb6d039ab48374485d6eb423839759f8b6c8f6445405c353219abe7"
 dependencies = [
  "hyperlane",
  "hyperlane-broadcast",
@@ -1489,7 +1489,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "8.13.2"
+version = "8.13.3"
 dependencies = [
  "hyperlane_init",
 ]
@@ -1502,9 +1502,9 @@ checksum = "d7604538534f747992bc1b74bab91f4b5d74dbfed987854d2bf4b0313e694a2e"
 
 [[package]]
 name = "hyperlane-utils"
-version = "12.13.5"
+version = "12.13.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "95df1caf955c5db64ba6657d4226b403afa96fe5dde9abbd4bc0fbfc17bfd301"
+checksum = "a50fce77b2f1f35a2eeb0e913d467aa0318605b2ea85d7292138254d9354372f"
 dependencies = [
  "ahash 0.8.12",
  "bin-encode-decode",
