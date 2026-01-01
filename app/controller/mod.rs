@@ -1,4 +1,5 @@
 pub mod chat;
+pub mod dataset;
 pub mod health_check;
 pub mod hello;
 pub mod log;

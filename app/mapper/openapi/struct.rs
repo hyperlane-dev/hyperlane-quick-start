@@ -3,11 +3,13 @@ use super::*;
 #[derive(utoipa::OpenApi)]
 #[openapi(
     paths(
-        controller::hello::openapi_hello_name,
         controller::chat::openapi_get_online_users,
+        controller::dataset::openapi_dataset,
         controller::upload::openapi_upload_register,
         controller::upload::openapi_upload_save,
         controller::upload::openapi_upload_merge,
+        controller::hello::openapi_hello_name,
+        controller::health_check::openapi_health_check,
         controller::log::openapi_log_info,
         controller::log::openapi_log_warn,
         controller::log::openapi_log_error,
