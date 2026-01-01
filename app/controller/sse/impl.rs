@@ -11,10 +11,9 @@ impl ServerHook for SseRoute {
         response_header(CONTENT_TYPE => TEXT_EVENT_STREAM)
     )]
     async fn handle(self, ctx: &Context) {
-        let _: Result<(), hyperlane::ResponseError> = ctx.send().await;
+        ctx.send().await;
         for i in 0..10 {
-            let _: Result<(), hyperlane::ResponseError> = ctx
-                .set_response_body(&format!("data:{i}{HTTP_DOUBLE_BR}"))
+            ctx.set_response_body(&format!("data:{i}{HTTP_DOUBLE_BR}"))
                 .await
                 .send_body()
                 .await;
