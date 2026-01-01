@@ -16,3 +16,4 @@ hyperlane_plugin = { workspace = true }
 
 hyperlane = { workspace = true }
 hyperlane-utils = { workspace = true }
+rustls = { workspace = true }

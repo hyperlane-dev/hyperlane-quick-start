@@ -1,4 +1,5 @@
 pub mod charset;
+pub mod dataset;
 pub mod hello;
 pub mod logo_img;
 pub mod not_found;

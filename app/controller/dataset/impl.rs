@@ -9,7 +9,13 @@ impl ServerHook for DatasetRoute {
     async fn handle(self, ctx: &Context) {
         match DatasetService::fetch_dataset().await {
             Ok(dataset_content) => {
-                ctx.set_response_body(&dataset_content).await;
+                ctx.set_response_header(
+                    CONTENT_TYPE,
+                    ContentType::format_content_type_with_charset(TEXT_PLAIN, UTF8),
+                )
+                .await
+                .set_response_body(&dataset_content)
+                .await;
             }
             Err(error) => {
                 let error_response: ApiResponse<()> =

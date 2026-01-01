@@ -23,6 +23,7 @@ hyperlane_plugin = { path = "plugin", version = "0.1.0" }
 serde = "1.0.228"
 hyperlane = "10.24.6"
 hyperlane-utils = "12.13.7"
+rustls = { version = "0.23", default-features = false, features = ["ring", "aws_lc_rs", "logging", "tls12"] }
 
 [dependencies]
 hyperlane_init = { workspace = true }
