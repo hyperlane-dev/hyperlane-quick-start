@@ -1,8 +1,14 @@
 use super::*;
 
-impl ServerHook for PanicHook {
-    async fn new(_ctx: &Context) -> Self {
-        Self
+impl ServerHook for ServerPanic {
+    #[prologue_macros(panic_data(request_error_data))]
+    async fn new(ctx: &Context) -> Self {
+        let content_type: String =
+            ContentType::format_content_type_with_charset(APPLICATION_JSON, UTF8);
+        Self {
+            content_type,
+            response_body: request_error_data.to_string(),
+        }
     }
 
     #[epilogue_macros(
@@ -12,17 +18,47 @@ impl ServerHook for PanicHook {
         response_body(&response_body),
         response_header(SERVER => HYPERLANE),
         response_version(HttpVersion::Http1_1),
-        response_header(CONTENT_TYPE, &content_type),
+        response_header(CONTENT_TYPE, &self.content_type),
         send
     )]
     async fn handle(self, ctx: &Context) {
-        let error: Panic = ctx.try_get_panic().await.unwrap_or_default();
-        let error_message: String = error.to_string();
-        log_error(&error_message).await;
+        log_error(&self.response_body).await;
         let api_response: ApiResponse<()> =
-            ApiResponse::error_with_code(ResponseCode::InternalError, error_message);
+            ApiResponse::error_with_code(ResponseCode::InternalError, self.response_body);
         let response_body: Vec<u8> = api_response.to_json_bytes();
+    }
+}
+
+impl ServerHook for ServerRequestError {
+    #[prologue_macros(request_error_data(request_error_data))]
+    async fn new(_ctx: &Context) -> Self {
         let content_type: String =
             ContentType::format_content_type_with_charset(APPLICATION_JSON, UTF8);
+        Self {
+            response_status_code: request_error_data.get_http_status_code(),
+            content_type,
+            response_body: request_error_data.to_string(),
+        }
+    }
+
+    #[epilogue_macros(
+        response_version(HttpVersion::Http1_1),
+        response_status_code(self.response_status_code),
+        clear_response_headers,
+        response_body(&response_body),
+        response_header(SERVER => HYPERLANE),
+        response_version(HttpVersion::Http1_1),
+        response_header(CONTENT_TYPE, &self.content_type),
+        send
+    )]
+    async fn handle(self, ctx: &Context) {
+        if self.response_status_code == HttpStatus::BadRequest.code() {
+            ctx.aborted().await;
+            return;
+        }
+        log_error(&self.response_body).await;
+        let api_response: ApiResponse<()> =
+            ApiResponse::error_with_code(ResponseCode::InternalError, self.response_body);
+        let response_body: Vec<u8> = api_response.to_json_bytes();
     }
 }
