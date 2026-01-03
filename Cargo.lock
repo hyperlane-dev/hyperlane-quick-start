@@ -1584,7 +1584,6 @@ dependencies = [
  "hyperlane_app",
  "hyperlane_config",
  "hyperlane_plugin",
- "rustls",
 ]
 
 [[package]]
