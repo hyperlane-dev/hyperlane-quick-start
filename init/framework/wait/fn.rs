@@ -1,5 +1,4 @@
 use super::*;
-use rustls;
 
 #[hyperlane(config: ServerConfig)]
 async fn init_config(server: &Server) {
@@ -91,18 +90,6 @@ async fn create_server() {
 }
 
 pub fn run() {
-    // Initialize the crypto provider to fix rustls issue
-    if let Err(e) = rustls::crypto::ring::default_provider().install_default() {
-        println_warning!(
-            "Failed to install default crypto provider: {:?}, trying fallback...",
-            e
-        );
-        // Fallback to aws-lc-rs if ring is not available
-        if let Err(e) = rustls::crypto::aws_lc_rs::default_provider().install_default() {
-            println_error!("Failed to install aws-lc-rs crypto provider: {:?}", e);
-        }
-    }
-
     if let Err(error) = init_env_config() {
         println_error!("{error}");
     }
