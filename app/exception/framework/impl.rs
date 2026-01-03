@@ -1,13 +1,13 @@
 use super::*;
 
-impl ServerHook for ServerPanic {
-    #[prologue_macros(panic_data(request_error_data))]
+impl ServerHook for TaskPanicHook {
+    #[prologue_macros(task_panic_data(task_panic_data))]
     async fn new(ctx: &Context) -> Self {
         let content_type: String =
             ContentType::format_content_type_with_charset(APPLICATION_JSON, UTF8);
         Self {
             content_type,
-            response_body: request_error_data.to_string(),
+            response_body: task_panic_data.to_string(),
         }
     }
 
@@ -29,7 +29,7 @@ impl ServerHook for ServerPanic {
     }
 }
 
-impl ServerHook for ServerRequestError {
+impl ServerHook for RequestErrorHook {
     #[prologue_macros(request_error_data(request_error_data))]
     async fn new(_ctx: &Context) -> Self {
         let content_type: String =
