@@ -56,7 +56,9 @@ impl ServerHook for RequestErrorHook {
             ctx.aborted().await;
             return;
         }
-        log_error(&self.response_body).await;
+        if self.response_status_code != HttpStatus::RequestTimeout.code() {
+            log_error(&self.response_body).await;
+        }
         let api_response: ApiResponse<()> =
             ApiResponse::error_with_code(ResponseCode::InternalError, self.response_body);
         let response_body: Vec<u8> = api_response.to_json_bytes();
