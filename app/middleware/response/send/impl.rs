@@ -5,6 +5,10 @@ impl ServerHook for SendMiddleware {
         Self
     }
 
-    #[epilogue_macros(http, reject(ctx.get_request_upgrade_type().await.is_ws()), send)]
+    #[prologue_macros(
+        http,
+        reject(ctx.get_request_upgrade_type().await.is_ws()),
+        send
+    )]
     async fn handle(self, ctx: &Context) {}
 }

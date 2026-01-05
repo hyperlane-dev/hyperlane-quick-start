@@ -5,8 +5,8 @@ impl ServerHook for UpgradeMiddleware {
         Self
     }
 
-    #[ws]
-    #[epilogue_macros(
+    #[prologue_macros(
+        ws,
         response_version(HttpVersion::Http1_1),
         response_status_code(101),
         response_body(&vec![]),
