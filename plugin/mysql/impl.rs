@@ -176,19 +176,10 @@ impl MySqlAutoCreation {
     }
 
     fn get_mysql_schema(&self) -> database::DatabaseSchema {
-        DatabaseSchema::new()
-            .add_table(TableSchema::new(
-                "record".to_string(),
-                MYSQL_RECORD_SQL.to_string(),
-            ))
-            .add_table(TableSchema::new(
-                "chat_history".to_string(),
-                MYSQL_CHAT_HISTORY_SQL.to_string(),
-            ))
-            .add_table(TableSchema::new(
-                "tracking_record".to_string(),
-                MYSQL_TRACKING_RECORD_SQL.to_string(),
-            ))
+        DatabaseSchema::new().add_table(TableSchema::new(
+            "record".to_string(),
+            MYSQL_RECORD_SQL.to_string(),
+        ))
     }
 }
 

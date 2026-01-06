@@ -160,33 +160,12 @@ impl TrackingMapper {
 
 pub fn get_tracking_db_connection() -> &'static DatabaseConnection {
     TRACKING_DB_CONNECTION.get_or_init(|| {
-        let env: &EnvConfig = get_global_env_config();
-        let db_url: String = if *env.get_enable_mysql() {
-            format!(
-                "mysql://{}:{}@{}:{}/{}",
-                env.get_mysql_username(),
-                env.get_mysql_password(),
-                env.get_mysql_host(),
-                env.get_mysql_port(),
-                env.get_mysql_database()
-            )
-        } else if *env.get_enable_postgresql() {
-            format!(
-                "postgres://{}:{}@{}:{}/{}",
-                env.get_postgresql_username(),
-                env.get_postgresql_password(),
-                env.get_postgresql_host(),
-                env.get_postgresql_port(),
-                env.get_postgresql_database()
-            )
-        } else {
-            panic!("No database enabled in configuration");
-        };
         tokio::task::block_in_place(|| {
             tokio::runtime::Handle::current().block_on(async {
-                Database::connect(&db_url)
+                let db: DatabaseConnection = get_postgresql_connection()
                     .await
-                    .expect("Failed to connect to database")
+                    .expect("Failed to connect to PostgreSQL database");
+                db
             })
         })
     })
