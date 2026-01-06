@@ -21,8 +21,8 @@ impl ServerHook for InsertRoute {
             }
         };
         match ShortlinkService::insert_shortlink(request).await {
-            Ok(id) => {
-                let response: ApiResponse<i32> = ApiResponse::<i32>::success(id);
+            Ok(encrypted_id) => {
+                let response: ApiResponse<String> = ApiResponse::<String>::success(encrypted_id);
                 ctx.set_response_body(&response.to_json_bytes()).await
             }
             Err(error) => {
@@ -45,28 +45,18 @@ impl ServerHook for QueryRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     async fn handle(self, ctx: &Context) {
-        let id: i32 = match id_opt {
-            Some(id_str) => match id_str.parse::<i32>() {
-                Ok(id) => id,
-                Err(_) => {
-                    let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                        ResponseCode::BadRequest,
-                        "Invalid ID parameter",
-                    );
-                    ctx.set_response_body(&response.to_json_bytes()).await;
-                    return;
-                }
-            },
+        let encrypted_id: String = match id_opt {
+            Some(id_str) => id_str,
             None => {
                 let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
                     ResponseCode::BadRequest,
-                    "ID parameter is required",
+                    "Shortlink ID parameter is required",
                 );
                 ctx.set_response_body(&response.to_json_bytes()).await;
                 return;
             }
         };
-        match ShortlinkService::query_shortlink(id).await {
+        match ShortlinkService::query_shortlink(encrypted_id).await {
             Ok(Some(record)) => {
                 let response: ApiResponse<ShortlinkRecord> =
                     ApiResponse::<ShortlinkRecord>::success(record);
@@ -79,7 +69,7 @@ impl ServerHook for QueryRoute {
                     .await
             }
             Ok(None) => {
-                let response = ApiResponse::<()>::error_with_code(
+                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
                     ResponseCode::NotFound,
                     "Shortlink not found",
                 );

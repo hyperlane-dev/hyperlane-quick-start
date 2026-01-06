@@ -185,12 +185,7 @@ impl PostgreSqlAutoCreation {
     }
 
     fn get_postgresql_schema(&self) -> DatabaseSchema {
-        let indexes: Vec<String> = POSTGRESQL_INDEXES_SQL
-            .lines()
-            .filter(|line| !line.trim().is_empty())
-            .map(|line| line.trim().to_string())
-            .collect();
-        let mut schema: DatabaseSchema = DatabaseSchema::new()
+        DatabaseSchema::new()
             .add_table(TableSchema::new(
                 "record".to_string(),
                 POSTGRESQL_RECORD_SQL.to_string(),
@@ -206,11 +201,7 @@ impl PostgreSqlAutoCreation {
             .add_table(TableSchema::new(
                 "shortlink".to_string(),
                 POSTGRESQL_SHORTLINK_SQL.to_string(),
-            ));
-        for index in indexes {
-            schema = schema.add_index(index);
-        }
-        schema
+            ))
     }
 }
 
@@ -274,7 +265,6 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
             database::PluginType::PostgreSQL,
         )
         .await;
-
         Ok(created_tables)
     }
 

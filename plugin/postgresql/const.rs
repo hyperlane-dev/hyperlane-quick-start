@@ -5,4 +5,3 @@ pub const POSTGRESQL_TRACKING_RECORD_SQL: &str =
     include_str!("../../resources/db/postgresql/tracking_record.sql");
 pub const POSTGRESQL_SHORTLINK_SQL: &str =
     include_str!("../../resources/db/postgresql/shortlink.sql");
-pub const POSTGRESQL_INDEXES_SQL: &str = include_str!("../../resources/db/postgresql/indexes.sql");

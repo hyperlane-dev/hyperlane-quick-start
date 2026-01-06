@@ -1,12 +1,23 @@
 use super::*;
+use hyperlane_config::application::charset::CHARSETS;
 
 impl ShortlinkService {
-    pub async fn insert_shortlink(request: ShortlinkInsertRequest) -> Result<i32, String> {
+    fn decrypt_id(encoded_id: &str) -> Result<i32, String> {
+        let decoded: String = hyperlane_utils::Decode::execute(CHARSETS, encoded_id)
+            .map_err(|_| "Invalid shortlink ID format".to_string())?;
+        decoded
+            .parse::<i32>()
+            .map_err(|_| "Invalid shortlink ID format".to_string())
+    }
+
+    fn encrypt_id(id: i32) -> Result<String, String> {
+        hyperlane_utils::Encode::execute(CHARSETS, &id.to_string())
+            .map_err(|_| "Failed to encrypt shortlink ID".to_string())
+    }
+
+    pub async fn insert_shortlink(request: ShortlinkInsertRequest) -> Result<String, String> {
         if request.url.is_empty() {
             return Err("URL cannot be empty".to_string());
-        }
-        if !request.url.starts_with("http://") && !request.url.starts_with("https://") {
-            return Err("URL must start with http:// or https://".to_string());
         }
         let db: DatabaseConnection = get_postgresql_connection().await?;
         let existing_record: Option<Model> = Entity::find()
@@ -14,22 +25,25 @@ impl ShortlinkService {
             .one(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
-        if let Some(record) = existing_record {
-            return Ok(record.id);
-        }
-        let active_model: ActiveModel = ActiveModel {
-            url: ActiveValue::Set(request.url),
-            id: ActiveValue::NotSet,
-            created_at: ActiveValue::NotSet,
+        let record_id: i32 = if let Some(record) = existing_record {
+            record.id
+        } else {
+            let active_model: ActiveModel = ActiveModel {
+                url: ActiveValue::Set(request.url),
+                id: ActiveValue::NotSet,
+                created_at: ActiveValue::NotSet,
+            };
+            let result = active_model
+                .insert(&db)
+                .await
+                .map_err(|error: DbErr| error.to_string())?;
+            result.id
         };
-        let result = active_model
-            .insert(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
-        Ok(result.id)
+        Self::encrypt_id(record_id)
     }
 
-    pub async fn query_shortlink(id: i32) -> Result<Option<ShortlinkRecord>, String> {
+    pub async fn query_shortlink(encrypted_id: String) -> Result<Option<ShortlinkRecord>, String> {
+        let id: i32 = Self::decrypt_id(&encrypted_id)?;
         let db: DatabaseConnection = get_postgresql_connection().await?;
         let record: Option<Model> = Entity::find_by_id(id)
             .one(&db)
