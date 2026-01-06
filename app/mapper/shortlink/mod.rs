@@ -7,6 +7,7 @@ pub use r#struct::*;
 
 use super::*;
 
+use chrono::NaiveDateTime;
 use sea_orm::{
     DeriveActiveModelBehavior, DeriveEntityModel, DerivePrimaryKey, EnumIter, PrimaryKeyTrait,
     RelationDef, RelationTrait,

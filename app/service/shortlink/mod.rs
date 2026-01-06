@@ -9,4 +9,4 @@ use hyperlane_plugin::postgresql::*;
 use mapper::shortlink::*;
 use model::param::shortlink::*;
 
-use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection, DbErr, EntityTrait};
+use sea_orm::{ActiveModelTrait, ActiveValue, ColumnTrait, DatabaseConnection, DbErr, EntityTrait, QueryFilter};

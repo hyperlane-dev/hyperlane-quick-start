@@ -12,5 +12,5 @@ pub struct Model {
     pub sender_type: String,
     pub message_type: String,
     pub content: String,
-    pub created_at: Option<chrono::NaiveDateTime>,
+    pub created_at: Option<NaiveDateTime>,
 }

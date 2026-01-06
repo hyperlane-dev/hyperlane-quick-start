@@ -13,6 +13,7 @@ use r#static::*;
 
 use std::{collections::HashMap, sync::OnceLock};
 
+use chrono::NaiveDateTime;
 use hyperlane::tokio::spawn;
 use hyperlane_utils::sea_orm::{
     ActiveModelBehavior, ActiveValue, ColumnTrait, Database, DatabaseConnection, DbErr,

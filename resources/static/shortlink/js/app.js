@@ -199,7 +199,6 @@ const ShortlinkApp = {
         },
         body: JSON.stringify({
           url: url,
-          user_cookie: null,
         }),
       });
 

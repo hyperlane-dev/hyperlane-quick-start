@@ -4,7 +4,6 @@ use super::*;
 pub struct ShortlinkDao {
     pub id: i32,
     pub url: String,
-    pub user_cookie: Option<String>,
     pub created_at: String,
 }
 
@@ -23,6 +22,5 @@ pub struct Model {
     #[sea_orm(primary_key, auto_increment = true)]
     pub id: i32,
     pub url: String,
-    pub user_cookie: Option<String>,
-    pub created_at: Option<chrono::NaiveDateTime>,
+    pub created_at: Option<NaiveDateTime>,
 }

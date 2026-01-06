@@ -9,9 +9,16 @@ impl ShortlinkService {
             return Err("URL must start with http:// or https://".to_string());
         }
         let db: DatabaseConnection = get_postgresql_connection().await?;
+        let existing_record: Option<Model> = Entity::find()
+            .filter(Column::Url.eq(&request.url))
+            .one(&db)
+            .await
+            .map_err(|error: DbErr| error.to_string())?;
+        if let Some(record) = existing_record {
+            return Ok(record.id);
+        }
         let active_model: ActiveModel = ActiveModel {
             url: ActiveValue::Set(request.url),
-            user_cookie: ActiveValue::Set(request.user_cookie),
             id: ActiveValue::NotSet,
             created_at: ActiveValue::NotSet,
         };
@@ -33,7 +40,6 @@ impl ShortlinkService {
                 let record = ShortlinkRecord {
                     id: model.id,
                     url: model.url,
-                    user_cookie: model.user_cookie,
                     created_at: model
                         .created_at
                         .map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string())

@@ -20,6 +20,7 @@ use std::{
     sync::{Arc, OnceLock, RwLock},
 };
 
+use chrono::NaiveDateTime;
 use hyperlane_utils::sea_orm::{
     ActiveModelBehavior, ActiveModelTrait, ActiveValue, ColumnTrait, Database, DatabaseConnection,
     DbErr, DeriveEntityModel, DerivePrimaryKey, DeriveRelation, EntityTrait, EnumIter,

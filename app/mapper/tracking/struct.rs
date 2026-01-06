@@ -11,5 +11,5 @@ pub struct Model {
     pub headers: String,
     pub body: String,
     pub timestamp: i64,
-    pub created_at: Option<chrono::NaiveDateTime>,
+    pub created_at: Option<NaiveDateTime>,
 }
