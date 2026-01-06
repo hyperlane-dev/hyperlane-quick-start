@@ -2,10 +2,7 @@ use super::*;
 
 #[utoipa::path(
     get,
-    path = "/static/{path}",
-    params(
-        ("path" = String, Path, description = "Static resource path")
-    ),
+    path = "/shortlink",
     responses(
         (status = 200, description = "Success"),
         (status = 400, description = "Bad Request"),
@@ -13,4 +10,4 @@ use super::*;
         (status = 500, description = "Internal Server Error")
     )
 )]
-pub fn openapi_static_resource_view() {}
+pub fn openapi_shortlink_view() {}

@@ -198,6 +198,10 @@ impl PostgreSqlAutoCreation {
             .add_table(TableSchema::new(
                 "chat_history".to_string(),
                 POSTGRESQL_CHAT_HISTORY_SQL.to_string(),
+            ))
+            .add_table(TableSchema::new(
+                "shortlink".to_string(),
+                POSTGRESQL_SHORTLINK_SQL.to_string(),
             ));
         for index in indexes {
             schema = schema.add_index(index);

@@ -7,6 +7,7 @@ pub mod openapi;
 pub mod postgresql;
 pub mod redis;
 pub mod rss;
+pub mod shortlink;
 pub mod static_resource;
 pub mod trace;
 pub mod tracking;

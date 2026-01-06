@@ -13,10 +13,9 @@ use r#static::*;
 
 use std::{collections::HashMap, sync::OnceLock};
 
+use hyperlane::tokio::spawn;
 use hyperlane_utils::sea_orm::{
     ActiveModelBehavior, ActiveValue, ColumnTrait, Database, DatabaseConnection, DbErr,
     DeriveEntityModel, DerivePrimaryKey, DeriveRelation, EntityTrait, EnumIter, PaginatorTrait,
     PrimaryKeyTrait, QueryFilter, QueryOrder, QuerySelect, Select,
 };
-
-use hyperlane::tokio::spawn;
