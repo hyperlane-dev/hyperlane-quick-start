@@ -2,7 +2,7 @@ use super::*;
 
 #[utoipa::path(
     get,
-    path = "/trace/{trace}",
+    path = "/api/trace/{trace}",
     params(
         ("trace" = String, Path, description = "Trace ID")
     ),

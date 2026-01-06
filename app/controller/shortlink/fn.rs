@@ -2,7 +2,7 @@ use super::*;
 
 #[utoipa::path(
     get,
-    path = "/shortlink/query/{id}",
+    path = "/api/shortlink/query/{id}",
     responses(
         (status = 200, description = "Success"),
         (status = 400, description = "Bad Request"),
@@ -14,7 +14,7 @@ pub fn openapi_shortlink_query() {}
 
 #[utoipa::path(
     post,
-    path = "/shortlink/insert",
+    path = "/api/shortlink/insert",
     responses(
         (status = 200, description = "Success"),
         (status = 400, description = "Bad Request"),

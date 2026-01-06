@@ -360,7 +360,9 @@
         }
 
         const baseUrl = window.location.origin;
-        const requestUrl = `${baseUrl}/trace/${encodeURIComponent(traceId)}`;
+        const requestUrl = `${baseUrl}/api/trace/${encodeURIComponent(
+          traceId
+        )}`;
         const urlElement = document.createElement('div');
         urlElement.className = 'request-url';
         urlElement.textContent = requestUrl;

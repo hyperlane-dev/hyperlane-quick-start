@@ -8,7 +8,7 @@ impl ServerHook for TraceViewRoute {
     #[prologue_macros(
         methods(get, post),
         response_status_code(302),
-        response_header(LOCATION => "/static/trace/index.html")
+        response_header(LOCATION => "/static/api/trace/index.html")
     )]
     async fn handle(self, ctx: &Context) {}
 }

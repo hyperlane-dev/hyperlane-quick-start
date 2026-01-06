@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="IE=edge" http-equiv="X-UA-Compatible" />
+    <meta
+      content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"
+      name="viewport"
+    />
+    <title>Hyperlane Shortlink Generator</title>
+    <link rel="icon" href="https://docs.ltpp.vip/img/hyperlane.png" />
+    <link href="./css/style.css" rel="stylesheet" />
+    <script src="./js/app.js" defer></script>
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">
+        <div class="header-content">
+          <h1 class="title">
+            <a href="/shortlink">
+              <span class="icon">🔗</span>
+              <span class="text">Shortlink Generator</span>
+            </a>
+          </h1>
+          <p class="subtitle">
+            Transform your long URLs into short, shareable links
+          </p>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <div class="form-container">
+          <form id="shortlinkForm" class="shortlink-form">
+            <div class="input-group">
+              <label for="urlInput" class="input-label">
+                <span class="label-text">Enter your URL</span>
+                <span class="required">*</span>
+              </label>
+              <div class="input-wrapper">
+                <input
+                  type="url"
+                  id="urlInput"
+                  class="url-input"
+                  placeholder="https://example.com/very/long/url/path"
+                  required
+                />
+                <div class="input-icon">🌐</div>
+              </div>
+              <span class="input-hint"
+                >Make sure your URL starts with http:// or https://</span
+              >
+            </div>
+
+            <div class="button-group">
+              <button type="submit" id="generateBtn" class="generate-btn">
+                <span class="btn-text">Generate Shortlink</span>
+                <span class="btn-icon">⚡</span>
+              </button>
+            </div>
+          </form>
+
+          <div id="resultContainer" class="result-container hidden">
+            <div class="result-header">
+              <h2 class="result-title">Your Shortlink is Ready!</h2>
+              <p class="result-subtitle">Click the link below to test it</p>
+            </div>
+
+            <div class="result-content">
+              <div class="shortlink-display">
+                <div class="shortlink-label">Shortlink:</div>
+                <div class="shortlink-value">
+                  <span id="shortlinkText" class="shortlink-text"></span>
+                  <button
+                    id="copyBtn"
+                    class="copy-btn"
+                    title="Copy to clipboard"
+                  >
+                    📋
+                  </button>
+                </div>
+              </div>
+
+              <div class="actions">
+                <button id="openBtn" class="open-btn">
+                  <span class="btn-text">Open Link</span>
+                  <span class="btn-icon">🔗</span>
+                </button>
+                <button id="newLinkBtn" class="new-link-btn">
+                  <span class="btn-text">Create Another</span>
+                  <span class="btn-icon">➕</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div id="loadingContainer" class="loading-container hidden">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Generating your shortlink...</p>
+          </div>
+
+          <div id="errorContainer" class="error-container hidden">
+            <div class="error-icon">⚠️</div>
+            <div class="error-content">
+              <h3 class="error-title">Oops! Something went wrong</h3>
+              <p id="errorMessage" class="error-message"></p>
+            </div>
+            <button id="retryBtn" class="retry-btn">
+              <span class="btn-text">Try Again</span>
+              <span class="btn-icon">🔄</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="info-section">
+          <div class="info-card">
+            <div class="info-icon">💡</div>
+            <div class="info-content">
+              <h3 class="info-title">How it works</h3>
+              <ul class="info-list">
+                <li>Enter your long URL in the field above</li>
+                <li>Click "Generate Shortlink" to create your link</li>
+                <li>Copy the generated link or test it by opening</li>
+                <li>Share your shortlink anywhere you want</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="info-card">
+            <div class="info-icon">🔒</div>
+            <div class="info-content">
+              <h3 class="info-title">Security & Privacy</h3>
+              <ul class="info-list">
+                <li>All URLs are validated before processing</li>
+                <li>Your original URL is stored securely</li>
+                <li>Shortlinks are permanent and don't expire</li>
+                <li>We don't track your usage or personal data</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="footer">
+        <div class="footer-content">
+          <p class="footer-text">
+            Powered by <a href="/" class="footer-link">Hyperlane</a>
+          </p>
+          <p class="footer-copyright">© 2024 Hyperlane. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+  </body>
+</html>

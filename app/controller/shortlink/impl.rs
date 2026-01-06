@@ -66,12 +66,17 @@ impl ServerHook for QueryRoute {
                 return;
             }
         };
-
         match ShortlinkService::query_shortlink(id).await {
             Ok(Some(record)) => {
                 let response: ApiResponse<ShortlinkRecord> =
                     ApiResponse::<ShortlinkRecord>::success(record);
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.set_response_status_code(302)
+                    .await
+                    .set_response_header(
+                        LOCATION,
+                        response.get_data().clone().unwrap_or_default().get_url(),
+                    )
+                    .await
             }
             Ok(None) => {
                 let response = ApiResponse::<()>::error_with_code(

@@ -1,7 +1,7 @@
 use super::*;
 
-#[route("/shortlink/query/{id")]
+#[route("/api/shortlink/query/{id}")]
 pub struct QueryRoute;
 
-#[route("/shortlink/insert")]
+#[route("/api/shortlink/insert")]
 pub struct InsertRoute;

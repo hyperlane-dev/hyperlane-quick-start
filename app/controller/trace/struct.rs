@@ -1,4 +1,4 @@
 use super::*;
 
-#[route("/trace/{trace}")]
+#[route("/api/trace/{trace}")]
 pub struct TraceRoute;
