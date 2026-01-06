@@ -37,6 +37,8 @@ use super::*;
         controller::tracking::openapi_tracking_report,
         controller::tracking::openapi_tracking_query,
         controller::rss::openapi_rss_feed,
+        controller::shortlink::openapi_shortlink_query,
+        controller::shortlink::openapi_shortlink_insert,
         view::chat::openapi_chat_view,
         view::favicon::openapi_favicon,
         view::monitor::openapi_monitor_view,

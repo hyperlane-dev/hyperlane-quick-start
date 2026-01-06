@@ -2,7 +2,7 @@ use super::*;
 
 #[utoipa::path(
     get,
-    path = "/api/postgresql/list",
+    path = "/shortlink/query/{id}",
     responses(
         (status = 200, description = "Success"),
         (status = 400, description = "Bad Request"),
@@ -10,11 +10,11 @@ use super::*;
         (status = 500, description = "Internal Server Error")
     )
 )]
-pub fn openapi_postgresql_records() {}
+pub fn openapi_shortlink_query() {}
 
 #[utoipa::path(
     post,
-    path = "/api/postgresql/create",
+    path = "/shortlink/insert",
     responses(
         (status = 200, description = "Success"),
         (status = 400, description = "Bad Request"),
@@ -22,28 +22,4 @@ pub fn openapi_postgresql_records() {}
         (status = 500, description = "Internal Server Error")
     )
 )]
-pub fn openapi_postgresql_record_create() {}
-
-#[utoipa::path(
-    post,
-    path = "/api/postgresql/update",
-    responses(
-        (status = 200, description = "Success"),
-        (status = 400, description = "Bad Request"),
-        (status = 404, description = "Not Found"),
-        (status = 500, description = "Internal Server Error")
-    )
-)]
-pub fn openapi_postgresql_record_update() {}
-
-#[utoipa::path(
-    post,
-    path = "/api/postgresql/delete",
-    responses(
-        (status = 200, description = "Success"),
-        (status = 400, description = "Bad Request"),
-        (status = 404, description = "Not Found"),
-        (status = 500, description = "Internal Server Error")
-    )
-)]
-pub fn openapi_postgresql_record_delete() {}
+pub fn openapi_shortlink_insert() {}
