@@ -200,6 +200,10 @@ impl PostgreSqlAutoCreation {
                 POSTGRESQL_CHAT_HISTORY_SQL.to_string(),
             ))
             .add_table(TableSchema::new(
+                "tracking_record".to_string(),
+                POSTGRESQL_TRACKING_RECORD_SQL.to_string(),
+            ))
+            .add_table(TableSchema::new(
                 "shortlink".to_string(),
                 POSTGRESQL_SHORTLINK_SQL.to_string(),
             ));

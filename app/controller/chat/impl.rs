@@ -52,12 +52,10 @@ impl ServerHook for ChatHistoryRoute {
         async fn get_before_id(ctx: &Context) -> Option<String> {
             before_id_opt
         }
-
         #[request_query_option("limit" => limit_opt)]
         async fn get_limit(_tx: &Context) -> Option<String> {
             limit_opt
         }
-
         let before_id: Option<i64> = get_before_id(ctx)
             .await
             .and_then(|id| id.parse::<i64>().ok());
@@ -65,7 +63,6 @@ impl ServerHook for ChatHistoryRoute {
             .await
             .and_then(|s| s.parse::<i64>().ok())
             .unwrap_or(20);
-
         match ChatService::get_chat_history(before_id, limit).await {
             Ok(history) => {
                 let response: ApiResponse<ChatHistoryResponse> = ApiResponse::success(history);

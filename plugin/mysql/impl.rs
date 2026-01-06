@@ -189,10 +189,6 @@ impl MySqlAutoCreation {
                 "tracking_record".to_string(),
                 MYSQL_TRACKING_RECORD_SQL.to_string(),
             ))
-            .add_table(TableSchema::new(
-                "shortlink".to_string(),
-                MYSQL_SHORTLINK_SQL.to_string(),
-            ))
     }
 }
 
