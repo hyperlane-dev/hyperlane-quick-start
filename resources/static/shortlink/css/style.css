@@ -42,11 +42,10 @@ body {
 
 /* Header */
 .header {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  padding: 40px 20px;
   text-align: center;
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+  color: white;
+  padding: 40px 20px;
+  animation: fadeInDown 0.6s ease;
 }
 
 .header-content {
@@ -78,16 +77,13 @@ body {
 }
 
 .title .text {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: white;
   font-weight: 700;
 }
 
 .subtitle {
   font-size: 1.1rem;
-  color: #6c757d;
+  color: rgba(255, 255, 255, 0.9);
   font-weight: 400;
   margin-top: 8px;
 }
