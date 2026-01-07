@@ -1,69 +1,43 @@
-/**
- * Shortlink Generator JavaScript
- * Handles URL shortening functionality with API integration
- */
-
-/**
- * Main application object for shortlink generation
- */
 const ShortlinkApp = {
-  /**
-   * Current generated shortlink ID
-   */
   currentShortlinkId: null,
 
-  /**
-   * API endpoints configuration
-   */
   api: {
     insert: '/api/shortlink/insert',
     query: (id) => `/api/shortlink/query/${id}`,
   },
 
-  /**
-   * Initialize the application
-   */
   init: function () {
     this.bindEvents();
     this.setupFormValidation();
     console.log('Shortlink App initialized');
   },
 
-  /**
-   * Bind all event listeners
-   */
   bindEvents: function () {
-    // Form submission
     const form = document.getElementById('shortlinkForm');
     if (form) {
       form.addEventListener('submit', (e) => this.handleFormSubmit(e));
     }
 
-    // Copy button
     const copyBtn = document.getElementById('copyBtn');
     if (copyBtn) {
       copyBtn.addEventListener('click', () => this.copyShortlink());
     }
 
-    // Open link button
     const openBtn = document.getElementById('openBtn');
     if (openBtn) {
       openBtn.addEventListener('click', () => this.openShortlink());
     }
 
-    // New link button
     const newLinkBtn = document.getElementById('newLinkBtn');
     if (newLinkBtn) {
       newLinkBtn.addEventListener('click', () => this.resetForm());
     }
 
-    // Retry button
     const retryBtn = document.getElementById('retryBtn');
     if (retryBtn) {
       retryBtn.addEventListener('click', () => this.retryLastAction());
     }
 
-    // URL input validation
     const urlInput = document.getElementById('urlInput');
     if (urlInput) {
       urlInput.addEventListener('blur', () => this.validateUrl(urlInput));
@@ -71,13 +45,9 @@ const ShortlinkApp = {
     }
   },
 
-  /**
-   * Setup form validation
-   */
   setupFormValidation: function () {
     const urlInput = document.getElementById('urlInput');
     if (urlInput) {
-      // Set custom validity messages
       urlInput.addEventListener('invalid', function (e) {
         if (this.validity.valueMissing) {
           this.setCustomValidity('Please enter a URL to shorten');
@@ -94,10 +64,6 @@ const ShortlinkApp = {
     }
   },
 
-  /**
-   * Handle form submission
-   * @param {Event} e - Form submit event
-   */
   handleFormSubmit: async function (e) {
     e.preventDefault();
 
@@ -115,11 +81,6 @@ const ShortlinkApp = {
     await this.generateShortlink(url);
   },
 
-  /**
-   * Validate URL input
-   * @param {HTMLInputElement} input - URL input element
-   * @returns {boolean} - Whether URL is valid
-   */
   validateUrl: function (input) {
     const url = input.value.trim();
 
@@ -143,11 +104,6 @@ const ShortlinkApp = {
     }
   },
 
-  /**
-   * Show input error message
-   * @param {HTMLInputElement} input - Input element
-   * @param {string} message - Error message
-   */
   showInputError: function (input, message) {
     this.clearInputError(input);
     this.showToast(message, 'error');
@@ -159,18 +115,10 @@ const ShortlinkApp = {
     input.focus();
   },
 
-  /**
-   * Clear input error message
-   * @param {HTMLInputElement} input - Input element
-   */
   clearInputError: function (input) {
     input.style.borderColor = '';
   },
 
-  /**
-   * Generate shortlink for given URL
-   * @param {string} url - URL to shorten
-   */
   generateShortlink: async function (url) {
     this.showLoading(true);
 
@@ -205,10 +153,6 @@ const ShortlinkApp = {
     }
   },
 
-  /**
-   * Display the generated shortlink result
-   * @param {number} id - Shortlink ID
-   */
   displayResult: function (id) {
     const shortlinkUrl = `${window.location.origin}/api/shortlink/query/${id}`;
     const shortlinkElement = document.getElementById('shortlinkText');
@@ -217,16 +161,12 @@ const ShortlinkApp = {
       shortlinkElement.textContent = shortlinkUrl;
     }
 
-    // Show result container and hide others
     this.showElement('resultContainer');
     this.hideElement('shortlinkForm');
     this.hideElement('errorContainer');
     this.hideElement('loadingContainer');
   },
 
-  /**
-   * Copy shortlink to clipboard
-   */
   copyShortlink: async function () {
     const shortlinkElement = document.getElementById('shortlinkText');
     if (!shortlinkElement || !shortlinkElement.textContent) {
@@ -238,7 +178,6 @@ const ShortlinkApp = {
       await navigator.clipboard.writeText(shortlinkElement.textContent);
       this.showToast('Shortlink copied to clipboard!', 'success');
 
-      // Update copy button temporarily
       const copyBtn = document.getElementById('copyBtn');
       if (copyBtn) {
         const originalText = copyBtn.innerHTML;
@@ -256,9 +195,6 @@ const ShortlinkApp = {
     }
   },
 
-  /**
-   * Open the shortlink in new tab
-   */
   openShortlink: function () {
     if (!this.currentShortlinkId) {
       this.showToast('No shortlink to open', 'error');
@@ -267,12 +203,10 @@ const ShortlinkApp = {
 
     const shortlinkUrl = this.api.query(this.currentShortlinkId);
 
-    // First, get the original URL by querying the shortlink
     fetch(shortlinkUrl)
       .then((response) => response.json())
       .then((result) => {
         if (result.code === 200 && result.data && result.data.url) {
-          // Open the original URL in a new tab
           window.open(result.data.url, '_blank');
         } else {
           throw new Error('Failed to retrieve original URL');
@@ -284,35 +218,25 @@ const ShortlinkApp = {
       });
   },
 
-  /**
-   * Reset form to create new shortlink
-   */
   resetForm: function () {
-    // Reset form
     const form = document.getElementById('shortlinkForm');
     if (form) {
       form.reset();
     }
 
-    // Reset state
     this.currentShortlinkId = null;
 
-    // Show form and hide result
     this.showElement('shortlinkForm');
     this.hideElement('resultContainer');
     this.hideElement('errorContainer');
     this.hideElement('loadingContainer');
 
-    // Focus on input
     const urlInput = document.getElementById('urlInput');
     if (urlInput) {
       urlInput.focus();
     }
   },
 
-  /**
-   * Retry last failed action
-   */
   retryLastAction: function () {
     const urlInput = document.getElementById('urlInput');
     const url = urlInput ? urlInput.value.trim() : '';
@@ -329,10 +253,6 @@ const ShortlinkApp = {
     }
   },
 
-  /**
-   * Show loading state
-   * @param {boolean} show - Whether to show loading
-   */
   showLoading: function (show) {
     if (show) {
       this.hideElement('shortlinkForm');
@@ -344,10 +264,6 @@ const ShortlinkApp = {
     }
   },
 
-  /**
-   * Show error message
-   * @param {string} message - Error message
-   */
   showError: function (message) {
     const errorElement = document.getElementById('errorMessage');
     if (errorElement) {
@@ -360,11 +276,6 @@ const ShortlinkApp = {
     this.showElement('errorContainer');
   },
 
-  /**
-   * Show toast notification
-   * @param {string} message - Toast message
-   * @param {string} type - Toast type (success/error)
-   */
   showToast: function (message, type = 'success') {
     const container = document.getElementById('toastContainer');
     if (!container) return;
@@ -375,7 +286,6 @@ const ShortlinkApp = {
 
     container.appendChild(toast);
 
-    // Remove toast after animation
     setTimeout(() => {
       if (toast.parentNode) {
         toast.parentNode.removeChild(toast);
@@ -383,10 +293,6 @@ const ShortlinkApp = {
     }, 4000);
   },
 
-  /**
-   * Show element by ID
-   * @param {string} elementId - Element ID
-   */
   showElement: function (elementId) {
     const element = document.getElementById(elementId);
     if (element) {
@@ -394,10 +300,6 @@ const ShortlinkApp = {
     }
   },
 
-  /**
-   * Hide element by ID
-   * @param {string} elementId - Element ID
-   */
   hideElement: function (elementId) {
     const element = document.getElementById(elementId);
     if (element) {
@@ -406,16 +308,7 @@ const ShortlinkApp = {
   },
 };
 
-/**
- * Toast notification system
- */
 const Toast = {
-  /**
-   * Show a toast notification
-   * @param {string} message - Message to display
-   * @param {string} type - Type of toast (success, error, warning)
-   * @param {number} duration - Duration in milliseconds
-   */
   show: function (message, type = 'success', duration = 3000) {
     const container = document.getElementById('toastContainer');
     if (!container) return;
@@ -426,7 +319,6 @@ const Toast = {
 
     container.appendChild(toast);
 
-    // Auto remove after duration
     setTimeout(() => {
       if (toast.parentNode) {
         toast.style.animation = 'slideInRight 0.3s ease reverse';
@@ -441,41 +333,24 @@ const Toast = {
     return toast;
   },
 
-  /**
-   * Show success toast
-   * @param {string} message - Success message
-   */
   success: function (message) {
     return this.show(message, 'success');
   },
 
-  /**
-   * Show error toast
-   * @param {string} message - Error message
-   */
   error: function (message) {
     return this.show(message, 'error');
   },
 
-  /**
-   * Show warning toast
-   * @param {string} message - Warning message
-   */
   warning: function (message) {
     return this.show(message, 'warning', 4000);
   },
 };
 
-// Make Toast globally available
 window.toast = Toast;
 
-/**
- * Initialize the application when DOM is loaded
- */
 document.addEventListener('DOMContentLoaded', function () {
   ShortlinkApp.init();
 
-  // Add some helpful console logging for debugging
   console.log('Shortlink Generator initialized successfully');
   console.log('Available functions:', {
     generate: 'Enter a URL and click Generate Shortlink',
@@ -485,10 +360,6 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
-/**
- * Handle before unload to clean up
- */
 window.addEventListener('beforeunload', function () {
-  // Cleanup if needed
   console.log('Shortlink app cleanup');
 });
