@@ -150,26 +150,13 @@ const ShortlinkApp = {
    */
   showInputError: function (input, message) {
     this.clearInputError(input);
-
-    const errorElement = document.createElement('div');
-    errorElement.className = 'input-error';
-    errorElement.style.cssText = `
-      color: #dc3545;
-      font-size: 0.85rem;
-      margin-top: 5px;
-      font-weight: 500;
-    `;
-    errorElement.textContent = message;
-    errorElement.id = `${input.id}-error`;
-
-    input.parentNode.appendChild(errorElement);
+    this.showToast(message, 'error');
     input.style.borderColor = '#dc3545';
-
-    // Add shake animation
     input.style.animation = 'shake 0.5s ease';
     setTimeout(() => {
       input.style.animation = '';
     }, 500);
+    input.focus();
   },
 
   /**
@@ -177,10 +164,6 @@ const ShortlinkApp = {
    * @param {HTMLInputElement} input - Input element
    */
   clearInputError: function (input) {
-    const errorElement = document.getElementById(`${input.id}-error`);
-    if (errorElement) {
-      errorElement.remove();
-    }
     input.style.borderColor = '';
   },
 

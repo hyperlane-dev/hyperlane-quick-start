@@ -584,41 +584,6 @@ body {
   font-weight: bold;
 }
 
-/* Footer */
-.footer {
-  background: rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
-  padding: 30px 20px;
-  text-align: center;
-}
-
-.footer-content {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.footer-text {
-  color: rgba(255, 255, 255, 0.9);
-  margin-bottom: 10px;
-  font-size: 1rem;
-}
-
-.footer-link {
-  color: rgba(255, 255, 255, 0.9);
-  text-decoration: none;
-  font-weight: 600;
-  transition: color 0.3s ease;
-}
-
-.footer-link:hover {
-  color: #ffd700;
-}
-
-.footer-copyright {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.9rem;
-}
-
 /* Toast Container */
 .toast-container {
   position: fixed;
