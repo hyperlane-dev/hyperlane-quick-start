@@ -185,7 +185,14 @@ impl PostgreSqlAutoCreation {
     }
 
     fn get_postgresql_schema(&self) -> DatabaseSchema {
-        DatabaseSchema::new()
+        let index_sql: &str = POSTGRESQL_CREATE_INDEX_SQL;
+        let indexes: Vec<String> = index_sql
+            .split(';')
+            .map(|s| s.trim())
+            .filter(|s| !s.is_empty() && !s.starts_with("--"))
+            .map(|s| format!("{s};"))
+            .collect();
+        let mut schema: DatabaseSchema = DatabaseSchema::new()
             .add_table(TableSchema::new(
                 "record".to_string(),
                 POSTGRESQL_RECORD_SQL.to_string(),
@@ -201,7 +208,11 @@ impl PostgreSqlAutoCreation {
             .add_table(TableSchema::new(
                 "shortlink".to_string(),
                 POSTGRESQL_SHORTLINK_SQL.to_string(),
-            ))
+            ));
+        for index in indexes {
+            schema = schema.add_index(index);
+        }
+        schema
     }
 }
 
