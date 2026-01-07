@@ -8,9 +8,6 @@ impl EnvConfig {
             let mut data: String = String::new();
             data.push_str(&format!("{ENV_KEY_GPT_API_URL}=\n"));
             data.push_str(&format!("{ENV_KEY_GPT_MODEL}=\n"));
-            data.push_str(&format!("{ENV_KEY_ENABLE_MYSQL}=\n"));
-            data.push_str(&format!("{ENV_KEY_ENABLE_REDIS}=\n"));
-            data.push_str(&format!("{ENV_KEY_ENABLE_POSTGRESQL}=\n"));
             write_to_file(ENV_FILE_PATH, data.as_bytes())
                 .map_err(|error| format!("Failed to create example env file: {error}"))?;
         }
@@ -21,7 +18,7 @@ impl EnvConfig {
             std::env::var(key)
                 .ok()
                 .and_then(|value| value.parse().ok())
-                .unwrap_or(false)
+                .unwrap_or(true)
         };
         let get_env_usize = |key: &str| -> Option<usize> {
             std::env::var(key).ok().and_then(|value| value.parse().ok())
@@ -29,9 +26,9 @@ impl EnvConfig {
         let mut config: EnvConfig = EnvConfig::default();
         config
             .set_gpt_api_url(get_env(ENV_KEY_GPT_API_URL).unwrap_or_default())
-            .set_enable_mysql(get_env_bool(ENV_KEY_ENABLE_MYSQL))
-            .set_enable_redis(get_env_bool(ENV_KEY_ENABLE_REDIS))
-            .set_enable_postgresql(get_env_bool(ENV_KEY_ENABLE_POSTGRESQL))
+            .set_enable_mysql(true)
+            .set_enable_redis(true)
+            .set_enable_postgresql(true)
             .set_gtp_model(get_env(ENV_KEY_GPT_MODEL).unwrap_or_default())
             .set_mysql_host(
                 get_env(ENV_KEY_MYSQL_HOST).unwrap_or_else(|| DEFAULT_DB_HOST.to_string()),

@@ -37,16 +37,11 @@ async fn init_network_capture() {
 
 async fn init_db() {
     let env: &EnvConfig = get_global_env_config();
-    if *env.get_enable_mysql() {
-        let _: Result<sea_orm::DatabaseConnection, String> = connection_mysql_db().await;
-    }
-    if *env.get_enable_postgresql() {
-        let _: Result<sea_orm::DatabaseConnection, String> = connection_postgresql_db().await;
-    }
-    if *env.get_enable_redis() {
-        let _: Result<std::sync::Arc<hyperlane_utils::redis::Connection>, String> =
-            connection_redis_db().await;
-    }
+
+    let _: Result<DatabaseConnection, String> = connection_mysql_db().await;
+    let _: Result<DatabaseConnection, String> = connection_postgresql_db().await;
+    let _: Result<Arc<Connection>, String> = connection_redis_db().await;
+
     match initialize_auto_creation().await {
         Ok(_) => {
             println_success!("Auto-creation initialization successful");

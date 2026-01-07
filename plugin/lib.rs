@@ -7,8 +7,11 @@ pub mod process;
 pub mod redis;
 
 pub use database::*;
+pub use env::*;
+pub use log::*;
 pub use mysql::*;
 pub use postgresql::*;
+pub use process::*;
 pub use redis::*;
 
 use std::*;

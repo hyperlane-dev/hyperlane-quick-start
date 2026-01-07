@@ -370,16 +370,6 @@ impl AutoCreationConfig {
         Ok(())
     }
 
-    pub fn get_summary() -> String {
-        let env: &'static EnvConfig = Self::get_env();
-        format!(
-            "Auto-creation config: MySQL={}, PostgreSQL={}, Redis={}",
-            env.get_enable_mysql(),
-            env.get_enable_postgresql(),
-            env.get_enable_redis()
-        )
-    }
-
     pub fn for_plugin(plugin_name: &str) -> PluginAutoCreationConfig {
         PluginAutoCreationConfig {
             plugin_name: plugin_name.to_string(),
@@ -389,17 +379,8 @@ impl AutoCreationConfig {
 
 impl PluginAutoCreationConfig {
     pub fn is_plugin_enabled(&self) -> bool {
-        let env: &'static EnvConfig = AutoCreationConfig::get_env();
-        if let Ok(plugin_type) = PluginType::from_str(&self.plugin_name) {
-            let is_enabled: &bool = match plugin_type {
-                PluginType::MySQL => env.get_enable_mysql(),
-                PluginType::PostgreSQL => env.get_enable_postgresql(),
-                PluginType::Redis => env.get_enable_redis(),
-            };
-            *is_enabled
-        } else {
-            false
-        }
+        // 所有插件默认启用
+        PluginType::from_str(&self.plugin_name).is_ok()
     }
 
     pub fn get_database_name(&self) -> String {

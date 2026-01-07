@@ -6,68 +6,59 @@ pub async fn initialize_auto_creation() -> Result<(), String> {
             "Auto-creation configuration validation failed: {error}"
         ));
     }
-    let summary: String = AutoCreationConfig::get_summary();
-    log_info(&format!("[AUTO-CREATION] Initialization: {summary}")).await;
-    let env: &'static EnvConfig = get_global_env_config();
     let mut initialization_results: Vec<String> = Vec::new();
-    if *env.get_enable_mysql() {
-        match perform_mysql_auto_creation().await {
-            Ok(result) => {
-                initialization_results.push(format!(
-                    "MySQL: {}",
-                    if result.has_changes() {
-                        "initialized with changes"
-                    } else {
-                        "verified"
-                    }
-                ));
-            }
-            Err(error) => {
-                if !error.should_continue() {
-                    return Err(format!("MySQL auto-creation failed: {error}"));
+    match perform_mysql_auto_creation().await {
+        Ok(result) => {
+            initialization_results.push(format!(
+                "MySQL: {}",
+                if result.has_changes() {
+                    "initialized with changes"
+                } else {
+                    "verified"
                 }
-                initialization_results.push(format!("MySQL: failed but continuing ({error})"));
+            ));
+        }
+        Err(error) => {
+            if !error.should_continue() {
+                return Err(format!("MySQL auto-creation failed: {error}"));
             }
+            initialization_results.push(format!("MySQL: failed but continuing ({error})"));
         }
     }
-    if *env.get_enable_postgresql() {
-        match perform_postgresql_auto_creation().await {
-            Ok(result) => {
-                initialization_results.push(format!(
-                    "PostgreSQL: {}",
-                    if result.has_changes() {
-                        "initialized with changes"
-                    } else {
-                        "verified"
-                    }
-                ));
-            }
-            Err(error) => {
-                if !error.should_continue() {
-                    return Err(format!("PostgreSQL auto-creation failed: {error}"));
+    match perform_postgresql_auto_creation().await {
+        Ok(result) => {
+            initialization_results.push(format!(
+                "PostgreSQL: {}",
+                if result.has_changes() {
+                    "initialized with changes"
+                } else {
+                    "verified"
                 }
-                initialization_results.push(format!("PostgreSQL: failed but continuing ({error})"));
+            ));
+        }
+        Err(error) => {
+            if !error.should_continue() {
+                return Err(format!("PostgreSQL auto-creation failed: {error}"));
             }
+            initialization_results.push(format!("PostgreSQL: failed but continuing ({error})"));
         }
     }
-    if *env.get_enable_redis() {
-        match perform_redis_auto_creation().await {
-            Ok(result) => {
-                initialization_results.push(format!(
-                    "Redis: {}",
-                    if result.has_changes() {
-                        "initialized with changes"
-                    } else {
-                        "verified"
-                    }
-                ));
-            }
-            Err(error) => {
-                if !error.should_continue() {
-                    return Err(format!("Redis auto-creation failed: {error}"));
+    match perform_redis_auto_creation().await {
+        Ok(result) => {
+            initialization_results.push(format!(
+                "Redis: {}",
+                if result.has_changes() {
+                    "initialized with changes"
+                } else {
+                    "verified"
                 }
-                initialization_results.push(format!("Redis: failed but continuing ({error})"));
+            ));
+        }
+        Err(error) => {
+            if !error.should_continue() {
+                return Err(format!("Redis auto-creation failed: {error}"));
             }
+            initialization_results.push(format!("Redis: failed but continuing ({error})"));
         }
     }
     if initialization_results.is_empty() {
