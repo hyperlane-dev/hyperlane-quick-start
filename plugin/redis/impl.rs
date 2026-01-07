@@ -142,15 +142,12 @@ impl RedisAutoCreation {
 impl DatabaseAutoCreation for RedisAutoCreation {
     async fn create_database_if_not_exists(&self) -> Result<bool, AutoCreationError> {
         self.validate_redis_server().await?;
-
         AutoCreationLogger::log_database_exists("default", database::PluginType::Redis).await;
-
         Ok(false)
     }
 
     async fn create_tables_if_not_exist(&self) -> Result<Vec<String>, AutoCreationError> {
         let setup_operations: Vec<String> = self.setup_redis_namespace().await?;
-
         if !setup_operations.is_empty() {
             AutoCreationLogger::log_tables_created(
                 &setup_operations,
@@ -162,7 +159,6 @@ impl DatabaseAutoCreation for RedisAutoCreation {
             AutoCreationLogger::log_tables_created(&[], "default", database::PluginType::Redis)
                 .await;
         }
-
         Ok(setup_operations)
     }
 
