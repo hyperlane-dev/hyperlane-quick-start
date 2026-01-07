@@ -3,10 +3,7 @@ use super::*;
 #[derive(Debug, Clone, Default, Data)]
 pub struct EnvConfig {
     gpt_api_url: String,
-    enable_mysql: bool,
-    enable_redis: bool,
-    enable_postgresql: bool,
-    gtp_model: String,
+    gpt_model: String,
     mysql_host: String,
     mysql_port: usize,
     mysql_database: String,

@@ -9,6 +9,6 @@ use hyperlane_plugin::*;
 
 use std::sync::Arc;
 
-use redis::Connection;
+use hyperlane_utils::redis::Connection;
 use sea_orm::DatabaseConnection;
 use tokio::runtime::{Builder, Runtime};

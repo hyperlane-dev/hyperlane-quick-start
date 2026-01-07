@@ -249,10 +249,10 @@ impl ChatService {
 
     async fn call_gpt_api_with_context(session: &ChatSession) -> Result<String, String> {
         let config: &EnvConfig = get_global_env_config();
-        let gtp_model: &str = config.get_gtp_model();
+        let gpt_model: &str = config.get_gpt_model();
         let messages: Vec<Value> = Self::build_gpt_request_messages(session);
         let body: Value = json!({
-            GPT_MODEL: gtp_model,
+            GPT_MODEL: gpt_model,
             JSON_FIELD_MESSAGES: messages
         });
         let headers: HashMapXxHash3_64<&str, String> = Self::build_gpt_request_headers();

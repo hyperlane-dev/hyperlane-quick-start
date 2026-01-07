@@ -14,22 +14,13 @@ impl EnvConfig {
         dotenvy::from_path(ENV_FILE_PATH)
             .map_err(|error| format!("Failed to load env file: {error}"))?;
         let get_env = |key: &str| -> Option<String> { std::env::var(key).ok() };
-        let get_env_bool = |key: &str| -> bool {
-            std::env::var(key)
-                .ok()
-                .and_then(|value| value.parse().ok())
-                .unwrap_or(true)
-        };
         let get_env_usize = |key: &str| -> Option<usize> {
             std::env::var(key).ok().and_then(|value| value.parse().ok())
         };
         let mut config: EnvConfig = EnvConfig::default();
         config
             .set_gpt_api_url(get_env(ENV_KEY_GPT_API_URL).unwrap_or_default())
-            .set_enable_mysql(true)
-            .set_enable_redis(true)
-            .set_enable_postgresql(true)
-            .set_gtp_model(get_env(ENV_KEY_GPT_MODEL).unwrap_or_default())
+            .set_gpt_model(get_env(ENV_KEY_GPT_MODEL).unwrap_or_default())
             .set_mysql_host(
                 get_env(ENV_KEY_MYSQL_HOST).unwrap_or_else(|| DEFAULT_DB_HOST.to_string()),
             )

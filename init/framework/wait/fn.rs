@@ -36,8 +36,6 @@ async fn init_network_capture() {
 }
 
 async fn init_db() {
-    let env: &EnvConfig = get_global_env_config();
-
     let _: Result<DatabaseConnection, String> = connection_mysql_db().await;
     let _: Result<DatabaseConnection, String> = connection_postgresql_db().await;
     let _: Result<Arc<Connection>, String> = connection_redis_db().await;

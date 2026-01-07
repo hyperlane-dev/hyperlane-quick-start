@@ -65,164 +65,6 @@ impl std::fmt::Display for AutoCreationError {
 
 impl std::error::Error for AutoCreationError {}
 
-impl AutoCreationErrorHandler {
-    pub fn standardize_error_message(
-        error: &AutoCreationError,
-        plugin_type: PluginType,
-        operation: &str,
-    ) -> String {
-        let prefix: String = format!("[{}] {operation}", plugin_type.as_str().to_uppercase());
-        match error {
-            AutoCreationError::InsufficientPermissions(msg) => {
-                format!("{prefix} - PERMISSION DENIED: {msg}")
-            }
-            AutoCreationError::ConnectionFailed(msg) => {
-                format!("{prefix} - CONNECTION FAILED: {msg}")
-            }
-            AutoCreationError::SchemaError(msg) => {
-                format!("{prefix} - SCHEMA ERROR: {msg}")
-            }
-            AutoCreationError::Timeout(msg) => {
-                format!("{prefix} - TIMEOUT: {msg}")
-            }
-            AutoCreationError::DatabaseError(msg) => {
-                format!("{prefix} - DATABASE ERROR: {msg}")
-            }
-        }
-    }
-
-    pub fn get_log_level(error: &AutoCreationError) -> &'static str {
-        match error {
-            AutoCreationError::InsufficientPermissions(_) => "WARN",
-            AutoCreationError::ConnectionFailed(_) => "ERROR",
-            AutoCreationError::SchemaError(_) => "WARN",
-            AutoCreationError::Timeout(_) => "WARN",
-            AutoCreationError::DatabaseError(_) => "ERROR",
-        }
-    }
-
-    pub fn get_recovery_suggestion(error: &AutoCreationError, plugin_type: PluginType) -> String {
-        match error {
-            AutoCreationError::InsufficientPermissions(_) => {
-                format!(
-                    "Grant CREATE DATABASE and CREATE TABLE permissions to the {plugin_type} user, or disable auto-creation"
-                )
-            }
-            AutoCreationError::ConnectionFailed(_) => {
-                format!(
-                    "Check {plugin_type} server connectivity, credentials, and network configuration"
-                )
-            }
-            AutoCreationError::SchemaError(_) => {
-                format!("Review {plugin_type} table schema definitions and database compatibility")
-            }
-            AutoCreationError::Timeout(_) => {
-                format!(
-                    "Increase AUTO_CREATION_TIMEOUT_SECONDS or check {plugin_type} server performance"
-                )
-            }
-            AutoCreationError::DatabaseError(_) => {
-                format!("Check {plugin_type} server logs and database configuration")
-            }
-        }
-    }
-
-    pub fn create_error_context(
-        error: &AutoCreationError,
-        plugin_type: PluginType,
-        operation: &str,
-        database_name: Option<&str>,
-    ) -> ErrorContext {
-        ErrorContext {
-            plugin_name: plugin_type.to_string(),
-            operation: operation.to_string(),
-            database_name: database_name.map(|name: &str| name.to_string()),
-            error_type: format!("{error:?}")
-                .split('(')
-                .next()
-                .unwrap_or("Unknown")
-                .to_string(),
-            error_message: error.user_message().to_string(),
-            should_continue: error.should_continue(),
-            log_level: Self::get_log_level(error).to_string(),
-            recovery_suggestion: Self::get_recovery_suggestion(error, plugin_type),
-            timestamp: std::time::SystemTime::now(),
-        }
-    }
-
-    pub async fn handle_error(
-        error: &AutoCreationError,
-        plugin_type: PluginType,
-        operation: &str,
-        database_name: Option<&str>,
-    ) -> bool {
-        let context: ErrorContext =
-            Self::create_error_context(error, plugin_type, operation, database_name);
-        let _standardized_message: String =
-            Self::standardize_error_message(error, plugin_type, operation);
-        AutoCreationLogger::log_auto_creation_error(error, operation, plugin_type, database_name)
-            .await;
-        let recovery_message: String = format!(
-            "[{}] RECOVERY SUGGESTION: {}",
-            plugin_type.as_str().to_uppercase(),
-            context.recovery_suggestion
-        );
-        if error.should_continue() {
-            log_info(&recovery_message).await;
-        } else {
-            log_error(&recovery_message).await;
-        }
-        error.should_continue()
-    }
-
-    pub fn from_database_error(error: &str, plugin_type: PluginType) -> AutoCreationError {
-        let error_lower: String = error.to_lowercase();
-        if error_lower.contains("access denied")
-            || error_lower.contains("permission denied")
-            || error_lower.contains("authentication failed")
-            || error_lower.contains("must be owner")
-            || error_lower.contains("noauth")
-        {
-            return AutoCreationError::InsufficientPermissions(format!(
-                "{plugin_type} permission error: {error}"
-            ));
-        }
-        if error_lower.contains("connection refused")
-            || error_lower.contains("connection failed")
-            || error_lower.contains("timeout")
-            || error_lower.contains("network")
-            || error_lower.contains("host")
-        {
-            return AutoCreationError::ConnectionFailed(format!(
-                "{plugin_type} connection error: {error}"
-            ));
-        }
-        if error_lower.contains("syntax error")
-            || error_lower.contains("invalid")
-            || error_lower.contains("constraint")
-            || error_lower.contains("foreign key")
-            || error_lower.contains("duplicate")
-        {
-            return AutoCreationError::SchemaError(format!("{plugin_type} schema error: {error}"));
-        }
-        AutoCreationError::DatabaseError(format!("{plugin_type} database error: {error}"))
-    }
-}
-
-impl ErrorContext {
-    pub fn format_for_log(&self) -> String {
-        format!(
-            "[{}] {} failed - Type: {}, Database: {}, Continue: {}, Suggestion: {}",
-            self.plugin_name,
-            self.operation,
-            self.error_type,
-            self.database_name.as_deref().unwrap_or("N/A"),
-            self.should_continue,
-            self.recovery_suggestion
-        )
-    }
-}
-
 impl AutoCreationResult {
     pub fn new() -> Self {
         Self {
@@ -335,38 +177,28 @@ impl AutoCreationConfig {
 
     pub fn validate() -> Result<(), String> {
         let env: &'static EnvConfig = Self::get_env();
-        if *env.get_enable_mysql() {
-            if env.get_mysql_host().is_empty() {
-                return Err("MySQL host is required when auto-creation is enabled".to_string());
-            }
-            if env.get_mysql_username().is_empty() {
-                return Err("MySQL username is required when auto-creation is enabled".to_string());
-            }
-            if env.get_mysql_database().is_empty() {
-                return Err(
-                    "MySQL database name is required when auto-creation is enabled".to_string(),
-                );
-            }
+        if env.get_mysql_host().is_empty() {
+            return Err("MySQL host is required".to_string());
         }
-        if *env.get_enable_postgresql() {
-            if env.get_postgresql_host().is_empty() {
-                return Err("PostgreSQL host is required when auto-creation is enabled".to_string());
-            }
-            if env.get_postgresql_username().is_empty() {
-                return Err(
-                    "PostgreSQL username is required when auto-creation is enabled".to_string(),
-                );
-            }
-            if env.get_postgresql_database().is_empty() {
-                return Err(
-                    "PostgreSQL database name is required when auto-creation is enabled"
-                        .to_string(),
-                );
-            }
+        if env.get_mysql_username().is_empty() {
+            return Err("MySQL username is required".to_string());
         }
-        if *env.get_enable_redis() && env.get_redis_host().is_empty() {
-            return Err("Redis host is required when auto-creation is enabled".to_string());
+        if env.get_mysql_database().is_empty() {
+            return Err("MySQL database name is required".to_string());
         }
+        if env.get_postgresql_host().is_empty() {
+            return Err("PostgreSQL host is required".to_string());
+        }
+        if env.get_postgresql_username().is_empty() {
+            return Err("PostgreSQL username is required".to_string());
+        }
+        if env.get_postgresql_database().is_empty() {
+            return Err("PostgreSQL database name is required".to_string());
+        }
+        if env.get_redis_host().is_empty() {
+            return Err("Redis host is required".to_string());
+        }
+
         Ok(())
     }
 
@@ -379,7 +211,6 @@ impl AutoCreationConfig {
 
 impl PluginAutoCreationConfig {
     pub fn is_plugin_enabled(&self) -> bool {
-        // 所有插件默认启用
         PluginType::from_str(&self.plugin_name).is_ok()
     }
 
@@ -421,6 +252,61 @@ impl PluginAutoCreationConfig {
 }
 
 impl AutoCreationLogger {
+    pub async fn log_auto_creation_start(plugin_type: PluginType, database_name: &str) {
+        let message: String = format!(
+            "[AUTO-CREATION] Starting auto-creation for {plugin_type} database '{database_name}'"
+        );
+        log_info(&message).await;
+    }
+
+    pub async fn log_auto_creation_complete(plugin_type: PluginType, result: &AutoCreationResult) {
+        let message: String = if result.has_errors() {
+            format!(
+                "[AUTO-CREATION] Auto-creation completed for {plugin_type} with warnings: {}",
+                result.errors.join(", ")
+            )
+        } else {
+            format!("[AUTO-CREATION] Auto-creation completed successfully for {plugin_type}")
+        };
+        log_info(&message).await;
+    }
+
+    pub async fn log_auto_creation_error(
+        error: &AutoCreationError,
+        operation: &str,
+        plugin_type: PluginType,
+        database_name: Option<&str>,
+    ) {
+        let message: String = format!(
+            "[AUTO-CREATION] {operation} failed for {plugin_type} database '{}': {error}",
+            database_name.unwrap_or("unknown"),
+        );
+        log_error(&message).await;
+    }
+
+    pub async fn log_connection_verification(
+        plugin_type: PluginType,
+        database_name: &str,
+        success: bool,
+        error: Option<&str>,
+    ) {
+        let message: String = if success {
+            format!(
+                "[AUTO-CREATION] Connection verification successful for {plugin_type} database '{database_name}'"
+            )
+        } else {
+            format!(
+                "[AUTO-CREATION] Connection verification failed for {plugin_type} database '{database_name}': {}",
+                error.unwrap_or("Unknown error")
+            )
+        };
+        if success {
+            log_debug(&message).await;
+        } else {
+            log_error(&message).await;
+        }
+    }
+
     pub async fn log_database_created(database_name: &str, plugin_type: PluginType) {
         let message: String = format!(
             "[AUTO-CREATION] Successfully created database '{database_name}' for {plugin_type} plugin"
@@ -456,121 +342,15 @@ impl AutoCreationLogger {
     ) {
         if tables.is_empty() {
             let message: String = format!(
-                "[AUTO-CREATION] No new tables needed for database '{database_name}' in {plugin_type} plugin"
+                "[AUTO-CREATION] No new tables created in database '{database_name}' for {plugin_type} plugin"
             );
             log_debug(&message).await;
         } else {
             let message: String = format!(
-                "[AUTO-CREATION] Created {} tables in database '{database_name}' for {plugin_type} plugin: {}",
-                tables.len(),
+                "[AUTO-CREATION] Created tables [{}] in database '{database_name}' for {plugin_type} plugin",
                 tables.join(", ")
             );
             log_info(&message).await;
         }
-    }
-
-    pub async fn log_auto_creation_disabled(plugin_type: PluginType, reason: &str) {
-        let message: String =
-            format!("[AUTO-CREATION] Auto-creation disabled for {plugin_type} plugin: {reason}");
-        log_info(&message).await;
-    }
-
-    pub async fn log_auto_creation_error(
-        error: &AutoCreationError,
-        operation: &str,
-        plugin_type: PluginType,
-        context: Option<&str>,
-    ) {
-        let context_str: String = context.map(|c| format!(" ({c})")).unwrap_or_default();
-        let message: String = format!(
-            "[AUTO-CREATION] {operation} failed for {plugin_type} plugin{context_str}: {error}"
-        );
-
-        if error.should_continue() {
-            log_error(&format!("{message} - Continuing with existing resources")).await;
-        } else {
-            log_error(&format!("{message} - Fatal error, cannot continue")).await;
-        }
-    }
-
-    pub async fn log_auto_creation_timeout(
-        operation: &str,
-        plugin_type: PluginType,
-        timeout_seconds: u64,
-    ) {
-        let message: String = format!(
-            "[AUTO-CREATION] {operation} timed out after {timeout_seconds} seconds for {plugin_type} plugin - Continuing with existing resources"
-        );
-        log_error(&message).await;
-    }
-
-    pub async fn log_auto_creation_start(plugin_type: PluginType, database_name: &str) {
-        let message: String = format!(
-            "[AUTO-CREATION] Starting auto-creation process for {plugin_type} plugin, database '{database_name}'"
-        );
-        log_debug(&message).await;
-    }
-
-    pub async fn log_auto_creation_complete(plugin_type: PluginType, result: &AutoCreationResult) {
-        let message: String = if result.has_changes() {
-            format!(
-                "[AUTO-CREATION] Completed for {plugin_type} plugin - Database created: {}, Tables created: {} ({}), Duration: {:?}",
-                result.database_created,
-                result.tables_created.len(),
-                result.tables_created.join(", "),
-                result.duration
-            )
-        } else {
-            format!(
-                "[AUTO-CREATION] Completed for {plugin_type} plugin - No changes needed, Duration: {:?}",
-                result.duration
-            )
-        };
-
-        if result.has_errors() {
-            log_error(&format!(
-                "{message} - Errors occurred: {}",
-                result.errors.join("; ")
-            ))
-            .await;
-        } else {
-            log_info(&message).await;
-        }
-    }
-
-    pub async fn log_connection_verification(
-        plugin_type: PluginType,
-        database_name: &str,
-        success: bool,
-        error: Option<&str>,
-    ) {
-        let message: String = if success {
-            format!(
-                "[AUTO-CREATION] Connection verification successful for {plugin_type} plugin, database '{database_name}'"
-            )
-        } else {
-            format!(
-                "[AUTO-CREATION] Connection verification failed for {plugin_type} plugin, database '{database_name}': {}",
-                error.unwrap_or("Unknown error")
-            )
-        };
-
-        if success {
-            log_debug(&message).await;
-        } else {
-            log_error(&message).await;
-        }
-    }
-
-    pub async fn log_permission_issue(
-        plugin_type: PluginType,
-        operation: &str,
-        database_name: &str,
-        error_details: &str,
-    ) {
-        let message: String = format!(
-            "[AUTO-CREATION] Insufficient permissions for {operation} in {plugin_type} plugin, database '{database_name}': {error_details} - Continuing with existing resources"
-        );
-        log_error(&message).await;
     }
 }

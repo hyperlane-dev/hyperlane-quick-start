@@ -20,13 +20,12 @@ pub fn init_env_config() -> Result<(), String> {
     );
     println_success!(
         "GPT Model: {}",
-        if config.get_gtp_model().is_empty() {
+        if config.get_gpt_model().is_empty() {
             "(not set)"
         } else {
-            config.get_gtp_model()
+            config.get_gpt_model()
         }
     );
-    // 数据库配置信息（统一启用）
     println_success!("MySQL Configuration:");
     println_success!(
         "  Host: {}",
@@ -61,7 +60,7 @@ pub fn init_env_config() -> Result<(), String> {
             "***"
         }
     );
-    
+
     println_success!("PostgreSQL Configuration:");
     println_success!(
         "  Host: {}",
