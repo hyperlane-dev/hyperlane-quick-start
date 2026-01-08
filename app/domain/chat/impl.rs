@@ -13,12 +13,6 @@ impl MessageType {
 }
 
 impl WebSocketReqData {
-    pub fn new<T: ToString>(msg_type: MessageType, data: T) -> Self {
-        let mut resp_data: Self = Self::default();
-        resp_data.set_type(msg_type).set_data(data.to_string());
-        resp_data
-    }
-
     pub fn is_ping(&self) -> bool {
         self.get_type().is_ping()
     }
@@ -35,14 +29,14 @@ impl WebSocketReqData {
 }
 
 impl WebSocketRespData {
-    pub async fn new<T: ToString>(r#type: MessageType, ctx: &Context, data: T) -> Self {
+    pub async fn from<T: ToString>(msg_type: MessageType, ctx: &Context, data: T) -> Self {
         let name: String = ChatService::get_name(ctx).await;
         let mut resp_data: Self = Self::default();
         resp_data
-            .set_type(r#type)
+            .set_type(msg_type)
             .set_data(data.to_string())
             .set_time(time());
-        if r#type == MessageType::OnlineCount {
+        if msg_type == MessageType::OnlineCount {
             resp_data.set_name("System".to_string());
         } else {
             resp_data.set_name(name.to_string());
@@ -51,11 +45,11 @@ impl WebSocketRespData {
     }
 
     pub async fn get_json_data<T: ToString>(
-        r#type: MessageType,
+        msg_type: MessageType,
         ctx: &Context,
         data: T,
     ) -> serde_json::Result<ResponseBody> {
-        serde_json::to_vec(&WebSocketRespData::new(r#type, ctx, data).await)
+        serde_json::to_vec(&WebSocketRespData::from(msg_type, ctx, data).await)
     }
 }
 

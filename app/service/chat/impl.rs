@@ -117,7 +117,7 @@ impl ChatService {
     pub async fn handle_ping_request(ctx: &Context, req_data: &WebSocketReqData) -> bool {
         if req_data.is_ping() {
             let resp_data: WebSocketRespData =
-                WebSocketRespData::new(MessageType::Pang, ctx, "").await;
+                WebSocketRespData::from(MessageType::Pang, ctx, "").await;
             let resp_data: ResponseBody = serde_json::to_vec(&resp_data).unwrap();
             ctx.set_response_body(&resp_data).await;
             return true;
@@ -144,7 +144,7 @@ impl ChatService {
             Err(error) => format!("API call failed: {error}"),
         };
         let gpt_resp_data: WebSocketRespData =
-            WebSocketRespData::new(MessageType::GptResponse, &ctx, &api_response).await;
+            WebSocketRespData::from(MessageType::GptResponse, &ctx, &api_response).await;
         let gpt_resp_json: ResponseBody = serde_json::to_vec(&gpt_resp_data).unwrap();
         let websocket: &WebSocket = get_global_websocket();
         let path: String = ctx.get_request_path().await;
