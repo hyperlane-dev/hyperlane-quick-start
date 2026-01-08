@@ -13,9 +13,9 @@ impl MessageType {
 }
 
 impl WebSocketReqData {
-    pub fn new<T: ToString>(r#type: MessageType, data: T) -> Self {
+    pub fn new<T: ToString>(msg_type: MessageType, data: T) -> Self {
         let mut resp_data: Self = Self::default();
-        resp_data.set_type(r#type).set_data(data.to_string());
+        resp_data.set_type(msg_type).set_data(data.to_string());
         resp_data
     }
 
