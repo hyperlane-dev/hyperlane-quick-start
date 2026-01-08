@@ -23,14 +23,15 @@ pub struct AutoCreationResult {
     pub duration: Duration,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, New)]
 pub struct TableSchema {
     pub name: String,
     pub sql: String,
+    #[new(skip)]
     pub dependencies: Vec<String>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct DatabaseSchema {
     pub tables: Vec<TableSchema>,
     pub indexes: Vec<String>,

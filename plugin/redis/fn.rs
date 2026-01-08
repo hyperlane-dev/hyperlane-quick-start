@@ -78,9 +78,9 @@ pub async fn get_redis_connection() -> Result<Arc<Connection>, String> {
 
 pub async fn perform_redis_auto_creation() -> Result<AutoCreationResult, AutoCreationError> {
     let start_time: Instant = Instant::now();
-    let mut result: AutoCreationResult = AutoCreationResult::new();
+    let mut result: AutoCreationResult = AutoCreationResult::default();
     AutoCreationLogger::log_auto_creation_start(database::PluginType::Redis, "default").await;
-    let auto_creator: RedisAutoCreation = RedisAutoCreation::new();
+    let auto_creator: RedisAutoCreation = RedisAutoCreation::default();
     match auto_creator.create_database_if_not_exists().await {
         Ok(created) => {
             result.database_created = created;

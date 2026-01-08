@@ -55,13 +55,13 @@ pub async fn get_postgresql_connection() -> Result<DatabaseConnection, String> {
 pub async fn perform_postgresql_auto_creation() -> Result<AutoCreationResult, AutoCreationError> {
     let start_time: Instant = Instant::now();
     let env: &'static EnvConfig = get_global_env_config();
-    let mut result: AutoCreationResult = AutoCreationResult::new();
+    let mut result: AutoCreationResult = AutoCreationResult::default();
     AutoCreationLogger::log_auto_creation_start(
         database::PluginType::PostgreSQL,
         env.get_postgresql_database(),
     )
     .await;
-    let auto_creator: PostgreSqlAutoCreation = PostgreSqlAutoCreation::new();
+    let auto_creator: PostgreSqlAutoCreation = PostgreSqlAutoCreation::default();
     match auto_creator.create_database_if_not_exists().await {
         Ok(created) => {
             result.database_created = created;

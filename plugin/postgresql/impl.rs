@@ -2,17 +2,13 @@ use super::*;
 
 impl Default for PostgreSqlAutoCreation {
     fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl PostgreSqlAutoCreation {
-    pub fn new() -> Self {
         Self {
             env: get_global_env_config(),
         }
     }
+}
 
+impl PostgreSqlAutoCreation {
     async fn create_admin_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
         let admin_url: String = format!(
             "postgres://{}:{}@{}:{}/postgres",
@@ -192,7 +188,7 @@ impl PostgreSqlAutoCreation {
             .filter(|s| !s.is_empty() && !s.starts_with("--"))
             .map(|s| format!("{s};"))
             .collect();
-        let mut schema: DatabaseSchema = DatabaseSchema::new()
+        let mut schema: DatabaseSchema = DatabaseSchema::default()
             .add_table(TableSchema::new(
                 "record".to_string(),
                 POSTGRESQL_RECORD_SQL.to_string(),

@@ -2,17 +2,13 @@ use super::*;
 
 impl Default for RedisAutoCreation {
     fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl RedisAutoCreation {
-    pub fn new() -> Self {
         Self {
             env: get_global_env_config(),
         }
     }
+}
 
+impl RedisAutoCreation {
     async fn create_mutable_connection(&self) -> Result<Connection, AutoCreationError> {
         let db_url: String = if self.env.get_redis_username().is_empty() {
             format!(

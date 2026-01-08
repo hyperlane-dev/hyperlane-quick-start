@@ -55,13 +55,13 @@ pub async fn get_mysql_connection() -> Result<DatabaseConnection, String> {
 pub async fn perform_mysql_auto_creation() -> Result<AutoCreationResult, AutoCreationError> {
     let start_time: Instant = Instant::now();
     let env: &'static EnvConfig = get_global_env_config();
-    let mut result: AutoCreationResult = AutoCreationResult::new();
+    let mut result: AutoCreationResult = AutoCreationResult::default();
     AutoCreationLogger::log_auto_creation_start(
         database::PluginType::MySQL,
         env.get_mysql_database(),
     )
     .await;
-    let auto_creator: MySqlAutoCreation = MySqlAutoCreation::new();
+    let auto_creator: MySqlAutoCreation = MySqlAutoCreation::default();
     match auto_creator.create_database_if_not_exists().await {
         Ok(created) => {
             result.database_created = created;

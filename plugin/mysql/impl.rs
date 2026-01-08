@@ -2,17 +2,13 @@ use super::*;
 
 impl Default for MySqlAutoCreation {
     fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl MySqlAutoCreation {
-    pub fn new() -> Self {
         Self {
             env: get_global_env_config(),
         }
     }
+}
 
+impl MySqlAutoCreation {
     async fn create_admin_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
         let admin_url: String = format!(
             "mysql://{}:{}@{}:{}",
@@ -176,7 +172,7 @@ impl MySqlAutoCreation {
     }
 
     fn get_mysql_schema(&self) -> database::DatabaseSchema {
-        DatabaseSchema::new().add_table(TableSchema::new(
+        DatabaseSchema::default().add_table(TableSchema::new(
             "record".to_string(),
             MYSQL_RECORD_SQL.to_string(),
         ))

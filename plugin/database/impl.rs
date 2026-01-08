@@ -66,15 +66,6 @@ impl std::fmt::Display for AutoCreationError {
 impl std::error::Error for AutoCreationError {}
 
 impl AutoCreationResult {
-    pub fn new() -> Self {
-        Self {
-            database_created: false,
-            tables_created: Vec::new(),
-            errors: Vec::new(),
-            duration: Duration::from_secs(0),
-        }
-    }
-
     pub fn has_changes(&self) -> bool {
         self.database_created || !self.tables_created.is_empty()
     }
@@ -86,19 +77,16 @@ impl AutoCreationResult {
 
 impl Default for AutoCreationResult {
     fn default() -> Self {
-        Self::new()
+        Self {
+            database_created: false,
+            tables_created: Vec::new(),
+            errors: Vec::new(),
+            duration: Duration::from_secs(0),
+        }
     }
 }
 
 impl TableSchema {
-    pub fn new(name: String, sql: String) -> Self {
-        Self {
-            name,
-            sql,
-            dependencies: Vec::new(),
-        }
-    }
-
     pub fn with_dependency(mut self, dependency: String) -> Self {
         self.dependencies.push(dependency);
         self
@@ -106,14 +94,6 @@ impl TableSchema {
 }
 
 impl DatabaseSchema {
-    pub fn new() -> Self {
-        Self {
-            tables: Vec::new(),
-            indexes: Vec::new(),
-            constraints: Vec::new(),
-        }
-    }
-
     pub fn add_table(mut self, table: TableSchema) -> Self {
         self.tables.push(table);
         self
@@ -161,12 +141,6 @@ impl DatabaseSchema {
         }
 
         ordered
-    }
-}
-
-impl Default for DatabaseSchema {
-    fn default() -> Self {
-        Self::new()
     }
 }
 

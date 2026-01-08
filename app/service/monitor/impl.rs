@@ -238,7 +238,6 @@ impl MonitorService {
         let kernel_version: String = Self::get_kernel_version().await;
         let cpu_cores: u32 = Self::get_cpu_cores().await;
         let cpu_model: String = Self::get_cpu_model().await;
-
         let mut status: ServerStatus = ServerStatus::default();
         status
             .set_timestamp(timestamp)
@@ -273,7 +272,6 @@ impl MonitorService {
         let cpu_model: String = Self::get_cpu_model().await;
         let total_memory: u64 = Self::get_total_memory().await;
         let total_disk: u64 = Self::get_total_disk().await;
-
         let mut info: SystemInfo = SystemInfo::default();
         info.set_hostname(hostname)
             .set_os_name(os_name)
@@ -335,7 +333,6 @@ impl MonitorService {
             let iowait: u64 = parts[5].parse::<u64>().unwrap_or(0);
             let irq: u64 = parts[6].parse::<u64>().unwrap_or(0);
             let softirq: u64 = parts[7].parse::<u64>().unwrap_or(0);
-
             let total: u64 = user + nice + system + idle + iowait + irq + softirq;
             let used: u64 = total - idle - iowait;
             if total > 0 {
@@ -376,7 +373,6 @@ impl MonitorService {
         if let Some(comma_pos) = line.find(',') {
             let total_str: &str = &line[..comma_pos];
             let free_str: &str = &line[comma_pos + 1..];
-
             if let (Ok(total_kb), Ok(free_kb)) = (
                 total_str.trim().parse::<u64>(),
                 free_str.trim().parse::<u64>(),
@@ -471,26 +467,21 @@ impl MonitorService {
             if let Some(memory_info) = Self::get_memory_via_powershell() {
                 return memory_info;
             }
-
             if let Some(total_memory) = Self::get_total_memory_via_wmic() {
                 if let Some(available_memory) = Self::get_free_memory_via_wmic() {
                     return Self::calculate_memory_usage(total_memory, available_memory);
                 }
             }
-
             (0, 0, 0.0)
         }
-
         #[cfg(not(target_os = "windows"))]
         {
-            let mut memory_info: LinuxMemoryInfo = LinuxMemoryInfo::new();
-
+            let mut memory_info: LinuxMemoryInfo = LinuxMemoryInfo::default();
             if let Ok(meminfo) = fs::read_to_string("/proc/meminfo") {
                 for line in meminfo.lines() {
                     memory_info.parse_meminfo_line(line);
                 }
             }
-
             memory_info.calculate_usage()
         }
     }
@@ -499,14 +490,12 @@ impl MonitorService {
         #[cfg(target_os = "windows")]
         {
             use std::process::Command;
-
             if let Ok(output) = Command::new("powershell")
                 .args(["-Command", "Get-PSDrive C | Select-Object Used, Free"])
                 .output()
             {
                 let output_str: String = String::from_utf8_lossy(&output.stdout).to_string();
                 let lines: Vec<&str> = output_str.lines().collect();
-
                 for line in lines.iter().skip(2) {
                     let parts: Vec<&str> = line.split_whitespace().collect();
                     if parts.len() >= 2 {
@@ -524,7 +513,6 @@ impl MonitorService {
                     }
                 }
             }
-
             if let Ok(output) = Command::new("fsutil")
                 .args(["volume", "diskfree", "C:"])
                 .output()
@@ -532,7 +520,6 @@ impl MonitorService {
                 let output_str: String = String::from_utf8_lossy(&output.stdout).to_string();
                 let mut total: u64 = 0;
                 let mut free: u64 = 0;
-
                 for line in output_str.lines() {
                     if line.contains("Total # of bytes") {
                         let parts: Vec<&str> = line.split(':').collect();
@@ -548,7 +535,6 @@ impl MonitorService {
                         }
                     }
                 }
-
                 if total > 0 {
                     let used: u64 = total.saturating_sub(free);
                     let usage: f64 = (used as f64 / total as f64) * 100.0;
@@ -587,7 +573,6 @@ impl MonitorService {
             use std::process::Command;
             let mut rx_bytes: u64 = 0;
             let mut tx_bytes: u64 = 0;
-
             if let Ok(output) = Command::new("powershell")
                 .args([
                     "-Command",
@@ -616,7 +601,6 @@ impl MonitorService {
                     }
                 }
             }
-
             if rx_bytes == 0 && tx_bytes == 0 {
                 if let Ok(output) = Command::new("powershell")
                     .args([
@@ -637,11 +621,9 @@ impl MonitorService {
                     }
                 }
             }
-
             if rx_bytes == 0 && tx_bytes == 0 {
                 return (1024 * 1024 * 150, 1024 * 1024 * 50);
             }
-
             (rx_bytes, tx_bytes)
         }
 
@@ -649,7 +631,6 @@ impl MonitorService {
         {
             let mut rx_bytes: u64 = 0;
             let mut tx_bytes: u64 = 0;
-
             if let Ok(net_dev) = fs::read_to_string("/proc/net/dev") {
                 for line in net_dev.lines().skip(2) {
                     let parts: Vec<&str> = line.split_whitespace().collect();
@@ -659,7 +640,6 @@ impl MonitorService {
                     }
                 }
             }
-
             (rx_bytes, tx_bytes)
         }
     }
@@ -876,6 +856,7 @@ impl MonitorService {
     async fn get_cpu_cores() -> u32 {
         #[cfg(target_os = "windows")]
         {
+            use std::env;
             use std::process::Command;
             if let Ok(output) = Command::new("powershell")
                 .args(["-Command", "Get-WmiObject -Class Win32_Processor | Select-Object -ExpandProperty NumberOfCores"])
@@ -886,8 +867,6 @@ impl MonitorService {
                     return cores;
                 }
             }
-
-            use std::env;
             if let Ok(cores_str) = env::var("NUMBER_OF_PROCESSORS") {
                 if let Ok(cores) = cores_str.parse::<u32>() {
                     return cores;
@@ -895,7 +874,6 @@ impl MonitorService {
             }
             8
         }
-
         #[cfg(not(target_os = "windows"))]
         {
             if let Ok(cpuinfo) = fs::read_to_string("/proc/cpuinfo") {
@@ -925,7 +903,6 @@ impl MonitorService {
                     return cpu_name;
                 }
             }
-
             if let Ok(output) = Command::new("wmic")
                 .args(["cpu", "get", "Name", "/format:list"])
                 .output()
@@ -959,7 +936,6 @@ impl MonitorService {
         #[cfg(target_os = "windows")]
         {
             use std::process::Command;
-
             if let Ok(output) = Command::new("wmic")
                 .args(["computersystem", "get", "TotalPhysicalMemory", "/value"])
                 .output()
@@ -975,7 +951,6 @@ impl MonitorService {
             }
             0
         }
-
         #[cfg(not(target_os = "windows"))]
         {
             if let Ok(meminfo) = fs::read_to_string("/proc/meminfo") {
@@ -995,7 +970,6 @@ impl MonitorService {
         #[cfg(target_os = "windows")]
         {
             use std::process::Command;
-
             if let Ok(output) = Command::new("powershell")
                 .args([
                     "-Command",
@@ -1032,7 +1006,6 @@ impl MonitorService {
         #[cfg(not(target_os = "windows"))]
         {
             use std::process::Command;
-
             if let Ok(output) = Command::new("df")
                 .args(&["/", "--output=size", "--block-size=1"])
                 .output()
@@ -1052,10 +1025,6 @@ impl MonitorService {
 
 #[cfg(not(target_os = "windows"))]
 impl LinuxMemoryInfo {
-    fn new() -> Self {
-        Self::default()
-    }
-
     fn parse_meminfo_line(&mut self, line: &str) {
         if line.starts_with("MemTotal:") {
             if let Some(value) = line.split_whitespace().nth(1) {
