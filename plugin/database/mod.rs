@@ -11,6 +11,5 @@ pub use r#trait::*;
 
 use super::*;
 use env::*;
-use log::*;
 
 use std::{str::FromStr, time::Duration};

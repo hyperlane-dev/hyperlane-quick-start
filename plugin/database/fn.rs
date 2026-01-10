@@ -62,13 +62,10 @@ pub async fn initialize_auto_creation() -> Result<(), String> {
         }
     }
     if initialization_results.is_empty() {
-        log_info("[AUTO-CREATION] No plugins enabled for auto-creation").await;
+        info!("[AUTO-CREATION] No plugins enabled for auto-creation");
     } else {
         let results_summary: String = initialization_results.join(", ");
-        log_info(&format!(
-            "[AUTO-CREATION] Initialization complete: {results_summary}"
-        ))
-        .await;
+        info!("[AUTO-CREATION] Initialization complete: {results_summary}");
     }
     Ok(())
 }

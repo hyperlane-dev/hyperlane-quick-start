@@ -53,7 +53,7 @@ impl ServerHook for ChatSendedHook {
         let request_string: String = ctx.get_request().await.get_body_string();
         let request: String = ctx.get_request().await.get_string();
         let response: String = ctx.get_response().await.get_string();
-        log_info(&format!("{request}{BR}{request_string}{BR}{response}")).await;
+        info!("{request}{BR}{request_string}{BR}{response}");
         let response_body: ResponseBody = ctx.get_response().await.get_body().clone();
         if let Ok(resp_data) = serde_json::from_slice::<WebSocketRespData>(&response_body) {
             if *resp_data.get_type() == MessageType::OnlineCount {
@@ -163,12 +163,10 @@ impl ChatService {
             )
             .await;
             if save_res.is_err() {
-                log_error(&format!(
-                    "Failed to save GPT response for session {}: {}",
-                    session_id_clone,
+                error!(
+                    "Failed to save GPT response for session {session_id_clone}: {}",
                     save_res.err().unwrap_or_default()
-                ))
-                .await;
+                );
             }
         });
     }
@@ -311,12 +309,10 @@ impl ChatService {
                 )
                 .await;
                 if save_res.is_err() {
-                    log_error(&format!(
-                        "Failed to save message for session {}: {}",
-                        session_id,
+                    error!(
+                        "Failed to save message for session {session_id}: {}",
                         save_res.err().unwrap_or_default()
-                    ))
-                    .await;
+                    );
                 }
             });
         }

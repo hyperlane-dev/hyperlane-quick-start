@@ -9,8 +9,8 @@ pub fn init_env_config() -> Result<(), String> {
     GLOBAL_ENV_CONFIG
         .set(config.clone())
         .map_err(|_| "Failed to initialize global environment configuration".to_string())?;
-    println_success!("Environment Configuration Loaded Successfully");
-    println_success!(
+    info!("Environment Configuration Loaded Successfully");
+    info!(
         "GPT API URL: {}",
         if config.get_gpt_api_url().is_empty() {
             "(not set)"
@@ -18,7 +18,7 @@ pub fn init_env_config() -> Result<(), String> {
             config.get_gpt_api_url()
         }
     );
-    println_success!(
+    info!(
         "GPT Model: {}",
         if config.get_gpt_model().is_empty() {
             "(not set)"
@@ -26,8 +26,8 @@ pub fn init_env_config() -> Result<(), String> {
             config.get_gpt_model()
         }
     );
-    println_success!("MySQL Configuration:");
-    println_success!(
+    info!("MySQL Configuration:");
+    info!(
         "  Host: {}",
         if config.get_mysql_host().is_empty() {
             "(not set)"
@@ -35,8 +35,8 @@ pub fn init_env_config() -> Result<(), String> {
             config.get_mysql_host()
         }
     );
-    println_success!("  Port: {}", config.get_mysql_port());
-    println_success!(
+    info!("  Port: {}", config.get_mysql_port());
+    info!(
         "  Database: {}",
         if config.get_mysql_database().is_empty() {
             "(not set)"
@@ -44,7 +44,7 @@ pub fn init_env_config() -> Result<(), String> {
             config.get_mysql_database()
         }
     );
-    println_success!(
+    info!(
         "  Username: {}",
         if config.get_mysql_username().is_empty() {
             "(not set)"
@@ -52,7 +52,7 @@ pub fn init_env_config() -> Result<(), String> {
             config.get_mysql_username()
         }
     );
-    println_success!(
+    info!(
         "  Password: {}",
         if config.get_mysql_password().is_empty() {
             "(not set)"
@@ -61,8 +61,8 @@ pub fn init_env_config() -> Result<(), String> {
         }
     );
 
-    println_success!("PostgreSQL Configuration:");
-    println_success!(
+    info!("PostgreSQL Configuration:");
+    info!(
         "  Host: {}",
         if config.get_postgresql_host().is_empty() {
             "(not set)"
@@ -70,8 +70,8 @@ pub fn init_env_config() -> Result<(), String> {
             config.get_postgresql_host()
         }
     );
-    println_success!("  Port: {}", config.get_postgresql_port());
-    println_success!(
+    info!("  Port: {}", config.get_postgresql_port());
+    info!(
         "  Database: {}",
         if config.get_postgresql_database().is_empty() {
             "(not set)"
@@ -79,7 +79,7 @@ pub fn init_env_config() -> Result<(), String> {
             config.get_postgresql_database()
         }
     );
-    println_success!(
+    info!(
         "  Username: {}",
         if config.get_postgresql_username().is_empty() {
             "(not set)"
@@ -87,7 +87,7 @@ pub fn init_env_config() -> Result<(), String> {
             config.get_postgresql_username()
         }
     );
-    println_success!(
+    info!(
         "  Password: {}",
         if config.get_postgresql_password().is_empty() {
             "(not set)"
@@ -95,8 +95,8 @@ pub fn init_env_config() -> Result<(), String> {
             "***"
         }
     );
-    println_success!("Redis Configuration:");
-    println_success!(
+    info!("Redis Configuration:");
+    info!(
         "  Host: {}",
         if config.get_redis_host().is_empty() {
             "(not set)"
@@ -104,8 +104,8 @@ pub fn init_env_config() -> Result<(), String> {
             config.get_redis_host()
         }
     );
-    println_success!("  Port: {}", config.get_redis_port());
-    println_success!(
+    info!("  Port: {}", config.get_redis_port());
+    info!(
         "  Username: {}",
         if config.get_redis_username().is_empty() {
             "(not set)"
@@ -113,7 +113,7 @@ pub fn init_env_config() -> Result<(), String> {
             config.get_redis_username()
         }
     );
-    println_success!(
+    info!(
         "  Password: {}",
         if config.get_redis_password().is_empty() {
             "(not set)"

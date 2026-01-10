@@ -112,10 +112,8 @@ impl DatabaseSchema {
     pub fn ordered_tables(&self) -> Vec<&TableSchema> {
         let mut ordered: Vec<&TableSchema> = Vec::new();
         let mut remaining: Vec<&TableSchema> = self.tables.iter().collect();
-
         while !remaining.is_empty() {
             let mut added_any: bool = false;
-
             remaining.retain(|table| {
                 let dependencies_satisfied = table.dependencies.iter().all(|dep| {
                     ordered
@@ -131,7 +129,6 @@ impl DatabaseSchema {
                     true
                 }
             });
-
             if !added_any && !remaining.is_empty() {
                 for table in remaining {
                     ordered.push(table);
@@ -139,7 +136,6 @@ impl DatabaseSchema {
                 break;
             }
         }
-
         ordered
     }
 }
@@ -172,7 +168,6 @@ impl AutoCreationConfig {
         if env.get_redis_host().is_empty() {
             return Err("Redis host is required".to_string());
         }
-
         Ok(())
     }
 
@@ -227,22 +222,20 @@ impl PluginAutoCreationConfig {
 
 impl AutoCreationLogger {
     pub async fn log_auto_creation_start(plugin_type: PluginType, database_name: &str) {
-        let message: String = format!(
+        info!(
             "[AUTO-CREATION] Starting auto-creation for {plugin_type} database '{database_name}'"
         );
-        log_info(&message).await;
     }
 
     pub async fn log_auto_creation_complete(plugin_type: PluginType, result: &AutoCreationResult) {
-        let message: String = if result.has_errors() {
-            format!(
+        if result.has_errors() {
+            info!(
                 "[AUTO-CREATION] Auto-creation completed for {plugin_type} with warnings: {}",
                 result.errors.join(", ")
-            )
+            );
         } else {
-            format!("[AUTO-CREATION] Auto-creation completed successfully for {plugin_type}")
-        };
-        log_info(&message).await;
+            info!("[AUTO-CREATION] Auto-creation completed successfully for {plugin_type}");
+        }
     }
 
     pub async fn log_auto_creation_error(
@@ -251,11 +244,10 @@ impl AutoCreationLogger {
         plugin_type: PluginType,
         database_name: Option<&str>,
     ) {
-        let message: String = format!(
+        error!(
             "[AUTO-CREATION] {operation} failed for {plugin_type} database '{}': {error}",
-            database_name.unwrap_or("unknown"),
+            database_name.unwrap_or("unknown")
         );
-        log_error(&message).await;
     }
 
     pub async fn log_connection_verification(
@@ -264,49 +256,38 @@ impl AutoCreationLogger {
         success: bool,
         error: Option<&str>,
     ) {
-        let message: String = if success {
-            format!(
+        if success {
+            info!(
                 "[AUTO-CREATION] Connection verification successful for {plugin_type} database '{database_name}'"
-            )
+            );
         } else {
-            format!(
+            error!(
                 "[AUTO-CREATION] Connection verification failed for {plugin_type} database '{database_name}': {}",
                 error.unwrap_or("Unknown error")
-            )
+            );
         };
-        if success {
-            log_debug(&message).await;
-        } else {
-            log_error(&message).await;
-        }
     }
 
     pub async fn log_database_created(database_name: &str, plugin_type: PluginType) {
-        let message: String = format!(
+        info!(
             "[AUTO-CREATION] Successfully created database '{database_name}' for {plugin_type} plugin"
         );
-        log_info(&message).await;
     }
 
     pub async fn log_database_exists(database_name: &str, plugin_type: PluginType) {
-        let message: String = format!(
-            "[AUTO-CREATION] Database '{database_name}' already exists for {plugin_type} plugin"
-        );
-        log_debug(&message).await;
+        info!("[AUTO-CREATION] Database '{database_name}' already exists for {plugin_type} plugin");
     }
 
     pub async fn log_table_created(table_name: &str, database_name: &str, plugin_type: PluginType) {
-        let message: String = format!(
+        info!(
             "[AUTO-CREATION] Successfully created table '{table_name}' in database '{database_name}' for {plugin_type} plugin"
         );
-        log_info(&message).await;
     }
 
     pub async fn log_table_exists(table_name: &str, database_name: &str, plugin_type: PluginType) {
-        let message: String = format!(
+        info!(
             "[AUTO-CREATION] Table '{table_name}' already exists in database '{database_name}' for {plugin_type} plugin"
         );
-        log_debug(&message).await;
     }
 
     pub async fn log_tables_created(
@@ -315,16 +296,14 @@ impl AutoCreationLogger {
         plugin_type: PluginType,
     ) {
         if tables.is_empty() {
-            let message: String = format!(
+            info!(
                 "[AUTO-CREATION] No new tables created in database '{database_name}' for {plugin_type} plugin"
             );
-            log_debug(&message).await;
         } else {
-            let message: String = format!(
+            info!(
                 "[AUTO-CREATION] Created tables [{}] in database '{database_name}' for {plugin_type} plugin",
                 tables.join(", ")
             );
-            log_info(&message).await;
         }
     }
 }

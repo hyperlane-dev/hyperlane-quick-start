@@ -10,11 +10,12 @@ pub mod service;
 pub mod utils;
 pub mod view;
 
-use hyperlane_plugin::{self, log::*};
 
 use std::*;
 
 use hyperlane::*;
-use hyperlane_utils::*;
-
+use hyperlane_utils::{
+    log::{error, info},
+    *,
+};
 use serde::{Deserialize, Serialize};

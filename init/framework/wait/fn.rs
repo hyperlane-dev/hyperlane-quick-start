@@ -1,3 +1,5 @@
+use crate::application::init_log;
+
 use super::*;
 
 #[hyperlane(config: ServerConfig)]
@@ -17,16 +19,16 @@ async fn init_config(server: &Server) {
 async fn print_route_matcher(server: &Server) {
     let route_matcher: RouteMatcher = server.get_route_matcher().await;
     for key in route_matcher.get_static_route().keys() {
-        println_success!("Static route: {key}");
+        info!("Static route: {key}");
     }
     for value in route_matcher.get_dynamic_route().values() {
         for (route_pattern, _) in value {
-            println_success!("Dynamic route: {route_pattern}");
+            info!("Dynamic route: {route_pattern}");
         }
     }
     for value in route_matcher.get_regex_route().values() {
         for (route_pattern, _) in value {
-            println_success!("Regex route: {route_pattern}");
+            info!("Regex route: {route_pattern}");
         }
     }
 }
@@ -42,10 +44,10 @@ async fn init_db() {
 
     match initialize_auto_creation().await {
         Ok(_) => {
-            println_success!("Auto-creation initialization successful");
+            info!("Auto-creation initialization successful");
         }
         Err(error) => {
-            println_error!("Auto-creation initialization failed: {error}");
+            error!("Auto-creation initialization failed: {error}");
         }
     };
 }
@@ -63,28 +65,29 @@ fn runtime() -> Runtime {
 
 #[hyperlane(server: Server)]
 async fn create_server() {
+    init_log(LevelFilter::Info);
     init_config(&server).await;
     init_network_capture().await;
     init_db().await;
-    println_success!("Server initialization successful");
+    info!("Server initialization successful");
     let server_result: Result<ServerControlHook, ServerError> = server.run().await;
     match server_result {
         Ok(server_hook) => {
             let host_port: String = format!("{SERVER_HOST}:{SERVER_PORT}");
             print_route_matcher(&server).await;
-            println_success!("Server listen in: {host_port}");
+            info!("Server listen in: {host_port}");
             let shutdown: SharedAsyncTaskFactory<()> = server_hook.get_shutdown_hook().clone();
             set_shutdown(shutdown);
             server_hook.wait().await;
         }
-        Err(server_error) => println_error!("Server run error: {server_error}"),
+        Err(server_error) => error!("Server run error: {server_error}"),
     }
 }
 
 pub fn run() {
     if let Err(error) = init_env_config() {
-        println_error!("{error}");
+        error!("{error}");
     }
-    println_success!("Environment configuration loaded successfully");
+    info!("Environment configuration loaded successfully");
     runtime().block_on(create(create_server));
 }

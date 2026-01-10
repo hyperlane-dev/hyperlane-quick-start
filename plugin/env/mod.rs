@@ -7,6 +7,7 @@ mod r#struct;
 pub use r#fn::*;
 pub use r#struct::*;
 
+use super::*;
 use r#const::*;
 use r#static::*;
 
