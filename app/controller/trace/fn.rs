@@ -4,7 +4,7 @@ use super::*;
     get,
     path = "/api/trace/{trace}",
     params(
-        ("trace" = String, Path, description = "Trace ID")
+        ("TRACE" = String, Path, description = "Trace ID")
     ),
     responses(
         (status = 200, description = "Success"),
