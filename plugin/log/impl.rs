@@ -5,35 +5,35 @@ impl Logger {
     where
         T: AsRef<str>,
     {
-        LOG.trace(data, log_handler);
+        FILE_LOGGER.trace(data, log_handler);
     }
 
     pub fn log_debug<T>(data: T)
     where
         T: AsRef<str>,
     {
-        LOG.debug(data, log_handler);
+        FILE_LOGGER.debug(data, log_handler);
     }
 
     pub fn log_info<T>(data: T)
     where
         T: AsRef<str>,
     {
-        LOG.info(data, log_handler);
+        FILE_LOGGER.info(data, log_handler);
     }
 
     pub fn log_warn<T>(data: T)
     where
         T: AsRef<str>,
     {
-        LOG.warn(data, log_handler);
+        FILE_LOGGER.warn(data, log_handler);
     }
 
     pub fn log_error<T>(data: T)
     where
         T: AsRef<str>,
     {
-        LOG.error(data, log_handler);
+        FILE_LOGGER.error(data, log_handler);
     }
 }
 
