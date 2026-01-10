@@ -11,6 +11,7 @@ pub mod utils;
 pub mod view;
 
 use hyperlane::*;
-use hyperlane_utils::*;
-
-use hyperlane_plugin::log::*;
+use hyperlane_utils::{
+    log::{error, info},
+    *,
+};

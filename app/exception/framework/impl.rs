@@ -21,7 +21,7 @@ impl ServerHook for TaskPanicHook {
     )]
     #[epilogue_macros(response_body(&response_body), send)]
     async fn handle(self, ctx: &Context) {
-        log_error(&self.response_body).await;
+        error!("{}", self.response_body);
         let api_response: ApiResponse<()> =
             ApiResponse::error_with_code(ResponseCode::InternalError, self.response_body);
         let response_body: Vec<u8> = api_response.to_json_bytes();
@@ -55,7 +55,7 @@ impl ServerHook for RequestErrorHook {
             return;
         }
         if self.response_status_code != HttpStatus::RequestTimeout.code() {
-            log_error(&self.response_body).await;
+            error!("{}", self.response_body);
         }
         let api_response: ApiResponse<()> =
             ApiResponse::error_with_code(ResponseCode::InternalError, self.response_body);

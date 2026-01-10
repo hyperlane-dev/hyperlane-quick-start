@@ -10,24 +10,24 @@ where
     manager
         .set_pid_file(SERVER_PID_FILE_PATH)
         .set_server_hook(server_hook);
-    let is_daemon: bool = args.len() >= 3 && args[2].to_lowercase() == "-d";
+    let is_daemon: bool = args.len() >= 3 && args[2].to_lowercase() == DAEMON_FLAG;
     let start_server = || async {
         if is_daemon {
             match manager.start_daemon().await {
-                Ok(_) => println_success!("Server started in background successfully"),
+                Ok(_) => info!("Server started in background successfully"),
                 Err(error) => {
-                    println_error!("Error starting server in background: {error}")
+                    error!("Error starting server in background: {error}")
                 }
             };
         } else {
-            println_success!("Server started successfully");
+            info!("Server started successfully");
             manager.start().await;
         }
     };
     let stop_server = || async {
         match manager.stop().await {
-            Ok(_) => println_success!("Server stopped successfully"),
-            Err(error) => println_error!("Error stopping server: {error}"),
+            Ok(_) => info!("Server stopped successfully"),
+            Err(error) => error!("Error stopping server: {error}"),
         };
     };
     let hot_restart_server = || async {
@@ -35,8 +35,8 @@ where
             .watch_detached(&["--clear", "--skip-local-deps", "-q", "-x", "run"])
             .await
         {
-            Ok(_) => println_success!("Server started successfully"),
-            Err(error) => println_error!("Error starting server in background: {error}"),
+            Ok(_) => info!("Server started successfully"),
+            Err(error) => error!("Error starting server in background: {error}"),
         }
     };
     let restart_server = || async {
@@ -49,12 +49,11 @@ where
     }
     let command: String = args[1].to_lowercase();
     match command.as_str() {
-        "start" => start_server().await,
-        "stop" => stop_server().await,
-        "restart" => restart_server().await,
-        "hot-restart" => hot_restart_server().await,
+        CMD_STOP => stop_server().await,
+        CMD_RESTART => restart_server().await,
+        CMD_HOT_RESTART => hot_restart_server().await,
         _ => {
-            println_error!("Invalid command: {command}");
+            error!("Invalid command: {command}");
         }
     }
 }

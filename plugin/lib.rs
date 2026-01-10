@@ -1,4 +1,8 @@
 pub mod log;
 pub mod process;
 
-use hyperlane_utils::*;
+use hyperlane::*;
+use hyperlane_utils::{
+    log::{error, info},
+    *,
+};
