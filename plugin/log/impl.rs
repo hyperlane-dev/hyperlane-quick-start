@@ -54,6 +54,16 @@ impl Log for Logger {
         let level_text: String = format!("{SPACE}{}{SPACE}", record.level());
         let args_text: String = format!("{SPACE}{}{SPACE}", record.args());
         let write_file_data: String = format!("{} {}", record.level(), record.args());
+        match record.metadata().level() {
+            Level::Trace => Self::log_trace(&write_file_data),
+            Level::Debug => Self::log_debug(&write_file_data),
+            Level::Info => Self::log_info(&write_file_data),
+            Level::Warn => Self::log_warn(&write_file_data),
+            Level::Error => Self::log_error(&write_file_data),
+        }
+        if !self.enabled(record.metadata()) {
+            return;
+        }
         let mut time_output_builder: OutputBuilder<'_> = OutputBuilder::new();
         let mut level_output_builder: OutputBuilder<'_> = OutputBuilder::new();
         let mut args_output_builder: OutputBuilder<'_> = OutputBuilder::new();
@@ -88,15 +98,6 @@ impl Log for Logger {
             .add(level_output)
             .add(args_output)
             .run();
-        if self.enabled(record.metadata()) {
-            match record.metadata().level() {
-                Level::Trace => Self::log_trace(&write_file_data),
-                Level::Debug => Self::log_debug(&write_file_data),
-                Level::Info => Self::log_info(&write_file_data),
-                Level::Warn => Self::log_warn(&write_file_data),
-                Level::Error => Self::log_error(&write_file_data),
-            }
-        }
     }
 
     fn flush(&self) {
