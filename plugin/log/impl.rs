@@ -41,7 +41,7 @@ impl Log for Logger {
     fn enabled(&self, metadata: &Metadata) -> bool {
         #[cfg(debug_assertions)]
         {
-            metadata.level() <= Level::Debug
+            metadata.level() <= Level::Trace
         }
         #[cfg(not(debug_assertions))]
         {
@@ -53,7 +53,7 @@ impl Log for Logger {
         let time_text: String = format!("{SPACE}{}{SPACE}", time());
         let level_text: String = format!("{SPACE}{}{SPACE}", record.level());
         let args_text: String = format!("{SPACE}{}{SPACE}", record.args());
-        let write_file_data: String = format!("{} - {}", record.level(), record.args());
+        let write_file_data: String = format!("{} {}", record.level(), record.args());
         let mut time_output_builder: OutputBuilder<'_> = OutputBuilder::new();
         let mut level_output_builder: OutputBuilder<'_> = OutputBuilder::new();
         let mut args_output_builder: OutputBuilder<'_> = OutputBuilder::new();
