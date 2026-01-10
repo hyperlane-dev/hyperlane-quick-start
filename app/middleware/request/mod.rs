@@ -1,9 +1,7 @@
-pub mod cross;
-pub mod response;
-pub mod upgrade;
+mod r#impl;
+pub mod r#struct;
 
-pub use cross::*;
-pub use response::*;
-pub use upgrade::*;
+pub use r#struct::*;
 
 use super::*;
+use hyperlane_config::application::templates::*;

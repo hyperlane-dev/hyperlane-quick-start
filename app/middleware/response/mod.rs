@@ -1,7 +1,6 @@
-pub mod log;
-pub mod send;
+mod r#impl;
+pub mod r#struct;
 
-pub use log::*;
-pub use send::*;
+pub use r#struct::*;
 
 use super::*;
