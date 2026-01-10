@@ -10,7 +10,6 @@ pub mod service;
 pub mod utils;
 pub mod view;
 
-
 use std::*;
 
 use hyperlane::*;
