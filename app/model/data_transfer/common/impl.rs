@@ -69,11 +69,11 @@ where
         instance
     }
 
-    pub fn error_with_code(code: ResponseCode, message: impl Into<String>) -> Self {
+    pub fn error_with_code(code: ResponseCode, message: impl ToString) -> Self {
         let mut instance: ApiResponse<T> = Self::default();
         instance
             .set_code(code as i32)
-            .set_message(message.into())
+            .set_message(message.to_string())
             .set_data(None)
             .set_timestamp(Some(date()));
         instance

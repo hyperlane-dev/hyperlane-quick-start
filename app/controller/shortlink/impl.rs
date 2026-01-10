@@ -15,7 +15,7 @@ impl ServerHook for InsertRoute {
             Ok(data) => data,
             Err(error) => {
                 let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error.to_string());
+                    ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error);
                 ctx.set_response_body(&response.to_json_bytes()).await;
                 return;
             }

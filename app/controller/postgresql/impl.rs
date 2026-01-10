@@ -38,8 +38,8 @@ impl ServerHook for CreateRecordRoute {
         let record: PostgresqlRecord = match record_opt {
             Ok(data) => data,
             Err(error) => {
-                let response =
-                    ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error.to_string());
+                let response: ApiResponse<()> =
+                    ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error);
                 ctx.set_response_body(&response.to_json_bytes()).await;
                 return;
             }
@@ -73,8 +73,8 @@ impl ServerHook for UpdateRecordRoute {
         let record: PostgresqlRecord = match record_opt {
             Ok(data) => data,
             Err(error) => {
-                let response =
-                    ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error.to_string());
+                let response: ApiResponse<()> =
+                    ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error);
                 ctx.set_response_body(&response.to_json_bytes()).await;
                 return;
             }
