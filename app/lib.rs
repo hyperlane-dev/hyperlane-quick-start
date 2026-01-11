@@ -14,7 +14,7 @@ use std::*;
 
 use hyperlane::*;
 use hyperlane_utils::{
-    log::{error, info},
+    log::{debug, error, info, trace, warn},
     *,
 };
 use serde::{Deserialize, Serialize};

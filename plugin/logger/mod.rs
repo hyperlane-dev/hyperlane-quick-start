@@ -5,7 +5,7 @@ mod r#struct;
 pub use r#struct::*;
 
 use super::*;
-use hyperlane_config::framework::*;
+use hyperlane_config::{application::logger::*, framework::*};
 use r#static::*;
 
 use hyperlane_utils::{

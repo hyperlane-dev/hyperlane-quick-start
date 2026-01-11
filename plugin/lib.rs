@@ -1,6 +1,6 @@
 pub mod database;
 pub mod env;
-pub mod log;
+pub mod logger;
 pub mod mysql;
 pub mod postgresql;
 pub mod process;
@@ -8,7 +8,7 @@ pub mod redis;
 
 pub use database::*;
 pub use env::*;
-pub use log::*;
+pub use logger::*;
 pub use mysql::*;
 pub use postgresql::*;
 pub use process::*;
@@ -18,6 +18,6 @@ use std::*;
 
 use hyperlane::*;
 use hyperlane_utils::{
-    log::{error, info},
+    log::{debug, error, info, trace, warn},
     *,
 };

@@ -39,14 +39,7 @@ impl Logger {
 
 impl Log for Logger {
     fn enabled(&self, metadata: &Metadata) -> bool {
-        #[cfg(debug_assertions)]
-        {
-            metadata.level() <= Level::Trace
-        }
-        #[cfg(not(debug_assertions))]
-        {
-            metadata.level() <= Level::Error
-        }
+        metadata.level() <= LOG_LEVEL_FILTER
     }
 
     fn log(&self, record: &Record) {
@@ -71,15 +64,17 @@ impl Log for Logger {
             .text(&time_text)
             .bold(true)
             .color(ColorType::Use(Color::White))
-            .bg_color(ColorType::Use(Color::Green))
+            .bg_color(ColorType::Use(Color::Black))
             .build();
         let level_output: Output<'_> = level_output_builder
             .text(&level_text)
             .bold(true)
             .color(ColorType::Use(Color::White))
             .bg_color(match record.level() {
-                Level::Trace | Level::Debug => ColorType::Use(Color::Yellow),
-                Level::Info | Level::Warn => ColorType::Use(Color::Blue),
+                Level::Trace => ColorType::Use(Color::Magenta),
+                Level::Debug => ColorType::Use(Color::Cyan),
+                Level::Info => ColorType::Use(Color::Green),
+                Level::Warn => ColorType::Use(Color::Yellow),
                 Level::Error => ColorType::Use(Color::Red),
             })
             .build();
@@ -88,8 +83,10 @@ impl Log for Logger {
             .bold(true)
             .endl(true)
             .color(match record.level() {
-                Level::Trace | Level::Debug => ColorType::Use(Color::Yellow),
-                Level::Info | Level::Warn => ColorType::Use(Color::Blue),
+                Level::Trace => ColorType::Use(Color::Magenta),
+                Level::Debug => ColorType::Use(Color::Cyan),
+                Level::Info => ColorType::Use(Color::Green),
+                Level::Warn => ColorType::Use(Color::Yellow),
                 Level::Error => ColorType::Use(Color::Red),
             })
             .build();
@@ -109,5 +106,40 @@ impl Logger {
     pub fn init(level: LevelFilter) {
         set_logger(&LOGGER).unwrap();
         set_max_level(level);
+    }
+
+    pub fn trace<T>(data: T)
+    where
+        T: AsRef<str>,
+    {
+        trace!("{}", data.as_ref());
+    }
+
+    pub fn debug<T>(data: T)
+    where
+        T: AsRef<str>,
+    {
+        debug!("{}", data.as_ref());
+    }
+
+    pub fn info<T>(data: T)
+    where
+        T: AsRef<str>,
+    {
+        info!("{}", data.as_ref());
+    }
+
+    pub fn warn<T>(data: T)
+    where
+        T: AsRef<str>,
+    {
+        warn!("{}", data.as_ref());
+    }
+
+    pub fn error<T>(data: T)
+    where
+        T: AsRef<str>,
+    {
+        error!("{}", data.as_ref());
     }
 }

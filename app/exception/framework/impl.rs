@@ -3,6 +3,7 @@ use super::*;
 impl ServerHook for TaskPanicHook {
     #[task_panic_data(task_panic_data)]
     async fn new(ctx: &Context) -> Self {
+        trace!("TaskPanicHook new");
         let content_type: String =
             ContentType::format_content_type_with_charset(APPLICATION_JSON, UTF8);
         Self {
@@ -21,7 +22,9 @@ impl ServerHook for TaskPanicHook {
     )]
     #[epilogue_macros(response_body(&response_body), send)]
     async fn handle(self, ctx: &Context) {
-        error!("{}", self.response_body);
+        trace!("TaskPanicHook handle");
+        debug!("Request => {}", ctx.get_request().await);
+        error!("TaskPanicHook => {}", self.response_body);
         let api_response: ApiResponse<()> =
             ApiResponse::error_with_code(ResponseCode::InternalError, self.response_body);
         let response_body: Vec<u8> = api_response.to_json_bytes();
@@ -31,6 +34,7 @@ impl ServerHook for TaskPanicHook {
 impl ServerHook for RequestErrorHook {
     #[request_error_data(request_error_data)]
     async fn new(_ctx: &Context) -> Self {
+        trace!("RequestErrorHook new");
         let content_type: String =
             ContentType::format_content_type_with_charset(APPLICATION_JSON, UTF8);
         Self {
@@ -50,12 +54,15 @@ impl ServerHook for RequestErrorHook {
     )]
     #[epilogue_macros(response_body(&response_body), send)]
     async fn handle(self, ctx: &Context) {
+        trace!("RequestErrorHook handle");
+        debug!("Request => {}", ctx.get_request().await);
         if self.response_status_code == HttpStatus::BadRequest.code() {
             ctx.aborted().await;
+            warn!("Context aborted");
             return;
         }
         if self.response_status_code != HttpStatus::RequestTimeout.code() {
-            error!("{}", self.response_body);
+            error!("RequestErrorHook =>{}", self.response_body);
         }
         let api_response: ApiResponse<()> =
             ApiResponse::error_with_code(ResponseCode::InternalError, self.response_body);
