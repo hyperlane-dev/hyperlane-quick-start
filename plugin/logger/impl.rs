@@ -43,9 +43,12 @@ impl Log for Logger {
     }
 
     fn log(&self, record: &Record) {
+        let module_path: &str = record.module_path().unwrap_or(record.target());
+        let location: &str = record.file().unwrap_or(module_path);
         let time_text: String = format!("{SPACE}{}{SPACE}", time());
         let level_text: String = format!("{SPACE}{}{SPACE}", record.level());
         let args_text: String = format!("{SPACE}{}{SPACE}", record.args());
+        let location_text: String = format!("{SPACE}{location}{SPACE}");
         let write_file_data: String = format!("{} {}", record.level(), record.args());
         match record.metadata().level() {
             Level::Trace => Self::log_trace(&write_file_data),
@@ -57,8 +60,16 @@ impl Log for Logger {
         if !self.enabled(record.metadata()) {
             return;
         }
+        let color: ColorType = match record.level() {
+            Level::Trace => ColorType::Use(Color::Magenta),
+            Level::Debug => ColorType::Use(Color::Cyan),
+            Level::Info => ColorType::Use(Color::Green),
+            Level::Warn => ColorType::Use(Color::Yellow),
+            Level::Error => ColorType::Use(Color::Red),
+        };
         let mut time_output_builder: OutputBuilder<'_> = OutputBuilder::new();
         let mut level_output_builder: OutputBuilder<'_> = OutputBuilder::new();
+        let mut location_output_builder: OutputBuilder<'_> = OutputBuilder::new();
         let mut args_output_builder: OutputBuilder<'_> = OutputBuilder::new();
         let time_output: Output<'_> = time_output_builder
             .text(&time_text)
@@ -70,29 +81,23 @@ impl Log for Logger {
             .text(&level_text)
             .bold(true)
             .color(ColorType::Use(Color::White))
-            .bg_color(match record.level() {
-                Level::Trace => ColorType::Use(Color::Magenta),
-                Level::Debug => ColorType::Use(Color::Cyan),
-                Level::Info => ColorType::Use(Color::Green),
-                Level::Warn => ColorType::Use(Color::Yellow),
-                Level::Error => ColorType::Use(Color::Red),
-            })
+            .bg_color(color)
+            .build();
+        let location_output: Output<'_> = location_output_builder
+            .text(&location_text)
+            .bold(true)
+            .color(color)
             .build();
         let args_output: Output<'_> = args_output_builder
             .text(&args_text)
             .bold(true)
+            .color(color)
             .endl(true)
-            .color(match record.level() {
-                Level::Trace => ColorType::Use(Color::Magenta),
-                Level::Debug => ColorType::Use(Color::Cyan),
-                Level::Info => ColorType::Use(Color::Green),
-                Level::Warn => ColorType::Use(Color::Yellow),
-                Level::Error => ColorType::Use(Color::Red),
-            })
             .build();
         OutputListBuilder::new()
             .add(time_output)
             .add(level_output)
+            .add(location_output)
             .add(args_output)
             .run();
     }
