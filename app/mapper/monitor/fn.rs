@@ -15,7 +15,6 @@ pub fn get_network_stats() -> Option<NetworkStats> {
     NETWORK_CAPTURE_STATS.get()?.read().ok()?.clone()
 }
 
-#[instrument_trace]
 pub fn set_network_stats(stats: NetworkStats) {
     if let Some(global_stats) = NETWORK_CAPTURE_STATS.get() {
         if let Ok(mut guard) = global_stats.write() {
