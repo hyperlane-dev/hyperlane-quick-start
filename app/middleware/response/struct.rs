@@ -1,9 +1,9 @@
 use super::*;
 
 #[response_middleware(1)]
-#[derive(Debug)]
+#[derive(Clone, Data, Debug, Default)]
 pub struct SendMiddleware;
 
 #[response_middleware(2)]
-#[derive(Debug)]
+#[derive(Clone, Data, Debug, Default)]
 pub struct LogMiddleware;

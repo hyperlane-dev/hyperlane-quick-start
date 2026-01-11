@@ -1,6 +1,7 @@
 use super::*;
 
 impl ResponseCode {
+    #[instrument_trace]
     pub fn default_message(&self) -> &'static str {
         match self {
             Self::Success => "Operation successful",
@@ -19,6 +20,7 @@ impl<T> ApiResponse<T>
 where
     T: Serialize + Default,
 {
+    #[instrument_trace]
     pub fn success(data: T) -> Self {
         let mut instance: ApiResponse<T> = Self::default();
         instance
@@ -29,6 +31,7 @@ where
         instance
     }
 
+    #[instrument_trace]
     pub fn success_with_message(data: T, message: impl Into<String>) -> Self {
         let mut instance: ApiResponse<T> = Self::default();
         instance
@@ -39,6 +42,7 @@ where
         instance
     }
 
+    #[instrument_trace]
     pub fn error(message: impl Into<String>) -> Self {
         let mut instance: ApiResponse<T> = Self::default();
         instance
@@ -49,6 +53,7 @@ where
         instance
     }
 
+    #[instrument_trace]
     pub fn error_with_code(code: ResponseCode, message: impl Into<String>) -> Self {
         let mut instance: ApiResponse<T> = Self::default();
         instance
@@ -59,12 +64,14 @@ where
         instance
     }
 
+    #[instrument_trace]
     pub fn to_json_bytes(&self) -> Vec<u8> {
         serde_json::to_vec(self).unwrap_or_default()
     }
 }
 
 impl ApiResponse<()> {
+    #[instrument_trace]
     pub fn success_without_data(message: impl Into<String>) -> Self {
         let mut instance: ApiResponse<()> = Self::default();
         instance
