@@ -1,55 +1,24 @@
 use super::*;
 
-impl Logger {
-    pub fn log_trace<T>(data: T)
-    where
-        T: AsRef<str>,
-    {
-        FILE_LOGGER.trace(data, log_handler);
-    }
-
-    pub fn log_debug<T>(data: T)
-    where
-        T: AsRef<str>,
-    {
-        FILE_LOGGER.debug(data, log_handler);
-    }
-
-    pub fn log_info<T>(data: T)
-    where
-        T: AsRef<str>,
-    {
-        FILE_LOGGER.info(data, log_handler);
-    }
-
-    pub fn log_warn<T>(data: T)
-    where
-        T: AsRef<str>,
-    {
-        FILE_LOGGER.warn(data, log_handler);
-    }
-
-    pub fn log_error<T>(data: T)
-    where
-        T: AsRef<str>,
-    {
-        FILE_LOGGER.error(data, log_handler);
-    }
-}
-
 impl Log for Logger {
     fn enabled(&self, metadata: &Metadata) -> bool {
         metadata.level() <= LOG_LEVEL_FILTER
     }
 
     fn log(&self, record: &Record) {
-        let module_path: &str = record.module_path().unwrap_or(record.target());
-        let location: &str = record.file().unwrap_or(module_path);
-        let time_text: String = format!("{SPACE}{}{SPACE}", time());
-        let level_text: String = format!("{SPACE}{}{SPACE}", record.level());
-        let args_text: String = format!("{SPACE}{}{SPACE}", record.args());
-        let location_text: String = format!("{SPACE}{location}{SPACE}");
-        let write_file_data: String = format!("{} {}", record.level(), record.args());
+        let now_time: String = time();
+        let level: Level = record.level();
+        let args: &Arguments<'_> = record.args();
+        let file: Option<&str> = record.file();
+        let module_path: Option<&str> = record.module_path();
+        let target: &str = record.target();
+        let line: u32 = record.line().unwrap_or_default();
+        let location: &str = file.unwrap_or(module_path.unwrap_or(target));
+        let time_text: String = format!("{SPACE}{now_time}{SPACE}");
+        let level_text: String = format!("{SPACE}{level}{SPACE}");
+        let args_text: String = format!("{SPACE}{args}{SPACE}");
+        let location_text: String = format!("{SPACE}{location}{COLON}{line}{SPACE}");
+        let write_file_data: String = format!("{level}{location_text}{args}");
         match record.metadata().level() {
             Level::Trace => Self::log_trace(&write_file_data),
             Level::Debug => Self::log_debug(&write_file_data),
@@ -109,42 +78,43 @@ impl Log for Logger {
 
 impl Logger {
     pub fn init(level: LevelFilter) {
+        trace!("Logger init");
         set_logger(&LOGGER).unwrap();
         set_max_level(level);
     }
 
-    pub fn trace<T>(data: T)
+    pub fn log_trace<T>(data: T)
     where
         T: AsRef<str>,
     {
-        trace!("{}", data.as_ref());
+        FILE_LOGGER.trace(data, log_handler);
     }
 
-    pub fn debug<T>(data: T)
+    pub fn log_debug<T>(data: T)
     where
         T: AsRef<str>,
     {
-        debug!("{}", data.as_ref());
+        FILE_LOGGER.debug(data, log_handler);
     }
 
-    pub fn info<T>(data: T)
+    pub fn log_info<T>(data: T)
     where
         T: AsRef<str>,
     {
-        info!("{}", data.as_ref());
+        FILE_LOGGER.info(data, log_handler);
     }
 
-    pub fn warn<T>(data: T)
+    pub fn log_warn<T>(data: T)
     where
         T: AsRef<str>,
     {
-        warn!("{}", data.as_ref());
+        FILE_LOGGER.warn(data, log_handler);
     }
 
-    pub fn error<T>(data: T)
+    pub fn log_error<T>(data: T)
     where
         T: AsRef<str>,
     {
-        error!("{}", data.as_ref());
+        FILE_LOGGER.error(data, log_handler);
     }
 }

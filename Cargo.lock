@@ -1444,7 +1444,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "8.16.11"
+version = "8.16.12"
 dependencies = [
  "hyperlane_init",
 ]
