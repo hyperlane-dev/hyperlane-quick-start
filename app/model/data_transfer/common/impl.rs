@@ -2,7 +2,6 @@ use super::*;
 
 impl ResponseCode {
     #[instrument_trace]
-    #[instrument_trace]
     pub fn default_message(&self) -> &'static str {
         match self {
             Self::Success => "Operation successful",
