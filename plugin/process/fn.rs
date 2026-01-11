@@ -1,11 +1,13 @@
 use super::*;
 
+#[instrument_trace]
 pub async fn create<F, Fut>(server_hook: F)
 where
     F: Fn() -> Fut + Send + Sync + 'static,
     Fut: Future<Output = ()> + Send + 'static,
 {
     let args: Vec<String> = args().collect();
+    debug!("Process create args{COLON_SPACE}{args:?}");
     let mut manager: ServerManager = ServerManager::new();
     manager
         .set_pid_file(SERVER_PID_FILE_PATH)
@@ -16,7 +18,7 @@ where
             match manager.start_daemon().await {
                 Ok(_) => info!("Server started in background successfully"),
                 Err(error) => {
-                    error!("Error starting server in background: {error}")
+                    error!("Error starting server in background{COLON_SPACE}{error}")
                 }
             };
         } else {
@@ -27,7 +29,7 @@ where
     let stop_server = || async {
         match manager.stop().await {
             Ok(_) => info!("Server stopped successfully"),
-            Err(error) => error!("Error stopping server: {error}"),
+            Err(error) => error!("Error stopping server{COLON_SPACE}{error}"),
         };
     };
     let hot_restart_server = || async {
@@ -36,7 +38,7 @@ where
             .await
         {
             Ok(_) => info!("Server started successfully"),
-            Err(error) => error!("Error starting server in background: {error}"),
+            Err(error) => error!("Error starting server in background{COLON_SPACE}{error}"),
         }
     };
     let restart_server = || async {
@@ -44,6 +46,7 @@ where
         start_server().await;
     };
     if args.len() < 2 {
+        warn!("No additional command-line parameters, default startup");
         start_server().await;
         return;
     }
@@ -53,7 +56,7 @@ where
         CMD_RESTART => restart_server().await,
         CMD_HOT_RESTART => hot_restart_server().await,
         _ => {
-            error!("Invalid command: {command}");
+            error!("Invalid command{COLON_SPACE}{command}");
         }
     }
 }

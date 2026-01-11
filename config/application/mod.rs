@@ -9,3 +9,5 @@ pub mod shortlink;
 pub mod static_resource;
 pub mod templates;
 pub mod upload;
+
+use super::*;

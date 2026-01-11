@@ -8,7 +8,6 @@ use super::*;
 use hyperlane_config::{application::logger::*, framework::*};
 use r#static::*;
 
-use hyperlane_utils::{
-    log::{Level, LevelFilter, Log, Metadata, Record, set_logger, set_max_level},
-    once_cell::sync::Lazy,
-};
+use hyperlane_utils::once_cell::sync::Lazy;
+
+use std::fmt::Arguments;

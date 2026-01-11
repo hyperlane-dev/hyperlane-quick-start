@@ -17,7 +17,4 @@ pub use redis::*;
 use std::*;
 
 use hyperlane::*;
-use hyperlane_utils::{
-    log::{debug, error, info, trace, warn},
-    *,
-};
+use hyperlane_utils::{log::*, *};

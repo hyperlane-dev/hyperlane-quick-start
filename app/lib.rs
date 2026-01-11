@@ -13,8 +13,5 @@ pub mod view;
 use std::*;
 
 use hyperlane::*;
-use hyperlane_utils::{
-    log::{debug, error, info, trace, warn},
-    *,
-};
+use hyperlane_utils::{log::*, *};
 use serde::{Deserialize, Serialize};
