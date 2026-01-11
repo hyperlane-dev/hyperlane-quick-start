@@ -6,6 +6,9 @@ impl Log for Logger {
     }
 
     fn log(&self, record: &Record) {
+        if !self.enabled(record.metadata()) {
+            return;
+        }
         let now_time: String = time();
         let level: Level = record.level();
         let args: &Arguments<'_> = record.args();
@@ -19,16 +22,6 @@ impl Log for Logger {
         let args_text: String = format!("{args}{SPACE}");
         let location_text: String = format!("{SPACE}{location}{COLON}{line}{SPACE}");
         let write_file_data: String = format!("{level}{location_text}{args}");
-        match record.metadata().level() {
-            Level::Trace => Self::log_trace(&write_file_data),
-            Level::Debug => Self::log_debug(&write_file_data),
-            Level::Info => Self::log_info(&write_file_data),
-            Level::Warn => Self::log_warn(&write_file_data),
-            Level::Error => Self::log_error(&write_file_data),
-        }
-        if !self.enabled(record.metadata()) {
-            return;
-        }
         let color: ColorType = match record.level() {
             Level::Trace => ColorType::Use(Color::Magenta),
             Level::Debug => ColorType::Use(Color::Cyan),
@@ -69,6 +62,13 @@ impl Log for Logger {
             .add(location_output)
             .add(args_output)
             .run();
+        match record.metadata().level() {
+            Level::Trace => Self::log_trace(&write_file_data),
+            Level::Debug => Self::log_debug(&write_file_data),
+            Level::Info => Self::log_info(&write_file_data),
+            Level::Warn => Self::log_warn(&write_file_data),
+            Level::Error => Self::log_error(&write_file_data),
+        }
     }
 
     fn flush(&self) {
