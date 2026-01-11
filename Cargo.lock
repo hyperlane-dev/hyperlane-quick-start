@@ -1444,7 +1444,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "8.17.1"
+version = "8.17.2"
 dependencies = [
  "hyperlane_init",
 ]
@@ -1457,9 +1457,9 @@ checksum = "673c3aa5fa8d0c1063300047454f8bbb83f10560edafc53368a11313cbb6897e"
 
 [[package]]
 name = "hyperlane-utils"
-version = "14.3.1"
+version = "14.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "237e293d32be4f49287f34e59eaa8d19b11dcd7096d2a1a86d58405eec742d04"
+checksum = "f89a6a95e0120a4e12d35a5917d89c6adc4d30c6e0cce43cb4bc468d3ec17715"
 dependencies = [
  "ahash 0.8.12",
  "bin-encode-decode",
@@ -1732,9 +1732,9 @@ dependencies = [
 
 [[package]]
 name = "instrument-level"
-version = "1.0.6"
+version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "564899e87c1e7b6183d5290bf0536f057425b05c95e4594f3da19c6846d0a2cf"
+checksum = "373758958c7ec202ff35f2b8665b0d4829195818390cf11d9bfec7b647e9e76d"
 dependencies = [
  "proc-macro2",
  "quote",
