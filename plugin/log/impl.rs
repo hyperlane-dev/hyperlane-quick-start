@@ -39,14 +39,7 @@ impl Logger {
 
 impl Log for Logger {
     fn enabled(&self, metadata: &Metadata) -> bool {
-        #[cfg(debug_assertions)]
-        {
-            metadata.level() <= Level::Trace
-        }
-        #[cfg(not(debug_assertions))]
-        {
-            metadata.level() <= Level::Error
-        }
+        metadata.level() <= LOG_LEVEL_FILTER
     }
 
     fn log(&self, record: &Record) {

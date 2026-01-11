@@ -1,5 +1,5 @@
 use super::*;
 
-pub fn init_log(level: LevelFilter) {
-    Logger::init(level);
+pub fn init_log() {
+    Logger::init(LOG_LEVEL_FILTER);
 }

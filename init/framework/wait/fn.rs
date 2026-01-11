@@ -1,15 +1,25 @@
-use crate::application::init_log;
-
 use super::*;
 
+fn runtime() -> Runtime {
+    Builder::new_multi_thread()
+        .worker_threads(num_cpus::get_physical() << 1)
+        .thread_stack_size(1_048_576)
+        .max_blocking_threads(2_048)
+        .max_io_events_per_tick(1_024)
+        .enable_all()
+        .build()
+        .unwrap()
+}
+
 #[hyperlane(config: ServerConfig)]
-async fn init_config(server: &Server) {
+async fn init_server_config(server: &Server) {
     config.host(SERVER_HOST).await;
     config.port(SERVER_PORT).await;
     config.ttl(SERVER_TTI).await;
     config.nodelay(SERVER_NODELAY).await;
     config.request_config(RequestConfig::default()).await;
     server.config(config).await;
+    info!("Server initialization successful");
 }
 
 async fn print_route_matcher(server: &Server) {
@@ -29,24 +39,10 @@ async fn print_route_matcher(server: &Server) {
     }
 }
 
-fn runtime() -> Runtime {
-    Builder::new_multi_thread()
-        .worker_threads(num_cpus::get_physical() << 1)
-        .thread_stack_size(1_048_576)
-        .max_blocking_threads(2_048)
-        .max_io_events_per_tick(1_024)
-        .enable_all()
-        .build()
-        .unwrap()
-}
-
 #[hyperlane(server: Server)]
 async fn create_server() {
-    init_log(LevelFilter::Info);
-    init_config(&server).await;
-    info!("Server initialization successful");
-    let server_result: Result<ServerControlHook, ServerError> = server.run().await;
-    match server_result {
+    init_server_config(&server).await;
+    match server.run().await {
         Ok(server_hook) => {
             let host_port: String = format!("{SERVER_HOST}:{SERVER_PORT}");
             print_route_matcher(&server).await;
@@ -60,5 +56,6 @@ async fn create_server() {
 }
 
 pub fn run() {
+    init_log();
     runtime().block_on(create(create_server));
 }
