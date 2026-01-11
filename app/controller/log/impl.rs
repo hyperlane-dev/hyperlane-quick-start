@@ -13,7 +13,7 @@ impl ServerHook for TraceLogRoute {
     )]
     #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        let log_content: String = LogService::read_log_file(SERVER_LOG_LEVEL[0]).await;
+        let log_content: String = LogService::read_log_file(Level::Trace).await;
         ctx.set_response_body(&log_content).await;
     }
 }
@@ -31,7 +31,7 @@ impl ServerHook for DebugLogRoute {
     )]
     #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        let log_content: String = LogService::read_log_file(SERVER_LOG_LEVEL[1]).await;
+        let log_content: String = LogService::read_log_file(Level::Debug).await;
         ctx.set_response_body(&log_content).await;
     }
 }
@@ -49,7 +49,7 @@ impl ServerHook for InfoLogRoute {
     )]
     #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        let log_content: String = LogService::read_log_file(SERVER_LOG_LEVEL[2]).await;
+        let log_content: String = LogService::read_log_file(Level::Info).await;
         ctx.set_response_body(&log_content).await;
     }
 }
@@ -67,7 +67,7 @@ impl ServerHook for WarnLogRoute {
     )]
     #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        let log_content: String = LogService::read_log_file(SERVER_LOG_LEVEL[3]).await;
+        let log_content: String = LogService::read_log_file(Level::Warn).await;
         ctx.set_response_body(&log_content).await;
     }
 }
@@ -85,7 +85,7 @@ impl ServerHook for ErrorLogRoute {
     )]
     #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        let log_content: String = LogService::read_log_file(SERVER_LOG_LEVEL[4]).await;
+        let log_content: String = LogService::read_log_file(Level::Error).await;
         ctx.set_response_body(log_content).await;
     }
 }

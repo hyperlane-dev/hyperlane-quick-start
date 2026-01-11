@@ -71,11 +71,13 @@ impl LogService {
     }
 
     #[instrument_trace]
-    pub async fn read_log_file(level: &str) -> String {
-        let log_dir: PathBuf = Path::new(SERVER_LOG_DIR).join(level);
+    pub async fn read_log_file(level: Level) -> String {
+        let log_dir: PathBuf = Path::new(SERVER_LOG_DIR).join(level.to_string());
         if !log_dir.exists() {
             return format!("Log directory not found: {}", log_dir.display());
         }
+        let level_string: String = level.to_string();
+        let log_dir_string: String = log_dir.display().to_string();
         let date_dirs: Vec<String> = Self::get_sorted_dirs(&log_dir);
         let mut all_logs: Vec<String> = Vec::new();
         for date_dir in date_dirs.iter().take(MAX_DATE_DIRS) {
@@ -83,7 +85,7 @@ impl LogService {
             all_logs.extend(logs);
         }
         if all_logs.is_empty() {
-            format!("No {level} logs found in {}", log_dir.display())
+            format!("No {level_string} logs found in {log_dir_string}")
         } else {
             all_logs.join(BR)
         }
