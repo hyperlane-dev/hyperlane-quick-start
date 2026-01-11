@@ -2,11 +2,13 @@ use super::*;
 
 impl ServerHook for OnlineRoute {
     async fn new(_ctx: &Context) -> Self {
+        trace!("OnlineRoute new");
         Self
     }
 
     #[prologue_macros(ws, get)]
     async fn handle(self, ctx: &Context) {
+        trace!("OnlineRoute handle");
         let websocket: &WebSocket = get_global_websocket();
         let path: String = ctx.get_request_path().await;
         let key: BroadcastType<String> = BroadcastType::PointToGroup(path);

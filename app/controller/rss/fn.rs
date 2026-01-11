@@ -10,4 +10,6 @@ use super::*;
         (status = 500, description = "Internal Server Error")
     )
 )]
-pub fn openapi_rss_feed() {}
+pub fn openapi_rss_feed() {
+    trace!("openapi_rss_feed");
+}

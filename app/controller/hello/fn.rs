@@ -13,4 +13,6 @@ use super::*;
         (status = 500, description = "Internal Server Error")
     )
 )]
-pub fn openapi_hello_name() {}
+pub fn openapi_hello_name() {
+    trace!("openapi_hello_name");
+}

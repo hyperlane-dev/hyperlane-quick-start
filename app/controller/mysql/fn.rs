@@ -10,7 +10,9 @@ use super::*;
         (status = 500, description = "Internal Server Error")
     )
 )]
-pub fn openapi_mysql_records() {}
+pub fn openapi_mysql_records() {
+    trace!("openapi_mysql_records");
+}
 
 #[utoipa::path(
     post,
@@ -22,7 +24,9 @@ pub fn openapi_mysql_records() {}
         (status = 500, description = "Internal Server Error")
     )
 )]
-pub fn openapi_mysql_record_create() {}
+pub fn openapi_mysql_record_create() {
+    trace!("openapi_mysql_record_create");
+}
 
 #[utoipa::path(
     post,
@@ -34,7 +38,9 @@ pub fn openapi_mysql_record_create() {}
         (status = 500, description = "Internal Server Error")
     )
 )]
-pub fn openapi_mysql_record_update() {}
+pub fn openapi_mysql_record_update() {
+    trace!("openapi_mysql_record_update");
+}
 
 #[utoipa::path(
     post,
@@ -46,4 +52,6 @@ pub fn openapi_mysql_record_update() {}
         (status = 500, description = "Internal Server Error")
     )
 )]
-pub fn openapi_mysql_record_delete() {}
+pub fn openapi_mysql_record_delete() {
+    trace!("openapi_mysql_record_delete");
+}

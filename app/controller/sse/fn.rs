@@ -10,4 +10,6 @@ use super::*;
         (status = 500, description = "Internal Server Error")
     )
 )]
-pub fn openapi_sse() {}
+pub fn openapi_sse() {
+    trace!("openapi_sse");
+}

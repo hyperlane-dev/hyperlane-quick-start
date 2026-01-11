@@ -9,4 +9,6 @@ use super::*;
     ),
     tag = "health"
 )]
-pub fn openapi_health_check() {}
+pub fn openapi_health_check() {
+    trace!("openapi_health_check");
+}

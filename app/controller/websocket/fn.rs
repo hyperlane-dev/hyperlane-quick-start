@@ -10,4 +10,6 @@ use super::*;
         (status = 500, description = "Internal Server Error")
     )
 )]
-pub fn openapi_websocket() {}
+pub fn openapi_websocket() {
+    trace!("openapi_websocket");
+}

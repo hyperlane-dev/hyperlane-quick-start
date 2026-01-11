@@ -10,4 +10,6 @@ use super::*;
         (status = 500, description = "Internal Server Error")
     )
 )]
-pub fn openapi_openapi_json() {}
+pub fn openapi_openapi_json() {
+    trace!("openapi_openapi_json");
+}
