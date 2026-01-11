@@ -2,6 +2,7 @@ use super::*;
 
 impl ServerHook for ListRecordsRoute {
     async fn new(_ctx: &Context) -> Self {
+        trace!("ListRecordsRoute new");
         Self
     }
 
@@ -10,6 +11,7 @@ impl ServerHook for ListRecordsRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     async fn handle(self, ctx: &Context) {
+        trace!("ListRecordsRoute handle");
         match MysqlService::get_all_mysql_records().await {
             Ok(records) => {
                 let response: ApiResponse<Vec<MysqlRecord>> = ApiResponse::success(records);
@@ -26,6 +28,7 @@ impl ServerHook for ListRecordsRoute {
 
 impl ServerHook for CreateRecordRoute {
     async fn new(_ctx: &Context) -> Self {
+        trace!("CreateRecordRoute new");
         Self
     }
 
@@ -35,6 +38,7 @@ impl ServerHook for CreateRecordRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     async fn handle(self, ctx: &Context) {
+        trace!("CreateRecordRoute handle");
         let record: MysqlRecord = match record_opt {
             Ok(data) => data,
             Err(error) => {
@@ -61,6 +65,7 @@ impl ServerHook for CreateRecordRoute {
 
 impl ServerHook for UpdateRecordRoute {
     async fn new(_ctx: &Context) -> Self {
+        trace!("UpdateRecordRoute new");
         Self
     }
 
@@ -70,6 +75,7 @@ impl ServerHook for UpdateRecordRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     async fn handle(self, ctx: &Context) {
+        trace!("UpdateRecordRoute handle");
         let record: MysqlRecord = match record_opt {
             Ok(data) => data,
             Err(error) => {
@@ -96,6 +102,7 @@ impl ServerHook for UpdateRecordRoute {
 
 impl ServerHook for DeleteRecordRoute {
     async fn new(_ctx: &Context) -> Self {
+        trace!("DeleteRecordRoute new");
         Self
     }
 
@@ -104,6 +111,7 @@ impl ServerHook for DeleteRecordRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     async fn handle(self, ctx: &Context) {
+        trace!("DeleteRecordRoute handle");
         let querys: RequestQuerys = ctx.get_request_querys().await;
         let key: &String = match querys.get("key") {
             Some(k) => k,

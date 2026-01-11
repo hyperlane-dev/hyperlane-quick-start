@@ -2,6 +2,7 @@ use super::*;
 
 impl ServerHook for TraceViewRoute {
     async fn new(_ctx: &Context) -> Self {
+        trace!("TraceViewRoute new");
         Self
     }
 
@@ -10,5 +11,7 @@ impl ServerHook for TraceViewRoute {
         response_status_code(302),
         response_header(LOCATION => "/static/trace/index.html")
     )]
-    async fn handle(self, ctx: &Context) {}
+    async fn handle(self, ctx: &Context) {
+        trace!("TraceViewRoute handle");
+    }
 }

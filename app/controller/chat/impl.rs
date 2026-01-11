@@ -2,6 +2,7 @@ use super::*;
 
 impl ServerHook for OnlineUsersRoute {
     async fn new(_ctx: &Context) -> Self {
+        trace!("OnlineUsersRoute new");
         Self
     }
 
@@ -10,6 +11,7 @@ impl ServerHook for OnlineUsersRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     async fn handle(self, ctx: &Context) {
+        trace!("OnlineUsersRoute handle");
         let user_list: UserListResponse = ChatDomain::get_online_users_list();
         let response: ApiResponse<UserListResponse> = ApiResponse::success(user_list);
         ctx.set_response_body(&response.to_json_bytes()).await;
@@ -18,11 +20,13 @@ impl ServerHook for OnlineUsersRoute {
 
 impl ServerHook for ChatRoute {
     async fn new(_ctx: &Context) -> Self {
+        trace!("ChatRoute new");
         Self
     }
 
     #[prologue_macros(ws, get)]
     async fn handle(self, ctx: &Context) {
+        trace!("ChatRoute handle");
         let websocket: &WebSocket = get_global_websocket();
         let path: String = ctx.get_request_path().await;
         let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
@@ -40,6 +44,7 @@ impl ServerHook for ChatRoute {
 
 impl ServerHook for ChatHistoryRoute {
     async fn new(_ctx: &Context) -> Self {
+        trace!("ChatHistoryRoute new");
         Self
     }
 
@@ -48,6 +53,7 @@ impl ServerHook for ChatHistoryRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     async fn handle(self, ctx: &Context) {
+        trace!("ChatHistoryRoute handle");
         #[request_query_option("before_id" => before_id_opt)]
         async fn get_before_id(ctx: &Context) -> Option<String> {
             before_id_opt

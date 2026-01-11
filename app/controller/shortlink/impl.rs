@@ -2,6 +2,7 @@ use super::*;
 
 impl ServerHook for InsertRoute {
     async fn new(_ctx: &Context) -> Self {
+        trace!("InsertRoute new");
         Self
     }
 
@@ -11,6 +12,7 @@ impl ServerHook for InsertRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     async fn handle(self, ctx: &Context) {
+        trace!("InsertRoute handle");
         let request: ShortlinkInsertRequest = match request_opt {
             Ok(data) => data,
             Err(error) => {
@@ -36,6 +38,7 @@ impl ServerHook for InsertRoute {
 
 impl ServerHook for QueryRoute {
     async fn new(_ctx: &Context) -> Self {
+        trace!("QueryRoute new");
         Self
     }
 
@@ -45,6 +48,7 @@ impl ServerHook for QueryRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     async fn handle(self, ctx: &Context) {
+        trace!("QueryRoute handle");
         let encrypted_id: String = match id_opt {
             Some(id_str) => id_str,
             None => {

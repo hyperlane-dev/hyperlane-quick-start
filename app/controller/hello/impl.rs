@@ -2,6 +2,7 @@ use super::*;
 
 impl ServerHook for HelloRoute {
     async fn new(_ctx: &Context) -> Self {
+        trace!("HelloRoute new");
         Self
     }
 
@@ -13,6 +14,7 @@ impl ServerHook for HelloRoute {
     )]
     #[epilogue_macros(response_header(SET_COOKIE => cookie_value))]
     async fn handle(self, ctx: &Context) {
+        trace!("HelloRoute handle");
         let cookie_value: String = CookieBuilder::new("time", time()).path("/").build();
     }
 }

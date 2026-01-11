@@ -2,6 +2,7 @@ use super::*;
 
 impl ServerHook for ListRecordsRoute {
     async fn new(_ctx: &Context) -> Self {
+        trace!("PostgresqlListRecordsRoute new");
         Self
     }
 
@@ -10,6 +11,7 @@ impl ServerHook for ListRecordsRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     async fn handle(self, ctx: &Context) {
+        trace!("PostgresqlListRecordsRoute handle");
         match PostgresqlService::get_all_postgresql_records().await {
             Ok(records) => {
                 let response: ApiResponse<Vec<PostgresqlRecord>> = ApiResponse::success(records);
@@ -26,6 +28,7 @@ impl ServerHook for ListRecordsRoute {
 
 impl ServerHook for CreateRecordRoute {
     async fn new(_ctx: &Context) -> Self {
+        trace!("PostgresqlCreateRecordRoute new");
         Self
     }
 
@@ -35,6 +38,7 @@ impl ServerHook for CreateRecordRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     async fn handle(self, ctx: &Context) {
+        trace!("PostgresqlCreateRecordRoute handle");
         let record: PostgresqlRecord = match record_opt {
             Ok(data) => data,
             Err(error) => {
@@ -61,6 +65,7 @@ impl ServerHook for CreateRecordRoute {
 
 impl ServerHook for UpdateRecordRoute {
     async fn new(_ctx: &Context) -> Self {
+        trace!("PostgresqlUpdateRecordRoute new");
         Self
     }
 
@@ -70,6 +75,7 @@ impl ServerHook for UpdateRecordRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     async fn handle(self, ctx: &Context) {
+        trace!("PostgresqlUpdateRecordRoute handle");
         let record: PostgresqlRecord = match record_opt {
             Ok(data) => data,
             Err(error) => {
@@ -96,6 +102,7 @@ impl ServerHook for UpdateRecordRoute {
 
 impl ServerHook for DeleteRecordRoute {
     async fn new(_ctx: &Context) -> Self {
+        trace!("PostgresqlDeleteRecordRoute new");
         Self
     }
 
@@ -104,6 +111,7 @@ impl ServerHook for DeleteRecordRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     async fn handle(self, ctx: &Context) {
+        trace!("PostgresqlDeleteRecordRoute handle");
         let key: String = match ctx.get_request_querys().await.get("key").cloned() {
             Some(k) => k,
             None => {

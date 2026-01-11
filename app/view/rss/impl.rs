@@ -2,6 +2,7 @@ use super::*;
 
 impl ServerHook for RssViewRoute {
     async fn new(_ctx: &Context) -> Self {
+        trace!("RssViewRoute new");
         Self
     }
 
@@ -10,5 +11,7 @@ impl ServerHook for RssViewRoute {
         response_status_code(302),
         response_header(LOCATION => "/static/rss/index.html")
     )]
-    async fn handle(self, ctx: &Context) {}
+    async fn handle(self, ctx: &Context) {
+        trace!("RssViewRoute handle");
+    }
 }

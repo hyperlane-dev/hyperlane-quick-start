@@ -2,6 +2,7 @@ use super::*;
 
 impl ServerHook for UploadViewRoute {
     async fn new(_ctx: &Context) -> Self {
+        trace!("UploadViewRoute new");
         Self
     }
 
@@ -10,11 +11,14 @@ impl ServerHook for UploadViewRoute {
         response_status_code(302),
         response_header(LOCATION => "/static/upload/index.html")
     )]
-    async fn handle(self, ctx: &Context) {}
+    async fn handle(self, ctx: &Context) {
+        trace!("UploadViewRoute handle");
+    }
 }
 
 impl ServerHook for UploadFileRoute {
     async fn new(_ctx: &Context) -> Self {
+        trace!("UploadFileRoute new");
         Self
     }
 
@@ -25,6 +29,7 @@ impl ServerHook for UploadFileRoute {
         request_header_option(RANGE => range_header_opt)
     )]
     async fn handle(self, ctx: &Context) {
+        trace!("UploadFileRoute handle");
         let dir: String = dir_opt.unwrap_or_default();
         let file: String = file_opt.unwrap_or_default();
         let has_range_request: bool = range_header_opt.is_some();

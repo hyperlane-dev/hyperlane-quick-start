@@ -2,6 +2,7 @@ use super::*;
 
 impl ServerHook for MysqlViewRoute {
     async fn new(_ctx: &Context) -> Self {
+        trace!("MysqlViewRoute new");
         Self
     }
 
@@ -10,5 +11,7 @@ impl ServerHook for MysqlViewRoute {
         response_status_code(302),
         response_header(LOCATION => "/static/postgresql/index.html")
     )]
-    async fn handle(self, ctx: &Context) {}
+    async fn handle(self, ctx: &Context) {
+        trace!("MysqlViewRoute handle");
+    }
 }

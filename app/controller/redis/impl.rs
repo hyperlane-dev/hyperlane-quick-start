@@ -2,6 +2,7 @@ use super::*;
 
 impl ServerHook for ListRecordsRoute {
     async fn new(_ctx: &Context) -> Self {
+        trace!("RedisListRecordsRoute new");
         Self
     }
 
@@ -11,6 +12,7 @@ impl ServerHook for ListRecordsRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     async fn handle(self, ctx: &Context) {
+        trace!("RedisListRecordsRoute handle");
         let keys: Vec<String> = match keys_opt {
             Some(k) => k.split(',').map(|s: &str| s.to_string()).collect(),
             None => {
@@ -38,6 +40,7 @@ impl ServerHook for ListRecordsRoute {
 
 impl ServerHook for CreateRecordRoute {
     async fn new(_ctx: &Context) -> Self {
+        trace!("RedisCreateRecordRoute new");
         Self
     }
 
@@ -47,6 +50,7 @@ impl ServerHook for CreateRecordRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     async fn handle(self, ctx: &Context) {
+        trace!("RedisCreateRecordRoute handle");
         let record: RedisRecord = match record_opt {
             Ok(data) => data,
             Err(error) => {
@@ -73,6 +77,7 @@ impl ServerHook for CreateRecordRoute {
 
 impl ServerHook for UpdateRecordRoute {
     async fn new(_ctx: &Context) -> Self {
+        trace!("RedisUpdateRecordRoute new");
         Self
     }
 
@@ -82,6 +87,7 @@ impl ServerHook for UpdateRecordRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     async fn handle(self, ctx: &Context) {
+        trace!("RedisUpdateRecordRoute handle");
         let record: RedisRecord = match record_opt {
             Ok(data) => data,
             Err(error) => {
@@ -108,6 +114,7 @@ impl ServerHook for UpdateRecordRoute {
 
 impl ServerHook for DeleteRecordRoute {
     async fn new(_ctx: &Context) -> Self {
+        trace!("RedisDeleteRecordRoute new");
         Self
     }
 
@@ -116,6 +123,7 @@ impl ServerHook for DeleteRecordRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     async fn handle(self, ctx: &Context) {
+        trace!("RedisDeleteRecordRoute handle");
         let querys: RequestQuerys = ctx.get_request_querys().await;
         let key: &String = match querys.get("key") {
             Some(k) => k,

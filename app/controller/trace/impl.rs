@@ -2,6 +2,7 @@ use super::*;
 
 impl ServerHook for TraceRoute {
     async fn new(_ctx: &Context) -> Self {
+        trace!("TraceRoute new");
         Self
     }
 
@@ -11,6 +12,7 @@ impl ServerHook for TraceRoute {
         route_param_option("trace" => trace_opt)
     )]
     async fn handle(self, ctx: &Context) {
+        trace!("TraceRoute handle");
         let trace: String = trace_opt.unwrap_or_default();
         let decoded_trace: String = decode(&trace)
             .unwrap_or_else(|_| trace.clone().into())
