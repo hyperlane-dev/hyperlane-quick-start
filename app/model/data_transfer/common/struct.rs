@@ -1,7 +1,7 @@
 use super::*;
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Default, Serialize, Deserialize, ToSchema, Data)]
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct ApiResponse<T>
 where
     T: Serialize + Default,
