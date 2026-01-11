@@ -77,8 +77,8 @@ impl Log for Logger {
 }
 
 impl Logger {
+    #[instrument_trace]
     pub fn init(level: LevelFilter) {
-        trace!("Logger init");
         set_logger(&LOGGER).unwrap();
         set_max_level(level);
     }

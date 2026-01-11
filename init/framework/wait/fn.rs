@@ -1,5 +1,6 @@
 use super::*;
 
+#[instrument_trace]
 fn runtime() -> Runtime {
     Builder::new_multi_thread()
         .worker_threads(num_cpus::get_physical() << 1)
@@ -12,6 +13,7 @@ fn runtime() -> Runtime {
 }
 
 #[hyperlane(config: ServerConfig)]
+#[instrument_trace]
 async fn init_server_config(server: &Server) {
     let mut request_config: RequestConfig = RequestConfig::default();
     request_config
@@ -27,6 +29,7 @@ async fn init_server_config(server: &Server) {
     info!("Server initialization successful");
 }
 
+#[instrument_trace]
 async fn print_route_matcher(server: &Server) {
     let route_matcher: RouteMatcher = server.get_route_matcher().await;
     for key in route_matcher.get_static_route().keys() {
@@ -45,6 +48,7 @@ async fn print_route_matcher(server: &Server) {
 }
 
 #[hyperlane(server: Server)]
+#[instrument_trace]
 async fn create_server() {
     init_server_config(&server).await;
     match server.run().await {
@@ -60,6 +64,7 @@ async fn create_server() {
     }
 }
 
+#[instrument_trace]
 pub fn run() {
     init_log();
     runtime().block_on(create(create_server));

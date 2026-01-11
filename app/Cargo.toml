@@ -11,5 +11,6 @@ hyperlane_config = { workspace = true }
 hyperlane_plugin = { workspace = true }
 
 serde = { workspace = true }
+tracing = { workspace = true }
 hyperlane = { workspace = true }
 hyperlane-utils = { workspace = true }

@@ -7,5 +7,7 @@ edition = "2024"
 path = "lib.rs"
 
 [dependencies]
+serde = { workspace = true }
+tracing = { workspace = true }
 hyperlane = { workspace = true }
 hyperlane-utils = { workspace = true }

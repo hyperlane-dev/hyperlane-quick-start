@@ -1,11 +1,11 @@
 use super::*;
 
+#[instrument_trace]
 pub async fn create<F, Fut>(server_hook: F)
 where
     F: Fn() -> Fut + Send + Sync + 'static,
     Fut: Future<Output = ()> + Send + 'static,
 {
-    trace!("Process run create");
     let args: Vec<String> = args().collect();
     debug!("Process create args{COLON_SPACE}{args:?}");
     let mut manager: ServerManager = ServerManager::new();

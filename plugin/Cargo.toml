@@ -9,5 +9,7 @@ path = "lib.rs"
 [dependencies]
 hyperlane_config = { workspace = true }
 
+serde = { workspace = true }
+tracing = { workspace = true }
 hyperlane = { workspace = true }
 hyperlane-utils = { workspace = true }

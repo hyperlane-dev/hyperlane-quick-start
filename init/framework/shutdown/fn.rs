@@ -1,5 +1,6 @@
 use super::*;
 
+#[instrument_trace]
 fn default_shutdown() -> SharedAsyncTaskFactory<()> {
     Arc::new(|| {
         Box::pin(async {
@@ -8,12 +9,12 @@ fn default_shutdown() -> SharedAsyncTaskFactory<()> {
     })
 }
 
+#[instrument_trace]
 pub fn set_shutdown(shutdown: SharedAsyncTaskFactory<()>) {
-    trace!("Set shutdown");
     drop(SHUTDOWN.set(shutdown));
 }
 
+#[instrument_trace]
 pub fn get_shutdown() -> SharedAsyncTaskFactory<()> {
-    trace!("Get shutdown");
     SHUTDOWN.get_or_init(default_shutdown).clone()
 }
