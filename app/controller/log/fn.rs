@@ -2,6 +2,32 @@ use super::*;
 
 #[utoipa::path(
     get,
+    path = "/log/trace",
+    responses(
+        (status = 200, description = "Success"),
+        (status = 400, description = "Bad Request"),
+        (status = 404, description = "Not Found"),
+        (status = 500, description = "Internal Server Error")
+    )
+)]
+#[instrument_trace]
+pub fn openapi_log_trace() {}
+
+#[utoipa::path(
+    get,
+    path = "/log/debug",
+    responses(
+        (status = 200, description = "Success"),
+        (status = 400, description = "Bad Request"),
+        (status = 404, description = "Not Found"),
+        (status = 500, description = "Internal Server Error")
+    )
+)]
+#[instrument_trace]
+pub fn openapi_log_debug() {}
+
+#[utoipa::path(
+    get,
     path = "/log/info",
     responses(
         (status = 200, description = "Success"),

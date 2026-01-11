@@ -1,6 +1,6 @@
 use super::*;
 
-impl ServerHook for InfoLogRoute {
+impl ServerHook for TraceLogRoute {
     #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
         Self
@@ -18,7 +18,7 @@ impl ServerHook for InfoLogRoute {
     }
 }
 
-impl ServerHook for WarnLogRoute {
+impl ServerHook for DebugLogRoute {
     #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
         Self
@@ -36,7 +36,7 @@ impl ServerHook for WarnLogRoute {
     }
 }
 
-impl ServerHook for ErrorLogRoute {
+impl ServerHook for InfoLogRoute {
     #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
         Self
@@ -50,6 +50,42 @@ impl ServerHook for ErrorLogRoute {
     #[instrument_trace]
     async fn handle(self, ctx: &Context) {
         let log_content: String = LogService::read_log_file(SERVER_LOG_LEVEL[2]).await;
+        ctx.set_response_body(&log_content).await;
+    }
+}
+
+impl ServerHook for WarnLogRoute {
+    #[instrument_trace]
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(
+        get,
+        response_header(CONTENT_TYPE => ContentType::format_content_type_with_charset(TEXT_PLAIN, UTF8)),
+        response_header(CONTENT_ENCODING => GZIP)
+    )]
+    #[instrument_trace]
+    async fn handle(self, ctx: &Context) {
+        let log_content: String = LogService::read_log_file(SERVER_LOG_LEVEL[3]).await;
+        ctx.set_response_body(&log_content).await;
+    }
+}
+
+impl ServerHook for ErrorLogRoute {
+    #[instrument_trace]
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(
+        get,
+        response_header(CONTENT_TYPE => ContentType::format_content_type_with_charset(TEXT_PLAIN, UTF8)),
+        response_header(CONTENT_ENCODING => GZIP)
+    )]
+    #[instrument_trace]
+    async fn handle(self, ctx: &Context) {
+        let log_content: String = LogService::read_log_file(SERVER_LOG_LEVEL[4]).await;
         ctx.set_response_body(log_content).await;
     }
 }

@@ -16,7 +16,7 @@ pub const SERVER_PID_FILE_PATH: &str = "./tmp/process/hyperlane.pid";
 pub const SERVER_REQUEST_HTTP_READ_TIMEOUT_MS: u64 = 60000;
 pub const SERVER_REQUEST_MAX_BODY_SIZE: usize = MB_100;
 
-pub const SERVER_LOG_LEVEL: [&str; 3] = ["info", "warn", "error"];
+pub const SERVER_LOG_LEVEL: [&str; 5] = ["trace", "debug", "info", "warn", "error"];
 pub const CACHE_CONTROL_STATIC_ASSETS: &str = "public, max-age=31536000, immutable";
 pub const CACHE_CONTROL_SHORT_TERM: &str = "public, max-age=3600";
 pub const EXPIRES_FAR_FUTURE: &str = "Wed, 1 Apr 8888 00:00:00 GMT";
