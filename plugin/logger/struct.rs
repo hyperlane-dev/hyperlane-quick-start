@@ -1,2 +1,2 @@
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy, Debug, Default)]
 pub struct Logger;

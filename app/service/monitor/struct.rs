@@ -1,10 +1,11 @@
 #[cfg(not(target_os = "windows"))]
 use super::*;
 
+#[derive(Clone, Copy, Debug, Default)]
 pub struct MonitorService;
 
 #[cfg(not(target_os = "windows"))]
-#[derive(Data, Default)]
+#[derive(Clone, Copy, Debug, Default)]
 pub struct LinuxMemoryInfo {
     total: u64,
     available: u64,

@@ -1,8 +1,9 @@
 use super::*;
 
+#[derive(Clone, Copy, Data, Debug, Default)]
 pub struct AutoCreationErrorHandler;
 
-#[derive(Debug, Clone)]
+#[derive(Clone, Data, Debug)]
 pub struct ErrorContext {
     pub plugin_name: String,
     pub operation: String,
@@ -15,7 +16,7 @@ pub struct ErrorContext {
     pub timestamp: std::time::SystemTime,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone, Data, Debug)]
 pub struct AutoCreationResult {
     pub database_created: bool,
     pub tables_created: Vec<String>,
@@ -23,7 +24,7 @@ pub struct AutoCreationResult {
     pub duration: Duration,
 }
 
-#[derive(Debug, Clone, New)]
+#[derive(Clone, Data, Debug, Default, New)]
 pub struct TableSchema {
     pub name: String,
     pub sql: String,
@@ -31,17 +32,20 @@ pub struct TableSchema {
     pub dependencies: Vec<String>,
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Clone, Data, Debug, Default)]
 pub struct DatabaseSchema {
     pub tables: Vec<TableSchema>,
     pub indexes: Vec<String>,
     pub constraints: Vec<String>,
 }
 
+#[derive(Clone, Copy, Data, Debug, Default)]
 pub struct AutoCreationConfig;
 
+#[derive(Clone, Data, Debug, Default)]
 pub struct PluginAutoCreationConfig {
     pub plugin_name: String,
 }
 
+#[derive(Clone, Copy, Data, Debug, Default)]
 pub struct AutoCreationLogger;

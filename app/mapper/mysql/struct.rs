@@ -1,6 +1,6 @@
 use super::*;
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Clone, Data, Debug, Default, Serialize, Deserialize)]
 pub struct MysqlRecordDao {
     pub key: String,
     pub value: String,
@@ -8,6 +8,7 @@ pub struct MysqlRecordDao {
 
 #[derive(
     Clone,
+    Data,
     Debug,
     PartialEq,
     Serialize,

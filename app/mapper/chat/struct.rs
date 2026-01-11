@@ -2,7 +2,7 @@ use super::*;
 
 pub struct ChatHistoryMapper;
 
-#[derive(Clone, Debug, PartialEq, DeriveEntityModel)]
+#[derive(Clone, Data, Debug, PartialEq, DeriveEntityModel)]
 #[sea_orm(table_name = "chat_history")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = true)]

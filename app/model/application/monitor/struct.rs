@@ -68,7 +68,7 @@ pub struct ServerStatus {
     cpu_model: String,
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize, ToSchema, Data)]
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct SystemInfo {
     hostname: String,
     os_name: String,

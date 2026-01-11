@@ -1,11 +1,11 @@
 use super::*;
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize, ToSchema, Data)]
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct ShortlinkInsertRequest {
     pub url: String,
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize, ToSchema, Data)]
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct ShortlinkRecord {
     pub id: i32,
     pub url: String,

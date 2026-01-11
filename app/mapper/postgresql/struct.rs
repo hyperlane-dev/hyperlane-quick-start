@@ -8,11 +8,12 @@ pub struct PostgresqlRecordDao {
 
 #[derive(
     Clone,
+    Data,
     Debug,
+    Default,
     PartialEq,
     Serialize,
     Deserialize,
-    Default,
     DeriveEntityModel,
     DeriveActiveModelBehavior,
 )]

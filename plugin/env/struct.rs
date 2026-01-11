@@ -1,6 +1,6 @@
 use super::*;
 
-#[derive(Debug, Clone, Default, Data)]
+#[derive(Clone, Data, Debug, Default)]
 pub struct EnvConfig {
     gpt_api_url: String,
     gpt_model: String,
@@ -20,7 +20,7 @@ pub struct EnvConfig {
     postgresql_password: String,
 }
 
-#[derive(Default, Clone, Debug, Data)]
+#[derive(Clone, Data, Debug, Default)]
 pub struct DockerComposeConfig {
     mysql_port: Option<usize>,
     mysql_database: Option<String>,
