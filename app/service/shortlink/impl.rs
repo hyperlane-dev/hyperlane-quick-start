@@ -2,6 +2,7 @@ use super::*;
 use hyperlane_config::application::charset::CHARSETS;
 
 impl ShortlinkService {
+    #[instrument_trace]
     fn decrypt_id(encoded_id: &str) -> Result<i32, String> {
         let decoded: String = hyperlane_utils::Decode::execute(CHARSETS, encoded_id)
             .map_err(|_| "Invalid shortlink ID format".to_string())?;
@@ -10,11 +11,13 @@ impl ShortlinkService {
             .map_err(|_| "Invalid shortlink ID format".to_string())
     }
 
+    #[instrument_trace]
     fn encrypt_id(id: i32) -> Result<String, String> {
         hyperlane_utils::Encode::execute(CHARSETS, &id.to_string())
             .map_err(|_| "Failed to encrypt shortlink ID".to_string())
     }
 
+    #[instrument_trace]
     pub async fn insert_shortlink(request: ShortlinkInsertRequest) -> Result<String, String> {
         if request.url.is_empty() {
             return Err("URL cannot be empty".to_string());
@@ -42,6 +45,7 @@ impl ShortlinkService {
         Self::encrypt_id(record_id)
     }
 
+    #[instrument_trace]
     pub async fn query_shortlink(encrypted_id: String) -> Result<Option<ShortlinkRecord>, String> {
         let id: i32 = Self::decrypt_id(&encrypted_id)?;
         let db: DatabaseConnection = get_postgresql_connection().await?;

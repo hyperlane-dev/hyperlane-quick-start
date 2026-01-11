@@ -10,4 +10,5 @@ use super::*;
         (status = 500, description = "Internal Server Error")
     )
 )]
+#[instrument_trace]
 pub fn openapi_mysql_view() {}

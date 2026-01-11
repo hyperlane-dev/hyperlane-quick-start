@@ -1,6 +1,7 @@
 use super::*;
 
 impl DatasetService {
+    #[instrument_trace]
     pub async fn fetch_dataset() -> Result<String, String> {
         let mut request_builder: BoxAsyncRequestTrait = RequestBuilder::new()
             .get(DATASET_URL)

@@ -10,6 +10,7 @@ use super::*;
         (status = 500, description = "Internal Server Error")
     )
 )]
+#[instrument_trace]
 pub fn openapi_upload_view() {}
 
 #[utoipa::path(
@@ -26,4 +27,5 @@ pub fn openapi_upload_view() {}
         (status = 500, description = "Internal Server Error")
     )
 )]
+#[instrument_trace]
 pub fn openapi_upload_file() {}

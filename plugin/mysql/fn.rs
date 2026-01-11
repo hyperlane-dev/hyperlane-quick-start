@@ -1,5 +1,6 @@
 use super::*;
 
+#[instrument_trace]
 pub async fn connection_mysql_db() -> Result<DatabaseConnection, String> {
     let env: &'static EnvConfig = get_global_env_config();
     match perform_mysql_auto_creation().await {
@@ -48,10 +49,12 @@ pub async fn connection_mysql_db() -> Result<DatabaseConnection, String> {
     })
 }
 
+#[instrument_trace]
 pub async fn get_mysql_connection() -> Result<DatabaseConnection, String> {
     MYSQL_DB.clone()
 }
 
+#[instrument_trace]
 pub async fn perform_mysql_auto_creation() -> Result<AutoCreationResult, AutoCreationError> {
     let start_time: Instant = Instant::now();
     let env: &'static EnvConfig = get_global_env_config();

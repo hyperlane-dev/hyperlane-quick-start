@@ -1,6 +1,7 @@
 use super::*;
 
 impl TraceService {
+    #[instrument_trace]
     pub async fn search_trace(trace: &str) -> String {
         let base_dir: &Path = Path::new(SERVER_LOG_DIR);
         if !base_dir.exists() {

@@ -1,10 +1,12 @@
 use super::*;
 
 impl ServerHook for ChatConnectedHook {
+    #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
         Self
     }
 
+    #[instrument_trace]
     async fn handle(self, ctx: &Context) {
         let websocket: &WebSocket = get_global_websocket();
         let path: String = ctx.get_request_path().await;
@@ -18,11 +20,13 @@ impl ServerHook for ChatConnectedHook {
 }
 
 impl ServerHook for ChatRequestHook {
+    #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
         Self
     }
 
     #[request_body_json_result(req_data_res: WebSocketReqData)]
+    #[instrument_trace]
     async fn handle(self, ctx: &Context) {
         let req_data: WebSocketReqData = req_data_res.unwrap();
         if ChatService::handle_ping_request(ctx, &req_data).await {
@@ -45,10 +49,12 @@ impl ServerHook for ChatRequestHook {
 }
 
 impl ServerHook for ChatSendedHook {
+    #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
         Self
     }
 
+    #[instrument_trace]
     async fn handle(self, ctx: &Context) {
         let request_string: String = ctx.get_request().await.get_body_string();
         let request: String = ctx.get_request().await.get_string();
@@ -67,10 +73,12 @@ impl ServerHook for ChatSendedHook {
 }
 
 impl ServerHook for ChatClosedHook {
+    #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
         Self
     }
 
+    #[instrument_trace]
     async fn handle(self, ctx: &Context) {
         let websocket: &WebSocket = get_global_websocket();
         let path: String = ctx.get_request_path().await;
@@ -85,6 +93,7 @@ impl ServerHook for ChatClosedHook {
 }
 
 impl ChatService {
+    #[instrument_trace]
     pub async fn pre_ws_upgrade(ctx: Context) {
         let addr: String = ctx.get_socket_addr_string().await;
         let encode_addr: String = Encode::execute(CHARSETS, &addr).unwrap_or_default();
@@ -92,6 +101,7 @@ impl ChatService {
             .await;
     }
 
+    #[instrument_trace]
     pub async fn create_online_count_message(
         ctx: &Context,
         receiver_count: String,
@@ -102,11 +112,13 @@ impl ChatService {
             .unwrap()
     }
 
+    #[instrument_trace]
     pub fn broadcast_online_count(key: BroadcastType<String>, message: ResponseBody) {
         let websocket: &WebSocket = get_global_websocket();
         let _: BroadcastMapSendResult<Vec<u8>> = websocket.send(key, message);
     }
 
+    #[instrument_trace]
     fn remove_mentions(text: &str) -> String {
         text.split_whitespace()
             .filter(|word| !word.starts_with(MENTION_PREFIX))
@@ -114,6 +126,7 @@ impl ChatService {
             .join(SPACE)
     }
 
+    #[instrument_trace]
     pub async fn handle_ping_request(ctx: &Context, req_data: &WebSocketReqData) -> bool {
         if req_data.is_ping() {
             let resp_data: WebSocketRespData =
@@ -125,12 +138,14 @@ impl ChatService {
         false
     }
 
+    #[instrument_trace]
     pub fn is_gpt_mentioned(message: &str) -> bool {
         message.contains(GPT_MENTION_UPPER)
             || message.contains(GPT_MENTION_FULL)
             || message.contains(GPT_MENTION_LOWER)
     }
 
+    #[instrument_trace]
     pub async fn process_gpt_request(session_id: String, message: String, ctx: Context) {
         let mut session: ChatSession = ChatDomain::get_or_create_session(&session_id);
         let cleaned_msg: String = Self::remove_mentions(&message);
@@ -171,6 +186,7 @@ impl ChatService {
         });
     }
 
+    #[instrument_trace]
     fn build_gpt_request_messages(session: &ChatSession) -> Vec<Value> {
         session
             .get_messages()
@@ -184,12 +200,14 @@ impl ChatService {
             .collect()
     }
 
+    #[instrument_trace]
     fn build_gpt_request_headers() -> HashMapXxHash3_64<&'static str, String> {
         let mut headers: HashMapXxHash3_64<&'static str, String> = hash_map_xx_hash3_64();
         headers.insert(CONTENT_TYPE, APPLICATION_JSON.to_string());
         headers
     }
 
+    #[instrument_trace]
     fn extract_response_content(response_json: &Value) -> Option<String> {
         response_json
             .get(JSON_FIELD_RESULT)
@@ -208,6 +226,7 @@ impl ChatService {
             })
     }
 
+    #[instrument_trace]
     fn extract_error_message(response_json: &Value) -> Option<String> {
         response_json
             .get(JSON_FIELD_ERRORS)
@@ -218,6 +237,7 @@ impl ChatService {
             .or_else(|| Some("API error: Unknown error".to_string()))
     }
 
+    #[instrument_trace]
     fn handle_gpt_api_response(response_text: &str) -> Result<String, String> {
         if response_text.trim().is_empty() {
             return Err(
@@ -237,14 +257,17 @@ impl ChatService {
         Err(format!("Incorrect API response format: {response_text}"))
     }
 
+    #[instrument_trace]
     pub async fn get_name(ctx: &Context) -> String {
         #[request_query_option("uuid" => uuid_opt)]
+        #[instrument_trace]
         async fn inner(_ctx: &Context) -> String {
             uuid_opt.unwrap_or_default()
         }
         inner(ctx).await
     }
 
+    #[instrument_trace]
     async fn call_gpt_api_with_context(session: &ChatSession) -> Result<String, String> {
         let config: &EnvConfig = get_global_env_config();
         let gpt_model: &str = config.get_gpt_model();
@@ -270,6 +293,7 @@ impl ChatService {
         }
     }
 
+    #[instrument_trace]
     pub async fn save_message_from_response(session_id: &str, response_body: &ResponseBody) {
         let response_body_string: String = String::from_utf8_lossy(response_body).into_owned();
         if let Ok(resp_data) = serde_json::from_str::<serde_json::Value>(&response_body_string) {
@@ -318,6 +342,7 @@ impl ChatService {
         }
     }
 
+    #[instrument_trace]
     pub async fn save_message(
         session_id: &str,
         sender_name: &str,
@@ -335,6 +360,7 @@ impl ChatService {
         .await
     }
 
+    #[instrument_trace]
     pub async fn get_chat_history(
         before_id: Option<i64>,
         limit: i64,

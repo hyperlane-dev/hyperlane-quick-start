@@ -1,6 +1,7 @@
 use super::*;
 
 impl RedisService {
+    #[instrument_trace]
     pub async fn create_redis_record(record: RedisRecord) -> Result<(), String> {
         let conn_arc: Arc<Connection> = get_redis_connection().await?;
         let dao: RedisRecordDao = RedisRecordDao {
@@ -14,6 +15,7 @@ impl RedisService {
         Ok(())
     }
 
+    #[instrument_trace]
     pub async fn get_all_redis_records(keys: Vec<String>) -> Result<Vec<RedisRecord>, String> {
         let conn_arc: Arc<Connection> = get_redis_connection().await?;
         let mut conn: Connection = Arc::try_unwrap(conn_arc)
@@ -32,6 +34,7 @@ impl RedisService {
         Ok(records)
     }
 
+    #[instrument_trace]
     pub async fn update_redis_record(record: RedisRecord) -> Result<(), String> {
         let conn_arc: Arc<Connection> = get_redis_connection().await?;
         let mut conn: Connection = Arc::try_unwrap(conn_arc)
@@ -41,6 +44,7 @@ impl RedisService {
         Ok(())
     }
 
+    #[instrument_trace]
     pub async fn delete_redis_record(key: &str) -> Result<(), String> {
         let conn_arc: Arc<Connection> = get_redis_connection().await?;
         let mut conn: Connection = Arc::try_unwrap(conn_arc)

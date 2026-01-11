@@ -1,6 +1,7 @@
 use super::*;
 
 impl TrackingService {
+    #[instrument_trace]
     pub async fn save_tracking_record(ctx: &Context, request: &RequestBody) -> Result<(), String> {
         let socket_addr: String = ctx.get_socket_addr_string().await;
         let timestamp: i64 = Utc::now().timestamp_millis();
@@ -17,6 +18,7 @@ impl TrackingService {
             .map_err(|error| format!("Failed to insert tracking record: {error}"))
     }
 
+    #[instrument_trace]
     pub async fn query_tracking_records(
         request: TrackingQueryRequest,
     ) -> Result<TrackingQueryResponse, String> {

@@ -3,6 +3,7 @@ use super::*;
 impl ActiveModelBehavior for ActiveModel {}
 
 impl ChatHistoryMapper {
+    #[instrument_trace]
     pub async fn insert_message(
         session_id: &str,
         sender_name: &str,
@@ -27,6 +28,7 @@ impl ChatHistoryMapper {
         Ok(())
     }
 
+    #[instrument_trace]
     pub async fn get_history(
         before_id: Option<i64>,
         limit: i64,
@@ -34,6 +36,7 @@ impl ChatHistoryMapper {
         Self::get_history_from_postgresql(before_id, limit).await
     }
 
+    #[instrument_trace]
     async fn get_history_from_postgresql(
         before_id: Option<i64>,
         limit: i64,
@@ -67,6 +70,7 @@ impl ChatHistoryMapper {
             .collect())
     }
 
+    #[instrument_trace]
     pub async fn count_messages() -> Result<i64, String> {
         let db: DatabaseConnection = get_postgresql_connection().await?;
         let count: u64 = Entity::find()

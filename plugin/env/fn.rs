@@ -1,9 +1,11 @@
 use super::*;
 
+#[instrument_trace]
 pub fn get_global_env_config() -> &'static EnvConfig {
     GLOBAL_ENV_CONFIG.get_or_init(EnvConfig::default)
 }
 
+#[instrument_trace]
 pub fn init_env_config() -> Result<(), String> {
     let config: EnvConfig = EnvConfig::load()?;
     GLOBAL_ENV_CONFIG

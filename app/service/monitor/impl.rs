@@ -1,6 +1,7 @@
 use super::*;
 
 impl MonitorService {
+    #[instrument_trace]
     pub async fn start_network_capture() {
         init_network_capture_globals();
         set_capture_status(CaptureStatus::Running);
@@ -17,6 +18,7 @@ impl MonitorService {
         });
     }
 
+    #[instrument_trace]
     async fn capture_network_data() -> Option<NetworkStats> {
         #[cfg(target_os = "windows")]
         {
@@ -30,11 +32,13 @@ impl MonitorService {
     }
 
     #[cfg(target_os = "windows")]
+    #[instrument_trace]
     fn create_empty_network_stats() -> NetworkStats {
         NetworkStats::default()
     }
 
     #[cfg(target_os = "windows")]
+    #[instrument_trace]
     fn process_netstat_output(output_str: &str) -> Vec<ConnectionInfo> {
         let connections: HashMap<String, ConnectionInfo> = output_str
             .lines()
@@ -69,6 +73,7 @@ impl MonitorService {
     }
 
     #[cfg(target_os = "windows")]
+    #[instrument_trace]
     fn get_network_performance_counters() -> (u64, u64) {
         let result: Option<(u64, u64)> = (|| {
             let output: std::process::Output = Command::new(WIN_POWERSHELL_COMMAND)
@@ -83,6 +88,7 @@ impl MonitorService {
     }
 
     #[cfg(target_os = "windows")]
+    #[instrument_trace]
     fn generate_sample_packets() -> Vec<NetworkPacket> {
         let now: u64 = SystemTime::now()
             .duration_since(UNIX_EPOCH)
@@ -124,6 +130,7 @@ impl MonitorService {
     }
 
     #[cfg(target_os = "windows")]
+    #[instrument_trace]
     async fn capture_windows_network() -> Option<NetworkStats> {
         let mut stats: NetworkStats = Self::create_empty_network_stats();
         if let Ok(output) = Command::new(WIN_NETSTAT_COMMAND)
@@ -146,11 +153,13 @@ impl MonitorService {
     }
 
     #[cfg(not(target_os = "windows"))]
+    #[instrument_trace]
     fn create_empty_linux_network_stats() -> NetworkStats {
         NetworkStats::default()
     }
 
     #[cfg(not(target_os = "windows"))]
+    #[instrument_trace]
     fn parse_network_dev_stats(content: &str) -> (u64, u64) {
         content
             .lines()
@@ -172,6 +181,7 @@ impl MonitorService {
     }
 
     #[cfg(not(target_os = "windows"))]
+    #[instrument_trace]
     async fn capture_linux_network() -> Option<NetworkStats> {
         let mut stats: NetworkStats = Self::create_empty_linux_network_stats();
         if let Ok(output) = Command::new(LINUX_SS_COMMAND).args(LINUX_SS_ARGS).output() {
@@ -186,6 +196,7 @@ impl MonitorService {
     }
 
     #[cfg(target_os = "windows")]
+    #[instrument_trace]
     fn parse_connection_line(parts: &[&str]) -> Option<((String, usize), (String, usize))> {
         if parts.len() < 3 {
             return None;
@@ -196,6 +207,7 @@ impl MonitorService {
     }
 
     #[cfg(target_os = "windows")]
+    #[instrument_trace]
     fn parse_address(addr: &str) -> Option<(String, usize)> {
         let colon_pos: usize = addr.rfind(':')?;
         let ip: String = addr[..colon_pos].to_string();
@@ -204,6 +216,7 @@ impl MonitorService {
     }
 
     #[response_header(CONTENT_TYPE => APPLICATION_JSON)]
+    #[instrument_trace]
     pub async fn get_network_capture_data(ctx: &Context) {
         let response_data: NetworkStats = get_network_stats().unwrap_or_default();
         if let Ok(json) = serde_json::to_vec(&response_data) {
@@ -211,6 +224,7 @@ impl MonitorService {
         }
     }
 
+    #[instrument_trace]
     pub async fn get_network_capture_stream(ctx: &Context) {
         let response_data: NetworkStats = get_network_stats().unwrap_or_default();
         if let Ok(json) = serde_json::to_string(&response_data) {
@@ -219,6 +233,7 @@ impl MonitorService {
         }
     }
 
+    #[instrument_trace]
     pub async fn get_server_status() -> ServerStatus {
         let timestamp: u64 = SystemTime::now()
             .duration_since(UNIX_EPOCH)
@@ -263,6 +278,7 @@ impl MonitorService {
         status
     }
 
+    #[instrument_trace]
     pub async fn get_system_info() -> SystemInfo {
         let hostname: String = Self::get_hostname().await;
         let os_name: String = Self::get_os_name().await;
@@ -285,6 +301,7 @@ impl MonitorService {
     }
 
     #[cfg(target_os = "windows")]
+    #[instrument_trace]
     fn get_cpu_usage_via_powershell() -> Option<f64> {
         use std::process::Command;
         if let Ok(output) = Command::new("powershell")
@@ -300,6 +317,7 @@ impl MonitorService {
     }
 
     #[cfg(target_os = "windows")]
+    #[instrument_trace]
     fn get_cpu_usage_via_typeperf() -> Option<f64> {
         use std::process::Command;
         if let Ok(output) = Command::new("typeperf")
@@ -323,6 +341,7 @@ impl MonitorService {
     }
 
     #[cfg(not(target_os = "windows"))]
+    #[instrument_trace]
     fn parse_proc_stat_line(line: &str) -> Option<f64> {
         let parts: Vec<&str> = line.split_whitespace().collect();
         if parts.len() >= 8 {
@@ -342,6 +361,7 @@ impl MonitorService {
         None
     }
 
+    #[instrument_trace]
     async fn get_cpu_usage() -> f64 {
         #[cfg(target_os = "windows")]
         {
@@ -368,6 +388,7 @@ impl MonitorService {
     }
 
     #[cfg(target_os = "windows")]
+    #[instrument_trace]
     fn parse_memory_from_powershell(output_str: &str) -> Option<(u64, u64, f64)> {
         let line: &str = output_str.trim();
         if let Some(comma_pos) = line.find(',') {
@@ -392,6 +413,7 @@ impl MonitorService {
     }
 
     #[cfg(target_os = "windows")]
+    #[instrument_trace]
     fn get_memory_via_powershell() -> Option<(u64, u64, f64)> {
         use std::process::Command;
         if let Ok(output) = Command::new("powershell")
@@ -413,6 +435,7 @@ impl MonitorService {
     }
 
     #[cfg(target_os = "windows")]
+    #[instrument_trace]
     fn get_total_memory_via_wmic() -> Option<u64> {
         use std::process::Command;
         if let Ok(output) = Command::new("wmic")
@@ -432,6 +455,7 @@ impl MonitorService {
     }
 
     #[cfg(target_os = "windows")]
+    #[instrument_trace]
     fn get_free_memory_via_wmic() -> Option<u64> {
         use std::process::Command;
         if let Ok(output) = Command::new("wmic")
@@ -451,6 +475,7 @@ impl MonitorService {
     }
 
     #[cfg(target_os = "windows")]
+    #[instrument_trace]
     fn calculate_memory_usage(total: u64, available: u64) -> (u64, u64, f64) {
         let used: u64 = total.saturating_sub(available);
         let usage: f64 = if total > 0 {
@@ -461,6 +486,7 @@ impl MonitorService {
         (used, total, usage)
     }
 
+    #[instrument_trace]
     async fn get_memory_info() -> (u64, u64, f64) {
         #[cfg(target_os = "windows")]
         {
@@ -486,6 +512,7 @@ impl MonitorService {
         }
     }
 
+    #[instrument_trace]
     async fn get_disk_info() -> (u64, u64, f64) {
         #[cfg(target_os = "windows")]
         {
@@ -567,6 +594,7 @@ impl MonitorService {
         }
     }
 
+    #[instrument_trace]
     async fn get_network_info() -> (u64, u64) {
         #[cfg(target_os = "windows")]
         {
@@ -644,6 +672,7 @@ impl MonitorService {
         }
     }
 
+    #[instrument_trace]
     async fn get_uptime() -> u64 {
         #[cfg(target_os = "windows")]
         {
@@ -683,6 +712,7 @@ impl MonitorService {
         }
     }
 
+    #[instrument_trace]
     async fn get_load_average() -> f64 {
         #[cfg(target_os = "windows")]
         {
@@ -714,6 +744,7 @@ impl MonitorService {
         }
     }
 
+    #[instrument_trace]
     async fn get_active_connections() -> u32 {
         #[cfg(target_os = "windows")]
         {
@@ -742,6 +773,7 @@ impl MonitorService {
         }
     }
 
+    #[instrument_trace]
     async fn get_process_count() -> u32 {
         #[cfg(target_os = "windows")]
         {
@@ -772,6 +804,7 @@ impl MonitorService {
         }
     }
 
+    #[instrument_trace]
     async fn get_hostname() -> String {
         #[cfg(target_os = "windows")]
         {
@@ -790,6 +823,7 @@ impl MonitorService {
         }
     }
 
+    #[instrument_trace]
     async fn get_os_name() -> String {
         #[cfg(target_os = "windows")]
         {
@@ -828,6 +862,7 @@ impl MonitorService {
         }
     }
 
+    #[instrument_trace]
     async fn get_os_version() -> String {
         if let Ok(os_release) = fs::read_to_string("/etc/os-release") {
             for line in os_release.lines() {
@@ -844,6 +879,7 @@ impl MonitorService {
         "Unknown".to_string()
     }
 
+    #[instrument_trace]
     async fn get_kernel_version() -> String {
         fs::read_to_string("/proc/version")
             .unwrap_or_else(|_| "Unknown".to_string())
@@ -853,6 +889,7 @@ impl MonitorService {
             .to_string()
     }
 
+    #[instrument_trace]
     async fn get_cpu_cores() -> u32 {
         #[cfg(target_os = "windows")]
         {
@@ -886,6 +923,7 @@ impl MonitorService {
         }
     }
 
+    #[instrument_trace]
     async fn get_cpu_model() -> String {
         #[cfg(target_os = "windows")]
         {
@@ -932,6 +970,7 @@ impl MonitorService {
         }
     }
 
+    #[instrument_trace]
     async fn get_total_memory() -> u64 {
         #[cfg(target_os = "windows")]
         {
@@ -966,6 +1005,7 @@ impl MonitorService {
         }
     }
 
+    #[instrument_trace]
     async fn get_total_disk() -> u64 {
         #[cfg(target_os = "windows")]
         {
@@ -1025,6 +1065,7 @@ impl MonitorService {
 
 #[cfg(not(target_os = "windows"))]
 impl LinuxMemoryInfo {
+    #[instrument_trace]
     fn parse_meminfo_line(&mut self, line: &str) {
         if line.starts_with("MemTotal:") {
             if let Some(value) = line.split_whitespace().nth(1) {
@@ -1049,6 +1090,7 @@ impl LinuxMemoryInfo {
         }
     }
 
+    #[instrument_trace]
     fn calculate_usage(&self) -> (u64, u64, f64) {
         let available: u64 = if *self.get_available() == 0 && *self.get_total() > 0 {
             *self.get_free() + *self.get_buffers() + *self.get_cached()

@@ -1,5 +1,6 @@
 use super::*;
 
+#[instrument_trace]
 pub async fn send_body_hook(ctx: &Context) {
     let body: ResponseBody = ctx.get_response_body().await;
     if ctx.get_request().await.is_ws() {

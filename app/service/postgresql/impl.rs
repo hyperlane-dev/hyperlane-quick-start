@@ -1,6 +1,7 @@
 use super::*;
 
 impl PostgresqlService {
+    #[instrument_trace]
     pub async fn create_postgresql_record(record: PostgresqlRecord) -> Result<(), String> {
         let db: DatabaseConnection = get_postgresql_connection().await?;
         let active_model: ActiveModel = ActiveModel {
@@ -15,6 +16,7 @@ impl PostgresqlService {
         Ok(())
     }
 
+    #[instrument_trace]
     pub async fn get_all_postgresql_records() -> Result<Vec<PostgresqlRecord>, String> {
         let db: DatabaseConnection = get_postgresql_connection().await?;
         let records: Vec<Model> = Entity::find()
@@ -32,6 +34,7 @@ impl PostgresqlService {
         Ok(result)
     }
 
+    #[instrument_trace]
     pub async fn update_postgresql_record(record: PostgresqlRecord) -> Result<(), String> {
         let db: DatabaseConnection = get_postgresql_connection().await?;
         Entity::update_many()
@@ -43,6 +46,7 @@ impl PostgresqlService {
         Ok(())
     }
 
+    #[instrument_trace]
     pub async fn delete_postgresql_record(key: &str) -> Result<(), String> {
         let db: DatabaseConnection = get_postgresql_connection().await?;
         Entity::delete_many()

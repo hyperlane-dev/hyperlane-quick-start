@@ -1,6 +1,7 @@
 use super::*;
 
 impl WebSocketService {
+    #[instrument_trace]
     pub fn get_response_body(body: &WebSocketMessage) -> Result<String, String> {
         if body.is_valid() {
             return Err("Invalid message".to_string());

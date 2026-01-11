@@ -1,6 +1,7 @@
 use super::*;
 
 impl Default for ChatSession {
+    #[instrument_trace]
     fn default() -> Self {
         Self {
             session_id: String::new(),
@@ -11,6 +12,7 @@ impl Default for ChatSession {
 }
 
 impl ChatSession {
+    #[instrument_trace]
     pub fn add_message(&mut self, role: String, content: String) {
         let mut message: ChatMessage = ChatMessage::default();
         message.set_role(role).set_content(content);

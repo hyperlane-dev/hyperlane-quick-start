@@ -1,6 +1,7 @@
 use super::*;
 
 impl Default for RedisAutoCreation {
+    #[instrument_trace]
     fn default() -> Self {
         Self {
             env: get_global_env_config(),
@@ -9,6 +10,7 @@ impl Default for RedisAutoCreation {
 }
 
 impl RedisAutoCreation {
+    #[instrument_trace]
     async fn create_mutable_connection(&self) -> Result<Connection, AutoCreationError> {
         let db_url: String = if self.env.get_redis_username().is_empty() {
             format!(
@@ -64,6 +66,7 @@ impl RedisAutoCreation {
         Ok(connection)
     }
 
+    #[instrument_trace]
     async fn validate_redis_server(&self) -> Result<(), AutoCreationError> {
         let mut conn: Connection = self.create_mutable_connection().await?;
         let pong: String =
@@ -96,6 +99,7 @@ impl RedisAutoCreation {
         Ok(())
     }
 
+    #[instrument_trace]
     async fn setup_redis_namespace(&self) -> Result<Vec<String>, AutoCreationError> {
         let mut setup_operations: Vec<String> = Vec::new();
         let mut conn: Connection = self.create_mutable_connection().await?;
@@ -136,12 +140,14 @@ impl RedisAutoCreation {
 }
 
 impl DatabaseAutoCreation for RedisAutoCreation {
+    #[instrument_trace]
     async fn create_database_if_not_exists(&self) -> Result<bool, AutoCreationError> {
         self.validate_redis_server().await?;
         AutoCreationLogger::log_database_exists("default", database::PluginType::Redis).await;
         Ok(false)
     }
 
+    #[instrument_trace]
     async fn create_tables_if_not_exist(&self) -> Result<Vec<String>, AutoCreationError> {
         let setup_operations: Vec<String> = self.setup_redis_namespace().await?;
         if !setup_operations.is_empty() {
@@ -158,6 +164,7 @@ impl DatabaseAutoCreation for RedisAutoCreation {
         Ok(setup_operations)
     }
 
+    #[instrument_trace]
     async fn verify_connection(&self) -> Result<(), AutoCreationError> {
         match self.validate_redis_server().await {
             Ok(_) => {

@@ -1,22 +1,26 @@
 use super::*;
 
 impl Default for MessageType {
+    #[instrument_trace]
     fn default() -> Self {
         Self::Text
     }
 }
 
 impl MessageType {
+    #[instrument_trace]
     fn is_ping(&self) -> bool {
         matches!(self, MessageType::Ping)
     }
 }
 
 impl WebSocketReqData {
+    #[instrument_trace]
     pub fn is_ping(&self) -> bool {
         self.get_type().is_ping()
     }
 
+    #[instrument_trace]
     pub async fn into_resp(&self, ctx: &Context) -> WebSocketRespData {
         let name: String = ChatService::get_name(ctx).await;
         let mut resp: WebSocketRespData = WebSocketRespData::default();
@@ -29,6 +33,7 @@ impl WebSocketReqData {
 }
 
 impl WebSocketRespData {
+    #[instrument_trace]
     pub async fn from<T: ToString>(msg_type: MessageType, ctx: &Context, data: T) -> Self {
         let name: String = ChatService::get_name(ctx).await;
         let mut resp_data: Self = Self::default();
@@ -44,6 +49,7 @@ impl WebSocketRespData {
         resp_data
     }
 
+    #[instrument_trace]
     pub async fn get_json_data<T: ToString>(
         msg_type: MessageType,
         ctx: &Context,
@@ -54,16 +60,19 @@ impl WebSocketRespData {
 }
 
 impl ChatSession {
+    #[instrument_trace]
     pub fn is_expired(&self, timeout_minutes: u64) -> bool {
         self.get_last_activity().elapsed().as_secs() > timeout_minutes * 60
     }
 }
 
 impl ChatDomain {
+    #[instrument_trace]
     pub fn get_global_chat_sessions() -> &'static Arc<RwLock<HashMap<String, ChatSession>>> {
         GLOBAL_CHAT_SESSIONS.get_or_init(|| Arc::new(RwLock::new(HashMap::new())))
     }
 
+    #[instrument_trace]
     pub fn get_or_create_session(session_id: &str) -> ChatSession {
         let sessions: &Arc<RwLock<HashMap<String, ChatSession>>> = Self::get_global_chat_sessions();
         if let Ok(mut sessions_guard) = sessions.write() {
@@ -89,6 +98,7 @@ impl ChatDomain {
         }
     }
 
+    #[instrument_trace]
     pub fn update_session(session: ChatSession) {
         let sessions: &Arc<RwLock<HashMap<String, ChatSession>>> = Self::get_global_chat_sessions();
         let mut sessions_guard: std::sync::RwLockWriteGuard<HashMap<String, ChatSession>> =
@@ -96,10 +106,12 @@ impl ChatDomain {
         sessions_guard.insert(session.get_session_id().clone(), session);
     }
 
+    #[instrument_trace]
     pub fn get_global_online_users() -> &'static Arc<RwLock<HashMap<String, OnlineUser>>> {
         GLOBAL_ONLINE_USERS.get_or_init(|| Arc::new(RwLock::new(HashMap::new())))
     }
 
+    #[instrument_trace]
     pub fn add_online_user(username: &str) {
         let users: &Arc<RwLock<HashMap<String, OnlineUser>>> = Self::get_global_online_users();
         let mut users_guard: RwLockWriteGuard<'_, HashMap<String, OnlineUser>> =
@@ -111,6 +123,7 @@ impl ChatDomain {
         users_guard.insert(username.to_string(), online_user);
     }
 
+    #[instrument_trace]
     pub fn remove_online_user(username: &str) {
         let users: &Arc<RwLock<HashMap<String, OnlineUser>>> = Self::get_global_online_users();
         let mut users_guard: RwLockWriteGuard<'_, HashMap<String, OnlineUser>> =
@@ -118,6 +131,7 @@ impl ChatDomain {
         users_guard.remove(username);
     }
 
+    #[instrument_trace]
     pub fn get_online_users_list() -> UserListResponse {
         let users: &Arc<RwLock<HashMap<String, OnlineUser>>> = Self::get_global_online_users();
         let mut users_vec: Vec<OnlineUser> = if let Ok(users_guard) = users.read() {

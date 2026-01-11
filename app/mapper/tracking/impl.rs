@@ -3,6 +3,21 @@ use super::*;
 impl ActiveModelBehavior for ActiveModel {}
 
 impl TrackingMapper {
+    #[instrument_trace]
+    pub fn get_db_connection() -> &'static DatabaseConnection {
+        TRACKING_DB_CONNECTION.get_or_init(|| {
+            tokio::task::block_in_place(|| {
+                tokio::runtime::Handle::current().block_on(async {
+                    let db: DatabaseConnection = get_postgresql_connection()
+                        .await
+                        .expect("Failed to connect to PostgreSQL database");
+                    db
+                })
+            })
+        })
+    }
+
+    #[instrument_trace]
     pub async fn insert(record: TrackingRecord) -> Result<(), DbErr> {
         let headers_json: String = serde_json::to_string(&record.headers)
             .map_err(|error| DbErr::Custom(format!("Failed to serialize headers: {error}")))?;
@@ -14,12 +29,13 @@ impl TrackingMapper {
                 timestamp: ActiveValue::Set(record.timestamp),
                 ..Default::default()
             };
-            let db: &DatabaseConnection = get_tracking_db_connection();
+            let db: &DatabaseConnection = Self::get_db_connection();
             Entity::insert(active_model).exec(db).await.unwrap();
         });
         Ok(())
     }
 
+    #[instrument_trace]
     pub async fn query(
         start_time: Option<i64>,
         end_time: Option<i64>,
@@ -27,7 +43,7 @@ impl TrackingMapper {
         page: i64,
         page_size: i64,
     ) -> Result<(Vec<Model>, i64), DbErr> {
-        let db: &DatabaseConnection = get_tracking_db_connection();
+        let db: &DatabaseConnection = Self::get_db_connection();
         let mut query: Select<Entity> = Entity::find();
         if let Some(start) = start_time {
             query = query.filter(Column::Timestamp.gte(start));
@@ -48,6 +64,7 @@ impl TrackingMapper {
         Ok((records, total))
     }
 
+    #[instrument_trace]
     pub async fn query_by_header(
         header_key: String,
         header_value: Option<String>,
@@ -57,7 +74,7 @@ impl TrackingMapper {
         page: i64,
         page_size: i64,
     ) -> Result<(Vec<Model>, i64), DbErr> {
-        let db: &DatabaseConnection = get_tracking_db_connection();
+        let db: &DatabaseConnection = Self::get_db_connection();
         let mut query: Select<Entity> = Entity::find();
         if let Some(start) = start_time {
             query = query.filter(Column::Timestamp.gte(start));
@@ -122,6 +139,7 @@ impl TrackingMapper {
         Ok((paginated_records, total))
     }
 
+    #[instrument_trace]
     pub async fn query_by_body_content(
         content: String,
         start_time: Option<i64>,
@@ -130,7 +148,7 @@ impl TrackingMapper {
         page: i64,
         page_size: i64,
     ) -> Result<(Vec<Model>, i64), DbErr> {
-        let db: &DatabaseConnection = get_tracking_db_connection();
+        let db: &DatabaseConnection = Self::get_db_connection();
         let mut query: Select<Entity> = Entity::find();
         if let Some(start) = start_time {
             query = query.filter(Column::Timestamp.gte(start));
@@ -156,17 +174,4 @@ impl TrackingMapper {
         };
         Ok((paginated_records, total))
     }
-}
-
-pub fn get_tracking_db_connection() -> &'static DatabaseConnection {
-    TRACKING_DB_CONNECTION.get_or_init(|| {
-        tokio::task::block_in_place(|| {
-            tokio::runtime::Handle::current().block_on(async {
-                let db: DatabaseConnection = get_postgresql_connection()
-                    .await
-                    .expect("Failed to connect to PostgreSQL database");
-                db
-            })
-        })
-    })
 }

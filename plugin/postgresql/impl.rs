@@ -1,6 +1,7 @@
 use super::*;
 
 impl Default for PostgreSqlAutoCreation {
+    #[instrument_trace]
     fn default() -> Self {
         Self {
             env: get_global_env_config(),
@@ -9,6 +10,7 @@ impl Default for PostgreSqlAutoCreation {
 }
 
 impl PostgreSqlAutoCreation {
+    #[instrument_trace]
     async fn create_admin_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
         let admin_url: String = format!(
             "postgres://{}:{}@{}:{}/postgres",
@@ -36,6 +38,7 @@ impl PostgreSqlAutoCreation {
         })
     }
 
+    #[instrument_trace]
     async fn create_target_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
         let db_url: String = format!(
             "postgres://{}:{}@{}:{}/{}",
@@ -53,6 +56,7 @@ impl PostgreSqlAutoCreation {
         })
     }
 
+    #[instrument_trace]
     async fn database_exists(
         &self,
         connection: &DatabaseConnection,
@@ -70,6 +74,7 @@ impl PostgreSqlAutoCreation {
         }
     }
 
+    #[instrument_trace]
     async fn create_database(
         &self,
         connection: &DatabaseConnection,
@@ -122,6 +127,7 @@ impl PostgreSqlAutoCreation {
         }
     }
 
+    #[instrument_trace]
     async fn table_exists(
         &self,
         connection: &DatabaseConnection,
@@ -139,6 +145,7 @@ impl PostgreSqlAutoCreation {
         }
     }
 
+    #[instrument_trace]
     async fn create_table(
         &self,
         connection: &DatabaseConnection,
@@ -165,6 +172,7 @@ impl PostgreSqlAutoCreation {
         }
     }
 
+    #[instrument_trace]
     async fn execute_sql(
         &self,
         connection: &DatabaseConnection,
@@ -180,6 +188,7 @@ impl PostgreSqlAutoCreation {
         }
     }
 
+    #[instrument_trace]
     fn get_postgresql_schema(&self) -> DatabaseSchema {
         let index_sql: &str = POSTGRESQL_CREATE_INDEX_SQL;
         let indexes: Vec<String> = index_sql
@@ -213,6 +222,7 @@ impl PostgreSqlAutoCreation {
 }
 
 impl DatabaseAutoCreation for PostgreSqlAutoCreation {
+    #[instrument_trace]
     async fn create_database_if_not_exists(&self) -> Result<bool, AutoCreationError> {
         let admin_connection: DatabaseConnection = self.create_admin_connection().await?;
         let result: Result<bool, AutoCreationError> = self.create_database(&admin_connection).await;
@@ -220,6 +230,7 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
         result
     }
 
+    #[instrument_trace]
     async fn create_tables_if_not_exist(&self) -> Result<Vec<String>, AutoCreationError> {
         let connection: DatabaseConnection = self.create_target_connection().await?;
         let schema: DatabaseSchema = self.get_postgresql_schema();
@@ -275,6 +286,7 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
         Ok(created_tables)
     }
 
+    #[instrument_trace]
     async fn verify_connection(&self) -> Result<(), AutoCreationError> {
         let connection: DatabaseConnection = self.create_target_connection().await?;
         let statement: Statement =

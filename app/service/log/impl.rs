@@ -1,6 +1,7 @@
 use super::*;
 
 impl LogService {
+    #[instrument_trace]
     pub fn get_sorted_dirs(path: &Path) -> Vec<String> {
         fs::read_dir(path)
             .map(|entries| {
@@ -16,6 +17,7 @@ impl LogService {
             .unwrap_or_default()
     }
 
+    #[instrument_trace]
     pub fn get_sorted_log_files(path: &Path) -> Vec<String> {
         fs::read_dir(path)
             .map(|entries| {
@@ -32,6 +34,7 @@ impl LogService {
             .unwrap_or_default()
     }
 
+    #[instrument_trace]
     pub async fn read_and_reverse_log_file(full_path: &Path) -> Result<String, String> {
         async_read_from_file::<Vec<u8>>(full_path.to_str().unwrap_or_default())
             .await
@@ -51,6 +54,7 @@ impl LogService {
             })
     }
 
+    #[instrument_trace]
     pub async fn process_date_directory(log_dir: &Path, date_dir: &str) -> Vec<String> {
         let date_path: PathBuf = log_dir.join(date_dir);
         let log_files: Vec<String> = Self::get_sorted_log_files(&date_path);
@@ -66,6 +70,7 @@ impl LogService {
         logs
     }
 
+    #[instrument_trace]
     pub async fn read_log_file(level: &str) -> String {
         let log_dir: PathBuf = Path::new(SERVER_LOG_DIR).join(level);
         if !log_dir.exists() {

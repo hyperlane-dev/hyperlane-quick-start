@@ -1,5 +1,6 @@
 use super::*;
 
+#[instrument_trace]
 pub async fn initialize_auto_creation() -> Result<(), String> {
     if let Err(error) = AutoCreationConfig::validate() {
         return Err(format!(

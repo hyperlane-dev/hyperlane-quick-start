@@ -1,6 +1,7 @@
 use super::*;
 
 impl RssService {
+    #[instrument_trace]
     pub async fn get_uploaded_files() -> Vec<UploadedFile> {
         let mut files: Vec<UploadedFile> = Vec::new();
         if let Ok(entries) = std::fs::read_dir(UPLOAD_DIR) {
@@ -12,6 +13,7 @@ impl RssService {
         files
     }
 
+    #[instrument_trace]
     fn scan_directory_recursive(path: &std::path::Path, files: &mut Vec<UploadedFile>) {
         if let Ok(entries) = std::fs::read_dir(path) {
             for entry in entries.flatten() {
@@ -27,6 +29,7 @@ impl RssService {
         }
     }
 
+    #[instrument_trace]
     fn create_uploaded_file(path: &std::path::Path) -> Option<UploadedFile> {
         let metadata: std::fs::Metadata = std::fs::metadata(path).ok()?;
         let file_size: u64 = metadata.len();
@@ -40,7 +43,7 @@ impl RssService {
         let upload_time: String = if let Ok(modified) = metadata.modified() {
             if let Ok(duration) = modified.duration_since(std::time::UNIX_EPOCH) {
                 let secs: u64 = duration.as_secs();
-                format_timestamp(secs)
+                Self::format_timestamp(secs)
             } else {
                 String::new()
             }
@@ -86,6 +89,7 @@ impl RssService {
         Some(file_info)
     }
 
+    #[instrument_trace]
     pub async fn generate_rss_feed(
         base_url: &str,
         limit: Option<usize>,
@@ -134,6 +138,7 @@ impl RssService {
         Self::build_rss_xml(&channel)
     }
 
+    #[instrument_trace]
     fn format_rfc822_date(timestamp: &str) -> String {
         if timestamp.is_empty() {
             return String::new();
@@ -141,6 +146,7 @@ impl RssService {
         timestamp.to_string()
     }
 
+    #[instrument_trace]
     fn build_rss_xml(channel: &RssChannel) -> String {
         let mut xml: String = String::from(r#"<?xml version="1.0" encoding="UTF-8"?>"#);
         xml.push_str("\n<rss version=\"2.0\">");
@@ -194,6 +200,7 @@ impl RssService {
         xml
     }
 
+    #[instrument_trace]
     fn escape_xml(text: &str) -> String {
         text.replace('&', "&amp;")
             .replace('<', "&lt;")
@@ -201,22 +208,23 @@ impl RssService {
             .replace('"', "&quot;")
             .replace('\'', "&apos;")
     }
-}
 
-fn format_timestamp(secs: u64) -> String {
-    let system_time: SystemTime = SystemTime::UNIX_EPOCH + Duration::from_secs(secs);
-    if let Ok(datetime) = system_time.duration_since(SystemTime::UNIX_EPOCH) {
-        let total_secs: u64 = datetime.as_secs();
-        let days: u64 = total_secs / 86400;
-        let hours: u64 = (total_secs % 86400) / 3600;
-        let minutes: u64 = (total_secs % 3600) / 60;
-        let seconds: u64 = total_secs % 60;
-        let year: i32 = 1970 + (days / 365) as i32;
-        let day_of_year: u64 = days % 365;
-        let month: u32 = ((day_of_year / 30) + 1) as u32;
-        let day: u32 = ((day_of_year % 30) + 1) as u32;
-        format!("{year:04}-{month:02}-{day:02} {hours:02}:{minutes:02}:{seconds:02}",)
-    } else {
-        String::new()
+    #[instrument_trace]
+    fn format_timestamp(secs: u64) -> String {
+        let system_time: SystemTime = SystemTime::UNIX_EPOCH + Duration::from_secs(secs);
+        if let Ok(datetime) = system_time.duration_since(SystemTime::UNIX_EPOCH) {
+            let total_secs: u64 = datetime.as_secs();
+            let days: u64 = total_secs / 86400;
+            let hours: u64 = (total_secs % 86400) / 3600;
+            let minutes: u64 = (total_secs % 3600) / 60;
+            let seconds: u64 = total_secs % 60;
+            let year: i32 = 1970 + (days / 365) as i32;
+            let day_of_year: u64 = days % 365;
+            let month: u32 = ((day_of_year / 30) + 1) as u32;
+            let day: u32 = ((day_of_year % 30) + 1) as u32;
+            format!("{year:04}-{month:02}-{day:02} {hours:02}:{minutes:02}:{seconds:02}",)
+        } else {
+            String::new()
+        }
     }
 }

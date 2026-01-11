@@ -1,6 +1,7 @@
 use super::*;
 
 impl EnvConfig {
+    #[instrument_trace]
     pub fn load() -> Result<Self, String> {
         let docker_config: DockerComposeConfig =
             Self::load_from_docker_compose().unwrap_or_default();
@@ -108,6 +109,7 @@ impl EnvConfig {
         Ok(config)
     }
 
+    #[instrument_trace]
     fn load_from_docker_compose() -> Result<DockerComposeConfig, String> {
         let docker_compose_content: Vec<u8> = read_from_file(DOCKER_COMPOSE_FILE_PATH)
             .map_err(|error| format!("Failed to read docker-compose.yml: {error}"))?;

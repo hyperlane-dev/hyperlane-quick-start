@@ -1,5 +1,6 @@
 use super::*;
 
+#[instrument_trace]
 pub async fn connection_redis_db() -> Result<Arc<Connection>, String> {
     let env: &'static EnvConfig = get_global_env_config();
     match perform_redis_auto_creation().await {
@@ -72,10 +73,12 @@ pub async fn connection_redis_db() -> Result<Arc<Connection>, String> {
     Ok(Arc::new(connection))
 }
 
+#[instrument_trace]
 pub async fn get_redis_connection() -> Result<Arc<Connection>, String> {
     REDIS_DB.clone()
 }
 
+#[instrument_trace]
 pub async fn perform_redis_auto_creation() -> Result<AutoCreationResult, AutoCreationError> {
     let start_time: Instant = Instant::now();
     let mut result: AutoCreationResult = AutoCreationResult::default();

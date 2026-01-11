@@ -1,12 +1,14 @@
 use super::*;
 
 impl UploadService {
+    #[instrument_trace]
     pub fn get_base_file_dir() -> String {
         let (year, month, day, hour, minute, _, _, _) = calculate_time();
         let full_dir: String = format!("{year}/{month}/{day}/{hour}/{minute}");
         full_dir
     }
 
+    #[instrument_trace]
     fn validate_file_id(file_id_opt: Option<String>, ctx: &Context) -> Result<String, ()> {
         match file_id_opt {
             Some(id) => Ok(id),
@@ -26,6 +28,7 @@ impl UploadService {
         }
     }
 
+    #[instrument_trace]
     fn validate_total_chunks(total_chunks_opt: Option<String>, ctx: &Context) -> Result<usize, ()> {
         match total_chunks_opt {
             Some(total) => match total.parse::<usize>() {
@@ -60,6 +63,7 @@ impl UploadService {
         }
     }
 
+    #[instrument_trace]
     fn validate_file_name(file_name_opt: Option<String>, ctx: &Context) -> Result<String, ()> {
         match file_name_opt {
             Some(name) => Ok(urlencoding::decode(&name).unwrap_or_default().into_owned()),
@@ -79,6 +83,7 @@ impl UploadService {
         }
     }
 
+    #[instrument_trace]
     fn validate_and_decode_directory(base_file_dir_opt: Option<String>) -> String {
         match base_file_dir_opt {
             Some(encode_dir) => {
@@ -95,6 +100,7 @@ impl UploadService {
         }
     }
 
+    #[instrument_trace]
     fn is_valid_directory_path(path: &str) -> bool {
         !path.is_empty()
             && !path.contains("../")
@@ -105,6 +111,7 @@ impl UploadService {
     #[request_header_option(CHUNKIFY_TOTAL_CHUNKS_HEADER => total_chunks_opt)]
     #[request_header_option(CHUNKIFY_FILE_NAME_HEADER => file_name_opt)]
     #[request_header_option(CHUNKIFY_DIRECTORY_HEADER => base_file_dir_opt)]
+    #[instrument_trace]
     pub async fn get_register_file_chunk_data<'a>(ctx: &'a Context) -> OptionFileChunkData {
         let file_id: String = Self::validate_file_id(file_id_opt, ctx).ok()?;
         let total_chunks: usize = Self::validate_total_chunks(total_chunks_opt, ctx).ok()?;
@@ -119,6 +126,7 @@ impl UploadService {
         Some(data)
     }
 
+    #[instrument_trace]
     pub async fn get_save_file_chunk_data(
         ctx: &Context,
         file_id_opt: Option<String>,
@@ -150,16 +158,19 @@ impl UploadService {
         Some(data)
     }
 
+    #[instrument_trace]
     pub async fn add_file_id_map(data: &FileChunkData) {
         write_file_id_map()
             .await
             .insert(data.get_file_id().to_owned(), data.clone());
     }
 
+    #[instrument_trace]
     pub async fn remove_file_id_map(file_id: &str) {
         write_file_id_map().await.remove(file_id);
     }
 
+    #[instrument_trace]
     pub async fn get_merge_file_chunk_data(
         ctx: &Context,
         file_id_opt: Option<String>,
@@ -179,6 +190,7 @@ impl UploadService {
     }
 
     #[response_status_code(200)]
+    #[instrument_trace]
     pub async fn set_common_success_response_body<'a>(ctx: &'a Context, url: &'a str) {
         let mut data: UploadResponse<'_> = UploadResponse {
             code: 0,
@@ -191,6 +203,7 @@ impl UploadService {
     }
 
     #[response_status_code(200)]
+    #[instrument_trace]
     pub async fn set_common_error_response_body<'a>(ctx: &'a Context, error: String) {
         let mut data: UploadResponse<'_> = UploadResponse {
             code: 0,
@@ -202,6 +215,7 @@ impl UploadService {
         let _: &Context = ctx.set_response_body(&data_json).await;
     }
 
+    #[instrument_trace]
     pub async fn serve_static_file(dir: &str, file: &str) -> Result<(Vec<u8>, String), String> {
         let decode_dir: String = Decode::execute(CHARSETS, dir).unwrap_or_default();
         let decode_file: String = Decode::execute(CHARSETS, file).unwrap_or_default();
@@ -219,6 +233,7 @@ impl UploadService {
         Ok((data, content_type))
     }
 
+    #[instrument_trace]
     pub fn parse_range_header(range_header: &str, file_size: u64) -> Result<RangeRequest, String> {
         if !range_header.starts_with("bytes=") {
             return Err("Invalid range header format".to_string());
@@ -252,6 +267,7 @@ impl UploadService {
         Ok(range_request)
     }
 
+    #[instrument_trace]
     pub async fn read_file_range(path: &str, start: u64, length: u64) -> Result<Vec<u8>, String> {
         use std::io::{Read, Seek, SeekFrom};
         let mut file: std::fs::File =
@@ -266,6 +282,7 @@ impl UploadService {
         Ok(buffer)
     }
 
+    #[instrument_trace]
     fn validate_file_paths(dir: &str, file: &str) -> Result<(String, String), String> {
         let decode_dir: String = Decode::execute(CHARSETS, dir).unwrap_or_default();
         let decode_file: String = Decode::execute(CHARSETS, file).unwrap_or_default();
@@ -277,6 +294,7 @@ impl UploadService {
         Ok((decode_dir, decode_file))
     }
 
+    #[instrument_trace]
     fn get_file_metadata_and_content_type(
         path: &str,
         decode_file: &str,
@@ -295,6 +313,7 @@ impl UploadService {
         Ok((file_metadata, content_type))
     }
 
+    #[instrument_trace]
     async fn handle_range_request(
         path: &str,
         range: RangeRequest,
@@ -318,6 +337,7 @@ impl UploadService {
         Ok((partial_content, content_type))
     }
 
+    #[instrument_trace]
     async fn handle_full_file_request(
         path: &str,
         file_size: u64,
@@ -337,6 +357,7 @@ impl UploadService {
         Ok((partial_content, content_type))
     }
 
+    #[instrument_trace]
     pub async fn serve_static_file_with_range(
         dir: &str,
         file: &str,
@@ -353,6 +374,7 @@ impl UploadService {
         }
     }
 
+    #[instrument_trace]
     pub async fn save_file_chunk(
         file_chunk_data: &FileChunkData,
         chunk_data: Vec<u8>,
@@ -382,6 +404,7 @@ impl UploadService {
         Ok(save_upload_dir.clone())
     }
 
+    #[instrument_trace]
     pub async fn merge_file_chunks(
         file_chunk_data: &FileChunkData,
     ) -> Result<(String, String), String> {

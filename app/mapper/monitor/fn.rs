@@ -1,5 +1,6 @@
 use super::*;
 
+#[instrument_trace]
 pub fn init_network_capture_globals() {
     let _: Result<(), Arc<RwLock<Option<NetworkStats>>>> =
         NETWORK_CAPTURE_STATS.set(Arc::new(RwLock::new(None)));
@@ -9,10 +10,12 @@ pub fn init_network_capture_globals() {
         ACTIVE_CONNECTIONS.set(Arc::new(RwLock::new(HashMap::new())));
 }
 
+#[instrument_trace]
 pub fn get_network_stats() -> Option<NetworkStats> {
     NETWORK_CAPTURE_STATS.get()?.read().ok()?.clone()
 }
 
+#[instrument_trace]
 pub fn set_network_stats(stats: NetworkStats) {
     if let Some(global_stats) = NETWORK_CAPTURE_STATS.get() {
         if let Ok(mut guard) = global_stats.write() {
@@ -21,6 +24,7 @@ pub fn set_network_stats(stats: NetworkStats) {
     }
 }
 
+#[instrument_trace]
 pub fn get_capture_status() -> CaptureStatus {
     CAPTURE_STATUS
         .get()
@@ -29,6 +33,7 @@ pub fn get_capture_status() -> CaptureStatus {
         .unwrap_or(CaptureStatus::Stopped)
 }
 
+#[instrument_trace]
 pub fn set_capture_status(status: CaptureStatus) {
     if let Some(global_status) = CAPTURE_STATUS.get() {
         if let Ok(mut guard) = global_status.write() {
@@ -37,6 +42,7 @@ pub fn set_capture_status(status: CaptureStatus) {
     }
 }
 
+#[instrument_trace]
 pub fn add_connection(connection_id: String, info: ConnectionInfo) {
     if let Some(connections) = ACTIVE_CONNECTIONS.get() {
         if let Ok(mut guard) = connections.write() {
@@ -45,6 +51,7 @@ pub fn add_connection(connection_id: String, info: ConnectionInfo) {
     }
 }
 
+#[instrument_trace]
 pub fn remove_connection(connection_id: &str) {
     if let Some(connections) = ACTIVE_CONNECTIONS.get() {
         if let Ok(mut guard) = connections.write() {
@@ -53,6 +60,7 @@ pub fn remove_connection(connection_id: &str) {
     }
 }
 
+#[instrument_trace]
 pub fn get_active_connections() -> HashMap<String, ConnectionInfo> {
     if let Some(connections) = ACTIVE_CONNECTIONS.get() {
         if let Ok(guard) = connections.read() {
