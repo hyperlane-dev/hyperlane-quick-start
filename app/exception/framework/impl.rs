@@ -23,7 +23,7 @@ impl ServerHook for TaskPanicHook {
     #[epilogue_macros(response_body(&response_body), send)]
     async fn handle(self, ctx: &Context) {
         trace!("TaskPanicHook handle");
-        debug!("Request => {}", ctx.get_request().await);
+        debug!("TaskPanicHook request => {}", ctx.get_request().await);
         error!("TaskPanicHook => {}", self.response_body);
         let api_response: ApiResponse<()> =
             ApiResponse::error_with_code(ResponseCode::InternalError, self.response_body);
@@ -55,14 +55,14 @@ impl ServerHook for RequestErrorHook {
     #[epilogue_macros(response_body(&response_body), send)]
     async fn handle(self, ctx: &Context) {
         trace!("RequestErrorHook handle");
-        debug!("Request => {}", ctx.get_request().await);
         if self.response_status_code == HttpStatus::BadRequest.code() {
             ctx.aborted().await;
             warn!("Context aborted");
             return;
         }
         if self.response_status_code != HttpStatus::RequestTimeout.code() {
-            error!("RequestErrorHook =>{}", self.response_body);
+            debug!("RequestErrorHook request => {}", ctx.get_request().await);
+            error!("RequestErrorHook => {}", self.response_body);
         }
         let api_response: ApiResponse<()> =
             ApiResponse::error_with_code(ResponseCode::InternalError, self.response_body);
