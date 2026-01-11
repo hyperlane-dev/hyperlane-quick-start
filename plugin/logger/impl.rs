@@ -16,7 +16,7 @@ impl Log for Logger {
         let location: &str = file.unwrap_or(module_path.unwrap_or(target));
         let time_text: String = format!("{SPACE}{now_time}{SPACE}");
         let level_text: String = format!("{SPACE}{level}{SPACE}");
-        let args_text: String = format!("{SPACE}{args}{SPACE}");
+        let args_text: String = format!("{args}{SPACE}");
         let location_text: String = format!("{SPACE}{location}{COLON}{line}{SPACE}");
         let write_file_data: String = format!("{level}{location_text}{args}");
         match record.metadata().level() {
