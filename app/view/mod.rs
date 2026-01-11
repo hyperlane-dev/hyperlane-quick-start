@@ -1,1 +1,3 @@
+mod favicon;
 
+use super::*;
