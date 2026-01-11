@@ -4,7 +4,6 @@ mod r#struct;
 pub use r#struct::*;
 
 use super::*;
-
 use hyperlane_plugin::mysql::*;
 use mapper::mysql::*;
 use model::param::mysql::*;

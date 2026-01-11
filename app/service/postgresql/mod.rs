@@ -4,7 +4,6 @@ mod r#struct;
 pub use r#struct::*;
 
 use super::*;
-
 use hyperlane_plugin::postgresql::*;
 use mapper::postgresql::*;
 use model::param::postgresql::*;

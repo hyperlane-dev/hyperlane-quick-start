@@ -1,2 +1,4 @@
-#[derive(Clone, Copy, Debug, Default)]
+use super::*;
+
+#[derive(Clone, Copy, Data, Debug, Default)]
 pub struct TraceService;

@@ -1,5 +1,5 @@
 use super::*;
 
 #[route("/trace")]
-#[derive(Clone, Copy, Debug, Default)]
+#[derive(Clone, Copy, Data, Debug, Default)]
 pub struct TraceViewRoute;

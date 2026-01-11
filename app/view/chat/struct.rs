@@ -1,5 +1,5 @@
 use super::*;
 
 #[route("/chat")]
-#[derive(Clone, Copy, Debug, Default)]
+#[derive(Clone, Copy, Data, Debug, Default)]
 pub struct ChatViewRoute;

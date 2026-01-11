@@ -1,5 +1,4 @@
 use super::*;
-use hyperlane_config::application::charset::CHARSETS;
 
 impl ShortlinkService {
     #[instrument_trace]
