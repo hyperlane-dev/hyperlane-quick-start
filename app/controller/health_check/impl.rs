@@ -1,13 +1,12 @@
 use super::*;
 
 impl ServerHook for HealthCheckRoute {
+    #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
-        trace!("HealthCheckRoute new");
         Self
     }
 
     #[prologue_macros(get)]
-    async fn handle(self, ctx: &Context) {
-        trace!("HealthCheckRoute handle");
-    }
+    #[instrument_trace]
+    async fn handle(self, ctx: &Context) {}
 }

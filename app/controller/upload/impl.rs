@@ -1,14 +1,14 @@
 use super::*;
 
 impl ServerHook for RegisterRoute {
+    #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
-        trace!("UploadRegisterRoute new");
         Self
     }
 
     #[prologue_macros(post)]
+    #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        trace!("RegisterRoute handle");
         let file_chunk_data_opt: OptionFileChunkData =
             UploadService::get_register_file_chunk_data(ctx).await;
         if file_chunk_data_opt.is_none() {
@@ -21,8 +21,8 @@ impl ServerHook for RegisterRoute {
 }
 
 impl ServerHook for SaveRoute {
+    #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
-        trace!("SaveRoute new");
         Self
     }
 
@@ -31,8 +31,8 @@ impl ServerHook for SaveRoute {
         request_header_option(CHUNKIFY_FILE_ID_HEADER => file_id_opt),
         request_header_option(CHUNKIFY_CHUNK_INDEX_HEADER => chunk_index_opt)
     )]
+    #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        trace!("SaveRoute handle");
         let file_chunk_data_opt: OptionFileChunkData =
             UploadService::get_save_file_chunk_data(ctx, file_id_opt, chunk_index_opt).await;
         if file_chunk_data_opt.is_none() {
@@ -54,8 +54,8 @@ impl ServerHook for SaveRoute {
 }
 
 impl ServerHook for MergeRoute {
+    #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
-        trace!("MergeRoute new");
         Self
     }
 
@@ -63,8 +63,8 @@ impl ServerHook for MergeRoute {
         post,
         request_header_option(CHUNKIFY_FILE_ID_HEADER => file_id_opt)
     )]
+    #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        trace!("MergeRoute handle");
         let file_chunk_data_opt: OptionFileChunkData =
             UploadService::get_merge_file_chunk_data(ctx, file_id_opt).await;
         if file_chunk_data_opt.is_none() {

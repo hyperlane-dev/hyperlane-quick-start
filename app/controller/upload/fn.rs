@@ -11,9 +11,8 @@ use super::*;
         (status = 500, description = "Internal Server Error")
     )
 )]
-pub fn openapi_upload_register() {
-    trace!("openapi_upload_register");
-}
+#[instrument_trace]
+pub fn openapi_upload_register() {}
 
 #[utoipa::path(
     post,
@@ -26,9 +25,8 @@ pub fn openapi_upload_register() {
         (status = 500, description = "Internal Server Error")
     )
 )]
-pub fn openapi_upload_save() {
-    trace!("openapi_upload_save");
-}
+#[instrument_trace]
+pub fn openapi_upload_save() {}
 
 #[utoipa::path(
     post,
@@ -41,6 +39,5 @@ pub fn openapi_upload_save() {
         (status = 500, description = "Internal Server Error")
     )
 )]
-pub fn openapi_upload_merge() {
-    trace!("openapi_upload_merge");
-}
+#[instrument_trace]
+pub fn openapi_upload_merge() {}

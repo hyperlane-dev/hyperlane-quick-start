@@ -1,8 +1,8 @@
 use super::*;
 
 impl ServerHook for MonitorViewRoute {
+    #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
-        trace!("MonitorViewRoute new");
         Self
     }
 
@@ -11,7 +11,6 @@ impl ServerHook for MonitorViewRoute {
         response_status_code(302),
         response_header(LOCATION => "/static/monitor/index.html")
     )]
-    async fn handle(self, ctx: &Context) {
-        trace!("MonitorViewRoute handle");
-    }
+    #[instrument_trace]
+    async fn handle(self, ctx: &Context) {}
 }

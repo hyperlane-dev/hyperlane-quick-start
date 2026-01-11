@@ -10,6 +10,7 @@ use super::*;
         (status = 500, description = "Internal Server Error")
     )
 )]
+#[instrument_trace]
 pub fn openapi_monitor_status_sse() {}
 
 #[utoipa::path(
@@ -22,9 +23,8 @@ pub fn openapi_monitor_status_sse() {}
         (status = 500, description = "Internal Server Error")
     )
 )]
-pub fn openapi_monitor_system_info() {
-    trace!("openapi_monitor_system_info");
-}
+#[instrument_trace]
+pub fn openapi_monitor_system_info() {}
 
 #[utoipa::path(
     get,
@@ -36,9 +36,8 @@ pub fn openapi_monitor_system_info() {
         (status = 500, description = "Internal Server Error")
     )
 )]
-pub fn openapi_monitor_network_capture_data() {
-    trace!("openapi_monitor_network_capture_data");
-}
+#[instrument_trace]
+pub fn openapi_monitor_network_capture_data() {}
 
 #[utoipa::path(
     get,
@@ -50,6 +49,5 @@ pub fn openapi_monitor_network_capture_data() {
         (status = 500, description = "Internal Server Error")
     )
 )]
-pub fn openapi_monitor_network_capture_stream() {
-    trace!("openapi_monitor_network_capture_stream");
-}
+#[instrument_trace]
+pub fn openapi_monitor_network_capture_stream() {}

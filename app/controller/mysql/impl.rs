@@ -1,8 +1,8 @@
 use super::*;
 
 impl ServerHook for ListRecordsRoute {
+    #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
-        trace!("ListRecordsRoute new");
         Self
     }
 
@@ -10,8 +10,8 @@ impl ServerHook for ListRecordsRoute {
         methods(get, post),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
+    #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        trace!("ListRecordsRoute handle");
         match MysqlService::get_all_mysql_records().await {
             Ok(records) => {
                 let response: ApiResponse<Vec<MysqlRecord>> = ApiResponse::success(records);
@@ -27,8 +27,8 @@ impl ServerHook for ListRecordsRoute {
 }
 
 impl ServerHook for CreateRecordRoute {
+    #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
-        trace!("CreateRecordRoute new");
         Self
     }
 
@@ -37,8 +37,8 @@ impl ServerHook for CreateRecordRoute {
         request_body_json_result(record_opt: MysqlRecord),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
+    #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        trace!("CreateRecordRoute handle");
         let record: MysqlRecord = match record_opt {
             Ok(data) => data,
             Err(error) => {
@@ -64,8 +64,8 @@ impl ServerHook for CreateRecordRoute {
 }
 
 impl ServerHook for UpdateRecordRoute {
+    #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
-        trace!("UpdateRecordRoute new");
         Self
     }
 
@@ -74,8 +74,8 @@ impl ServerHook for UpdateRecordRoute {
         request_body_json_result(record_opt: MysqlRecord),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
+    #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        trace!("UpdateRecordRoute handle");
         let record: MysqlRecord = match record_opt {
             Ok(data) => data,
             Err(error) => {
@@ -101,8 +101,8 @@ impl ServerHook for UpdateRecordRoute {
 }
 
 impl ServerHook for DeleteRecordRoute {
+    #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
-        trace!("DeleteRecordRoute new");
         Self
     }
 
@@ -110,8 +110,8 @@ impl ServerHook for DeleteRecordRoute {
         post,
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
+    #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        trace!("DeleteRecordRoute handle");
         let querys: RequestQuerys = ctx.get_request_querys().await;
         let key: &String = match querys.get("key") {
             Some(k) => k,

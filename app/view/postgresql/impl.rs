@@ -1,8 +1,8 @@
 use super::*;
 
 impl ServerHook for PostgresqlViewRoute {
+    #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
-        trace!("PostgresqlViewRoute new");
         Self
     }
 
@@ -11,7 +11,6 @@ impl ServerHook for PostgresqlViewRoute {
         response_status_code(302),
         response_header(LOCATION => "/static/postgresql/index.html")
     )]
-    async fn handle(self, ctx: &Context) {
-        trace!("PostgresqlViewRoute handle");
-    }
+    #[instrument_trace]
+    async fn handle(self, ctx: &Context) {}
 }

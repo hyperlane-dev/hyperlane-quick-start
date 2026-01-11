@@ -10,6 +10,5 @@ use super::*;
         (status = 500, description = "Internal Server Error")
     )
 )]
-pub fn openapi_get_online_users() {
-    trace!("openapi_get_online_users");
-}
+#[instrument_trace]
+pub fn openapi_get_online_users() {}

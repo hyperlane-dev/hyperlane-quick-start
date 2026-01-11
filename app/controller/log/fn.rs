@@ -10,9 +10,8 @@ use super::*;
         (status = 500, description = "Internal Server Error")
     )
 )]
-pub fn openapi_log_info() {
-    trace!("openapi_log_info");
-}
+#[instrument_trace]
+pub fn openapi_log_info() {}
 
 #[utoipa::path(
     get,
@@ -24,9 +23,8 @@ pub fn openapi_log_info() {
         (status = 500, description = "Internal Server Error")
     )
 )]
-pub fn openapi_log_warn() {
-    trace!("openapi_log_warn");
-}
+#[instrument_trace]
+pub fn openapi_log_warn() {}
 
 #[utoipa::path(
     get,
@@ -38,6 +36,5 @@ pub fn openapi_log_warn() {
         (status = 500, description = "Internal Server Error")
     )
 )]
-pub fn openapi_log_error() {
-    trace!("openapi_log_error");
-}
+#[instrument_trace]
+pub fn openapi_log_error() {}

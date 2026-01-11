@@ -10,9 +10,8 @@ use super::*;
         (status = 500, description = "Internal Server Error")
     )
 )]
-pub fn openapi_shortlink_query() {
-    trace!("openapi_shortlink_query");
-}
+#[instrument_trace]
+pub fn openapi_shortlink_query() {}
 
 #[utoipa::path(
     post,
@@ -24,6 +23,5 @@ pub fn openapi_shortlink_query() {
         (status = 500, description = "Internal Server Error")
     )
 )]
-pub fn openapi_shortlink_insert() {
-    trace!("openapi_shortlink_insert");
-}
+#[instrument_trace]
+pub fn openapi_shortlink_insert() {}

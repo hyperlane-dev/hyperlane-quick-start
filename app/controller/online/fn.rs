@@ -10,6 +10,5 @@ use super::*;
         (status = 500, description = "Internal Server Error")
     )
 )]
-pub fn openapi_online_docs() {
-    trace!("openapi_online_docs");
-}
+#[instrument_trace]
+pub fn openapi_online_docs() {}

@@ -1,8 +1,8 @@
 use super::*;
 
 impl ServerHook for ChatViewRoute {
+    #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
-        trace!("ChatViewRoute new");
         Self
     }
 
@@ -11,7 +11,6 @@ impl ServerHook for ChatViewRoute {
         response_status_code(302),
         response_header(LOCATION => "/static/chat/index.html")
     )]
-    async fn handle(self, ctx: &Context) {
-        trace!("ChatViewRoute handle");
-    }
+    #[instrument_trace]
+    async fn handle(self, ctx: &Context) {}
 }

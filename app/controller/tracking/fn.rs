@@ -10,9 +10,8 @@ use super::*;
         (status = 500, description = "Internal Server Error")
     )
 )]
-pub fn openapi_tracking_report() {
-    trace!("openapi_tracking_report");
-}
+#[instrument_trace]
+pub fn openapi_tracking_report() {}
 
 #[utoipa::path(
     get,
@@ -24,6 +23,5 @@ pub fn openapi_tracking_report() {
         (status = 500, description = "Internal Server Error")
     )
 )]
-pub fn openapi_tracking_query() {
-    trace!("openapi_tracking_query");
-}
+#[instrument_trace]
+pub fn openapi_tracking_query() {}

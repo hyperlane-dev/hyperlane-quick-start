@@ -1,14 +1,14 @@
 use super::*;
 
 impl ServerHook for DatasetRoute {
+    #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
-        trace!("DatasetRoute new");
         Self
     }
 
     #[prologue_macros(get)]
+    #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        trace!("DatasetRoute handle");
         match DatasetService::fetch_dataset().await {
             Ok(dataset_content) => {
                 ctx.set_response_header(

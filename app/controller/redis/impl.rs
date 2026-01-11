@@ -1,8 +1,8 @@
 use super::*;
 
 impl ServerHook for ListRecordsRoute {
+    #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
-        trace!("RedisListRecordsRoute new");
         Self
     }
 
@@ -11,8 +11,8 @@ impl ServerHook for ListRecordsRoute {
         request_query_option("keys" => keys_opt),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
+    #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        trace!("RedisListRecordsRoute handle");
         let keys: Vec<String> = match keys_opt {
             Some(k) => k.split(',').map(|s: &str| s.to_string()).collect(),
             None => {
@@ -39,8 +39,8 @@ impl ServerHook for ListRecordsRoute {
 }
 
 impl ServerHook for CreateRecordRoute {
+    #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
-        trace!("RedisCreateRecordRoute new");
         Self
     }
 
@@ -49,8 +49,8 @@ impl ServerHook for CreateRecordRoute {
         request_body_json_result(record_opt: RedisRecord),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
+    #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        trace!("RedisCreateRecordRoute handle");
         let record: RedisRecord = match record_opt {
             Ok(data) => data,
             Err(error) => {
@@ -76,8 +76,8 @@ impl ServerHook for CreateRecordRoute {
 }
 
 impl ServerHook for UpdateRecordRoute {
+    #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
-        trace!("RedisUpdateRecordRoute new");
         Self
     }
 
@@ -86,8 +86,8 @@ impl ServerHook for UpdateRecordRoute {
         request_body_json_result(record_opt: RedisRecord),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
+    #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        trace!("RedisUpdateRecordRoute handle");
         let record: RedisRecord = match record_opt {
             Ok(data) => data,
             Err(error) => {
@@ -113,8 +113,8 @@ impl ServerHook for UpdateRecordRoute {
 }
 
 impl ServerHook for DeleteRecordRoute {
+    #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
-        trace!("RedisDeleteRecordRoute new");
         Self
     }
 
@@ -122,8 +122,8 @@ impl ServerHook for DeleteRecordRoute {
         post,
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
+    #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        trace!("RedisDeleteRecordRoute handle");
         let querys: RequestQuerys = ctx.get_request_querys().await;
         let key: &String = match querys.get("key") {
             Some(k) => k,

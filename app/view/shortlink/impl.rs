@@ -1,8 +1,8 @@
 use super::*;
 
 impl ServerHook for ShortlinkViewRoute {
+    #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
-        trace!("ShortlinkViewRoute new");
         Self
     }
 
@@ -11,7 +11,6 @@ impl ServerHook for ShortlinkViewRoute {
         response_status_code(302),
         response_header(LOCATION => "/static/shortlink/index.html")
     )]
-    async fn handle(self, ctx: &Context) {
-        trace!("ShortlinkViewRoute handle");
-    }
+    #[instrument_trace]
+    async fn handle(self, ctx: &Context) {}
 }

@@ -1,8 +1,8 @@
 use super::*;
 
 impl ServerHook for TrackingReportRoute {
+    #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
-        trace!("TrackingReportRoute new");
         Self
     }
 
@@ -10,8 +10,8 @@ impl ServerHook for TrackingReportRoute {
         post,
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
+    #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        trace!("TrackingReportRoute handle");
         let body: RequestBody = ctx.get_request_body().await;
         match TrackingService::save_tracking_record(ctx, &body).await {
             Ok(_) => {
@@ -27,8 +27,8 @@ impl ServerHook for TrackingReportRoute {
 }
 
 impl ServerHook for TrackingQueryRoute {
+    #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
-        trace!("TrackingQueryRoute new");
         Self
     }
 
@@ -36,8 +36,8 @@ impl ServerHook for TrackingQueryRoute {
         post,
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
+    #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        trace!("TrackingQueryRoute handle");
         let body: RequestBody = ctx.get_request_body().await;
         let request: TrackingQueryRequest = match serde_json::from_slice(&body) {
             Ok(req) => req,

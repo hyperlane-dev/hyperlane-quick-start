@@ -1,8 +1,8 @@
 use super::*;
 
 impl ServerHook for InfoLogRoute {
+    #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
-        trace!("InfoLogRoute new");
         Self
     }
 
@@ -11,16 +11,16 @@ impl ServerHook for InfoLogRoute {
         response_header(CONTENT_TYPE => ContentType::format_content_type_with_charset(TEXT_PLAIN, UTF8)),
         response_header(CONTENT_ENCODING => GZIP)
     )]
+    #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        trace!("InfoLogRoute handle");
         let log_content: String = LogService::read_log_file(SERVER_LOG_LEVEL[0]).await;
         ctx.set_response_body(&log_content).await;
     }
 }
 
 impl ServerHook for WarnLogRoute {
+    #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
-        trace!("WarnLogRoute new");
         Self
     }
 
@@ -29,16 +29,16 @@ impl ServerHook for WarnLogRoute {
         response_header(CONTENT_TYPE => ContentType::format_content_type_with_charset(TEXT_PLAIN, UTF8)),
         response_header(CONTENT_ENCODING => GZIP)
     )]
+    #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        trace!("WarnLogRoute handle");
         let log_content: String = LogService::read_log_file(SERVER_LOG_LEVEL[1]).await;
         ctx.set_response_body(&log_content).await;
     }
 }
 
 impl ServerHook for ErrorLogRoute {
+    #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
-        trace!("ErrorLogRoute new");
         Self
     }
 
@@ -47,8 +47,8 @@ impl ServerHook for ErrorLogRoute {
         response_header(CONTENT_TYPE => ContentType::format_content_type_with_charset(TEXT_PLAIN, UTF8)),
         response_header(CONTENT_ENCODING => GZIP)
     )]
+    #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        trace!("ErrorLogRoute handle");
         let log_content: String = LogService::read_log_file(SERVER_LOG_LEVEL[2]).await;
         ctx.set_response_body(log_content).await;
     }

@@ -1,8 +1,8 @@
 use super::*;
 
 impl ServerHook for StaticResourceRoute {
+    #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
-        trace!("StaticResourceRoute new");
         Self
     }
 
@@ -10,8 +10,8 @@ impl ServerHook for StaticResourceRoute {
         methods(get),
         route_param_option(PATH_KEY => path_opt)
     )]
+    #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        trace!("StaticResourceRoute handle");
         let path: String = path_opt.unwrap_or_default();
         if path.contains("..") || path.starts_with("/") || path.starts_with("\\") {
             ctx.set_response_status_code(403).await;

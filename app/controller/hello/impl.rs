@@ -1,8 +1,8 @@
 use super::*;
 
 impl ServerHook for HelloRoute {
+    #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
-        trace!("HelloRoute new");
         Self
     }
 
@@ -13,8 +13,8 @@ impl ServerHook for HelloRoute {
         response_body(format!("Hello {} ! The time is {}.", name_opt.unwrap_or_default(), time_opt.unwrap_or(time())))
     )]
     #[epilogue_macros(response_header(SET_COOKIE => cookie_value))]
+    #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        trace!("HelloRoute handle");
         let cookie_value: String = CookieBuilder::new("time", time()).path("/").build();
     }
 }
