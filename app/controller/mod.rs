@@ -2,6 +2,7 @@ pub mod chat;
 pub mod dataset;
 pub mod health_check;
 pub mod hello;
+pub mod index;
 pub mod log;
 pub mod monitor;
 pub mod mysql;

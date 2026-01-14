@@ -1,0 +1,5 @@
+use super::*;
+
+#[route("/")]
+#[derive(Clone, Copy, Data, Debug, Default)]
+pub struct IndexRoute;
