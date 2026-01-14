@@ -8,6 +8,8 @@ use super::*;
         controller::health_check::openapi_health_check,
         controller::hello::openapi_hello_name,
         controller::index::openapi_index,
+        controller::log::openapi_log_trace,
+        controller::log::openapi_log_debug,
         controller::log::openapi_log_info,
         controller::log::openapi_log_warn,
         controller::log::openapi_log_error,
