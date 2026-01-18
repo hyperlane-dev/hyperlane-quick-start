@@ -9,7 +9,7 @@ impl ServerHook for SendMiddleware {
     #[prologue_macros(
         http,
         reject(ctx.get_request_upgrade_type().await.is_ws()),
-        send
+        try_send
     )]
     #[instrument_trace]
     async fn handle(self, ctx: &Context) {}

@@ -4,7 +4,7 @@ use super::*;
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct ApiResponse<T>
 where
-    T: Serialize + Default,
+    T: Clone + Default + Serialize,
 {
     code: i32,
     message: String,

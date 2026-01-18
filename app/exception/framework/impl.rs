@@ -20,7 +20,7 @@ impl ServerHook for TaskPanicHook {
         response_version(HttpVersion::Http1_1),
         response_header(CONTENT_TYPE, &self.content_type),
     )]
-    #[epilogue_macros(response_body(&response_body), send)]
+    #[epilogue_macros(response_body(&response_body), try_send)]
     #[instrument_trace]
     async fn handle(self, ctx: &Context) {
         debug!("TaskPanicHook request => {}", ctx.get_request().await);
@@ -52,7 +52,7 @@ impl ServerHook for RequestErrorHook {
         response_version(HttpVersion::Http1_1),
         response_header(CONTENT_TYPE, &self.content_type),
     )]
-    #[epilogue_macros(response_body(&response_body), send)]
+    #[epilogue_macros(response_body(&response_body), try_send)]
     #[instrument_trace]
     async fn handle(self, ctx: &Context) {
         if self.response_status_code == HttpStatus::BadRequest.code() {
