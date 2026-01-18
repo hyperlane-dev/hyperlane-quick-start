@@ -18,7 +18,7 @@ impl ResponseCode {
 
 impl<T> ApiResponse<T>
 where
-    T: Serialize + Default,
+    T: Clone + Default + Serialize,
 {
     #[instrument_trace]
     pub fn default_success() -> Self {
