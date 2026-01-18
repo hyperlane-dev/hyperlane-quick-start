@@ -15,6 +15,6 @@ impl ServerHook for HelloRoute {
     #[epilogue_macros(response_header(SET_COOKIE => cookie_value))]
     #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        let cookie_value: String = CookieBuilder::new("time", time()).path("/").build();
+        let cookie_value: String = CookieBuilder::new("time", time()).set_path("/").build();
     }
 }

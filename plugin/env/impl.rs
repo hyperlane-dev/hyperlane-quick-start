@@ -27,27 +27,27 @@ impl EnvConfig {
             )
             .set_mysql_port(
                 docker_config
-                    .get_mysql_port()
+                    .try_get_mysql_port()
                     .or_else(|| get_env_usize(ENV_KEY_MYSQL_PORT))
                     .unwrap_or(DEFAULT_MYSQL_PORT),
             )
             .set_mysql_database(
                 docker_config
-                    .get_mysql_database()
+                    .try_get_mysql_database()
                     .clone()
                     .or_else(|| get_env(ENV_KEY_MYSQL_DATABASE))
                     .unwrap_or_default(),
             )
             .set_mysql_username(
                 docker_config
-                    .get_mysql_username()
+                    .try_get_mysql_username()
                     .clone()
                     .or_else(|| get_env(ENV_KEY_MYSQL_USERNAME))
                     .unwrap_or_default(),
             )
             .set_mysql_password(
                 docker_config
-                    .get_mysql_password()
+                    .try_get_mysql_password()
                     .clone()
                     .or_else(|| get_env(ENV_KEY_MYSQL_PASSWORD))
                     .unwrap_or_default(),
@@ -57,20 +57,20 @@ impl EnvConfig {
             )
             .set_redis_port(
                 docker_config
-                    .get_redis_port()
+                    .try_get_redis_port()
                     .or_else(|| get_env_usize(ENV_KEY_REDIS_PORT))
                     .unwrap_or(DEFAULT_REDIS_PORT),
             )
             .set_redis_username(
                 docker_config
-                    .get_redis_username()
+                    .try_get_redis_username()
                     .clone()
                     .or_else(|| get_env(ENV_KEY_REDIS_USERNAME))
                     .unwrap_or_default(),
             )
             .set_redis_password(
                 docker_config
-                    .get_redis_password()
+                    .try_get_redis_password()
                     .clone()
                     .or_else(|| get_env(ENV_KEY_REDIS_PASSWORD))
                     .unwrap_or_default(),
@@ -80,27 +80,27 @@ impl EnvConfig {
             )
             .set_postgresql_port(
                 docker_config
-                    .get_postgresql_port()
+                    .try_get_postgresql_port()
                     .or_else(|| get_env_usize(ENV_KEY_POSTGRES_PORT))
                     .unwrap_or(DEFAULT_POSTGRESQL_PORT),
             )
             .set_postgresql_database(
                 docker_config
-                    .get_postgresql_database()
+                    .try_get_postgresql_database()
                     .clone()
                     .or_else(|| get_env(ENV_KEY_POSTGRES_DATABASE))
                     .unwrap_or_default(),
             )
             .set_postgresql_username(
                 docker_config
-                    .get_postgresql_username()
+                    .try_get_postgresql_username()
                     .clone()
                     .or_else(|| get_env(ENV_KEY_POSTGRES_USERNAME))
                     .unwrap_or_default(),
             )
             .set_postgresql_password(
                 docker_config
-                    .get_postgresql_password()
+                    .try_get_postgresql_password()
                     .clone()
                     .or_else(|| get_env(ENV_KEY_POSTGRES_PASSWORD))
                     .unwrap_or_default(),

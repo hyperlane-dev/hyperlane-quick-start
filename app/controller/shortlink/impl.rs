@@ -68,7 +68,11 @@ impl ServerHook for QueryRoute {
                     .await
                     .set_response_header(
                         LOCATION,
-                        response.get_data().clone().unwrap_or_default().get_url(),
+                        response
+                            .try_get_data()
+                            .clone()
+                            .unwrap_or_default()
+                            .get_url(),
                     )
                     .await
             }

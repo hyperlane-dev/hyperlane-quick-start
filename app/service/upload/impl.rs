@@ -321,7 +321,10 @@ impl UploadService {
         content_type: String,
     ) -> Result<(PartialContent, String), String> {
         let start: u64 = *range.get_start();
-        let end: u64 = range.get_end().unwrap_or(file_size - 1).min(file_size - 1);
+        let end: u64 = range
+            .try_get_end()
+            .unwrap_or(file_size - 1)
+            .min(file_size - 1);
         if start > end {
             return Err("Invalid range: start > end".to_string());
         }
