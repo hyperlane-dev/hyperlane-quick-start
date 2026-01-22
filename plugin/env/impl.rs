@@ -113,7 +113,7 @@ impl EnvConfig {
     fn load_from_docker_compose() -> Result<DockerComposeConfig, String> {
         let docker_compose_content: Vec<u8> = read_from_file(DOCKER_COMPOSE_FILE_PATH)
             .map_err(|error| format!("Failed to read docker-compose.yml: {error}"))?;
-        let yaml: Value = serde_yaml::from_slice(&docker_compose_content)
+        let yaml: serde_yaml::Value = serde_yaml::from_slice(&docker_compose_content)
             .map_err(|error| format!("Failed to parse docker-compose.yml: {error}"))?;
         let mut config: DockerComposeConfig = DockerComposeConfig::default();
         if let Some(mysql) = yaml

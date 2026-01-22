@@ -4,16 +4,14 @@ mod r#impl;
 mod r#static;
 mod r#struct;
 
-pub use r#const::*;
-pub use {r#fn::*, r#struct::*};
+pub use {r#const::*, r#fn::*, r#struct::*};
 
-use super::*;
-use database::*;
-use env::*;
-use r#static::*;
+use {super::*, database::*, env::*, r#static::*};
 
 use std::time::Instant;
 
-use futures::executor::block_on;
-use once_cell::sync::Lazy;
-use sea_orm::{ConnectionTrait, Database, DatabaseBackend, DatabaseConnection, DbErr, Statement};
+use {
+    futures::executor::block_on,
+    once_cell::sync::Lazy,
+    sea_orm::{ConnectionTrait, Database, DatabaseBackend, DatabaseConnection, DbErr, Statement},
+};

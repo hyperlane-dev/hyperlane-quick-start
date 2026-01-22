@@ -4,11 +4,8 @@ mod r#impl;
 mod r#struct;
 mod r#trait;
 
-pub use r#enum::*;
-pub use r#trait::*;
-pub use {r#fn::*, r#struct::*};
+pub use {r#enum::*, r#fn::*, r#struct::*, r#trait::*};
 
-use super::*;
-use env::*;
+use {super::*, env::*};
 
 use std::{str::FromStr, time::Duration};

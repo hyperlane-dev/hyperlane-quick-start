@@ -187,7 +187,7 @@ impl ChatService {
     }
 
     #[instrument_trace]
-    fn build_gpt_request_messages(session: &ChatSession) -> Vec<Value> {
+    fn build_gpt_request_messages(session: &ChatSession) -> Vec<serde_json::Value> {
         session
             .get_messages()
             .iter()
@@ -208,26 +208,26 @@ impl ChatService {
     }
 
     #[instrument_trace]
-    fn extract_response_content(response_json: &Value) -> Option<String> {
+    fn extract_response_content(response_json: &serde_json::Value) -> Option<String> {
         response_json
             .get(JSON_FIELD_RESULT)
-            .and_then(|result: &Value| result.get(JSON_FIELD_RESPONSE))
-            .and_then(|response: &Value| response.as_str())
+            .and_then(|result: &serde_json::Value| result.get(JSON_FIELD_RESPONSE))
+            .and_then(|response: &serde_json::Value| response.as_str())
             .filter(|data: &&str| !data.is_empty())
             .map(String::from)
             .or_else(|| {
                 response_json
                     .get(JSON_FIELD_CHOICES)
-                    .and_then(|choices: &Value| choices.get(0))
-                    .and_then(|choice: &Value| choice.get(JSON_FIELD_MESSAGE))
-                    .and_then(|message: &Value| message.get(JSON_FIELD_CONTENT))
-                    .and_then(|content: &Value| content.as_str())
+                    .and_then(|choices: &serde_json::Value| choices.get(0))
+                    .and_then(|choice: &serde_json::Value| choice.get(JSON_FIELD_MESSAGE))
+                    .and_then(|message: &serde_json::Value| message.get(JSON_FIELD_CONTENT))
+                    .and_then(|content: &serde_json::Value| content.as_str())
                     .map(String::from)
             })
     }
 
     #[instrument_trace]
-    fn extract_error_message(response_json: &Value) -> Option<String> {
+    fn extract_error_message(response_json: &serde_json::Value) -> Option<String> {
         response_json
             .get(JSON_FIELD_ERRORS)
             .and_then(|errors| errors.get(0))
@@ -245,9 +245,10 @@ impl ChatService {
                     .to_string(),
             );
         }
-        let response_json: Value = serde_json::from_str(response_text).map_err(|error| {
-            format!("JSON parsing failed: {error} (response content: {response_text})",)
-        })?;
+        let response_json: serde_json::Value =
+            serde_json::from_str(response_text).map_err(|error| {
+                format!("JSON parsing failed: {error} (response content: {response_text})",)
+            })?;
         if let Some(content) = Self::extract_response_content(&response_json) {
             return Ok(content);
         }
@@ -271,8 +272,8 @@ impl ChatService {
     async fn call_gpt_api_with_context(session: &ChatSession) -> Result<String, String> {
         let config: &EnvConfig = get_global_env_config();
         let gpt_model: &str = config.get_gpt_model();
-        let messages: Vec<Value> = Self::build_gpt_request_messages(session);
-        let body: Value = json!({
+        let messages: Vec<serde_json::Value> = Self::build_gpt_request_messages(session);
+        let body: serde_json::Value = json!({
             GPT_MODEL: gpt_model,
             JSON_FIELD_MESSAGES: messages
         });

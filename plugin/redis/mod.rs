@@ -5,12 +5,8 @@ mod r#struct;
 
 pub use {r#fn::*, r#struct::*};
 
-use super::*;
-use env::*;
-use r#static::*;
+use {super::*, env::*, r#static::*};
 
 use std::{sync::Arc, time::Instant};
 
-use futures::executor::block_on;
-use hyperlane_utils::redis::*;
-use once_cell::sync::Lazy;
+use {futures::executor::block_on, hyperlane_utils::redis::*, once_cell::sync::Lazy};

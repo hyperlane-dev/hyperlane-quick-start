@@ -25,7 +25,7 @@ pub struct TrackingQueryResponse {
 pub struct TrackingRecordDTO {
     pub id: i64,
     pub socket_addr: String,
-    pub headers: Value,
+    pub headers: serde_json::Value,
     pub body: String,
     pub timestamp: i64,
     pub created_at: String,
