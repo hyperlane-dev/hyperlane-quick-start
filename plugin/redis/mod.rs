@@ -3,8 +3,7 @@ mod r#impl;
 mod r#static;
 mod r#struct;
 
-pub use r#fn::*;
-pub use r#struct::*;
+pub use {r#fn::*, r#struct::*};
 
 use super::*;
 use env::*;

@@ -3,9 +3,9 @@ mod r#struct;
 
 pub use r#struct::*;
 
-use super::*;
+use {super::*, mapper::log::*};
+
 use hyperlane_config::framework::*;
-use mapper::log::*;
 
 use std::{
     fs,

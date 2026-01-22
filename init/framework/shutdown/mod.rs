@@ -3,7 +3,6 @@ mod r#static;
 
 pub use r#fn::*;
 
-use super::*;
-use r#static::*;
+use {super::*, r#static::*};
 
 use std::sync::{Arc, OnceLock};

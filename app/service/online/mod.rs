@@ -3,5 +3,4 @@ mod r#struct;
 
 pub use r#struct::*;
 
-use super::*;
-use mapper::chat::*;
+use {super::*, mapper::chat::*};

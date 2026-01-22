@@ -1,5 +1,5 @@
 mod r#impl;
-pub mod r#struct;
+mod r#struct;
 
 pub use r#struct::*;
 

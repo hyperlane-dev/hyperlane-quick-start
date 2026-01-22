@@ -1,5 +1,4 @@
 pub mod application;
 pub mod framework;
 
-use hyperlane::*;
-use hyperlane_utils::log::*;
+use {hyperlane::*, hyperlane_utils::log::*};

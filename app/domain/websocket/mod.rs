@@ -3,5 +3,4 @@ mod r#struct;
 
 pub use r#struct::*;
 
-use super::*;
-use model::param::websocket::*;
+use {super::*, model::param::websocket::*};

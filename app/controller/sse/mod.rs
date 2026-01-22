@@ -4,5 +4,4 @@ mod r#struct;
 
 pub use r#fn::*;
 
-use super::*;
-use r#struct::*;
+use {super::*, r#struct::*};

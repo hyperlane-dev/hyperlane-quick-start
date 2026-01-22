@@ -3,8 +3,8 @@ mod r#struct;
 
 pub use r#struct::*;
 
-use super::*;
-use mapper::tracking::*;
-use model::{application::tracking::*, data_transfer::tracking::*};
-
-use chrono::Utc;
+use {
+    super::*,
+    mapper::tracking::*,
+    model::{application::tracking::*, data_transfer::tracking::*},
+};

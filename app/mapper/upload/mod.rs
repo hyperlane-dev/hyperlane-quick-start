@@ -2,12 +2,11 @@ mod r#fn;
 mod r#static;
 mod r#type;
 
-pub use r#fn::*;
-pub use r#static::*;
-pub use r#type::*;
+pub use {r#fn::*, r#static::*, r#type::*};
 
-use super::*;
-use model::application::upload::*;
+use {super::*, model::application::upload::*};
 
-use once_cell::sync::Lazy;
-use tokio::sync::{RwLockReadGuard, RwLockWriteGuard};
+use {
+    once_cell::sync::Lazy,
+    tokio::sync::{RwLockReadGuard, RwLockWriteGuard},
+};

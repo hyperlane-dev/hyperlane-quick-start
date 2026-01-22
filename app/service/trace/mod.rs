@@ -3,9 +3,8 @@ mod r#struct;
 
 pub use r#struct::*;
 
-use super::*;
+use {super::*, mapper::log::*, service::log::*};
+
 use hyperlane_config::framework::*;
-use mapper::log::*;
-use service::log::*;
 
 use std::path::{Path, PathBuf};

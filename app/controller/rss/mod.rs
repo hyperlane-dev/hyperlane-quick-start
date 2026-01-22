@@ -4,6 +4,4 @@ mod r#struct;
 
 pub use r#fn::*;
 
-use super::*;
-use service::rss::*;
-use r#struct::*;
+use {super::*, service::rss::*, r#struct::*};

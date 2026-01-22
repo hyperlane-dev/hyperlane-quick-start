@@ -3,10 +3,12 @@ mod r#struct;
 
 pub use r#struct::*;
 
-use super::*;
-use mapper::chat::*;
-use model::{application::chat::*, data_transfer::chat::*, param::chat::*};
-use service::chat::*;
+use {
+    super::*,
+    mapper::chat::*,
+    model::{application::chat::*, data_transfer::chat::*, param::chat::*},
+    service::chat::*,
+};
 
 use std::{
     collections::HashMap,

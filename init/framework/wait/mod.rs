@@ -2,14 +2,21 @@ mod r#fn;
 
 pub use r#fn::*;
 
-use super::{shutdown::*, *};
-use application::*;
-use hyperlane_app::service::monitor::*;
-use hyperlane_config::framework::*;
-use hyperlane_plugin::*;
+use {
+    super::{shutdown::*, *},
+    application::*,
+};
+
+#[allow(unused_imports)]
+use {
+    hyperlane_app::service::monitor::*, hyperlane_app::*, hyperlane_config::framework::*,
+    hyperlane_plugin::process::*, hyperlane_plugin::*,
+};
 
 use std::sync::Arc;
 
-use hyperlane_utils::redis::Connection;
-use sea_orm::DatabaseConnection;
-use tokio::runtime::{Builder, Runtime};
+use {
+    hyperlane_utils::redis::Connection,
+    sea_orm::DatabaseConnection,
+    tokio::runtime::{Builder, Runtime},
+};

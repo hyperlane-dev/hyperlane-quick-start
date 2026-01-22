@@ -5,9 +5,8 @@ mod r#struct;
 mod r#trait;
 
 pub use r#enum::*;
-pub use r#fn::*;
-pub use r#struct::*;
 pub use r#trait::*;
+pub use {r#fn::*, r#struct::*};
 
 use super::*;
 use env::*;

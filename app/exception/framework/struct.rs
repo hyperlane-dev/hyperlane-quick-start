@@ -10,6 +10,7 @@ pub struct TaskPanicHook {
 #[request_error]
 #[derive(Clone, Data, Debug, Default)]
 pub struct RequestErrorHook {
+    #[get(type(copy))]
     pub(super) response_status_code: ResponseStatusCode,
     pub(super) content_type: String,
     pub(super) response_body: String,

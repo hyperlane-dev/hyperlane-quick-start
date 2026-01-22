@@ -4,8 +4,9 @@ mod r#struct;
 
 pub use r#fn::*;
 
-use super::*;
-use r#struct::*;
-
-use model::{data_transfer::common::*, param::postgresql::*};
-use service::postgresql::PostgresqlService;
+use {
+    super::*,
+    model::{data_transfer::common::*, param::postgresql::*},
+    service::postgresql::*,
+    r#struct::*,
+};

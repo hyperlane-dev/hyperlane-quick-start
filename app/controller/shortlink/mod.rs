@@ -4,9 +4,11 @@ mod r#struct;
 
 pub use r#fn::*;
 
-use super::*;
-use r#struct::*;
+use {
+    super::*,
+    model::{data_transfer::common::*, param::shortlink::*},
+    service::shortlink::*,
+    r#struct::*,
+};
 
 use hyperlane_config::application::shortlink::*;
-use model::{data_transfer::common::*, param::shortlink::*};
-use service::shortlink::*;

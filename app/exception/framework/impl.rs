@@ -24,9 +24,9 @@ impl ServerHook for TaskPanicHook {
     #[instrument_trace]
     async fn handle(self, ctx: &Context) {
         debug!("TaskPanicHook request => {}", ctx.get_request().await);
-        error!("TaskPanicHook => {}", self.response_body);
+        error!("TaskPanicHook => {}", self.get_response_body());
         let api_response: ApiResponse<()> =
-            ApiResponse::error_with_code(ResponseCode::InternalError, self.response_body);
+            ApiResponse::error_with_code(ResponseCode::InternalError, self.get_response_body());
         let response_body: Vec<u8> = api_response.to_json_bytes();
     }
 }
@@ -46,7 +46,7 @@ impl ServerHook for RequestErrorHook {
 
     #[prologue_macros(
         response_version(HttpVersion::Http1_1),
-        response_status_code(self.response_status_code),
+        response_status_code(self.get_response_status_code()),
         clear_response_headers,
         response_header(SERVER => HYPERLANE),
         response_version(HttpVersion::Http1_1),
@@ -55,17 +55,17 @@ impl ServerHook for RequestErrorHook {
     #[epilogue_macros(response_body(&response_body), try_send)]
     #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        if self.response_status_code == HttpStatus::BadRequest.code() {
+        if self.get_response_status_code() == HttpStatus::BadRequest.code() {
             ctx.aborted().await;
             warn!("Context aborted");
             return;
         }
-        if self.response_status_code != HttpStatus::RequestTimeout.code() {
+        if self.get_response_status_code() != HttpStatus::RequestTimeout.code() {
             debug!("RequestErrorHook request => {}", ctx.get_request().await);
-            error!("RequestErrorHook => {}", self.response_body);
+            error!("RequestErrorHook => {}", self.get_response_body());
         }
         let api_response: ApiResponse<()> =
-            ApiResponse::error_with_code(ResponseCode::InternalError, self.response_body);
+            ApiResponse::error_with_code(ResponseCode::InternalError, self.get_response_body());
         let response_body: Vec<u8> = api_response.to_json_bytes();
     }
 }

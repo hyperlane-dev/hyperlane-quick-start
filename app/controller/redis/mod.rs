@@ -4,8 +4,9 @@ mod r#struct;
 
 pub use r#fn::*;
 
-use super::*;
-use r#struct::*;
-
-use model::{data_transfer::common::*, param::redis::*};
-use service::redis::RedisService;
+use {
+    super::*,
+    model::{data_transfer::common::*, param::redis::*},
+    service::redis::*,
+    r#struct::*,
+};

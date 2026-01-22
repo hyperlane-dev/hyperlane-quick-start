@@ -4,6 +4,6 @@ mod r#struct;
 
 pub use r#fn::*;
 
-use super::*;
+use {super::*, r#struct::*};
+
 use hyperlane_config::application::hello::*;
-use r#struct::*;

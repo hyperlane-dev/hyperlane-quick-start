@@ -8,5 +8,3 @@ pub use r#struct::*;
 use super::*;
 
 use std::time::Instant;
-
-use utoipa::ToSchema;

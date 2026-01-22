@@ -3,11 +3,10 @@ mod r#struct;
 
 pub use r#struct::*;
 
-use super::*;
+use {super::*, mapper::redis::*, model::param::redis::*};
+
 use hyperlane_plugin::redis::*;
-use mapper::redis::*;
-use model::param::redis::*;
 
 use std::sync::Arc;
 
-use hyperlane_utils::redis::{Commands, Connection, RedisError};
+use hyperlane_utils::redis::{Commands, Connection};

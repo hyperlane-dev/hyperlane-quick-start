@@ -4,10 +4,11 @@ mod r#struct;
 
 pub use r#fn::*;
 
-use super::*;
-use r#struct::*;
+use {super::*, r#struct::*};
 
-use domain::chat::*;
-use mapper::chat::*;
-use model::data_transfer::{chat::*, common::*};
-use service::chat::*;
+use {
+    domain::chat::*,
+    mapper::chat::*,
+    model::data_transfer::{chat::*, common::*},
+    service::chat::*,
+};

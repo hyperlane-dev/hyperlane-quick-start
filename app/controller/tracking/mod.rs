@@ -4,8 +4,9 @@ mod r#struct;
 
 pub use r#fn::*;
 
-use super::*;
-use r#struct::*;
-
-use model::data_transfer::{common::*, tracking::*};
-use service::tracking::*;
+use {
+    super::*,
+    model::data_transfer::{common::*, tracking::*},
+    service::tracking::*,
+    r#struct::*,
+};

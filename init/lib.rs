@@ -1,7 +1,7 @@
 pub mod application;
 pub mod framework;
 
-use std::*;
-
-use hyperlane::*;
-use hyperlane_utils::{log::*, *};
+use {
+    hyperlane::*,
+    hyperlane_utils::{log::*, *},
+};

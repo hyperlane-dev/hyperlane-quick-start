@@ -4,9 +4,9 @@ mod r#struct;
 
 pub use r#fn::*;
 
-use super::*;
-use model::{application::monitor::*, data_transfer::common::*};
-use service::monitor::*;
-use r#struct::*;
-
-use tokio::time::{Duration, sleep};
+use {
+    super::*,
+    model::{application::monitor::*, data_transfer::common::*},
+    service::monitor::*,
+    r#struct::*,
+};

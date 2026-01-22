@@ -4,8 +4,6 @@ mod r#struct;
 
 pub use r#fn::*;
 
-use super::*;
-use service::trace::*;
-use r#struct::*;
+use {super::*, service::trace::*, r#struct::*};
 
 use urlencoding::decode;
