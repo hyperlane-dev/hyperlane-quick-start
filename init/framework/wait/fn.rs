@@ -15,16 +15,18 @@ fn runtime() -> Runtime {
 #[hyperlane(config: ServerConfig)]
 #[instrument_trace]
 async fn init_server_config(server: &Server) {
-    let mut request_config: RequestConfig = RequestConfig::default();
+    let request_config: RequestConfig = RequestConfig::default();
     request_config
-        .set_max_body_size(SERVER_REQUEST_MAX_BODY_SIZE)
-        .set_http_read_timeout_ms(SERVER_REQUEST_HTTP_READ_TIMEOUT_MS);
+        .max_body_size(SERVER_REQUEST_MAX_BODY_SIZE)
+        .await
+        .http_read_timeout_ms(SERVER_REQUEST_HTTP_READ_TIMEOUT_MS)
+        .await;
     config.host(SERVER_HOST).await;
     config.port(SERVER_PORT).await;
     config.ttl(SERVER_TTI).await;
     config.nodelay(SERVER_NODELAY).await;
-    config.request_config(request_config).await;
-    server.config(config.clone()).await;
+    server.server_config(config.clone()).await;
+    server.request_config(request_config).await;
     debug!("Server config{COLON_SPACE}{:?}", config);
     info!("Server initialization successful");
 }
