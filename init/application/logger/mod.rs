@@ -1,7 +1,7 @@
 mod r#fn;
 
-use super::*;
 pub use r#fn::*;
 
-use hyperlane_config::application::logger::*;
-use hyperlane_plugin::logger::*;
+use super::*;
+
+use {hyperlane_config::application::logger::*, hyperlane_plugin::logger::*};
