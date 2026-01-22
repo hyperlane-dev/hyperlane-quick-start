@@ -1,7 +1,7 @@
 use super::*;
 
 #[instrument_trace]
-async fn try_send_body_hook(ctx: &Context) -> Result<(), ResponseError> {
+pub async fn try_send_body_hook(ctx: &Context) -> Result<(), ResponseError> {
     let send_result: Result<(), ResponseError> = if ctx.get_request().await.is_ws() {
         let body: ResponseBody = ctx.get_response_body().await;
         let frame_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
