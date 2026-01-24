@@ -48,6 +48,28 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "tag=v$VERSION" >> $GITHUB_OUTPUT
           echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
+      - name: Sync version to subdirectories
+        run: |
+          VERSION=${{ steps.read.outputs.version }}
+          echo "🔄 Syncing version $VERSION to subdirectories..."
+          for dir in config plugin app init; do
+            if [ -f "$dir/Cargo.toml" ]; then
+              OLD_VERSION=$(toml get $dir/Cargo.toml package.version --raw)
+              toml set $dir/Cargo.toml package.version "$VERSION"
+              echo "✅ Updated $dir/Cargo.toml: $OLD_VERSION -> $VERSION"
+            fi
+          done
+      - name: Commit version changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git status
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -m "chore: sync versions to ${{ steps.read.outputs.version }}" || echo "No changes to commit"
+          else
+            echo "No changes to commit"
+          fi
 
   check:
     needs: setup
@@ -103,9 +125,54 @@ jobs:
       - name: Build release
         run: cargo check --release --all-features
 
-  publish:
+  sync_versions:
     needs: [setup, check, tests, clippy, build]
-    if: needs.setup.outputs.tag != ''
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.read.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Restore toml-cli
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/bin/toml
+          key: toml-cli-${{ runner.os }}
+      - name: Read root version
+        id: read
+        run: |
+          VERSION=$(toml get Cargo.toml package.version --raw)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "📦 Root package version: $VERSION"
+      - name: Sync version to subdirectories
+        run: |
+          VERSION=${{ steps.read.outputs.version }}
+          echo "🔄 Syncing version $VERSION to subdirectories..."
+          for dir in config plugin app init; do
+            if [ -f "$dir/Cargo.toml" ]; then
+              OLD_VERSION=$(toml get $dir/Cargo.toml package.version --raw)
+              toml set $dir/Cargo.toml package.version "$VERSION"
+              echo "✅ Updated $dir/Cargo.toml: $OLD_VERSION -> $VERSION"
+            fi
+          done
+      - name: Commit version changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -m "chore: sync versions to $VERSION" || echo "No changes to commit"
+          else
+            echo "No changes to commit"
+          fi
+      - name: Push changes
+        run: |
+          git push origin HEAD:${{ github.ref }} || echo "No changes to push"
+
+  publish_config:
+    needs: sync_versions
     runs-on: ubuntu-latest
     outputs:
       published: ${{ steps.publish.outputs.published }}
@@ -117,7 +184,143 @@ jobs:
         with:
           path: ~/.cargo/bin/toml
           key: toml-cli-${{ runner.os }}
-      - name: Publish to crates.io
+      - name: Publish config to crates.io
+        id: publish
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: |
+          set -e
+          echo "published=false" >> $GITHUB_OUTPUT
+          echo "${{ secrets.CARGO_REGISTRY_TOKEN }}" | cargo login
+          cd config
+          PACKAGE_NAME=$(toml get Cargo.toml package.name --raw)
+          VERSION=${{ needs.sync_versions.outputs.version }}
+          if cargo publish --allow-dirty; then
+            echo "published=true" >> $GITHUB_OUTPUT
+            echo "🎉🎉🎉 PUBLISH SUCCESSFUL 🎉🎉🎉"
+            echo "✅ Successfully published $PACKAGE_NAME v$VERSION to crates.io"
+            echo "📦 Crates.io: [https://crates.io/crates/$PACKAGE_NAME/$VERSION](https://crates.io/crates/$PACKAGE_NAME/$VERSION)"
+            echo "📚 Docs.rs: [https://docs.rs/$PACKAGE_NAME/$VERSION](https://docs.rs/$PACKAGE_NAME/$VERSION)"
+          else
+            echo "❌ Publish failed"
+          fi
+
+  publish_plugin:
+    needs: publish_config
+    runs-on: ubuntu-latest
+    outputs:
+      published: ${{ steps.publish.outputs.published }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Restore toml-cli
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/bin/toml
+          key: toml-cli-${{ runner.os }}
+      - name: Publish plugin to crates.io
+        id: publish
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: |
+          set -e
+          echo "published=false" >> $GITHUB_OUTPUT
+          echo "${{ secrets.CARGO_REGISTRY_TOKEN }}" | cargo login
+          cd plugin
+          PACKAGE_NAME=$(toml get Cargo.toml package.name --raw)
+          VERSION=${{ needs.sync_versions.outputs.version }}
+          if cargo publish --allow-dirty; then
+            echo "published=true" >> $GITHUB_OUTPUT
+            echo "🎉🎉🎉 PUBLISH SUCCESSFUL 🎉🎉🎉"
+            echo "✅ Successfully published $PACKAGE_NAME v$VERSION to crates.io"
+            echo "📦 Crates.io: [https://crates.io/crates/$PACKAGE_NAME/$VERSION](https://crates.io/crates/$PACKAGE_NAME/$VERSION)"
+            echo "📚 Docs.rs: [https://docs.rs/$PACKAGE_NAME/$VERSION](https://docs.rs/$PACKAGE_NAME/$VERSION)"
+          else
+            echo "❌ Publish failed"
+          fi
+
+  publish_app:
+    needs: publish_plugin
+    runs-on: ubuntu-latest
+    outputs:
+      published: ${{ steps.publish.outputs.published }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Restore toml-cli
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/bin/toml
+          key: toml-cli-${{ runner.os }}
+      - name: Publish app to crates.io
+        id: publish
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: |
+          set -e
+          echo "published=false" >> $GITHUB_OUTPUT
+          echo "${{ secrets.CARGO_REGISTRY_TOKEN }}" | cargo login
+          cd app
+          PACKAGE_NAME=$(toml get Cargo.toml package.name --raw)
+          VERSION=${{ needs.sync_versions.outputs.version }}
+          if cargo publish --allow-dirty; then
+            echo "published=true" >> $GITHUB_OUTPUT
+            echo "🎉🎉🎉 PUBLISH SUCCESSFUL 🎉🎉🎉"
+            echo "✅ Successfully published $PACKAGE_NAME v$VERSION to crates.io"
+            echo "📦 Crates.io: [https://crates.io/crates/$PACKAGE_NAME/$VERSION](https://crates.io/crates/$PACKAGE_NAME/$VERSION)"
+            echo "📚 Docs.rs: [https://docs.rs/$PACKAGE_NAME/$VERSION](https://docs.rs/$PACKAGE_NAME/$VERSION)"
+          else
+            echo "❌ Publish failed"
+          fi
+
+  publish_init:
+    needs: publish_app
+    runs-on: ubuntu-latest
+    outputs:
+      published: ${{ steps.publish.outputs.published }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Restore toml-cli
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/bin/toml
+          key: toml-cli-${{ runner.os }}
+      - name: Publish init to crates.io
+        id: publish
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: |
+          set -e
+          echo "published=false" >> $GITHUB_OUTPUT
+          echo "${{ secrets.CARGO_REGISTRY_TOKEN }}" | cargo login
+          cd init
+          PACKAGE_NAME=$(toml get Cargo.toml package.name --raw)
+          VERSION=${{ needs.sync_versions.outputs.version }}
+          if cargo publish --allow-dirty; then
+            echo "published=true" >> $GITHUB_OUTPUT
+            echo "🎉🎉🎉 PUBLISH SUCCESSFUL 🎉🎉🎉"
+            echo "✅ Successfully published $PACKAGE_NAME v$VERSION to crates.io"
+            echo "📦 Crates.io: [https://crates.io/crates/$PACKAGE_NAME/$VERSION](https://crates.io/crates/$PACKAGE_NAME/$VERSION)"
+            echo "📚 Docs.rs: [https://docs.rs/$PACKAGE_NAME/$VERSION](https://docs.rs/$PACKAGE_NAME/$VERSION)"
+          else
+            echo "❌ Publish failed"
+          fi
+
+  publish:
+    needs: publish_init
+    runs-on: ubuntu-latest
+    outputs:
+      published: ${{ steps.publish.outputs.published }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Restore toml-cli
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/bin/toml
+          key: toml-cli-${{ runner.os }}
+      - name: Publish root to crates.io
         id: publish
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
@@ -126,7 +329,7 @@ jobs:
           echo "published=false" >> $GITHUB_OUTPUT
           echo "${{ secrets.CARGO_REGISTRY_TOKEN }}" | cargo login
           PACKAGE_NAME=$(toml get Cargo.toml package.name --raw)
-          VERSION=${{ needs.setup.outputs.version }}
+          VERSION=${{ needs.sync_versions.outputs.version }}
           if cargo publish --allow-dirty; then
             echo "published=true" >> $GITHUB_OUTPUT
             echo "🎉🎉🎉 PUBLISH SUCCESSFUL 🎉🎉🎉"
@@ -138,11 +341,11 @@ jobs:
           fi
 
   release:
-    needs: [setup, check, tests, clippy, build]
+    needs: [publish]
     permissions:
       contents: write
       packages: write
-    if: needs.setup.outputs.tag != ''
+    if: needs.publish.outputs.published == 'true'
     runs-on: ubuntu-latest
     outputs:
       released: ${{ steps.release.outputs.released }}
@@ -154,33 +357,39 @@ jobs:
       - name: Get package name
         id: package_info
         run: |
-          echo "package_name=${{ needs.setup.outputs.package_name }}" >> $GITHUB_OUTPUT
+          VERSION=$(toml get Cargo.toml package.version --raw)
+          PACKAGE_NAME=$(toml get Cargo.toml package.name --raw)
+          echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=v$VERSION" >> $GITHUB_OUTPUT
       - name: Check tag status
         id: check_tag
         run: |
-          if git tag -l | grep -q "^${{ needs.setup.outputs.tag }}$"; then
+          TAG="v${{ steps.package_info.outputs.version }}"
+          if git tag -l | grep -q "^${TAG}$"; then
             echo "tag_exists=true" >> $GITHUB_OUTPUT
-            echo "🏷️ Tag ${{ needs.setup.outputs.tag }} exists locally"
+            echo "🏷️ Tag $TAG exists locally"
           else
             echo "tag_exists=false" >> $GITHUB_OUTPUT
-            echo "🏷️ Tag ${{ needs.setup.outputs.tag }} does not exist locally"
+            echo "🏷️ Tag $TAG does not exist locally"
           fi
-          if git ls-remote --tags origin | grep -q "refs/tags/${{ needs.setup.outputs.tag }}$"; then
+          if git ls-remote --tags origin | grep -q "refs/tags/${TAG}$"; then
             echo "remote_tag_exists=true" >> $GITHUB_OUTPUT
-            echo "🌐 Tag ${{ needs.setup.outputs.tag }} exists on remote"
+            echo "🌐 Tag $TAG exists on remote"
           else
             echo "remote_tag_exists=false" >> $GITHUB_OUTPUT
-            echo "🌐 Tag ${{ needs.setup.outputs.tag }} does not exist on remote"
+            echo "🌐 Tag $TAG does not exist on remote"
           fi
       - name: Check release status
         id: check_release
         run: |
-          if gh release view "${{ needs.setup.outputs.tag }}" > /dev/null 2>&1; then
+          TAG="v${{ steps.package_info.outputs.version }}"
+          if gh release view "$TAG" > /dev/null 2>&1; then
             echo "release_exists=true" >> $GITHUB_OUTPUT
-            echo "📦 Release ${{ needs.setup.outputs.tag }} already exists"
+            echo "📦 Release $TAG already exists"
           else
             echo "release_exists=false" >> $GITHUB_OUTPUT
-            echo "📦 Release ${{ needs.setup.outputs.tag }} does not exist"
+            echo "📦 Release $TAG does not exist"
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -190,8 +399,8 @@ jobs:
           set -e
           echo "released=false" >> $GITHUB_OUTPUT
           PACKAGE_NAME="${{ steps.package_info.outputs.package_name }}"
-          VERSION="${{ needs.setup.outputs.version }}"
-          TAG="${{ needs.setup.outputs.tag }}"
+          VERSION="${{ steps.package_info.outputs.version }}"
+          TAG="v$VERSION"
           echo "📦 Building source archives..."
           git archive --format=zip --prefix="${PACKAGE_NAME}-${VERSION}/" HEAD > "${PACKAGE_NAME}-${VERSION}.zip"
           git archive --format=tar.gz --prefix="${PACKAGE_NAME}-${VERSION}/" HEAD > "${PACKAGE_NAME}-${VERSION}.tar.gz"
