@@ -1576,7 +1576,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "9.2.0"
+version = "9.2.1"
 dependencies = [
  "hyperlane_init",
  "serde",
@@ -1662,7 +1662,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_config"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
@@ -1685,11 +1685,10 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_plugin"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
- "hyperlane_config",
  "serde",
  "tracing",
 ]

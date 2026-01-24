@@ -69,5 +69,5 @@ async fn create_server() {
 #[instrument_trace]
 pub fn run() {
     init_log();
-    runtime().block_on(create(create_server));
+    runtime().block_on(create(SERVER_PID_FILE_PATH, create_server));
 }
