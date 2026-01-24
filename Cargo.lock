@@ -1576,7 +1576,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "9.1.0"
+version = "9.2.0"
 dependencies = [
  "hyperlane_init",
  "serde",
@@ -1591,9 +1591,9 @@ checksum = "51339af6bf230df06daa71016ac3b19cbc27462886ce8f79685650ff97e91608"
 
 [[package]]
 name = "hyperlane-utils"
-version = "14.4.1"
+version = "14.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5ed6a93456d98aa19f8b508241d6846257efac99f9902f54a4300b8797437c09"
+checksum = "b2c596cbba54131bb22ccdc7b8f88210aec39883f6fca18e06ac9715b89ae8bd"
 dependencies = [
  "ahash 0.8.12",
  "bin-encode-decode",
@@ -1616,6 +1616,7 @@ dependencies = [
  "hyperlane-plugin-websocket",
  "instrument-level",
  "jsonwebtoken",
+ "jwt-service",
  "lettre",
  "log",
  "lombok-macros",
@@ -1922,6 +1923,17 @@ dependencies = [
  "sha2",
  "signature",
  "simple_asn1",
+]
+
+[[package]]
+name = "jwt-service"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "890cc54999dd946bb383c36fa17695ad57bb6d05faa88b3bdfb4002bb5ebc5e4"
+dependencies = [
+ "jsonwebtoken",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
