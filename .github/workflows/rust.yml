@@ -39,8 +39,8 @@ jobs:
       - name: Read cargo metadata
         id: read
         run: |
-          VERSION=$(toml get Cargo.toml package.version --raw)
-          PACKAGE_NAME=$(toml get Cargo.toml package.name --raw)
+          VERSION=$(~/.cargo/bin/toml get Cargo.toml package.version --raw)
+          PACKAGE_NAME=$(~/.cargo/bin/toml get Cargo.toml package.name --raw)
           echo "📦 Detected package: $PACKAGE_NAME v$VERSION"
           if [ -z "$VERSION" ] || [ -z "$PACKAGE_NAME" ]; then
             echo "❌ Failed to read package info from Cargo.toml"
@@ -48,28 +48,6 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "tag=v$VERSION" >> $GITHUB_OUTPUT
           echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
-      - name: Sync version to subdirectories
-        run: |
-          VERSION=${{ steps.read.outputs.version }}
-          echo "🔄 Syncing version $VERSION to subdirectories..."
-          for dir in config plugin app init; do
-            if [ -f "$dir/Cargo.toml" ]; then
-              OLD_VERSION=$(toml get $dir/Cargo.toml package.version --raw)
-              toml set $dir/Cargo.toml package.version "$VERSION"
-              echo "✅ Updated $dir/Cargo.toml: $OLD_VERSION -> $VERSION"
-            fi
-          done
-      - name: Commit version changes
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git status
-          if [ -n "$(git status --porcelain)" ]; then
-            git commit -m "chore: sync versions to ${{ steps.read.outputs.version }}" || echo "No changes to commit"
-          else
-            echo "No changes to commit"
-          fi
 
   check:
     needs: setup
@@ -143,7 +121,7 @@ jobs:
       - name: Read root version
         id: read
         run: |
-          VERSION=$(toml get Cargo.toml package.version --raw)
+          VERSION=$(~/.cargo/bin/toml get Cargo.toml package.version --raw)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "📦 Root package version: $VERSION"
       - name: Sync version to subdirectories
@@ -152,8 +130,8 @@ jobs:
           echo "🔄 Syncing version $VERSION to subdirectories..."
           for dir in config plugin app init; do
             if [ -f "$dir/Cargo.toml" ]; then
-              OLD_VERSION=$(toml get $dir/Cargo.toml package.version --raw)
-              toml set $dir/Cargo.toml package.version "$VERSION"
+              OLD_VERSION=$(~/.cargo/bin/toml get $dir/Cargo.toml package.version --raw)
+              ~/.cargo/bin/toml set $dir/Cargo.toml package.version "$VERSION"
               echo "✅ Updated $dir/Cargo.toml: $OLD_VERSION -> $VERSION"
             fi
           done
@@ -164,12 +142,10 @@ jobs:
           git add -A
           if [ -n "$(git status --porcelain)" ]; then
             git commit -m "chore: sync versions to $VERSION" || echo "No changes to commit"
+            git push origin HEAD:${{ github.ref }} || echo "No changes to push"
           else
             echo "No changes to commit"
           fi
-      - name: Push changes
-        run: |
-          git push origin HEAD:${{ github.ref }} || echo "No changes to push"
 
   publish_config:
     needs: sync_versions
@@ -193,8 +169,9 @@ jobs:
           echo "published=false" >> $GITHUB_OUTPUT
           echo "${{ secrets.CARGO_REGISTRY_TOKEN }}" | cargo login
           cd config
-          PACKAGE_NAME=$(toml get Cargo.toml package.name --raw)
+          PACKAGE_NAME=$(~/.cargo/bin/toml get Cargo.toml package.name --raw)
           VERSION=${{ needs.sync_versions.outputs.version }}
+          echo "🚀 Publishing $PACKAGE_NAME v$VERSION to crates.io..."
           if cargo publish --allow-dirty; then
             echo "published=true" >> $GITHUB_OUTPUT
             echo "🎉🎉🎉 PUBLISH SUCCESSFUL 🎉🎉🎉"
@@ -203,6 +180,7 @@ jobs:
             echo "📚 Docs.rs: [https://docs.rs/$PACKAGE_NAME/$VERSION](https://docs.rs/$PACKAGE_NAME/$VERSION)"
           else
             echo "❌ Publish failed"
+            exit 1
           fi
 
   publish_plugin:
@@ -227,8 +205,9 @@ jobs:
           echo "published=false" >> $GITHUB_OUTPUT
           echo "${{ secrets.CARGO_REGISTRY_TOKEN }}" | cargo login
           cd plugin
-          PACKAGE_NAME=$(toml get Cargo.toml package.name --raw)
+          PACKAGE_NAME=$(~/.cargo/bin/toml get Cargo.toml package.name --raw)
           VERSION=${{ needs.sync_versions.outputs.version }}
+          echo "🚀 Publishing $PACKAGE_NAME v$VERSION to crates.io..."
           if cargo publish --allow-dirty; then
             echo "published=true" >> $GITHUB_OUTPUT
             echo "🎉🎉🎉 PUBLISH SUCCESSFUL 🎉🎉🎉"
@@ -237,6 +216,7 @@ jobs:
             echo "📚 Docs.rs: [https://docs.rs/$PACKAGE_NAME/$VERSION](https://docs.rs/$PACKAGE_NAME/$VERSION)"
           else
             echo "❌ Publish failed"
+            exit 1
           fi
 
   publish_app:
@@ -261,8 +241,9 @@ jobs:
           echo "published=false" >> $GITHUB_OUTPUT
           echo "${{ secrets.CARGO_REGISTRY_TOKEN }}" | cargo login
           cd app
-          PACKAGE_NAME=$(toml get Cargo.toml package.name --raw)
+          PACKAGE_NAME=$(~/.cargo/bin/toml get Cargo.toml package.name --raw)
           VERSION=${{ needs.sync_versions.outputs.version }}
+          echo "🚀 Publishing $PACKAGE_NAME v$VERSION to crates.io..."
           if cargo publish --allow-dirty; then
             echo "published=true" >> $GITHUB_OUTPUT
             echo "🎉🎉🎉 PUBLISH SUCCESSFUL 🎉🎉🎉"
@@ -271,6 +252,7 @@ jobs:
             echo "📚 Docs.rs: [https://docs.rs/$PACKAGE_NAME/$VERSION](https://docs.rs/$PACKAGE_NAME/$VERSION)"
           else
             echo "❌ Publish failed"
+            exit 1
           fi
 
   publish_init:
@@ -295,8 +277,9 @@ jobs:
           echo "published=false" >> $GITHUB_OUTPUT
           echo "${{ secrets.CARGO_REGISTRY_TOKEN }}" | cargo login
           cd init
-          PACKAGE_NAME=$(toml get Cargo.toml package.name --raw)
+          PACKAGE_NAME=$(~/.cargo/bin/toml get Cargo.toml package.name --raw)
           VERSION=${{ needs.sync_versions.outputs.version }}
+          echo "🚀 Publishing $PACKAGE_NAME v$VERSION to crates.io..."
           if cargo publish --allow-dirty; then
             echo "published=true" >> $GITHUB_OUTPUT
             echo "🎉🎉🎉 PUBLISH SUCCESSFUL 🎉🎉🎉"
@@ -305,6 +288,7 @@ jobs:
             echo "📚 Docs.rs: [https://docs.rs/$PACKAGE_NAME/$VERSION](https://docs.rs/$PACKAGE_NAME/$VERSION)"
           else
             echo "❌ Publish failed"
+            exit 1
           fi
 
   publish:
@@ -328,8 +312,9 @@ jobs:
           set -e
           echo "published=false" >> $GITHUB_OUTPUT
           echo "${{ secrets.CARGO_REGISTRY_TOKEN }}" | cargo login
-          PACKAGE_NAME=$(toml get Cargo.toml package.name --raw)
+          PACKAGE_NAME=$(~/.cargo/bin/toml get Cargo.toml package.name --raw)
           VERSION=${{ needs.sync_versions.outputs.version }}
+          echo "🚀 Publishing $PACKAGE_NAME v$VERSION to crates.io..."
           if cargo publish --allow-dirty; then
             echo "published=true" >> $GITHUB_OUTPUT
             echo "🎉🎉🎉 PUBLISH SUCCESSFUL 🎉🎉🎉"
@@ -338,6 +323,7 @@ jobs:
             echo "📚 Docs.rs: [https://docs.rs/$PACKAGE_NAME/$VERSION](https://docs.rs/$PACKAGE_NAME/$VERSION)"
           else
             echo "❌ Publish failed"
+            exit 1
           fi
 
   release:
@@ -357,8 +343,8 @@ jobs:
       - name: Get package name
         id: package_info
         run: |
-          VERSION=$(toml get Cargo.toml package.version --raw)
-          PACKAGE_NAME=$(toml get Cargo.toml package.name --raw)
+          VERSION=$(~/.cargo/bin/toml get Cargo.toml package.version --raw)
+          PACKAGE_NAME=$(~/.cargo/bin/toml get Cargo.toml package.name --raw)
           echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "tag=v$VERSION" >> $GITHUB_OUTPUT
@@ -429,6 +415,7 @@ jobs:
               echo "🚀 Release: [GitHub Release](${{ github.server_url }}/${{ github.repository }}/releases/tag/$TAG)"
             else
               echo "❌ Failed to update release"
+              exit 1
             fi
           else
             if [ "${{ steps.check_tag.outputs.remote_tag_exists }}" = "false" ]; then
@@ -455,6 +442,7 @@ jobs:
               echo "🚀 Release: [GitHub Release](${{ github.server_url }}/${{ github.repository }}/releases/tag/$TAG)"
             else
               echo "❌ Failed to create release"
+              exit 1
             fi
           fi
         env:
