@@ -1,7 +1,8 @@
+pub mod jwt;
 pub mod logger;
 pub mod process;
 
 use {
     hyperlane::*,
-    hyperlane_utils::{log::*, *},
+    hyperlane_utils::{jsonwebtoken, log::*, *},
 };
