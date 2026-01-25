@@ -1,2 +1,4 @@
-#[derive(Debug, Clone, Copy)]
+use super::*;
+
+#[derive(Clone, Copy, Data, Debug, Default)]
 pub struct Logger;

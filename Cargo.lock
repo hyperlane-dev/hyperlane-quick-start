@@ -1690,6 +1690,7 @@ version = "9.2.13"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
+ "hyperlane_resources",
  "serde",
  "tracing",
 ]
@@ -1697,12 +1698,6 @@ dependencies = [
 [[package]]
 name = "hyperlane_resources"
 version = "9.2.13"
-dependencies = [
- "hyperlane",
- "hyperlane-utils",
- "serde",
- "tracing",
-]
 
 [[package]]
 name = "iana-time-zone"
