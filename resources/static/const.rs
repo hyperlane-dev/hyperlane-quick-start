@@ -1,1 +1,12 @@
+pub const CHAT_HTML: &str = include_str!("./chat/index.html");
+pub const DIFF_HTML: &str = include_str!("./diff/index.html");
+pub const MONITOR_HTML: &str = include_str!("./monitor/index.html");
+pub const MYSQL_HTML: &str = include_str!("./mysql/index.html");
 pub const NOT_FOUND_HTML: &str = include_str!("./not_found/index.html");
+pub const POSTGRESQL_HTML: &str = include_str!("./postgresql/index.html");
+pub const REDIS_HTML: &str = include_str!("./redis/index.html");
+pub const RSS_HTML: &str = include_str!("./rss/index.html");
+pub const SHORTLINK_HTML: &str = include_str!("./shortlink/index.html");
+pub const TRACE_HTML: &str = include_str!("./trace/index.html");
+pub const TRACKING_HTML: &str = include_str!("./tracking/index.html");
+pub const UPLOAD_HTML: &str = include_str!("./upload/index.html");

@@ -8,11 +8,9 @@ impl ServerHook for TrackingViewRoute {
 
     #[prologue_macros(
         get,
-        response_header(CONTENT_TYPE => TEXT_HTML)
+        response_header(CONTENT_TYPE => TEXT_HTML),
+        response_body(TRACKING_HTML)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
-        let html: &str = include_str!("../../../resources/static/tracking/index.html");
-        ctx.set_response_body(html.as_bytes()).await;
-    }
+    async fn handle(self, ctx: &Context) {}
 }
