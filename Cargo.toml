@@ -29,7 +29,7 @@ members = ["app", "config", "init", "plugin"]
 [workspace.dependencies]
 hyperlane_app = { path = "app", version = "9.2.6" }
 hyperlane_config = { path = "config", version = "9.2.6" }
-hyperlane_init = { path = "init", version = "9.2.5" }
+hyperlane_init = { path = "init", version = "9.2.6" }
 hyperlane_plugin = { path = "plugin", version = "9.2.6" }
 
 tracing = "0.1.44"
