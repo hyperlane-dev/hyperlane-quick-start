@@ -1650,7 +1650,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_app"
-version = "9.2.5"
+version = "9.2.6"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
