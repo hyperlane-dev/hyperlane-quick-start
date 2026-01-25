@@ -149,54 +149,57 @@ impl RssService {
     #[instrument_trace]
     fn build_rss_xml(channel: &RssChannel) -> String {
         let mut xml: String = String::from(r#"<?xml version="1.0" encoding="UTF-8"?>"#);
-        xml.push_str("\n<rss version=\"2.0\">");
-        xml.push_str("\n  <channel>");
+        xml.push_str("{BR}<rss version=\"2.0\">");
+        xml.push_str("{BR}  <channel>");
         xml.push_str(&format!(
-            "\n    <title>{}</title>",
+            "{BR}    <title>{}</title>",
             Self::escape_xml(&channel.title)
         ));
         xml.push_str(&format!(
-            "\n    <link>{}</link>",
+            "{BR}    <link>{}</link>",
             Self::escape_xml(&channel.link)
         ));
         xml.push_str(&format!(
-            "\n    <description>{}</description>",
+            "{BR}    <description>{}</description>",
             Self::escape_xml(&channel.description)
         ));
-        xml.push_str(&format!("\n    <language>{}</language>", channel.language));
+        xml.push_str(&format!(
+            "{BR}    <language>{}</language>",
+            channel.language
+        ));
         for item in &channel.items {
-            xml.push_str("\n    <item>");
+            xml.push_str("{BR}    <item>");
             xml.push_str(&format!(
-                "\n      <title>{}</title>",
+                "{BR}      <title>{}</title>",
                 Self::escape_xml(&item.title)
             ));
             xml.push_str(&format!(
-                "\n      <link>{}</link>",
+                "{BR}      <link>{}</link>",
                 Self::escape_xml(&item.link)
             ));
             xml.push_str(&format!(
-                "\n      <description>{}</description>",
+                "{BR}      <description>{}</description>",
                 Self::escape_xml(&item.description)
             ));
             if !item.pub_date.is_empty() {
-                xml.push_str(&format!("\n      <pubDate>{}</pubDate>", item.pub_date));
+                xml.push_str(&format!("{BR}      <pubDate>{}</pubDate>", item.pub_date));
             }
             xml.push_str(&format!(
-                "\n      <guid>{}</guid>",
+                "{BR}      <guid>{}</guid>",
                 Self::escape_xml(&item.guid)
             ));
             if let Some(enclosure) = &item.enclosure {
                 xml.push_str(&format!(
-                    "\n      <enclosure url=\"{}\" length=\"{}\" type=\"{}\" />",
+                    "{BR}      <enclosure url=\"{}\" length=\"{}\" type=\"{}\" />",
                     Self::escape_xml(&enclosure.url),
                     enclosure.length,
                     Self::escape_xml(&enclosure.r#type)
                 ));
             }
-            xml.push_str("\n    </item>");
+            xml.push_str("{BR}    </item>");
         }
-        xml.push_str("\n  </channel>");
-        xml.push_str("\n</rss>");
+        xml.push_str("{BR}  </channel>");
+        xml.push_str("{BR}</rss>");
         xml
     }
 

@@ -115,8 +115,8 @@ impl EnvConfig {
             Self::load_from_docker_compose().unwrap_or_default();
         if read_from_file::<Vec<u8>>(ENV_FILE_PATH).is_err() {
             let mut data: String = String::new();
-            data.push_str(&format!("{ENV_KEY_GPT_API_URL}=\n"));
-            data.push_str(&format!("{ENV_KEY_GPT_MODEL}=\n"));
+            data.push_str(&format!("{ENV_KEY_GPT_API_URL}={BR}"));
+            data.push_str(&format!("{ENV_KEY_GPT_MODEL}={BR}"));
             write_to_file(ENV_FILE_PATH, data.as_bytes())
                 .map_err(|error| format!("Failed to create example env file: {error}"))?;
         }
