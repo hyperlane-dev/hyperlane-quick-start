@@ -54,10 +54,11 @@ async fn init_network_capture() {
 }
 
 async fn init_db() {
-    let _: Result<DatabaseConnection, String> = connection_mysql_db().await;
-    let _: Result<DatabaseConnection, String> = connection_postgresql_db().await;
+    let _: Result<DatabaseConnection, String> =
+        connection_mysql_db(DEFAULT_MYSQL_INSTANCE_NAME).await;
+    let _: Result<DatabaseConnection, String> =
+        connection_postgresql_db(DEFAULT_POSTGRESQL_INSTANCE_NAME).await;
     let _: Result<Arc<Connection>, String> = connection_redis_db().await;
-
     match initialize_auto_creation().await {
         Ok(_) => {
             info!("Auto-creation initialization successful");

@@ -1,6 +1,6 @@
 use super::*;
 
-#[derive(Clone, Copy, Data, Debug)]
+#[derive(Clone, Data, Debug, New)]
 pub struct MySqlAutoCreation {
-    pub env: &'static EnvConfig,
+    pub instance: MySqlInstanceConfig,
 }

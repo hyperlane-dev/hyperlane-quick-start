@@ -163,25 +163,13 @@ impl AutoCreationConfig {
     #[instrument_trace]
     pub fn validate() -> Result<(), String> {
         let env: &'static EnvConfig = Self::get_env();
-        if env.get_mysql_host().is_empty() {
-            return Err("MySQL host is required".to_string());
+        if env.mysql_instances.is_empty() {
+            return Err("At least one MySQL instance is required".to_string());
         }
-        if env.get_mysql_username().is_empty() {
-            return Err("MySQL username is required".to_string());
+        if env.postgresql_instances.is_empty() {
+            return Err("At least one PostgreSQL instance is required".to_string());
         }
-        if env.get_mysql_database().is_empty() {
-            return Err("MySQL database name is required".to_string());
-        }
-        if env.get_postgresql_host().is_empty() {
-            return Err("PostgreSQL host is required".to_string());
-        }
-        if env.get_postgresql_username().is_empty() {
-            return Err("PostgreSQL username is required".to_string());
-        }
-        if env.get_postgresql_database().is_empty() {
-            return Err("PostgreSQL database name is required".to_string());
-        }
-        if env.get_redis_host().is_empty() {
+        if env.redis_host.is_empty() {
             return Err("Redis host is required".to_string());
         }
         Ok(())
@@ -206,8 +194,20 @@ impl PluginAutoCreationConfig {
         let env: &'static EnvConfig = AutoCreationConfig::get_env();
         if let Ok(plugin_type) = PluginType::from_str(&self.plugin_name) {
             match plugin_type {
-                PluginType::MySQL => env.get_mysql_database().clone(),
-                PluginType::PostgreSQL => env.get_postgresql_database().clone(),
+                PluginType::MySQL => {
+                    if let Some(instance) = env.get_default_mysql_instance() {
+                        instance.database.clone()
+                    } else {
+                        "unknown".to_string()
+                    }
+                }
+                PluginType::PostgreSQL => {
+                    if let Some(instance) = env.get_default_postgresql_instance() {
+                        instance.database.clone()
+                    } else {
+                        "unknown".to_string()
+                    }
+                }
                 PluginType::Redis => "default".to_string(),
             }
         } else {
@@ -220,19 +220,27 @@ impl PluginAutoCreationConfig {
         let env: &'static EnvConfig = AutoCreationConfig::get_env();
         if let Ok(plugin_type) = PluginType::from_str(&self.plugin_name) {
             match plugin_type {
-                PluginType::MySQL => format!(
-                    "{}:{}:{}",
-                    env.get_mysql_host(),
-                    env.get_mysql_port(),
-                    env.get_mysql_database()
-                ),
-                PluginType::PostgreSQL => format!(
-                    "{}:{}:{}",
-                    env.get_postgresql_host(),
-                    env.get_postgresql_port(),
-                    env.get_postgresql_database()
-                ),
-                PluginType::Redis => format!("{}:{}", env.get_redis_host(), env.get_redis_port()),
+                PluginType::MySQL => {
+                    if let Some(instance) = env.get_default_mysql_instance() {
+                        format!(
+                            "{}:{}:{}",
+                            instance.host, instance.port, instance.database
+                        )
+                    } else {
+                        "unknown".to_string()
+                    }
+                }
+                PluginType::PostgreSQL => {
+                    if let Some(instance) = env.get_default_postgresql_instance() {
+                        format!(
+                            "{}:{}:{}",
+                            instance.host, instance.port, instance.database
+                        )
+                    } else {
+                        "unknown".to_string()
+                    }
+                }
+                PluginType::Redis => format!("{}:{}", env.redis_host, env.redis_port),
             }
         } else {
             "unknown".to_string()

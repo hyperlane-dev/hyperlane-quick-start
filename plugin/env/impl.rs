@@ -1,6 +1,81 @@
 use super::*;
 
+impl MySqlInstanceConfig {
+    pub fn get_connection_url(&self) -> String {
+        format!(
+            "mysql://{}:{}@{}:{}/{}",
+            self.username, self.password, self.host, self.port, self.database
+        )
+    }
+
+    pub fn get_admin_url(&self) -> String {
+        format!(
+            "mysql://{}:{}@{}:{}",
+            self.username, self.password, self.host, self.port
+        )
+    }
+}
+
+impl PostgreSqlInstanceConfig {
+    pub fn get_connection_url(&self) -> String {
+        format!(
+            "postgres://{}:{}@{}:{}/{}",
+            self.username, self.password, self.host, self.port, self.database
+        )
+    }
+
+    pub fn get_admin_url(&self) -> String {
+        format!(
+            "postgres://{}:{}@{}:{}/postgres",
+            self.username, self.password, self.host, self.port
+        )
+    }
+}
+
 impl EnvConfig {
+    pub fn get_mysql_instance(&self, name: &str) -> Option<&MySqlInstanceConfig> {
+        self.mysql_instances
+            .iter()
+            .find(|instance| instance.name == name)
+    }
+
+    pub fn get_mysql_instance_mut(&mut self, name: &str) -> Option<&mut MySqlInstanceConfig> {
+        self.mysql_instances
+            .iter_mut()
+            .find(|instance| instance.name == name)
+    }
+
+    pub fn add_mysql_instance(&mut self, instance: MySqlInstanceConfig) {
+        self.mysql_instances.push(instance);
+    }
+
+    pub fn get_postgresql_instance(&self, name: &str) -> Option<&PostgreSqlInstanceConfig> {
+        self.postgresql_instances
+            .iter()
+            .find(|instance| instance.name == name)
+    }
+
+    pub fn get_postgresql_instance_mut(
+        &mut self,
+        name: &str,
+    ) -> Option<&mut PostgreSqlInstanceConfig> {
+        self.postgresql_instances
+            .iter_mut()
+            .find(|instance| instance.name == name)
+    }
+
+    pub fn add_postgresql_instance(&mut self, instance: PostgreSqlInstanceConfig) {
+        self.postgresql_instances.push(instance);
+    }
+
+    pub fn get_default_mysql_instance(&self) -> Option<&MySqlInstanceConfig> {
+        self.mysql_instances.first()
+    }
+
+    pub fn get_default_postgresql_instance(&self) -> Option<&PostgreSqlInstanceConfig> {
+        self.postgresql_instances.first()
+    }
+
     #[instrument_trace]
     pub fn load() -> Result<Self, String> {
         let docker_config: DockerComposeConfig =
@@ -19,93 +94,133 @@ impl EnvConfig {
             std::env::var(key).ok().and_then(|value| value.parse().ok())
         };
         let mut config: EnvConfig = EnvConfig::default();
-        config
-            .set_gpt_api_url(get_env(ENV_KEY_GPT_API_URL).unwrap_or_default())
-            .set_gpt_model(get_env(ENV_KEY_GPT_MODEL).unwrap_or_default())
-            .set_mysql_host(
-                get_env(ENV_KEY_MYSQL_HOST).unwrap_or_else(|| DEFAULT_DB_HOST.to_string()),
-            )
-            .set_mysql_port(
-                docker_config
-                    .try_get_mysql_port()
-                    .or_else(|| get_env_usize(ENV_KEY_MYSQL_PORT))
-                    .unwrap_or(DEFAULT_MYSQL_PORT),
-            )
-            .set_mysql_database(
-                docker_config
-                    .try_get_mysql_database()
-                    .clone()
-                    .or_else(|| get_env(ENV_KEY_MYSQL_DATABASE))
-                    .unwrap_or_default(),
-            )
-            .set_mysql_username(
-                docker_config
-                    .try_get_mysql_username()
-                    .clone()
-                    .or_else(|| get_env(ENV_KEY_MYSQL_USERNAME))
-                    .unwrap_or_default(),
-            )
-            .set_mysql_password(
-                docker_config
-                    .try_get_mysql_password()
-                    .clone()
-                    .or_else(|| get_env(ENV_KEY_MYSQL_PASSWORD))
-                    .unwrap_or_default(),
-            )
-            .set_redis_host(
-                get_env(ENV_KEY_REDIS_HOST).unwrap_or_else(|| DEFAULT_DB_HOST.to_string()),
-            )
-            .set_redis_port(
-                docker_config
-                    .try_get_redis_port()
-                    .or_else(|| get_env_usize(ENV_KEY_REDIS_PORT))
-                    .unwrap_or(DEFAULT_REDIS_PORT),
-            )
-            .set_redis_username(
-                docker_config
-                    .try_get_redis_username()
-                    .clone()
-                    .or_else(|| get_env(ENV_KEY_REDIS_USERNAME))
-                    .unwrap_or_default(),
-            )
-            .set_redis_password(
-                docker_config
-                    .try_get_redis_password()
-                    .clone()
-                    .or_else(|| get_env(ENV_KEY_REDIS_PASSWORD))
-                    .unwrap_or_default(),
-            )
-            .set_postgresql_host(
-                get_env(ENV_KEY_POSTGRES_HOST).unwrap_or_else(|| DEFAULT_DB_HOST.to_string()),
-            )
-            .set_postgresql_port(
-                docker_config
-                    .try_get_postgresql_port()
-                    .or_else(|| get_env_usize(ENV_KEY_POSTGRES_PORT))
-                    .unwrap_or(DEFAULT_POSTGRESQL_PORT),
-            )
-            .set_postgresql_database(
-                docker_config
-                    .try_get_postgresql_database()
-                    .clone()
-                    .or_else(|| get_env(ENV_KEY_POSTGRES_DATABASE))
-                    .unwrap_or_default(),
-            )
-            .set_postgresql_username(
-                docker_config
-                    .try_get_postgresql_username()
-                    .clone()
-                    .or_else(|| get_env(ENV_KEY_POSTGRES_USERNAME))
-                    .unwrap_or_default(),
-            )
-            .set_postgresql_password(
-                docker_config
-                    .try_get_postgresql_password()
-                    .clone()
-                    .or_else(|| get_env(ENV_KEY_POSTGRES_PASSWORD))
-                    .unwrap_or_default(),
-            );
+        config.gpt_api_url = get_env(ENV_KEY_GPT_API_URL).unwrap_or_default();
+        config.gpt_model = get_env(ENV_KEY_GPT_MODEL).unwrap_or_default();
+        let default_mysql_host =
+            get_env(ENV_KEY_MYSQL_HOST).unwrap_or_else(|| DEFAULT_DB_HOST.to_string());
+        let default_mysql_port = docker_config
+            .try_get_mysql_port()
+            .or_else(|| get_env_usize(ENV_KEY_MYSQL_PORT))
+            .unwrap_or(DEFAULT_MYSQL_PORT);
+        let default_mysql_database = docker_config
+            .try_get_mysql_database()
+            .clone()
+            .or_else(|| get_env(ENV_KEY_MYSQL_DATABASE))
+            .unwrap_or_default();
+        let default_mysql_username = docker_config
+            .try_get_mysql_username()
+            .clone()
+            .or_else(|| get_env(ENV_KEY_MYSQL_USERNAME))
+            .unwrap_or_default();
+        let default_mysql_password = docker_config
+            .try_get_mysql_password()
+            .clone()
+            .or_else(|| get_env(ENV_KEY_MYSQL_PASSWORD))
+            .unwrap_or_default();
+        let instance: MySqlInstanceConfig = MySqlInstanceConfig {
+            name: DEFAULT_MYSQL_INSTANCE_NAME.to_string(),
+            host: default_mysql_host,
+            port: default_mysql_port,
+            database: default_mysql_database,
+            username: default_mysql_username,
+            password: default_mysql_password,
+        };
+        config.mysql_instances.push(instance);
+        let mut instance_index: usize = 1;
+        loop {
+            let prefix: String = format!("MYSQL_{instance_index}_");
+            let host_key: String = format!("{prefix}HOST");
+            if let Some(host) = get_env(&host_key) {
+                let port_key: String = format!("{prefix}PORT");
+                let database_key: String = format!("{prefix}DATABASE");
+                let username_key: String = format!("{prefix}USERNAME");
+                let password_key: String = format!("{prefix}PASSWORD");
+                let instance_name: String = format!("mysql_{instance_index}");
+                let instance: MySqlInstanceConfig = MySqlInstanceConfig {
+                    name: instance_name,
+                    host,
+                    port: get_env_usize(&port_key).unwrap_or(DEFAULT_MYSQL_PORT),
+                    database: get_env(&database_key).unwrap_or_default(),
+                    username: get_env(&username_key).unwrap_or_default(),
+                    password: get_env(&password_key).unwrap_or_default(),
+                };
+                config.mysql_instances.push(instance);
+                instance_index += 1;
+            } else {
+                break;
+            }
+        }
+        let default_postgres_host: String =
+            get_env(ENV_KEY_POSTGRES_HOST).unwrap_or_else(|| DEFAULT_DB_HOST.to_string());
+        let default_postgres_port: usize = docker_config
+            .try_get_postgresql_port()
+            .or_else(|| get_env_usize(ENV_KEY_POSTGRES_PORT))
+            .unwrap_or(DEFAULT_POSTGRESQL_PORT);
+        let default_postgres_database = docker_config
+            .try_get_postgresql_database()
+            .clone()
+            .or_else(|| get_env(ENV_KEY_POSTGRES_DATABASE))
+            .unwrap_or_default();
+        let default_postgres_username = docker_config
+            .try_get_postgresql_username()
+            .clone()
+            .or_else(|| get_env(ENV_KEY_POSTGRES_USERNAME))
+            .unwrap_or_default();
+        let default_postgres_password = docker_config
+            .try_get_postgresql_password()
+            .clone()
+            .or_else(|| get_env(ENV_KEY_POSTGRES_PASSWORD))
+            .unwrap_or_default();
+        let instance: PostgreSqlInstanceConfig = PostgreSqlInstanceConfig {
+            name: DEFAULT_POSTGRESQL_INSTANCE_NAME.to_string(),
+            host: default_postgres_host,
+            port: default_postgres_port,
+            database: default_postgres_database,
+            username: default_postgres_username,
+            password: default_postgres_password,
+        };
+        config.postgresql_instances.push(instance);
+        let mut instance_index: usize = 1;
+        loop {
+            let prefix: String = format!("POSTGRES_{instance_index}_");
+            let host_key: String = format!("{prefix}HOST");
+            if let Some(host) = get_env(&host_key) {
+                let port_key: String = format!("{prefix}PORT");
+                let database_key: String = format!("{prefix}DATABASE");
+                let username_key: String = format!("{prefix}USERNAME");
+                let password_key: String = format!("{prefix}PASSWORD");
 
+                let instance_name: String = format!("postgres_{instance_index}");
+                let instance = PostgreSqlInstanceConfig {
+                    name: instance_name,
+                    host,
+                    port: get_env_usize(&port_key).unwrap_or(DEFAULT_POSTGRESQL_PORT),
+                    database: get_env(&database_key).unwrap_or_default(),
+                    username: get_env(&username_key).unwrap_or_default(),
+                    password: get_env(&password_key).unwrap_or_default(),
+                };
+                config.postgresql_instances.push(instance);
+                instance_index += 1;
+            } else {
+                break;
+            }
+        }
+        config.redis_host =
+            get_env(ENV_KEY_REDIS_HOST).unwrap_or_else(|| DEFAULT_DB_HOST.to_string());
+        config.redis_port = docker_config
+            .try_get_redis_port()
+            .or_else(|| get_env_usize(ENV_KEY_REDIS_PORT))
+            .unwrap_or(DEFAULT_REDIS_PORT);
+        config.redis_username = docker_config
+            .try_get_redis_username()
+            .clone()
+            .or_else(|| get_env(ENV_KEY_REDIS_USERNAME))
+            .unwrap_or_default();
+        config.redis_password = docker_config
+            .try_get_redis_password()
+            .clone()
+            .or_else(|| get_env(ENV_KEY_REDIS_PASSWORD))
+            .unwrap_or_default();
         Ok(config)
     }
 
@@ -221,7 +336,6 @@ impl EnvConfig {
                 }
             }
         }
-
         Ok(config)
     }
 }

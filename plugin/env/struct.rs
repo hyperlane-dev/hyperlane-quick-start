@@ -1,23 +1,35 @@
 use super::*;
 
 #[derive(Clone, Data, Debug, Default)]
+pub struct MySqlInstanceConfig {
+    pub name: String,
+    pub host: String,
+    pub port: usize,
+    pub database: String,
+    pub username: String,
+    pub password: String,
+}
+
+#[derive(Clone, Data, Debug, Default)]
+pub struct PostgreSqlInstanceConfig {
+    pub name: String,
+    pub host: String,
+    pub port: usize,
+    pub database: String,
+    pub username: String,
+    pub password: String,
+}
+
+#[derive(Clone, Data, Debug, Default)]
 pub struct EnvConfig {
-    gpt_api_url: String,
-    gpt_model: String,
-    mysql_host: String,
-    mysql_port: usize,
-    mysql_database: String,
-    mysql_username: String,
-    mysql_password: String,
-    redis_host: String,
-    redis_port: usize,
-    redis_username: String,
-    redis_password: String,
-    postgresql_host: String,
-    postgresql_port: usize,
-    postgresql_database: String,
-    postgresql_username: String,
-    postgresql_password: String,
+    pub gpt_api_url: String,
+    pub gpt_model: String,
+    pub mysql_instances: Vec<MySqlInstanceConfig>,
+    pub redis_host: String,
+    pub redis_port: usize,
+    pub redis_username: String,
+    pub redis_password: String,
+    pub postgresql_instances: Vec<PostgreSqlInstanceConfig>,
 }
 
 #[derive(Clone, Data, Debug, Default)]

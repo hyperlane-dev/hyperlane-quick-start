@@ -1,6 +1,6 @@
 use super::*;
 
-#[derive(Clone, Copy, Data, Debug)]
+#[derive(Clone, Data, Debug, New)]
 pub struct PostgreSqlAutoCreation {
-    pub env: &'static EnvConfig,
+    pub instance: PostgreSqlInstanceConfig,
 }

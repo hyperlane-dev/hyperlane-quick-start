@@ -7,44 +7,63 @@ pub async fn initialize_auto_creation() -> Result<(), String> {
             "Auto-creation configuration validation failed: {error}"
         ));
     }
+    let env: &'static EnvConfig = get_global_env_config();
     let mut initialization_results: Vec<String> = Vec::new();
-    match perform_mysql_auto_creation().await {
-        Ok(result) => {
-            initialization_results.push(format!(
-                "MySQL: {}",
-                if result.has_changes() {
-                    "initialized with changes"
-                } else {
-                    "verified"
-                }
-            ));
-        }
-        Err(error) => {
-            if !error.should_continue() {
-                return Err(format!("MySQL auto-creation failed: {error}"));
+    for instance in &env.mysql_instances {
+        match mysql::perform_mysql_auto_creation(instance).await {
+            Ok(result) => {
+                initialization_results.push(format!(
+                    "MySQL ({}) : {}",
+                    instance.name,
+                    if result.has_changes() {
+                        "initialized with changes"
+                    } else {
+                        "verified"
+                    }
+                ));
             }
-            initialization_results.push(format!("MySQL: failed but continuing ({error})"));
+            Err(error) => {
+                if !error.should_continue() {
+                    return Err(format!(
+                        "MySQL ({}) auto-creation failed: {error}",
+                        instance.name
+                    ));
+                }
+                initialization_results.push(format!(
+                    "MySQL ({}) : failed but continuing ({error})",
+                    instance.name
+                ));
+            }
         }
     }
-    match perform_postgresql_auto_creation().await {
-        Ok(result) => {
-            initialization_results.push(format!(
-                "PostgreSQL: {}",
-                if result.has_changes() {
-                    "initialized with changes"
-                } else {
-                    "verified"
-                }
-            ));
-        }
-        Err(error) => {
-            if !error.should_continue() {
-                return Err(format!("PostgreSQL auto-creation failed: {error}"));
+    for instance in &env.postgresql_instances {
+        match postgresql::perform_postgresql_auto_creation(instance).await {
+            Ok(result) => {
+                initialization_results.push(format!(
+                    "PostgreSQL ({}) : {}",
+                    instance.name,
+                    if result.has_changes() {
+                        "initialized with changes"
+                    } else {
+                        "verified"
+                    }
+                ));
             }
-            initialization_results.push(format!("PostgreSQL: failed but continuing ({error})"));
+            Err(error) => {
+                if !error.should_continue() {
+                    return Err(format!(
+                        "PostgreSQL ({}) auto-creation failed: {error}",
+                        instance.name
+                    ));
+                }
+                initialization_results.push(format!(
+                    "PostgreSQL ({}) : failed but continuing ({error})",
+                    instance.name
+                ));
+            }
         }
     }
-    match perform_redis_auto_creation().await {
+    match redis::perform_redis_auto_creation().await {
         Ok(result) => {
             initialization_results.push(format!(
                 "Redis: {}",

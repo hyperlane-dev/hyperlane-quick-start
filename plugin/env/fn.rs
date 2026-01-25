@@ -14,110 +14,66 @@ pub fn init_env_config() -> Result<(), String> {
     info!("Environment Configuration Loaded Successfully");
     info!(
         "GPT API URL: {}",
-        if config.get_gpt_api_url().is_empty() {
+        if config.gpt_api_url.is_empty() {
             "(not set)"
         } else {
-            config.get_gpt_api_url()
+            &config.gpt_api_url
         }
     );
     info!(
         "GPT Model: {}",
-        if config.get_gpt_model().is_empty() {
+        if config.gpt_model.is_empty() {
             "(not set)"
         } else {
-            config.get_gpt_model()
-        }
-    );
-    info!("MySQL Configuration:");
-    info!(
-        "  Host: {}",
-        if config.get_mysql_host().is_empty() {
-            "(not set)"
-        } else {
-            config.get_mysql_host()
-        }
-    );
-    info!("  Port: {}", config.get_mysql_port());
-    info!(
-        "  Database: {}",
-        if config.get_mysql_database().is_empty() {
-            "(not set)"
-        } else {
-            config.get_mysql_database()
-        }
-    );
-    info!(
-        "  Username: {}",
-        if config.get_mysql_username().is_empty() {
-            "(not set)"
-        } else {
-            config.get_mysql_username()
-        }
-    );
-    info!(
-        "  Password: {}",
-        if config.get_mysql_password().is_empty() {
-            "(not set)"
-        } else {
-            "***"
+            &config.gpt_model
         }
     );
 
+    info!("MySQL Configuration:");
+    if config.mysql_instances.is_empty() {
+        info!("  (no MySQL instances configured)");
+    } else {
+        for instance in &config.mysql_instances {
+            info!(
+                "  Instance '{}': {}:{}@{}:{}/{}",
+                instance.name, instance.username, "***", instance.host, instance.port, instance.database
+            );
+        }
+    }
+
     info!("PostgreSQL Configuration:");
-    info!(
-        "  Host: {}",
-        if config.get_postgresql_host().is_empty() {
-            "(not set)"
-        } else {
-            config.get_postgresql_host()
+    if config.postgresql_instances.is_empty() {
+        info!("  (no PostgreSQL instances configured)");
+    } else {
+        for instance in &config.postgresql_instances {
+            info!(
+                "  Instance '{}': {}:{}@{}:{}/{}",
+                instance.name, instance.username, "***", instance.host, instance.port, instance.database
+            );
         }
-    );
-    info!("  Port: {}", config.get_postgresql_port());
-    info!(
-        "  Database: {}",
-        if config.get_postgresql_database().is_empty() {
-            "(not set)"
-        } else {
-            config.get_postgresql_database()
-        }
-    );
-    info!(
-        "  Username: {}",
-        if config.get_postgresql_username().is_empty() {
-            "(not set)"
-        } else {
-            config.get_postgresql_username()
-        }
-    );
-    info!(
-        "  Password: {}",
-        if config.get_postgresql_password().is_empty() {
-            "(not set)"
-        } else {
-            "***"
-        }
-    );
+    }
+
     info!("Redis Configuration:");
     info!(
         "  Host: {}",
-        if config.get_redis_host().is_empty() {
+        if config.redis_host.is_empty() {
             "(not set)"
         } else {
-            config.get_redis_host()
+            &config.redis_host
         }
     );
-    info!("  Port: {}", config.get_redis_port());
+    info!("  Port: {}", config.redis_port);
     info!(
         "  Username: {}",
-        if config.get_redis_username().is_empty() {
+        if config.redis_username.is_empty() {
             "(not set)"
         } else {
-            config.get_redis_username()
+            &config.redis_username
         }
     );
     info!(
         "  Password: {}",
-        if config.get_redis_password().is_empty() {
+        if config.redis_password.is_empty() {
             "(not set)"
         } else {
             "***"

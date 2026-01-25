@@ -3,8 +3,12 @@ use super::*;
 impl Default for MySqlAutoCreation {
     #[instrument_trace]
     fn default() -> Self {
-        Self {
-            env: get_global_env_config(),
+        let env: &'static EnvConfig = get_global_env_config();
+        if let Some(instance) = env.get_default_mysql_instance() {
+            Self::new(instance.clone())
+        } else {
+            let default_instance: MySqlInstanceConfig = MySqlInstanceConfig::default();
+            Self::new(default_instance)
         }
     }
 }
@@ -12,13 +16,7 @@ impl Default for MySqlAutoCreation {
 impl MySqlAutoCreation {
     #[instrument_trace]
     async fn create_admin_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
-        let admin_url: String = format!(
-            "mysql://{}:{}@{}:{}",
-            self.env.get_mysql_username(),
-            self.env.get_mysql_password(),
-            self.env.get_mysql_host(),
-            self.env.get_mysql_port()
-        );
+        let admin_url: String = self.instance.get_admin_url();
         Database::connect(&admin_url).await.map_err(|error: DbErr| {
             let error_msg: String = error.to_string();
             if error_msg.contains("Access denied") || error_msg.contains("permission") {
@@ -42,7 +40,7 @@ impl MySqlAutoCreation {
     ) -> Result<bool, AutoCreationError> {
         let query: String = format!(
             "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '{}'",
-            self.env.get_mysql_database()
+            self.instance.database
         );
         let statement: Statement = Statement::from_string(DatabaseBackend::MySql, query);
         match connection.query_all(statement).await {
@@ -60,7 +58,7 @@ impl MySqlAutoCreation {
     ) -> Result<bool, AutoCreationError> {
         if self.database_exists(connection).await? {
             AutoCreationLogger::log_database_exists(
-                self.env.get_mysql_database(),
+                &self.instance.database,
                 database::PluginType::MySQL,
             )
             .await;
@@ -68,13 +66,13 @@ impl MySqlAutoCreation {
         }
         let create_query: String = format!(
             "CREATE DATABASE IF NOT EXISTS `{}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
-            self.env.get_mysql_database()
+            self.instance.database
         );
         let statement: Statement = Statement::from_string(DatabaseBackend::MySql, create_query);
         match connection.execute(statement).await {
             Ok(_) => {
                 AutoCreationLogger::log_database_created(
-                    self.env.get_mysql_database(),
+                    &self.instance.database,
                     database::PluginType::MySQL,
                 )
                 .await;
@@ -85,14 +83,12 @@ impl MySqlAutoCreation {
                 if error_msg.contains("Access denied") || error_msg.contains("permission") {
                     Err(AutoCreationError::InsufficientPermissions(format!(
                         "Cannot create MySQL database '{}': {}",
-                        self.env.get_mysql_database(),
-                        error_msg
+                        self.instance.database, error_msg
                     )))
                 } else {
                     Err(AutoCreationError::DatabaseError(format!(
                         "Failed to create MySQL database '{}': {}",
-                        self.env.get_mysql_database(),
-                        error_msg
+                        self.instance.database, error_msg
                     )))
                 }
             }
@@ -101,19 +97,11 @@ impl MySqlAutoCreation {
 
     #[instrument_trace]
     async fn create_target_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
-        let db_url: String = format!(
-            "mysql://{}:{}@{}:{}/{}",
-            self.env.get_mysql_username(),
-            self.env.get_mysql_password(),
-            self.env.get_mysql_host(),
-            self.env.get_mysql_port(),
-            self.env.get_mysql_database()
-        );
+        let db_url: String = self.instance.get_connection_url();
         Database::connect(&db_url).await.map_err(|error: DbErr| {
             AutoCreationError::ConnectionFailed(format!(
                 "Cannot connect to MySQL database '{}': {}",
-                self.env.get_mysql_database(),
-                error
+                self.instance.database, error
             ))
         })
     }
@@ -126,7 +114,7 @@ impl MySqlAutoCreation {
     ) -> Result<bool, AutoCreationError> {
         let query: String = format!(
             "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{}' AND TABLE_NAME = '{table_name}'",
-            self.env.get_mysql_database()
+            self.instance.database
         );
         let statement: Statement = Statement::from_string(DatabaseBackend::MySql, query);
         match connection.query_all(statement).await {
@@ -208,14 +196,14 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                 created_tables.push(table.name.clone());
                 AutoCreationLogger::log_table_created(
                     &table.name,
-                    self.env.get_mysql_database(),
+                    &self.instance.database,
                     database::PluginType::MySQL,
                 )
                 .await;
             } else {
                 AutoCreationLogger::log_table_exists(
                     &table.name,
-                    self.env.get_mysql_database(),
+                    &self.instance.database,
                     database::PluginType::MySQL,
                 )
                 .await;
@@ -227,7 +215,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                     &error,
                     "Index creation",
                     database::PluginType::MySQL,
-                    Some(self.env.get_mysql_database()),
+                    Some(&self.instance.database),
                 )
                 .await;
             }
@@ -238,7 +226,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                     &error,
                     "Constraint creation",
                     database::PluginType::MySQL,
-                    Some(self.env.get_mysql_database()),
+                    Some(&self.instance.database),
                 )
                 .await;
             }
@@ -246,7 +234,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
         let _: Result<(), DbErr> = connection.close().await;
         AutoCreationLogger::log_tables_created(
             &created_tables,
-            self.env.get_mysql_database(),
+            &self.instance.database,
             database::PluginType::MySQL,
         )
         .await;
@@ -255,14 +243,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
 
     #[instrument_trace]
     async fn verify_connection(&self) -> Result<(), AutoCreationError> {
-        let db_url: String = format!(
-            "mysql://{}:{}@{}:{}/{}",
-            self.env.get_mysql_username(),
-            self.env.get_mysql_password(),
-            self.env.get_mysql_host(),
-            self.env.get_mysql_port(),
-            self.env.get_mysql_database()
-        );
+        let db_url: String = self.instance.get_connection_url();
         let connection: DatabaseConnection = Database::connect(&db_url).await.map_err(|error| {
             AutoCreationError::ConnectionFailed(format!(
                 "Failed to verify MySQL connection: {error}"
@@ -276,7 +257,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                 let _: Result<(), DbErr> = connection.close().await;
                 AutoCreationLogger::log_connection_verification(
                     database::PluginType::MySQL,
-                    self.env.get_mysql_database(),
+                    &self.instance.database,
                     true,
                     None,
                 )
@@ -288,7 +269,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                 let error_msg: String = error.to_string();
                 AutoCreationLogger::log_connection_verification(
                     database::PluginType::MySQL,
-                    self.env.get_mysql_database(),
+                    &self.instance.database,
                     false,
                     Some(&error_msg),
                 )
