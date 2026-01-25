@@ -106,11 +106,12 @@ jobs:
       - name: Publish crates in order
         run: |
           set -e
+          ROOT_DIR=$(pwd)
           VERSION=$(toml get Cargo.toml package.version --raw)
 
           publish_if_needed() {
             DIR=$1
-            cd "$DIR"
+            cd "$ROOT_DIR/$DIR"
             NAME=$(toml get Cargo.toml package.name --raw)
 
             echo "Publishing $NAME v$VERSION..."
@@ -120,7 +121,7 @@ jobs:
             else
               cargo publish
             fi
-            cd ..
+            cd "$ROOT_DIR"
           }
 
           publish_if_needed config
