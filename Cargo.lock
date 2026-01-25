@@ -1696,7 +1696,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_resources"
-version = "9.2.6"
+version = "9.2.8"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
