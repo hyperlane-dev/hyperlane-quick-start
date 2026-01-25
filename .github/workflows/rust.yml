@@ -35,24 +35,8 @@ jobs:
           echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
           echo "📦 Root package: $PACKAGE_NAME v$VERSION"
 
-  update_subpackage_versions:
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Install toml-cli
-        run: cargo install toml-cli
-      - name: Update subpackage versions
-        run: |
-          VERSION=${{ needs.setup.outputs.version }}
-          for pkg in config plugin app init; do
-            echo "🔧 Updating $pkg/Cargo.toml version to $VERSION"
-            toml set $pkg/Cargo.toml package.version $VERSION
-          done
-
   publish_subpackages:
-    needs: update_subpackage_versions
+    needs: setup
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -60,10 +44,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Install toml-cli
+        run: cargo install toml-cli
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
+      - name: Update ${{ matrix.package }} version
+        run: |
+          VERSION=${{ needs.setup.outputs.version }}
+          PACKAGE="${{ matrix.package }}"
+          echo "🔧 Updating $PACKAGE/Cargo.toml version to $VERSION"
+          toml set $PACKAGE/Cargo.toml package.version $VERSION
       - name: Publish ${{ matrix.package }}
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
