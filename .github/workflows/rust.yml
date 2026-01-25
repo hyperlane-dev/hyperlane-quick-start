@@ -31,8 +31,6 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: Install toml-cli
         run: cargo install toml-cli
-      - name: Install cargo-release
-        run: cargo install cargo-release
       - name: Cache toml-cli
         uses: actions/cache@v3
         with:
@@ -121,6 +119,8 @@ jobs:
         with:
           path: ~/.cargo/bin/toml
           key: toml-cli-${{ runner.os }}
+      - name: Install cargo-release
+        run: cargo install cargo-release
       - name: Publish to crates.io
         id: publish
         env:
