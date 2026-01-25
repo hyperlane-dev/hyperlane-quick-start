@@ -2,7 +2,7 @@ use super::*;
 
 impl Log for Logger {
     fn enabled(&self, metadata: &Metadata) -> bool {
-        metadata.level() <= LOG_LEVEL_FILTER
+        metadata.level() <= max_level()
     }
 
     fn log(&self, record: &Record) {
@@ -77,44 +77,52 @@ impl Log for Logger {
 }
 
 impl Logger {
-    #[instrument_trace]
-    pub fn init(level: LevelFilter) {
+    fn read() -> RwLockReadGuard<'static, FileLogger> {
+        FILE_LOGGER.try_read().unwrap()
+    }
+
+    fn write() -> RwLockWriteGuard<'static, FileLogger> {
+        FILE_LOGGER.try_write().unwrap()
+    }
+
+    pub fn init(level: LevelFilter, file_logger: FileLogger) {
         set_logger(&LOGGER).unwrap();
         set_max_level(level);
+        *Self::write() = file_logger;
     }
 
     pub fn log_trace<T>(data: T)
     where
         T: AsRef<str>,
     {
-        FILE_LOGGER.trace(data, log_handler);
+        Self::read().trace(data, log_handler);
     }
 
     pub fn log_debug<T>(data: T)
     where
         T: AsRef<str>,
     {
-        FILE_LOGGER.debug(data, log_handler);
+        Self::read().debug(data, log_handler);
     }
 
     pub fn log_info<T>(data: T)
     where
         T: AsRef<str>,
     {
-        FILE_LOGGER.info(data, log_handler);
+        Self::read().info(data, log_handler);
     }
 
     pub fn log_warn<T>(data: T)
     where
         T: AsRef<str>,
     {
-        FILE_LOGGER.warn(data, log_handler);
+        Self::read().warn(data, log_handler);
     }
 
     pub fn log_error<T>(data: T)
     where
         T: AsRef<str>,
     {
-        FILE_LOGGER.error(data, log_handler);
+        Self::read().error(data, log_handler);
     }
 }

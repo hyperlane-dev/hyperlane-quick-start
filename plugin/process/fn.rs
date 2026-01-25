@@ -1,8 +1,9 @@
 use super::*;
 
 #[instrument_trace]
-pub async fn create<F, Fut>(server_hook: F)
+pub async fn create<P, F, Fut>(pid_path: P, server_hook: F)
 where
+    P: AsRef<str>,
     F: Fn() -> Fut + Send + Sync + 'static,
     Fut: Future<Output = ()> + Send + 'static,
 {
@@ -10,7 +11,7 @@ where
     debug!("Process create args{COLON_SPACE}{args:?}");
     let mut manager: ServerManager = ServerManager::new();
     manager
-        .set_pid_file(SERVER_PID_FILE_PATH)
+        .set_pid_file(pid_path.as_ref())
         .set_server_hook(server_hook);
     let is_daemon: bool = args.len() >= 3 && args[2].to_lowercase() == DAEMON_FLAG;
     let start_server = || async {

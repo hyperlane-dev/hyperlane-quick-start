@@ -94,5 +94,5 @@ pub fn run() {
         error!("{error}");
     }
     info!("Environment configuration loaded successfully");
-    runtime().block_on(create(create_server));
+    runtime().block_on(create(SERVER_PID_FILE_PATH, create_server));
 }

@@ -104,6 +104,8 @@ jobs:
         run: cargo check --release --all-features
 
   publish:
+    permissions:
+      contents: write
     needs: [setup, check, tests, clippy, build]
     if: needs.setup.outputs.tag != ''
     runs-on: ubuntu-latest
@@ -117,6 +119,12 @@ jobs:
         with:
           path: ~/.cargo/bin/toml
           key: toml-cli-${{ runner.os }}
+      - name: Install cargo-release
+        run: cargo install cargo-release
+      - name: Configure git
+        run: |
+          git config user.name "eastspire"
+          git config user.email "root@ltpp.vip"
       - name: Publish to crates.io
         id: publish
         env:
@@ -127,6 +135,21 @@ jobs:
           echo "${{ secrets.CARGO_REGISTRY_TOKEN }}" | cargo login
           PACKAGE_NAME=$(toml get Cargo.toml package.name --raw)
           VERSION=${{ needs.setup.outputs.version }}
+          PACKAGES=(
+            hyperlane_config
+            hyperlane_plugin
+            hyperlane_app
+            hyperlane_init
+            hyperlane-quick-start
+          )
+          for pkg in "${PACKAGES[@]}"; do
+            echo "🚀 Releasing $pkg v$VERSION"
+            if cargo release "$VERSION" --package "$pkg" --execute --no-confirm; then
+              echo "✅ $pkg release success"
+            else
+              echo "⚠️ $pkg release failed, continue to next package"
+            fi
+          done
           if cargo publish --allow-dirty; then
             echo "published=true" >> $GITHUB_OUTPUT
             echo "🎉🎉🎉 PUBLISH SUCCESSFUL 🎉🎉🎉"

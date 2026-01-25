@@ -2,8 +2,6 @@
 
 ## hyperlane-quick-start
 
-[English](README.md) | [简体中文](README.ZH-CN.md)
-
 <img src="https://docs.ltpp.vip/img/hyperlane.png" alt="" height="160">
 
 [![](https://img.shields.io/crates/v/hyperlane.svg)](https://crates.io/crates/hyperlane)
@@ -22,7 +20,7 @@
 
 ## Api Docs
 
-- [Api Docs](https://docs.rs/hyperlane/latest/hyperlane/)
+- [Api Docs](https://docs.rs/hyperlane/latest/)
 
 ## Run
 

@@ -1,7 +1,15 @@
 [package]
 name = "hyperlane_plugin"
-version = "0.1.0"
+version = "9.2.5"
+readme = "README.md"
 edition = "2024"
+authors = ["root@ltpp.vip"]
+license = "MIT"
+description = "A powerful plugin system for hyperlane framework"
+keywords = ["http", "request", "response", "tcp", "cross-platform"]
+repository = "https://github.com/hyperlane-dev/hyperlane-quick-start.git"
+categories = ["network-programming", "web-programming"]
+exclude = ["target", "Cargo.lock", ".github", "tmp", "**/*.pid", "**/*.log"]
 
 [lib]
 path = "lib.rs"
@@ -10,8 +18,6 @@ path = "lib.rs"
 workspace = true
 
 [dependencies]
-hyperlane_config = { workspace = true }
-
 serde = { workspace = true }
 tracing = { workspace = true }
 hyperlane = { workspace = true }

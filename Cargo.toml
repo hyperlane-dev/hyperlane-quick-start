@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane-quick-start"
-version = "9.2.0"
+version = "9.2.6"
 readme = "README.md"
 edition = "2024"
 authors = ["root@ltpp.vip"]
@@ -9,20 +9,32 @@ description = """A lightweight rust http server with middleware, websocket, sse,
 keywords = ["http", "request", "response", "tcp", "cross-platform"]
 repository = "https://github.com/hyperlane-dev/hyperlane-quick-start.git"
 categories = ["network-programming", "web-programming"]
-exclude = ["target", "Cargo.lock", ".github", "tmp", "**/*.pid", "**/*.log"]
+exclude = [
+    "tmp",
+    "logs",
+    "target",
+    ".github",
+    ".vscode",
+    "process",
+    "node_modules",
+    "**/*.pid",
+    "**/*.log",
+    "Cargo.lock",
+]
 
 [workspace]
+resolver = "3"
 members = ["app", "config", "init", "plugin"]
 
 [workspace.dependencies]
-hyperlane_app = { path = "app", version = "0.1.0" }
-hyperlane_config = { path = "config", version = "0.1.0" }
-hyperlane_init = { path = "init", version = "0.1.0" }
-hyperlane_plugin = { path = "plugin", version = "0.1.0" }
+hyperlane_app = { path = "app", version = "9.2.5" }
+hyperlane_config = { path = "config", version = "9.2.5" }
+hyperlane_init = { path = "init", version = "9.2.5" }
+hyperlane_plugin = { path = "plugin", version = "9.2.5" }
 
 tracing = "0.1.44"
-hyperlane = "11.0.9"
-hyperlane-utils = "14.5.0"
+hyperlane = "11.0.10"
+hyperlane-utils = "14.5.1"
 serde = { version = "1.0.228", features = ["derive"] }
 
 [dependencies]
