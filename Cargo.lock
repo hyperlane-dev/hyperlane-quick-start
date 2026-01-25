@@ -1656,6 +1656,7 @@ dependencies = [
  "hyperlane-utils",
  "hyperlane_config",
  "hyperlane_plugin",
+ "hyperlane_resources",
  "serde",
  "tracing",
 ]
@@ -1685,6 +1686,16 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_plugin"
+version = "9.2.6"
+dependencies = [
+ "hyperlane",
+ "hyperlane-utils",
+ "serde",
+ "tracing",
+]
+
+[[package]]
+name = "hyperlane_resources"
 version = "9.2.6"
 dependencies = [
  "hyperlane",
