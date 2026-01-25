@@ -48,7 +48,7 @@ jobs:
           VERSION=${{ needs.setup.outputs.version }}
           for pkg in config plugin app init; do
             echo "🔧 Updating $pkg/Cargo.toml version to $VERSION"
-            toml set $pkg/Cargo.toml package.version $VERSION --force
+            toml set $pkg/Cargo.toml package.version $VERSION
           done
 
   publish_subpackages:
@@ -73,6 +73,8 @@ jobs:
           (cd $PACKAGE && cargo publish --allow-dirty)
 
   publish_root:
+    permissions:
+      contents: write
     needs: publish_subpackages
     runs-on: ubuntu-latest
     steps:
@@ -91,6 +93,8 @@ jobs:
           cargo publish --allow-dirty
 
   git_push:
+    permissions:
+      contents: write
     needs: publish_root
     runs-on: ubuntu-latest
     steps:
