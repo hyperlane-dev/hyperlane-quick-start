@@ -1663,7 +1663,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_config"
-version = "9.2.6"
+version = "9.2.10"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
