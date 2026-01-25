@@ -4,4 +4,4 @@ CREATE TABLE `record` (
     `value` TEXT,
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_key` (`key`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci
