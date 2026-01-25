@@ -67,7 +67,7 @@ impl ServerHook for ResponseBodyMiddleware {
         Self
     }
 
-    #[epilogue_macros(response_body(include_str!("../../../resources/templates/index/index.html").replace("{{ time }}", &time())))]
+    #[epilogue_macros(response_body(TEMPLATES_INDEX_HTML.replace("{{ time }}", &time())))]
     #[instrument_trace]
     async fn handle(self, ctx: &Context) {}
 }
