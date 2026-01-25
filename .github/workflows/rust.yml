@@ -106,6 +106,8 @@ jobs:
         run: cargo check --release --all-features
 
   publish:
+    permissions:
+      contents: write
     needs: [setup, check, tests, clippy, build]
     if: needs.setup.outputs.tag != ''
     runs-on: ubuntu-latest
