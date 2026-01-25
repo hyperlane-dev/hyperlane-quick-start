@@ -55,7 +55,7 @@ jobs:
           VERSION=${{ needs.setup.outputs.version }}
           PACKAGE="${{ matrix.package }}"
           echo "🔧 Updating $PACKAGE/Cargo.toml version to $VERSION"
-          toml set $PACKAGE/Cargo.toml package.version $VERSION
+          toml set $PACKAGE/Cargo.toml package.version $VERSION > $PACKAGE/Cargo.toml.tmp
       - name: Publish ${{ matrix.package }}
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
