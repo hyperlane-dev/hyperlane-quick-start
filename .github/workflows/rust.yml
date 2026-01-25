@@ -11,147 +11,99 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.meta.outputs.version }}
+      version: ${{ steps.read_root.outputs.version }}
+      tag: ${{ steps.read_root.outputs.tag }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - uses: dtolnay/rust-toolchain@stable
+      - name: Install rust-toolchain
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
           components: rustfmt, clippy
-
-      - run: cargo install toml-cli || true
-
-      - id: meta
+      - name: Install toml-cli
+        run: cargo install toml-cli
+      - name: Read root Cargo.toml
+        id: read_root
         run: |
           VERSION=$(toml get Cargo.toml package.version --raw)
+          PACKAGE_NAME=$(toml get Cargo.toml package.name --raw)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "Detected version: $VERSION"
+          echo "tag=v$VERSION" >> $GITHUB_OUTPUT
+          echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
+          echo "📦 Root package: $PACKAGE_NAME v$VERSION"
 
-  check:
+  update_subpackage_versions:
     needs: setup
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - run: cargo fmt -- --check
-      - run: cargo test --all-features
-      - run: cargo clippy --all-features
-      - run: cargo check --release
-
-  sync_versions:
-    needs: check
-    runs-on: ubuntu-latest
-    outputs:
-      version: ${{ needs.setup.outputs.version }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - run: cargo install toml-cli || true
-
-      - run: |
-          VERSION="${{ needs.setup.outputs.version }}"
-          echo "Sync version $VERSION to sub crates..."
-
-          for dir in config plugin app init; do
-            toml set $dir/Cargo.toml package.version "$VERSION"
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install toml-cli
+        run: cargo install toml-cli
+      - name: Update subpackage versions
+        run: |
+          VERSION=${{ needs.setup.outputs.version }}
+          for pkg in config plugin app init; do
+            echo "🔧 Updating $pkg/Cargo.toml version to $VERSION"
+            toml set $pkg/Cargo.toml package.version $VERSION --force
           done
 
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          git add -A
-          if [ -n "$(git status --porcelain)" ]; then
-            git commit -m "chore: sync versions to $VERSION"
-            git push origin HEAD:${{ github.ref }}
-          else
-            echo "No version changes"
-          fi
-
-  publish:
-    needs: sync_versions
+  publish_subpackages:
+    needs: update_subpackage_versions
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    strategy:
+      matrix:
+        package: [config, plugin, app, init]
     steps:
-      # IMPORTANT: checkout latest commit after sync
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
         with:
-          fetch-depth: 0
-          ref: ${{ github.ref }}
-
-      - uses: dtolnay/rust-toolchain@stable
-
-      - run: cargo install toml-cli || true
-
-      - name: Verify version consistency
-        run: |
-          ROOT=$(toml get Cargo.toml package.version --raw)
-          for dir in config plugin app init; do
-            SUB=$(toml get $dir/Cargo.toml package.version --raw)
-            if [ "$ROOT" != "$SUB" ]; then
-              echo "Version mismatch: root=$ROOT $dir=$SUB"
-              exit 1
-            fi
-          done
-          echo "All versions consistent: $ROOT"
-
-      - name: Login crates.io
-        run: echo "${{ secrets.CARGO_REGISTRY_TOKEN }}" | cargo login
-
-      - name: Publish crates in order
-        run: |
-          set -e
-          ROOT_DIR=$(pwd)
-          VERSION=$(toml get Cargo.toml package.version --raw)
-
-          publish_if_needed() {
-            DIR=$1
-            cd "$ROOT_DIR/$DIR"
-            NAME=$(toml get Cargo.toml package.name --raw)
-
-            echo "Publishing $NAME v$VERSION..."
-
-            if cargo search "^$NAME$" | grep -q "$VERSION"; then
-              echo "Already published, skipping $NAME"
-            else
-              cargo publish
-            fi
-            cd "$ROOT_DIR"
-          }
-
-          publish_if_needed config
-          publish_if_needed plugin
-          publish_if_needed app
-          publish_if_needed init
-          publish_if_needed .
-
-      - name: Create GitHub Release
+          toolchain: stable
+      - name: Publish ${{ matrix.package }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         run: |
-          VERSION=$(toml get Cargo.toml package.version --raw)
-          NAME=$(toml get Cargo.toml package.name --raw)
+          PACKAGE="${{ matrix.package }}"
+          echo "📦 Publishing $PACKAGE..."
+          (cd $PACKAGE && cargo publish --allow-dirty)
+
+  publish_root:
+    needs: publish_subpackages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+      - name: Publish root package
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: |
+          VERSION=${{ needs.setup.outputs.version }}
+          echo "📦 Publishing root package v$VERSION..."
+          cargo publish --allow-dirty
+
+  git_push:
+    needs: publish_root
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Push tags and commits
+        run: |
+          VERSION=${{ needs.setup.outputs.version }}
           TAG="v$VERSION"
-
-          git tag "$TAG" || true
-          git push origin "$TAG" || true
-
-          gh release create "$TAG" \
-            --title "$TAG" \
-            --notes "Release $TAG
-
-          Package: $NAME
-          Version: $VERSION
-
-          crates.io:
-          https://crates.io/crates/$NAME/$VERSION
-
-          docs.rs:
-          https://docs.rs/$NAME/$VERSION
-          " --latest || \
-          gh release edit "$TAG" --notes "Updated release $TAG"
+          if ! git tag -l | grep -q "^$TAG$"; then
+            git tag $TAG
+          fi
+          git push origin master --tags
+          echo "✅ Pushed commits and tag $TAG to remote"

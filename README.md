@@ -20,7 +20,7 @@
 
 ## Api Docs
 
-- [Api Docs](https://docs.rs/hyperlane/latest/hyperlane/)
+- [Api Docs](https://docs.rs/hyperlane/latest/)
 
 ## Run
 
