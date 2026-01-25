@@ -30,7 +30,7 @@ members = ["app", "config", "init", "plugin"]
 hyperlane_app = { path = "app", version = "9.2.4" }
 hyperlane_config = { path = "config", version = "9.2.5" }
 hyperlane_init = { path = "init", version = "9.2.5" }
-hyperlane_plugin = { path = "plugin", version = "9.2.4" }
+hyperlane_plugin = { path = "plugin", version = "9.2.5" }
 
 tracing = "0.1.44"
 hyperlane = "11.0.10"
