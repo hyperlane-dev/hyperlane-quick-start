@@ -67,9 +67,14 @@ impl ServerHook for ResponseBodyMiddleware {
         Self
     }
 
-    #[response_body(include_str!("../../../resources/templates/index/index.html").replace("{{ time }}", &time()))]
+    #[epilogue_macros(response_body(body))]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {}
+    async fn handle(self, ctx: &Context) {
+        let body: String = tokio::fs::read_to_string("./resources/templates/index/index.html")
+            .await
+            .unwrap()
+            .replace("{{ time }}", &time());
+    }
 }
 
 impl ServerHook for OptionMethodMiddleware {
