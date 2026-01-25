@@ -21,14 +21,20 @@ pub struct PostgreSqlInstanceConfig {
 }
 
 #[derive(Clone, Data, Debug, Default)]
+pub struct RedisInstanceConfig {
+    pub name: String,
+    pub host: String,
+    pub port: usize,
+    pub username: String,
+    pub password: String,
+}
+
+#[derive(Clone, Data, Debug, Default)]
 pub struct EnvConfig {
     pub gpt_api_url: String,
     pub gpt_model: String,
     pub mysql_instances: Vec<MySqlInstanceConfig>,
-    pub redis_host: String,
-    pub redis_port: usize,
-    pub redis_username: String,
-    pub redis_password: String,
+    pub redis_instances: Vec<RedisInstanceConfig>,
     pub postgresql_instances: Vec<PostgreSqlInstanceConfig>,
 }
 

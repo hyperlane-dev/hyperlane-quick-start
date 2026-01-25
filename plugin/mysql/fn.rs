@@ -5,7 +5,7 @@ pub async fn connection_mysql_db(instance_name: &str) -> Result<DatabaseConnecti
     let env: &'static EnvConfig = get_global_env_config();
     let instance: &MySqlInstanceConfig = env
         .get_mysql_instance(instance_name)
-        .ok_or_else(|| format!("MySQL instance '{}' not found", instance_name))?;
+        .ok_or_else(|| format!("MySQL instance '{instance_name}' not found"))?;
     match perform_mysql_auto_creation(instance).await {
         Ok(result) => {
             if result.has_changes() {

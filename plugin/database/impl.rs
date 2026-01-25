@@ -169,8 +169,8 @@ impl AutoCreationConfig {
         if env.postgresql_instances.is_empty() {
             return Err("At least one PostgreSQL instance is required".to_string());
         }
-        if env.redis_host.is_empty() {
-            return Err("Redis host is required".to_string());
+        if env.redis_instances.is_empty() {
+            return Err("At least one Redis instance is required".to_string());
         }
         Ok(())
     }
@@ -222,25 +222,25 @@ impl PluginAutoCreationConfig {
             match plugin_type {
                 PluginType::MySQL => {
                     if let Some(instance) = env.get_default_mysql_instance() {
-                        format!(
-                            "{}:{}:{}",
-                            instance.host, instance.port, instance.database
-                        )
+                        format!("{}:{}:{}", instance.host, instance.port, instance.database)
                     } else {
                         "unknown".to_string()
                     }
                 }
                 PluginType::PostgreSQL => {
                     if let Some(instance) = env.get_default_postgresql_instance() {
-                        format!(
-                            "{}:{}:{}",
-                            instance.host, instance.port, instance.database
-                        )
+                        format!("{}:{}:{}", instance.host, instance.port, instance.database)
                     } else {
                         "unknown".to_string()
                     }
                 }
-                PluginType::Redis => format!("{}:{}", env.redis_host, env.redis_port),
+                PluginType::Redis => {
+                    if let Some(instance) = env.get_default_redis_instance() {
+                        format!("{}:{}", instance.host, instance.port)
+                    } else {
+                        "unknown".to_string()
+                    }
+                }
             }
         } else {
             "unknown".to_string()

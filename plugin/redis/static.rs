@@ -1,4 +1,4 @@
 use super::*;
 
-pub static REDIS_DB: Lazy<Result<Arc<Connection>, String>> =
-    Lazy::new(|| block_on(async { connection_redis_db().await }));
+pub static REDIS_CONNECTIONS: Lazy<RwLock<RedisConnectionMap>> =
+    Lazy::new(|| RwLock::new(HashMap::new()));

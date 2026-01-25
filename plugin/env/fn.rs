@@ -36,7 +36,12 @@ pub fn init_env_config() -> Result<(), String> {
         for instance in &config.mysql_instances {
             info!(
                 "  Instance '{}': {}:{}@{}:{}/{}",
-                instance.name, instance.username, "***", instance.host, instance.port, instance.database
+                instance.name,
+                instance.username,
+                "***",
+                instance.host,
+                instance.port,
+                instance.database
             );
         }
     }
@@ -48,36 +53,34 @@ pub fn init_env_config() -> Result<(), String> {
         for instance in &config.postgresql_instances {
             info!(
                 "  Instance '{}': {}:{}@{}:{}/{}",
-                instance.name, instance.username, "***", instance.host, instance.port, instance.database
+                instance.name,
+                instance.username,
+                "***",
+                instance.host,
+                instance.port,
+                instance.database
             );
         }
     }
 
     info!("Redis Configuration:");
-    info!(
-        "  Host: {}",
-        if config.redis_host.is_empty() {
-            "(not set)"
-        } else {
-            &config.redis_host
+    if config.redis_instances.is_empty() {
+        info!("  (no Redis instances configured)");
+    } else {
+        for instance in &config.redis_instances {
+            info!(
+                "  Instance '{}': {}:{}@{}:{}",
+                instance.name,
+                if instance.username.is_empty() {
+                    "(none)"
+                } else {
+                    &instance.username
+                },
+                "***",
+                instance.host,
+                instance.port
+            );
         }
-    );
-    info!("  Port: {}", config.redis_port);
-    info!(
-        "  Username: {}",
-        if config.redis_username.is_empty() {
-            "(not set)"
-        } else {
-            &config.redis_username
-        }
-    );
-    info!(
-        "  Password: {}",
-        if config.redis_password.is_empty() {
-            "(not set)"
-        } else {
-            "***"
-        }
-    );
+    }
     Ok(())
 }

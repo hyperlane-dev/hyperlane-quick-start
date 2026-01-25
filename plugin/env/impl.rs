@@ -32,6 +32,19 @@ impl PostgreSqlInstanceConfig {
     }
 }
 
+impl RedisInstanceConfig {
+    pub fn get_connection_url(&self) -> String {
+        if self.username.is_empty() {
+            format!("redis://:{}@{}:{}", self.password, self.host, self.port)
+        } else {
+            format!(
+                "redis://{}:{}@{}:{}",
+                self.username, self.password, self.host, self.port
+            )
+        }
+    }
+}
+
 impl EnvConfig {
     pub fn get_mysql_instance(&self, name: &str) -> Option<&MySqlInstanceConfig> {
         self.mysql_instances
@@ -76,6 +89,26 @@ impl EnvConfig {
         self.postgresql_instances.first()
     }
 
+    pub fn get_redis_instance(&self, name: &str) -> Option<&RedisInstanceConfig> {
+        self.redis_instances
+            .iter()
+            .find(|instance| instance.name == name)
+    }
+
+    pub fn get_redis_instance_mut(&mut self, name: &str) -> Option<&mut RedisInstanceConfig> {
+        self.redis_instances
+            .iter_mut()
+            .find(|instance| instance.name == name)
+    }
+
+    pub fn add_redis_instance(&mut self, instance: RedisInstanceConfig) {
+        self.redis_instances.push(instance);
+    }
+
+    pub fn get_default_redis_instance(&self) -> Option<&RedisInstanceConfig> {
+        self.redis_instances.first()
+    }
+
     #[instrument_trace]
     pub fn load() -> Result<Self, String> {
         let docker_config: DockerComposeConfig =
@@ -93,9 +126,11 @@ impl EnvConfig {
         let get_env_usize = |key: &str| -> Option<usize> {
             std::env::var(key).ok().and_then(|value| value.parse().ok())
         };
-        let mut config: EnvConfig = EnvConfig::default();
-        config.gpt_api_url = get_env(ENV_KEY_GPT_API_URL).unwrap_or_default();
-        config.gpt_model = get_env(ENV_KEY_GPT_MODEL).unwrap_or_default();
+        let mut config: EnvConfig = EnvConfig {
+            gpt_api_url: get_env(ENV_KEY_GPT_API_URL).unwrap_or_default(),
+            gpt_model: get_env(ENV_KEY_GPT_MODEL).unwrap_or_default(),
+            ..Default::default()
+        };
         let default_mysql_host =
             get_env(ENV_KEY_MYSQL_HOST).unwrap_or_else(|| DEFAULT_DB_HOST.to_string());
         let default_mysql_port = docker_config
@@ -205,22 +240,52 @@ impl EnvConfig {
                 break;
             }
         }
-        config.redis_host =
+        let default_redis_host: String =
             get_env(ENV_KEY_REDIS_HOST).unwrap_or_else(|| DEFAULT_DB_HOST.to_string());
-        config.redis_port = docker_config
+        let default_redis_port: usize = docker_config
             .try_get_redis_port()
             .or_else(|| get_env_usize(ENV_KEY_REDIS_PORT))
             .unwrap_or(DEFAULT_REDIS_PORT);
-        config.redis_username = docker_config
+        let default_redis_username = docker_config
             .try_get_redis_username()
             .clone()
             .or_else(|| get_env(ENV_KEY_REDIS_USERNAME))
             .unwrap_or_default();
-        config.redis_password = docker_config
+        let default_redis_password = docker_config
             .try_get_redis_password()
             .clone()
             .or_else(|| get_env(ENV_KEY_REDIS_PASSWORD))
             .unwrap_or_default();
+        let instance: RedisInstanceConfig = RedisInstanceConfig {
+            name: DEFAULT_REDIS_INSTANCE_NAME.to_string(),
+            host: default_redis_host,
+            port: default_redis_port,
+            username: default_redis_username,
+            password: default_redis_password,
+        };
+        config.redis_instances.push(instance);
+        let mut instance_index: usize = 1;
+        loop {
+            let prefix: String = format!("REDIS_{instance_index}_");
+            let host_key: String = format!("{prefix}HOST");
+            if let Some(host) = get_env(&host_key) {
+                let port_key: String = format!("{prefix}PORT");
+                let username_key: String = format!("{prefix}USERNAME");
+                let password_key: String = format!("{prefix}PASSWORD");
+                let instance_name: String = format!("redis_{instance_index}");
+                let instance: RedisInstanceConfig = RedisInstanceConfig {
+                    name: instance_name,
+                    host,
+                    port: get_env_usize(&port_key).unwrap_or(DEFAULT_REDIS_PORT),
+                    username: get_env(&username_key).unwrap_or_default(),
+                    password: get_env(&password_key).unwrap_or_default(),
+                };
+                config.redis_instances.push(instance);
+                instance_index += 1;
+            } else {
+                break;
+            }
+        }
         Ok(config)
     }
 

@@ -5,7 +5,7 @@ pub use r#struct::*;
 
 use {super::*, mapper::redis::*, model::param::redis::*};
 
-use hyperlane_plugin::redis::*;
+use hyperlane_plugin::redis::{DEFAULT_REDIS_INSTANCE_NAME, get_redis_connection};
 
 use std::sync::Arc;
 

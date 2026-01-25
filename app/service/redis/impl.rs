@@ -3,7 +3,7 @@ use super::*;
 impl RedisService {
     #[instrument_trace]
     pub async fn create_redis_record(record: RedisRecord) -> Result<(), String> {
-        let conn_arc: Arc<Connection> = get_redis_connection().await?;
+        let conn_arc: Arc<Connection> = get_redis_connection(DEFAULT_REDIS_INSTANCE_NAME).await?;
         let dao: RedisRecordDao = RedisRecordDao {
             key: record.get_key().clone(),
             value: record.get_value().clone(),
@@ -17,7 +17,7 @@ impl RedisService {
 
     #[instrument_trace]
     pub async fn get_all_redis_records(keys: Vec<String>) -> Result<Vec<RedisRecord>, String> {
-        let conn_arc: Arc<Connection> = get_redis_connection().await?;
+        let conn_arc: Arc<Connection> = get_redis_connection(DEFAULT_REDIS_INSTANCE_NAME).await?;
         let mut conn: Connection = Arc::try_unwrap(conn_arc)
             .map_err(|_| "Failed to get exclusive access to connection")?;
         let values: Vec<String> =
@@ -36,7 +36,7 @@ impl RedisService {
 
     #[instrument_trace]
     pub async fn update_redis_record(record: RedisRecord) -> Result<(), String> {
-        let conn_arc: Arc<Connection> = get_redis_connection().await?;
+        let conn_arc: Arc<Connection> = get_redis_connection(DEFAULT_REDIS_INSTANCE_NAME).await?;
         let mut conn: Connection = Arc::try_unwrap(conn_arc)
             .map_err(|_| "Failed to get exclusive access to connection")?;
         let _: () = Commands::set(&mut conn, record.get_key(), record.get_value())
@@ -46,7 +46,7 @@ impl RedisService {
 
     #[instrument_trace]
     pub async fn delete_redis_record(key: &str) -> Result<(), String> {
-        let conn_arc: Arc<Connection> = get_redis_connection().await?;
+        let conn_arc: Arc<Connection> = get_redis_connection(DEFAULT_REDIS_INSTANCE_NAME).await?;
         let mut conn: Connection = Arc::try_unwrap(conn_arc)
             .map_err(|_| "Failed to get exclusive access to connection")?;
         let _: () = Commands::del(&mut conn, key).map_err(|error: RedisError| error.to_string())?;

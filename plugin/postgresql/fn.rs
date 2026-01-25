@@ -5,7 +5,7 @@ pub async fn connection_postgresql_db(instance_name: &str) -> Result<DatabaseCon
     let env: &'static EnvConfig = get_global_env_config();
     let instance: &PostgreSqlInstanceConfig = env
         .get_postgresql_instance(instance_name)
-        .ok_or_else(|| format!("PostgreSQL instance '{}' not found", instance_name))?;
+        .ok_or_else(|| format!("PostgreSQL instance '{instance_name}' not found"))?;
     match perform_postgresql_auto_creation(instance).await {
         Ok(result) => {
             if result.has_changes() {

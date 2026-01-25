@@ -63,22 +63,31 @@ pub async fn initialize_auto_creation() -> Result<(), String> {
             }
         }
     }
-    match redis::perform_redis_auto_creation().await {
-        Ok(result) => {
-            initialization_results.push(format!(
-                "Redis: {}",
-                if result.has_changes() {
-                    "initialized with changes"
-                } else {
-                    "verified"
-                }
-            ));
-        }
-        Err(error) => {
-            if !error.should_continue() {
-                return Err(format!("Redis auto-creation failed: {error}"));
+    for instance in &env.redis_instances {
+        match redis::perform_redis_auto_creation(instance).await {
+            Ok(result) => {
+                initialization_results.push(format!(
+                    "Redis ({}) : {}",
+                    instance.name,
+                    if result.has_changes() {
+                        "initialized with changes"
+                    } else {
+                        "verified"
+                    }
+                ));
             }
-            initialization_results.push(format!("Redis: failed but continuing ({error})"));
+            Err(error) => {
+                if !error.should_continue() {
+                    return Err(format!(
+                        "Redis ({}) auto-creation failed: {error}",
+                        instance.name
+                    ));
+                }
+                initialization_results.push(format!(
+                    "Redis ({}) : failed but continuing ({error})",
+                    instance.name
+                ));
+            }
         }
     }
     if initialization_results.is_empty() {

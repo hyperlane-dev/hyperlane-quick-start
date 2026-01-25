@@ -3,8 +3,12 @@ use super::*;
 impl Default for RedisAutoCreation {
     #[instrument_trace]
     fn default() -> Self {
-        Self {
-            env: get_global_env_config(),
+        let env: &'static EnvConfig = get_global_env_config();
+        if let Some(instance) = env.get_default_redis_instance() {
+            Self::new(instance.clone())
+        } else {
+            let default_instance: RedisInstanceConfig = RedisInstanceConfig::default();
+            Self::new(default_instance)
         }
     }
 }
@@ -12,22 +16,7 @@ impl Default for RedisAutoCreation {
 impl RedisAutoCreation {
     #[instrument_trace]
     async fn create_mutable_connection(&self) -> Result<Connection, AutoCreationError> {
-        let db_url: String = if self.env.get_redis_username().is_empty() {
-            format!(
-                "redis://:{}@{}:{}",
-                self.env.get_redis_password(),
-                self.env.get_redis_host(),
-                self.env.get_redis_port()
-            )
-        } else {
-            format!(
-                "redis://{}:{}@{}:{}",
-                self.env.get_redis_username(),
-                self.env.get_redis_password(),
-                self.env.get_redis_host(),
-                self.env.get_redis_port()
-            )
-        };
+        let db_url: String = self.instance.get_connection_url();
         let client: Client = Client::open(db_url).map_err(|error: redis::RedisError| {
             let error_msg: String = error.to_string();
             if error_msg.contains("authentication failed") || error_msg.contains("NOAUTH") {
@@ -90,7 +79,7 @@ impl RedisAutoCreation {
         if info.contains("redis_version:") {
             AutoCreationLogger::log_connection_verification(
                 database::PluginType::Redis,
-                "default",
+                &self.instance.name,
                 true,
                 None,
             )
@@ -103,18 +92,19 @@ impl RedisAutoCreation {
     async fn setup_redis_namespace(&self) -> Result<Vec<String>, AutoCreationError> {
         let mut setup_operations: Vec<String> = Vec::new();
         let mut conn: Connection = self.create_mutable_connection().await?;
-        let app_key: &str = "hyperlane:initialized";
+        let app_key: String = format!("{}:initialized", self.instance.name);
         let init_value: &str = "true";
-        let exists: i32 = redis::cmd("EXISTS").arg(app_key).query(&mut conn).map_err(
-            |error: redis::RedisError| {
+        let exists: i32 = redis::cmd("EXISTS")
+            .arg(&app_key)
+            .query(&mut conn)
+            .map_err(|error: redis::RedisError| {
                 AutoCreationError::DatabaseError(format!(
                     "Failed to check Redis key existence: {error}"
                 ))
-            },
-        )?;
+            })?;
         if exists == 0 {
             let _: () = redis::cmd("SET")
-                .arg(app_key)
+                .arg(&app_key)
                 .arg(init_value)
                 .query(&mut conn)
                 .map_err(|error: redis::RedisError| {
@@ -122,10 +112,10 @@ impl RedisAutoCreation {
                         "Failed to set Redis initialization key: {error}"
                     ))
                 })?;
-            setup_operations.push("hyperlane:initialized".to_string());
-            let config_key: &str = "hyperlane:config:version";
+            setup_operations.push(app_key.clone());
+            let config_key: String = format!("{}:config:version", self.instance.name);
             let _: () = redis::cmd("SET")
-                .arg(config_key)
+                .arg(&config_key)
                 .arg("1.0.0")
                 .query(&mut conn)
                 .map_err(|error: redis::RedisError| {
@@ -133,7 +123,7 @@ impl RedisAutoCreation {
                         "Failed to set Redis config key: {error}"
                     ))
                 })?;
-            setup_operations.push("hyperlane:config:version".to_string());
+            setup_operations.push(config_key);
         }
         Ok(setup_operations)
     }
@@ -143,7 +133,8 @@ impl DatabaseAutoCreation for RedisAutoCreation {
     #[instrument_trace]
     async fn create_database_if_not_exists(&self) -> Result<bool, AutoCreationError> {
         self.validate_redis_server().await?;
-        AutoCreationLogger::log_database_exists("default", database::PluginType::Redis).await;
+        AutoCreationLogger::log_database_exists(&self.instance.name, database::PluginType::Redis)
+            .await;
         Ok(false)
     }
 
@@ -153,13 +144,17 @@ impl DatabaseAutoCreation for RedisAutoCreation {
         if !setup_operations.is_empty() {
             AutoCreationLogger::log_tables_created(
                 &setup_operations,
-                "default",
+                &self.instance.name,
                 database::PluginType::Redis,
             )
             .await;
         } else {
-            AutoCreationLogger::log_tables_created(&[], "default", database::PluginType::Redis)
-                .await;
+            AutoCreationLogger::log_tables_created(
+                &[],
+                &self.instance.name,
+                database::PluginType::Redis,
+            )
+            .await;
         }
         Ok(setup_operations)
     }
@@ -170,7 +165,7 @@ impl DatabaseAutoCreation for RedisAutoCreation {
             Ok(_) => {
                 AutoCreationLogger::log_connection_verification(
                     database::PluginType::Redis,
-                    "default",
+                    &self.instance.name,
                     true,
                     None,
                 )
@@ -180,7 +175,7 @@ impl DatabaseAutoCreation for RedisAutoCreation {
             Err(error) => {
                 AutoCreationLogger::log_connection_verification(
                     database::PluginType::Redis,
-                    "default",
+                    &self.instance.name,
                     false,
                     Some(&error.to_string()),
                 )
