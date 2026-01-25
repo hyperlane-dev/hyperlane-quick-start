@@ -121,6 +121,10 @@ jobs:
           key: toml-cli-${{ runner.os }}
       - name: Install cargo-release
         run: cargo install cargo-release
+      - name: Configure git
+        run: |
+          git config user.name "eastspire"
+          git config user.email "root@ltpp.vip"
       - name: Publish to crates.io
         id: publish
         env:
