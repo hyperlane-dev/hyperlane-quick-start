@@ -48,11 +48,6 @@ hyperlane_config = { path = "config" }
 hyperlane_init = { path = "init" }
 hyperlane_plugin = { path = "plugin" }
 
-[release]
-workspace = true
-execute = true
-no_confirm = true
-
 [profile.dev]
 incremental = true
 opt-level = 1
