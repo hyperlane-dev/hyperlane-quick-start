@@ -10,6 +10,8 @@ pub mod service;
 pub mod utils;
 pub mod view;
 
+use hyperlane_resources::*;
+
 use {
     chrono::{NaiveDateTime, Utc},
     hyperlane::*,

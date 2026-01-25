@@ -1,11 +1,11 @@
 [package]
 name = "hyperlane_app"
-version = "9.2.5"
+version = "9.2.11"
 readme = "README.md"
 edition = "2024"
 authors = ["root@ltpp.vip"]
 license = "MIT"
-description = "Hyperlane application"
+description = """Hyperlane application module containing core application logic, controllers, services, and middleware components."""
 keywords = ["http", "request", "response", "tcp", "cross-platform"]
 repository = "https://github.com/hyperlane-dev/hyperlane-quick-start.git"
 categories = ["network-programming", "web-programming"]
@@ -20,6 +20,7 @@ workspace = true
 [dependencies]
 hyperlane_config = { workspace = true }
 hyperlane_plugin = { workspace = true }
+hyperlane_resources = { workspace = true }
 
 serde = { workspace = true }
 tracing = { workspace = true }

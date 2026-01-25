@@ -68,7 +68,7 @@ impl ServerHook for ResponseBodyMiddleware {
         Self
     }
 
-    #[response_body(format!("{HYPERLANE}{COLON_SPACE}{}", time()))]
+    #[epilogue_macros(response_body(TEMPLATES_INDEX_HTML.replace("{{ time }}", &time())))]
     #[instrument_trace]
     async fn handle(self, ctx: &Context) {}
 }

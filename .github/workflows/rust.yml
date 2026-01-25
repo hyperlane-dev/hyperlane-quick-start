@@ -136,6 +136,7 @@ jobs:
           PACKAGE_NAME=$(toml get Cargo.toml package.name --raw)
           VERSION=${{ needs.setup.outputs.version }}
           PACKAGES=(
+            hyperlane_resources
             hyperlane_config
             hyperlane_plugin
             hyperlane_app

@@ -1,11 +1,11 @@
 [package]
-name = "hyperlane_config"
+name = "hyperlane_resources"
 version = "9.2.11"
 readme = "README.md"
 edition = "2024"
 authors = ["root@ltpp.vip"]
 license = "MIT"
-description = """Hyperlane configuration module providing comprehensive configuration management capabilities for the framework."""
+description = """Hyperlane resources module containing various resources and utilities used by the framework."""
 keywords = ["http", "request", "response", "tcp", "cross-platform"]
 repository = "https://github.com/hyperlane-dev/hyperlane-quick-start.git"
 categories = ["network-programming", "web-programming"]
@@ -13,9 +13,6 @@ exclude = ["target", "Cargo.lock", ".github", "tmp", "**/*.pid", "**/*.log"]
 
 [lib]
 path = "lib.rs"
-
-[lints]
-workspace = true
 
 [dependencies]
 serde = { workspace = true }
