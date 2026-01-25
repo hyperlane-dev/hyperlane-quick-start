@@ -1673,7 +1673,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_init"
-version = "9.2.6"
+version = "9.2.10"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
