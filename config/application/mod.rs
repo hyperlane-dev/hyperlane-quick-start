@@ -3,11 +3,9 @@ pub mod dataset;
 pub mod hello;
 pub mod logger;
 pub mod logo_img;
-pub mod not_found;
 pub mod root;
 pub mod shortlink;
 pub mod static_resource;
-pub mod templates;
 pub mod upload;
 
 use super::*;
