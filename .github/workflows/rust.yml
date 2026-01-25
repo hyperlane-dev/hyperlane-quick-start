@@ -31,6 +31,8 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: Install toml-cli
         run: cargo install toml-cli
+      - name: Install cargo-release
+        run: cargo install cargo-release
       - name: Cache toml-cli
         uses: actions/cache@v3
         with:
@@ -136,7 +138,7 @@ jobs:
           )
           for pkg in "${PACKAGES[@]}"; do
             echo "🚀 Releasing $pkg v$VERSION"
-            if cargo release "$VERSION" --package "$pkg" --execute; then
+            if cargo release "$VERSION" --package "$pkg" --execute --no-confirm; then
               echo "✅ $pkg release success"
             else
               echo "⚠️ $pkg release failed, continue to next package"
