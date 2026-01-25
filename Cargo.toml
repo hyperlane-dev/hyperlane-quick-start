@@ -24,7 +24,7 @@ exclude = [
 
 [workspace]
 resolver = "3"
-members = ["./"]
+members = ["app", "config", "init", "plugin"]
 
 [workspace.dependencies]
 hyperlane_app = { path = "app", version = "9.2.4" }
