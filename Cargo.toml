@@ -65,3 +65,6 @@ panic = "unwind"
 debug = false
 codegen-units = 1
 strip = "debuginfo"
+workspace = true
+execute = true
+no_confirm = true
