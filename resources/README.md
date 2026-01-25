@@ -12,7 +12,7 @@
 
 </center>
 
-> Hyperlane resources
+> Hyperlane resources module containing various resources and utilities used by the framework.
 
 ## License
 
