@@ -1697,7 +1697,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_resources"
-version = "9.2.13"
+version = "9.3.0"
 
 [[package]]
 name = "iana-time-zone"
