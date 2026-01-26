@@ -117,11 +117,12 @@ impl EnvConfig {
             let mut data: String = String::new();
             data.push_str(&format!("{ENV_KEY_GPT_API_URL}={BR}"));
             data.push_str(&format!("{ENV_KEY_GPT_MODEL}={BR}"));
-            write_to_file(ENV_FILE_PATH, data.as_bytes())
-                .map_err(|error| format!("Failed to create example env file: {error}"))?;
+            write_to_file(ENV_FILE_PATH, data.as_bytes()).map_err(|error| {
+                format!("Failed to create example env file{COLON_SPACE}{error}")
+            })?;
         }
         dotenvy::from_path(ENV_FILE_PATH)
-            .map_err(|error| format!("Failed to load env file: {error}"))?;
+            .map_err(|error| format!("Failed to load env file{COLON_SPACE}{error}"))?;
         let get_env = |key: &str| -> Option<String> { std::env::var(key).ok() };
         let get_env_usize = |key: &str| -> Option<usize> {
             std::env::var(key).ok().and_then(|value| value.parse().ok())
@@ -292,9 +293,9 @@ impl EnvConfig {
     #[instrument_trace]
     fn load_from_docker_compose() -> Result<DockerComposeConfig, String> {
         let docker_compose_content: Vec<u8> = read_from_file(DOCKER_COMPOSE_FILE_PATH)
-            .map_err(|error| format!("Failed to read docker-compose.yml: {error}"))?;
+            .map_err(|error| format!("Failed to read docker-compose.yml{COLON_SPACE}{error}"))?;
         let yaml: serde_yaml::Value = serde_yaml::from_slice(&docker_compose_content)
-            .map_err(|error| format!("Failed to parse docker-compose.yml: {error}"))?;
+            .map_err(|error| format!("Failed to parse docker-compose.yml{COLON_SPACE}{error}"))?;
         let mut config: DockerComposeConfig = DockerComposeConfig::default();
         if let Some(mysql) = yaml
             .get(DOCKER_YAML_SERVICES)

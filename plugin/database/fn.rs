@@ -4,7 +4,7 @@ use super::*;
 pub async fn initialize_auto_creation() -> Result<(), String> {
     if let Err(error) = AutoCreationConfig::validate() {
         return Err(format!(
-            "Auto-creation configuration validation failed: {error}"
+            "Auto-creation configuration validation failed{COLON_SPACE}{error}"
         ));
     }
     let env: &'static EnvConfig = get_global_env_config();
@@ -13,7 +13,7 @@ pub async fn initialize_auto_creation() -> Result<(), String> {
         match mysql::perform_mysql_auto_creation(instance).await {
             Ok(result) => {
                 initialization_results.push(format!(
-                    "MySQL ({}) : {}",
+                    "MySQL ({}) {COLON_SPACE}{}",
                     instance.name,
                     if result.has_changes() {
                         "initialized with changes"
@@ -25,7 +25,7 @@ pub async fn initialize_auto_creation() -> Result<(), String> {
             Err(error) => {
                 if !error.should_continue() {
                     return Err(format!(
-                        "MySQL ({}) auto-creation failed: {error}",
+                        "MySQL ({}) auto-creation failed{COLON_SPACE}{error}",
                         instance.name
                     ));
                 }
@@ -40,7 +40,7 @@ pub async fn initialize_auto_creation() -> Result<(), String> {
         match postgresql::perform_postgresql_auto_creation(instance).await {
             Ok(result) => {
                 initialization_results.push(format!(
-                    "PostgreSQL ({}) : {}",
+                    "PostgreSQL ({}) {COLON_SPACE}{}",
                     instance.name,
                     if result.has_changes() {
                         "initialized with changes"
@@ -52,7 +52,7 @@ pub async fn initialize_auto_creation() -> Result<(), String> {
             Err(error) => {
                 if !error.should_continue() {
                     return Err(format!(
-                        "PostgreSQL ({}) auto-creation failed: {error}",
+                        "PostgreSQL ({}) auto-creation failed{COLON_SPACE}{error}",
                         instance.name
                     ));
                 }
@@ -67,7 +67,7 @@ pub async fn initialize_auto_creation() -> Result<(), String> {
         match redis::perform_redis_auto_creation(instance).await {
             Ok(result) => {
                 initialization_results.push(format!(
-                    "Redis ({}) : {}",
+                    "Redis ({}) {COLON_SPACE}{}",
                     instance.name,
                     if result.has_changes() {
                         "initialized with changes"
@@ -79,7 +79,7 @@ pub async fn initialize_auto_creation() -> Result<(), String> {
             Err(error) => {
                 if !error.should_continue() {
                     return Err(format!(
-                        "Redis ({}) auto-creation failed: {error}",
+                        "Redis ({}) auto-creation failed{COLON_SPACE}{error}",
                         instance.name
                     ));
                 }
@@ -94,7 +94,7 @@ pub async fn initialize_auto_creation() -> Result<(), String> {
         info!("[AUTO-CREATION] No plugins enabled for auto-creation");
     } else {
         let results_summary: String = initialization_results.join(", ");
-        info!("[AUTO-CREATION] Initialization complete: {results_summary}");
+        info!("[AUTO-CREATION] Initialization complete{COLON_SPACE}{results_summary}");
     }
     Ok(())
 }
