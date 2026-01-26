@@ -156,7 +156,7 @@ impl ChatService {
                 ChatDomain::update_session(session);
                 format!("{MENTION_PREFIX}{session_id}{SPACE}{gpt_response}")
             }
-            Err(error) => format!("API call failed: {error}"),
+            Err(error) => format!("API call failed{COLON_SPACE}{error}"),
         };
         let gpt_resp_data: WebSocketRespData =
             WebSocketRespData::from(MessageType::GptResponse, &ctx, &api_response).await;
@@ -179,7 +179,7 @@ impl ChatService {
             .await;
             if save_res.is_err() {
                 error!(
-                    "Failed to save GPT response for session {session_id_clone}: {}",
+                    "Failed to save GPT response for session {session_id_clone}{COLON_SPACE}{}",
                     save_res.err().unwrap_or_default()
                 );
             }
@@ -233,7 +233,7 @@ impl ChatService {
             .and_then(|errors| errors.get(0))
             .and_then(|error| error.get(JSON_FIELD_MESSAGE))
             .and_then(|message| message.as_str())
-            .map(|msg| format!("API error: {msg}"))
+            .map(|msg| format!("API error{COLON_SPACE}{msg}"))
             .or_else(|| Some("API error: Unknown error".to_string()))
     }
 
@@ -247,7 +247,7 @@ impl ChatService {
         }
         let response_json: serde_json::Value =
             serde_json::from_str(response_text).map_err(|error| {
-                format!("JSON parsing failed: {error} (response content: {response_text})",)
+                format!("JSON parsing failed{COLON_SPACE}{error} (response content{COLON_SPACE}{response_text})",)
             })?;
         if let Some(content) = Self::extract_response_content(&response_json) {
             return Ok(content);
@@ -255,7 +255,7 @@ impl ChatService {
         if let Some(error) = Self::extract_error_message(&response_json) {
             return Err(error);
         }
-        Err(format!("Incorrect API response format: {response_text}"))
+        Err(format!("Incorrect API response format{COLON_SPACE}{response_text}"))
     }
 
     #[instrument_trace]
@@ -290,7 +290,7 @@ impl ChatService {
                 let response_text: String = response.text().get_body();
                 Self::handle_gpt_api_response(&response_text)
             }
-            Err(error) => Err(format!("Request sending failed: {error}")),
+            Err(error) => Err(format!("Request sending failed{COLON_SPACE}{error}")),
         }
     }
 
@@ -335,7 +335,7 @@ impl ChatService {
                 .await;
                 if save_res.is_err() {
                     error!(
-                        "Failed to save message for session {session_id}: {}",
+                        "Failed to save message for session {session_id}{COLON_SPACE}{}",
                         save_res.err().unwrap_or_default()
                     );
                 }

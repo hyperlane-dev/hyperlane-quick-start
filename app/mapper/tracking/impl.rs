@@ -21,7 +21,7 @@ impl TrackingMapper {
     #[instrument_trace]
     pub async fn insert(record: TrackingRecord) -> Result<(), DbErr> {
         let headers_json: String = serde_json::to_string(&record.headers)
-            .map_err(|error| DbErr::Custom(format!("Failed to serialize headers: {error}")))?;
+            .map_err(|error| DbErr::Custom(format!("Failed to serialize headers{COLON_SPACE}{error}")))?;
         spawn(async move {
             let active_model: ActiveModel = ActiveModel {
                 socket_addr: ActiveValue::Set(record.socket_addr),

@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane_plugin"
-version = "9.2.13"
+version = "9.3.0"
 readme = "README.md"
 edition = "2024"
 authors = ["root@ltpp.vip"]

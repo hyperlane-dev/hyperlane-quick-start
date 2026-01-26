@@ -21,14 +21,16 @@ impl MySqlAutoCreation {
             let error_msg: String = error.to_string();
             if error_msg.contains("Access denied") || error_msg.contains("permission") {
                 AutoCreationError::InsufficientPermissions(format!(
-                    "Cannot connect to MySQL server for database creation: {error_msg}"
+                    "Cannot connect to MySQL server for database creation{COLON_SPACE}{error_msg}"
                 ))
             } else if error_msg.contains("timeout") || error_msg.contains("Connection refused") {
                 AutoCreationError::ConnectionFailed(format!(
-                    "Cannot connect to MySQL server: {error_msg}"
+                    "Cannot connect to MySQL server{COLON_SPACE}{error_msg}"
                 ))
             } else {
-                AutoCreationError::DatabaseError(format!("MySQL connection error: {error_msg}"))
+                AutoCreationError::DatabaseError(format!(
+                    "MySQL connection error{COLON_SPACE}{error_msg}"
+                ))
             }
         })
     }
@@ -46,7 +48,7 @@ impl MySqlAutoCreation {
         match connection.query_all(statement).await {
             Ok(results) => Ok(!results.is_empty()),
             Err(error) => Err(AutoCreationError::DatabaseError(format!(
-                "Failed to check if database exists: {error}"
+                "Failed to check if database exists{COLON_SPACE}{error}"
             ))),
         }
     }
@@ -82,12 +84,12 @@ impl MySqlAutoCreation {
                 let error_msg: String = error.to_string();
                 if error_msg.contains("Access denied") || error_msg.contains("permission") {
                     Err(AutoCreationError::InsufficientPermissions(format!(
-                        "Cannot create MySQL database '{}': {}",
+                        "Cannot create MySQL database '{}'{COLON_SPACE}{}",
                         self.instance.database, error_msg
                     )))
                 } else {
                     Err(AutoCreationError::DatabaseError(format!(
-                        "Failed to create MySQL database '{}': {}",
+                        "Failed to create MySQL database '{}'{COLON_SPACE}{}",
                         self.instance.database, error_msg
                     )))
                 }
@@ -100,27 +102,31 @@ impl MySqlAutoCreation {
         let db_url: String = self.instance.get_connection_url();
         Database::connect(&db_url).await.map_err(|error: DbErr| {
             AutoCreationError::ConnectionFailed(format!(
-                "Cannot connect to MySQL database '{}': {}",
+                "Cannot connect to MySQL database '{}'{COLON_SPACE}{}",
                 self.instance.database, error
             ))
         })
     }
 
     #[instrument_trace]
-    async fn table_exists(
+    async fn table_exists<T>(
         &self,
         connection: &DatabaseConnection,
-        table_name: &str,
-    ) -> Result<bool, AutoCreationError> {
+        table_name: T,
+    ) -> Result<bool, AutoCreationError>
+    where
+        T: AsRef<str>,
+    {
+        let table_name_str: &str = table_name.as_ref();
         let query: String = format!(
-            "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{}' AND TABLE_NAME = '{table_name}'",
+            "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{}' AND TABLE_NAME = '{table_name_str}'",
             self.instance.database
         );
         let statement: Statement = Statement::from_string(DatabaseBackend::MySql, query);
         match connection.query_all(statement).await {
             Ok(results) => Ok(!results.is_empty()),
             Err(error) => Err(AutoCreationError::DatabaseError(format!(
-                "Failed to check if table '{table_name}' exists: {error}"
+                "Failed to check if table '{table_name_str}' exists{COLON_SPACE}{error}"
             ))),
         }
     }
@@ -139,12 +145,12 @@ impl MySqlAutoCreation {
                 let error_msg: String = error.to_string();
                 if error_msg.contains("Access denied") || error_msg.contains("permission") {
                     Err(AutoCreationError::InsufficientPermissions(format!(
-                        "Cannot create MySQL table '{}': {}",
+                        "Cannot create MySQL table '{}'{COLON_SPACE}{}",
                         table.name, error_msg
                     )))
                 } else {
                     Err(AutoCreationError::SchemaError(format!(
-                        "Failed to create MySQL table '{}': {}",
+                        "Failed to create MySQL table '{}'{COLON_SPACE}{}",
                         table.name, error_msg
                     )))
                 }
@@ -153,16 +159,19 @@ impl MySqlAutoCreation {
     }
 
     #[instrument_trace]
-    async fn execute_sql(
+    async fn execute_sql<S>(
         &self,
         connection: &DatabaseConnection,
-        sql: &str,
-    ) -> Result<(), AutoCreationError> {
-        let statement: Statement = Statement::from_string(DatabaseBackend::MySql, sql.to_string());
+        sql: S,
+    ) -> Result<(), AutoCreationError>
+    where
+        S: AsRef<str>,
+    {
+        let statement: Statement = Statement::from_string(DatabaseBackend::MySql, sql.as_ref());
         match connection.execute(statement).await {
             Ok(_) => Ok(()),
             Err(error) => Err(AutoCreationError::DatabaseError(format!(
-                "Failed to execute SQL: {error}"
+                "Failed to execute SQL{COLON_SPACE}{error}"
             ))),
         }
     }
@@ -246,10 +255,9 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
         let db_url: String = self.instance.get_connection_url();
         let connection: DatabaseConnection = Database::connect(&db_url).await.map_err(|error| {
             AutoCreationError::ConnectionFailed(format!(
-                "Failed to verify MySQL connection: {error}"
+                "Failed to verify MySQL connection{COLON_SPACE}{error}"
             ))
         })?;
-
         let statement: Statement =
             Statement::from_string(DatabaseBackend::MySql, "SELECT 1".to_string());
         match connection.query_all(statement).await {
@@ -275,7 +283,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                 )
                 .await;
                 Err(AutoCreationError::ConnectionFailed(format!(
-                    "MySQL connection verification failed: {error_msg}"
+                    "MySQL connection verification failed{COLON_SPACE}{error_msg}"
                 )))
             }
         }

@@ -48,7 +48,7 @@ impl LogService {
             })
             .map_err(|_| {
                 format!(
-                    "Failed to read file: {}",
+                    "Failed to read file{COLON_SPACE}{}",
                     full_path.to_str().unwrap_or("invalid path")
                 )
             })
@@ -74,7 +74,7 @@ impl LogService {
     pub async fn read_log_file(level: Level) -> String {
         let log_dir: PathBuf = Path::new(SERVER_LOG_DIR).join(level.to_string().to_lowercase());
         if !log_dir.exists() {
-            return format!("Log directory not found: {}", log_dir.display());
+            return format!("Log directory not found{COLON_SPACE}{}", log_dir.display());
         }
         let level_string: String = level.to_string();
         let log_dir_string: String = log_dir.display().to_string();

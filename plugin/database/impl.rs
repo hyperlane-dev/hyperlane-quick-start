@@ -60,11 +60,13 @@ impl std::fmt::Display for AutoCreationError {
     #[instrument_trace]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::InsufficientPermissions(msg) => write!(f, "Insufficient permissions: {msg}"),
-            Self::ConnectionFailed(msg) => write!(f, "Connection failed: {msg}"),
-            Self::SchemaError(msg) => write!(f, "Schema error: {msg}"),
-            Self::Timeout(msg) => write!(f, "Timeout: {msg}"),
-            Self::DatabaseError(msg) => write!(f, "Database error: {msg}"),
+            Self::InsufficientPermissions(msg) => {
+                write!(f, "Insufficient permissions{COLON_SPACE}{msg}")
+            }
+            Self::ConnectionFailed(msg) => write!(f, "Connection failed{COLON_SPACE}{msg}"),
+            Self::SchemaError(msg) => write!(f, "Schema error{COLON_SPACE}{msg}"),
+            Self::Timeout(msg) => write!(f, "Timeout{COLON_SPACE}{msg}"),
+            Self::DatabaseError(msg) => write!(f, "Database error{COLON_SPACE}{msg}"),
         }
     }
 }
@@ -260,7 +262,7 @@ impl AutoCreationLogger {
     pub async fn log_auto_creation_complete(plugin_type: PluginType, result: &AutoCreationResult) {
         if result.has_errors() {
             info!(
-                "[AUTO-CREATION] Auto-creation completed for {plugin_type} with warnings: {}",
+                "[AUTO-CREATION] Auto-creation completed for {plugin_type} with warnings{COLON_SPACE}{}",
                 result.errors.join(", ")
             );
         } else {
@@ -276,7 +278,7 @@ impl AutoCreationLogger {
         database_name: Option<&str>,
     ) {
         error!(
-            "[AUTO-CREATION] {operation} failed for {plugin_type} database '{}': {error}",
+            "[AUTO-CREATION] {operation} failed for {plugin_type} database '{}'{COLON_SPACE}{error}",
             database_name.unwrap_or("unknown")
         );
     }
@@ -294,7 +296,7 @@ impl AutoCreationLogger {
             );
         } else {
             error!(
-                "[AUTO-CREATION] Connection verification failed for {plugin_type} database '{database_name}': {}",
+                "[AUTO-CREATION] Connection verification failed for {plugin_type} database '{database_name}'{COLON_SPACE}{}",
                 error.unwrap_or("Unknown error")
             );
         };

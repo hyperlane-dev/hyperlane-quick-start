@@ -1,11 +1,15 @@
 use super::*;
 
 #[instrument_trace]
-pub async fn connection_mysql_db(instance_name: &str) -> Result<DatabaseConnection, String> {
+pub async fn connection_mysql_db<I>(instance_name: I) -> Result<DatabaseConnection, String>
+where
+    I: AsRef<str>,
+{
+    let instance_name_str: &str = instance_name.as_ref();
     let env: &'static EnvConfig = get_global_env_config();
     let instance: &MySqlInstanceConfig = env
-        .get_mysql_instance(instance_name)
-        .ok_or_else(|| format!("MySQL instance '{instance_name}' not found"))?;
+        .get_mysql_instance(instance_name_str)
+        .ok_or_else(|| format!("MySQL instance '{instance_name_str}' not found"))?;
     match perform_mysql_auto_creation(instance).await {
         Ok(result) => {
             if result.has_changes() {
@@ -48,28 +52,32 @@ pub async fn connection_mysql_db(instance_name: &str) -> Result<DatabaseConnecti
 }
 
 #[instrument_trace]
-pub async fn get_mysql_connection(instance_name: &str) -> Result<DatabaseConnection, String> {
+pub async fn get_mysql_connection<I>(instance_name: I) -> Result<DatabaseConnection, String>
+where
+    I: AsRef<str>,
+{
+    let instance_name_str: &str = instance_name.as_ref();
     let mut connections: RwLockWriteGuard<'_, HashMap<String, Result<DatabaseConnection, String>>> =
         MYSQL_CONNECTIONS.write().await;
-    if let Some(connection_result) = connections.get(instance_name) {
+    if let Some(connection_result) = connections.get(instance_name_str) {
         match connection_result {
             Ok(conn) => return Ok(conn.clone()),
             Err(_) => {
-                connections.remove(instance_name);
+                connections.remove(instance_name_str);
             }
         }
     }
     drop(connections);
     let new_connection: Result<DatabaseConnection, String> =
-        connection_mysql_db(instance_name).await;
+        connection_mysql_db(instance_name_str).await;
     let mut connections: RwLockWriteGuard<'_, HashMap<String, Result<DatabaseConnection, String>>> =
         MYSQL_CONNECTIONS.write().await;
     match &new_connection {
         Ok(conn) => {
-            connections.insert(instance_name.to_string(), Ok(conn.clone()));
+            connections.insert(instance_name_str.to_string(), Ok(conn.clone()));
         }
-        Err(e) => {
-            connections.insert(instance_name.to_string(), Err(e.clone()));
+        Err(error) => {
+            connections.insert(instance_name_str.to_string(), Err(error.clone()));
         }
     }
     new_connection

@@ -6,7 +6,7 @@ impl TraceService {
         let log_dir: PathBuf =
             Path::new(SERVER_LOG_DIR).join(Level::Info.to_string().to_lowercase());
         if !log_dir.exists() {
-            return format!("Log directory not found: {}", log_dir.display());
+            return format!("Log directory not found{COLON_SPACE}{}", log_dir.display());
         }
         let mut prev_line: Option<String> = None;
         let date_dirs: Vec<String> = LogService::get_sorted_dirs(&log_dir);
@@ -32,6 +32,6 @@ impl TraceService {
                 }
             }
         }
-        format!("No trace found with value: {trace}")
+        format!("No trace found with value{COLON_SPACE}{trace}")
     }
 }

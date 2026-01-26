@@ -16,7 +16,7 @@ impl ServerHook for ServerStatusRoute {
         loop {
             let server_status: ServerStatus = MonitorService::get_server_status().await;
             let status_json: String = serde_json::to_string(&server_status).unwrap_or_default();
-            let sse_data: String = format!("data: {status_json}{DOUBLE_BR}");
+            let sse_data: String = format!("data{COLON_SPACE}{status_json}{DOUBLE_BR}");
             let send_result: Result<(), ResponseError> =
                 ctx.set_response_body(&sse_data).await.try_send_body().await;
             if send_result.is_err() {

@@ -1,11 +1,15 @@
 use super::*;
 
 #[instrument_trace]
-pub async fn connection_redis_db(instance_name: &str) -> Result<Arc<Connection>, String> {
+pub async fn connection_redis_db<I>(instance_name: I) -> Result<Arc<Connection>, String>
+where
+    I: AsRef<str>,
+{
+    let instance_name_str: &str = instance_name.as_ref();
     let env: &'static EnvConfig = get_global_env_config();
     let instance: &RedisInstanceConfig = env
-        .get_redis_instance(instance_name)
-        .ok_or_else(|| format!("Redis instance '{instance_name}' not found"))?;
+        .get_redis_instance(instance_name_str)
+        .ok_or_else(|| format!("Redis instance '{instance_name_str}' not found"))?;
     match perform_redis_auto_creation(instance).await {
         Ok(result) => {
             if result.has_changes() {
@@ -32,7 +36,7 @@ pub async fn connection_redis_db(instance_name: &str) -> Result<Arc<Connection>,
     let db_url: String = instance.get_connection_url();
     let client: Client = Client::open(db_url).map_err(|error: redis::RedisError| {
         let error_msg: String = error.to_string();
-        let instance_name_clone: String = instance_name.to_string();
+        let instance_name_clone: String = instance_name_str.to_string();
         let error_msg_clone: String = error_msg.clone();
         tokio::spawn(async move {
             database::AutoCreationLogger::log_connection_verification(
@@ -49,7 +53,7 @@ pub async fn connection_redis_db(instance_name: &str) -> Result<Arc<Connection>,
         .get_connection()
         .map_err(|error: redis::RedisError| {
             let error_msg: String = error.to_string();
-            let instance_name_clone: String = instance_name.to_string();
+            let instance_name_clone: String = instance_name_str.to_string();
             let error_msg_clone: String = error_msg.clone();
             tokio::spawn(async move {
                 database::AutoCreationLogger::log_connection_verification(
@@ -66,27 +70,32 @@ pub async fn connection_redis_db(instance_name: &str) -> Result<Arc<Connection>,
 }
 
 #[instrument_trace]
-pub async fn get_redis_connection(instance_name: &str) -> Result<Arc<Connection>, String> {
+pub async fn get_redis_connection<I>(instance_name: I) -> Result<Arc<Connection>, String>
+where
+    I: AsRef<str>,
+{
+    let instance_name_str: &str = instance_name.as_ref();
     let mut connections: RwLockWriteGuard<'_, HashMap<String, Result<Arc<Connection>, String>>> =
         REDIS_CONNECTIONS.write().await;
-    if let Some(connection_result) = connections.get(instance_name) {
+    if let Some(connection_result) = connections.get(instance_name_str) {
         match connection_result {
             Ok(conn) => return Ok(conn.clone()),
             Err(_) => {
-                connections.remove(instance_name);
+                connections.remove(instance_name_str);
             }
         }
     }
     drop(connections);
-    let new_connection: Result<Arc<Connection>, String> = connection_redis_db(instance_name).await;
+    let new_connection: Result<Arc<Connection>, String> =
+        connection_redis_db(instance_name_str).await;
     let mut connections: RwLockWriteGuard<'_, HashMap<String, Result<Arc<Connection>, String>>> =
         REDIS_CONNECTIONS.write().await;
     match &new_connection {
         Ok(conn) => {
-            connections.insert(instance_name.to_string(), Ok(conn.clone()));
+            connections.insert(instance_name_str.to_string(), Ok(conn.clone()));
         }
-        Err(e) => {
-            connections.insert(instance_name.to_string(), Err(e.clone()));
+        Err(error) => {
+            connections.insert(instance_name_str.to_string(), Err(error.clone()));
         }
     }
     new_connection

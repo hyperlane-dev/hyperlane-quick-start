@@ -118,7 +118,7 @@ impl RssService {
                 title: file.get_file_name().to_string(),
                 link: full_url.clone(),
                 description: format!(
-                    "File: {}, Size: {} bytes, Upload Time: {}.",
+                    "File{COLON_SPACE}{}, Size{COLON_SPACE}{} bytes, Upload Time{COLON_SPACE}{}.",
                     file.get_file_name(),
                     file.get_file_size(),
                     file.get_upload_time()

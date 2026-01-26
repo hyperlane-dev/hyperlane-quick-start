@@ -64,7 +64,7 @@ async fn init_db() {
             info!("Auto-creation initialization successful");
         }
         Err(error) => {
-            error!("Auto-creation initialization failed: {error}");
+            error!("Auto-creation initialization failed{COLON_SPACE}{error}");
         }
     };
 }
