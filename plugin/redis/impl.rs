@@ -93,7 +93,6 @@ impl RedisAutoCreation {
         let mut setup_operations: Vec<String> = Vec::new();
         let mut conn: Connection = self.create_mutable_connection().await?;
         let app_key: String = format!("{}:initialized", self.instance.name);
-        let init_value: &str = "true";
         let exists: i32 = redis::cmd("EXISTS")
             .arg(&app_key)
             .query(&mut conn)
@@ -105,7 +104,7 @@ impl RedisAutoCreation {
         if exists == 0 {
             let _: () = redis::cmd("SET")
                 .arg(&app_key)
-                .arg(init_value)
+                .arg("true")
                 .query(&mut conn)
                 .map_err(|error: redis::RedisError| {
                     AutoCreationError::DatabaseError(format!(

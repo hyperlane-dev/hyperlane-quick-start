@@ -116,19 +116,23 @@ impl PostgreSqlAutoCreation {
     }
 
     #[instrument_trace]
-    async fn table_exists(
+    async fn table_exists<T>(
         &self,
         connection: &DatabaseConnection,
-        table_name: &str,
-    ) -> Result<bool, AutoCreationError> {
+        table_name: T,
+    ) -> Result<bool, AutoCreationError>
+    where
+        T: AsRef<str>,
+    {
+        let table_name_str: &str = table_name.as_ref();
         let query: String = format!(
-            "SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = '{table_name}'"
+            "SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = '{table_name_str}'"
         );
         let statement: Statement = Statement::from_string(DatabaseBackend::Postgres, query);
         match connection.query_all(statement).await {
             Ok(results) => Ok(!results.is_empty()),
             Err(error) => Err(AutoCreationError::DatabaseError(format!(
-                "Failed to check if table '{table_name}' exists: {error}"
+                "Failed to check if table '{table_name_str}' exists: {error}"
             ))),
         }
     }
@@ -161,13 +165,15 @@ impl PostgreSqlAutoCreation {
     }
 
     #[instrument_trace]
-    async fn execute_sql(
+    async fn execute_sql<S>(
         &self,
         connection: &DatabaseConnection,
-        sql: &str,
-    ) -> Result<(), AutoCreationError> {
-        let statement: Statement =
-            Statement::from_string(DatabaseBackend::Postgres, sql.to_string());
+        sql: S,
+    ) -> Result<(), AutoCreationError>
+    where
+        S: AsRef<str>,
+    {
+        let statement: Statement = Statement::from_string(DatabaseBackend::Postgres, sql.as_ref());
         match connection.execute(statement).await {
             Ok(_) => Ok(()),
             Err(error) => Err(AutoCreationError::DatabaseError(format!(
@@ -178,8 +184,7 @@ impl PostgreSqlAutoCreation {
 
     #[instrument_trace]
     fn get_postgresql_schema(&self) -> DatabaseSchema {
-        let index_sql: &str = POSTGRESQL_CREATE_INDEX_SQL;
-        let indexes: Vec<String> = index_sql
+        let indexes: Vec<String> = POSTGRESQL_CREATE_INDEX_SQL
             .split(';')
             .map(|s| s.trim())
             .filter(|s| !s.is_empty() && !s.starts_with("--"))

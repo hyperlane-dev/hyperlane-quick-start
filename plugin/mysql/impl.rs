@@ -107,20 +107,24 @@ impl MySqlAutoCreation {
     }
 
     #[instrument_trace]
-    async fn table_exists(
+    async fn table_exists<T>(
         &self,
         connection: &DatabaseConnection,
-        table_name: &str,
-    ) -> Result<bool, AutoCreationError> {
+        table_name: T,
+    ) -> Result<bool, AutoCreationError>
+    where
+        T: AsRef<str>,
+    {
+        let table_name_str: &str = table_name.as_ref();
         let query: String = format!(
-            "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{}' AND TABLE_NAME = '{table_name}'",
+            "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{}' AND TABLE_NAME = '{table_name_str}'",
             self.instance.database
         );
         let statement: Statement = Statement::from_string(DatabaseBackend::MySql, query);
         match connection.query_all(statement).await {
             Ok(results) => Ok(!results.is_empty()),
             Err(error) => Err(AutoCreationError::DatabaseError(format!(
-                "Failed to check if table '{table_name}' exists: {error}"
+                "Failed to check if table '{table_name_str}' exists: {error}"
             ))),
         }
     }
@@ -153,12 +157,15 @@ impl MySqlAutoCreation {
     }
 
     #[instrument_trace]
-    async fn execute_sql(
+    async fn execute_sql<S>(
         &self,
         connection: &DatabaseConnection,
-        sql: &str,
-    ) -> Result<(), AutoCreationError> {
-        let statement: Statement = Statement::from_string(DatabaseBackend::MySql, sql.to_string());
+        sql: S,
+    ) -> Result<(), AutoCreationError>
+    where
+        S: AsRef<str>,
+    {
+        let statement: Statement = Statement::from_string(DatabaseBackend::MySql, sql.as_ref());
         match connection.execute(statement).await {
             Ok(_) => Ok(()),
             Err(error) => Err(AutoCreationError::DatabaseError(format!(
@@ -249,7 +256,6 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                 "Failed to verify MySQL connection: {error}"
             ))
         })?;
-
         let statement: Statement =
             Statement::from_string(DatabaseBackend::MySql, "SELECT 1".to_string());
         match connection.query_all(statement).await {
