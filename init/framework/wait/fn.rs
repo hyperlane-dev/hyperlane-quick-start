@@ -53,6 +53,7 @@ async fn print_route_matcher(server: &Server) {
 #[instrument_trace]
 async fn create_server() {
     init_server_config(&server).await;
+    init_db().await;
     match server.run().await {
         Ok(server_hook) => {
             let host_port: String = format!("{SERVER_HOST}{COLON}{SERVER_PORT}");
@@ -69,5 +70,8 @@ async fn create_server() {
 #[instrument_trace]
 pub fn run() {
     init_log();
+    if let Err(error) = init_env_config() {
+        error!("{error}");
+    }
     runtime().block_on(create(SERVER_PID_FILE_PATH, create_server));
 }

@@ -8,6 +8,10 @@ use {
 };
 
 #[allow(unused_imports)]
-use {hyperlane_app::*, hyperlane_config::framework::*, hyperlane_plugin::process::*};
+use {
+    hyperlane_app::*,
+    hyperlane_config::framework::*,
+    hyperlane_plugin::{env::*, process::*},
+};
 
 use tokio::runtime::{Builder, Runtime};
