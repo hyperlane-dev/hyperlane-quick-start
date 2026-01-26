@@ -1,6 +1,15 @@
 use super::*;
 
 #[instrument_trace]
+pub fn get_connection_timeout_duration() -> Duration {
+    let timeout_seconds: u64 = std::env::var(ENV_KEY_DB_CONNECTION_TIMEOUT_MILLIS)
+        .ok()
+        .and_then(|value: String| value.parse::<u64>().ok())
+        .unwrap_or(DEFAULT_DB_CONNECTION_TIMEOUT_MILLIS);
+    Duration::from_millis(timeout_seconds)
+}
+
+#[instrument_trace]
 pub async fn initialize_auto_creation() -> Result<(), String> {
     if let Err(error) = AutoCreationConfig::validate() {
         return Err(format!(

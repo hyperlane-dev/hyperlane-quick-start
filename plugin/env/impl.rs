@@ -117,6 +117,9 @@ impl EnvConfig {
             let mut data: String = String::new();
             data.push_str(&format!("{ENV_KEY_GPT_API_URL}={BR}"));
             data.push_str(&format!("{ENV_KEY_GPT_MODEL}={BR}"));
+            data.push_str(&format!(
+                "{ENV_KEY_DB_CONNECTION_TIMEOUT_MILLIS}={DEFAULT_DB_CONNECTION_TIMEOUT_MILLIS}{BR}"
+            ));
             write_to_file(ENV_FILE_PATH, data.as_bytes()).map_err(|error| {
                 format!("Failed to create example env file{COLON_SPACE}{error}")
             })?;
