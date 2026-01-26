@@ -6,6 +6,6 @@ mod r#struct;
 
 pub use {r#const::*, r#fn::*, r#struct::*};
 
-use {super::*, mysql::*, postgresql::*, r#static::*};
+use {super::*, mysql::*, postgresql::*, redis::*, r#static::*};
 
 use std::sync::OnceLock;
