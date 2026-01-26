@@ -9,17 +9,15 @@ use {
 
 #[allow(unused_imports)]
 use {
-    hyperlane_app::service::monitor::*,
     hyperlane_app::*,
     hyperlane_config::framework::*,
-    hyperlane_plugin::process::*,
-    hyperlane_plugin::{redis::DEFAULT_REDIS_INSTANCE_NAME, *},
+    hyperlane_plugin::{database::*, env::*, mysql::*, postgresql::*, process::*, redis::*},
 };
 
 use std::sync::Arc;
 
 use {
-    hyperlane_utils::redis::Connection,
+    redis::Connection,
     sea_orm::DatabaseConnection,
     tokio::runtime::{Builder, Runtime},
 };
