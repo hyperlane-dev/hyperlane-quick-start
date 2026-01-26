@@ -5,6 +5,8 @@ mod r#struct;
 
 pub use {r#enum::*, r#struct::*};
 
-use {super::*, hyperlane_plugin::*, model::application::tracking::*, r#static::*};
+use {super::*, model::application::tracking::*, r#static::*};
+
+use hyperlane_plugin::postgresql::*;
 
 use std::{collections::HashMap, sync::OnceLock};

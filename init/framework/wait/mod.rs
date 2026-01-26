@@ -9,7 +9,7 @@ use {
 
 #[allow(unused_imports)]
 use {
-    hyperlane_app::*,
+    hyperlane_app::{service::monitor::*, *},
     hyperlane_config::framework::*,
     hyperlane_plugin::{database::*, env::*, mysql::*, postgresql::*, process::*, redis::*},
 };
