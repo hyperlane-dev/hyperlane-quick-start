@@ -147,7 +147,7 @@ jobs:
           fi
 
   release:
-    needs: [setup, check, tests, clippy, build]
+    needs: [setup, check, tests, clippy, build, publish]
     permissions:
       contents: write
       packages: write
