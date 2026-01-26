@@ -34,7 +34,16 @@ where
         }
     }
     let db_url: String = instance.get_connection_url();
-    Database::connect(&db_url).await.map_err(|error: DbErr| {
+    let timeout_duration: Duration = get_connection_timeout_duration();
+    let timeout_seconds: u64 = timeout_duration.as_secs();
+    let connection_result: Result<DatabaseConnection, DbErr> =
+        match timeout(timeout_duration, Database::connect(&db_url)).await {
+            Ok(result) => result,
+            Err(_) => Err(DbErr::Custom(format!(
+                "PostgreSQL connection timeout after {timeout_seconds} seconds"
+            ))),
+        };
+    connection_result.map_err(|error: DbErr| {
         let error_msg: String = error.to_string();
         let database_name: String = instance.database.clone();
         let error_msg_clone: String = error_msg.clone();

@@ -17,7 +17,18 @@ impl PostgreSqlAutoCreation {
     #[instrument_trace]
     async fn create_admin_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
         let admin_url: String = self.instance.get_admin_url();
-        Database::connect(&admin_url).await.map_err(|error: DbErr| {
+        let timeout_duration: Duration = get_connection_timeout_duration();
+        let timeout_seconds: u64 = timeout_duration.as_secs();
+        let connection_result: Result<DatabaseConnection, DbErr> =
+            match timeout(timeout_duration, Database::connect(&admin_url)).await {
+                Ok(result) => result,
+                Err(_) => {
+                    return Err(AutoCreationError::Timeout(format!(
+                        "PostgreSQL admin connection timeout after {timeout_seconds} seconds"
+                    )));
+                }
+            };
+        connection_result.map_err(|error: DbErr| {
             let error_msg: String = error.to_string();
             if error_msg.contains("authentication failed") || error_msg.contains("permission") {
                 AutoCreationError::InsufficientPermissions(format!(
@@ -38,7 +49,23 @@ impl PostgreSqlAutoCreation {
     #[instrument_trace]
     async fn create_target_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
         let db_url: String = self.instance.get_connection_url();
-        Database::connect(&db_url).await.map_err(|error: DbErr| {
+        let timeout_duration: Duration = get_connection_timeout_duration();
+        let timeout_seconds: u64 = timeout_duration.as_secs();
+        let connection_result: Result<DatabaseConnection, DbErr> = match timeout(
+            timeout_duration,
+            Database::connect(&db_url),
+        )
+        .await
+        {
+            Ok(result) => result,
+            Err(_) => {
+                return Err(AutoCreationError::Timeout(format!(
+                    "PostgreSQL database connection timeout after {timeout_seconds} seconds{COLON_SPACE}{}",
+                    self.instance.database
+                )));
+            }
+        };
+        connection_result.map_err(|error: DbErr| {
             AutoCreationError::ConnectionFailed(format!(
                 "Cannot connect to PostgreSQL database '{}'{COLON_SPACE}{error}",
                 self.instance.database,

@@ -49,10 +49,46 @@ where
         });
         error_msg
     })?;
-    let connection: Connection = client
-        .get_connection()
-        .map_err(|error: redis::RedisError| {
-            let error_msg: String = error.to_string();
+    let timeout_duration: Duration = get_connection_timeout_duration();
+    let timeout_seconds: u64 = timeout_duration.as_secs();
+    let connection_task: JoinHandle<Result<Connection, RedisError>> =
+        spawn_blocking(move || client.get_connection());
+    let connection: Connection = match timeout(timeout_duration, connection_task).await {
+        Ok(join_result) => match join_result {
+            Ok(result) => result.map_err(|error: redis::RedisError| {
+                let error_msg: String = error.to_string();
+                let instance_name_clone: String = instance_name_str.to_string();
+                let error_msg_clone: String = error_msg.clone();
+                tokio::spawn(async move {
+                    database::AutoCreationLogger::log_connection_verification(
+                        database::PluginType::Redis,
+                        &instance_name_clone,
+                        false,
+                        Some(&error_msg_clone),
+                    )
+                    .await;
+                });
+                error_msg
+            })?,
+            Err(_) => {
+                let error_msg: String = "Redis connection task failed".to_string();
+                let instance_name_clone: String = instance_name_str.to_string();
+                let error_msg_clone: String = error_msg.clone();
+                tokio::spawn(async move {
+                    database::AutoCreationLogger::log_connection_verification(
+                        database::PluginType::Redis,
+                        &instance_name_clone,
+                        false,
+                        Some(&error_msg_clone),
+                    )
+                    .await;
+                });
+                return Err(error_msg);
+            }
+        },
+        Err(_) => {
+            let error_msg: String =
+                format!("Redis connection timeout after {timeout_seconds} seconds");
             let instance_name_clone: String = instance_name_str.to_string();
             let error_msg_clone: String = error_msg.clone();
             tokio::spawn(async move {
@@ -64,8 +100,9 @@ where
                 )
                 .await;
             });
-            error_msg
-        })?;
+            return Err(error_msg);
+        }
+    };
     Ok(Arc::new(connection))
 }
 

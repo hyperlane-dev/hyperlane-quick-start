@@ -17,7 +17,18 @@ impl MySqlAutoCreation {
     #[instrument_trace]
     async fn create_admin_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
         let admin_url: String = self.instance.get_admin_url();
-        Database::connect(&admin_url).await.map_err(|error: DbErr| {
+        let timeout_duration: Duration = get_connection_timeout_duration();
+        let timeout_seconds: u64 = timeout_duration.as_secs();
+        let connection_result: Result<DatabaseConnection, DbErr> =
+            match timeout(timeout_duration, Database::connect(&admin_url)).await {
+                Ok(result) => result,
+                Err(_) => {
+                    return Err(AutoCreationError::Timeout(format!(
+                        "MySQL admin connection timeout after {timeout_seconds} seconds"
+                    )));
+                }
+            };
+        connection_result.map_err(|error: DbErr| {
             let error_msg: String = error.to_string();
             if error_msg.contains("Access denied") || error_msg.contains("permission") {
                 AutoCreationError::InsufficientPermissions(format!(
@@ -100,7 +111,23 @@ impl MySqlAutoCreation {
     #[instrument_trace]
     async fn create_target_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
         let db_url: String = self.instance.get_connection_url();
-        Database::connect(&db_url).await.map_err(|error: DbErr| {
+        let timeout_duration: Duration = get_connection_timeout_duration();
+        let timeout_seconds: u64 = timeout_duration.as_secs();
+        let connection_result: Result<DatabaseConnection, DbErr> = match timeout(
+            timeout_duration,
+            Database::connect(&db_url),
+        )
+        .await
+        {
+            Ok(result) => result,
+            Err(_) => {
+                return Err(AutoCreationError::Timeout(format!(
+                    "MySQL database connection timeout after {timeout_seconds} seconds{COLON_SPACE}{}",
+                    self.instance.database
+                )));
+            }
+        };
+        connection_result.map_err(|error: DbErr| {
             AutoCreationError::ConnectionFailed(format!(
                 "Cannot connect to MySQL database '{}'{COLON_SPACE}{}",
                 self.instance.database, error
@@ -253,7 +280,18 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
     #[instrument_trace]
     async fn verify_connection(&self) -> Result<(), AutoCreationError> {
         let db_url: String = self.instance.get_connection_url();
-        let connection: DatabaseConnection = Database::connect(&db_url).await.map_err(|error| {
+        let timeout_duration: Duration = get_connection_timeout_duration();
+        let timeout_seconds: u64 = timeout_duration.as_secs();
+        let connection_result: Result<DatabaseConnection, DbErr> =
+            match timeout(timeout_duration, Database::connect(&db_url)).await {
+                Ok(result) => result,
+                Err(_) => {
+                    return Err(AutoCreationError::Timeout(format!(
+                        "Failed to verify MySQL connection within {timeout_seconds} seconds"
+                    )));
+                }
+            };
+        let connection: DatabaseConnection = connection_result.map_err(|error: DbErr| {
             AutoCreationError::ConnectionFailed(format!(
                 "Failed to verify MySQL connection{COLON_SPACE}{error}"
             ))

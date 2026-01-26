@@ -17,7 +17,7 @@ impl RedisAutoCreation {
     #[instrument_trace]
     async fn create_mutable_connection(&self) -> Result<Connection, AutoCreationError> {
         let db_url: String = self.instance.get_connection_url();
-        let client: Client = Client::open(db_url).map_err(|error: redis::RedisError| {
+        let client: Client = Client::open(db_url).map_err(|error: RedisError| {
             let error_msg: String = error.to_string();
             if error_msg.contains("authentication failed") || error_msg.contains("NOAUTH") {
                 AutoCreationError::InsufficientPermissions(format!(
@@ -33,10 +33,13 @@ impl RedisAutoCreation {
                 ))
             }
         })?;
-        let connection: Connection =
-            client
-                .get_connection()
-                .map_err(|error: redis::RedisError| {
+        let timeout_duration: Duration = get_connection_timeout_duration();
+        let timeout_seconds: u64 = timeout_duration.as_secs();
+        let connection_task: tokio::task::JoinHandle<Result<Connection, RedisError>> =
+            tokio::task::spawn_blocking(move || client.get_connection());
+        let connection: Connection = match timeout(timeout_duration, connection_task).await {
+            Ok(join_result) => match join_result {
+                Ok(result) => result.map_err(|error: RedisError| {
                     let error_msg: String = error.to_string();
                     if error_msg.contains("authentication failed") || error_msg.contains("NOAUTH") {
                         AutoCreationError::InsufficientPermissions(format!(
@@ -53,33 +56,46 @@ impl RedisAutoCreation {
                             "Redis connection error{COLON_SPACE}{error_msg}"
                         ))
                     }
-                })?;
+                })?,
+                Err(_) => {
+                    return Err(AutoCreationError::ConnectionFailed(
+                        "Redis connection task failed".to_string(),
+                    ));
+                }
+            },
+            Err(_) => {
+                return Err(AutoCreationError::Timeout(format!(
+                    "Redis connection timeout after {timeout_seconds} seconds"
+                )));
+            }
+        };
         Ok(connection)
     }
 
     #[instrument_trace]
     async fn validate_redis_server(&self) -> Result<(), AutoCreationError> {
         let mut conn: Connection = self.create_mutable_connection().await?;
-        let pong: String =
-            redis::cmd("PING")
-                .query(&mut conn)
-                .map_err(|error: redis::RedisError| {
-                    AutoCreationError::ConnectionFailed(format!(
-                        "Redis PING failed{COLON_SPACE}{error}"
-                    ))
-                })?;
+        let pong: String = redis::cmd("PING")
+            .query(&mut conn)
+            .map_err(|error: RedisError| {
+                AutoCreationError::ConnectionFailed(format!(
+                    "Redis PING failed{COLON_SPACE}{error}"
+                ))
+            })?;
         if pong != "PONG" {
             return Err(AutoCreationError::ConnectionFailed(
                 "Redis PING returned unexpected response".to_string(),
             ));
         }
-        let info: String = redis::cmd("INFO").arg("server").query(&mut conn).map_err(
-            |error: redis::RedisError| {
-                AutoCreationError::DatabaseError(format!(
-                    "Failed to get Redis server info{COLON_SPACE}{error}"
-                ))
-            },
-        )?;
+        let info: String =
+            redis::cmd("INFO")
+                .arg("server")
+                .query(&mut conn)
+                .map_err(|error: RedisError| {
+                    AutoCreationError::DatabaseError(format!(
+                        "Failed to get Redis server info{COLON_SPACE}{error}"
+                    ))
+                })?;
         if info.contains("redis_version:") {
             AutoCreationLogger::log_connection_verification(
                 database::PluginType::Redis,
@@ -100,7 +116,7 @@ impl RedisAutoCreation {
         let exists: i32 = redis::cmd("EXISTS")
             .arg(&app_key)
             .query(&mut conn)
-            .map_err(|error: redis::RedisError| {
+            .map_err(|error: RedisError| {
                 AutoCreationError::DatabaseError(format!(
                     "Failed to check Redis key existence{COLON_SPACE}{error}"
                 ))
@@ -110,7 +126,7 @@ impl RedisAutoCreation {
                 .arg(&app_key)
                 .arg("true")
                 .query(&mut conn)
-                .map_err(|error: redis::RedisError| {
+                .map_err(|error: RedisError| {
                     AutoCreationError::DatabaseError(format!(
                         "Failed to set Redis initialization key{COLON_SPACE}{error}"
                     ))
@@ -121,7 +137,7 @@ impl RedisAutoCreation {
                 .arg(&config_key)
                 .arg("1.0.0")
                 .query(&mut conn)
-                .map_err(|error: redis::RedisError| {
+                .map_err(|error: RedisError| {
                     AutoCreationError::DatabaseError(format!(
                         "Failed to set Redis config key{COLON_SPACE}{error}"
                     ))
