@@ -7,7 +7,9 @@ mod r#type;
 
 pub use {r#const::*, r#fn::*, r#struct::*, r#type::*};
 
-use {super::*, database::*, env::*, hyperlane_utils::redis::*, r#static::*};
+use {super::*, database::*, env::*, r#static::*};
+
+use hyperlane_utils::redis::*;
 
 use std::{
     collections::HashMap,
