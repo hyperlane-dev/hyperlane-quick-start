@@ -89,5 +89,6 @@ pub fn run() {
     if let Err(error) = init_env_config() {
         error!("{error}");
     }
+    info!("Environment configuration loaded successfully");
     runtime().block_on(create(SERVER_PID_FILE_PATH, create_server));
 }
