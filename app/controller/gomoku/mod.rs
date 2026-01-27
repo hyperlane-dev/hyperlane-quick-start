@@ -6,4 +6,4 @@ pub use r#fn::*;
 
 use {super::*, r#struct::*};
 
-use {mapper::gomoku::*, service::gomoku_websocket::*};
+use {mapper::chat::*, service::gomoku::*};

@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -11,20 +11,19 @@
     <link rel="icon" href="https://docs.ltpp.vip/img/hyperlane.png" />
     <style>
       :root {
-        --bg-primary: #667eea;
-        --bg-secondary: #764ba2;
-        --card-bg: rgba(255, 255, 255, 0.95);
-        --card-border: rgba(102, 126, 234, 0.2);
-        --accent: #667eea;
-        --accent-2: #764ba2;
-        --text-primary: #2c3e50;
-        --text-muted: #6c757d;
+        --bg-dark: #0f172a;
+        --bg-card: rgba(15, 23, 42, 0.7);
+        --border: rgba(148, 163, 184, 0.25);
+        --accent: #7c3aed;
+        --accent-2: #4f46e5;
+        --text: #e2e8f0;
+        --text-muted: #94a3b8;
         --success: #22c55e;
         --warning: #f59e0b;
         --error: #ef4444;
-        --board-bg: #f7f8ff;
-        --cell-border: rgba(102, 126, 234, 0.2);
-        --stone-black: #1f2937;
+        --board-bg: #1e293b;
+        --cell-border: rgba(148, 163, 184, 0.25);
+        --stone-black: #0f172a;
         --stone-white: #f8fafc;
       }
 
@@ -35,27 +34,18 @@
       }
 
       body {
-        font-family:
-          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-        background: linear-gradient(
-          135deg,
-          var(--bg-primary) 0%,
-          var(--bg-secondary) 100%
-        );
-        color: var(--text-primary);
+        font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: radial-gradient(circle at top, #1e293b, #0f172a 65%);
+        color: var(--text);
         min-height: 100vh;
-        height: 100vh;
         display: flex;
         flex-direction: column;
-        overflow: hidden;
       }
 
       .app {
         display: flex;
         flex-direction: column;
         min-height: 100vh;
-        height: 100vh;
-        overflow: hidden;
       }
 
       .header {
@@ -63,9 +53,7 @@
         align-items: center;
         justify-content: space-between;
         padding: 20px 32px;
-        background: rgba(255, 255, 255, 0.92);
-        border-bottom: 1px solid var(--card-border);
-        box-shadow: 0 10px 30px rgba(30, 64, 175, 0.15);
+        border-bottom: 1px solid var(--border);
         backdrop-filter: blur(12px);
       }
 
@@ -75,14 +63,13 @@
         gap: 12px;
         font-weight: 600;
         font-size: 18px;
-        color: var(--text-primary);
       }
 
       .brand img {
         width: 36px;
         height: 36px;
         border-radius: 10px;
-        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.35);
+        box-shadow: 0 0 15px rgba(124, 58, 237, 0.4);
       }
 
       .status {
@@ -110,31 +97,23 @@
         grid-template-columns: 320px 1fr 320px;
         gap: 24px;
         padding: 24px 32px 32px;
-        min-height: 0;
-        overflow: hidden;
       }
 
       .panel {
-        background: var(--card-bg);
-        border: 1px solid var(--card-border);
+        background: var(--bg-card);
+        border: 1px solid var(--border);
         border-radius: 20px;
         padding: 20px;
-        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
+        backdrop-filter: blur(16px);
+        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.35);
         display: flex;
         flex-direction: column;
         gap: 16px;
-        min-height: 0;
-      }
-
-      .panel-scroll {
-        height: 100%;
-        overflow-y: auto;
       }
 
       .panel h2 {
         font-size: 18px;
         font-weight: 600;
-        color: var(--text-primary);
       }
 
       .field {
@@ -149,11 +128,11 @@
       }
 
       .field input {
-        background: #ffffff;
-        border: 1px solid rgba(148, 163, 184, 0.4);
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid var(--border);
         border-radius: 10px;
         padding: 10px 12px;
-        color: var(--text-primary);
+        color: var(--text);
         font-size: 14px;
       }
 
@@ -172,24 +151,16 @@
         transition: 0.2s ease;
         color: #fff;
         background: linear-gradient(135deg, var(--accent), var(--accent-2));
-        box-shadow: 0 8px 16px rgba(102, 126, 234, 0.25);
-      }
-
-      button:hover {
-        transform: translateY(-1px);
       }
 
       button.secondary {
-        background: #eef2ff;
-        color: var(--text-primary);
-        border: 1px solid rgba(102, 126, 234, 0.3);
-        box-shadow: none;
+        background: rgba(148, 163, 184, 0.15);
+        color: var(--text);
       }
 
       button:disabled {
         opacity: 0.5;
         cursor: not-allowed;
-        transform: none;
       }
 
       .room-info {
@@ -201,7 +172,7 @@
       }
 
       .room-info span {
-        color: var(--text-primary);
+        color: var(--text);
         font-weight: 500;
       }
 
@@ -219,9 +190,8 @@
         border-radius: 18px;
         display: grid;
         grid-template-columns: repeat(15, 1fr);
-        border: 1px solid var(--card-border);
+        border: 1px solid var(--border);
         overflow: hidden;
-        box-shadow: inset 0 0 0 1px rgba(102, 126, 234, 0.1);
       }
 
       .cell {
@@ -231,7 +201,6 @@
         justify-content: center;
         cursor: pointer;
         position: relative;
-        background: rgba(255, 255, 255, 0.6);
       }
 
       .cell:hover::after {
@@ -239,7 +208,7 @@
         width: 70%;
         height: 70%;
         border-radius: 50%;
-        border: 2px dashed rgba(102, 126, 234, 0.6);
+        border: 2px dashed rgba(148, 163, 184, 0.6);
         position: absolute;
       }
 
@@ -247,27 +216,15 @@
         width: 70%;
         height: 70%;
         border-radius: 50%;
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
       }
 
       .stone.black {
-        background: radial-gradient(
-          circle at 30% 30%,
-          #4b5563,
-          var(--stone-black)
-        );
+        background: radial-gradient(circle at 30% 30%, #334155, var(--stone-black));
       }
 
       .stone.white {
-        background: radial-gradient(
-          circle at 30% 30%,
-          #ffffff,
-          var(--stone-white)
-        );
-        border: 2px solid rgba(102, 126, 234, 0.5);
-        box-shadow:
-          0 6px 16px rgba(0, 0, 0, 0.2),
-          inset 0 0 0 2px rgba(102, 126, 234, 0.25);
+        background: radial-gradient(circle at 30% 30%, #ffffff, var(--stone-white));
       }
 
       .sidebar-list {
@@ -292,59 +249,15 @@
       .move-item {
         padding: 8px 10px;
         border-radius: 10px;
-        background: rgba(102, 126, 234, 0.1);
+        background: rgba(148, 163, 184, 0.1);
         font-size: 13px;
-        color: var(--text-primary);
       }
 
       .footer {
         padding: 16px 32px;
         text-align: center;
-        color: rgba(255, 255, 255, 0.8);
+        color: var(--text-muted);
         font-size: 12px;
-      }
-
-      .toast-container {
-        position: fixed;
-        top: 24px;
-        left: 50%;
-        transform: translateX(-50%);
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        z-index: 1000;
-        pointer-events: none;
-      }
-
-      .toast {
-        min-width: 220px;
-        max-width: 320px;
-        background: #ffffff;
-        border: 1px solid var(--card-border);
-        color: var(--text-primary);
-        padding: 12px 16px;
-        border-radius: 12px;
-        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
-        opacity: 0;
-        transform: translateY(-10px);
-        transition: 0.3s ease;
-      }
-
-      .toast.show {
-        opacity: 1;
-        transform: translateY(0);
-      }
-
-      .toast.success {
-        border-left: 4px solid var(--success);
-      }
-
-      .toast.warning {
-        border-left: 4px solid var(--warning);
-      }
-
-      .toast.error {
-        border-left: 4px solid var(--error);
       }
 
       @media (max-width: 1200px) {
@@ -365,7 +278,7 @@
           <img
             src="https://docs.ltpp.vip/img/hyperlane.png"
             alt="Hyperlane"
-            onerror="this.style.display = 'none'"
+            onerror="this.style.display='none'"
           />
           Hyperlane Gomoku
         </div>
@@ -374,8 +287,6 @@
           <span id="statusText">Disconnected</span>
         </div>
       </header>
-
-      <div class="toast-container" id="toastContainer"></div>
 
       <main class="main">
         <section class="panel">
@@ -406,9 +317,8 @@
           <div class="board" id="gomokuBoard"></div>
         </section>
 
-        <section class="panel panel-scroll">
+        <section class="panel">
           <h2>Match Info</h2>
-
           <div class="sidebar-list">
             <span>Players</span>
             <div id="playersList"></div>
@@ -454,10 +364,6 @@
         room: null,
         role: '-',
         myColor: null,
-        lastStatus: null,
-        reconnectTimer: null,
-        reconnectAttempts: 0,
-        connecting: false,
       };
 
       const boardEl = document.getElementById('gomokuBoard');
@@ -472,7 +378,6 @@
       const playersListEl = document.getElementById('playersList');
       const spectatorsListEl = document.getElementById('spectatorsList');
       const moveLogEl = document.getElementById('moveLog');
-      const toastContainer = document.getElementById('toastContainer');
 
       function getUserId() {
         const key = 'gomoku_user_id';
@@ -492,63 +397,14 @@
         statusText.textContent = connected ? 'Connected' : 'Disconnected';
       }
 
-      function showToast(message, type) {
-        if (!toastContainer) return;
-        const toast = document.createElement('div');
-        toast.className = `toast ${type || 'success'}`;
-        toast.textContent = message;
-        toastContainer.appendChild(toast);
-        requestAnimationFrame(() => {
-          toast.classList.add('show');
-        });
-        setTimeout(() => {
-          toast.classList.remove('show');
-          setTimeout(() => {
-            toast.remove();
-          }, 300);
-        }, 2500);
-      }
-
-      function clearReconnectTimer() {
-        if (state.reconnectTimer) {
-          clearTimeout(state.reconnectTimer);
-          state.reconnectTimer = null;
-        }
-      }
-
-      function scheduleReconnect() {
-        if (state.reconnectTimer) return;
-        state.reconnectAttempts += 1;
-        const delay = Math.min(
-          30000,
-          1000 * 2 ** (state.reconnectAttempts - 1),
-        );
-        state.reconnectTimer = setTimeout(() => {
-          state.reconnectTimer = null;
-          connect();
-        }, delay);
-      }
-
       function connect() {
-        if (state.connecting) return;
         if (state.socket) {
-          const readyState = state.socket.readyState;
-          if (
-            readyState === WebSocket.OPEN ||
-            readyState === WebSocket.CONNECTING
-          ) {
-            return;
-          }
           state.socket.close();
         }
-        state.connecting = true;
         state.socket = new WebSocket(wsUrl());
         setStatus(false);
 
         state.socket.onopen = () => {
-          state.connecting = false;
-          state.reconnectAttempts = 0;
-          clearReconnectTimer();
           setStatus(true);
         };
 
@@ -561,26 +417,17 @@
           }
         };
 
-        state.socket.onerror = () => {
-          if (state.socket) {
-            state.socket.close();
-          }
-        };
-
         state.socket.onclose = () => {
-          state.connecting = false;
           setStatus(false);
-          scheduleReconnect();
         };
       }
 
       function sendMessage(type, roomId, payload) {
         if (!state.socket || state.socket.readyState !== WebSocket.OPEN) {
           connect();
-          setTimeout(() => sendMessage(type, roomId, payload), 500);
+          setTimeout(() => sendMessage(type, roomId, payload), 300);
           return;
         }
-
         const message = {
           type,
           room_id: roomId || '',
@@ -596,8 +443,6 @@
           if (message.payload && message.payload.room) {
             updateRoomState(message.payload.room);
           }
-        } else if (message.type === MessageType.Start) {
-          showToast('游戏开始', 'success');
         } else if (message.type === MessageType.Error) {
           alert(message.payload?.message || 'Operation failed');
         }
@@ -605,57 +450,36 @@
 
       function updateRoomState(room) {
         state.room = room;
-        const nextStatus = room.status || 'Waiting';
-        const previousStatus = state.lastStatus;
-        state.lastStatus = nextStatus;
         currentRoomEl.textContent = room.room_id || '-';
-        gameStatusEl.textContent = nextStatus;
+        gameStatusEl.textContent = room.status || 'Waiting';
         const players = room.players || [];
         const spectators = room.spectators || [];
         const moves = room.moves || [];
 
         const myId = getUserId();
         const player = players.find((item) => item.user_id === myId);
-        state.role = player
-          ? 'Player'
-          : spectators.includes(myId)
-            ? 'Spectator'
-            : '-';
+        state.role = player ? 'Player' : spectators.includes(myId) ? 'Spectator' : '-';
         state.myColor = player ? player.color : null;
         myRoleEl.textContent = state.role;
         turnInfoEl.textContent = room.next_turn || '-';
 
-        playersListEl.innerHTML =
-          players
-            .map((item) => `<div>${item.user_id} (${item.color})</div>`)
-            .join('') || '<span>-</span>';
-        spectatorsListEl.innerHTML =
-          spectators.map((item) => `<div>${item}</div>`).join('') ||
-          '<span>-</span>';
+        playersListEl.innerHTML = players
+          .map((item) => `<div>${item.user_id} (${item.color})</div>`)
+          .join('') || '<span>-</span>';
+        spectatorsListEl.innerHTML = spectators
+          .map((item) => `<div>${item}</div>`)
+          .join('') || '<span>-</span>';
 
-        moveLogEl.innerHTML =
-          moves
-            .slice()
-            .reverse()
-            .map(
-              (move) =>
-                `<div class="move-item">#${move.step} ${move.color} (${move.x}, ${move.y})</div>`,
-            )
-            .join('') || '<span>-</span>';
+        moveLogEl.innerHTML = moves
+          .slice()
+          .reverse()
+          .map(
+            (move) =>
+              `<div class="move-item">#${move.step} ${move.color} (${move.x}, ${move.y})</div>`
+          )
+          .join('') || '<span>-</span>';
 
         renderBoard(room.board || []);
-        if (nextStatus === 'Finished' && previousStatus !== 'Finished') {
-          let resultText = '平局';
-          let resultType = 'warning';
-          if (room.winner === 'Black') {
-            resultText = '黑方胜利';
-            resultType = 'success';
-          } else if (room.winner === 'White') {
-            resultText = '白方胜利';
-            resultType = 'success';
-          }
-          showToast(`对局结束：${resultText}`, resultType);
-        }
       }
 
       function renderBoard(board) {

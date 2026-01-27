@@ -1,6 +1,6 @@
 pub mod chat;
 pub mod dataset;
-pub mod gomoku_websocket;
+pub mod gomoku;
 pub mod log;
 pub mod monitor;
 pub mod mysql;

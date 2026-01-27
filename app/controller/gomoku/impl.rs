@@ -9,7 +9,7 @@ impl ServerHook for GomokuRoute {
     #[prologue_macros(ws, get)]
     #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        let websocket: &WebSocket = get_global_gomoku_websocket();
+        let websocket: &WebSocket = get_global_websocket();
         let user_id: String = GomokuWebSocketService::get_user_id(ctx).await;
         let key_value: String = if user_id.trim().is_empty() {
             ctx.get_request_path().await

@@ -7,7 +7,9 @@ impl ServerHook for GomokuConnectedHook {
     }
 
     #[instrument_trace]
-    async fn handle(self, _ctx: &Context) {}
+    async fn handle(self, ctx: &Context) {
+        let _user_id: String = GomokuWebSocketService::get_user_id(ctx).await;
+    }
 }
 
 impl ServerHook for GomokuRequestHook {
@@ -172,16 +174,7 @@ impl GomokuWebSocketService {
         GomokuRoomMapper::set_user_room(sender_id, &room_id);
         if room.get_status() == &GameStatus::Waiting && room.get_players().len() == 2 {
             GomokuDomain::start_game(&mut room)?;
-            if let Ok(start_body) = Self::build_response_body(
-                GomokuMessageType::Start,
-                &room_id,
-                sender_id,
-                json!(room.clone()),
-            ) {
-                Self::broadcast_room(&room_id, "", &start_body);
-            }
         }
-
         GomokuRoomMapper::save_room(room.clone());
         let resp_body: ResponseBody = Self::build_response_body(
             GomokuMessageType::RoomState,
@@ -337,8 +330,7 @@ impl GomokuWebSocketService {
 
     #[instrument_trace]
     pub fn broadcast_room(room_id: &str, sender_id: &str, resp_body: &ResponseBody) {
-        let websocket: &WebSocket = get_global_gomoku_websocket();
-
+        let websocket: &WebSocket = get_global_websocket();
         let mut targets: Vec<String> = GomokuRoomMapper::get_room_user_ids(room_id);
         targets.retain(|item| item != sender_id);
         for user_id in targets {
