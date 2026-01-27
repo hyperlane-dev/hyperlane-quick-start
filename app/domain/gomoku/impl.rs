@@ -15,6 +15,7 @@ impl GomokuDomain {
             .set_players(players)
             .set_status(GameStatus::Waiting)
             .set_next_turn(StoneColor::Black);
+        Self::ensure_board(&mut room);
         room
     }
 
@@ -82,8 +83,44 @@ impl GomokuDomain {
         if room.get_players().len() != 2 {
             return Err("Waiting for second player".to_string());
         }
+        Self::ensure_board(room);
         room.set_status(GameStatus::InProgress);
         Ok(())
+    }
+
+    #[instrument_trace]
+    pub fn ensure_board(room: &mut GomokuRoom) {
+        let size: usize = 15;
+        let mut is_valid: bool = true;
+        let board: &Vec<Vec<u8>> = room.get_board();
+        if board.len() != size {
+            is_valid = false;
+        } else {
+            for row in board.iter() {
+                let row_len: usize = row.len();
+                if row_len != size {
+                    is_valid = false;
+                    break;
+                }
+            }
+        }
+        if is_valid {
+            return;
+        }
+        let new_board: Vec<Vec<u8>> = Self::build_empty_board(size);
+        *room.get_mut_board() = new_board;
+    }
+
+    #[instrument_trace]
+    fn build_empty_board(size: usize) -> Vec<Vec<u8>> {
+        let mut board: Vec<Vec<u8>> = Vec::new();
+        let row: Vec<u8> = vec![0; size];
+        let mut index: usize = 0;
+        while index < size {
+            board.push(row.clone());
+            index += 1;
+        }
+        board
     }
 
     #[instrument_trace]
@@ -96,6 +133,7 @@ impl GomokuDomain {
         if room.get_status() != &GameStatus::InProgress {
             return Err("Game is not in progress".to_string());
         }
+        Self::ensure_board(room);
         let player_color: StoneColor =
             Self::get_player_color(room, user_id).ok_or("Player not found".to_string())?;
         if &player_color != room.get_next_turn() {

@@ -272,8 +272,10 @@ impl GomokuWebSocketService {
         } else {
             req_data.get_room_id().clone()
         };
-        let room: GomokuRoom =
+        let mut room: GomokuRoom =
             GomokuRoomMapper::get_room(&room_id).ok_or("Room not found".to_string())?;
+        GomokuDomain::ensure_board(&mut room);
+        GomokuRoomMapper::save_room(room.clone());
         let resp_body: ResponseBody = Self::build_response_body(
             GomokuMessageType::RoomState,
             &room_id,
