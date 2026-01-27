@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -32,8 +32,8 @@
       }
 
       body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
-          sans-serif;
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         min-height: 100vh;
         padding: 20px;
@@ -347,7 +347,7 @@
         const resultCard = result.parentElement;
 
         const existingMessages = resultCard.querySelectorAll(
-          '.status-message, .request-url'
+          '.status-message, .request-url',
         );
         existingMessages.forEach((msg) => msg.remove());
 
@@ -361,7 +361,7 @@
 
         const baseUrl = window.location.origin;
         const requestUrl = `${baseUrl}/api/trace/${encodeURIComponent(
-          traceId
+          traceId,
         )}`;
         const urlElement = document.createElement('div');
         urlElement.className = 'request-url';

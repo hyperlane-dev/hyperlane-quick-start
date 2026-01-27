@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 
 <html lang="en">
   <head>
@@ -27,8 +27,8 @@
       }
 
       body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
-          sans-serif;
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: #2c3e50;
         overflow-x: hidden;
@@ -911,7 +911,7 @@
                   },
                 },
               },
-            }
+            },
           );
 
           this.charts.disk = new Chart(document.getElementById('diskChart'), {
@@ -968,7 +968,7 @@
                 ],
               },
               options: chartOptions,
-            }
+            },
           );
         }
 
@@ -1003,7 +1003,7 @@
             this.reconnectAttempts++;
             this.updateConnectionStatus(
               `Reconnecting... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`,
-              false
+              false,
             );
 
             setTimeout(() => {
@@ -1023,38 +1023,25 @@
         }
 
         updateServerStatus(data) {
-          document.getElementById(
-            'cpuUsage'
-          ).innerHTML = `${data.cpu_usage.toFixed(
-            1
-          )}<span class="metric-unit">%</span>`;
-          document.getElementById(
-            'cpuProgress'
-          ).style.width = `${data.cpu_usage}%`;
+          document.getElementById('cpuUsage').innerHTML =
+            `${data.cpu_usage.toFixed(1)}<span class="metric-unit">%</span>`;
+          document.getElementById('cpuProgress').style.width =
+            `${data.cpu_usage}%`;
 
-          document.getElementById(
-            'memoryUsage'
-          ).innerHTML = `${data.memory_usage.toFixed(
-            1
-          )}<span class="metric-unit">%</span>`;
-          document.getElementById(
-            'memoryProgress'
-          ).style.width = `${data.memory_usage}%`;
+          document.getElementById('memoryUsage').innerHTML =
+            `${data.memory_usage.toFixed(1)}<span class="metric-unit">%</span>`;
+          document.getElementById('memoryProgress').style.width =
+            `${data.memory_usage}%`;
 
-          document.getElementById(
-            'diskUsage'
-          ).innerHTML = `${data.disk_usage.toFixed(
-            1
-          )}<span class="metric-unit">%</span>`;
-          document.getElementById(
-            'diskProgress'
-          ).style.width = `${data.disk_usage}%`;
+          document.getElementById('diskUsage').innerHTML =
+            `${data.disk_usage.toFixed(1)}<span class="metric-unit">%</span>`;
+          document.getElementById('diskProgress').style.width =
+            `${data.disk_usage}%`;
 
           const rxMB = (data.network_rx / 1024 / 1024).toFixed(2);
           const txMB = (data.network_tx / 1024 / 1024).toFixed(2);
-          document.getElementById(
-            'networkRx'
-          ).innerHTML = `${rxMB}<span class="metric-unit">MB</span>`;
+          document.getElementById('networkRx').innerHTML =
+            `${rxMB}<span class="metric-unit">MB</span>`;
           document.getElementById('networkTx').textContent = `${txMB} MB`;
 
           document.getElementById('loadAverage').textContent =
@@ -1064,9 +1051,8 @@
 
           const days = Math.floor(data.uptime / 86400);
           const hours = Math.floor((data.uptime % 86400) / 3600);
-          document.getElementById(
-            'uptime'
-          ).innerHTML = `${days}<span class="metric-unit">days</span>`;
+          document.getElementById('uptime').innerHTML =
+            `${days}<span class="metric-unit">days</span>`;
 
           document.getElementById('processCount').textContent =
             data.process_count;
@@ -1076,10 +1062,10 @@
           document.getElementById('cpuModel').textContent = data.cpu_model;
           document.getElementById('cpuCores').textContent = data.cpu_cores;
           document.getElementById('totalMemory').textContent = this.formatBytes(
-            data.memory_total
+            data.memory_total,
           );
           document.getElementById('totalDisk').textContent = this.formatBytes(
-            data.disk_total
+            data.disk_total,
           );
 
           this.updateChartData(data);

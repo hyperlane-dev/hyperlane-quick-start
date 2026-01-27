@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 
 <html lang="en">
   <head>
@@ -26,8 +26,8 @@
       }
 
       body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
-          sans-serif;
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: #2c3e50;
         min-height: 100vh;
@@ -200,8 +200,8 @@
         color: #6c757d;
         font-size: 1rem;
         transition: all 0.3s ease;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
-          sans-serif;
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
       }
 
       .form-input::placeholder {
@@ -1131,14 +1131,14 @@
             <div class="detail-section">
               <div class="detail-label">Socket Address</div>
               <div class="detail-value">${this.escapeHtml(
-                record.socket_addr
+                record.socket_addr,
               )}</div>
             </div>
             <div class="detail-section">
               <div class="detail-label">Timestamp</div>
               <div class="detail-value">${record.timestamp} (${new Date(
-            record.timestamp
-          ).toLocaleString()})</div>
+                record.timestamp,
+              ).toLocaleString()})</div>
             </div>
             <div class="detail-section">
               <div class="detail-label">Created At</div>
@@ -1149,7 +1149,7 @@
               <div class="detail-value">${JSON.stringify(
                 record.headers,
                 null,
-                2
+                2,
               )}</div>
             </div>
             <div class="detail-section">
@@ -1188,11 +1188,8 @@
         }
 
         showError(message) {
-          document.getElementById(
-            'resultsContainer'
-          ).innerHTML = `<div class="no-data">Error: ${this.escapeHtml(
-            message
-          )}</div>`;
+          document.getElementById('resultsContainer').innerHTML =
+            `<div class="no-data">Error: ${this.escapeHtml(message)}</div>`;
         }
 
         reset() {

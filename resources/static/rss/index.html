@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -31,8 +31,8 @@
       }
 
       body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
-          sans-serif;
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         min-height: 100vh;
         padding: 20px;
@@ -487,8 +487,8 @@
               border-bottom: 2px solid rgba(255, 255, 255, 0.5);
               transition: border-color 0.3s;
             "
-            onmouseover="this.style.borderColor='white'"
-            onmouseout="this.style.borderColor='rgba(255,255,255,0.5)'"
+            onmouseover="this.style.borderColor = 'white'"
+            onmouseout="this.style.borderColor = 'rgba(255,255,255,0.5)'"
             >Subscribe to the latest uploaded resources</a
           >
         </p>
@@ -648,13 +648,13 @@
 
         div.innerHTML = `
                 <h3><a href="${escapeHtml(link)}" target="_blank">${escapeHtml(
-          title
-        )}</a></h3>
+                  title,
+                )}</a></h3>
                 <div class="feed-meta">
                     ${
                       pubDate
                         ? `<div class="meta-item"><span class="meta-icon">📅</span>${escapeHtml(
-                            pubDate
+                            pubDate,
                           )}</div>`
                         : ''
                     }
@@ -666,7 +666,7 @@
                     ${
                       fileType
                         ? `<div class="meta-item"><span class="meta-icon">📄</span>${getFileTypeName(
-                            fileType
+                            fileType,
                           )}</div>`
                         : ''
                     }
@@ -680,14 +680,14 @@
                     <div class="file-details">
                         <div class="file-name">${escapeHtml(title)}</div>
                         <div class="file-size">${fileSize} • ${getFileTypeName(
-                        fileType
-                      )}</div>
+                          fileType,
+                        )}</div>
                     </div>
                     <a href="${escapeHtml(
-                      link
+                      link,
                     )}" class="download-btn" download="${escapeHtml(
-                        title
-                      )}">Download</a>
+                      title,
+                    )}">Download</a>
                 </div>
                 `
                     : ''

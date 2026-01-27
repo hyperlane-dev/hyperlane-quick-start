@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 
 <html lang="en">
   <head>
@@ -121,8 +121,8 @@
       }
 
       body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
-          sans-serif;
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
         margin: 0;
         padding: 0;
         height: 100vh;
@@ -331,7 +331,8 @@
         color: white;
         margin: 0 8px;
         flex-shrink: 0;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15),
+        box-shadow:
+          0 2px 8px rgba(0, 0, 0, 0.15),
           0 0 0 1.5px rgba(255, 255, 255, 0.8);
         border: 1px solid rgba(255, 255, 255, 0.9);
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
@@ -346,7 +347,8 @@
 
       .message-avatar:hover {
         transform: scale(1.1);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25),
+        box-shadow:
+          0 4px 12px rgba(0, 0, 0, 0.25),
           0 0 0 1.5px rgba(255, 255, 255, 0.9);
       }
 
@@ -1501,7 +1503,7 @@
             const r = (Math.random() * 16) | 0;
             const v = c === 'x' ? r : (r & 0x3) | 0x8;
             return v.toString(16);
-          }
+          },
         );
       }
 
@@ -1627,7 +1629,7 @@
             idx,
             options,
             env,
-            renderer
+            renderer,
           ) {
             const token = tokens[idx];
             token.attrSet('target', '_blank');
@@ -1658,7 +1660,7 @@
           const isSelfMention = isCurrentUser(
             cleanUsername,
             currentUuid,
-            currentUsername
+            currentUsername,
           );
 
           if (isSelfMention) {
@@ -1680,7 +1682,7 @@
         ];
 
         return possibleMatches.some(
-          (match) => mentionedUsername.toLowerCase() === match.toLowerCase()
+          (match) => mentionedUsername.toLowerCase() === match.toLowerCase(),
         );
       }
 
@@ -2123,7 +2125,7 @@
                         </div>
                         <div class="message-content gpt-response">
                             <div class="message-text">${formatMessageText(
-                              message.data
+                              message.data,
                             )}</div>
                         </div>
                         <div class="message-time">${message.time}</div>
@@ -2144,7 +2146,7 @@
                         </div>
                         <div class="message-content">
                             <div class="message-text">${formatMessageText(
-                              message.data
+                              message.data,
                             )}</div>
                         </div>
                         <div class="message-time">${message.time}</div>
@@ -2165,7 +2167,7 @@
                         </div>
                         <div class="message-content self">
                             <div class="message-text">${formatMessageText(
-                              message.data
+                              message.data,
                             )}</div>
                         </div>
                         <div class="message-time">${message.time}</div>
@@ -2298,7 +2300,7 @@
         socket = new WebSocket(
           `${protocol}://${
             window.location.host
-          }/api/chat?uuid=${getPersistentUUID()}`
+          }/api/chat?uuid=${getPersistentUUID()}`,
         );
 
         socket.onopen = () => {
@@ -2355,7 +2357,7 @@
           }, reconnectInterval);
         } else {
           console.error(
-            'Maximum reconnection attempts reached, stopping reconnection'
+            'Maximum reconnection attempts reached, stopping reconnection',
           );
         }
       }
@@ -2567,7 +2569,7 @@
           const protocol = window.location.protocol;
 
           const response = await fetch(
-            `${protocol}//${window.location.host}/chat/users/online`
+            `${protocol}//${window.location.host}/chat/users/online`,
           );
           if (response.ok) {
             const result = await response.json();
@@ -2663,7 +2665,7 @@
               input.setSelectionRange(newCursorPos, newCursorPos);
               input.focus();
             },
-            true
+            true,
           );
 
           item.addEventListener('mouseenter', () => {
@@ -2694,7 +2696,7 @@
             event.preventDefault();
             selectedIndex = Math.min(
               selectedIndex + 1,
-              filteredUsers.length - 1
+              filteredUsers.length - 1,
             );
             if (selectedIndex !== previousIndex) {
               renderMentionList();
@@ -2831,7 +2833,7 @@
             const inputContainer =
               document.getElementById('chatInputContainer');
             const uploadStatusContainer = document.getElementById(
-              'uploadStatusContainer'
+              'uploadStatusContainer',
             );
 
             if (dropdown.contains(event.target)) {
@@ -2845,7 +2847,7 @@
               closeMentionDropdown();
             }
           },
-          true
+          true,
         );
 
         connect();
@@ -2904,11 +2906,11 @@
             uploadedChunks = new Set(progress.uploadedChunks || []);
             completedChunks = uploadedChunks.size;
             const resumePercent = Math.floor(
-              (completedChunks / totalChunks) * 100
+              (completedChunks / totalChunks) * 100,
             );
             showUploadStatus(
               `Resuming "${file.name}" from ${resumePercent}%`,
-              'success'
+              'success',
             );
           }
         } catch (e) {
@@ -2925,7 +2927,7 @@
                 totalChunks,
                 uploadedChunks: Array.from(uploadedChunks),
                 timestamp: Date.now(),
-              })
+              }),
             );
           } catch (e) {
             console.error('Failed to save upload progress:', e);
@@ -2973,7 +2975,7 @@
 
         const updateProgress = async () => {
           const currentProgress = Math.floor(
-            (completedChunks / totalChunks) * 100
+            (completedChunks / totalChunks) * 100,
           );
           if (currentProgress >= lastProgressUpdate) {
             lastProgressUpdate = currentProgress;
@@ -3003,7 +3005,7 @@
             } catch (error) {
               registerSuccess = false;
               await new Promise((resolve) =>
-                setTimeout(resolve, 1000 * retries)
+                setTimeout(resolve, 1000 * retries),
               );
             }
           }
@@ -3022,7 +3024,7 @@
           }
           async function processTasksWithConcurrencyLimit(
             tasks,
-            concurrencyLimit
+            concurrencyLimit,
           ) {
             const results = [];
             const runningTasks = new Set();
@@ -3041,7 +3043,7 @@
                     task.index,
                     task.totalChunks,
                     task.fileId,
-                    task.file
+                    task.file,
                   );
 
                   if (!uploadedChunks.has(task.index)) {
@@ -3054,22 +3056,22 @@
                   retries++;
                   console.error(
                     `Chunk ${task.index} failed (attempt ${retries}/${maxRetries}):`,
-                    error
+                    error,
                   );
 
                   if (retries > maxRetries) {
                     showUploadStatus(
                       `Chunk ${task.index} failed after ${maxRetries} retries`,
-                      'error'
+                      'error',
                     );
                     throw new Error(
-                      `Chunk ${task.index} upload failed: ${error.message}`
+                      `Chunk ${task.index} upload failed: ${error.message}`,
                     );
                   }
 
                   const delay = Math.min(
                     1000 * Math.pow(2, retries - 1),
-                    10000
+                    10000,
                   );
                   await new Promise((resolve) => setTimeout(resolve, delay));
                 }
@@ -3093,7 +3095,7 @@
           }
           const results = await processTasksWithConcurrencyLimit(
             tasks,
-            MAX_CONCURRENT_UPLOADS
+            MAX_CONCURRENT_UPLOADS,
           );
           let mergeSuccess = false;
           let mergeSuccessfulUploads = null;
@@ -3112,7 +3114,7 @@
             } catch (error) {
               mergeSuccess = false;
               await new Promise((resolve) =>
-                setTimeout(resolve, 1000 * retries)
+                setTimeout(resolve, 1000 * retries),
               );
             }
           }
@@ -3139,13 +3141,13 @@
           sendWebSocketMessage(messageData);
           showUploadStatus(
             `File "${file.name}" uploaded successfully!`,
-            'success'
+            'success',
           );
         } catch (error) {
           console.error('Upload failed:', error);
           showUploadStatus(
             `Upload failed: ${error.message}. Progress saved, you can retry later.`,
-            'error'
+            'error',
           );
         }
       }

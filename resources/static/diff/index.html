@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -74,8 +74,8 @@
       }
 
       body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
-          sans-serif;
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         min-height: 100vh;
         padding: 20px;
@@ -841,7 +841,7 @@
             arr2,
             arr1.length,
             arr2.length,
-            result
+            result,
           );
           const diffResult = result.reverse();
 
@@ -1035,7 +1035,7 @@
             }
 
             return `<span class="${className}">${escapeHtml(
-              part.value
+              part.value,
             )}</span>`;
           })
           .join('');
@@ -1069,7 +1069,7 @@
       function handlePaste(e) {
         e.preventDefault();
         const text = (e.clipboardData || window.clipboardData).getData(
-          'text/plain'
+          'text/plain',
         );
         document.execCommand('insertText', false, text);
       }
