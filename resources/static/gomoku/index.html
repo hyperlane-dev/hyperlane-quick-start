@@ -11,20 +11,21 @@
     <link rel="icon" href="https://docs.ltpp.vip/img/hyperlane.png" />
     <style>
       :root {
-        --bg-dark: #0f172a;
-        --bg-card: rgba(15, 23, 42, 0.7);
-        --border: rgba(148, 163, 184, 0.25);
-        --accent: #7c3aed;
-        --accent-2: #4f46e5;
-        --text: #e2e8f0;
-        --text-muted: #94a3b8;
+        --bg-dark: #f5f7fb;
+        --bg-card: #ffffff;
+        --border: rgba(100, 116, 139, 0.18);
+        --accent: #667eea;
+        --accent-2: #764ba2;
+        --text: #1e293b;
+        --text-muted: #64748b;
         --success: #22c55e;
         --warning: #f59e0b;
         --error: #ef4444;
-        --board-bg: #1e293b;
-        --cell-border: rgba(148, 163, 184, 0.25);
-        --stone-black: #0f172a;
+        --board-bg: #f4e7b6;
+        --cell-border: rgba(148, 163, 184, 0.55);
+        --stone-black: #111827;
         --stone-white: #f8fafc;
+        --stone-white-border: rgba(100, 116, 139, 0.6);
       }
 
       * {
@@ -40,17 +41,19 @@
           BlinkMacSystemFont,
           'Segoe UI',
           sans-serif;
-        background: radial-gradient(circle at top, #1e293b, #0f172a 65%);
+        background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
         color: var(--text);
         min-height: 100vh;
         display: flex;
         flex-direction: column;
+        overflow: hidden;
       }
 
       .app {
         display: flex;
         flex-direction: column;
         min-height: 100vh;
+        height: 100vh;
       }
 
       .header {
@@ -68,6 +71,14 @@
         gap: 12px;
         font-weight: 600;
         font-size: 18px;
+      }
+
+      .brand a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: inherit;
+        text-decoration: none;
       }
 
       .brand img {
@@ -102,6 +113,8 @@
         grid-template-columns: 320px 1fr 320px;
         gap: 24px;
         padding: 24px 32px 32px;
+        min-height: 0;
+        overflow: hidden;
       }
 
       .panel {
@@ -109,11 +122,16 @@
         border: 1px solid var(--border);
         border-radius: 20px;
         padding: 20px;
-        backdrop-filter: blur(16px);
-        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.35);
+        box-shadow: 0 16px 32px rgba(148, 163, 184, 0.25);
         display: flex;
         flex-direction: column;
         gap: 16px;
+        min-height: 0;
+      }
+
+      .panel-scroll {
+        min-height: 0;
+        overflow: hidden;
       }
 
       .panel h2 {
@@ -133,7 +151,7 @@
       }
 
       .field input {
-        background: rgba(15, 23, 42, 0.8);
+        background: #f8fafc;
         border: 1px solid var(--border);
         border-radius: 10px;
         padding: 10px 12px;
@@ -195,7 +213,7 @@
         border-radius: 18px;
         display: grid;
         grid-template-columns: repeat(15, 1fr);
-        border: 1px solid var(--border);
+        border: 1px solid rgba(148, 163, 184, 0.4);
         overflow: hidden;
       }
 
@@ -206,6 +224,7 @@
         justify-content: center;
         cursor: pointer;
         position: relative;
+        aspect-ratio: 1;
       }
 
       .cell:hover::after {
@@ -219,7 +238,8 @@
 
       .stone {
         width: 70%;
-        height: 70%;
+        aspect-ratio: 1;
+        height: auto;
         border-radius: 50%;
         box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
       }
@@ -238,6 +258,10 @@
           #ffffff,
           var(--stone-white)
         );
+        border: 2px solid var(--stone-white-border);
+        box-shadow:
+          0 6px 14px rgba(15, 23, 42, 0.2),
+          inset 0 -4px 8px rgba(148, 163, 184, 0.3);
       }
 
       .sidebar-list {
@@ -257,6 +281,20 @@
         display: flex;
         flex-direction: column;
         gap: 8px;
+        min-height: 0;
+      }
+
+      .move-log::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .move-log::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, var(--accent), var(--accent-2));
+        border-radius: 6px;
+      }
+
+      .move-log::-webkit-scrollbar-track {
+        background: rgba(148, 163, 184, 0.2);
       }
 
       .move-item {
@@ -288,12 +326,14 @@
     <div class="app">
       <header class="header">
         <div class="brand">
-          <img
-            src="https://docs.ltpp.vip/img/hyperlane.png"
-            alt="Hyperlane"
-            onerror="this.style.display = 'none'"
-          />
-          Hyperlane Gomoku
+          <a href="https://github.com/hyperlane-dev/hyperlane" target="_blank">
+            <img
+              src="https://docs.ltpp.vip/img/hyperlane.png"
+              alt="Hyperlane"
+              onerror="this.style.display = 'none'"
+            />
+            <span>Hyperlane Gomoku</span>
+          </a>
         </div>
         <div class="status" id="connectionStatus">
           <span class="status-dot"></span>
@@ -330,7 +370,7 @@
           <div class="board" id="gomokuBoard"></div>
         </section>
 
-        <section class="panel">
+        <section class="panel panel-scroll">
           <h2>Match Info</h2>
           <div class="sidebar-list">
             <span>Players</span>
@@ -347,7 +387,15 @@
         </section>
       </main>
 
-      <footer class="footer">Gomoku powered by Hyperlane WebSocket</footer>
+      <footer class="footer">
+        <a
+          href="https://github.com/hyperlane-dev/hyperlane"
+          target="_blank"
+          style="color: inherit; text-decoration: none"
+        >
+          Gomoku powered by Hyperlane WebSocket</a
+        >
+      </footer>
     </div>
 
     <script>
