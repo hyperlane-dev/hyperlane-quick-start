@@ -1,4 +1,5 @@
 pub mod chat;
+pub mod gomoku;
 pub mod mysql;
 pub mod postgresql;
 pub mod redis;

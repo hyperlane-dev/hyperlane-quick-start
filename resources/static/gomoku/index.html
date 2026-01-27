@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="IE=edge" http-equiv="X-UA-Compatible" />
+    <meta
+      content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"
+      name="viewport"
+    />
+    <title>Hyperlane Gomoku</title>
+    <link rel="icon" href="https://docs.ltpp.vip/img/hyperlane.png" />
+    <style>
+      :root {
+        --bg-primary: #667eea;
+        --bg-secondary: #764ba2;
+        --card-bg: rgba(255, 255, 255, 0.95);
+        --card-border: rgba(102, 126, 234, 0.2);
+        --accent: #667eea;
+        --accent-2: #764ba2;
+        --text-primary: #2c3e50;
+        --text-muted: #6c757d;
+        --success: #22c55e;
+        --warning: #f59e0b;
+        --error: #ef4444;
+        --board-bg: #f7f8ff;
+        --cell-border: rgba(102, 126, 234, 0.2);
+        --stone-black: #1f2937;
+        --stone-white: #f8fafc;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+        color: var(--text-primary);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .app {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 32px;
+        background: rgba(255, 255, 255, 0.92);
+        border-bottom: 1px solid var(--card-border);
+        box-shadow: 0 10px 30px rgba(30, 64, 175, 0.15);
+        backdrop-filter: blur(12px);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 600;
+        font-size: 18px;
+        color: var(--text-primary);
+      }
+
+      .brand img {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.35);
+      }
+
+      .status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        color: var(--text-muted);
+      }
+
+      .status-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--error);
+      }
+
+      .status.connected .status-dot {
+        background: var(--success);
+      }
+
+      .main {
+        flex: 1;
+        display: grid;
+        grid-template-columns: 320px 1fr 320px;
+        gap: 24px;
+        padding: 24px 32px 32px;
+      }
+
+      .panel {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .panel h2 {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .field label {
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+
+      .field input {
+        background: #ffffff;
+        border: 1px solid rgba(148, 163, 184, 0.4);
+        border-radius: 10px;
+        padding: 10px 12px;
+        color: var(--text-primary);
+        font-size: 14px;
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+
+      button {
+        border: none;
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s ease;
+        color: #fff;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        box-shadow: 0 8px 16px rgba(102, 126, 234, 0.25);
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+      }
+
+      button.secondary {
+        background: #eef2ff;
+        color: var(--text-primary);
+        border: 1px solid rgba(102, 126, 234, 0.3);
+        box-shadow: none;
+      }
+
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .room-info {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        font-size: 14px;
+        color: var(--text-muted);
+      }
+
+      .room-info span {
+        color: var(--text-primary);
+        font-weight: 500;
+      }
+
+      .board-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .board {
+        width: min(70vw, 680px);
+        aspect-ratio: 1;
+        background: var(--board-bg);
+        border-radius: 18px;
+        display: grid;
+        grid-template-columns: repeat(15, 1fr);
+        border: 1px solid var(--card-border);
+        overflow: hidden;
+        box-shadow: inset 0 0 0 1px rgba(102, 126, 234, 0.1);
+      }
+
+      .cell {
+        border: 1px solid var(--cell-border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        position: relative;
+        background: rgba(255, 255, 255, 0.6);
+      }
+
+      .cell:hover::after {
+        content: '';
+        width: 70%;
+        height: 70%;
+        border-radius: 50%;
+        border: 2px dashed rgba(102, 126, 234, 0.6);
+        position: absolute;
+      }
+
+      .stone {
+        width: 70%;
+        height: 70%;
+        border-radius: 50%;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+      }
+
+      .stone.black {
+        background: radial-gradient(circle at 30% 30%, #4b5563, var(--stone-black));
+      }
+
+      .stone.white {
+        background: radial-gradient(circle at 30% 30%, #ffffff, var(--stone-white));
+        border: 2px solid rgba(102, 126, 234, 0.5);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2), inset 0 0 0 2px rgba(102, 126, 234, 0.25);
+      }
+
+
+      .sidebar-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .sidebar-list span {
+        font-size: 13px;
+        color: var(--text-muted);
+      }
+
+      .move-log {
+        flex: 1;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .move-item {
+        padding: 8px 10px;
+        border-radius: 10px;
+        background: rgba(102, 126, 234, 0.1);
+        font-size: 13px;
+        color: var(--text-primary);
+      }
+
+      .footer {
+        padding: 16px 32px;
+        text-align: center;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 12px;
+      }
+
+      .toast-container {
+        position: fixed;
+        top: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 1000;
+        pointer-events: none;
+      }
+
+      .toast {
+        min-width: 220px;
+        max-width: 320px;
+        background: #ffffff;
+        border: 1px solid var(--card-border);
+        color: var(--text-primary);
+        padding: 12px 16px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: 0.3s ease;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .toast.success {
+        border-left: 4px solid var(--success);
+      }
+
+      .toast.warning {
+        border-left: 4px solid var(--warning);
+      }
+
+      .toast.error {
+        border-left: 4px solid var(--error);
+      }
+
+      @media (max-width: 1200px) {
+
+        .main {
+          grid-template-columns: 1fr;
+        }
+
+        .board {
+          width: min(90vw, 640px);
+        }
+      }
+    </style>
+
+  </head>
+  <body>
+    <div class="app">
+      <header class="header">
+        <div class="brand">
+          <img
+            src="https://docs.ltpp.vip/img/hyperlane.png"
+            alt="Hyperlane"
+            onerror="this.style.display='none'"
+          />
+          Hyperlane Gomoku
+        </div>
+        <div class="status" id="connectionStatus">
+          <span class="status-dot"></span>
+          <span id="statusText">Disconnected</span>
+        </div>
+      </header>
+
+      <div class="toast-container" id="toastContainer"></div>
+
+      <main class="main">
+
+        <section class="panel">
+          <h2>Room Control</h2>
+          <div class="field">
+            <label>User ID</label>
+            <input id="userIdInput" readonly />
+          </div>
+          <div class="field">
+            <label>Room ID</label>
+            <input id="roomIdInput" placeholder="Enter room id" />
+          </div>
+          <div class="actions">
+            <button id="createBtn">Create</button>
+            <button id="joinBtn">Join</button>
+            <button id="spectateBtn" class="secondary">Spectate</button>
+            <button id="leaveBtn" class="secondary">Leave</button>
+          </div>
+          <div class="room-info">
+            <div>Current Room: <span id="currentRoom">-</span></div>
+            <div>My Role: <span id="myRole">-</span></div>
+            <div>Turn: <span id="turnInfo">-</span></div>
+            <div>Status: <span id="gameStatus">Waiting</span></div>
+          </div>
+        </section>
+
+        <section class="board-wrapper">
+          <div class="board" id="gomokuBoard"></div>
+        </section>
+
+        <section class="panel">
+          <h2>Match Info</h2>
+          <div class="sidebar-list">
+            <span>Players</span>
+            <div id="playersList"></div>
+          </div>
+          <div class="sidebar-list">
+            <span>Spectators</span>
+            <div id="spectatorsList"></div>
+          </div>
+          <div class="sidebar-list">
+            <span>Moves</span>
+            <div class="move-log" id="moveLog"></div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">Gomoku powered by Hyperlane WebSocket</footer>
+    </div>
+
+    <script>
+      const wsUrl = () => {
+        const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+        return `${protocol}://${window.location.host}/api/gomoku?uid=${getUserId()}`;
+      };
+
+      const MessageType = {
+        CreateRoom: 'CreateRoom',
+        JoinRoom: 'JoinRoom',
+        Spectate: 'Spectate',
+        Leave: 'Leave',
+        Start: 'Start',
+        PlaceStone: 'PlaceStone',
+        Sync: 'Sync',
+        RoomState: 'RoomState',
+        MoveResult: 'MoveResult',
+        Error: 'Error',
+        Ping: 'Ping',
+        Pang: 'Pang',
+      };
+
+      const state = {
+        socket: null,
+        connected: false,
+        room: null,
+        role: '-',
+        myColor: null,
+        lastStatus: null,
+        reconnectTimer: null,
+        reconnectAttempts: 0,
+        connecting: false,
+      };
+
+
+
+      const boardEl = document.getElementById('gomokuBoard');
+      const statusEl = document.getElementById('connectionStatus');
+      const statusText = document.getElementById('statusText');
+      const userIdInput = document.getElementById('userIdInput');
+      const roomIdInput = document.getElementById('roomIdInput');
+      const currentRoomEl = document.getElementById('currentRoom');
+      const myRoleEl = document.getElementById('myRole');
+      const turnInfoEl = document.getElementById('turnInfo');
+      const gameStatusEl = document.getElementById('gameStatus');
+      const playersListEl = document.getElementById('playersList');
+      const spectatorsListEl = document.getElementById('spectatorsList');
+      const moveLogEl = document.getElementById('moveLog');
+      const toastContainer = document.getElementById('toastContainer');
+
+
+      function getUserId() {
+        const key = 'gomoku_user_id';
+        let id = localStorage.getItem(key);
+        if (!id) {
+          id = `user_${Date.now().toString(36)}_${Math.random()
+            .toString(36)
+            .slice(2, 8)}`;
+          localStorage.setItem(key, id);
+        }
+        return id;
+      }
+
+      function setStatus(connected) {
+        state.connected = connected;
+        statusEl.classList.toggle('connected', connected);
+        statusText.textContent = connected ? 'Connected' : 'Disconnected';
+      }
+
+      function showToast(message, type) {
+        if (!toastContainer) return;
+        const toast = document.createElement('div');
+        toast.className = `toast ${type || 'success'}`;
+        toast.textContent = message;
+        toastContainer.appendChild(toast);
+        requestAnimationFrame(() => {
+          toast.classList.add('show');
+        });
+        setTimeout(() => {
+          toast.classList.remove('show');
+          setTimeout(() => {
+            toast.remove();
+          }, 300);
+        }, 2500);
+      }
+
+      function clearReconnectTimer() {
+        if (state.reconnectTimer) {
+          clearTimeout(state.reconnectTimer);
+          state.reconnectTimer = null;
+        }
+      }
+
+      function scheduleReconnect() {
+        if (state.reconnectTimer) return;
+        state.reconnectAttempts += 1;
+        const delay = Math.min(30000, 1000 * 2 ** (state.reconnectAttempts - 1));
+        state.reconnectTimer = setTimeout(() => {
+          state.reconnectTimer = null;
+          connect();
+        }, delay);
+      }
+
+      function connect() {
+        if (state.connecting) return;
+        if (state.socket) {
+          const readyState = state.socket.readyState;
+          if (readyState === WebSocket.OPEN || readyState === WebSocket.CONNECTING) {
+            return;
+          }
+          state.socket.close();
+        }
+        state.connecting = true;
+        state.socket = new WebSocket(wsUrl());
+        setStatus(false);
+
+        state.socket.onopen = () => {
+          state.connecting = false;
+          state.reconnectAttempts = 0;
+          clearReconnectTimer();
+          setStatus(true);
+        };
+
+        state.socket.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            handleMessage(data);
+          } catch (error) {
+            console.error('Invalid message', error);
+          }
+        };
+
+        state.socket.onerror = () => {
+          if (state.socket) {
+            state.socket.close();
+          }
+        };
+
+        state.socket.onclose = () => {
+          state.connecting = false;
+          setStatus(false);
+          scheduleReconnect();
+        };
+      }
+
+
+      function sendMessage(type, roomId, payload) {
+        if (!state.socket || state.socket.readyState !== WebSocket.OPEN) {
+          connect();
+          setTimeout(() => sendMessage(type, roomId, payload), 500);
+          return;
+        }
+
+        const message = {
+          type,
+          room_id: roomId || '',
+          payload: payload || {},
+        };
+        state.socket.send(JSON.stringify(message));
+      }
+
+      function handleMessage(message) {
+        if (message.type === MessageType.RoomState) {
+          updateRoomState(message.payload);
+        } else if (message.type === MessageType.MoveResult) {
+          if (message.payload && message.payload.room) {
+            updateRoomState(message.payload.room);
+          }
+        } else if (message.type === MessageType.Start) {
+          showToast('游戏开始', 'success');
+        } else if (message.type === MessageType.Error) {
+          alert(message.payload?.message || 'Operation failed');
+        }
+      }
+
+
+      function updateRoomState(room) {
+        state.room = room;
+        const nextStatus = room.status || 'Waiting';
+        const previousStatus = state.lastStatus;
+        state.lastStatus = nextStatus;
+        currentRoomEl.textContent = room.room_id || '-';
+        gameStatusEl.textContent = nextStatus;
+        const players = room.players || [];
+        const spectators = room.spectators || [];
+        const moves = room.moves || [];
+
+        const myId = getUserId();
+        const player = players.find((item) => item.user_id === myId);
+        state.role = player ? 'Player' : spectators.includes(myId) ? 'Spectator' : '-';
+        state.myColor = player ? player.color : null;
+        myRoleEl.textContent = state.role;
+        turnInfoEl.textContent = room.next_turn || '-';
+
+
+        playersListEl.innerHTML = players
+          .map((item) => `<div>${item.user_id} (${item.color})</div>`)
+          .join('') || '<span>-</span>';
+        spectatorsListEl.innerHTML = spectators
+          .map((item) => `<div>${item}</div>`)
+          .join('') || '<span>-</span>';
+
+        moveLogEl.innerHTML = moves
+          .slice()
+          .reverse()
+          .map(
+            (move) =>
+              `<div class="move-item">#${move.step} ${move.color} (${move.x}, ${move.y})</div>`
+          )
+          .join('') || '<span>-</span>';
+
+        renderBoard(room.board || []);
+        if (nextStatus === 'Finished' && previousStatus !== 'Finished') {
+          let resultText = '平局';
+          let resultType = 'warning';
+          if (room.winner === 'Black') {
+            resultText = '黑方胜利';
+            resultType = 'success';
+          } else if (room.winner === 'White') {
+            resultText = '白方胜利';
+            resultType = 'success';
+          }
+          showToast(`对局结束：${resultText}`, resultType);
+        }
+      }
+
+
+      function renderBoard(board) {
+        boardEl.innerHTML = '';
+        for (let y = 0; y < 15; y++) {
+          for (let x = 0; x < 15; x++) {
+            const cell = document.createElement('div');
+            cell.className = 'cell';
+            const value = board[y]?.[x] || 0;
+            if (value === 1) {
+              const stone = document.createElement('div');
+              stone.className = 'stone black';
+              cell.appendChild(stone);
+            }
+            if (value === 2) {
+              const stone = document.createElement('div');
+              stone.className = 'stone white';
+              cell.appendChild(stone);
+            }
+            cell.addEventListener('click', () => handleCellClick(x, y));
+            boardEl.appendChild(cell);
+          }
+        }
+      }
+
+      function handleCellClick(x, y) {
+        if (!state.room || state.room.status !== 'InProgress') {
+          return;
+        }
+        if (state.role !== 'Player') {
+          return;
+        }
+        if (state.myColor && state.room.next_turn !== state.myColor) {
+          return;
+        }
+        sendMessage(MessageType.PlaceStone, state.room.room_id, { x, y });
+      }
+
+      document.getElementById('createBtn').addEventListener('click', () => {
+        sendMessage(MessageType.CreateRoom, roomIdInput.value.trim(), {});
+      });
+
+      document.getElementById('joinBtn').addEventListener('click', () => {
+        const roomId = roomIdInput.value.trim();
+        if (!roomId) return;
+        sendMessage(MessageType.JoinRoom, roomId, {});
+      });
+
+      document.getElementById('spectateBtn').addEventListener('click', () => {
+        const roomId = roomIdInput.value.trim();
+        if (!roomId) return;
+        sendMessage(MessageType.Spectate, roomId, {});
+      });
+
+      document.getElementById('leaveBtn').addEventListener('click', () => {
+        sendMessage(MessageType.Leave, state.room?.room_id || '', {});
+      });
+
+      userIdInput.value = getUserId();
+      connect();
+    </script>
+  </body>
+</html>
