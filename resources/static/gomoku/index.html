@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -35,18 +35,27 @@
       }
 
       body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-        background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        background: linear-gradient(
+          135deg,
+          var(--bg-primary) 0%,
+          var(--bg-secondary) 100%
+        );
         color: var(--text-primary);
         min-height: 100vh;
+        height: 100vh;
         display: flex;
         flex-direction: column;
+        overflow: hidden;
       }
 
       .app {
         display: flex;
         flex-direction: column;
         min-height: 100vh;
+        height: 100vh;
+        overflow: hidden;
       }
 
       .header {
@@ -101,6 +110,8 @@
         grid-template-columns: 320px 1fr 320px;
         gap: 24px;
         padding: 24px 32px 32px;
+        min-height: 0;
+        overflow: hidden;
       }
 
       .panel {
@@ -112,6 +123,12 @@
         display: flex;
         flex-direction: column;
         gap: 16px;
+        min-height: 0;
+      }
+
+      .panel-scroll {
+        height: 100%;
+        overflow-y: auto;
       }
 
       .panel h2 {
@@ -234,15 +251,24 @@
       }
 
       .stone.black {
-        background: radial-gradient(circle at 30% 30%, #4b5563, var(--stone-black));
+        background: radial-gradient(
+          circle at 30% 30%,
+          #4b5563,
+          var(--stone-black)
+        );
       }
 
       .stone.white {
-        background: radial-gradient(circle at 30% 30%, #ffffff, var(--stone-white));
+        background: radial-gradient(
+          circle at 30% 30%,
+          #ffffff,
+          var(--stone-white)
+        );
         border: 2px solid rgba(102, 126, 234, 0.5);
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2), inset 0 0 0 2px rgba(102, 126, 234, 0.25);
+        box-shadow:
+          0 6px 16px rgba(0, 0, 0, 0.2),
+          inset 0 0 0 2px rgba(102, 126, 234, 0.25);
       }
-
 
       .sidebar-list {
         display: flex;
@@ -322,7 +348,6 @@
       }
 
       @media (max-width: 1200px) {
-
         .main {
           grid-template-columns: 1fr;
         }
@@ -332,7 +357,6 @@
         }
       }
     </style>
-
   </head>
   <body>
     <div class="app">
@@ -341,7 +365,7 @@
           <img
             src="https://docs.ltpp.vip/img/hyperlane.png"
             alt="Hyperlane"
-            onerror="this.style.display='none'"
+            onerror="this.style.display = 'none'"
           />
           Hyperlane Gomoku
         </div>
@@ -354,7 +378,6 @@
       <div class="toast-container" id="toastContainer"></div>
 
       <main class="main">
-
         <section class="panel">
           <h2>Room Control</h2>
           <div class="field">
@@ -383,8 +406,9 @@
           <div class="board" id="gomokuBoard"></div>
         </section>
 
-        <section class="panel">
+        <section class="panel panel-scroll">
           <h2>Match Info</h2>
+
           <div class="sidebar-list">
             <span>Players</span>
             <div id="playersList"></div>
@@ -436,8 +460,6 @@
         connecting: false,
       };
 
-
-
       const boardEl = document.getElementById('gomokuBoard');
       const statusEl = document.getElementById('connectionStatus');
       const statusText = document.getElementById('statusText');
@@ -451,7 +473,6 @@
       const spectatorsListEl = document.getElementById('spectatorsList');
       const moveLogEl = document.getElementById('moveLog');
       const toastContainer = document.getElementById('toastContainer');
-
 
       function getUserId() {
         const key = 'gomoku_user_id';
@@ -498,7 +519,10 @@
       function scheduleReconnect() {
         if (state.reconnectTimer) return;
         state.reconnectAttempts += 1;
-        const delay = Math.min(30000, 1000 * 2 ** (state.reconnectAttempts - 1));
+        const delay = Math.min(
+          30000,
+          1000 * 2 ** (state.reconnectAttempts - 1),
+        );
         state.reconnectTimer = setTimeout(() => {
           state.reconnectTimer = null;
           connect();
@@ -509,7 +533,10 @@
         if (state.connecting) return;
         if (state.socket) {
           const readyState = state.socket.readyState;
-          if (readyState === WebSocket.OPEN || readyState === WebSocket.CONNECTING) {
+          if (
+            readyState === WebSocket.OPEN ||
+            readyState === WebSocket.CONNECTING
+          ) {
             return;
           }
           state.socket.close();
@@ -547,7 +574,6 @@
         };
       }
 
-
       function sendMessage(type, roomId, payload) {
         if (!state.socket || state.socket.readyState !== WebSocket.OPEN) {
           connect();
@@ -577,7 +603,6 @@
         }
       }
 
-
       function updateRoomState(room) {
         state.room = room;
         const nextStatus = room.status || 'Waiting';
@@ -591,27 +616,32 @@
 
         const myId = getUserId();
         const player = players.find((item) => item.user_id === myId);
-        state.role = player ? 'Player' : spectators.includes(myId) ? 'Spectator' : '-';
+        state.role = player
+          ? 'Player'
+          : spectators.includes(myId)
+            ? 'Spectator'
+            : '-';
         state.myColor = player ? player.color : null;
         myRoleEl.textContent = state.role;
         turnInfoEl.textContent = room.next_turn || '-';
 
+        playersListEl.innerHTML =
+          players
+            .map((item) => `<div>${item.user_id} (${item.color})</div>`)
+            .join('') || '<span>-</span>';
+        spectatorsListEl.innerHTML =
+          spectators.map((item) => `<div>${item}</div>`).join('') ||
+          '<span>-</span>';
 
-        playersListEl.innerHTML = players
-          .map((item) => `<div>${item.user_id} (${item.color})</div>`)
-          .join('') || '<span>-</span>';
-        spectatorsListEl.innerHTML = spectators
-          .map((item) => `<div>${item}</div>`)
-          .join('') || '<span>-</span>';
-
-        moveLogEl.innerHTML = moves
-          .slice()
-          .reverse()
-          .map(
-            (move) =>
-              `<div class="move-item">#${move.step} ${move.color} (${move.x}, ${move.y})</div>`
-          )
-          .join('') || '<span>-</span>';
+        moveLogEl.innerHTML =
+          moves
+            .slice()
+            .reverse()
+            .map(
+              (move) =>
+                `<div class="move-item">#${move.step} ${move.color} (${move.x}, ${move.y})</div>`,
+            )
+            .join('') || '<span>-</span>';
 
         renderBoard(room.board || []);
         if (nextStatus === 'Finished' && previousStatus !== 'Finished') {
@@ -627,7 +657,6 @@
           showToast(`对局结束：${resultText}`, resultType);
         }
       }
-
 
       function renderBoard(board) {
         boardEl.innerHTML = '';

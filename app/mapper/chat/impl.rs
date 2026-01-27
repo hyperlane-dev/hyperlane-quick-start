@@ -53,7 +53,9 @@ impl ChatHistoryMapper {
             .limit(limit as u64)
             .all(&db)
             .await
-            .map_err(|error: DbErr| format!("Failed to query from PostgreSQL{COLON_SPACE}{error}"))?;
+            .map_err(|error: DbErr| {
+                format!("Failed to query from PostgreSQL{COLON_SPACE}{error}")
+            })?;
         records.reverse();
         Ok(records
             .into_iter()
@@ -76,10 +78,9 @@ impl ChatHistoryMapper {
     pub async fn count_messages() -> Result<i64, String> {
         let db: DatabaseConnection =
             get_postgresql_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME).await?;
-        let count: u64 = Entity::find()
-            .count(&db)
-            .await
-            .map_err(|error: DbErr| format!("Failed to count from PostgreSQL{COLON_SPACE}{error}"))?;
+        let count: u64 = Entity::find().count(&db).await.map_err(|error: DbErr| {
+            format!("Failed to count from PostgreSQL{COLON_SPACE}{error}")
+        })?;
         Ok(count as i64)
     }
 }

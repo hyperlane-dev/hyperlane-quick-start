@@ -29,4 +29,3 @@ pub enum GomokuMessageType {
     Pang,
     Unknown,
 }
-

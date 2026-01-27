@@ -10,8 +10,7 @@ impl GomokuDomain {
             .set_user_id(owner_id.to_string())
             .set_color(StoneColor::Black);
         players.push(owner);
-        room
-            .set_room_id(room_id.to_string())
+        room.set_room_id(room_id.to_string())
             .set_owner_id(owner_id.to_string())
             .set_players(players)
             .set_status(GameStatus::Waiting)
@@ -71,10 +70,8 @@ impl GomokuDomain {
         }
         if removed && room.get_status() == &GameStatus::InProgress {
             room.set_status(GameStatus::Finished);
-            let winner: Option<StoneColor> = room
-                .get_players()
-                .first()
-                .map(|player| *player.get_color());
+            let winner: Option<StoneColor> =
+                room.get_players().first().map(|player| *player.get_color());
             room.set_winner(winner);
         }
         removed
@@ -128,11 +125,10 @@ impl GomokuDomain {
             .set_color(player_color)
             .set_step(step);
         room.get_mut_moves().push(move_data.clone());
-        let board: &Vec<Vec<u8>> = room.get_board();
+        let board: &[Vec<u8>] = room.get_board();
         let mut result: GomokuPlaceResult = GomokuPlaceResult::default();
         result.set_move_data(move_data);
         if Self::check_five(board, x, y, value) {
-
             room.set_status(GameStatus::Finished);
             room.set_winner(Some(player_color));
             result
@@ -169,9 +165,9 @@ impl GomokuDomain {
     }
 
     #[instrument_trace]
-    fn is_board_full(board: &Vec<Vec<u8>>) -> bool {
+    fn is_board_full(board: &[Vec<u8>]) -> bool {
         for row in board.iter() {
-            if row.iter().any(|cell| *cell == 0) {
+            if row.contains(&0) {
                 return false;
             }
         }
@@ -179,7 +175,7 @@ impl GomokuDomain {
     }
 
     #[instrument_trace]
-    fn check_five(board: &Vec<Vec<u8>>, x: usize, y: usize, value: u8) -> bool {
+    fn check_five(board: &[Vec<u8>], x: usize, y: usize, value: u8) -> bool {
         let directions: [(isize, isize); 4] = [(1, 0), (0, 1), (1, 1), (1, -1)];
         for (dx, dy) in directions.iter() {
             let mut count: usize = 1;
@@ -194,7 +190,7 @@ impl GomokuDomain {
 
     #[instrument_trace]
     fn count_direction(
-        board: &Vec<Vec<u8>>,
+        board: &[Vec<u8>],
         x: usize,
         y: usize,
         dx: isize,

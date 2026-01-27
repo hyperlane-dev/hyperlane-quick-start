@@ -255,7 +255,9 @@ impl ChatService {
         if let Some(error) = Self::extract_error_message(&response_json) {
             return Err(error);
         }
-        Err(format!("Incorrect API response format{COLON_SPACE}{response_text}"))
+        Err(format!(
+            "Incorrect API response format{COLON_SPACE}{response_text}"
+        ))
     }
 
     #[instrument_trace]

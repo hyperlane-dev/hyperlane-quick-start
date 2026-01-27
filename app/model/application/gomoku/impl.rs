@@ -66,4 +66,3 @@ fn build_empty_board(size: usize) -> Vec<Vec<u8>> {
     }
     board
 }
-

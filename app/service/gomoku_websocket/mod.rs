@@ -9,4 +9,3 @@ use {
     mapper::gomoku::*,
     model::{application::gomoku::*, data_transfer::gomoku::*, param::gomoku::*},
 };
-

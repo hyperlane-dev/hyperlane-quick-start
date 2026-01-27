@@ -1,7 +1,7 @@
 pub mod chat;
 pub mod diff;
-pub mod gomoku;
 pub mod favicon;
+pub mod gomoku;
 pub mod monitor;
 pub mod mysql;
 pub mod openapi;

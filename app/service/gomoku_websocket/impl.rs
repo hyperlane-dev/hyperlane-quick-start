@@ -171,7 +171,7 @@ impl GomokuWebSocketService {
         let _color: StoneColor = GomokuDomain::add_player(&mut room, sender_id)?;
         GomokuRoomMapper::set_user_room(sender_id, &room_id);
         if room.get_status() == &GameStatus::Waiting && room.get_players().len() == 2 {
-            let _ = GomokuDomain::start_game(&mut room);
+            GomokuDomain::start_game(&mut room)?;
             if let Ok(start_body) = Self::build_response_body(
                 GomokuMessageType::Start,
                 &room_id,
