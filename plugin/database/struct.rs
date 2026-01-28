@@ -1,5 +1,28 @@
 use super::*;
 
+#[derive(Clone, Debug)]
+pub struct ConnectionCache<T: Clone> {
+    pub result: Result<T, String>,
+    pub last_attempt: Instant,
+}
+
+impl<T: Clone> ConnectionCache<T> {
+    pub fn new(result: Result<T, String>) -> Self {
+        Self {
+            result,
+            last_attempt: Instant::now(),
+        }
+    }
+
+    pub fn is_cooldown_expired(&self, cooldown_duration: Duration) -> bool {
+        self.last_attempt.elapsed() >= cooldown_duration
+    }
+
+    pub fn should_retry(&self, cooldown_duration: Duration) -> bool {
+        self.result.is_err() && self.is_cooldown_expired(cooldown_duration)
+    }
+}
+
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct AutoCreationErrorHandler;
 

@@ -1,5 +1,5 @@
 use super::*;
 
 pub static POSTGRESQL_CONNECTIONS: Lazy<
-    RwLock<HashMap<String, Result<DatabaseConnection, String>>>,
+    RwLock<HashMap<String, ConnectionCache<DatabaseConnection>>>,
 > = Lazy::new(|| RwLock::new(HashMap::new()));

@@ -66,29 +66,49 @@ where
     I: AsRef<str>,
 {
     let instance_name_str: &str = instance_name.as_ref();
-    let mut connections: RwLockWriteGuard<'_, HashMap<String, Result<DatabaseConnection, String>>> =
-        MYSQL_CONNECTIONS.write().await;
-    if let Some(connection_result) = connections.get(instance_name_str) {
-        match connection_result {
-            Ok(conn) => return Ok(conn.clone()),
-            Err(_) => {
-                connections.remove(instance_name_str);
+    let cooldown_duration: Duration = get_retry_cooldown_duration();
+    {
+        let connections: tokio::sync::RwLockReadGuard<
+            '_,
+            HashMap<String, ConnectionCache<DatabaseConnection>>,
+        > = MYSQL_CONNECTIONS.read().await;
+        if let Some(cache) = connections.get(instance_name_str) {
+            match &cache.result {
+                Ok(conn) => return Ok(conn.clone()),
+                Err(error) => {
+                    if !cache.is_cooldown_expired(cooldown_duration) {
+                        return Err(error.clone());
+                    }
+                }
             }
         }
     }
+    let mut connections: RwLockWriteGuard<
+        '_,
+        HashMap<String, ConnectionCache<DatabaseConnection>>,
+    > = MYSQL_CONNECTIONS.write().await;
+    if let Some(cache) = connections.get(instance_name_str) {
+        match &cache.result {
+            Ok(conn) => return Ok(conn.clone()),
+            Err(error) => {
+                if !cache.is_cooldown_expired(cooldown_duration) {
+                    return Err(error.clone());
+                }
+            }
+        }
+    }
+    connections.remove(instance_name_str);
     drop(connections);
     let new_connection: Result<DatabaseConnection, String> =
         connection_mysql_db(instance_name_str).await;
-    let mut connections: RwLockWriteGuard<'_, HashMap<String, Result<DatabaseConnection, String>>> =
-        MYSQL_CONNECTIONS.write().await;
-    match &new_connection {
-        Ok(conn) => {
-            connections.insert(instance_name_str.to_string(), Ok(conn.clone()));
-        }
-        Err(error) => {
-            connections.insert(instance_name_str.to_string(), Err(error.clone()));
-        }
-    }
+    let mut connections: RwLockWriteGuard<
+        '_,
+        HashMap<String, ConnectionCache<DatabaseConnection>>,
+    > = MYSQL_CONNECTIONS.write().await;
+    connections.insert(
+        instance_name_str.to_string(),
+        ConnectionCache::new(new_connection.clone()),
+    );
     new_connection
 }
 
