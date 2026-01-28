@@ -10,6 +10,15 @@ pub fn get_connection_timeout_duration() -> Duration {
 }
 
 #[instrument_trace]
+pub fn get_retry_cooldown_duration() -> Duration {
+    let cooldown_millis: u64 = std::env::var(ENV_KEY_DB_RETRY_COOLDOWN_MILLIS)
+        .ok()
+        .and_then(|value: String| value.parse::<u64>().ok())
+        .unwrap_or(DEFAULT_DB_RETRY_COOLDOWN_MILLIS);
+    Duration::from_millis(cooldown_millis)
+}
+
+#[instrument_trace]
 pub async fn initialize_auto_creation() -> Result<(), String> {
     if let Err(error) = AutoCreationConfig::validate() {
         return Err(format!(

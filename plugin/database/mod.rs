@@ -8,4 +8,7 @@ pub use {r#enum::*, r#fn::*, r#struct::*, r#trait::*};
 
 use {super::*, env::*};
 
-use std::{str::FromStr, time::Duration};
+use std::{
+    str::FromStr,
+    time::{Duration, Instant},
+};
