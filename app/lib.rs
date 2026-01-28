@@ -10,8 +10,6 @@ pub mod service;
 pub mod utils;
 pub mod view;
 
-use hyperlane_resources::*;
-
 use {
     hyperlane::*,
     hyperlane_utils::{log::*, *},

@@ -210,34 +210,8 @@ impl PostgreSqlAutoCreation {
     }
 
     #[instrument_trace]
-    fn get_postgresql_schema(&self) -> DatabaseSchema {
-        let indexes: Vec<String> = POSTGRESQL_CREATE_INDEX_SQL
-            .split(';')
-            .map(|s| s.trim())
-            .filter(|s| !s.is_empty() && !s.starts_with("--"))
-            .map(|s| format!("{s};"))
-            .collect();
-        let mut schema: DatabaseSchema = DatabaseSchema::default()
-            .add_table(TableSchema::new(
-                "record".to_string(),
-                POSTGRESQL_RECORD_SQL.to_string(),
-            ))
-            .add_table(TableSchema::new(
-                "chat_history".to_string(),
-                POSTGRESQL_CHAT_HISTORY_SQL.to_string(),
-            ))
-            .add_table(TableSchema::new(
-                "tracking_record".to_string(),
-                POSTGRESQL_TRACKING_RECORD_SQL.to_string(),
-            ))
-            .add_table(TableSchema::new(
-                "shortlink".to_string(),
-                POSTGRESQL_SHORTLINK_SQL.to_string(),
-            ));
-        for index in indexes {
-            schema = schema.add_index(index);
-        }
-        schema
+    fn get_database_schema(&self) -> &DatabaseSchema {
+        &self.schema
     }
 }
 
@@ -253,7 +227,7 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
     #[instrument_trace]
     async fn create_tables_if_not_exist(&self) -> Result<Vec<String>, AutoCreationError> {
         let connection: DatabaseConnection = self.create_target_connection().await?;
-        let schema: DatabaseSchema = self.get_postgresql_schema();
+        let schema: &DatabaseSchema = self.get_database_schema();
         let mut created_tables: Vec<String> = Vec::new();
         for table in schema.ordered_tables() {
             if !self.table_exists(&connection, &table.name).await? {

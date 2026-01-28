@@ -1,7 +1,10 @@
 use super::*;
 
 #[instrument_trace]
-pub async fn connection_mysql_db<I>(instance_name: I) -> Result<DatabaseConnection, String>
+pub async fn connection_mysql_db<I>(
+    instance_name: I,
+    schema: Option<DatabaseSchema>,
+) -> Result<DatabaseConnection, String>
 where
     I: AsRef<str>,
 {
@@ -10,7 +13,7 @@ where
     let instance: &MySqlInstanceConfig = env
         .get_mysql_instance(instance_name_str)
         .ok_or_else(|| format!("MySQL instance '{instance_name_str}' not found"))?;
-    match perform_mysql_auto_creation(instance).await {
+    match perform_mysql_auto_creation(instance, schema.clone()).await {
         Ok(result) => {
             if result.has_changes() {
                 database::AutoCreationLogger::log_auto_creation_complete(
@@ -61,7 +64,10 @@ where
 }
 
 #[instrument_trace]
-pub async fn get_mysql_connection<I>(instance_name: I) -> Result<DatabaseConnection, String>
+pub async fn get_mysql_connection<I>(
+    instance_name: I,
+    schema: Option<DatabaseSchema>,
+) -> Result<DatabaseConnection, String>
 where
     I: AsRef<str>,
 {
@@ -100,7 +106,7 @@ where
     connections.remove(instance_name_str);
     drop(connections);
     let new_connection: Result<DatabaseConnection, String> =
-        connection_mysql_db(instance_name_str).await;
+        connection_mysql_db(instance_name_str, schema).await;
     let mut connections: RwLockWriteGuard<
         '_,
         HashMap<String, ConnectionCache<DatabaseConnection>>,
@@ -115,12 +121,16 @@ where
 #[instrument_trace]
 pub async fn perform_mysql_auto_creation(
     instance: &MySqlInstanceConfig,
+    schema: Option<DatabaseSchema>,
 ) -> Result<AutoCreationResult, AutoCreationError> {
     let start_time: Instant = Instant::now();
     let mut result: AutoCreationResult = AutoCreationResult::default();
     AutoCreationLogger::log_auto_creation_start(database::PluginType::MySQL, &instance.database)
         .await;
-    let auto_creator: MySqlAutoCreation = MySqlAutoCreation::new(instance.clone());
+    let auto_creator: MySqlAutoCreation = match schema {
+        Some(s) => MySqlAutoCreation::with_schema(instance.clone(), s),
+        None => MySqlAutoCreation::new(instance.clone()),
+    };
     match auto_creator.create_database_if_not_exists().await {
         Ok(created) => {
             result.database_created = created;
