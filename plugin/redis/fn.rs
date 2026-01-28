@@ -114,8 +114,7 @@ where
     let instance_name_str: &str = instance_name.as_ref();
     let cooldown_duration: Duration = get_retry_cooldown_duration();
     {
-        let connections: tokio::sync::RwLockReadGuard<'_, RedisConnectionMap> =
-            REDIS_CONNECTIONS.read().await;
+        let connections: RwLockReadGuard<'_, RedisConnectionMap> = REDIS_CONNECTIONS.read().await;
         if let Some(cache) = connections.get(instance_name_str) {
             match &cache.result {
                 Ok(conn) => return Ok(conn.clone()),
