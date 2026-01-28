@@ -17,7 +17,7 @@ use {
     once_cell::sync::Lazy,
     sea_orm::{ConnectionTrait, Database, DatabaseBackend, DatabaseConnection, DbErr, Statement},
     tokio::{
-        sync::{RwLock, RwLockWriteGuard},
+        sync::{RwLock, RwLockReadGuard, RwLockWriteGuard},
         time::timeout,
     },
 };
