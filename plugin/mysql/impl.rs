@@ -15,6 +15,11 @@ impl Default for MySqlAutoCreation {
 
 impl MySqlAutoCreation {
     #[instrument_trace]
+    pub fn with_schema(instance: MySqlInstanceConfig, schema: DatabaseSchema) -> Self {
+        Self { instance, schema }
+    }
+
+    #[instrument_trace]
     async fn create_admin_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
         let admin_url: String = self.instance.get_admin_url();
         let timeout_duration: Duration = get_connection_timeout_duration();
@@ -204,11 +209,8 @@ impl MySqlAutoCreation {
     }
 
     #[instrument_trace]
-    fn get_mysql_schema(&self) -> database::DatabaseSchema {
-        DatabaseSchema::default().add_table(TableSchema::new(
-            "record".to_string(),
-            MYSQL_RECORD_SQL.to_string(),
-        ))
+    fn get_database_schema(&self) -> &DatabaseSchema {
+        &self.schema
     }
 }
 
@@ -224,7 +226,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
     #[instrument_trace]
     async fn create_tables_if_not_exist(&self) -> Result<Vec<String>, AutoCreationError> {
         let connection: DatabaseConnection = self.create_target_connection().await?;
-        let schema: DatabaseSchema = self.get_mysql_schema();
+        let schema: &DatabaseSchema = self.get_database_schema();
         let mut created_tables: Vec<String> = Vec::new();
         for table in schema.ordered_tables() {
             if !self.table_exists(&connection, &table.name).await? {

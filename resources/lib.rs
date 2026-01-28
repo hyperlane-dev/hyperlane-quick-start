@@ -1,5 +1,3 @@
-mod sql;
-mod r#static;
-mod templates;
-
-pub use {sql::*, r#static::*, templates::*};
+pub mod sql;
+pub mod r#static;
+pub mod templates;

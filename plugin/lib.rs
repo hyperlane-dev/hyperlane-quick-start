@@ -6,8 +6,6 @@ pub mod postgresql;
 pub mod process;
 pub mod redis;
 
-use hyperlane_resources::*;
-
 use {
     hyperlane::*,
     hyperlane_utils::{log::*, *},

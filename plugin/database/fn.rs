@@ -20,6 +20,15 @@ pub fn get_retry_cooldown_duration() -> Duration {
 
 #[instrument_trace]
 pub async fn initialize_auto_creation() -> Result<(), String> {
+    initialize_auto_creation_with_schema(None, None, None).await
+}
+
+#[instrument_trace]
+pub async fn initialize_auto_creation_with_schema(
+    mysql_schema: Option<DatabaseSchema>,
+    postgresql_schema: Option<DatabaseSchema>,
+    _redis_schema: Option<()>,
+) -> Result<(), String> {
     if let Err(error) = AutoCreationConfig::validate() {
         return Err(format!(
             "Auto-creation configuration validation failed{COLON_SPACE}{error}"
@@ -28,7 +37,7 @@ pub async fn initialize_auto_creation() -> Result<(), String> {
     let env: &'static EnvConfig = get_global_env_config();
     let mut initialization_results: Vec<String> = Vec::new();
     for instance in &env.mysql_instances {
-        match mysql::perform_mysql_auto_creation(instance).await {
+        match mysql::perform_mysql_auto_creation(instance, mysql_schema.clone()).await {
             Ok(result) => {
                 initialization_results.push(format!(
                     "MySQL ({}) {COLON_SPACE}{}",
@@ -55,7 +64,9 @@ pub async fn initialize_auto_creation() -> Result<(), String> {
         }
     }
     for instance in &env.postgresql_instances {
-        match postgresql::perform_postgresql_auto_creation(instance).await {
+        match postgresql::perform_postgresql_auto_creation(instance, postgresql_schema.clone())
+            .await
+        {
             Ok(result) => {
                 initialization_results.push(format!(
                     "PostgreSQL ({}) {COLON_SPACE}{}",
