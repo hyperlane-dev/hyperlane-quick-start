@@ -8,6 +8,8 @@ pub use {r#enum::*, r#fn::*, r#struct::*, r#trait::*};
 
 use {super::*, env::*};
 
+use hyperlane_resources::*;
+
 use std::{
     str::FromStr,
     time::{Duration, Instant},

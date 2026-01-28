@@ -12,6 +12,7 @@ use {
     hyperlane_app::{service::monitor::*, *},
     hyperlane_config::framework::*,
     hyperlane_plugin::{database::*, env::*, mysql::*, postgresql::*, process::*, redis::*},
+    hyperlane_resources::*,
 };
 
 use std::sync::Arc;

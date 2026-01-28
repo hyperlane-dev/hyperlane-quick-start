@@ -1680,6 +1680,7 @@ dependencies = [
  "hyperlane_app",
  "hyperlane_config",
  "hyperlane_plugin",
+ "hyperlane_resources",
  "serde",
  "tracing",
 ]

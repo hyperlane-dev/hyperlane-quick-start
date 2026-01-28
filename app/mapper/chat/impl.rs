@@ -11,8 +11,11 @@ impl ChatHistoryMapper {
         message_type: &str,
         content: &str,
     ) -> Result<(), String> {
-        let db: DatabaseConnection =
-            get_postgresql_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME).await?;
+        let db: DatabaseConnection = get_postgresql_connection(
+            DEFAULT_POSTGRESQL_INSTANCE_NAME,
+            Some(build_postgresql_schema()),
+        )
+        .await?;
         let active_model: ActiveModel = ActiveModel {
             id: ActiveValue::NotSet,
             session_id: ActiveValue::Set(session_id.to_string()),
@@ -42,8 +45,11 @@ impl ChatHistoryMapper {
         before_id: Option<i64>,
         limit: i64,
     ) -> Result<Vec<ChatHistory>, String> {
-        let db: DatabaseConnection =
-            get_postgresql_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME).await?;
+        let db: DatabaseConnection = get_postgresql_connection(
+            DEFAULT_POSTGRESQL_INSTANCE_NAME,
+            Some(build_postgresql_schema()),
+        )
+        .await?;
         let mut query: Select<Entity> = Entity::find();
         if let Some(id) = before_id {
             query = query.filter(Column::Id.lt(id));
@@ -76,8 +82,11 @@ impl ChatHistoryMapper {
 
     #[instrument_trace]
     pub async fn count_messages() -> Result<i64, String> {
-        let db: DatabaseConnection =
-            get_postgresql_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME).await?;
+        let db: DatabaseConnection = get_postgresql_connection(
+            DEFAULT_POSTGRESQL_INSTANCE_NAME,
+            Some(build_postgresql_schema()),
+        )
+        .await?;
         let count: u64 = Entity::find().count(&db).await.map_err(|error: DbErr| {
             format!("Failed to count from PostgreSQL{COLON_SPACE}{error}")
         })?;

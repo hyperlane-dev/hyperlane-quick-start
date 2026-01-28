@@ -9,7 +9,7 @@ pub use {r#const::*, r#enum::*, r#fn::*, r#static::*, r#struct::*};
 
 use {super::*, model::application::chat::*};
 
-use hyperlane_plugin::postgresql::*;
+use hyperlane_plugin::{database::*, postgresql::*};
 
 use std::{
     collections::HashMap,
