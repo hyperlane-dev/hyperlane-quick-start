@@ -49,10 +49,6 @@ async fn print_route_matcher(server: &Server) {
     }
 }
 
-async fn init_network_capture() {
-    MonitorService::start_network_capture().await;
-}
-
 async fn init_db() {
     let mysql_schema: DatabaseSchema = build_mysql_schema();
     let postgresql_schema: DatabaseSchema = build_postgresql_schema();

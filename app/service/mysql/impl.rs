@@ -28,7 +28,7 @@ impl MysqlService {
         Ok(records
             .into_iter()
             .map(|r: Model| {
-                let mut record = MysqlRecord::default();
+                let mut record: MysqlRecord = MysqlRecord::default();
                 record.set_key(r.key).set_value(r.value);
                 record
             })
