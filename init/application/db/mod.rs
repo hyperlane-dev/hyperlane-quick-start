@@ -4,7 +4,10 @@ pub use r#fn::*;
 
 use super::*;
 
-use hyperlane_plugin::{database::*, mysql::*, postgresql::*, redis::*};
+use {
+    hyperlane_plugin::{database::*, mysql::*, postgresql::*, redis::*},
+    hyperlane_resources::*,
+};
 
 use std::sync::Arc;
 

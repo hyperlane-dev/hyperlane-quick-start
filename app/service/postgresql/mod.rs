@@ -5,4 +5,4 @@ pub use r#struct::*;
 
 use {super::*, mapper::postgresql::*, model::param::postgresql::*};
 
-use hyperlane_plugin::{database::*, postgresql::*};
+use hyperlane_plugin::postgresql::*;

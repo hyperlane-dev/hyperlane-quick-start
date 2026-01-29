@@ -1,6 +1,45 @@
 use super::*;
 
 #[instrument_trace]
+pub fn build_mysql_schema() -> DatabaseSchema {
+    DatabaseSchema::default().add_table(TableSchema::new(
+        "record".to_string(),
+        MYSQL_RECORD_SQL.to_string(),
+    ))
+}
+
+#[instrument_trace]
+pub fn build_postgresql_schema() -> DatabaseSchema {
+    let indexes: Vec<String> = POSTGRESQL_CREATE_INDEX_SQL
+        .split(';')
+        .map(|s| s.trim())
+        .filter(|s| !s.is_empty() && !s.starts_with("--"))
+        .map(|s| format!("{s};"))
+        .collect();
+    let mut schema: DatabaseSchema = DatabaseSchema::default()
+        .add_table(TableSchema::new(
+            "record".to_string(),
+            POSTGRESQL_RECORD_SQL.to_string(),
+        ))
+        .add_table(TableSchema::new(
+            "chat_history".to_string(),
+            POSTGRESQL_CHAT_HISTORY_SQL.to_string(),
+        ))
+        .add_table(TableSchema::new(
+            "tracking_record".to_string(),
+            POSTGRESQL_TRACKING_RECORD_SQL.to_string(),
+        ))
+        .add_table(TableSchema::new(
+            "shortlink".to_string(),
+            POSTGRESQL_SHORTLINK_SQL.to_string(),
+        ));
+    for index in indexes {
+        schema = schema.add_index(index);
+    }
+    schema
+}
+
+#[instrument_trace]
 pub async fn init_db() {
     let mysql_schema: DatabaseSchema = build_mysql_schema();
     let postgresql_schema: DatabaseSchema = build_postgresql_schema();

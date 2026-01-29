@@ -1691,7 +1691,6 @@ version = "9.4.3"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
- "hyperlane_resources",
  "serde",
  "tracing",
 ]
