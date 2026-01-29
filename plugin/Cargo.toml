@@ -15,8 +15,6 @@ exclude = ["target", "Cargo.lock", ".github", "tmp", "**/*.pid", "**/*.log"]
 path = "lib.rs"
 
 [dependencies]
-hyperlane_resources = { workspace = true }
-
 serde = { workspace = true }
 tracing = { workspace = true }
 hyperlane = { workspace = true }
