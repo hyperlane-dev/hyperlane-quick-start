@@ -6,7 +6,7 @@ pub fn get_global_env_config() -> &'static EnvConfig {
 }
 
 #[instrument_trace]
-pub fn init_env_config() -> Result<(), String> {
+pub fn load_env_config() -> Result<(), String> {
     let config: EnvConfig = EnvConfig::load()?;
     GLOBAL_ENV_CONFIG
         .set(config.clone())
