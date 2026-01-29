@@ -9,13 +9,23 @@ services:
       MYSQL_USER: hyperlane
       MYSQL_PASSWORD: hyperlane
     ports:
-      - "3306:3306"
+      - '3306:3306'
     volumes:
       - ./tmp/mysql_data:/var/lib/mysql
     networks:
       - hyperlane_network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-phyperlane"]
+      test:
+        [
+          'CMD',
+          'mysqladmin',
+          'ping',
+          '-h',
+          'localhost',
+          '-u',
+          'root',
+          '-phyperlane',
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -30,13 +40,13 @@ services:
       POSTGRES_PASSWORD: hyperlane
       POSTGRES_HOST_AUTH_METHOD: md5
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - ./tmp/postgres_data:/var/lib/postgresql/data
     networks:
       - hyperlane_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
+      test: ['CMD-SHELL', 'pg_isready']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -47,13 +57,13 @@ services:
     restart: always
     command: redis-server --requirepass hyperlane
     ports:
-      - "6379:6379"
+      - '6379:6379'
     volumes:
       - ./tmp/redis_data:/data
     networks:
       - hyperlane_network
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "hyperlane", "ping"]
+      test: ['CMD', 'redis-cli', '-a', 'hyperlane', 'ping']
       interval: 10s
       timeout: 5s
       retries: 5
