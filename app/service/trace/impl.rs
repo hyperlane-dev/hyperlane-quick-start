@@ -20,7 +20,7 @@ impl TraceService {
                 {
                     let content_str: String = String::from_utf8_lossy(&content).to_string();
                     for line in content_str.lines() {
-                        if line.trim().contains(&format!("\"{TRACE}\": [\"{trace}\"]")) {
+                        if line.trim().contains(&format!("\"{TRACE}\":[\"{trace}\"]")) {
                             return if let Some(prev) = &prev_line {
                                 format!("{prev}{BR}{BR}{line}{BR}")
                             } else {
