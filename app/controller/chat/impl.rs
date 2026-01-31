@@ -7,7 +7,7 @@ impl ServerHook for OnlineUsersRoute {
     }
 
     #[prologue_macros(
-        get,
+        get_method,
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
@@ -24,7 +24,7 @@ impl ServerHook for ChatRoute {
         Self
     }
 
-    #[prologue_macros(ws, get)]
+    #[prologue_macros(ws_upgrade_type, get_method)]
     #[instrument_trace]
     async fn handle(self, ctx: &Context) {
         let websocket: &WebSocket = get_global_websocket();
@@ -49,7 +49,7 @@ impl ServerHook for ChatHistoryRoute {
     }
 
     #[prologue_macros(
-        get,
+        get_method,
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]

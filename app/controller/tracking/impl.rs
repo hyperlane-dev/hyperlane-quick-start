@@ -7,7 +7,7 @@ impl ServerHook for TrackingReportRoute {
     }
 
     #[prologue_macros(
-        post,
+        post_method,
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
@@ -33,7 +33,7 @@ impl ServerHook for TrackingQueryRoute {
     }
 
     #[prologue_macros(
-        post,
+        post_method,
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]

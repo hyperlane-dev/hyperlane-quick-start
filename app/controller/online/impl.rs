@@ -6,7 +6,7 @@ impl ServerHook for OnlineRoute {
         Self
     }
 
-    #[prologue_macros(ws, get)]
+    #[prologue_macros(ws_upgrade_type, get_method)]
     #[instrument_trace]
     async fn handle(self, ctx: &Context) {
         let websocket: &WebSocket = get_global_websocket();

@@ -6,7 +6,7 @@ impl ServerHook for HealthCheckRoute {
         Self
     }
 
-    #[prologue_macros(get)]
+    #[prologue_macros(get_method)]
     #[instrument_trace]
     async fn handle(self, ctx: &Context) {}
 }

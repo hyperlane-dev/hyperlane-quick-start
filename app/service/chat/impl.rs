@@ -56,10 +56,9 @@ impl ServerHook for ChatSendedHook {
 
     #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        let request_string: String = ctx.get_request().await.get_body_string();
-        let request: String = ctx.get_request().await.get_string();
-        let response: String = ctx.get_response().await.get_string();
-        info!("{request}{BR}{request_string}{BR}{response}");
+        let request: String = ctx.get_request_json_string().await;
+        let response: String = ctx.get_response_json_string().await;
+        info!("{request}{BR}{response}");
         let response_body: ResponseBody = ctx.get_response().await.get_body().clone();
         if let Ok(resp_data) = serde_json::from_slice::<WebSocketRespData>(&response_body) {
             if *resp_data.get_type() == MessageType::OnlineCount {

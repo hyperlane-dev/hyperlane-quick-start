@@ -7,7 +7,7 @@ impl ServerHook for InsertRoute {
     }
 
     #[prologue_macros(
-        post,
+        post_method,
         request_body_json_result(request_opt: ShortlinkInsertRequest),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
@@ -43,7 +43,7 @@ impl ServerHook for QueryRoute {
     }
 
     #[prologue_macros(
-        get,
+        get_method,
         route_param_option(ID_KEY => id_opt),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]

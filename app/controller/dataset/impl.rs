@@ -6,7 +6,7 @@ impl ServerHook for DatasetRoute {
         Self
     }
 
-    #[prologue_macros(get)]
+    #[prologue_macros(get_method)]
     #[instrument_trace]
     async fn handle(self, ctx: &Context) {
         match DatasetService::fetch_dataset().await {

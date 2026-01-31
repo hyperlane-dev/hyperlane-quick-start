@@ -6,7 +6,7 @@ impl ServerHook for WebSocketRoute {
         Self
     }
 
-    #[prologue_macros(ws, ws_from_stream(request))]
+    #[prologue_macros(ws_upgrade_type, ws_from_stream(request))]
     #[instrument_trace]
     async fn handle(self, ctx: &Context) {
         let request_body: serde_json::Result<WebSocketMessage> = request.try_get_body_json();

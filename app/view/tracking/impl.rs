@@ -7,7 +7,7 @@ impl ServerHook for TrackingViewRoute {
     }
 
     #[prologue_macros(
-        get,
+        get_method,
         response_header(CONTENT_TYPE => TEXT_HTML),
         response_body(TRACKING_HTML)
     )]

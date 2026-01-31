@@ -33,7 +33,7 @@ impl ServerHook for CreateRecordRoute {
     }
 
     #[prologue_macros(
-        post,
+        post_method,
         request_body_json_result(record_opt: PostgresqlRecord),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
@@ -70,7 +70,7 @@ impl ServerHook for UpdateRecordRoute {
     }
 
     #[prologue_macros(
-        post,
+        post_method,
         request_body_json_result(record_opt: PostgresqlRecord),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
@@ -107,7 +107,7 @@ impl ServerHook for DeleteRecordRoute {
     }
 
     #[prologue_macros(
-        post,
+        post_method,
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]

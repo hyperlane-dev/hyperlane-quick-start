@@ -7,7 +7,7 @@ impl ServerHook for ServerStatusRoute {
     }
 
     #[prologue_macros(
-        get,
+        get_method,
         response_header(CONTENT_TYPE => TEXT_EVENT_STREAM),
         send
     )]
@@ -35,7 +35,7 @@ impl ServerHook for SystemInfoRoute {
     }
 
     #[prologue_macros(
-        get,
+        get_method,
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
