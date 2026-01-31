@@ -7,7 +7,7 @@ impl ServerHook for HttpRequestMiddleware {
     }
 
     #[prologue_macros(
-        reject(ctx.get_request_is_http().await),
+        reject(ctx.get_request_is_http_version().await),
         send,
     )]
     #[instrument_trace]
@@ -79,7 +79,7 @@ impl ServerHook for OptionMethodMiddleware {
     }
 
     #[prologue_macros(
-        filter(ctx.get_request_is_options().await),
+        filter(ctx.get_request_is_options_method().await),
         send
     )]
     #[instrument_trace]
@@ -95,7 +95,7 @@ impl ServerHook for UpgradeMiddleware {
     }
 
     #[prologue_macros(
-        ws,
+        ws_upgrade_type,
         response_version(HttpVersion::Http1_1),
         response_status_code(101),
         response_body(&vec![]),

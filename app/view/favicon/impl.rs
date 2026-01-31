@@ -7,7 +7,7 @@ impl ServerHook for FaviconRoute {
     }
 
     #[prologue_macros(
-        get,
+        get_method,
         response_status_code(301),
         response_header(LOCATION => LOGO_IMG_URL)
     )]
