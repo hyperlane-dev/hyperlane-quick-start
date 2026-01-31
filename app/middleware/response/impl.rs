@@ -7,8 +7,7 @@ impl ServerHook for SendMiddleware {
     }
 
     #[prologue_macros(
-        http,
-        reject(ctx.get_request_upgrade_type().await.is_ws()),
+        reject(ctx.get_request_is_ws_upgrade_type().await),
         try_send
     )]
     #[instrument_trace]
@@ -23,8 +22,8 @@ impl ServerHook for LogMiddleware {
 
     #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        let request: String = ctx.get_request().await.get_string();
-        let response: String = ctx.get_response().await.get_string();
+        let request: String = ctx.get_request_json_string().await;
+        let response: String = ctx.get_response_json_string().await;
         info!("{request}");
         info!("{response}");
     }
