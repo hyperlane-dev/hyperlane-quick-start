@@ -1,5 +1,3 @@
-use crate::utils::json::{get_request_json, get_response_json};
-
 use super::*;
 
 impl ServerHook for ChatConnectedHook {

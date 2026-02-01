@@ -8,6 +8,7 @@ use {
     domain::chat::*,
     mapper::chat::*,
     model::{application::chat::*, data_transfer::chat::*, param::chat::*},
+    utils::json::*,
 };
 
 use {hyperlane_config::application::charset::*, hyperlane_plugin::env::*};

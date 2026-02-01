@@ -2,10 +2,27 @@ use super::*;
 
 #[instrument_trace]
 pub fn build_mysql_schema() -> DatabaseSchema {
-    DatabaseSchema::default().add_table(TableSchema::new(
-        "record".to_string(),
-        MYSQL_RECORD_SQL.to_string(),
-    ))
+    DatabaseSchema::default()
+        .add_table(TableSchema::new(
+            "record".to_string(),
+            MYSQL_RECORD_SQL.to_string(),
+        ))
+        .add_table(TableSchema::new(
+            "cicd_pipeline".to_string(),
+            CICD_PIPELINE_SQL.to_string(),
+        ))
+        .add_table(TableSchema::new(
+            "cicd_run".to_string(),
+            CICD_RUN_SQL.to_string(),
+        ))
+        .add_table(TableSchema::new(
+            "cicd_job".to_string(),
+            CICD_JOB_SQL.to_string(),
+        ))
+        .add_table(TableSchema::new(
+            "cicd_step".to_string(),
+            CICD_STEP_SQL.to_string(),
+        ))
 }
 
 #[instrument_trace]

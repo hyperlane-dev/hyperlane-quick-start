@@ -1,4 +1,5 @@
 pub mod database;
+pub mod docker;
 pub mod env;
 pub mod logger;
 pub mod mysql;

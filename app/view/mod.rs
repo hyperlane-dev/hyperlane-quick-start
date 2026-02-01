@@ -1,4 +1,5 @@
 pub mod chat;
+pub mod cicd;
 pub mod diff;
 pub mod favicon;
 pub mod gomoku;

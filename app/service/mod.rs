@@ -1,4 +1,5 @@
 pub mod chat;
+pub mod cicd;
 pub mod dataset;
 pub mod gomoku;
 pub mod log;
