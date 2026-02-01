@@ -1,6 +1,6 @@
 use super::*;
 
-#[derive(Clone, Data, Debug, Default, Serialize, Deserialize)]
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]
 pub struct MysqlRecordDao {
     pub key: String,
     pub value: String,
@@ -10,12 +10,12 @@ pub struct MysqlRecordDao {
     Clone,
     Data,
     Debug,
+    Default,
+    DeriveActiveModelBehavior,
+    DeriveEntityModel,
+    Deserialize,
     PartialEq,
     Serialize,
-    Deserialize,
-    Default,
-    DeriveEntityModel,
-    DeriveActiveModelBehavior,
 )]
 #[sea_orm(table_name = "record", schema_name = "public")]
 pub struct Model {

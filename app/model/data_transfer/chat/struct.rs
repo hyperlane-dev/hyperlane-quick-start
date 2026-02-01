@@ -1,6 +1,6 @@
 use super::*;
 
-#[derive(Data, Default, Serialize, Deserialize, ToSchema)]
+#[derive(Data, Default, Deserialize, Serialize, ToSchema)]
 pub struct WebSocketRespData {
     r#type: MessageType,
     name: String,
@@ -8,13 +8,13 @@ pub struct WebSocketRespData {
     time: String,
 }
 
-#[derive(Debug, Default, Clone, Serialize, Deserialize, ToSchema, Data)]
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct UserListResponse {
     users: Vec<OnlineUser>,
     total_count: usize,
 }
 
-#[derive(Debug, Default, Clone, Serialize, Deserialize, ToSchema, Data)]
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct ChatHistoryResponse {
     pub messages: Vec<ChatHistory>,
     pub total: usize,

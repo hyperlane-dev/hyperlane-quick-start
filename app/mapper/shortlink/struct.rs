@@ -1,6 +1,6 @@
 use super::*;
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct ShortlinkDao {
     pub id: i32,
     pub url: String,
@@ -10,12 +10,12 @@ pub struct ShortlinkDao {
 #[derive(
     Clone,
     Debug,
+    Default,
+    DeriveActiveModelBehavior,
+    DeriveEntityModel,
+    Deserialize,
     PartialEq,
     Serialize,
-    Deserialize,
-    Default,
-    DeriveEntityModel,
-    DeriveActiveModelBehavior,
 )]
 #[sea_orm(table_name = "shortlink", schema_name = "public")]
 pub struct Model {

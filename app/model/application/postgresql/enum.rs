@@ -1,4 +1,4 @@
 use super::*;
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, EnumIter)]
+#[derive(Clone, Copy, Debug, EnumIter, Eq, PartialEq)]
 pub enum Relation {}

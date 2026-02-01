@@ -2,7 +2,7 @@ use super::*;
 
 pub struct TrackingMapper;
 
-#[derive(Clone, Debug, PartialEq, DeriveEntityModel)]
+#[derive(Clone, Debug, DeriveEntityModel, PartialEq)]
 #[sea_orm(table_name = "tracking_record")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = true)]

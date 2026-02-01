@@ -1,4 +1,4 @@
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug)]
 pub enum AutoCreationError {
     InsufficientPermissions(String),
     ConnectionFailed(String),
@@ -7,7 +7,7 @@ pub enum AutoCreationError {
     DatabaseError(String),
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum PluginType {
     MySQL,
     PostgreSQL,

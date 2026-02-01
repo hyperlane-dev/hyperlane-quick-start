@@ -1,6 +1,6 @@
 use super::*;
 
-#[derive(Debug, Default, Clone, Serialize, Deserialize, ToSchema, Data)]
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct NetworkPacket {
     timestamp: u64,
     protocol: String,
@@ -12,7 +12,7 @@ pub struct NetworkPacket {
     direction: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default, Data)]
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct NetworkStats {
     total_packets: u64,
     total_bytes: u64,
@@ -21,7 +21,7 @@ pub struct NetworkStats {
     recent_packets: Vec<NetworkPacket>,
 }
 
-#[derive(Debug, Default, Clone, Serialize, Deserialize, ToSchema, Data)]
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct ConnectionInfo {
     remote_ip: String,
     port: usize,
@@ -30,21 +30,21 @@ pub struct ConnectionInfo {
     bytes: u64,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Data)]
+#[derive(Clone, Data, Debug, Deserialize, Serialize, ToSchema)]
 pub struct NetworkCaptureRequest {
     duration_seconds: Option<u64>,
     filter_protocol: Option<String>,
     filter_port: Option<usize>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Data)]
+#[derive(Clone, Data, Debug, Deserialize, Serialize, ToSchema)]
 pub struct NetworkCaptureResponse {
     status: String,
     message: String,
     data: Option<NetworkStats>,
 }
 
-#[derive(Debug, Default, Clone, Serialize, Deserialize, ToSchema, Data)]
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct ServerStatus {
     timestamp: u64,
     cpu_usage: f64,

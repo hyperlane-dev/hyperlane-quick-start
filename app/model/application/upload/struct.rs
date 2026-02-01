@@ -1,6 +1,6 @@
 use super::*;
 
-#[derive(Debug, Default, Data, Clone, ToSchema)]
+#[derive(Clone, Data, Debug, Default, ToSchema)]
 pub struct FileChunkData {
     file_id: String,
     file_name: String,
@@ -9,13 +9,13 @@ pub struct FileChunkData {
     base_file_dir: String,
 }
 
-#[derive(Debug, Clone, ToSchema, Data, Default)]
+#[derive(Clone, Data, Debug, Default, ToSchema)]
 pub struct RangeRequest {
     start: u64,
     end: Option<u64>,
 }
 
-#[derive(Debug, Default, Clone, ToSchema, Data)]
+#[derive(Clone, Data, Debug, Default, ToSchema)]
 pub struct PartialContent {
     data: Vec<u8>,
     content_range: String,

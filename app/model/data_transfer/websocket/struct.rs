@@ -1,6 +1,6 @@
 use super::*;
 
-#[derive(Debug, Default, Data, Serialize, Deserialize)]
+#[derive(Data, Debug, Default, Deserialize, Serialize)]
 pub struct MessageResponse {
     message: String,
     time: String,

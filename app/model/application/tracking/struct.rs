@@ -1,11 +1,11 @@
 use super::*;
 
-#[derive(Data, DisplayDebug, CustomDebug, Deserialize, Default)]
+#[derive(CustomDebug, Data, Default, Deserialize, DisplayDebug)]
 pub struct Tracking {
     url: String,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct TrackingRecord {
     pub socket_addr: String,
     pub headers: RequestHeaders,

@@ -1,6 +1,6 @@
 use super::*;
 
-#[derive(Debug, Default, Data, Clone, ToSchema)]
+#[derive(Clone, Data, Debug, Default, ToSchema)]
 pub struct UploadedFile {
     file_name: String,
     file_path: String,

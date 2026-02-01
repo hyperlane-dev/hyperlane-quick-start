@@ -1,12 +1,12 @@
 use super::*;
 
-#[derive(Data, Default, Serialize, Deserialize, ToSchema, Clone)]
+#[derive(Clone, Data, Default, Deserialize, Serialize, ToSchema)]
 pub struct WebSocketReqData {
     r#type: MessageType,
     data: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Data)]
+#[derive(Clone, Data, Debug, Deserialize, Serialize, ToSchema)]
 pub struct ChatHistoryParams {
     pub session_id: String,
     pub offset: Option<i64>,

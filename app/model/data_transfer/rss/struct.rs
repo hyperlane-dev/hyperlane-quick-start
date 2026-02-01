@@ -1,6 +1,6 @@
 use super::*;
 
-#[derive(Debug, Serialize, Clone, ToSchema)]
+#[derive(Clone, Debug, Serialize, ToSchema)]
 pub struct RssChannel {
     pub title: String,
     pub link: String,
@@ -9,7 +9,7 @@ pub struct RssChannel {
     pub items: Vec<RssItem>,
 }
 
-#[derive(Debug, Serialize, Clone, ToSchema)]
+#[derive(Clone, Debug, Serialize, ToSchema)]
 pub struct RssItem {
     pub title: String,
     pub link: String,
@@ -19,7 +19,7 @@ pub struct RssItem {
     pub enclosure: Option<RssEnclosure>,
 }
 
-#[derive(Debug, Serialize, Clone, ToSchema)]
+#[derive(Clone, Debug, Serialize, ToSchema)]
 pub struct RssEnclosure {
     pub url: String,
     pub length: u64,

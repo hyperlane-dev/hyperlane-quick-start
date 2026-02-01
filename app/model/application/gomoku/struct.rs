@@ -1,12 +1,12 @@
 use super::*;
 
-#[derive(Debug, Clone, Data, Default, Serialize, Deserialize, ToSchema)]
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct GomokuPlayer {
     user_id: String,
     color: StoneColor,
 }
 
-#[derive(Debug, Clone, Data, Default, Serialize, Deserialize, ToSchema)]
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct GomokuMove {
     x: usize,
     y: usize,
@@ -14,7 +14,7 @@ pub struct GomokuMove {
     step: usize,
 }
 
-#[derive(Debug, Clone, Data, Default, Serialize, Deserialize, ToSchema)]
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct GomokuPlaceResult {
     status: GameStatus,
     winner: Option<StoneColor>,
@@ -22,7 +22,7 @@ pub struct GomokuPlaceResult {
     move_data: GomokuMove,
 }
 
-#[derive(Debug, Clone, Data, Serialize, Deserialize, ToSchema)]
+#[derive(Clone, Data, Debug, Deserialize, Serialize, ToSchema)]
 pub struct GomokuRoom {
     pub(super) room_id: String,
     pub(super) owner_id: String,

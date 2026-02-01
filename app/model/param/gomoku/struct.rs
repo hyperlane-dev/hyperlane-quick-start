@@ -1,6 +1,6 @@
 use super::*;
 
-#[derive(Data, Default, Serialize, Deserialize, ToSchema, Clone)]
+#[derive(Clone, Data, Default, Deserialize, Serialize, ToSchema)]
 pub struct GomokuWsRequest {
     r#type: GomokuMessageType,
     room_id: String,
