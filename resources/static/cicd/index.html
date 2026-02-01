@@ -36,7 +36,9 @@
         background: #555;
       }
 
-      input, textarea, select {
+      input,
+      textarea,
+      select {
         user-select: text !important;
         -webkit-user-select: text !important;
         -moz-user-select: text !important;
@@ -44,7 +46,8 @@
       }
 
       body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
         background: #0d1117;
         color: #c9d1d9;
         min-height: 100vh;
@@ -329,8 +332,13 @@
       }
 
       @keyframes pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.5; }
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
       }
 
       .run-info {
@@ -369,7 +377,9 @@
         margin-bottom: 8px;
       }
 
-      .form-input, .form-textarea, .form-select {
+      .form-input,
+      .form-textarea,
+      .form-select {
         width: 100%;
         padding: 8px 12px;
         background: #0d1117;
@@ -380,7 +390,9 @@
         transition: all 0.2s;
       }
 
-      .form-input:focus, .form-textarea:focus, .form-select:focus {
+      .form-input:focus,
+      .form-textarea:focus,
+      .form-select:focus {
         outline: none;
         border-color: #58a6ff;
         box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
@@ -540,7 +552,6 @@
         background: #21262d;
       }
 
-
       .step-status {
         width: 16px;
         height: 16px;
@@ -552,11 +563,27 @@
         flex-shrink: 0;
       }
 
-      .step-status.success { background: #238636; color: #fff; }
-      .step-status.failure { background: #da3633; color: #fff; }
-      .step-status.pending { background: #8b949e; color: #fff; }
-      .step-status.running { background: #1f6feb; color: #fff; animation: pulse 1.5s infinite; }
-      .step-status.skipped { background: #6e7681; color: #fff; }
+      .step-status.success {
+        background: #238636;
+        color: #fff;
+      }
+      .step-status.failure {
+        background: #da3633;
+        color: #fff;
+      }
+      .step-status.pending {
+        background: #8b949e;
+        color: #fff;
+      }
+      .step-status.running {
+        background: #1f6feb;
+        color: #fff;
+        animation: pulse 1.5s infinite;
+      }
+      .step-status.skipped {
+        background: #6e7681;
+        color: #fff;
+      }
 
       .step-name {
         flex: 1;
@@ -574,7 +601,9 @@
         border: 1px solid #30363d;
         border-radius: 6px;
         padding: 16px;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', 'Arial', sans-serif;
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue',
+          'Arial', sans-serif;
         font-size: 11px;
         line-height: 1.6;
         color: #c9d1d9;
@@ -693,7 +722,9 @@
 
       .step-log-content {
         padding: 12px 16px;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', 'Arial', sans-serif;
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue',
+          'Arial', sans-serif;
         font-size: 11px;
         line-height: 1.6;
         color: #c9d1d9;
@@ -898,7 +929,9 @@
       </div>
 
       <div id="run-detail-view" class="hidden">
-        <button class="btn back-btn" onclick="backToRuns()">← Back to Runs</button>
+        <button class="btn back-btn" onclick="backToRuns()">
+          ← Back to Runs
+        </button>
         <div class="detail-header">
           <div class="detail-title" id="detail-title">Run #1</div>
           <div class="detail-meta" id="detail-meta"></div>
@@ -911,24 +944,46 @@
       <div class="modal-content">
         <div class="modal-header">
           <span class="modal-title">Create New Pipeline</span>
-          <button class="modal-close" onclick="closeModal('create-modal')">&times;</button>
+          <button class="modal-close" onclick="closeModal('create-modal')">
+            &times;
+          </button>
         </div>
         <div class="modal-body">
           <div class="form-group">
             <label class="form-label">Pipeline Name *</label>
-            <input type="text" class="form-input" id="create-name" placeholder="e.g., Build and Test">
+            <input
+              type="text"
+              class="form-input"
+              id="create-name"
+              placeholder="e.g., Build and Test"
+            />
           </div>
           <div class="form-group">
             <label class="form-label">Description</label>
-            <input type="text" class="form-input" id="create-description" placeholder="Brief description of this pipeline">
+            <input
+              type="text"
+              class="form-input"
+              id="create-description"
+              placeholder="Brief description of this pipeline"
+            />
           </div>
           <div class="form-group">
             <label class="form-label">Repository URL</label>
-            <input type="text" class="form-input" id="create-repo" placeholder="https://github.com/user/repo.git">
+            <input
+              type="text"
+              class="form-input"
+              id="create-repo"
+              placeholder="https://github.com/user/repo.git"
+            />
           </div>
           <div class="form-group">
             <label class="form-label">Branch</label>
-            <input type="text" class="form-input" id="create-branch" value="main">
+            <input
+              type="text"
+              class="form-input"
+              id="create-branch"
+              value="main"
+            />
           </div>
           <div class="form-group">
             <label class="form-label">Trigger Type</label>
@@ -941,7 +996,8 @@
           </div>
           <div class="form-group">
             <label class="form-label">Pipeline Config (YAML)</label>
-            <textarea class="form-textarea" id="create-config">name: Docker Hello World
+            <textarea class="form-textarea" id="create-config">
+name: Docker Hello World
 on: [manual]
 dockerfile: |
   FROM alpine:latest
@@ -953,12 +1009,17 @@ jobs:
       - name: Build and Run
         dockerfile: |
           FROM alpine:latest
-          RUN echo 'Hello World from Docker!'</textarea>
+          RUN echo 'Hello World from Docker!'</textarea
+            >
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn" onclick="closeModal('create-modal')">Cancel</button>
-          <button class="btn btn-primary" onclick="createPipeline()">Create Pipeline</button>
+          <button class="btn" onclick="closeModal('create-modal')">
+            Cancel
+          </button>
+          <button class="btn btn-primary" onclick="createPipeline()">
+            Create Pipeline
+          </button>
         </div>
       </div>
     </div>
@@ -967,25 +1028,27 @@ jobs:
       <div class="modal-content">
         <div class="modal-header">
           <span class="modal-title">Edit Pipeline</span>
-          <button class="modal-close" onclick="closeModal('edit-modal')">&times;</button>
+          <button class="modal-close" onclick="closeModal('edit-modal')">
+            &times;
+          </button>
         </div>
         <div class="modal-body">
-          <input type="hidden" id="edit-id">
+          <input type="hidden" id="edit-id" />
           <div class="form-group">
             <label class="form-label">Pipeline Name *</label>
-            <input type="text" class="form-input" id="edit-name">
+            <input type="text" class="form-input" id="edit-name" />
           </div>
           <div class="form-group">
             <label class="form-label">Description</label>
-            <input type="text" class="form-input" id="edit-description">
+            <input type="text" class="form-input" id="edit-description" />
           </div>
           <div class="form-group">
             <label class="form-label">Repository URL</label>
-            <input type="text" class="form-input" id="edit-repo">
+            <input type="text" class="form-input" id="edit-repo" />
           </div>
           <div class="form-group">
             <label class="form-label">Branch</label>
-            <input type="text" class="form-input" id="edit-branch">
+            <input type="text" class="form-input" id="edit-branch" />
           </div>
           <div class="form-group">
             <label class="form-label">Trigger Type</label>
@@ -1002,17 +1065,18 @@ jobs:
           </div>
           <div class="form-group">
             <label class="form-label">
-              <input type="checkbox" id="edit-active"> Active
+              <input type="checkbox" id="edit-active" /> Active
             </label>
           </div>
         </div>
         <div class="modal-footer">
           <button class="btn" onclick="closeModal('edit-modal')">Cancel</button>
-          <button class="btn btn-primary" onclick="updatePipeline()">Save Changes</button>
+          <button class="btn btn-primary" onclick="updatePipeline()">
+            Save Changes
+          </button>
         </div>
       </div>
     </div>
-
 
     <div class="toast-container" id="toast-container"></div>
 
@@ -1034,7 +1098,7 @@ jobs:
         const iconMap = {
           success: '✓',
           error: '✗',
-          info: 'ℹ'
+          info: 'ℹ',
         };
 
         toast.innerHTML = `
@@ -1056,8 +1120,12 @@ jobs:
       }
 
       function switchTab(tab, updateHash = true) {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.querySelector(`.tab[onclick="switchTab('${tab}')"]`).classList.add('active');
+        document
+          .querySelectorAll('.tab')
+          .forEach((t) => t.classList.remove('active'));
+        document
+          .querySelector(`.tab[onclick="switchTab('${tab}')"]`)
+          .classList.add('active');
 
         document.getElementById('pipelines-view').classList.add('hidden');
         document.getElementById('runs-view').classList.add('hidden');
@@ -1098,9 +1166,10 @@ jobs:
       }
 
       function renderPipelines() {
-        document.getElementById('pipeline-count').textContent = pipelines.length;
+        document.getElementById('pipeline-count').textContent =
+          pipelines.length;
         const container = document.getElementById('pipeline-list');
-        
+
         if (pipelines.length === 0) {
           container.innerHTML = `
             <div class="empty-state">
@@ -1111,8 +1180,10 @@ jobs:
           `;
           return;
         }
-        
-        container.innerHTML = pipelines.map(p => `
+
+        container.innerHTML = pipelines
+          .map(
+            (p) => `
           <div class="pipeline-item" onclick="viewPipelineRuns(${p.id})">
             <div class="pipeline-status ${p.is_active ? 'active' : 'inactive'}"></div>
             <div class="pipeline-info">
@@ -1131,7 +1202,9 @@ jobs:
               <button class="btn btn-danger" onclick="deletePipeline(${p.id})">Delete</button>
             </div>
           </div>
-        `).join('');
+        `,
+          )
+          .join('');
       }
 
       const DEFAULT_CONFIG = `name: Hello World Pipeline
@@ -1144,14 +1217,17 @@ jobs:
         run: echo 'Hello World'`;
 
       async function createPipeline() {
-        const configValue = document.getElementById('create-config').value.trim();
+        const configValue = document
+          .getElementById('create-config')
+          .value.trim();
         const data = {
           name: document.getElementById('create-name').value,
-          description: document.getElementById('create-description').value || null,
+          description:
+            document.getElementById('create-description').value || null,
           repository_url: document.getElementById('create-repo').value || null,
           branch: document.getElementById('create-branch').value || 'main',
           config_content: configValue || DEFAULT_CONFIG,
-          trigger_type: document.getElementById('create-trigger').value
+          trigger_type: document.getElementById('create-trigger').value,
         };
 
         if (!data.name) {
@@ -1163,7 +1239,7 @@ jobs:
           const response = await fetch('/api/cicd/pipeline/create', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
           });
           const result = await response.json();
           if (result.code === 200) {
@@ -1193,10 +1269,12 @@ jobs:
           const p = result.data;
           document.getElementById('edit-id').value = p.id;
           document.getElementById('edit-name').value = p.name;
-          document.getElementById('edit-description').value = p.description || '';
+          document.getElementById('edit-description').value =
+            p.description || '';
           document.getElementById('edit-repo').value = p.repository_url || '';
           document.getElementById('edit-branch').value = p.branch || 'main';
-          document.getElementById('edit-trigger').value = p.trigger_type || 'manual';
+          document.getElementById('edit-trigger').value =
+            p.trigger_type || 'manual';
           document.getElementById('edit-config').value = p.config_content || '';
           document.getElementById('edit-active').checked = p.is_active;
           document.getElementById('edit-modal').classList.add('active');
@@ -1209,19 +1287,20 @@ jobs:
         const data = {
           id: parseInt(document.getElementById('edit-id').value),
           name: document.getElementById('edit-name').value,
-          description: document.getElementById('edit-description').value || null,
+          description:
+            document.getElementById('edit-description').value || null,
           repository_url: document.getElementById('edit-repo').value || null,
           branch: document.getElementById('edit-branch').value || 'main',
           config_content: document.getElementById('edit-config').value || null,
           trigger_type: document.getElementById('edit-trigger').value,
-          is_active: document.getElementById('edit-active').checked
+          is_active: document.getElementById('edit-active').checked,
         };
-        
+
         try {
           const response = await fetch('/api/cicd/pipeline/update', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
           });
           const result = await response.json();
           if (result.code === 200) {
@@ -1238,7 +1317,9 @@ jobs:
 
       async function deletePipeline(id) {
         try {
-          const response = await fetch(`/api/cicd/pipeline/delete?id=${id}`, { method: 'POST' });
+          const response = await fetch(`/api/cicd/pipeline/delete?id=${id}`, {
+            method: 'POST',
+          });
           const result = await response.json();
           if (result.code === 200) {
             loadPipelines();
@@ -1259,12 +1340,15 @@ jobs:
             body: JSON.stringify({
               pipeline_id: id,
               trigger_type: 'manual',
-              triggered_by: 'user'
-            })
+              triggered_by: 'user',
+            }),
           });
           const result = await response.json();
           if (result.code === 200) {
-            showToast('Pipeline triggered successfully! Run ID: ' + result.data, 'success');
+            showToast(
+              'Pipeline triggered successfully! Run ID: ' + result.data,
+              'success',
+            );
             loadRuns();
           } else {
             showToast('Error: ' + result.message, 'error');
@@ -1276,11 +1360,14 @@ jobs:
 
       async function loadRuns() {
         try {
-          const response = await fetch('/api/cicd/run/list?page=1&page_size=50');
+          const response = await fetch(
+            '/api/cicd/run/list?page=1&page_size=50',
+          );
           const result = await response.json();
           if (result.code === 200) {
             runs = result.data?.runs || [];
-            document.getElementById('run-count').textContent = result.data?.total || 0;
+            document.getElementById('run-count').textContent =
+              result.data?.total || 0;
             renderRuns();
           }
         } catch (error) {
@@ -1290,7 +1377,7 @@ jobs:
 
       function renderRuns() {
         const container = document.getElementById('run-list');
-        
+
         if (runs.length === 0) {
           container.innerHTML = `
             <div class="empty-state">
@@ -1301,8 +1388,10 @@ jobs:
           `;
           return;
         }
-        
-        container.innerHTML = runs.map(r => `
+
+        container.innerHTML = runs
+          .map(
+            (r) => `
           <div class="run-item" onclick="viewRunDetail(${r.id})">
             <div class="run-status ${r.status}">
               ${r.status === 'success' ? '✓' : r.status === 'failure' ? '✗' : r.status === 'running' ? '◐' : '○'}
@@ -1317,7 +1406,9 @@ jobs:
               ${r.duration_ms > 0 ? formatDuration(r.duration_ms) : r.status === 'running' ? 'Running...' : '-'}
             </div>
           </div>
-        `).join('');
+        `,
+          )
+          .join('');
       }
 
       function viewPipelineRuns(pipelineId) {
@@ -1351,8 +1442,12 @@ jobs:
               const prevRun = currentRunDetail.run;
               currentRunDetail = result.data;
               updateRunDetailUI();
-              const isCompleted = ['success', 'failure', 'cancelled'].includes(currentRunDetail.run.status);
-              const wasCompleted = ['success', 'failure', 'cancelled'].includes(prevRun.status);
+              const isCompleted = ['success', 'failure', 'cancelled'].includes(
+                currentRunDetail.run.status,
+              );
+              const wasCompleted = ['success', 'failure', 'cancelled'].includes(
+                prevRun.status,
+              );
               if (isCompleted && !wasCompleted) {
                 stopDetailPolling();
               }
@@ -1372,7 +1467,8 @@ jobs:
 
       function updateRunDetailUI() {
         const run = currentRunDetail.run;
-        document.getElementById('detail-title').textContent = `${getPipelineName(run.pipeline_id)} #${run.run_number}`;
+        document.getElementById('detail-title').textContent =
+          `${getPipelineName(run.pipeline_id)} #${run.run_number}`;
         document.getElementById('detail-meta').innerHTML = `
           <span class="run-status ${run.status}" style="display: inline-flex; width: 18px; height: 18px; font-size: 11px;">
             ${run.status === 'success' ? '✓' : run.status === 'failure' ? '✗' : run.status === 'running' ? '◐' : '○'}
@@ -1391,7 +1487,8 @@ jobs:
       function renderJobSteps() {
         const jobsContainer = document.getElementById('job-list');
         if (!currentRunDetail.jobs || currentRunDetail.jobs.length === 0) {
-          jobsContainer.innerHTML = '<div class="empty-state"><p>No jobs found for this run</p></div>';
+          jobsContainer.innerHTML =
+            '<div class="empty-state"><p>No jobs found for this run</p></div>';
           return;
         }
 
@@ -1405,11 +1502,23 @@ jobs:
             const statusEl = jobHeader.querySelector('.run-status');
             if (statusEl) {
               statusEl.className = `run-status ${j.job.status}`;
-              statusEl.textContent = j.job.status === 'success' ? '✓' : j.job.status === 'failure' ? '✗' : j.job.status === 'running' ? '◐' : '○';
+              statusEl.textContent =
+                j.job.status === 'success'
+                  ? '✓'
+                  : j.job.status === 'failure'
+                    ? '✗'
+                    : j.job.status === 'running'
+                      ? '◐'
+                      : '○';
             }
             const timeEl = jobHeader.querySelector('span:last-child');
             if (timeEl) {
-              timeEl.textContent = j.job.duration_ms > 0 ? formatDuration(j.job.duration_ms) : j.job.status === 'running' ? 'Running...' : '';
+              timeEl.textContent =
+                j.job.duration_ms > 0
+                  ? formatDuration(j.job.duration_ms)
+                  : j.job.status === 'running'
+                    ? 'Running...'
+                    : '';
             }
           }
 
@@ -1419,11 +1528,21 @@ jobs:
               const statusEl = stepEl.querySelector('.step-status');
               if (statusEl) {
                 statusEl.className = `step-status ${s.status}`;
-                statusEl.textContent = s.status === 'success' ? '✓' : s.status === 'failure' ? '✗' : s.status === 'running' ? '◐' : s.status === 'skipped' ? '⊘' : '○';
+                statusEl.textContent =
+                  s.status === 'success'
+                    ? '✓'
+                    : s.status === 'failure'
+                      ? '✗'
+                      : s.status === 'running'
+                        ? '◐'
+                        : s.status === 'skipped'
+                          ? '⊘'
+                          : '○';
               }
               const timeEl = stepEl.querySelector('.step-time');
               if (timeEl) {
-                timeEl.textContent = s.duration_ms > 0 ? formatDuration(s.duration_ms) : '';
+                timeEl.textContent =
+                  s.duration_ms > 0 ? formatDuration(s.duration_ms) : '';
               }
 
               const logContent = stepEl.querySelector('.step-log-content');
@@ -1441,7 +1560,8 @@ jobs:
         document.getElementById('run-detail-view').classList.remove('hidden');
 
         const run = currentRunDetail.run;
-        document.getElementById('detail-title').textContent = `${getPipelineName(run.pipeline_id)} #${run.run_number}`;
+        document.getElementById('detail-title').textContent =
+          `${getPipelineName(run.pipeline_id)} #${run.run_number}`;
         document.getElementById('detail-meta').innerHTML = `
           <span class="run-status ${run.status}" style="display: inline-flex; width: 18px; height: 18px; font-size: 11px;">
             ${run.status === 'success' ? '✓' : run.status === 'failure' ? '✗' : run.status === 'running' ? '◐' : '○'}
@@ -1457,16 +1577,19 @@ jobs:
 
         const jobsContainer = document.getElementById('job-list');
         if (!currentRunDetail.jobs || currentRunDetail.jobs.length === 0) {
-          jobsContainer.innerHTML = '<div class="empty-state"><p>No jobs found for this run</p></div>';
+          jobsContainer.innerHTML =
+            '<div class="empty-state"><p>No jobs found for this run</p></div>';
           return;
         }
 
         expandedSteps.clear();
-        currentRunDetail.jobs.forEach(j => {
-          j.steps.forEach(s => expandedSteps.add(s.id));
+        currentRunDetail.jobs.forEach((j) => {
+          j.steps.forEach((s) => expandedSteps.add(s.id));
         });
 
-        jobsContainer.innerHTML = currentRunDetail.jobs.map(j => `
+        jobsContainer.innerHTML = currentRunDetail.jobs
+          .map(
+            (j) => `
           <div class="job-item">
             <div class="job-header">
               <div class="run-status ${j.job.status}" style="width: 20px; height: 20px; font-size: 12px;">
@@ -1478,11 +1601,12 @@ jobs:
               </span>
             </div>
             <div class="step-list">
-              ${j.steps.map(s => renderStepItem(s)).join('')}
+              ${j.steps.map((s) => renderStepItem(s)).join('')}
             </div>
           </div>
-        `).join('');
-
+        `,
+          )
+          .join('');
       }
 
       function renderStepItem(s) {
@@ -1513,8 +1637,12 @@ jobs:
       }
 
       function toggleStepLog(stepId) {
-        const logContent = document.getElementById(`step-log-content-${stepId}`);
-        const toggleIcon = document.querySelector(`#step-log-${stepId} .step-log-toggle-icon`);
+        const logContent = document.getElementById(
+          `step-log-content-${stepId}`,
+        );
+        const toggleIcon = document.querySelector(
+          `#step-log-${stepId} .step-log-toggle-icon`,
+        );
 
         if (!logContent) return;
 
@@ -1529,7 +1657,10 @@ jobs:
           toggleIcon?.classList.remove('collapsed');
           const step = findStepById(stepId);
           if (step) {
-            logContent.innerHTML = formatLogOutput(step.output, step.started_at);
+            logContent.innerHTML = formatLogOutput(
+              step.output,
+              step.started_at,
+            );
           }
         }
       }
@@ -1554,21 +1685,24 @@ jobs:
       }
 
       function formatLogOutput(output, startedAt) {
-        if (!output) return '<div class="log-line"><span class="log-timestamp">--:--:--</span>No output available</div>';
+        if (!output)
+          return '<div class="log-line"><span class="log-timestamp">--:--:--</span>No output available</div>';
 
         const lines = output.split('\n');
         const baseTime = startedAt ? new Date(startedAt) : null;
         const totalLines = lines.length;
 
-        return lines.map((line, i) => {
-          let timestampStr = '--:--:--';
-          if (baseTime && !isNaN(baseTime.getTime())) {
-            const lineTime = new Date(baseTime.getTime() + (i * 1000));
-            timestampStr = lineTime.toISOString().split('T')[1].split('.')[0];
-          }
-          const coloredLine = colorizeLogLine(line);
-          return `<div class="log-line"><span class="log-timestamp">${timestampStr}</span>${coloredLine}</div>`;
-        }).join('');
+        return lines
+          .map((line, i) => {
+            let timestampStr = '--:--:--';
+            if (baseTime && !isNaN(baseTime.getTime())) {
+              const lineTime = new Date(baseTime.getTime() + i * 1000);
+              timestampStr = lineTime.toISOString().split('T')[1].split('.')[0];
+            }
+            const coloredLine = colorizeLogLine(line);
+            return `<div class="log-line"><span class="log-timestamp">${timestampStr}</span>${coloredLine}</div>`;
+          })
+          .join('');
       }
 
       function colorizeLogLine(line) {
@@ -1576,67 +1710,87 @@ jobs:
 
         let html = escapeHtml(line);
 
-        if (html.startsWith('[Build Log]') || html.startsWith('[Build Output]') || html.startsWith('[Build Errors]') || html.startsWith('[Run Output]') || html.startsWith('[Run Errors]') || html.startsWith('[Run Failed]')) {
+        if (
+          html.startsWith('[Build Log]') ||
+          html.startsWith('[Build Output]') ||
+          html.startsWith('[Build Errors]') ||
+          html.startsWith('[Run Output]') ||
+          html.startsWith('[Run Errors]') ||
+          html.startsWith('[Run Failed]')
+        ) {
           return `<span class="log-section">${html}</span>`;
         }
 
         if (html.match(/^#\d+\s+\[.+\]/)) {
-          html = html.replace(/^(#\d+\s+\[.+?\])/, '<span class="log-docker-step">$1</span>');
+          html = html.replace(
+            /^(#\d+\s+\[.+?\])/,
+            '<span class="log-docker-step">$1</span>',
+          );
         }
 
         if (html.includes('DONE')) {
-          html = html.replace(/(DONE\s+\d+\.\d+s|DONE)/g, '<span class="log-docker-done">$1</span>');
+          html = html.replace(
+            /(DONE\s+\d+\.\d+s|DONE)/g,
+            '<span class="log-docker-done">$1</span>',
+          );
         }
 
         if (html.includes('CACHED')) {
-          html = html.replace(/(CACHED)/g, '<span class="log-docker-cache">$1</span>');
+          html = html.replace(
+            /(CACHED)/g,
+            '<span class="log-docker-cache">$1</span>',
+          );
         }
 
         const errorPatterns = [
           /\b(Error|ERROR|Failed|FAILED|FAIL|exception|Exception|panic|Panic)\b/g,
-          /\b(error:|failed:|fatal:)\b/gi
+          /\b(error:|failed:|fatal:)\b/gi,
         ];
-        errorPatterns.forEach(pattern => {
+        errorPatterns.forEach((pattern) => {
           html = html.replace(pattern, '<span class="log-error">$1</span>');
         });
 
         const warningPatterns = [
           /\b(Warning|WARNING|WARN|warn|warning:)\b/g,
-          /\b(deprecation|deprecated|Deprecated)\b/g
+          /\b(deprecation|deprecated|Deprecated)\b/g,
         ];
-        warningPatterns.forEach(pattern => {
+        warningPatterns.forEach((pattern) => {
           html = html.replace(pattern, '<span class="log-warning">$1</span>');
         });
 
         const successPatterns = [
           /\b(Success|SUCCESS|success|Passed|PASSED|pass|OK|ok)\b/g,
-          /\b(successfully|completed)\b/gi
+          /\b(successfully|completed)\b/gi,
         ];
-        successPatterns.forEach(pattern => {
+        successPatterns.forEach((pattern) => {
           html = html.replace(pattern, '<span class="log-success">$1</span>');
         });
 
         const infoPatterns = [
           /\b(Info|INFO|info:)\b/g,
-          /\b(Building|building|Loading|loading|Transferring|transferring)\b/g
+          /\b(Building|building|Loading|loading|Transferring|transferring)\b/g,
         ];
-        infoPatterns.forEach(pattern => {
+        infoPatterns.forEach((pattern) => {
           html = html.replace(pattern, '<span class="log-info">$1</span>');
         });
 
         const commandPatterns = [
           /\b(RUN|CMD|ENTRYPOINT|COPY|ADD|FROM|WORKDIR|ENV|ARG)\b/g,
-          /^(\s*\$\s+)/
+          /^(\s*\$\s+)/,
         ];
-        commandPatterns.forEach(pattern => {
+        commandPatterns.forEach((pattern) => {
           html = html.replace(pattern, '<span class="log-command">$1</span>');
         });
 
-        const hashPattern = /\b([a-f0-9]{64}|[a-f0-9]{40}|[a-f0-9]{32}|sha256:[a-f0-9]{64})\b/gi;
+        const hashPattern =
+          /\b([a-f0-9]{64}|[a-f0-9]{40}|[a-f0-9]{32}|sha256:[a-f0-9]{64})\b/gi;
         html = html.replace(hashPattern, '<span class="log-hash">$1</span>');
 
         const urlPattern = /\b(https?:\/\/[^\s]+|docker-desktop:\/\/[^\s]+)/g;
-        html = html.replace(urlPattern, '<span class="log-url" onclick="window.open(\'$1\', \'_blank\')">$1</span>');
+        html = html.replace(
+          urlPattern,
+          '<span class="log-url" onclick="window.open(\'$1\', \'_blank\')">$1</span>',
+        );
 
         html = parseAnsiCodes(html);
 
@@ -1645,22 +1799,22 @@ jobs:
 
       function parseAnsiCodes(text) {
         const ansiColorMap = {
-          '30': '#24292f',
-          '31': '#f85149',
-          '32': '#3fb950',
-          '33': '#d29922',
-          '34': '#58a6ff',
-          '35': '#d2a8ff',
-          '36': '#39c5cf',
-          '37': '#f0f6fc',
-          '90': '#6e7681',
-          '91': '#ff7b72',
-          '92': '#7ee787',
-          '93': '#f0883e',
-          '94': '#79c0ff',
-          '95': '#d2a8ff',
-          '96': '#56d4dd',
-          '97': '#ffffff'
+          30: '#24292f',
+          31: '#f85149',
+          32: '#3fb950',
+          33: '#d29922',
+          34: '#58a6ff',
+          35: '#d2a8ff',
+          36: '#39c5cf',
+          37: '#f0f6fc',
+          90: '#6e7681',
+          91: '#ff7b72',
+          92: '#7ee787',
+          93: '#f0883e',
+          94: '#79c0ff',
+          95: '#d2a8ff',
+          96: '#56d4dd',
+          97: '#ffffff',
         };
 
         let result = text;
@@ -1681,7 +1835,7 @@ jobs:
       }
 
       function getPipelineName(id) {
-        const p = pipelines.find(x => x.id === id);
+        const p = pipelines.find((x) => x.id === id);
         return p ? p.name : `Pipeline ${id}`;
       }
 
@@ -1690,7 +1844,7 @@ jobs:
         const date = new Date(isoString);
         const now = new Date();
         const diff = Math.floor((now - date) / 1000);
-        
+
         if (diff < 60) return 'just now';
         if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
         if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
@@ -1712,17 +1866,17 @@ jobs:
         return div.innerHTML;
       }
 
-      document.querySelectorAll('.modal').forEach(modal => {
-        modal.addEventListener('click', e => {
+      document.querySelectorAll('.modal').forEach((modal) => {
+        modal.addEventListener('click', (e) => {
           if (e.target === modal) closeModal(modal.id);
         });
       });
 
       async function restoreViewFromHash() {
         const hash = window.location.hash.slice(1);
-        
+
         await loadPipelines();
-        
+
         if (hash.startsWith('run/')) {
           const runId = parseInt(hash.split('/')[1]);
           if (!isNaN(runId)) {
@@ -1744,7 +1898,9 @@ jobs:
       restoreViewFromHash();
 
       setInterval(() => {
-        const isRunsViewVisible = !document.getElementById('runs-view').classList.contains('hidden');
+        const isRunsViewVisible = !document
+          .getElementById('runs-view')
+          .classList.contains('hidden');
         if (isRunsViewVisible) {
           loadRuns();
         }
