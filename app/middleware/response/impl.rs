@@ -22,9 +22,9 @@ impl ServerHook for LogMiddleware {
 
     #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        let request: String = ctx.get_request_json_string().await;
-        let response: String = ctx.get_response_json_string().await;
-        info!("{request}");
-        info!("{response}");
+        let request_json: String = get_request_json(ctx).await;
+        let response_json: String = get_response_json(ctx).await;
+        info!("{request_json}");
+        info!("{response_json}");
     }
 }
