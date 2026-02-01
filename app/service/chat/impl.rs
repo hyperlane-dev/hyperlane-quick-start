@@ -1,3 +1,5 @@
+use crate::utils::json::{get_request_json, get_response_json};
+
 use super::*;
 
 impl ServerHook for ChatConnectedHook {
@@ -56,8 +58,8 @@ impl ServerHook for ChatSendedHook {
 
     #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        let request: String = ctx.get_request_json_string().await;
-        let response: String = ctx.get_response_json_string().await;
+        let request: String = get_request_json(ctx).await;
+        let response: String = get_response_json(ctx).await;
         info!("{request}{BR}{response}");
         let response_body: ResponseBody = ctx.get_response().await.get_body().clone();
         if let Ok(resp_data) = serde_json::from_slice::<WebSocketRespData>(&response_body) {
