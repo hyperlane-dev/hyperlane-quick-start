@@ -1,5 +1,25 @@
 use super::*;
 
+impl<T: Clone> ConnectionCache<T> {
+    #[instrument_trace]
+    pub fn new(result: Result<T, String>) -> Self {
+        Self {
+            result,
+            last_attempt: Instant::now(),
+        }
+    }
+
+    #[instrument_trace]
+    pub fn is_cooldown_expired(&self, cooldown_duration: Duration) -> bool {
+        self.last_attempt.elapsed() >= cooldown_duration
+    }
+
+    #[instrument_trace]
+    pub fn should_retry(&self, cooldown_duration: Duration) -> bool {
+        self.result.is_err() && self.is_cooldown_expired(cooldown_duration)
+    }
+}
+
 impl PluginType {
     #[instrument_trace]
     pub fn as_str(&self) -> &'static str {

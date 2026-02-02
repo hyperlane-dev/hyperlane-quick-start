@@ -26,9 +26,6 @@ pub struct Model {
     pub updated_at: Option<NaiveDateTime>,
 }
 
-#[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
-pub enum Relation {}
-
 pub type JobEntity = Entity;
 pub type JobActiveModel = ActiveModel;
 pub type JobColumn = Column;

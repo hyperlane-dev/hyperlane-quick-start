@@ -22,9 +22,6 @@ pub struct Model {
     pub updated_at: Option<NaiveDateTime>,
 }
 
-#[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
-pub enum Relation {}
-
 pub type PipelineEntity = Entity;
 pub type PipelineActiveModel = ActiveModel;
 pub type PipelineColumn = Column;
