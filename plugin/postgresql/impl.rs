@@ -15,6 +15,11 @@ impl Default for PostgreSqlAutoCreation {
 
 impl PostgreSqlAutoCreation {
     #[instrument_trace]
+    pub fn with_schema(instance: PostgreSqlInstanceConfig, schema: DatabaseSchema) -> Self {
+        Self { instance, schema }
+    }
+
+    #[instrument_trace]
     async fn create_admin_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
         let admin_url: String = self.instance.get_admin_url();
         let timeout_duration: Duration = get_connection_timeout_duration();
