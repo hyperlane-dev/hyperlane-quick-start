@@ -699,7 +699,9 @@
         border: 1px solid #30363d;
         border-radius: 6px;
         padding: 16px;
-        font-family: 'SFMono-Regular', 'Monaco', 'Inconsolata', 'Fira Code', 'Consolas', 'Courier New', monospace;
+        font-family:
+          'SFMono-Regular', 'Monaco', 'Inconsolata', 'Fira Code', 'Consolas',
+          'Courier New', monospace;
         font-size: 12px;
         line-height: 1.6;
         color: #c9d1d9;
@@ -818,7 +820,9 @@
 
       .step-log-content {
         padding: 12px 16px;
-        font-family: 'SFMono-Regular', 'Monaco', 'Inconsolata', 'Fira Code', 'Consolas', 'Courier New', monospace;
+        font-family:
+          'SFMono-Regular', 'Monaco', 'Inconsolata', 'Fira Code', 'Consolas',
+          'Courier New', monospace;
         font-size: 12px;
         line-height: 1.6;
         color: #c9d1d9;
@@ -960,16 +964,7 @@
         }
 
         .pipeline-item {
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 12px;
           padding: 12px;
-        }
-
-        .pipeline-info {
-          flex: 1;
-          min-width: 0;
-          width: 100%;
         }
 
         .pipeline-name {
@@ -979,13 +974,6 @@
         .pipeline-meta {
           font-size: 11px;
           gap: 8px;
-        }
-
-        .pipeline-actions {
-          flex-shrink: 0;
-          width: 100%;
-          flex-wrap: nowrap;
-          justify-content: flex-end;
         }
 
         .pipeline-actions .btn {
@@ -1338,7 +1326,9 @@ jobs:
     <div class="modal" id="run-config-modal">
       <div class="modal-content">
         <div class="modal-header">
-          <span class="modal-title" id="run-config-title">Confirm Run Pipeline</span>
+          <span class="modal-title" id="run-config-title"
+            >Confirm Run Pipeline</span
+          >
           <button class="modal-close" onclick="closeModal('run-config-modal')">
             &times;
           </button>
@@ -1346,18 +1336,40 @@ jobs:
         <div class="modal-body">
           <div class="form-group">
             <label class="form-label">Pipeline Name</label>
-            <div class="form-input" id="run-config-pipeline-name" style="background: #0d1117; cursor: default;"></div>
+            <div
+              class="form-input"
+              id="run-config-pipeline-name"
+              style="background: #0d1117; cursor: default"
+            ></div>
           </div>
           <div class="form-group">
             <label class="form-label">Configuration</label>
-            <pre class="form-textarea" id="run-config-content" style="background: #0d1117; overflow: auto; min-height: 300px; cursor: default; white-space: pre-wrap; word-wrap: break-word; font-family: 'SFMono-Regular', monospace; font-size: 13px; line-height: 1.5;"></pre>
+            <pre
+              class="form-textarea"
+              id="run-config-content"
+              style="
+                background: #0d1117;
+                overflow: auto;
+                min-height: 300px;
+                cursor: default;
+                white-space: pre-wrap;
+                word-wrap: break-word;
+                font-family: 'SFMono-Regular', monospace;
+                font-size: 13px;
+                line-height: 1.5;
+              "
+            ></pre>
           </div>
         </div>
         <div class="modal-footer">
           <button class="btn" onclick="closeModal('run-config-modal')">
             Cancel
           </button>
-          <button class="btn btn-primary" id="run-config-confirm-btn" onclick="confirmTriggerPipeline()">
+          <button
+            class="btn btn-primary"
+            id="run-config-confirm-btn"
+            onclick="confirmTriggerPipeline()"
+          >
             Confirm Run
           </button>
         </div>
@@ -1377,6 +1389,8 @@ jobs:
       const RUNS_PAGE_SIZE = 50;
       let runsHasMore = true;
       let isLoadingMoreRuns = false;
+      let logEventSource = null;
+      let stepOutputOffsets = new Map();
 
       function showToast(message, type = 'info', duration = 3000) {
         const container = document.getElementById('toast-container');
@@ -1623,11 +1637,16 @@ jobs:
       let currentRunPipelineId = null;
 
       function showRunConfigModal(id) {
-        const pipelineItem = document.querySelector(`.pipeline-item[data-pipeline-id="${id}"]`);
+        const pipelineItem = document.querySelector(
+          `.pipeline-item[data-pipeline-id="${id}"]`,
+        );
         if (!pipelineItem) return;
 
-        const name = pipelineItem.getAttribute('data-pipeline-name') || 'Unknown';
-        const config = pipelineItem.getAttribute('data-pipeline-config') || 'No configuration available';
+        const name =
+          pipelineItem.getAttribute('data-pipeline-name') || 'Unknown';
+        const config =
+          pipelineItem.getAttribute('data-pipeline-config') ||
+          'No configuration available';
 
         currentRunPipelineId = id;
         document.getElementById('run-config-pipeline-name').textContent = name;
@@ -1768,11 +1787,25 @@ jobs:
 
       async function viewRunDetail(runId) {
         stopDetailPolling();
+        stepOutputOffsets.clear();
         try {
           const response = await fetch(`/api/cicd/run/detail?id=${runId}`);
           const result = await response.json();
           if (result.code === 200) {
             currentRunDetail = result.data;
+
+            if (currentRunDetail.jobs) {
+              for (const job of currentRunDetail.jobs) {
+                for (const step of job.steps) {
+                  if (step.output) {
+                    stepOutputOffsets.set(step.id, step.output.length);
+                  } else {
+                    stepOutputOffsets.set(step.id, 0);
+                  }
+                }
+              }
+            }
+
             renderRunDetail();
             startDetailPolling(runId);
             window.location.hash = `run/${runId}`;
@@ -1784,35 +1817,171 @@ jobs:
 
       function startDetailPolling(runId) {
         stopDetailPolling();
+
+        if (typeof EventSource !== 'undefined') {
+          startLogEventSource(runId);
+        } else {
+          startLegacyPolling(runId);
+        }
+
         detailPollingInterval = setInterval(async () => {
           if (!currentRunDetail) return;
           try {
-            const response = await fetch(`/api/cicd/run/detail?id=${runId}`);
-            const result = await response.json();
-            if (result.code === 200) {
-              const prevRun = currentRunDetail.run;
-              currentRunDetail = result.data;
-              updateRunDetailUI();
-              const isCompleted = ['success', 'failure', 'cancelled'].includes(
-                currentRunDetail.run.status,
-              );
-              const wasCompleted = ['success', 'failure', 'cancelled'].includes(
-                prevRun.status,
-              );
-              if (isCompleted && !wasCompleted) {
-                stopDetailPolling();
-              }
-            }
+            await pollIncrementalDetail(runId);
           } catch (error) {
             console.error('Error polling run detail:', error);
           }
-        }, 3000);
+        }, 2000);
+      }
+
+      function startLogEventSource(runId) {
+        if (logEventSource) {
+          logEventSource.close();
+        }
+
+        logEventSource = new EventSource(
+          `/api/cicd/run/logs/stream?run_id=${runId}`,
+        );
+
+        logEventSource.addEventListener('log', (event) => {
+          try {
+            const logData = JSON.parse(event.data);
+            appendRealtimeLog(logData);
+          } catch (error) {
+            console.error('Error parsing log event:', error);
+          }
+        });
+
+        logEventSource.addEventListener('notice', (event) => {
+          console.warn('SSE notice:', event.data);
+        });
+
+        logEventSource.addEventListener('complete', (event) => {
+          console.log('SSE complete:', event.data);
+          if (logEventSource) {
+            logEventSource.close();
+            logEventSource = null;
+          }
+        });
+
+        logEventSource.onerror = (error) => {
+          console.error('SSE error:', error);
+          if (logEventSource) {
+            logEventSource.close();
+            logEventSource = null;
+          }
+        };
+      }
+
+      function startLegacyPolling(runId) {
+        console.log('EventSource not supported, using legacy polling');
+      }
+
+      async function pollIncrementalDetail(runId) {
+        const offsets = [];
+        if (currentRunDetail && currentRunDetail.jobs) {
+          for (const job of currentRunDetail.jobs) {
+            for (const step of job.steps) {
+              const offset = stepOutputOffsets.get(step.id) || 0;
+              offsets.push({ step_id: step.id, offset });
+            }
+          }
+        }
+
+        const offsetParam = offsets.length > 0 ? JSON.stringify(offsets) : '';
+        const url = offsetParam
+          ? `/api/cicd/run/detail/incremental?run_id=${runId}&offsets=${encodeURIComponent(offsetParam)}`
+          : `/api/cicd/run/detail/incremental?run_id=${runId}`;
+
+        const response = await fetch(url);
+        const result = await response.json();
+
+        if (result.code === 200 && result.data) {
+          updateIncrementalRunDetail(result.data);
+
+          const isCompleted = ['success', 'failure', 'cancelled'].includes(
+            result.data.run.status,
+          );
+          if (isCompleted) {
+            stopDetailPolling();
+          }
+        }
+      }
+
+      function updateIncrementalRunDetail(detail) {
+        if (!currentRunDetail) return;
+
+        currentRunDetail.run = detail.run;
+        updateRunDetailUI();
+
+        if (detail.jobs) {
+          for (const jobData of detail.jobs) {
+            for (const stepLog of jobData.steps) {
+              if (stepLog.new_output) {
+                appendStepLog(stepLog.step_id, stepLog.new_output);
+                stepOutputOffsets.set(stepLog.step_id, stepLog.output_length);
+              }
+            }
+          }
+        }
+      }
+
+      function appendRealtimeLog(logData) {
+        const { step_id, content, is_stderr } = logData;
+
+        if (!stepOutputOffsets.has(step_id)) {
+          stepOutputOffsets.set(step_id, 0);
+        }
+        const currentOffset = stepOutputOffsets.get(step_id);
+        stepOutputOffsets.set(step_id, currentOffset + content.length);
+
+        appendStepLog(step_id, content, is_stderr);
+      }
+
+      function appendStepLog(stepId, content, isStderr = false) {
+        const logContent = document.getElementById(
+          `step-log-content-${stepId}`,
+        );
+        if (!logContent) return;
+
+        if (!expandedSteps.has(stepId)) {
+          expandedSteps.add(stepId);
+          logContent.classList.remove('collapsed');
+          const toggleIcon = document.querySelector(
+            `#step-log-${stepId} .step-log-toggle-icon`,
+          );
+          if (toggleIcon) {
+            toggleIcon.classList.remove('collapsed');
+          }
+        }
+
+        const lines = content.split('\n');
+        const baseTime = new Date();
+        const timestampStr = baseTime.toISOString().split('T')[1].split('.')[0];
+
+        let html = '';
+        for (const line of lines) {
+          if (line.trim()) {
+            const coloredLine = colorizeLogLine(line);
+            const lineClass = isStderr ? 'log-error' : '';
+            html += `<div class="log-line ${lineClass}"><span class="log-timestamp">${timestampStr}</span>${coloredLine}</div>`;
+          }
+        }
+
+        if (html) {
+          logContent.insertAdjacentHTML('beforeend', html);
+          logContent.scrollTop = logContent.scrollHeight;
+        }
       }
 
       function stopDetailPolling() {
         if (detailPollingInterval) {
           clearInterval(detailPollingInterval);
           detailPollingInterval = null;
+        }
+        if (logEventSource) {
+          logEventSource.close();
+          logEventSource = null;
         }
       }
 
@@ -2028,6 +2197,7 @@ jobs:
         document.getElementById('runs-view').classList.remove('hidden');
         currentRunDetail = null;
         expandedSteps.clear();
+        stepOutputOffsets.clear();
         window.location.hash = 'runs';
       }
 
@@ -2295,10 +2465,22 @@ jobs:
                 const timeEl = item.querySelector('.run-time');
                 if (statusEl) {
                   statusEl.className = `run-status ${run.status}`;
-                  statusEl.textContent = run.status === 'success' ? '✓' : run.status === 'failure' ? '✗' : run.status === 'running' ? '◐' : '○';
+                  statusEl.textContent =
+                    run.status === 'success'
+                      ? '✓'
+                      : run.status === 'failure'
+                        ? '✗'
+                        : run.status === 'running'
+                          ? '◐'
+                          : '○';
                 }
                 if (timeEl) {
-                  timeEl.textContent = run.duration_ms > 0 ? formatDuration(run.duration_ms) : run.status === 'running' ? 'Running...' : '-';
+                  timeEl.textContent =
+                    run.duration_ms > 0
+                      ? formatDuration(run.duration_ms)
+                      : run.status === 'running'
+                        ? 'Running...'
+                        : '-';
                 }
               }
             });

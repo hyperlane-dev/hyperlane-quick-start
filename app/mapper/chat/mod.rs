@@ -13,5 +13,7 @@ use hyperlane_plugin::postgresql::*;
 
 use std::{
     collections::HashMap,
-    sync::{Arc, OnceLock, RwLock},
+    sync::{Arc, OnceLock},
 };
+
+use tokio::sync::RwLock;

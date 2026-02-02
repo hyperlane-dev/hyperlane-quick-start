@@ -8,5 +8,7 @@ use {super::*, model::application::monitor::*};
 
 use std::{
     collections::HashMap,
-    sync::{Arc, OnceLock, RwLock},
+    sync::{Arc, OnceLock},
 };
+
+use tokio::sync::RwLock;

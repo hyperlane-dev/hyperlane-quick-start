@@ -12,7 +12,7 @@ impl ServerHook for OnlineUsersRoute {
     )]
     #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        let user_list: UserListResponse = ChatDomain::get_online_users_list();
+        let user_list: UserListResponse = ChatDomain::get_online_users_list().await;
         let response: ApiResponse<UserListResponse> = ApiResponse::success(user_list);
         ctx.set_response_body(&response.to_json_bytes()).await;
     }

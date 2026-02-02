@@ -73,37 +73,29 @@ impl ChatDomain {
     }
 
     #[instrument_trace]
-    pub fn get_or_create_session(session_id: &str) -> ChatSession {
+    pub async fn get_or_create_session(session_id: &str) -> ChatSession {
         let sessions: &Arc<RwLock<HashMap<String, ChatSession>>> = Self::get_global_chat_sessions();
-        if let Ok(mut sessions_guard) = sessions.write() {
-            sessions_guard.retain(|_, session| !session.is_expired(30));
-            sessions_guard
-                .entry(session_id.to_string())
-                .or_insert_with(|| {
-                    let mut session: ChatSession = ChatSession::default();
-                    session
-                        .set_session_id(session_id.to_string())
-                        .set_messages(Vec::new())
-                        .set_last_activity(std::time::Instant::now());
-                    session
-                })
-                .clone()
-        } else {
-            let mut session: ChatSession = ChatSession::default();
-            session
-                .set_session_id(session_id.to_string())
-                .set_messages(Vec::new())
-                .set_last_activity(std::time::Instant::now());
-            session
-        }
+        let mut sessions_guard = sessions.write().await;
+        sessions_guard.retain(|_, session| !session.is_expired(30));
+        sessions_guard
+            .entry(session_id.to_string())
+            .or_insert_with(|| {
+                let mut session: ChatSession = ChatSession::default();
+                session
+                    .set_session_id(session_id.to_string())
+                    .set_messages(Vec::new())
+                    .set_last_activity(std::time::Instant::now());
+                session
+            })
+            .clone()
     }
 
     #[instrument_trace]
-    pub fn update_session(session: ChatSession) {
-        let sessions: &Arc<RwLock<HashMap<String, ChatSession>>> = Self::get_global_chat_sessions();
-        let mut sessions_guard: std::sync::RwLockWriteGuard<HashMap<String, ChatSession>> =
-            sessions.write().unwrap();
-        sessions_guard.insert(session.get_session_id().clone(), session);
+    pub async fn update_session(session: ChatSession) {
+        Self::get_global_chat_sessions()
+            .write()
+            .await
+            .insert(session.get_session_id().clone(), session);
     }
 
     #[instrument_trace]
@@ -112,33 +104,33 @@ impl ChatDomain {
     }
 
     #[instrument_trace]
-    pub fn add_online_user(username: &str) {
-        let users: &Arc<RwLock<HashMap<String, OnlineUser>>> = Self::get_global_online_users();
-        let mut users_guard: RwLockWriteGuard<'_, HashMap<String, OnlineUser>> =
-            users.write().unwrap();
+    pub async fn add_online_user(username: &str) {
         let mut online_user: OnlineUser = OnlineUser::default();
         online_user
             .set_username(username.to_string())
             .set_join_time(time());
-        users_guard.insert(username.to_string(), online_user);
+        Self::get_global_online_users()
+            .write()
+            .await
+            .insert(username.to_string(), online_user);
     }
 
     #[instrument_trace]
-    pub fn remove_online_user(username: &str) {
-        let users: &Arc<RwLock<HashMap<String, OnlineUser>>> = Self::get_global_online_users();
-        let mut users_guard: RwLockWriteGuard<'_, HashMap<String, OnlineUser>> =
-            users.write().unwrap();
-        users_guard.remove(username);
+    pub async fn remove_online_user(username: &str) {
+        Self::get_global_online_users()
+            .write()
+            .await
+            .remove(username);
     }
 
     #[instrument_trace]
-    pub fn get_online_users_list() -> UserListResponse {
-        let users: &Arc<RwLock<HashMap<String, OnlineUser>>> = Self::get_global_online_users();
-        let mut users_vec: Vec<OnlineUser> = if let Ok(users_guard) = users.read() {
-            users_guard.values().cloned().collect()
-        } else {
-            Vec::new()
-        };
+    pub async fn get_online_users_list() -> UserListResponse {
+        let mut users_vec: Vec<OnlineUser> = Self::get_global_online_users()
+            .read()
+            .await
+            .values()
+            .cloned()
+            .collect();
         let mut gpt_user: OnlineUser = OnlineUser::default();
         gpt_user.set_username(GPT.to_string()).set_join_time(time());
         users_vec.insert(0, gpt_user);

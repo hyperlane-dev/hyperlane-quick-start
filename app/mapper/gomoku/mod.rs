@@ -9,5 +9,7 @@ use {super::*, model::application::gomoku::*};
 
 use std::{
     collections::{HashMap, HashSet},
-    sync::{Arc, OnceLock, RwLock},
+    sync::{Arc, OnceLock},
 };
+
+use tokio::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};

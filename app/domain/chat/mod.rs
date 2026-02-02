@@ -10,7 +10,6 @@ use {
     service::chat::*,
 };
 
-use std::{
-    collections::HashMap,
-    sync::{Arc, RwLock, RwLockWriteGuard},
-};
+use std::{collections::HashMap, sync::Arc};
+
+use tokio::sync::RwLock;

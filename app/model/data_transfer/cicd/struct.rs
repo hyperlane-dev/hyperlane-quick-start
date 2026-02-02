@@ -77,3 +77,26 @@ pub struct PaginatedRunsDto {
     pub runs: Vec<RunDto>,
     pub has_more: bool,
 }
+
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
+pub struct StepLogDto {
+    pub step_id: i32,
+    pub step_name: String,
+    pub status: CicdStatus,
+    pub output: Option<String>,
+    pub output_length: usize,
+    pub new_output: Option<String>,
+    pub output_offset: usize,
+}
+
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
+pub struct IncrementalRunDetailDto {
+    pub run: RunDto,
+    pub jobs: Vec<JobWithIncrementalStepsDto>,
+}
+
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
+pub struct JobWithIncrementalStepsDto {
+    pub job: JobDto,
+    pub steps: Vec<StepLogDto>,
+}

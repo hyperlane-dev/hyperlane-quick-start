@@ -36,6 +36,14 @@ pub struct UpdateJobRoute;
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct UpdateStepRoute;
 
+#[route("/api/cicd/run/detail/incremental")]
+#[derive(Clone, Copy, Data, Debug, Default)]
+pub struct GetIncrementalRunDetailRoute;
+
 #[route("/cicd")]
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct CicdViewRoute;
+
+#[route("/api/cicd/run/logs/stream")]
+#[derive(Clone, Copy, Data, Debug, Default)]
+pub struct RunLogsSseRoute;

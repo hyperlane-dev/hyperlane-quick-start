@@ -30,7 +30,7 @@ impl ServerHook for GomokuRequestHook {
             Ok((resp_body, room_id)) => {
                 ctx.set_response_body(&resp_body).await;
                 if !room_id.is_empty() {
-                    GomokuWebSocketService::broadcast_room(&room_id, &sender_id, &resp_body);
+                    GomokuWebSocketService::broadcast_room(&room_id, &sender_id, &resp_body).await;
                 }
             }
             Err(error) => {
@@ -64,14 +64,14 @@ impl ServerHook for GomokuClosedHook {
         if user_id.is_empty() {
             return;
         }
-        let room_id: Option<String> = GomokuRoomMapper::get_user_room(&user_id);
+        let room_id: Option<String> = GomokuRoomMapper::get_user_room(&user_id).await;
         if let Some(room_id) = room_id {
-            if let Some(mut room) = GomokuRoomMapper::get_room(&room_id) {
+            if let Some(mut room) = GomokuRoomMapper::get_room(&room_id).await {
                 let removed: bool = GomokuDomain::remove_user(&mut room, &user_id);
                 if removed {
-                    GomokuRoomMapper::save_room(room.clone());
+                    GomokuRoomMapper::save_room(room.clone()).await;
                     if room.get_players().is_empty() && room.get_spectators().is_empty() {
-                        GomokuRoomMapper::remove_room(&room_id);
+                        GomokuRoomMapper::remove_room(&room_id).await;
                     }
                     let resp_body: ResponseBody = GomokuWebSocketService::build_response_body(
                         GomokuMessageType::RoomState,
@@ -80,10 +80,10 @@ impl ServerHook for GomokuClosedHook {
                         json!(room),
                     )
                     .unwrap_or_default();
-                    GomokuWebSocketService::broadcast_room(&room_id, &user_id, &resp_body);
+                    GomokuWebSocketService::broadcast_room(&room_id, &user_id, &resp_body).await;
                 }
             }
-            GomokuRoomMapper::remove_user_room(&user_id);
+            GomokuRoomMapper::remove_user_room(&user_id).await;
         }
     }
 }
@@ -128,18 +128,18 @@ impl GomokuWebSocketService {
         sender_id: &str,
     ) -> Result<(ResponseBody, String), String> {
         match req_data.get_type() {
-            GomokuMessageType::CreateRoom => Self::handle_create_room(req_data, sender_id),
-            GomokuMessageType::JoinRoom => Self::handle_join_room(req_data, sender_id),
-            GomokuMessageType::Spectate => Self::handle_spectate(req_data, sender_id),
-            GomokuMessageType::Leave => Self::handle_leave(req_data, sender_id),
-            GomokuMessageType::PlaceStone => Self::handle_place_stone(req_data, sender_id),
-            GomokuMessageType::Sync => Self::handle_sync(req_data, sender_id),
+            GomokuMessageType::CreateRoom => Self::handle_create_room(req_data, sender_id).await,
+            GomokuMessageType::JoinRoom => Self::handle_join_room(req_data, sender_id).await,
+            GomokuMessageType::Spectate => Self::handle_spectate(req_data, sender_id).await,
+            GomokuMessageType::Leave => Self::handle_leave(req_data, sender_id).await,
+            GomokuMessageType::PlaceStone => Self::handle_place_stone(req_data, sender_id).await,
+            GomokuMessageType::Sync => Self::handle_sync(req_data, sender_id).await,
             _ => Err("Unsupported message type".to_string()),
         }
     }
 
     #[instrument_trace]
-    fn handle_create_room(
+    async fn handle_create_room(
         req_data: &GomokuWsRequest,
         sender_id: &str,
     ) -> Result<(ResponseBody, String), String> {
@@ -147,12 +147,12 @@ impl GomokuWebSocketService {
         if room_id.trim().is_empty() {
             room_id = Self::generate_room_id(sender_id);
         }
-        if GomokuRoomMapper::get_room(&room_id).is_some() {
+        if GomokuRoomMapper::get_room(&room_id).await.is_some() {
             return Err("Room already exists".to_string());
         }
         let room: GomokuRoom = GomokuDomain::create_room(&room_id, sender_id);
-        GomokuRoomMapper::save_room(room.clone());
-        GomokuRoomMapper::set_user_room(sender_id, &room_id);
+        GomokuRoomMapper::save_room(room.clone()).await;
+        GomokuRoomMapper::set_user_room(sender_id, &room_id).await;
         let resp_body: ResponseBody = Self::build_response_body(
             GomokuMessageType::RoomState,
             &room_id,
@@ -163,19 +163,20 @@ impl GomokuWebSocketService {
     }
 
     #[instrument_trace]
-    fn handle_join_room(
+    async fn handle_join_room(
         req_data: &GomokuWsRequest,
         sender_id: &str,
     ) -> Result<(ResponseBody, String), String> {
         let room_id: String = req_data.get_room_id().clone();
-        let mut room: GomokuRoom =
-            GomokuRoomMapper::get_room(&room_id).ok_or("Room not found".to_string())?;
+        let mut room: GomokuRoom = GomokuRoomMapper::get_room(&room_id)
+            .await
+            .ok_or("Room not found".to_string())?;
         let _color: StoneColor = GomokuDomain::add_player(&mut room, sender_id)?;
-        GomokuRoomMapper::set_user_room(sender_id, &room_id);
+        GomokuRoomMapper::set_user_room(sender_id, &room_id).await;
         if room.get_status() == &GameStatus::Waiting && room.get_players().len() == 2 {
             GomokuDomain::start_game(&mut room)?;
         }
-        GomokuRoomMapper::save_room(room.clone());
+        GomokuRoomMapper::save_room(room.clone()).await;
         let resp_body: ResponseBody = Self::build_response_body(
             GomokuMessageType::RoomState,
             &room_id,
@@ -186,19 +187,20 @@ impl GomokuWebSocketService {
     }
 
     #[instrument_trace]
-    fn handle_spectate(
+    async fn handle_spectate(
         req_data: &GomokuWsRequest,
         sender_id: &str,
     ) -> Result<(ResponseBody, String), String> {
         let room_id: String = req_data.get_room_id().clone();
-        let mut room: GomokuRoom =
-            GomokuRoomMapper::get_room(&room_id).ok_or("Room not found".to_string())?;
+        let mut room: GomokuRoom = GomokuRoomMapper::get_room(&room_id)
+            .await
+            .ok_or("Room not found".to_string())?;
         let added: bool = GomokuDomain::add_spectator(&mut room, sender_id);
         if !added {
             return Err("Already in room".to_string());
         }
-        GomokuRoomMapper::set_user_room(sender_id, &room_id);
-        GomokuRoomMapper::save_room(room.clone());
+        GomokuRoomMapper::set_user_room(sender_id, &room_id).await;
+        GomokuRoomMapper::save_room(room.clone()).await;
         let resp_body: ResponseBody = Self::build_response_body(
             GomokuMessageType::RoomState,
             &room_id,
@@ -209,29 +211,32 @@ impl GomokuWebSocketService {
     }
 
     #[instrument_trace]
-    fn handle_leave(
+    async fn handle_leave(
         req_data: &GomokuWsRequest,
         sender_id: &str,
     ) -> Result<(ResponseBody, String), String> {
         let room_id: String = if req_data.get_room_id().is_empty() {
-            GomokuRoomMapper::get_user_room(sender_id).unwrap_or_default()
+            GomokuRoomMapper::get_user_room(sender_id)
+                .await
+                .unwrap_or_default()
         } else {
             req_data.get_room_id().clone()
         };
         if room_id.is_empty() {
             return Err("Room not found".to_string());
         }
-        let mut room: GomokuRoom =
-            GomokuRoomMapper::get_room(&room_id).ok_or("Room not found".to_string())?;
+        let mut room: GomokuRoom = GomokuRoomMapper::get_room(&room_id)
+            .await
+            .ok_or("Room not found".to_string())?;
         let removed: bool = GomokuDomain::remove_user(&mut room, sender_id);
         if !removed {
             return Err("User not in room".to_string());
         }
-        GomokuRoomMapper::remove_user_room(sender_id);
+        GomokuRoomMapper::remove_user_room(sender_id).await;
         if room.get_players().is_empty() && room.get_spectators().is_empty() {
-            GomokuRoomMapper::remove_room(&room_id);
+            GomokuRoomMapper::remove_room(&room_id).await;
         } else {
-            GomokuRoomMapper::save_room(room.clone());
+            GomokuRoomMapper::save_room(room.clone()).await;
         }
         let resp_body: ResponseBody = Self::build_response_body(
             GomokuMessageType::RoomState,
@@ -243,16 +248,17 @@ impl GomokuWebSocketService {
     }
 
     #[instrument_trace]
-    fn handle_place_stone(
+    async fn handle_place_stone(
         req_data: &GomokuWsRequest,
         sender_id: &str,
     ) -> Result<(ResponseBody, String), String> {
         let room_id: String = req_data.get_room_id().clone();
-        let mut room: GomokuRoom =
-            GomokuRoomMapper::get_room(&room_id).ok_or("Room not found".to_string())?;
+        let mut room: GomokuRoom = GomokuRoomMapper::get_room(&room_id)
+            .await
+            .ok_or("Room not found".to_string())?;
         let (x, y): (usize, usize) = Self::parse_position(req_data.get_payload())?;
         let result: GomokuPlaceResult = GomokuDomain::place_stone(&mut room, sender_id, x, y)?;
-        GomokuRoomMapper::save_room(room.clone());
+        GomokuRoomMapper::save_room(room.clone()).await;
         let payload: serde_json::Value = json!({
             "result": result,
             "room": room
@@ -263,19 +269,22 @@ impl GomokuWebSocketService {
     }
 
     #[instrument_trace]
-    fn handle_sync(
+    async fn handle_sync(
         req_data: &GomokuWsRequest,
         sender_id: &str,
     ) -> Result<(ResponseBody, String), String> {
         let room_id: String = if req_data.get_room_id().is_empty() {
-            GomokuRoomMapper::get_user_room(sender_id).unwrap_or_default()
+            GomokuRoomMapper::get_user_room(sender_id)
+                .await
+                .unwrap_or_default()
         } else {
             req_data.get_room_id().clone()
         };
-        let mut room: GomokuRoom =
-            GomokuRoomMapper::get_room(&room_id).ok_or("Room not found".to_string())?;
+        let mut room: GomokuRoom = GomokuRoomMapper::get_room(&room_id)
+            .await
+            .ok_or("Room not found".to_string())?;
         GomokuDomain::ensure_board(&mut room);
-        GomokuRoomMapper::save_room(room.clone());
+        GomokuRoomMapper::save_room(room.clone()).await;
         let resp_body: ResponseBody = Self::build_response_body(
             GomokuMessageType::RoomState,
             &room_id,
@@ -331,9 +340,9 @@ impl GomokuWebSocketService {
     }
 
     #[instrument_trace]
-    pub fn broadcast_room(room_id: &str, sender_id: &str, resp_body: &ResponseBody) {
+    pub async fn broadcast_room(room_id: &str, sender_id: &str, resp_body: &ResponseBody) {
         let websocket: &WebSocket = get_global_websocket();
-        let mut targets: Vec<String> = GomokuRoomMapper::get_room_user_ids(room_id);
+        let mut targets: Vec<String> = GomokuRoomMapper::get_room_user_ids(room_id).await;
         targets.retain(|item| item != sender_id);
         for user_id in targets {
             let key: BroadcastType<String> = BroadcastType::PointToGroup(user_id);

@@ -84,7 +84,7 @@ impl ServerHook for ChatClosedHook {
         let key: BroadcastType<String> = BroadcastType::PointToGroup(path.clone());
         let receiver_count: ReceiverCount = websocket.receiver_count_after_closed(key);
         let username: String = ChatService::get_name(ctx).await;
-        ChatDomain::remove_online_user(&username);
+        ChatDomain::remove_online_user(&username).await;
         let resp_data: ResponseBody =
             ChatService::create_online_count_message(ctx, receiver_count.to_string()).await;
         ctx.set_response_body(&resp_data).await;
@@ -146,13 +146,13 @@ impl ChatService {
 
     #[instrument_trace]
     pub async fn process_gpt_request(session_id: String, message: String, ctx: Context) {
-        let mut session: ChatSession = ChatDomain::get_or_create_session(&session_id);
+        let mut session: ChatSession = ChatDomain::get_or_create_session(&session_id).await;
         let cleaned_msg: String = Self::remove_mentions(&message);
         session.add_message(ROLE_USER.to_string(), cleaned_msg);
         let api_response: String = match Self::call_gpt_api_with_context(&session).await {
             Ok(gpt_response) => {
                 session.add_message(ROLE_ASSISTANT.to_string(), gpt_response.clone());
-                ChatDomain::update_session(session);
+                ChatDomain::update_session(session).await;
                 format!("{MENTION_PREFIX}{session_id}{SPACE}{gpt_response}")
             }
             Err(error) => format!("API call failed{COLON_SPACE}{error}"),

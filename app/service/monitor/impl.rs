@@ -4,13 +4,13 @@ impl MonitorService {
     #[instrument_trace]
     pub async fn start_network_capture() {
         init_network_capture_globals();
-        set_capture_status(CaptureStatus::Running);
+        set_capture_status(CaptureStatus::Running).await;
         let _handle: std::thread::JoinHandle<()> = std::thread::spawn(|| {
             let rt: Runtime = Runtime::new().unwrap();
             rt.block_on(async {
                 loop {
                     if let Some(stats) = Self::capture_network_data().await {
-                        set_network_stats(stats);
+                        set_network_stats(stats).await;
                     }
                     std::thread::sleep(Duration::from_secs(CAPTURE_INTERVAL_SECONDS));
                 }
@@ -207,7 +207,7 @@ impl MonitorService {
     #[response_header(CONTENT_TYPE => APPLICATION_JSON)]
     #[instrument_trace]
     pub async fn get_network_capture_data(ctx: &Context) {
-        let response_data: NetworkStats = get_network_stats().unwrap_or_default();
+        let response_data: NetworkStats = get_network_stats().await.unwrap_or_default();
         if let Ok(json) = serde_json::to_vec(&response_data) {
             ctx.set_response_body(&json).await;
         }
@@ -215,7 +215,7 @@ impl MonitorService {
 
     #[instrument_trace]
     pub async fn get_network_capture_stream(ctx: &Context) {
-        let response_data: NetworkStats = get_network_stats().unwrap_or_default();
+        let response_data: NetworkStats = get_network_stats().await.unwrap_or_default();
         if let Ok(json) = serde_json::to_string(&response_data) {
             let event: String = format!("{SSE_DATA_PREFIX}{json}{DOUBLE_BR}");
             ctx.set_response_body(&event).await;

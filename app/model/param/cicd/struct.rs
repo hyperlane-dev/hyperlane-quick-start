@@ -36,3 +36,15 @@ pub struct QueryRunsParam {
     pub page_size: Option<i32>,
     pub last_id: Option<i32>,
 }
+
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
+pub struct IncrementalRunDetailParam {
+    pub run_id: i32,
+    pub step_offsets: Vec<StepOffsetParam>,
+}
+
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
+pub struct StepOffsetParam {
+    pub step_id: i32,
+    pub offset: usize,
+}

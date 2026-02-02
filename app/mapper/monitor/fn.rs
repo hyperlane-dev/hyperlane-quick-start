@@ -3,70 +3,57 @@ use super::*;
 #[instrument_trace]
 pub fn init_network_capture_globals() {
     let _: Result<(), Arc<RwLock<Option<NetworkStats>>>> =
-        NETWORK_CAPTURE_STATS.set(Arc::new(RwLock::new(None)));
+        NETWORK_CAPTURE_STATS.set(arc_rwlock(None));
     let _: Result<(), Arc<RwLock<CaptureStatus>>> =
-        CAPTURE_STATUS.set(Arc::new(RwLock::new(CaptureStatus::Stopped)));
+        CAPTURE_STATUS.set(arc_rwlock(CaptureStatus::Stopped));
     let _: Result<(), Arc<RwLock<HashMap<String, ConnectionInfo>>>> =
-        ACTIVE_CONNECTIONS.set(Arc::new(RwLock::new(HashMap::new())));
+        ACTIVE_CONNECTIONS.set(arc_rwlock(HashMap::new()));
 }
 
 #[instrument_trace]
-pub fn get_network_stats() -> Option<NetworkStats> {
-    NETWORK_CAPTURE_STATS.get()?.read().ok()?.clone()
+pub async fn get_network_stats() -> Option<NetworkStats> {
+    NETWORK_CAPTURE_STATS.get()?.read().await.clone()
 }
 
-pub fn set_network_stats(stats: NetworkStats) {
+pub async fn set_network_stats(stats: NetworkStats) {
     if let Some(global_stats) = NETWORK_CAPTURE_STATS.get() {
-        if let Ok(mut guard) = global_stats.write() {
-            *guard = Some(stats);
-        }
+        *global_stats.write().await = Some(stats);
     }
 }
 
 #[instrument_trace]
-pub fn get_capture_status() -> CaptureStatus {
-    CAPTURE_STATUS
-        .get()
-        .and_then(|status| status.read().ok())
-        .map(|guard| guard.clone())
-        .unwrap_or(CaptureStatus::Stopped)
+pub async fn get_capture_status() -> CaptureStatus {
+    match CAPTURE_STATUS.get() {
+        Some(status) => status.read().await.clone(),
+        None => CaptureStatus::Stopped,
+    }
 }
 
 #[instrument_trace]
-pub fn set_capture_status(status: CaptureStatus) {
+pub async fn set_capture_status(status: CaptureStatus) {
     if let Some(global_status) = CAPTURE_STATUS.get() {
-        if let Ok(mut guard) = global_status.write() {
-            *guard = status;
-        }
+        *global_status.write().await = status;
     }
 }
 
 #[instrument_trace]
-pub fn add_connection(connection_id: String, info: ConnectionInfo) {
+pub async fn add_connection(connection_id: String, info: ConnectionInfo) {
     if let Some(connections) = ACTIVE_CONNECTIONS.get() {
-        if let Ok(mut guard) = connections.write() {
-            guard.insert(connection_id, info);
-        }
+        connections.write().await.insert(connection_id, info);
     }
 }
 
 #[instrument_trace]
-pub fn remove_connection(connection_id: &str) {
+pub async fn remove_connection(connection_id: &str) {
     if let Some(connections) = ACTIVE_CONNECTIONS.get() {
-        if let Ok(mut guard) = connections.write() {
-            guard.remove(connection_id);
-        }
+        connections.write().await.remove(connection_id);
     }
 }
 
 #[instrument_trace]
-pub fn get_active_connections() -> HashMap<String, ConnectionInfo> {
+pub async fn get_active_connections() -> HashMap<String, ConnectionInfo> {
     if let Some(connections) = ACTIVE_CONNECTIONS.get() {
-        if let Ok(guard) = connections.read() {
-            guard.clone()
-        } else {
-            HashMap::new()
-        }
+        connections.read().await.clone()
     } else {
         HashMap::new()
     }
