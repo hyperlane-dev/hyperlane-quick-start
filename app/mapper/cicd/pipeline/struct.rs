@@ -17,13 +17,10 @@ pub struct Model {
     pub id: i32,
     pub name: String,
     pub description: Option<String>,
-    pub repository_url: Option<String>,
-    pub branch: String,
     pub config_content: Option<String>,
-    pub trigger_type: String,
-    pub is_active: bool,
     pub created_at: Option<NaiveDateTime>,
     pub updated_at: Option<NaiveDateTime>,
+    pub deleted_at: Option<NaiveDateTime>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

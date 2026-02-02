@@ -5,14 +5,8 @@ impl CicdService {
     pub async fn create_pipeline(param: CreatePipelineParam) -> Result<i32, String> {
         let db: DatabaseConnection =
             get_mysql_connection(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let active_model: PipelineActiveModel = PipelineActiveModel::new(
-            param.name,
-            param.description,
-            param.repository_url,
-            param.branch,
-            param.config_content,
-            param.trigger_type,
-        );
+        let active_model: PipelineActiveModel =
+            PipelineActiveModel::new(param.name, param.description, param.config_content);
         let result: mapper::cicd::pipeline::Model = active_model
             .insert(&db)
             .await
@@ -29,16 +23,9 @@ impl CicdService {
             .col_expr(PipelineColumn::Name, Expr::value(param.name))
             .col_expr(PipelineColumn::Description, Expr::value(param.description))
             .col_expr(
-                PipelineColumn::RepositoryUrl,
-                Expr::value(param.repository_url),
-            )
-            .col_expr(PipelineColumn::Branch, Expr::value(param.branch))
-            .col_expr(
                 PipelineColumn::ConfigContent,
                 Expr::value(param.config_content),
             )
-            .col_expr(PipelineColumn::TriggerType, Expr::value(param.trigger_type))
-            .col_expr(PipelineColumn::IsActive, Expr::value(param.is_active))
             .exec(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
@@ -49,8 +36,11 @@ impl CicdService {
     pub async fn delete_pipeline(id: i32) -> Result<(), String> {
         let db: DatabaseConnection =
             get_mysql_connection(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        PipelineEntity::delete_many()
+        let now: NaiveDateTime = Utc::now().naive_utc();
+        PipelineEntity::update_many()
             .filter(PipelineColumn::Id.eq(id))
+            .filter(PipelineColumn::DeletedAt.is_null())
+            .col_expr(PipelineColumn::DeletedAt, Expr::value(now))
             .exec(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
@@ -62,6 +52,7 @@ impl CicdService {
         let db: DatabaseConnection =
             get_mysql_connection(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
         let result: Option<mapper::cicd::pipeline::Model> = PipelineEntity::find_by_id(id)
+            .filter(PipelineColumn::DeletedAt.is_null())
             .one(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
@@ -73,6 +64,7 @@ impl CicdService {
         let db: DatabaseConnection =
             get_mysql_connection(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
         let models: Vec<mapper::cicd::pipeline::Model> = PipelineEntity::find()
+            .filter(PipelineColumn::DeletedAt.is_null())
             .order_by_desc(PipelineColumn::CreatedAt)
             .all(&db)
             .await
@@ -95,7 +87,6 @@ impl CicdService {
         let active_model: RunActiveModel = RunActiveModel::new(
             param.pipeline_id,
             run_number,
-            param.trigger_type,
             param.triggered_by,
             param.commit_hash,
             param.commit_message,
@@ -125,6 +116,7 @@ impl CicdService {
         let db: DatabaseConnection =
             get_mysql_connection(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
         let result: Option<mapper::cicd::pipeline::Model> = PipelineEntity::find_by_id(id)
+            .filter(PipelineColumn::DeletedAt.is_null())
             .one(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
@@ -417,6 +409,7 @@ impl CicdService {
         let db: DatabaseConnection =
             get_mysql_connection(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
         let result: Option<mapper::cicd::run::Model> = RunEntity::find_by_id(id)
+            .filter(RunColumn::DeletedAt.is_null())
             .one(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
@@ -429,6 +422,7 @@ impl CicdService {
             get_mysql_connection(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
         let models: Vec<mapper::cicd::run::Model> = RunEntity::find()
             .filter(RunColumn::PipelineId.eq(pipeline_id))
+            .filter(RunColumn::DeletedAt.is_null())
             .order_by_desc(RunColumn::CreatedAt)
             .all(&db)
             .await
@@ -442,7 +436,7 @@ impl CicdService {
             get_mysql_connection(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
         let page: i32 = param.page.unwrap_or(1);
         let page_size: i32 = param.page_size.unwrap_or(10);
-        let mut query = RunEntity::find();
+        let mut query = RunEntity::find().filter(RunColumn::DeletedAt.is_null());
         if let Some(pipeline_id) = param.pipeline_id {
             query = query.filter(RunColumn::PipelineId.eq(pipeline_id));
         }
@@ -694,11 +688,7 @@ fn pipeline_to_dto(model: mapper::cicd::pipeline::Model) -> PipelineDto {
         id: model.id,
         name: model.name,
         description: model.description,
-        repository_url: model.repository_url,
-        branch: model.branch,
         config_content: model.config_content,
-        trigger_type: model.trigger_type,
-        is_active: model.is_active,
         created_at: model.created_at.map(|dt| dt.to_string()),
         updated_at: model.updated_at.map(|dt| dt.to_string()),
     }
@@ -713,7 +703,6 @@ fn run_to_dto(model: mapper::cicd::run::Model) -> RunDto {
         pipeline_name: None,
         run_number: model.run_number,
         status,
-        trigger_type: model.trigger_type,
         triggered_by: model.triggered_by,
         commit_hash: model.commit_hash,
         commit_message: model.commit_message,

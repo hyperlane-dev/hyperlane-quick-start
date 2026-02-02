@@ -18,7 +18,6 @@ pub struct Model {
     pub pipeline_id: i32,
     pub run_number: i32,
     pub status: String,
-    pub trigger_type: String,
     pub triggered_by: Option<String>,
     pub commit_hash: Option<String>,
     pub commit_message: Option<String>,
@@ -27,4 +26,5 @@ pub struct Model {
     pub duration_ms: i32,
     pub created_at: Option<NaiveDateTime>,
     pub updated_at: Option<NaiveDateTime>,
+    pub deleted_at: Option<NaiveDateTime>,
 }

@@ -403,7 +403,8 @@
         font-family: 'SFMono-Regular', monospace;
         font-size: 13px;
         line-height: 1.5;
-        resize: vertical;
+        resize: none;
+        overflow: hidden;
       }
 
       .modal {
@@ -968,37 +969,9 @@
             />
           </div>
           <div class="form-group">
-            <label class="form-label">Repository URL</label>
-            <input
-              type="text"
-              class="form-input"
-              id="create-repo"
-              placeholder="https://github.com/user/repo.git"
-            />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Branch</label>
-            <input
-              type="text"
-              class="form-input"
-              id="create-branch"
-              value="main"
-            />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Trigger Type</label>
-            <select class="form-select" id="create-trigger">
-              <option value="manual">Manual</option>
-              <option value="push">Push</option>
-              <option value="pull_request">Pull Request</option>
-              <option value="schedule">Schedule</option>
-            </select>
-          </div>
-          <div class="form-group">
             <label class="form-label">Pipeline Config (YAML)</label>
             <textarea class="form-textarea" id="create-config">
 name: Docker Hello World
-on: [manual]
 dockerfile: |
   FROM alpine:latest
   RUN echo "Building Hello World image..."
@@ -1043,30 +1016,8 @@ jobs:
             <input type="text" class="form-input" id="edit-description" />
           </div>
           <div class="form-group">
-            <label class="form-label">Repository URL</label>
-            <input type="text" class="form-input" id="edit-repo" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Branch</label>
-            <input type="text" class="form-input" id="edit-branch" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Trigger Type</label>
-            <select class="form-select" id="edit-trigger">
-              <option value="manual">Manual</option>
-              <option value="push">Push</option>
-              <option value="pull_request">Pull Request</option>
-              <option value="schedule">Schedule</option>
-            </select>
-          </div>
-          <div class="form-group">
             <label class="form-label">Pipeline Config (YAML)</label>
             <textarea class="form-textarea" id="edit-config"></textarea>
-          </div>
-          <div class="form-group">
-            <label class="form-label">
-              <input type="checkbox" id="edit-active" /> Active
-            </label>
           </div>
         </div>
         <div class="modal-footer">
@@ -1144,8 +1095,28 @@ jobs:
         }
       }
 
+      function autoResizeTextarea(textarea) {
+        textarea.style.height = 'auto';
+        textarea.style.height = Math.max(200, textarea.scrollHeight) + 'px';
+      }
+
+      function setupAutoResizeTextarea(textareaId) {
+        const textarea = document.getElementById(textareaId);
+        if (!textarea) return;
+        textarea.addEventListener('input', function () {
+          autoResizeTextarea(this);
+        });
+        textarea.addEventListener('focus', function () {
+          autoResizeTextarea(this);
+        });
+        autoResizeTextarea(textarea);
+      }
+
       function showCreateModal() {
         document.getElementById('create-modal').classList.add('active');
+        setTimeout(() => {
+          setupAutoResizeTextarea('create-config');
+        }, 0);
       }
 
       function closeModal(modalId) {
@@ -1184,19 +1155,11 @@ jobs:
         container.innerHTML = pipelines
           .map(
             (p) => `
-          <div class="pipeline-item" onclick="viewPipelineRuns(${p.id})">
-            <div class="pipeline-status ${p.is_active ? 'active' : 'inactive'}"></div>
+          <div class="pipeline-item">
             <div class="pipeline-info">
               <div class="pipeline-name">${escapeHtml(p.name)}</div>
-              <div class="pipeline-meta">
-                <span>${p.branch || 'main'}</span>
-                <span>•</span>
-                <span>${p.trigger_type || 'manual'}</span>
-                <span>•</span>
-                <span>${p.is_active ? 'Active' : 'Inactive'}</span>
-              </div>
             </div>
-            <div class="pipeline-actions" onclick="event.stopPropagation()">
+            <div class="pipeline-actions">
               <button class="btn btn-primary" onclick="triggerPipeline(${p.id})">Run</button>
               <button class="btn" onclick="showEditModal(${p.id})">Edit</button>
               <button class="btn btn-danger" onclick="deletePipeline(${p.id})">Delete</button>
@@ -1208,7 +1171,6 @@ jobs:
       }
 
       const DEFAULT_CONFIG = `name: Hello World Pipeline
-on: [manual]
 jobs:
   hello-job:
     runs-on: ubuntu-latest
@@ -1224,10 +1186,7 @@ jobs:
           name: document.getElementById('create-name').value,
           description:
             document.getElementById('create-description').value || null,
-          repository_url: document.getElementById('create-repo').value || null,
-          branch: document.getElementById('create-branch').value || 'main',
           config_content: configValue || DEFAULT_CONFIG,
-          trigger_type: document.getElementById('create-trigger').value,
         };
 
         if (!data.name) {
@@ -1247,7 +1206,6 @@ jobs:
             loadPipelines();
             document.getElementById('create-name').value = '';
             document.getElementById('create-description').value = '';
-            document.getElementById('create-repo').value = '';
             document.getElementById('create-config').value = '';
             showToast('Pipeline created successfully', 'success');
           } else {
@@ -1271,13 +1229,11 @@ jobs:
           document.getElementById('edit-name').value = p.name;
           document.getElementById('edit-description').value =
             p.description || '';
-          document.getElementById('edit-repo').value = p.repository_url || '';
-          document.getElementById('edit-branch').value = p.branch || 'main';
-          document.getElementById('edit-trigger').value =
-            p.trigger_type || 'manual';
           document.getElementById('edit-config').value = p.config_content || '';
-          document.getElementById('edit-active').checked = p.is_active;
           document.getElementById('edit-modal').classList.add('active');
+          setTimeout(() => {
+            setupAutoResizeTextarea('edit-config');
+          }, 0);
         } catch (error) {
           showToast('Network error: ' + error.message, 'error');
         }
@@ -1289,11 +1245,7 @@ jobs:
           name: document.getElementById('edit-name').value,
           description:
             document.getElementById('edit-description').value || null,
-          repository_url: document.getElementById('edit-repo').value || null,
-          branch: document.getElementById('edit-branch').value || 'main',
           config_content: document.getElementById('edit-config').value || null,
-          trigger_type: document.getElementById('edit-trigger').value,
-          is_active: document.getElementById('edit-active').checked,
         };
 
         try {
@@ -1339,7 +1291,6 @@ jobs:
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               pipeline_id: id,
-              trigger_type: 'manual',
               triggered_by: 'user',
             }),
           });
@@ -1399,7 +1350,7 @@ jobs:
             <div class="run-info">
               <div class="run-title">${getPipelineName(r.pipeline_id)} #${r.run_number}</div>
               <div class="run-meta">
-                ${r.trigger_type} • ${r.triggered_by || 'unknown'} • ${formatTime(r.created_at)}
+                ${r.triggered_by || 'unknown'} • ${formatTime(r.created_at)}
               </div>
             </div>
             <div class="run-time">
@@ -1474,8 +1425,6 @@ jobs:
             ${run.status === 'success' ? '✓' : run.status === 'failure' ? '✗' : run.status === 'running' ? '◐' : '○'}
           </span>
           <span>${run.status}</span>
-          <span>•</span>
-          <span>${run.trigger_type}</span>
           <span>•</span>
           <span>${run.triggered_by || 'unknown'}</span>
           ${run.commit_hash ? `<span>•</span><span>${run.commit_hash.substring(0, 7)}</span>` : ''}
@@ -1567,8 +1516,6 @@ jobs:
             ${run.status === 'success' ? '✓' : run.status === 'failure' ? '✗' : run.status === 'running' ? '◐' : '○'}
           </span>
           <span>${run.status}</span>
-          <span>•</span>
-          <span>${run.trigger_type}</span>
           <span>•</span>
           <span>${run.triggered_by || 'unknown'}</span>
           ${run.commit_hash ? `<span>•</span><span>${run.commit_hash.substring(0, 7)}</span>` : ''}
