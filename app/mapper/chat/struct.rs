@@ -6,11 +6,18 @@ pub struct ChatHistoryMapper;
 #[sea_orm(table_name = "chat_history")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = true)]
-    pub id: i64,
-    pub session_id: String,
-    pub sender_name: String,
-    pub sender_type: String,
-    pub message_type: String,
-    pub content: String,
-    pub created_at: Option<NaiveDateTime>,
+    #[get(type(copy), pub(crate))]
+    pub(super) id: i64,
+    #[get(pub(crate))]
+    pub(super) session_id: String,
+    #[get(pub(crate))]
+    pub(super) sender_name: String,
+    #[get(pub(crate))]
+    pub(super) sender_type: String,
+    #[get(pub(crate))]
+    pub(super) message_type: String,
+    #[get(pub(crate))]
+    pub(super) content: String,
+    #[get(pub(crate))]
+    pub(super) created_at: Option<NaiveDateTime>,
 }

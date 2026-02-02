@@ -11,7 +11,7 @@ impl CicdService {
             .insert(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
-        Ok(result.id)
+        Ok(result.get_id())
     }
 
     #[instrument_trace]
@@ -43,9 +43,9 @@ impl CicdService {
             get_mysql_connection(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
 
         let pipeline = Self::get_pipeline_by_id_with_config(param.pipeline_id).await?;
-        let config_content = pipeline
+        let config_content: String = pipeline
             .as_ref()
-            .and_then(|p| p.config_content.clone())
+            .and_then(|p| p.try_get_config_content().clone())
             .ok_or_else(|| "Pipeline config content is required".to_string())?;
 
         let run_number: i32 = Self::get_next_run_number(param.pipeline_id).await?;
@@ -60,7 +60,7 @@ impl CicdService {
             .insert(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
-        let run_id: i32 = run_result.id;
+        let run_id: i32 = run_result.get_id();
 
         Self::parse_config_and_create_jobs(&db, run_id, &config_content).await?;
 
@@ -109,7 +109,7 @@ impl CicdService {
                 .insert(db)
                 .await
                 .map_err(|error: DbErr| error.to_string())?;
-            let job_id: i32 = job_result.id;
+            let job_id: i32 = job_result.get_id();
 
             for step_config in job_config.steps {
                 let step_dockerfile: Option<String> =
@@ -742,7 +742,7 @@ impl CicdService {
             .map_err(|error: DbErr| error.to_string())?;
         if let Some(run_model) = run {
             let now: NaiveDateTime = Utc::now().naive_utc();
-            let started_at: NaiveDateTime = run_model.started_at.unwrap_or(now);
+            let started_at: NaiveDateTime = run_model.try_get_started_at().unwrap_or(now);
             let duration_ms: i32 =
                 (now.and_utc().timestamp_millis() - started_at.and_utc().timestamp_millis()) as i32;
             RunEntity::update_many()
@@ -766,7 +766,7 @@ impl CicdService {
             .insert(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
-        Ok(result.id)
+        Ok(result.get_id())
     }
 
     #[instrument_trace]
@@ -802,7 +802,10 @@ impl CicdService {
                 .await
                 .map_err(|error: DbErr| error.to_string())?;
             if let Some(job_model) = job {
-                let started_at: NaiveDateTime = job_model.started_at.unwrap_or(now);
+                let started_at: NaiveDateTime = job_model
+                    .try_get_started_at()
+                    .map(|s| s)
+                    .unwrap_or(now);
                 let duration_ms: i32 = (now.and_utc().timestamp_millis()
                     - started_at.and_utc().timestamp_millis())
                     as i32;
@@ -839,7 +842,7 @@ impl CicdService {
             .insert(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
-        Ok(result.id)
+        Ok(result.get_id())
     }
 
     #[instrument_trace]
@@ -874,7 +877,8 @@ impl CicdService {
                 .await
                 .map_err(|error: DbErr| error.to_string())?;
             if let Some(step_model) = step {
-                let started_at: NaiveDateTime = step_model.started_at.unwrap_or(now);
+                let started_at: NaiveDateTime =
+                    (*step_model.try_get_started_at()).unwrap_or(now);
                 let duration_ms: i32 = (now.and_utc().timestamp_millis()
                     - started_at.and_utc().timestamp_millis())
                     as i32;
@@ -940,7 +944,7 @@ impl CicdService {
         let error_message: &str = "[System] Task was interrupted due to server restart";
 
         for run in running_runs {
-            let run_id: i32 = run.id;
+            let run_id: i32 = run.get_id();
 
             let jobs: Vec<mapper::cicd::job::Model> = JobEntity::find()
                 .filter(JobColumn::RunId.eq(run_id))
@@ -950,8 +954,8 @@ impl CicdService {
                 .map_err(|error: DbErr| error.to_string())?;
 
             for job in jobs {
-                let job_id: i32 = job.id;
-                let job_started_at: NaiveDateTime = job.started_at.unwrap_or(now);
+                let job_id: i32 = job.get_id();
+                let job_started_at: NaiveDateTime = job.try_get_started_at().unwrap_or(now);
                 let job_duration_ms: i32 = (now.and_utc().timestamp_millis()
                     - job_started_at.and_utc().timestamp_millis())
                     as i32;
@@ -976,13 +980,15 @@ impl CicdService {
                     .map_err(|error: DbErr| error.to_string())?;
 
                 for step in steps {
-                    let step_id: i32 = step.id;
-                    let step_started_at: NaiveDateTime = step.started_at.unwrap_or(now);
+                    let step_id: i32 = step.get_id();
+                    let step_started_at: NaiveDateTime =
+                        step.try_get_started_at().map(|s| s).unwrap_or(now);
                     let step_duration_ms: i32 = (now.and_utc().timestamp_millis()
                         - step_started_at.and_utc().timestamp_millis())
                         as i32;
                     let step_output: String = step
-                        .output
+                        .try_get_output()
+                        .clone()
                         .map(|o| format!("{o}\n\n{error_message}"))
                         .unwrap_or_else(|| error_message.to_string());
 
@@ -1001,7 +1007,7 @@ impl CicdService {
                 }
             }
 
-            let started_at: NaiveDateTime = run.started_at.unwrap_or(now);
+            let started_at: NaiveDateTime = run.try_get_started_at().unwrap_or(now);
             let duration_ms: i32 =
                 (now.and_utc().timestamp_millis() - started_at.and_utc().timestamp_millis()) as i32;
 
