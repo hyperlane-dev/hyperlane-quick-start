@@ -1,3 +1,3 @@
 use super::*;
 
-pub const TASK_TIMEOUT: Duration = Duration::from_secs(600);
+pub const TASK_TIMEOUT: Duration = Duration::from_secs(1800);

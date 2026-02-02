@@ -9,7 +9,7 @@ use {
     super::*,
     mapper::cicd::{
         job::{JobActiveModel, JobColumn, JobEntity},
-        pipeline::{PipelineActiveModel, PipelineColumn, PipelineEntity},
+        pipeline::{Model, PipelineActiveModel, PipelineColumn, PipelineEntity},
         run::{RunActiveModel, RunColumn, RunEntity},
         step::{StepActiveModel, StepColumn, StepEntity},
     },
@@ -21,3 +21,11 @@ use {
 };
 
 use hyperlane_plugin::{docker::*, mysql::*};
+
+use std::process::{ExitStatus, Output};
+
+use tokio::{
+    process::Command,
+    task::{JoinError, JoinHandle},
+    time::{error::Elapsed, timeout},
+};

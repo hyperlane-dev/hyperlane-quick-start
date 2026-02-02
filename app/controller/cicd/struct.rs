@@ -4,14 +4,6 @@ use super::*;
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct CreatePipelineRoute;
 
-#[route("/api/cicd/pipeline/update")]
-#[derive(Clone, Copy, Data, Debug, Default)]
-pub struct UpdatePipelineRoute;
-
-#[route("/api/cicd/pipeline/delete")]
-#[derive(Clone, Copy, Data, Debug, Default)]
-pub struct DeletePipelineRoute;
-
 #[route("/api/cicd/pipeline/list")]
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct ListPipelinesRoute;

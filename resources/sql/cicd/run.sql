@@ -11,10 +11,8 @@ CREATE TABLE IF NOT EXISTS cicd_run (
     duration_ms INT DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    deleted_at DATETIME,
     INDEX idx_pipeline_id (pipeline_id),
     INDEX idx_status (status),
     INDEX idx_run_number (run_number),
-    INDEX idx_deleted_at (deleted_at),
     FOREIGN KEY (pipeline_id) REFERENCES cicd_pipeline (id) ON DELETE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;

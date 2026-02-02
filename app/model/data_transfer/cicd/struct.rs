@@ -74,7 +74,6 @@ pub struct JobWithStepsDto {
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct PaginatedRunsDto {
     pub total: i32,
-    pub page: i32,
-    pub page_size: i32,
     pub runs: Vec<RunDto>,
+    pub has_more: bool,
 }

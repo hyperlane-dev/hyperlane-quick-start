@@ -28,6 +28,7 @@ pub async fn create_server() {
     info!("Environment configuration loaded successfully");
     init_server_config(&server).await;
     init_db().await;
+    init_cicd().await;
     match server.run().await {
         Ok(server_hook) => {
             let host_port: String = format!("{SERVER_HOST}{COLON}{SERVER_PORT}");

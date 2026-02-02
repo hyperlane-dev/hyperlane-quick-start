@@ -13,30 +13,6 @@ use super::*;
 pub fn openapi_create_pipeline() {}
 
 #[utoipa::path(
-    post,
-    path = "/api/cicd/pipeline/update",
-    responses(
-        (status = 200, description = "Pipeline updated successfully"),
-        (status = 400, description = "Bad request"),
-        (status = 500, description = "Internal server error")
-    )
-)]
-#[instrument_trace]
-pub fn openapi_update_pipeline() {}
-
-#[utoipa::path(
-    post,
-    path = "/api/cicd/pipeline/delete",
-    responses(
-        (status = 200, description = "Pipeline deleted successfully"),
-        (status = 400, description = "Bad request"),
-        (status = 500, description = "Internal server error")
-    )
-)]
-#[instrument_trace]
-pub fn openapi_delete_pipeline() {}
-
-#[utoipa::path(
     get,
     path = "/api/cicd/pipeline/list",
     responses(

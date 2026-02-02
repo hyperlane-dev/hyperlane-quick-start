@@ -10,7 +10,6 @@ impl ActiveModel {
             id: ActiveValue::NotSet,
             created_at: ActiveValue::NotSet,
             updated_at: ActiveValue::NotSet,
-            deleted_at: ActiveValue::NotSet,
         }
     }
 }

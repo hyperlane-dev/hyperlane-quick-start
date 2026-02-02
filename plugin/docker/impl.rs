@@ -73,6 +73,51 @@ impl DockerConfig {
         self.env_vars.push((key.to_string(), value.to_string()));
         self
     }
+
+    #[instrument_trace]
+    pub fn get_image(&self) -> &String {
+        &self.image
+    }
+
+    #[instrument_trace]
+    pub fn get_shell(&self) -> &String {
+        &self.shell
+    }
+
+    #[instrument_trace]
+    pub fn get_shell_flag(&self) -> &String {
+        &self.shell_flag
+    }
+
+    #[instrument_trace]
+    pub fn get_cpus(&self) -> Option<f32> {
+        self.cpus
+    }
+
+    #[instrument_trace]
+    pub fn get_memory(&self) -> &Option<String> {
+        &self.memory
+    }
+
+    #[instrument_trace]
+    pub fn get_pids_limit(&self) -> Option<i32> {
+        self.pids_limit
+    }
+
+    #[instrument_trace]
+    pub fn is_disable_network(&self) -> bool {
+        self.disable_network
+    }
+
+    #[instrument_trace]
+    pub fn is_read_only(&self) -> bool {
+        self.read_only
+    }
+
+    #[instrument_trace]
+    pub fn get_workdir(&self) -> &String {
+        &self.workdir
+    }
 }
 
 impl DockerResult {

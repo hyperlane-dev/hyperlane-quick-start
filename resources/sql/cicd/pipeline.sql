@@ -5,7 +5,5 @@ CREATE TABLE IF NOT EXISTS cicd_pipeline (
     config_content TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    deleted_at DATETIME,
-    INDEX idx_name (name),
-    INDEX idx_deleted_at (deleted_at)
+    INDEX idx_name (name)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;

@@ -26,5 +26,4 @@ pub struct Model {
     pub duration_ms: i32,
     pub created_at: Option<NaiveDateTime>,
     pub updated_at: Option<NaiveDateTime>,
-    pub deleted_at: Option<NaiveDateTime>,
 }

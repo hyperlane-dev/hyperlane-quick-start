@@ -8,14 +8,6 @@ pub struct CreatePipelineParam {
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
-pub struct UpdatePipelineParam {
-    pub id: i32,
-    pub name: String,
-    pub description: Option<String>,
-    pub config_content: Option<String>,
-}
-
-#[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct TriggerRunParam {
     pub pipeline_id: i32,
     pub triggered_by: Option<String>,
@@ -41,6 +33,6 @@ pub struct UpdateStepStatusParam {
 pub struct QueryRunsParam {
     pub pipeline_id: Option<i32>,
     pub status: Option<CicdStatus>,
-    pub page: Option<i32>,
     pub page_size: Option<i32>,
+    pub last_id: Option<i32>,
 }

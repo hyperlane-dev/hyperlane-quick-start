@@ -5,8 +5,6 @@ use super::*;
     paths(
         controller::chat::openapi_get_online_users,
         controller::cicd::openapi_create_pipeline,
-        controller::cicd::openapi_update_pipeline,
-        controller::cicd::openapi_delete_pipeline,
         controller::cicd::openapi_list_pipelines,
         controller::cicd::openapi_get_pipeline,
         controller::cicd::openapi_trigger_run,
@@ -114,7 +112,6 @@ use super::*;
         model::data_transfer::cicd::JobWithStepsDto,
         model::data_transfer::cicd::PaginatedRunsDto,
         model::param::cicd::CreatePipelineParam,
-        model::param::cicd::UpdatePipelineParam,
         model::param::cicd::TriggerRunParam,
         model::param::cicd::UpdateJobStatusParam,
         model::param::cicd::UpdateStepStatusParam,

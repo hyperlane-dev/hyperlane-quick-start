@@ -302,6 +302,7 @@
         align-items: center;
         justify-content: center;
         font-size: 12px;
+        line-height: 1;
         flex-shrink: 0;
       }
 
@@ -313,6 +314,37 @@
       .run-status.failure {
         background: #da3633;
         color: #fff;
+        padding-bottom: 3px;
+      }
+
+      .loading-more {
+        text-align: center;
+        padding: 20px;
+        color: #8b949e;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .loading-more.hidden {
+        display: none;
+      }
+
+      .loading-spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid #30363d;
+        border-top-color: #58a6ff;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
       }
 
       .run-status.pending {
@@ -405,6 +437,71 @@
         line-height: 1.5;
         resize: none;
         overflow: hidden;
+      }
+
+      .config-mode-toggle {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 8px;
+      }
+
+      .toggle-label {
+        font-size: 14px;
+        font-weight: 500;
+        color: #c9d1d9;
+      }
+
+      .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 48px;
+        height: 24px;
+      }
+
+      .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #30363d;
+        transition: 0.3s;
+        border-radius: 24px;
+      }
+
+      .toggle-slider:before {
+        position: absolute;
+        content: '';
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: #c9d1d9;
+        transition: 0.3s;
+        border-radius: 50%;
+      }
+
+      .toggle-switch input:checked + .toggle-slider {
+        background-color: #238636;
+      }
+
+      .toggle-switch input:checked + .toggle-slider:before {
+        transform: translateX(24px);
+        background-color: #fff;
+      }
+
+      .mode-hint {
+        font-size: 12px;
+        color: #8b949e;
+        margin-left: auto;
       }
 
       .modal {
@@ -602,10 +699,8 @@
         border: 1px solid #30363d;
         border-radius: 6px;
         padding: 16px;
-        font-family:
-          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue',
-          'Arial', sans-serif;
-        font-size: 11px;
+        font-family: 'SFMono-Regular', 'Monaco', 'Inconsolata', 'Fira Code', 'Consolas', 'Courier New', monospace;
+        font-size: 12px;
         line-height: 1.6;
         color: #c9d1d9;
         max-height: 400px;
@@ -723,10 +818,8 @@
 
       .step-log-content {
         padding: 12px 16px;
-        font-family:
-          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue',
-          'Arial', sans-serif;
-        font-size: 11px;
+        font-family: 'SFMono-Regular', 'Monaco', 'Inconsolata', 'Fira Code', 'Consolas', 'Courier New', monospace;
+        font-size: 12px;
         line-height: 1.6;
         color: #c9d1d9;
       }
@@ -844,28 +937,260 @@
           font-size: 1rem;
         }
 
+        .header h1 span:last-child {
+          display: none;
+        }
+
         .container {
-          padding: 16px;
+          padding: 12px;
+        }
+
+        .tabs {
+          margin-bottom: 16px;
+        }
+
+        .tab {
+          padding: 10px 12px;
+          font-size: 13px;
+        }
+
+        .tab .count {
+          padding: 1px 6px;
+          font-size: 11px;
         }
 
         .pipeline-item {
           flex-direction: column;
           align-items: flex-start;
+          gap: 12px;
+          padding: 12px;
+        }
+
+        .pipeline-info {
+          flex: 1;
+          min-width: 0;
+          width: 100%;
+        }
+
+        .pipeline-name {
+          font-size: 14px;
+        }
+
+        .pipeline-meta {
+          font-size: 11px;
+          gap: 8px;
         }
 
         .pipeline-actions {
+          flex-shrink: 0;
           width: 100%;
+          flex-wrap: nowrap;
           justify-content: flex-end;
+        }
+
+        .pipeline-actions .btn {
+          white-space: nowrap;
+          flex-shrink: 0;
+          padding: 6px 12px;
+          font-size: 13px;
         }
 
         .run-item {
           flex-wrap: wrap;
+          padding: 10px 12px;
+          gap: 10px;
+        }
+
+        .run-info {
+          flex: 1;
+          min-width: 0;
+        }
+
+        .run-title {
+          font-size: 13px;
+        }
+
+        .run-meta {
+          font-size: 11px;
         }
 
         .run-time {
           width: 100%;
           text-align: left;
-          margin-top: 8px;
+          margin-top: 4px;
+          font-size: 11px;
+        }
+
+        .btn {
+          padding: 5px 12px;
+          font-size: 13px;
+        }
+
+        .modal-content {
+          max-width: 100%;
+          max-height: 95vh;
+          margin: 10px;
+          border-radius: 8px;
+        }
+
+        .modal-header {
+          padding: 16px;
+        }
+
+        .modal-title {
+          font-size: 16px;
+        }
+
+        .modal-body {
+          padding: 16px;
+        }
+
+        .modal-footer {
+          padding: 12px 16px;
+        }
+
+        .form-group {
+          margin-bottom: 12px;
+        }
+
+        .form-label {
+          font-size: 13px;
+          margin-bottom: 6px;
+        }
+
+        .form-input,
+        .form-select {
+          padding: 8px 10px;
+          font-size: 16px;
+        }
+
+        .form-textarea {
+          min-height: 150px;
+          font-size: 13px;
+        }
+
+        .detail-title {
+          font-size: 18px;
+        }
+
+        .detail-meta {
+          flex-wrap: wrap;
+          gap: 8px;
+          font-size: 12px;
+        }
+
+        .job-header {
+          padding: 10px 12px;
+        }
+
+        .job-name {
+          font-size: 14px;
+        }
+
+        .step-header-row {
+          padding: 8px 10px;
+        }
+
+        .step-name {
+          font-size: 12px;
+        }
+
+        .log-output {
+          padding: 12px;
+          font-size: 11px;
+          max-height: 300px;
+        }
+
+        .step-log-content {
+          padding: 10px 12px;
+          font-size: 11px;
+        }
+
+        .card-header {
+          padding: 12px 16px;
+        }
+
+        .card-title {
+          font-size: 14px;
+        }
+
+        .card-body {
+          padding: 16px;
+        }
+
+        .back-btn {
+          margin-bottom: 12px;
+        }
+
+        .toast-container {
+          top: 10px;
+          right: 10px;
+          left: 10px;
+        }
+
+        .toast {
+          min-width: auto;
+          max-width: 100%;
+          padding: 10px 12px;
+        }
+
+        .empty-state {
+          padding: 40px 16px;
+        }
+
+        .empty-state-icon {
+          font-size: 36px;
+        }
+
+        .empty-state-title {
+          font-size: 16px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .header {
+          padding: 10px 12px;
+        }
+
+        .header h1 {
+          font-size: 0.9rem;
+        }
+
+        .container {
+          padding: 8px;
+        }
+
+        .pipeline-item {
+          padding: 10px;
+        }
+
+        .pipeline-actions {
+          justify-content: stretch;
+        }
+
+        .pipeline-actions .btn {
+          flex: 1;
+          justify-content: center;
+        }
+
+        .tab {
+          padding: 8px 10px;
+          font-size: 12px;
+        }
+
+        .tab .count {
+          display: none;
+        }
+
+        .modal-content {
+          margin: 5px;
+          border-radius: 6px;
+        }
+
+        .modal-header,
+        .modal-body,
+        .modal-footer {
+          padding: 12px;
         }
       }
     </style>
@@ -925,6 +1250,10 @@
                 <p>Trigger a pipeline to see runs here</p>
               </div>
             </div>
+            <div class="loading-more hidden" id="loading-more">
+              <div class="loading-spinner"></div>
+              <span>Loading more...</span>
+            </div>
           </div>
         </div>
       </div>
@@ -969,20 +1298,29 @@
             />
           </div>
           <div class="form-group">
-            <label class="form-label">Pipeline Config (YAML)</label>
+            <div class="config-mode-toggle">
+              <span class="toggle-label">Use Dockerfile</span>
+              <label class="toggle-switch">
+                <input
+                  type="checkbox"
+                  id="create-mode-dockerfile"
+                  onchange="toggleCreateMode()"
+                />
+                <span class="toggle-slider"></span>
+              </label>
+              <span class="mode-hint" id="create-mode-hint">YAML mode</span>
+            </div>
+            <label class="form-label" id="create-config-label"
+              >Pipeline Config (YAML)</label
+            >
             <textarea class="form-textarea" id="create-config">
-name: Docker Hello World
-dockerfile: |
-  FROM alpine:latest
-  RUN echo "Building Hello World image..."
+name: Hello World Pipeline
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Build and Run
-        dockerfile: |
-          FROM alpine:latest
-          RUN echo 'Hello World from Docker!'</textarea
+      - name: Hello World Step
+        run: echo 'hello world'</textarea
             >
           </div>
         </div>
@@ -997,33 +1335,30 @@ jobs:
       </div>
     </div>
 
-    <div class="modal" id="edit-modal">
+    <div class="modal" id="run-config-modal">
       <div class="modal-content">
         <div class="modal-header">
-          <span class="modal-title">Edit Pipeline</span>
-          <button class="modal-close" onclick="closeModal('edit-modal')">
+          <span class="modal-title" id="run-config-title">Confirm Run Pipeline</span>
+          <button class="modal-close" onclick="closeModal('run-config-modal')">
             &times;
           </button>
         </div>
         <div class="modal-body">
-          <input type="hidden" id="edit-id" />
           <div class="form-group">
-            <label class="form-label">Pipeline Name *</label>
-            <input type="text" class="form-input" id="edit-name" />
+            <label class="form-label">Pipeline Name</label>
+            <div class="form-input" id="run-config-pipeline-name" style="background: #0d1117; cursor: default;"></div>
           </div>
           <div class="form-group">
-            <label class="form-label">Description</label>
-            <input type="text" class="form-input" id="edit-description" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Pipeline Config (YAML)</label>
-            <textarea class="form-textarea" id="edit-config"></textarea>
+            <label class="form-label">Configuration</label>
+            <pre class="form-textarea" id="run-config-content" style="background: #0d1117; overflow: auto; min-height: 300px; cursor: default; white-space: pre-wrap; word-wrap: break-word; font-family: 'SFMono-Regular', monospace; font-size: 13px; line-height: 1.5;"></pre>
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn" onclick="closeModal('edit-modal')">Cancel</button>
-          <button class="btn btn-primary" onclick="updatePipeline()">
-            Save Changes
+          <button class="btn" onclick="closeModal('run-config-modal')">
+            Cancel
+          </button>
+          <button class="btn btn-primary" id="run-config-confirm-btn" onclick="confirmTriggerPipeline()">
+            Confirm Run
           </button>
         </div>
       </div>
@@ -1038,6 +1373,10 @@ jobs:
       let runsPollingInterval = null;
       let detailPollingInterval = null;
       let expandedSteps = new Set();
+      let lastRunId = null;
+      const RUNS_PAGE_SIZE = 50;
+      let runsHasMore = true;
+      let isLoadingMoreRuns = false;
 
       function showToast(message, type = 'info', duration = 3000) {
         const container = document.getElementById('toast-container');
@@ -1070,6 +1409,34 @@ jobs:
         setTimeout(() => toast.remove(), 300);
       }
 
+      function setLoadingMoreIndicator(show) {
+        const indicator = document.getElementById('loading-more');
+        if (indicator) {
+          if (show && runsHasMore) {
+            indicator.classList.remove('hidden');
+          } else {
+            indicator.classList.add('hidden');
+          }
+        }
+      }
+
+      function handleScroll() {
+        const runsView = document.getElementById('runs-view');
+        if (runsView.classList.contains('hidden')) return;
+
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
+
+        if (scrollTop + windowHeight >= documentHeight - 100) {
+          if (!isLoadingMoreRuns && runsHasMore) {
+            loadRuns(false);
+          }
+        }
+      }
+
+      window.addEventListener('scroll', handleScroll);
+
       function switchTab(tab, updateHash = true) {
         document
           .querySelectorAll('.tab')
@@ -1087,7 +1454,7 @@ jobs:
           loadPipelines();
         } else {
           document.getElementById('runs-view').classList.remove('hidden');
-          loadRuns();
+          loadRuns(true);
         }
 
         if (updateHash) {
@@ -1113,6 +1480,13 @@ jobs:
       }
 
       function showCreateModal() {
+        document.getElementById('create-name').value = '';
+        document.getElementById('create-description').value = '';
+        document.getElementById('create-mode-dockerfile').checked = false;
+        document.getElementById('create-config').value = DEFAULT_CONFIG;
+        document.getElementById('create-config-label').textContent =
+          'Pipeline Config (YAML)';
+        document.getElementById('create-mode-hint').textContent = 'YAML mode';
         document.getElementById('create-modal').classList.add('active');
         setTimeout(() => {
           setupAutoResizeTextarea('create-config');
@@ -1155,14 +1529,12 @@ jobs:
         container.innerHTML = pipelines
           .map(
             (p) => `
-          <div class="pipeline-item">
+          <div class="pipeline-item" data-pipeline-id="${p.id}" data-pipeline-name="${escapeHtml(p.name)}" data-pipeline-config="${escapeHtml(p.config_content || '')}" onclick="showRunConfigModal(${p.id})">
             <div class="pipeline-info">
               <div class="pipeline-name">${escapeHtml(p.name)}</div>
             </div>
-            <div class="pipeline-actions">
+            <div class="pipeline-actions" onclick="event.stopPropagation();">
               <button class="btn btn-primary" onclick="triggerPipeline(${p.id})">Run</button>
-              <button class="btn" onclick="showEditModal(${p.id})">Edit</button>
-              <button class="btn btn-danger" onclick="deletePipeline(${p.id})">Delete</button>
             </div>
           </div>
         `,
@@ -1172,11 +1544,43 @@ jobs:
 
       const DEFAULT_CONFIG = `name: Hello World Pipeline
 jobs:
-  hello-job:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Say Hello
-        run: echo 'Hello World'`;
+      - name: Hello World Step
+        run: echo 'hello world'`;
+
+      const DOCKERFILE_CONFIG = `name: Docker Build Pipeline
+image: alpine:latest
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build with Dockerfile
+        dockerfile: |
+          FROM alpine:latest
+          RUN echo 'Building from Dockerfile...'
+          CMD echo 'Hello from Docker container!'`;
+
+      function toggleCreateMode() {
+        const isDockerfileMode = document.getElementById(
+          'create-mode-dockerfile',
+        ).checked;
+        const configTextarea = document.getElementById('create-config');
+        const configLabel = document.getElementById('create-config-label');
+        const modeHint = document.getElementById('create-mode-hint');
+
+        if (isDockerfileMode) {
+          configTextarea.value = DOCKERFILE_CONFIG;
+          configLabel.textContent = 'Pipeline Config (Dockerfile Mode)';
+          modeHint.textContent = 'Dockerfile mode';
+        } else {
+          configTextarea.value = DEFAULT_CONFIG;
+          configLabel.textContent = 'Pipeline Config (YAML)';
+          modeHint.textContent = 'YAML mode';
+        }
+        setupAutoResizeTextarea('create-config');
+      }
 
       async function createPipeline() {
         const configValue = document
@@ -1216,72 +1620,27 @@ jobs:
         }
       }
 
-      async function showEditModal(id) {
-        try {
-          const response = await fetch(`/api/cicd/pipeline/get?id=${id}`);
-          const result = await response.json();
-          if (result.code !== 200 || !result.data) {
-            showToast('Failed to load pipeline details', 'error');
-            return;
-          }
-          const p = result.data;
-          document.getElementById('edit-id').value = p.id;
-          document.getElementById('edit-name').value = p.name;
-          document.getElementById('edit-description').value =
-            p.description || '';
-          document.getElementById('edit-config').value = p.config_content || '';
-          document.getElementById('edit-modal').classList.add('active');
-          setTimeout(() => {
-            setupAutoResizeTextarea('edit-config');
-          }, 0);
-        } catch (error) {
-          showToast('Network error: ' + error.message, 'error');
-        }
+      let currentRunPipelineId = null;
+
+      function showRunConfigModal(id) {
+        const pipelineItem = document.querySelector(`.pipeline-item[data-pipeline-id="${id}"]`);
+        if (!pipelineItem) return;
+
+        const name = pipelineItem.getAttribute('data-pipeline-name') || 'Unknown';
+        const config = pipelineItem.getAttribute('data-pipeline-config') || 'No configuration available';
+
+        currentRunPipelineId = id;
+        document.getElementById('run-config-pipeline-name').textContent = name;
+        document.getElementById('run-config-content').textContent = config;
+        document.getElementById('run-config-modal').classList.add('active');
       }
 
-      async function updatePipeline() {
-        const data = {
-          id: parseInt(document.getElementById('edit-id').value),
-          name: document.getElementById('edit-name').value,
-          description:
-            document.getElementById('edit-description').value || null,
-          config_content: document.getElementById('edit-config').value || null,
-        };
+      async function confirmTriggerPipeline() {
+        if (!currentRunPipelineId) return;
 
-        try {
-          const response = await fetch('/api/cicd/pipeline/update', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-          });
-          const result = await response.json();
-          if (result.code === 200) {
-            closeModal('edit-modal');
-            loadPipelines();
-            showToast('Pipeline updated successfully', 'success');
-          } else {
-            showToast('Error: ' + result.message, 'error');
-          }
-        } catch (error) {
-          showToast('Network error: ' + error.message, 'error');
-        }
-      }
-
-      async function deletePipeline(id) {
-        try {
-          const response = await fetch(`/api/cicd/pipeline/delete?id=${id}`, {
-            method: 'POST',
-          });
-          const result = await response.json();
-          if (result.code === 200) {
-            loadPipelines();
-            showToast('Pipeline deleted successfully', 'success');
-          } else {
-            showToast('Error: ' + result.message, 'error');
-          }
-        } catch (error) {
-          showToast('Network error: ' + error.message, 'error');
-        }
+        closeModal('run-config-modal');
+        await triggerPipeline(currentRunPipelineId);
+        currentRunPipelineId = null;
       }
 
       async function triggerPipeline(id) {
@@ -1300,7 +1659,7 @@ jobs:
               'Pipeline triggered successfully! Run ID: ' + result.data,
               'success',
             );
-            loadRuns();
+            await loadRuns(true);
           } else {
             showToast('Error: ' + result.message, 'error');
           }
@@ -1309,24 +1668,54 @@ jobs:
         }
       }
 
-      async function loadRuns() {
+      async function loadRuns(reset = false) {
+        if (isLoadingMoreRuns) return;
+        if (reset) {
+          lastRunId = null;
+          runsHasMore = true;
+          runs = [];
+        }
+        if (!runsHasMore && !reset) return;
+
+        isLoadingMoreRuns = true;
+        setLoadingMoreIndicator(true);
+
         try {
-          const response = await fetch(
-            '/api/cicd/run/list?page=1&page_size=50',
-          );
+          const url = lastRunId
+            ? `/api/cicd/run/list?page_size=${RUNS_PAGE_SIZE}&last_id=${lastRunId}`
+            : `/api/cicd/run/list?page_size=${RUNS_PAGE_SIZE}`;
+          const response = await fetch(url);
           const result = await response.json();
           if (result.code === 200) {
-            runs = result.data?.runs || [];
-            document.getElementById('run-count').textContent =
-              result.data?.total || 0;
-            renderRuns();
+            const newRuns = result.data?.runs || [];
+            const total = result.data?.total || 0;
+
+            lastFetchedRuns = newRuns;
+            if (reset) {
+              runs = newRuns;
+            } else {
+              runs = runs.concat(newRuns);
+            }
+
+            runsHasMore = result.data?.has_more ?? false;
+            document.getElementById('run-count').textContent = total;
+            renderRuns(!reset);
+
+            if (newRuns.length > 0) {
+              lastRunId = newRuns[newRuns.length - 1].id;
+            }
           }
         } catch (error) {
           console.error('Error loading runs:', error);
+        } finally {
+          isLoadingMoreRuns = false;
+          setLoadingMoreIndicator(false);
         }
       }
 
-      function renderRuns() {
+      let lastFetchedRuns = [];
+
+      function renderRuns(append = false) {
         const container = document.getElementById('run-list');
 
         if (runs.length === 0) {
@@ -1340,7 +1729,8 @@ jobs:
           return;
         }
 
-        container.innerHTML = runs
+        const runsToRender = append ? lastFetchedRuns : runs;
+        const newRunsHtml = runsToRender
           .map(
             (r) => `
           <div class="run-item" onclick="viewRunDetail(${r.id})">
@@ -1360,6 +1750,16 @@ jobs:
         `,
           )
           .join('');
+
+        if (append) {
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = newRunsHtml;
+          while (tempDiv.firstChild) {
+            container.appendChild(tempDiv.firstChild);
+          }
+        } else {
+          container.innerHTML = newRunsHtml;
+        }
       }
 
       function viewPipelineRuns(pipelineId) {
@@ -1822,34 +2222,98 @@ jobs:
       async function restoreViewFromHash() {
         const hash = window.location.hash.slice(1);
 
-        await loadPipelines();
+        await Promise.all([loadPipelines(), loadRuns(true)]);
 
         if (hash.startsWith('run/')) {
           const runId = parseInt(hash.split('/')[1]);
           if (!isNaN(runId)) {
             await viewRunDetail(runId);
+            document
+              .querySelectorAll('.tab')
+              .forEach((t) => t.classList.remove('active'));
+            document
+              .querySelector('.tab[onclick="switchTab(\'runs\')"]')
+              ?.classList.add('active');
             return;
           }
         }
-        if (hash === 'runs') {
-          await loadRuns();
-          switchTab('runs', false);
-        } else if (hash === 'pipelines') {
-          switchTab('pipelines', false);
+        if (hash === 'pipelines') {
+          document.getElementById('pipelines-view').classList.remove('hidden');
+          document.getElementById('runs-view').classList.add('hidden');
+          document.getElementById('run-detail-view').classList.add('hidden');
+          document
+            .querySelectorAll('.tab')
+            .forEach((t) => t.classList.remove('active'));
+          document
+            .querySelector('.tab[onclick="switchTab(\'pipelines\')"]')
+            ?.classList.add('active');
+        } else if (hash === 'runs') {
+          document.getElementById('pipelines-view').classList.add('hidden');
+          document.getElementById('runs-view').classList.remove('hidden');
+          document.getElementById('run-detail-view').classList.add('hidden');
+          document
+            .querySelectorAll('.tab')
+            .forEach((t) => t.classList.remove('active'));
+          document
+            .querySelector('.tab[onclick="switchTab(\'runs\')"]')
+            ?.classList.add('active');
         } else {
-          await loadRuns();
+          document.getElementById('pipelines-view').classList.add('hidden');
+          document.getElementById('runs-view').classList.remove('hidden');
+          document.getElementById('run-detail-view').classList.add('hidden');
+          document
+            .querySelectorAll('.tab')
+            .forEach((t) => t.classList.remove('active'));
+          document
+            .querySelector('.tab[onclick="switchTab(\'runs\')"]')
+            ?.classList.add('active');
         }
       }
 
       window.addEventListener('hashchange', restoreViewFromHash);
       restoreViewFromHash();
 
+      async function pollRunsStatus() {
+        if (isLoadingMoreRuns) return;
+        try {
+          const response = await fetch(
+            `/api/cicd/run/list?page=1&page_size=${Math.max(runs.length, RUNS_PAGE_SIZE)}`,
+          );
+          const result = await response.json();
+          if (result.code === 200) {
+            const newRuns = result.data?.runs || [];
+            const total = result.data?.total || 0;
+            document.getElementById('run-count').textContent = total;
+
+            const container = document.getElementById('run-list');
+            const currentItems = container.querySelectorAll('.run-item');
+
+            newRuns.forEach((run, index) => {
+              if (index < currentItems.length) {
+                const item = currentItems[index];
+                const statusEl = item.querySelector('.run-status');
+                const timeEl = item.querySelector('.run-time');
+                if (statusEl) {
+                  statusEl.className = `run-status ${run.status}`;
+                  statusEl.textContent = run.status === 'success' ? '✓' : run.status === 'failure' ? '✗' : run.status === 'running' ? '◐' : '○';
+                }
+                if (timeEl) {
+                  timeEl.textContent = run.duration_ms > 0 ? formatDuration(run.duration_ms) : run.status === 'running' ? 'Running...' : '-';
+                }
+              }
+            });
+          }
+        } catch (error) {
+          console.error('Error polling runs:', error);
+        }
+      }
+
       setInterval(() => {
         const isRunsViewVisible = !document
           .getElementById('runs-view')
           .classList.contains('hidden');
         if (isRunsViewVisible) {
-          loadRuns();
+          pollRunsStatus();
         }
       }, 5000);
     </script>

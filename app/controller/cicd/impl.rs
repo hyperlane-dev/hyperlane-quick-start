@@ -36,82 +36,6 @@ impl ServerHook for CreatePipelineRoute {
     }
 }
 
-impl ServerHook for UpdatePipelineRoute {
-    #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
-        Self
-    }
-
-    #[prologue_macros(
-        post_method,
-        request_body_json_result(param: UpdatePipelineParam),
-        response_header(CONTENT_TYPE => APPLICATION_JSON)
-    )]
-    #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
-        let param: UpdatePipelineParam = match param {
-            Ok(data) => data,
-            Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error);
-                ctx.set_response_body(&response.to_json_bytes()).await;
-                return;
-            }
-        };
-        match CicdService::update_pipeline(param).await {
-            Ok(()) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::success_without_data("Pipeline updated successfully");
-                ctx.set_response_body(&response.to_json_bytes()).await
-            }
-            Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
-                ctx.set_response_body(&response.to_json_bytes()).await
-            }
-        };
-    }
-}
-
-impl ServerHook for DeletePipelineRoute {
-    #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
-        Self
-    }
-
-    #[prologue_macros(
-        post_method,
-        response_header(CONTENT_TYPE => APPLICATION_JSON)
-    )]
-    #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
-        let querys: RequestQuerys = ctx.get_request_querys().await;
-        let id: i32 = match querys.get("id").and_then(|s: &String| s.parse().ok()) {
-            Some(id) => id,
-            None => {
-                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                    ResponseCode::BadRequest,
-                    "Missing or invalid id parameter",
-                );
-                ctx.set_response_body(&response.to_json_bytes()).await;
-                return;
-            }
-        };
-        match CicdService::delete_pipeline(id).await {
-            Ok(()) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::success_without_data("Pipeline deleted successfully");
-                ctx.set_response_body(&response.to_json_bytes()).await
-            }
-            Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
-                ctx.set_response_body(&response.to_json_bytes()).await
-            }
-        };
-    }
-}
-
 impl ServerHook for ListPipelinesRoute {
     #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
@@ -231,11 +155,19 @@ impl ServerHook for ListRunsRoute {
     )]
     #[instrument_trace]
     async fn handle(self, ctx: &Context) {
+        let querys: RequestQuerys = ctx.get_request_querys().await;
+        let page_size: Option<i32> = querys
+            .get("page_size")
+            .and_then(|s: &String| s.parse().ok());
+        let last_id: Option<i32> = querys.get("last_id").and_then(|s: &String| s.parse().ok());
+        let pipeline_id: Option<i32> = querys
+            .get("pipeline_id")
+            .and_then(|s: &String| s.parse().ok());
         let param: QueryRunsParam = QueryRunsParam {
-            pipeline_id: None,
+            pipeline_id,
             status: None,
-            page: Some(1),
-            page_size: Some(50),
+            page_size,
+            last_id,
         };
         match CicdService::query_runs(param).await {
             Ok(result) => {
