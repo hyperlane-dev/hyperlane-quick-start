@@ -28,5 +28,3 @@ pub struct Model {
     pub created_at: Option<NaiveDateTime>,
     pub updated_at: Option<NaiveDateTime>,
 }
-
-
