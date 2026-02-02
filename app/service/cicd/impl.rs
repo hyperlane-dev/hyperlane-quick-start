@@ -1,5 +1,82 @@
 use super::*;
 
+impl From<Model> for PipelineDto {
+    fn from(model: Model) -> Self {
+        Self {
+            id: model.get_id(),
+            name: model.get_name().clone(),
+            description: model.try_get_description().clone(),
+            config_content: model.try_get_config_content().clone(),
+            created_at: model.try_get_created_at().as_ref().map(|dt| dt.to_string()),
+            updated_at: model.try_get_updated_at().as_ref().map(|dt| dt.to_string()),
+        }
+    }
+}
+
+impl From<mapper::cicd::run::Model> for RunDto {
+    fn from(model: mapper::cicd::run::Model) -> Self {
+        let status: CicdStatus = model.get_status().parse().unwrap_or_default();
+        Self {
+            id: model.get_id(),
+            pipeline_id: model.get_pipeline_id(),
+            pipeline_name: None,
+            run_number: model.get_run_number(),
+            status,
+            triggered_by: model.try_get_triggered_by().clone(),
+            commit_hash: model.try_get_commit_hash().clone(),
+            commit_message: model.try_get_commit_message().clone(),
+            started_at: model.try_get_started_at().as_ref().map(|dt| dt.to_string()),
+            completed_at: model
+                .try_get_completed_at()
+                .as_ref()
+                .map(|dt| dt.to_string()),
+            duration_ms: model.get_duration_ms(),
+            created_at: model.try_get_created_at().as_ref().map(|dt| dt.to_string()),
+        }
+    }
+}
+
+impl From<mapper::cicd::job::Model> for JobDto {
+    fn from(model: mapper::cicd::job::Model) -> Self {
+        let status: CicdStatus = model.get_status().parse().unwrap_or_default();
+        Self {
+            id: model.get_id(),
+            run_id: model.get_run_id(),
+            name: model.get_name().clone(),
+            status,
+            runner: model.try_get_runner().clone(),
+            started_at: model.try_get_started_at().as_ref().map(|dt| dt.to_string()),
+            completed_at: model
+                .try_get_completed_at()
+                .as_ref()
+                .map(|dt| dt.to_string()),
+            duration_ms: model.get_duration_ms(),
+        }
+    }
+}
+
+impl From<mapper::cicd::step::Model> for StepDto {
+    fn from(model: mapper::cicd::step::Model) -> Self {
+        let status: CicdStatus = model.get_status().parse().unwrap_or_default();
+        Self {
+            id: model.get_id(),
+            job_id: model.get_job_id(),
+            name: model.get_name().clone(),
+            command: model.try_get_command().clone(),
+            status,
+            output: model.try_get_output().clone(),
+            dockerfile: model.try_get_dockerfile().clone(),
+            image: model.try_get_image().clone(),
+            started_at: model.try_get_started_at().as_ref().map(|dt| dt.to_string()),
+            completed_at: model
+                .try_get_completed_at()
+                .as_ref()
+                .map(|dt| dt.to_string()),
+            duration_ms: model.get_duration_ms(),
+        }
+    }
+}
+
 impl CicdService {
     #[instrument_trace]
     pub async fn create_pipeline(param: CreatePipelineParam) -> Result<i32, String> {
@@ -22,7 +99,7 @@ impl CicdService {
             .one(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
-        Ok(result.map(pipeline_to_dto))
+        Ok(result.map(Into::into))
     }
 
     #[instrument_trace]
@@ -34,7 +111,7 @@ impl CicdService {
             .all(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
-        Ok(models.into_iter().map(pipeline_to_dto).collect())
+        Ok(models.into_iter().map(Into::into).collect())
     }
 
     #[instrument_trace]
@@ -647,7 +724,7 @@ impl CicdService {
             .one(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
-        Ok(result.map(run_to_dto))
+        Ok(result.map(Into::into))
     }
 
     #[instrument_trace]
@@ -660,7 +737,7 @@ impl CicdService {
             .all(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
-        Ok(models.into_iter().map(run_to_dto).collect())
+        Ok(models.into_iter().map(Into::into).collect())
     }
 
     #[instrument_trace]
@@ -696,7 +773,7 @@ impl CicdService {
         };
         Ok(PaginatedRunsDto {
             total,
-            runs: runs.into_iter().map(run_to_dto).collect(),
+            runs: runs.into_iter().map(Into::into).collect(),
             has_more,
         })
     }
@@ -779,7 +856,7 @@ impl CicdService {
             .all(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
-        Ok(models.into_iter().map(job_to_dto).collect())
+        Ok(models.into_iter().map(Into::into).collect())
     }
 
     #[instrument_trace]
@@ -802,10 +879,8 @@ impl CicdService {
                 .await
                 .map_err(|error: DbErr| error.to_string())?;
             if let Some(job_model) = job {
-                let started_at: NaiveDateTime = job_model
-                    .try_get_started_at()
-                    .map(|s| s)
-                    .unwrap_or(now);
+                let started_at: NaiveDateTime =
+                    job_model.try_get_started_at().map(|s| s).unwrap_or(now);
                 let duration_ms: i32 = (now.and_utc().timestamp_millis()
                     - started_at.and_utc().timestamp_millis())
                     as i32;
@@ -855,7 +930,7 @@ impl CicdService {
             .all(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
-        Ok(models.into_iter().map(step_to_dto).collect())
+        Ok(models.into_iter().map(Into::into).collect())
     }
 
     #[instrument_trace]
@@ -877,8 +952,7 @@ impl CicdService {
                 .await
                 .map_err(|error: DbErr| error.to_string())?;
             if let Some(step_model) = step {
-                let started_at: NaiveDateTime =
-                    (*step_model.try_get_started_at()).unwrap_or(now);
+                let started_at: NaiveDateTime = (*step_model.try_get_started_at()).unwrap_or(now);
                 let duration_ms: i32 = (now.and_utc().timestamp_millis()
                     - started_at.and_utc().timestamp_millis())
                     as i32;

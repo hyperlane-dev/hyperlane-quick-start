@@ -2,6 +2,23 @@ use super::*;
 
 impl ActiveModelBehavior for ActiveModel {}
 
+impl From<Model> for ChatHistory {
+    fn from(model: Model) -> Self {
+        Self {
+            id: model.id,
+            session_id: model.session_id,
+            sender_name: model.sender_name,
+            sender_type: model.sender_type,
+            message_type: model.message_type,
+            content: model.content,
+            created_at: model
+                .created_at
+                .map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string())
+                .unwrap_or_default(),
+        }
+    }
+}
+
 impl ChatHistoryMapper {
     #[instrument_trace]
     pub async fn insert_message(
@@ -57,21 +74,7 @@ impl ChatHistoryMapper {
                 format!("Failed to query from PostgreSQL{COLON_SPACE}{error}")
             })?;
         records.reverse();
-        Ok(records
-            .into_iter()
-            .map(|r: Model| ChatHistory {
-                id: r.id,
-                session_id: r.session_id,
-                sender_name: r.sender_name,
-                sender_type: r.sender_type,
-                message_type: r.message_type,
-                content: r.content,
-                created_at: r
-                    .created_at
-                    .map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string())
-                    .unwrap_or_default(),
-            })
-            .collect())
+        Ok(records.into_iter().map(Into::into).collect())
     }
 
     #[instrument_trace]
