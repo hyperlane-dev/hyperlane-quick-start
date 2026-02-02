@@ -28,7 +28,6 @@ pub fn load_env_config() -> Result<(), String> {
             &config.gpt_model
         }
     );
-
     info!("MySQL Configuration:");
     if config.mysql_instances.is_empty() {
         info!("  (no MySQL instances configured)");
@@ -45,7 +44,6 @@ pub fn load_env_config() -> Result<(), String> {
             );
         }
     }
-
     info!("PostgreSQL Configuration:");
     if config.postgresql_instances.is_empty() {
         info!("  (no PostgreSQL instances configured)");
@@ -62,7 +60,6 @@ pub fn load_env_config() -> Result<(), String> {
             );
         }
     }
-
     info!("Redis Configuration:");
     if config.redis_instances.is_empty() {
         info!("  (no Redis instances configured)");

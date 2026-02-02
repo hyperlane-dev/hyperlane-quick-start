@@ -23,7 +23,6 @@ impl MonitorService {
         {
             Self::capture_windows_network().await
         }
-
         #[cfg(not(target_os = "windows"))]
         {
             Self::capture_linux_network().await
@@ -358,7 +357,6 @@ impl MonitorService {
             }
             25.5
         }
-
         #[cfg(not(target_os = "windows"))]
         {
             if let Ok(stat) = fs::read_to_string("/proc/stat") {
@@ -548,7 +546,6 @@ impl MonitorService {
             }
             (50 * 1024 * 1024 * 1024, 100 * 1024 * 1024 * 1024, 50.0)
         }
-
         #[cfg(not(target_os = "windows"))]
         {
             use std::process::Command;
@@ -631,7 +628,6 @@ impl MonitorService {
             }
             (rx_bytes, tx_bytes)
         }
-
         #[cfg(not(target_os = "windows"))]
         {
             let mut rx_bytes: u64 = 0;
@@ -674,7 +670,6 @@ impl MonitorService {
             }
             3600 * 24 * 2
         }
-
         #[cfg(not(target_os = "windows"))]
         {
             if let Ok(uptime_str) = fs::read_to_string("/proc/uptime") {
@@ -707,7 +702,6 @@ impl MonitorService {
             }
             1.25
         }
-
         #[cfg(not(target_os = "windows"))]
         {
             if let Ok(loadavg) = fs::read_to_string("/proc/loadavg") {
@@ -733,7 +727,6 @@ impl MonitorService {
             }
             42
         }
-
         #[cfg(not(target_os = "windows"))]
         {
             let mut count: u32 = 0;
@@ -758,7 +751,6 @@ impl MonitorService {
             }
             156
         }
-
         #[cfg(not(target_os = "windows"))]
         {
             if let Ok(entries) = fs::read_dir("/proc") {
@@ -785,7 +777,6 @@ impl MonitorService {
                 env::var("COMPUTERNAME").unwrap_or_else(|_| "Windows-PC".to_string());
             hostname
         }
-
         #[cfg(not(target_os = "windows"))]
         {
             fs::read_to_string("/proc/sys/kernel/hostname")
@@ -814,7 +805,6 @@ impl MonitorService {
             }
             "Windows".to_string()
         }
-
         #[cfg(not(target_os = "windows"))]
         {
             if let Ok(os_release) = fs::read_to_string("/etc/os-release") {
@@ -921,7 +911,6 @@ impl MonitorService {
             }
             "Intel Core i7".to_string()
         }
-
         #[cfg(not(target_os = "windows"))]
         {
             if let Ok(cpuinfo) = fs::read_to_string("/proc/cpuinfo") {
@@ -987,7 +976,6 @@ impl MonitorService {
                     return size;
                 }
             }
-
             if let Ok(output) = Command::new("fsutil")
                 .args(["volume", "diskfree", "C:"])
                 .output()
@@ -1007,7 +995,6 @@ impl MonitorService {
             }
             0
         }
-
         #[cfg(not(target_os = "windows"))]
         {
             use std::process::Command;
@@ -1060,7 +1047,6 @@ impl LinuxMemoryInfo {
         } else {
             *self.get_available()
         };
-
         let used: u64 = self.get_total().saturating_sub(available);
         let usage: f64 = if *self.get_total() > 0 {
             (used as f64 / *self.get_total() as f64) * 100.0

@@ -286,11 +286,9 @@ impl UploadService {
     fn validate_file_paths(dir: &str, file: &str) -> Result<(String, String), String> {
         let decode_dir: String = Decode::execute(CHARSETS, dir).unwrap_or_default();
         let decode_file: String = Decode::execute(CHARSETS, file).unwrap_or_default();
-
         if decode_dir.is_empty() || decode_file.is_empty() {
             return Err("Invalid directory or file name".to_string());
         }
-
         Ok((decode_dir, decode_file))
     }
 

@@ -367,14 +367,12 @@ impl ServerHook for GetIncrementalRunDetailRoute {
                 return;
             }
         };
-
         let step_offsets: Vec<StepOffsetParam> = match querys.get("offsets") {
             Some(offsets_str) => {
                 serde_json::from_str::<Vec<StepOffsetParam>>(offsets_str).unwrap_or_default()
             }
             None => Vec::new(),
         };
-
         match CicdService::get_incremental_run_detail(run_id, step_offsets).await {
             Ok(Some(detail)) => {
                 let response: ApiResponse<IncrementalRunDetailDto> = ApiResponse::success(detail);
@@ -435,12 +433,9 @@ impl ServerHook for RunLogsSseRoute {
                 return;
             }
         };
-
         ctx.send().await;
-
         let log_manager: &LogStreamManager = get_log_stream_manager();
         let step_ids: Vec<i32> = log_manager.get_run_step_ids(run_id).await;
-
         if step_ids.is_empty() {
             let completion_event: String = format!(
                 "event: complete\ndata: {{\"run_id\":{run_id},\"reason\":\"no_active_streams\"}}{HTTP_DOUBLE_BR}"
@@ -469,12 +464,10 @@ impl ServerHook for RunLogsSseRoute {
             ctx.closed().await;
             return;
         }
-
         let mut interval: tokio::time::Interval =
             tokio::time::interval(tokio::time::Duration::from_millis(100));
         let timeout_duration: tokio::time::Duration = tokio::time::Duration::from_secs(3600);
         let start_time: tokio::time::Instant = tokio::time::Instant::now();
-
         loop {
             if start_time.elapsed() > timeout_duration {
                 let timeout_event: String = format!(
@@ -486,9 +479,7 @@ impl ServerHook for RunLogsSseRoute {
                     .await;
                 break;
             }
-
             let mut has_activity: bool = false;
-
             for (idx, receiver) in receivers.iter_mut().enumerate() {
                 let step_id: i32 = step_ids[idx];
                 match receiver.try_recv() {
@@ -517,7 +508,6 @@ impl ServerHook for RunLogsSseRoute {
                     }
                 }
             }
-
             let current_step_ids: Vec<i32> = log_manager.get_run_step_ids(run_id).await;
             if current_step_ids.is_empty() && !has_activity {
                 let completion_event: String = format!(
@@ -529,7 +519,6 @@ impl ServerHook for RunLogsSseRoute {
                     .await;
                 break;
             }
-
             for step_id in &current_step_ids {
                 if !step_ids.contains(step_id) {
                     if let Some(receiver) = log_manager.subscribe_to_step(run_id, *step_id).await {
@@ -537,12 +526,10 @@ impl ServerHook for RunLogsSseRoute {
                     }
                 }
             }
-
             if !has_activity {
                 interval.tick().await;
             }
         }
-
         ctx.closed().await;
     }
 }

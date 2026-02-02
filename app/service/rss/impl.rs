@@ -85,7 +85,6 @@ impl RssService {
             .set_upload_time(upload_time)
             .set_file_url(file_url)
             .set_content_type(content_type);
-
         Some(file_info)
     }
 

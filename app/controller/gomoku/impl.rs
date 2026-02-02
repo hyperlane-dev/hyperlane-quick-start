@@ -17,7 +17,6 @@ impl ServerHook for GomokuRoute {
             user_id
         };
         let key: BroadcastType<String> = BroadcastType::PointToGroup(key_value);
-
         let cfg: WebSocketConfig<String> = WebSocketConfig::new()
             .set_context(ctx.clone())
             .set_broadcast_type(key)

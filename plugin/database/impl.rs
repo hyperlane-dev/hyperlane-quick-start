@@ -156,7 +156,6 @@ impl DatabaseSchema {
                         .iter()
                         .any(|ordered_table: &&TableSchema| &ordered_table.name == dep)
                 });
-
                 if dependencies_satisfied {
                     ordered.push(table);
                     added_any = true;

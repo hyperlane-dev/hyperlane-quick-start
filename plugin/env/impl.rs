@@ -228,7 +228,6 @@ impl EnvConfig {
                 let database_key: String = format!("{prefix}DATABASE");
                 let username_key: String = format!("{prefix}USERNAME");
                 let password_key: String = format!("{prefix}PASSWORD");
-
                 let instance_name: String = format!("postgres_{instance_index}");
                 let instance = PostgreSqlInstanceConfig {
                     name: instance_name,

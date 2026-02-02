@@ -109,12 +109,10 @@ impl CicdService {
     pub async fn trigger_run(param: TriggerRunParam) -> Result<i32, String> {
         let db: DatabaseConnection =
             get_mysql_connection(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-
         let pipeline = Self::get_pipeline_by_id_with_config(param.pipeline_id).await?;
         let config_content: String = pipeline
             .and_then(|p| p.try_get_config_content().clone())
             .ok_or_else(|| "Pipeline config content is required".to_string())?;
-
         let run_number: i32 = Self::get_next_run_number(param.pipeline_id).await?;
         let active_model: RunActiveModel = RunActiveModel::new(
             param.pipeline_id,
@@ -128,16 +126,13 @@ impl CicdService {
             .await
             .map_err(|error: DbErr| error.to_string())?;
         let run_id: i32 = run_result.get_id();
-
         Self::parse_config_and_create_jobs(&db, run_id, &config_content).await?;
-
         let run_id_clone: i32 = run_id;
-        tokio::spawn(async move {
+        spawn(async move {
             if let Err(error) = Self::execute_run(run_id_clone).await {
                 tracing::error!("Failed to execute run {}: {}", run_id_clone, error);
             }
         });
-
         Ok(run_id)
     }
 
@@ -160,16 +155,13 @@ impl CicdService {
     ) -> Result<(), String> {
         let config: PipelineConfig = serde_yaml::from_str(config_content)
             .map_err(|error| format!("Failed to parse config: {error}"))?;
-
         let pipeline_dockerfile: Option<String> = config.dockerfile;
         let pipeline_image: Option<String> = config.image;
-
         for (job_name, job_config) in config.jobs {
             let job_dockerfile: Option<String> = job_config
                 .dockerfile
                 .or_else(|| pipeline_dockerfile.clone());
             let job_image: Option<String> = job_config.image.or_else(|| pipeline_image.clone());
-
             let job_active_model: mapper::cicd::job::ActiveModel =
                 JobActiveModel::new(run_id, job_name);
             let job_result = job_active_model
@@ -177,12 +169,10 @@ impl CicdService {
                 .await
                 .map_err(|error: DbErr| error.to_string())?;
             let job_id: i32 = job_result.get_id();
-
             for step_config in job_config.steps {
                 let step_dockerfile: Option<String> =
                     step_config.dockerfile.or_else(|| job_dockerfile.clone());
                 let step_image: Option<String> = job_image.clone();
-
                 let step_active_model: mapper::cicd::step::ActiveModel =
                     if step_dockerfile.is_some() || step_image.is_some() {
                         StepActiveModel::new_with_dockerfile(
@@ -200,17 +190,14 @@ impl CicdService {
                     .map_err(|error: DbErr| error.to_string())?;
             }
         }
-
         Ok(())
     }
 
     #[instrument_trace]
     pub async fn execute_run(run_id: i32) -> Result<(), String> {
         Self::start_run(run_id).await?;
-
         let jobs: Vec<JobDto> = Self::get_jobs_by_run(run_id).await?;
         let mut has_error: bool = false;
-
         for job in jobs {
             let job_id: i32 = job.id;
             Self::update_job_status(UpdateJobStatusParam {
@@ -219,23 +206,18 @@ impl CicdService {
                 runner: Some("local-runner".to_string()),
             })
             .await?;
-
             let steps: Vec<StepDto> = Self::get_steps_by_job(job_id).await?;
             let mut job_has_error: bool = false;
-
             for step in steps {
                 let step_id: i32 = step.id;
-
                 Self::update_step_status(UpdateStepStatusParam {
                     step_id,
                     status: CicdStatus::Running,
                     output: None,
                 })
                 .await?;
-
                 let log_manager: &LogStreamManager = get_log_stream_manager();
                 log_manager.start_step_stream(run_id, step_id).await;
-
                 let output: String = if step.image.is_some() && step.dockerfile.is_none() {
                     Self::execute_image(run_id, &step).await
                 } else if step.dockerfile.is_some() {
@@ -244,7 +226,6 @@ impl CicdService {
                     let command: String = step.command.unwrap_or_default();
                     Self::execute_command(run_id, step_id, &command).await
                 };
-
                 let step_status: CicdStatus = if output.starts_with("Error:") {
                     job_has_error = true;
                     has_error = true;
@@ -252,52 +233,43 @@ impl CicdService {
                 } else {
                     CicdStatus::Success
                 };
-
                 log_manager
                     .update_step_status(run_id, step_id, step_status)
                     .await;
                 log_manager.end_step_stream(run_id, step_id).await;
-
                 Self::update_step_status(UpdateStepStatusParam {
                     step_id,
                     status: step_status,
                     output: Some(output),
                 })
                 .await?;
-
                 if job_has_error {
                     break;
                 }
             }
-
             let job_status: CicdStatus = if job_has_error {
                 CicdStatus::Failure
             } else {
                 CicdStatus::Success
             };
-
             Self::update_job_status(UpdateJobStatusParam {
                 job_id,
                 status: job_status,
                 runner: Some("local-runner".to_string()),
             })
             .await?;
-
             if job_has_error {
                 break;
             }
         }
-
         let run_status: CicdStatus = if has_error {
             CicdStatus::Failure
         } else {
             CicdStatus::Success
         };
-
         let log_manager: &LogStreamManager = get_log_stream_manager();
         log_manager.end_run_streams(run_id).await;
         Self::complete_run(run_id, run_status).await?;
-
         Ok(())
     }
 
@@ -306,10 +278,8 @@ impl CicdService {
         if command.is_empty() {
             return "No command to execute".to_string();
         }
-
         let config: DockerConfig = DockerConfig::secure();
         let run_args: Vec<String> = Self::build_docker_args_for_cicd(&config, command);
-
         let container_id_output: Output =
             match Command::new("docker").args(&run_args).output().await {
                 Ok(output) => output,
@@ -317,25 +287,20 @@ impl CicdService {
                     return format!("Error: Failed to run Docker container: {error}");
                 }
             };
-
         if !container_id_output.status.success() {
             let stderr: String = String::from_utf8_lossy(&container_id_output.stderr).to_string();
             return format!("Error: Failed to start container: {stderr}");
         }
-
         let container_id: String = String::from_utf8_lossy(&container_id_output.stdout)
             .trim()
             .to_string();
-
         let log_manager: &LogStreamManager = get_log_stream_manager();
         let output_result: Result<String, String> =
             Self::stream_container_logs(run_id, step_id, &container_id, log_manager).await;
-
         let _: Result<Output, std::io::Error> = Command::new("docker")
             .args(["rm", "-f", &container_id])
             .output()
             .await;
-
         match output_result {
             Ok(output) => output,
             Err(error) => format!("Error: {error}"),
@@ -351,15 +316,14 @@ impl CicdService {
     ) -> Result<String, String> {
         let container_id: String = container_id.to_string();
         let log_manager: LogStreamManager = log_manager.clone();
-
         let stdout_handle: JoinHandle<Result<String, String>> = {
             let container_id: String = container_id.clone();
             let log_manager: LogStreamManager = log_manager.clone();
-            tokio::spawn(async move {
-                let child: tokio::process::Child = match Command::new("docker")
+            spawn(async move {
+                let child: Child = match Command::new("docker")
                     .args(["logs", "-f", &container_id])
-                    .stdout(std::process::Stdio::piped())
-                    .stderr(std::process::Stdio::null())
+                    .stdout(Stdio::piped())
+                    .stderr(Stdio::null())
                     .spawn()
                 {
                     Ok(c) => c,
@@ -368,15 +332,14 @@ impl CicdService {
                 Self::read_stdout_stream(child, run_id, step_id, &log_manager).await
             })
         };
-
         let stderr_handle: JoinHandle<Result<String, String>> = {
             let container_id: String = container_id.clone();
             let log_manager: LogStreamManager = log_manager.clone();
-            tokio::spawn(async move {
-                let child: tokio::process::Child = match Command::new("docker")
+            spawn(async move {
+                let child: Child = match Command::new("docker")
                     .args(["logs", "-f", &container_id])
-                    .stdout(std::process::Stdio::null())
-                    .stderr(std::process::Stdio::piped())
+                    .stdout(Stdio::null())
+                    .stderr(Stdio::piped())
                     .spawn()
                 {
                     Ok(c) => c,
@@ -385,23 +348,14 @@ impl CicdService {
                 Self::read_stderr_stream(child, run_id, step_id, &log_manager).await
             })
         };
-
-        let timeout_result: Result<
-            (
-                Result<Result<String, String>, JoinError>,
-                Result<Result<String, String>, JoinError>,
-            ),
-            Elapsed,
-        > = timeout(TASK_TIMEOUT, async {
-            let stdout_result: Result<Result<String, String>, JoinError> = stdout_handle.await;
-            let stderr_result: Result<Result<String, String>, JoinError> = stderr_handle.await;
+        let timeout_result: TimeoutResult = timeout(TASK_TIMEOUT, async {
+            let stdout_result: StreamResult = stdout_handle.await;
+            let stderr_result: StreamResult = stderr_handle.await;
             (stdout_result, stderr_result)
         })
         .await;
-
         let mut output_builder: StepOutputBuilder = StepOutputBuilder::new();
         let is_timeout: bool = timeout_result.is_err();
-
         if is_timeout {
             let _: Result<Output, std::io::Error> = Command::new("docker")
                 .args(["stop", "-t", "10", &container_id])
@@ -426,10 +380,7 @@ impl CicdService {
             output_builder.add_stderr(stderr);
             output_builder.mark_timeout(TASK_TIMEOUT.as_secs());
         } else {
-            let (stdout_result, stderr_result): (
-                Result<Result<String, String>, JoinError>,
-                Result<Result<String, String>, JoinError>,
-            ) = match timeout_result {
+            let (stdout_result, stderr_result): StreamResultPair = match timeout_result {
                 Ok(results) => results,
                 Err(_) => (Ok(Ok(String::new())), Ok(Ok(String::new()))),
             };
@@ -442,31 +393,23 @@ impl CicdService {
             output_builder.add_stdout(stdout);
             output_builder.add_stderr(stderr);
         }
-
         Ok(output_builder.build())
     }
 
     #[instrument_trace]
     async fn read_stdout_stream(
-        mut child: tokio::process::Child,
+        mut child: Child,
         run_id: i32,
         step_id: i32,
         log_manager: &LogStreamManager,
     ) -> Result<String, String> {
-        use std::pin::Pin;
-        use tokio::io::BufReader;
-        use tokio::io::{AsyncBufReadExt, AsyncRead};
-
-        let output_stream: Option<tokio::process::ChildStdout> = child.stdout.take();
-
-        let reader: BufReader<Pin<Box<dyn AsyncRead + Send>>> = match output_stream {
+        let mut lines: Lines<BufReader<Pin<Box<dyn AsyncRead + Send>>>> = match child.stdout.take()
+        {
             Some(s) => BufReader::new(Box::pin(s) as Pin<Box<dyn AsyncRead + Send>>),
             None => return Ok(String::new()),
-        };
-
-        let mut lines: tokio::io::Lines<BufReader<Pin<Box<dyn AsyncRead + Send>>>> = reader.lines();
+        }
+        .lines();
         let mut output_buffer: String = String::new();
-
         while let Ok(Some(line)) = lines.next_line().await {
             let line_with_newline: String = format!("{line}\n");
             log_manager
@@ -474,32 +417,24 @@ impl CicdService {
                 .await;
             output_buffer.push_str(&line_with_newline);
         }
-
         let _ = child.wait().await;
         Ok(output_buffer)
     }
 
     #[instrument_trace]
     async fn read_stderr_stream(
-        mut child: tokio::process::Child,
+        mut child: Child,
         run_id: i32,
         step_id: i32,
         log_manager: &LogStreamManager,
     ) -> Result<String, String> {
-        use std::pin::Pin;
-        use tokio::io::BufReader;
-        use tokio::io::{AsyncBufReadExt, AsyncRead};
-
-        let error_stream: Option<tokio::process::ChildStderr> = child.stderr.take();
-
-        let reader: BufReader<Pin<Box<dyn AsyncRead + Send>>> = match error_stream {
+        let mut lines: Lines<BufReader<Pin<Box<dyn AsyncRead + Send>>>> = match child.stderr.take()
+        {
             Some(s) => BufReader::new(Box::pin(s) as Pin<Box<dyn AsyncRead + Send>>),
             None => return Ok(String::new()),
-        };
-
-        let mut lines: tokio::io::Lines<BufReader<Pin<Box<dyn AsyncRead + Send>>>> = reader.lines();
+        }
+        .lines();
         let mut output_buffer: String = String::new();
-
         while let Ok(Some(line)) = lines.next_line().await {
             let line_with_newline: String = format!("{line}\n");
             log_manager
@@ -507,7 +442,6 @@ impl CicdService {
                 .await;
             output_buffer.push_str(&line_with_newline);
         }
-
         let _ = child.wait().await;
         Ok(output_buffer)
     }
@@ -547,13 +481,11 @@ impl CicdService {
             Some(img) => img.clone(),
             None => return "Error: No image specified".to_string(),
         };
-
         let step_id: i32 = step.id;
         let container_name: String = format!(
             "cicd-run-{run_id}-step-{step_id}-{}",
             Utc::now().timestamp()
         );
-
         let run_args: Vec<String> = vec![
             "run".to_string(),
             "-d".to_string(),
@@ -565,7 +497,6 @@ impl CicdService {
             "--pids-limit=100".to_string(),
             image.clone(),
         ];
-
         let container_id_output: Output =
             match Command::new("docker").args(&run_args).output().await {
                 Ok(output) => output,
@@ -573,25 +504,20 @@ impl CicdService {
                     return format!("Error: Failed to run Docker container: {error}");
                 }
             };
-
         if !container_id_output.status.success() {
             let stderr: String = String::from_utf8_lossy(&container_id_output.stderr).to_string();
             return format!("Error: Failed to start container: {stderr}");
         }
-
         let container_id: String = String::from_utf8_lossy(&container_id_output.stdout)
             .trim()
             .to_string();
-
         let log_manager: &LogStreamManager = get_log_stream_manager();
         let output_result: Result<String, String> =
             Self::stream_container_logs(run_id, step_id, &container_id, log_manager).await;
-
         let _: Result<Output, std::io::Error> = Command::new("docker")
             .args(["rm", "-f", &container_id])
             .output()
             .await;
-
         match output_result {
             Ok(output) => output,
             Err(error) => format!("Error: {error}"),
@@ -604,27 +530,21 @@ impl CicdService {
             Some(content) => content.clone(),
             None => return "Error: No Dockerfile content".to_string(),
         };
-
         let step_id: i32 = step.id;
         let image_tag: String = format!("cicd-run-{run_id}-step-{step_id}");
-        let temp_dir: std::path::PathBuf =
-            std::env::temp_dir().join(format!("cicd-{run_id}-{step_id}"));
-
-        if let Err(error) = tokio::fs::create_dir_all(&temp_dir).await {
+        let temp_dir: PathBuf = std::env::temp_dir().join(format!("cicd-{run_id}-{step_id}"));
+        if let Err(error) = fs::create_dir_all(&temp_dir).await {
             return format!("Error: Failed to create temp directory: {error}");
         }
-
-        let dockerfile_path: std::path::PathBuf = temp_dir.join("Dockerfile");
-        if let Err(error) = tokio::fs::write(&dockerfile_path, dockerfile_content).await {
+        let dockerfile_path: PathBuf = temp_dir.join("Dockerfile");
+        if let Err(error) = fs::write(&dockerfile_path, dockerfile_content).await {
             return format!("Error: Failed to write Dockerfile: {error}");
         }
-
         let log_manager: &LogStreamManager = get_log_stream_manager();
         let build_log_header: String = "[Build Log]\n".to_string();
         log_manager
             .append_log(run_id, step_id, &build_log_header, false)
             .await;
-
         let build_result: Result<Result<Output, std::io::Error>, Elapsed> = timeout(
             TASK_TIMEOUT,
             Command::new("docker")
@@ -638,22 +558,20 @@ impl CicdService {
                 .output(),
         )
         .await;
-
         let build_output: Output = match build_result {
             Ok(Ok(output)) => output,
             Ok(Err(error)) => {
-                let _ = tokio::fs::remove_dir_all(&temp_dir).await;
+                let _ = fs::remove_dir_all(&temp_dir).await;
                 return format!("Error: Failed to build Docker image: {error}");
             }
             Err(_) => {
-                let _ = tokio::fs::remove_dir_all(&temp_dir).await;
+                let _ = fs::remove_dir_all(&temp_dir).await;
                 return format!(
                     "Error: Docker build timeout after {} seconds",
                     TASK_TIMEOUT.as_secs()
                 );
             }
         };
-
         let build_stdout: String = String::from_utf8_lossy(&build_output.stdout).to_string();
         let build_stderr: String = String::from_utf8_lossy(&build_output.stderr).to_string();
         log_manager
@@ -662,9 +580,8 @@ impl CicdService {
         log_manager
             .append_log(run_id, step_id, &build_stderr, true)
             .await;
-
         if !build_output.status.success() {
-            let _ = tokio::fs::remove_dir_all(&temp_dir).await;
+            let _ = fs::remove_dir_all(&temp_dir).await;
             let _: Result<Output, std::io::Error> = Command::new("docker")
                 .args(["rmi", &image_tag])
                 .output()
@@ -675,7 +592,6 @@ impl CicdService {
                 build_stderr.trim()
             );
         }
-
         let container_name: String = format!("cicd-run-{run_id}-step-{step_id}-run");
         let run_args: Vec<String> = vec![
             "run".to_string(),
@@ -688,12 +604,11 @@ impl CicdService {
             "--pids-limit=100".to_string(),
             image_tag.clone(),
         ];
-
         let container_id_output: Output =
             match Command::new("docker").args(&run_args).output().await {
                 Ok(output) => output,
                 Err(error) => {
-                    let _ = tokio::fs::remove_dir_all(&temp_dir).await;
+                    let _ = fs::remove_dir_all(&temp_dir).await;
                     let _: Result<Output, std::io::Error> = Command::new("docker")
                         .args(["rmi", &image_tag])
                         .output()
@@ -701,39 +616,33 @@ impl CicdService {
                     return format!("Error: Failed to run Docker container: {error}");
                 }
             };
-
         if !container_id_output.status.success() {
             let stderr: String = String::from_utf8_lossy(&container_id_output.stderr).to_string();
-            let _ = tokio::fs::remove_dir_all(&temp_dir).await;
+            let _ = fs::remove_dir_all(&temp_dir).await;
             let _: Result<Output, std::io::Error> = Command::new("docker")
                 .args(["rmi", &image_tag])
                 .output()
                 .await;
             return format!("Error: Failed to start container: {stderr}");
         }
-
         let container_id: String = String::from_utf8_lossy(&container_id_output.stdout)
             .trim()
             .to_string();
-
         let run_log_header: String = "\n[Run Output]\n".to_string();
         log_manager
             .append_log(run_id, step_id, &run_log_header, false)
             .await;
-
         let output_result: Result<String, String> =
             Self::stream_container_logs(run_id, step_id, &container_id, log_manager).await;
-
         let _: Result<Output, std::io::Error> = Command::new("docker")
             .args(["rm", "-f", &container_id])
             .output()
             .await;
-        let _ = tokio::fs::remove_dir_all(&temp_dir).await;
+        let _ = fs::remove_dir_all(&temp_dir).await;
         let _: Result<Output, std::io::Error> = Command::new("docker")
             .args(["rmi", &image_tag])
             .output()
             .await;
-
         match output_result {
             Ok(run_output) => run_output,
             Err(error) => format!("Error: {error}"),
@@ -1041,39 +950,31 @@ impl CicdService {
     pub async fn recover_interrupted_runs() -> Result<u32, String> {
         let db: DatabaseConnection =
             get_mysql_connection(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-
         let running_runs: Vec<mapper::cicd::run::Model> = RunEntity::find()
             .filter(RunColumn::Status.eq(CicdStatus::Running.to_string()))
             .all(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
-
         let count: u32 = running_runs.len() as u32;
-
         if count == 0 {
             return Ok(0);
         }
-
         let now: NaiveDateTime = Utc::now().naive_utc();
         let error_message: &str = "[System] Task was interrupted due to server restart";
-
         for run in running_runs {
             let run_id: i32 = run.get_id();
-
             let jobs: Vec<mapper::cicd::job::Model> = JobEntity::find()
                 .filter(JobColumn::RunId.eq(run_id))
                 .filter(JobColumn::Status.eq(CicdStatus::Running.to_string()))
                 .all(&db)
                 .await
                 .map_err(|error: DbErr| error.to_string())?;
-
             for job in jobs {
                 let job_id: i32 = job.get_id();
                 let job_started_at: NaiveDateTime = job.try_get_started_at().unwrap_or(now);
                 let job_duration_ms: i32 = (now.and_utc().timestamp_millis()
                     - job_started_at.and_utc().timestamp_millis())
                     as i32;
-
                 JobEntity::update_many()
                     .filter(JobColumn::Id.eq(job_id))
                     .col_expr(
@@ -1085,14 +986,12 @@ impl CicdService {
                     .exec(&db)
                     .await
                     .map_err(|error: DbErr| error.to_string())?;
-
                 let steps: Vec<mapper::cicd::step::Model> = StepEntity::find()
                     .filter(StepColumn::JobId.eq(job_id))
                     .filter(StepColumn::Status.eq(CicdStatus::Running.to_string()))
                     .all(&db)
                     .await
                     .map_err(|error: DbErr| error.to_string())?;
-
                 for step in steps {
                     let step_id: i32 = step.get_id();
                     let step_started_at: NaiveDateTime =
@@ -1105,7 +1004,6 @@ impl CicdService {
                         .clone()
                         .map(|o| format!("{o}\n\n{error_message}"))
                         .unwrap_or_else(|| error_message.to_string());
-
                     StepEntity::update_many()
                         .filter(StepColumn::Id.eq(step_id))
                         .col_expr(
@@ -1120,11 +1018,9 @@ impl CicdService {
                         .map_err(|error: DbErr| error.to_string())?;
                 }
             }
-
             let started_at: NaiveDateTime = run.try_get_started_at().unwrap_or(now);
             let duration_ms: i32 =
                 (now.and_utc().timestamp_millis() - started_at.and_utc().timestamp_millis()) as i32;
-
             RunEntity::update_many()
                 .filter(RunColumn::Id.eq(run_id))
                 .col_expr(
@@ -1136,13 +1032,11 @@ impl CicdService {
                 .exec(&db)
                 .await
                 .map_err(|error: DbErr| error.to_string())?;
-
             tracing::warn!(
                 "Run {} was interrupted by server restart and marked as failed",
                 run_id
             );
         }
-
         Ok(count)
     }
 
@@ -1155,22 +1049,18 @@ impl CicdService {
         if let Some(run_dto) = run {
             let jobs: Vec<JobDto> = Self::get_jobs_by_run(run_id).await?;
             let mut jobs_with_steps: Vec<JobWithIncrementalStepsDto> = Vec::new();
-
             for job in jobs {
                 let steps: Vec<StepDto> = Self::get_steps_by_job(job.id).await?;
                 let mut step_logs: Vec<StepLogDto> = Vec::new();
-
                 for step in steps {
                     let offset: usize = step_offsets
                         .iter()
                         .find(|o: &&StepOffsetParam| o.step_id == step.id)
                         .map(|o: &StepOffsetParam| o.offset)
                         .unwrap_or(0);
-
                     let output: Option<String> = step.output.clone();
                     let output_str: &str = output.as_deref().unwrap_or("");
                     let output_length: usize = output_str.len();
-
                     let (new_output, final_offset): (Option<String>, usize) =
                         if offset < output_length {
                             let new_content: String = output_str[offset..].to_string();
@@ -1178,7 +1068,6 @@ impl CicdService {
                         } else {
                             (None, output_length)
                         };
-
                     step_logs.push(StepLogDto {
                         step_id: step.id,
                         step_name: step.name.clone(),
@@ -1189,13 +1078,11 @@ impl CicdService {
                         output_offset: offset,
                     });
                 }
-
                 jobs_with_steps.push(JobWithIncrementalStepsDto {
                     job,
                     steps: step_logs,
                 });
             }
-
             Ok(Some(IncrementalRunDetailDto {
                 run: run_dto,
                 jobs: jobs_with_steps,

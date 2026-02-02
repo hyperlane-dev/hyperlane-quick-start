@@ -25,14 +25,19 @@ use hyperlane_plugin::{docker::*, mysql::*};
 
 use std::{
     collections::HashMap,
-    process::{ExitStatus, Output},
+    path::PathBuf,
+    pin::Pin,
+    process::{ExitStatus, Output, Stdio},
     sync::Arc,
 };
 
 use {
     once_cell::sync::Lazy,
     tokio::{
-        process::Command,
+        fs,
+        io::{AsyncBufReadExt, AsyncRead, BufReader, Lines},
+        process::{Child, Command},
+        spawn,
         sync::{RwLock, RwLockReadGuard, RwLockWriteGuard, broadcast},
         task::{JoinError, JoinHandle},
         time::{error::Elapsed, timeout},
