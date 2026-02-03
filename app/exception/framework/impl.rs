@@ -17,7 +17,6 @@ impl ServerHook for TaskPanicHook {
         response_status_code(500),
         clear_response_headers,
         response_header(SERVER => HYPERLANE),
-        response_version(HttpVersion::Http1_1),
         response_header(CONTENT_TYPE, &self.content_type),
     )]
     #[epilogue_macros(response_body(&response_body), try_send)]
@@ -49,8 +48,8 @@ impl ServerHook for RequestErrorHook {
         response_status_code(self.get_response_status_code()),
         clear_response_headers,
         response_header(SERVER => HYPERLANE),
-        response_version(HttpVersion::Http1_1),
         response_header(CONTENT_TYPE, &self.content_type),
+        response_header(TRACE => uuid::Uuid::new_v4().to_string()),
     )]
     #[epilogue_macros(response_body(&response_body), try_send)]
     #[instrument_trace]
