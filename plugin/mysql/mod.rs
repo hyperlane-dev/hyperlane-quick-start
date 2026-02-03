@@ -14,6 +14,6 @@ use std::{
 };
 
 use tokio::{
-    sync::{RwLock, RwLockReadGuard, RwLockWriteGuard},
+    sync::{RwLock, RwLockWriteGuard},
     time::timeout,
 };

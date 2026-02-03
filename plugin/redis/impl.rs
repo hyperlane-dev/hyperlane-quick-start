@@ -71,7 +71,6 @@ impl RedisAutoCreation {
         };
         Ok(connection)
     }
-
     #[instrument_trace]
     async fn validate_redis_server(&self) -> Result<(), AutoCreationError> {
         let mut conn: Connection = self.create_mutable_connection().await?;
@@ -99,7 +98,7 @@ impl RedisAutoCreation {
         if info.contains("redis_version:") {
             AutoCreationLogger::log_connection_verification(
                 database::PluginType::Redis,
-                &self.instance.name,
+                self.instance.get_name().as_str(),
                 true,
                 None,
             )
@@ -107,12 +106,11 @@ impl RedisAutoCreation {
         }
         Ok(())
     }
-
     #[instrument_trace]
     async fn setup_redis_namespace(&self) -> Result<Vec<String>, AutoCreationError> {
         let mut setup_operations: Vec<String> = Vec::new();
         let mut conn: Connection = self.create_mutable_connection().await?;
-        let app_key: String = format!("{}:initialized", self.instance.name);
+        let app_key: String = format!("{}:initialized", self.instance.get_name());
         let exists: i32 = redis::cmd("EXISTS")
             .arg(&app_key)
             .query(&mut conn)
@@ -132,7 +130,7 @@ impl RedisAutoCreation {
                     ))
                 })?;
             setup_operations.push(app_key.clone());
-            let config_key: String = format!("{}:config:version", self.instance.name);
+            let config_key: String = format!("{}:config:version", self.instance.get_name());
             let _: () = redis::cmd("SET")
                 .arg(&config_key)
                 .arg("1.0.0")
@@ -152,39 +150,40 @@ impl DatabaseAutoCreation for RedisAutoCreation {
     #[instrument_trace]
     async fn create_database_if_not_exists(&self) -> Result<bool, AutoCreationError> {
         self.validate_redis_server().await?;
-        AutoCreationLogger::log_database_exists(&self.instance.name, database::PluginType::Redis)
-            .await;
+        AutoCreationLogger::log_database_exists(
+            self.instance.get_name().as_str(),
+            database::PluginType::Redis,
+        )
+        .await;
         Ok(false)
     }
-
     #[instrument_trace]
     async fn create_tables_if_not_exist(&self) -> Result<Vec<String>, AutoCreationError> {
         let setup_operations: Vec<String> = self.setup_redis_namespace().await?;
         if !setup_operations.is_empty() {
             AutoCreationLogger::log_tables_created(
                 &setup_operations,
-                &self.instance.name,
+                self.instance.get_name().as_str(),
                 database::PluginType::Redis,
             )
             .await;
         } else {
             AutoCreationLogger::log_tables_created(
                 &[],
-                &self.instance.name,
+                self.instance.get_name().as_str(),
                 database::PluginType::Redis,
             )
             .await;
         }
         Ok(setup_operations)
     }
-
     #[instrument_trace]
     async fn verify_connection(&self) -> Result<(), AutoCreationError> {
         match self.validate_redis_server().await {
             Ok(_) => {
                 AutoCreationLogger::log_connection_verification(
                     database::PluginType::Redis,
-                    &self.instance.name,
+                    self.instance.get_name().as_str(),
                     true,
                     None,
                 )
@@ -194,7 +193,7 @@ impl DatabaseAutoCreation for RedisAutoCreation {
             Err(error) => {
                 AutoCreationLogger::log_connection_verification(
                     database::PluginType::Redis,
-                    &self.instance.name,
+                    self.instance.get_name().as_str(),
                     false,
                     Some(&error.to_string()),
                 )

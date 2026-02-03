@@ -36,12 +36,12 @@ pub async fn initialize_auto_creation_with_schema(
     }
     let env: &'static EnvConfig = get_global_env_config();
     let mut initialization_results: Vec<String> = Vec::new();
-    for instance in &env.mysql_instances {
+    for instance in env.get_mysql_instances() {
         match mysql::perform_mysql_auto_creation(instance, mysql_schema.clone()).await {
             Ok(result) => {
                 initialization_results.push(format!(
                     "MySQL ({}) {COLON_SPACE}{}",
-                    instance.name,
+                    instance.get_name(),
                     if result.has_changes() {
                         "initialized with changes"
                     } else {
@@ -53,24 +53,24 @@ pub async fn initialize_auto_creation_with_schema(
                 if !error.should_continue() {
                     return Err(format!(
                         "MySQL ({}) auto-creation failed{COLON_SPACE}{error}",
-                        instance.name
+                        instance.get_name()
                     ));
                 }
                 initialization_results.push(format!(
                     "MySQL ({}) : failed but continuing ({error})",
-                    instance.name
+                    instance.get_name()
                 ));
             }
         }
     }
-    for instance in &env.postgresql_instances {
+    for instance in env.get_postgresql_instances() {
         match postgresql::perform_postgresql_auto_creation(instance, postgresql_schema.clone())
             .await
         {
             Ok(result) => {
                 initialization_results.push(format!(
                     "PostgreSQL ({}) {COLON_SPACE}{}",
-                    instance.name,
+                    instance.get_name(),
                     if result.has_changes() {
                         "initialized with changes"
                     } else {
@@ -82,22 +82,22 @@ pub async fn initialize_auto_creation_with_schema(
                 if !error.should_continue() {
                     return Err(format!(
                         "PostgreSQL ({}) auto-creation failed{COLON_SPACE}{error}",
-                        instance.name
+                        instance.get_name()
                     ));
                 }
                 initialization_results.push(format!(
                     "PostgreSQL ({}) : failed but continuing ({error})",
-                    instance.name
+                    instance.get_name()
                 ));
             }
         }
     }
-    for instance in &env.redis_instances {
+    for instance in env.get_redis_instances() {
         match redis::perform_redis_auto_creation(instance).await {
             Ok(result) => {
                 initialization_results.push(format!(
                     "Redis ({}) {COLON_SPACE}{}",
-                    instance.name,
+                    instance.get_name(),
                     if result.has_changes() {
                         "initialized with changes"
                     } else {
@@ -109,12 +109,12 @@ pub async fn initialize_auto_creation_with_schema(
                 if !error.should_continue() {
                     return Err(format!(
                         "Redis ({}) auto-creation failed{COLON_SPACE}{error}",
-                        instance.name
+                        instance.get_name()
                     ));
                 }
                 initialization_results.push(format!(
                     "Redis ({}) : failed but continuing ({error})",
-                    instance.name
+                    instance.get_name()
                 ));
             }
         }

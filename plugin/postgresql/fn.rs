@@ -28,7 +28,7 @@ where
                 &error,
                 "Auto-creation process",
                 database::PluginType::PostgreSQL,
-                Some(&instance.database),
+                Some(instance.get_database().as_str()),
             )
             .await;
             if !error.should_continue() {
@@ -48,7 +48,7 @@ where
         };
     connection_result.map_err(|error: DbErr| {
         let error_msg: String = error.to_string();
-        let database_name: String = instance.database.clone();
+        let database_name: String = instance.get_database().clone();
         let error_msg_clone: String = error_msg.clone();
         tokio::spawn(async move {
             database::AutoCreationLogger::log_connection_verification(
@@ -74,10 +74,8 @@ where
     let instance_name_str: &str = instance_name.as_ref();
     let cooldown_duration: Duration = get_retry_cooldown_duration();
     {
-        let connections: RwLockReadGuard<'_, HashMap<String, ConnectionCache<DatabaseConnection>>> =
-            POSTGRESQL_CONNECTIONS.read().await;
-        if let Some(cache) = connections.get(instance_name_str) {
-            match &cache.result {
+        if let Some(cache) = POSTGRESQL_CONNECTIONS.read().await.get(instance_name_str) {
+            match cache.try_get_result() {
                 Ok(conn) => return Ok(conn.clone()),
                 Err(error) => {
                     if !cache.is_cooldown_expired(cooldown_duration) {
@@ -92,7 +90,7 @@ where
         HashMap<String, ConnectionCache<DatabaseConnection>>,
     > = POSTGRESQL_CONNECTIONS.write().await;
     if let Some(cache) = connections.get(instance_name_str) {
-        match &cache.result {
+        match cache.try_get_result() {
             Ok(conn) => return Ok(conn.clone()),
             Err(error) => {
                 if !cache.is_cooldown_expired(cooldown_duration) {
@@ -125,7 +123,7 @@ pub async fn perform_postgresql_auto_creation(
     let mut result: AutoCreationResult = AutoCreationResult::default();
     AutoCreationLogger::log_auto_creation_start(
         database::PluginType::PostgreSQL,
-        &instance.database,
+        instance.get_database(),
     )
     .await;
     let auto_creator: PostgreSqlAutoCreation = match schema {
@@ -134,36 +132,36 @@ pub async fn perform_postgresql_auto_creation(
     };
     match auto_creator.create_database_if_not_exists().await {
         Ok(created) => {
-            result.database_created = created;
+            result.set_database_created(created);
         }
         Err(error) => {
             AutoCreationLogger::log_auto_creation_error(
                 &error,
                 "Database creation",
                 database::PluginType::PostgreSQL,
-                Some(&instance.database),
+                Some(instance.get_database().as_str()),
             )
             .await;
             if !error.should_continue() {
-                result.duration = start_time.elapsed();
+                result.set_duration(start_time.elapsed());
                 return Err(error);
             }
-            result.errors.push(error.to_string());
+            result.get_mut_errors().push(error.to_string());
         }
     }
     match auto_creator.create_tables_if_not_exist().await {
         Ok(tables) => {
-            result.tables_created = tables;
+            result.set_tables_created(tables);
         }
         Err(error) => {
             AutoCreationLogger::log_auto_creation_error(
                 &error,
                 "Table creation",
                 database::PluginType::PostgreSQL,
-                Some(&instance.database),
+                Some(instance.get_database().as_str()),
             )
             .await;
-            result.errors.push(error.to_string());
+            result.get_mut_errors().push(error.to_string());
         }
     }
     if let Err(error) = auto_creator.verify_connection().await {
@@ -171,16 +169,16 @@ pub async fn perform_postgresql_auto_creation(
             &error,
             "Connection verification",
             database::PluginType::PostgreSQL,
-            Some(&instance.database),
+            Some(instance.get_database().as_str()),
         )
         .await;
         if !error.should_continue() {
-            result.duration = start_time.elapsed();
+            result.set_duration(start_time.elapsed());
             return Err(error);
         }
-        result.errors.push(error.to_string());
+        result.get_mut_errors().push(error.to_string());
     }
-    result.duration = start_time.elapsed();
+    result.set_duration(start_time.elapsed());
     AutoCreationLogger::log_auto_creation_complete(database::PluginType::PostgreSQL, &result).await;
     Ok(result)
 }

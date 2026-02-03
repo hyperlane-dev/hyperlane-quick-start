@@ -1,116 +1,98 @@
 use super::*;
 
 impl MySqlInstanceConfig {
-    pub fn get_connection_url(&self) -> String {
+    pub(crate) fn get_connection_url(&self) -> String {
         format!(
             "mysql://{}:{}@{}:{}/{}",
-            self.username, self.password, self.host, self.port, self.database
+            self.get_username(),
+            self.get_password(),
+            self.get_host(),
+            self.get_port(),
+            self.get_database()
         )
     }
-
-    pub fn get_admin_url(&self) -> String {
+    pub(crate) fn get_admin_url(&self) -> String {
         format!(
             "mysql://{}:{}@{}:{}",
-            self.username, self.password, self.host, self.port
+            self.get_username(),
+            self.get_password(),
+            self.get_host(),
+            self.get_port()
         )
     }
 }
 
 impl PostgreSqlInstanceConfig {
-    pub fn get_connection_url(&self) -> String {
+    pub(crate) fn get_connection_url(&self) -> String {
         format!(
             "postgres://{}:{}@{}:{}/{}",
-            self.username, self.password, self.host, self.port, self.database
+            self.get_username(),
+            self.get_password(),
+            self.get_host(),
+            self.get_port(),
+            self.get_database()
         )
     }
-
-    pub fn get_admin_url(&self) -> String {
+    pub(crate) fn get_admin_url(&self) -> String {
         format!(
             "postgres://{}:{}@{}:{}/postgres",
-            self.username, self.password, self.host, self.port
+            self.get_username(),
+            self.get_password(),
+            self.get_host(),
+            self.get_port()
         )
     }
 }
 
 impl RedisInstanceConfig {
-    pub fn get_connection_url(&self) -> String {
-        if self.username.is_empty() {
-            format!("redis://:{}@{}:{}", self.password, self.host, self.port)
+    pub(crate) fn get_connection_url(&self) -> String {
+        let port: usize = self.get_port();
+        if self.get_username().is_empty() {
+            format!(
+                "redis://:{}@{}:{}",
+                self.get_password(),
+                self.get_host(),
+                port
+            )
         } else {
             format!(
                 "redis://{}:{}@{}:{}",
-                self.username, self.password, self.host, self.port
+                self.get_username(),
+                self.get_password(),
+                self.get_host(),
+                port
             )
         }
     }
 }
 
 impl EnvConfig {
-    pub fn get_mysql_instance(&self, name: &str) -> Option<&MySqlInstanceConfig> {
-        self.mysql_instances
+    pub(crate) fn get_mysql_instance(&self, name: &str) -> Option<&MySqlInstanceConfig> {
+        self.get_mysql_instances()
             .iter()
-            .find(|instance| instance.name == name)
+            .find(|instance| instance.get_name() == name)
     }
-
-    pub fn get_mysql_instance_mut(&mut self, name: &str) -> Option<&mut MySqlInstanceConfig> {
-        self.mysql_instances
-            .iter_mut()
-            .find(|instance| instance.name == name)
-    }
-
-    pub fn add_mysql_instance(&mut self, instance: MySqlInstanceConfig) {
-        self.mysql_instances.push(instance);
-    }
-
-    pub fn get_postgresql_instance(&self, name: &str) -> Option<&PostgreSqlInstanceConfig> {
-        self.postgresql_instances
+    pub(crate) fn get_postgresql_instance(&self, name: &str) -> Option<&PostgreSqlInstanceConfig> {
+        self.get_postgresql_instances()
             .iter()
-            .find(|instance| instance.name == name)
+            .find(|instance| instance.get_name() == name)
     }
-
-    pub fn get_postgresql_instance_mut(
-        &mut self,
-        name: &str,
-    ) -> Option<&mut PostgreSqlInstanceConfig> {
-        self.postgresql_instances
-            .iter_mut()
-            .find(|instance| instance.name == name)
+    pub(crate) fn get_default_mysql_instance(&self) -> Option<&MySqlInstanceConfig> {
+        self.get_mysql_instances().first()
     }
-
-    pub fn add_postgresql_instance(&mut self, instance: PostgreSqlInstanceConfig) {
-        self.postgresql_instances.push(instance);
+    pub(crate) fn get_default_postgresql_instance(&self) -> Option<&PostgreSqlInstanceConfig> {
+        self.get_postgresql_instances().first()
     }
-
-    pub fn get_default_mysql_instance(&self) -> Option<&MySqlInstanceConfig> {
-        self.mysql_instances.first()
-    }
-
-    pub fn get_default_postgresql_instance(&self) -> Option<&PostgreSqlInstanceConfig> {
-        self.postgresql_instances.first()
-    }
-
-    pub fn get_redis_instance(&self, name: &str) -> Option<&RedisInstanceConfig> {
-        self.redis_instances
+    pub(crate) fn get_redis_instance(&self, name: &str) -> Option<&RedisInstanceConfig> {
+        self.get_redis_instances()
             .iter()
-            .find(|instance| instance.name == name)
+            .find(|instance| instance.get_name() == name)
     }
-
-    pub fn get_redis_instance_mut(&mut self, name: &str) -> Option<&mut RedisInstanceConfig> {
-        self.redis_instances
-            .iter_mut()
-            .find(|instance| instance.name == name)
+    pub(crate) fn get_default_redis_instance(&self) -> Option<&RedisInstanceConfig> {
+        self.get_redis_instances().first()
     }
-
-    pub fn add_redis_instance(&mut self, instance: RedisInstanceConfig) {
-        self.redis_instances.push(instance);
-    }
-
-    pub fn get_default_redis_instance(&self) -> Option<&RedisInstanceConfig> {
-        self.redis_instances.first()
-    }
-
     #[instrument_trace]
-    pub fn load() -> Result<Self, String> {
+    pub(crate) fn load() -> Result<Self, String> {
         let docker_config: DockerComposeConfig =
             Self::load_from_docker_compose().unwrap_or_default();
         if read_from_file::<Vec<u8>>(ENV_FILE_PATH).is_err() {
@@ -135,23 +117,23 @@ impl EnvConfig {
             gpt_model: get_env(ENV_KEY_GPT_MODEL).unwrap_or_default(),
             ..Default::default()
         };
-        let default_mysql_host =
+        let default_mysql_host: String =
             get_env(ENV_KEY_MYSQL_HOST).unwrap_or_else(|| DEFAULT_DB_HOST.to_string());
-        let default_mysql_port = docker_config
-            .try_get_mysql_port()
+        let default_mysql_port: usize = docker_config
+            .get_mysql_port()
             .or_else(|| get_env_usize(ENV_KEY_MYSQL_PORT))
             .unwrap_or(DEFAULT_MYSQL_PORT);
-        let default_mysql_database = docker_config
+        let default_mysql_database: String = docker_config
             .try_get_mysql_database()
             .clone()
             .or_else(|| get_env(ENV_KEY_MYSQL_DATABASE))
             .unwrap_or_default();
-        let default_mysql_username = docker_config
+        let default_mysql_username: String = docker_config
             .try_get_mysql_username()
             .clone()
             .or_else(|| get_env(ENV_KEY_MYSQL_USERNAME))
             .unwrap_or_default();
-        let default_mysql_password = docker_config
+        let default_mysql_password: String = docker_config
             .try_get_mysql_password()
             .clone()
             .or_else(|| get_env(ENV_KEY_MYSQL_PASSWORD))
@@ -164,7 +146,7 @@ impl EnvConfig {
             username: default_mysql_username,
             password: default_mysql_password,
         };
-        config.mysql_instances.push(instance);
+        config.get_mut_mysql_instances().push(instance);
         let mut instance_index: usize = 1;
         loop {
             let prefix: String = format!("MYSQL_{instance_index}_");
@@ -183,7 +165,7 @@ impl EnvConfig {
                     username: get_env(&username_key).unwrap_or_default(),
                     password: get_env(&password_key).unwrap_or_default(),
                 };
-                config.mysql_instances.push(instance);
+                config.get_mut_mysql_instances().push(instance);
                 instance_index += 1;
             } else {
                 break;
@@ -192,20 +174,20 @@ impl EnvConfig {
         let default_postgres_host: String =
             get_env(ENV_KEY_POSTGRES_HOST).unwrap_or_else(|| DEFAULT_DB_HOST.to_string());
         let default_postgres_port: usize = docker_config
-            .try_get_postgresql_port()
+            .get_postgresql_port()
             .or_else(|| get_env_usize(ENV_KEY_POSTGRES_PORT))
             .unwrap_or(DEFAULT_POSTGRESQL_PORT);
-        let default_postgres_database = docker_config
+        let default_postgres_database: String = docker_config
             .try_get_postgresql_database()
             .clone()
             .or_else(|| get_env(ENV_KEY_POSTGRES_DATABASE))
             .unwrap_or_default();
-        let default_postgres_username = docker_config
+        let default_postgres_username: String = docker_config
             .try_get_postgresql_username()
             .clone()
             .or_else(|| get_env(ENV_KEY_POSTGRES_USERNAME))
             .unwrap_or_default();
-        let default_postgres_password = docker_config
+        let default_postgres_password: String = docker_config
             .try_get_postgresql_password()
             .clone()
             .or_else(|| get_env(ENV_KEY_POSTGRES_PASSWORD))
@@ -218,7 +200,7 @@ impl EnvConfig {
             username: default_postgres_username,
             password: default_postgres_password,
         };
-        config.postgresql_instances.push(instance);
+        config.get_mut_postgresql_instances().push(instance);
         let mut instance_index: usize = 1;
         loop {
             let prefix: String = format!("POSTGRES_{instance_index}_");
@@ -228,9 +210,8 @@ impl EnvConfig {
                 let database_key: String = format!("{prefix}DATABASE");
                 let username_key: String = format!("{prefix}USERNAME");
                 let password_key: String = format!("{prefix}PASSWORD");
-
                 let instance_name: String = format!("postgres_{instance_index}");
-                let instance = PostgreSqlInstanceConfig {
+                let instance: PostgreSqlInstanceConfig = PostgreSqlInstanceConfig {
                     name: instance_name,
                     host,
                     port: get_env_usize(&port_key).unwrap_or(DEFAULT_POSTGRESQL_PORT),
@@ -238,7 +219,7 @@ impl EnvConfig {
                     username: get_env(&username_key).unwrap_or_default(),
                     password: get_env(&password_key).unwrap_or_default(),
                 };
-                config.postgresql_instances.push(instance);
+                config.get_mut_postgresql_instances().push(instance);
                 instance_index += 1;
             } else {
                 break;
@@ -247,15 +228,15 @@ impl EnvConfig {
         let default_redis_host: String =
             get_env(ENV_KEY_REDIS_HOST).unwrap_or_else(|| DEFAULT_DB_HOST.to_string());
         let default_redis_port: usize = docker_config
-            .try_get_redis_port()
+            .get_redis_port()
             .or_else(|| get_env_usize(ENV_KEY_REDIS_PORT))
             .unwrap_or(DEFAULT_REDIS_PORT);
-        let default_redis_username = docker_config
+        let default_redis_username: String = docker_config
             .try_get_redis_username()
             .clone()
             .or_else(|| get_env(ENV_KEY_REDIS_USERNAME))
             .unwrap_or_default();
-        let default_redis_password = docker_config
+        let default_redis_password: String = docker_config
             .try_get_redis_password()
             .clone()
             .or_else(|| get_env(ENV_KEY_REDIS_PASSWORD))
@@ -267,7 +248,7 @@ impl EnvConfig {
             username: default_redis_username,
             password: default_redis_password,
         };
-        config.redis_instances.push(instance);
+        config.get_mut_redis_instances().push(instance);
         let mut instance_index: usize = 1;
         loop {
             let prefix: String = format!("REDIS_{instance_index}_");
@@ -284,7 +265,7 @@ impl EnvConfig {
                     username: get_env(&username_key).unwrap_or_default(),
                     password: get_env(&password_key).unwrap_or_default(),
                 };
-                config.redis_instances.push(instance);
+                config.get_mut_redis_instances().push(instance);
                 instance_index += 1;
             } else {
                 break;
@@ -292,7 +273,6 @@ impl EnvConfig {
         }
         Ok(config)
     }
-
     #[instrument_trace]
     fn load_from_docker_compose() -> Result<DockerComposeConfig, String> {
         let docker_compose_content: Vec<u8> = read_from_file(DOCKER_COMPOSE_FILE_PATH)

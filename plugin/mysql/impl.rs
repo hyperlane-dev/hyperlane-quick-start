@@ -18,7 +18,6 @@ impl MySqlAutoCreation {
     pub fn with_schema(instance: MySqlInstanceConfig, schema: DatabaseSchema) -> Self {
         Self { instance, schema }
     }
-
     #[instrument_trace]
     async fn create_admin_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
         let admin_url: String = self.instance.get_admin_url();
@@ -50,7 +49,6 @@ impl MySqlAutoCreation {
             }
         })
     }
-
     #[instrument_trace]
     async fn database_exists(
         &self,
@@ -58,7 +56,7 @@ impl MySqlAutoCreation {
     ) -> Result<bool, AutoCreationError> {
         let query: String = format!(
             "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '{}'",
-            self.instance.database
+            self.instance.get_database()
         );
         let statement: Statement = Statement::from_string(DatabaseBackend::MySql, query);
         match connection.query_all(statement).await {
@@ -68,7 +66,6 @@ impl MySqlAutoCreation {
             ))),
         }
     }
-
     #[instrument_trace]
     async fn create_database(
         &self,
@@ -76,7 +73,7 @@ impl MySqlAutoCreation {
     ) -> Result<bool, AutoCreationError> {
         if self.database_exists(connection).await? {
             AutoCreationLogger::log_database_exists(
-                &self.instance.database,
+                self.instance.get_database().as_str(),
                 database::PluginType::MySQL,
             )
             .await;
@@ -84,13 +81,13 @@ impl MySqlAutoCreation {
         }
         let create_query: String = format!(
             "CREATE DATABASE IF NOT EXISTS `{}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
-            self.instance.database
+            self.instance.get_database()
         );
         let statement: Statement = Statement::from_string(DatabaseBackend::MySql, create_query);
         match connection.execute(statement).await {
             Ok(_) => {
                 AutoCreationLogger::log_database_created(
-                    &self.instance.database,
+                    self.instance.get_database().as_str(),
                     database::PluginType::MySQL,
                 )
                 .await;
@@ -101,18 +98,19 @@ impl MySqlAutoCreation {
                 if error_msg.contains("Access denied") || error_msg.contains("permission") {
                     Err(AutoCreationError::InsufficientPermissions(format!(
                         "Cannot create MySQL database '{}'{COLON_SPACE}{}",
-                        self.instance.database, error_msg
+                        self.instance.get_database().as_str(),
+                        error_msg
                     )))
                 } else {
                     Err(AutoCreationError::DatabaseError(format!(
                         "Failed to create MySQL database '{}'{COLON_SPACE}{}",
-                        self.instance.database, error_msg
+                        self.instance.get_database().as_str(),
+                        error_msg
                     )))
                 }
             }
         }
     }
-
     #[instrument_trace]
     async fn create_target_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
         let db_url: String = self.instance.get_connection_url();
@@ -128,18 +126,18 @@ impl MySqlAutoCreation {
             Err(_) => {
                 return Err(AutoCreationError::Timeout(format!(
                     "MySQL database connection timeout after {timeout_seconds} seconds{COLON_SPACE}{}",
-                    self.instance.database
+                    self.instance.get_database()
                 )));
             }
         };
         connection_result.map_err(|error: DbErr| {
             AutoCreationError::ConnectionFailed(format!(
                 "Cannot connect to MySQL database '{}'{COLON_SPACE}{}",
-                self.instance.database, error
+                self.instance.get_database().as_str(),
+                error
             ))
         })
     }
-
     #[instrument_trace]
     async fn table_exists<T>(
         &self,
@@ -152,7 +150,7 @@ impl MySqlAutoCreation {
         let table_name_str: &str = table_name.as_ref();
         let query: String = format!(
             "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{}' AND TABLE_NAME = '{table_name_str}'",
-            self.instance.database
+            self.instance.get_database()
         );
         let statement: Statement = Statement::from_string(DatabaseBackend::MySql, query);
         match connection.query_all(statement).await {
@@ -162,7 +160,6 @@ impl MySqlAutoCreation {
             ))),
         }
     }
-
     #[instrument_trace]
     async fn create_table(
         &self,
@@ -170,7 +167,7 @@ impl MySqlAutoCreation {
         table: &database::TableSchema,
     ) -> Result<(), AutoCreationError> {
         let statement: Statement =
-            Statement::from_string(DatabaseBackend::MySql, table.sql.clone());
+            Statement::from_string(DatabaseBackend::MySql, table.get_sql().clone());
         match connection.execute(statement).await {
             Ok(_) => Ok(()),
             Err(error) => {
@@ -178,18 +175,19 @@ impl MySqlAutoCreation {
                 if error_msg.contains("Access denied") || error_msg.contains("permission") {
                     Err(AutoCreationError::InsufficientPermissions(format!(
                         "Cannot create MySQL table '{}'{COLON_SPACE}{}",
-                        table.name, error_msg
+                        table.get_name(),
+                        error_msg
                     )))
                 } else {
                     Err(AutoCreationError::SchemaError(format!(
                         "Failed to create MySQL table '{}'{COLON_SPACE}{}",
-                        table.name, error_msg
+                        table.get_name(),
+                        error_msg
                     )))
                 }
             }
         }
     }
-
     #[instrument_trace]
     async fn execute_sql<S>(
         &self,
@@ -207,7 +205,6 @@ impl MySqlAutoCreation {
             ))),
         }
     }
-
     #[instrument_trace]
     fn get_database_schema(&self) -> &DatabaseSchema {
         &self.schema
@@ -222,49 +219,48 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
         let _: Result<(), DbErr> = admin_connection.close().await;
         result
     }
-
     #[instrument_trace]
     async fn create_tables_if_not_exist(&self) -> Result<Vec<String>, AutoCreationError> {
         let connection: DatabaseConnection = self.create_target_connection().await?;
         let schema: &DatabaseSchema = self.get_database_schema();
         let mut created_tables: Vec<String> = Vec::new();
         for table in schema.ordered_tables() {
-            if !self.table_exists(&connection, &table.name).await? {
+            if !self.table_exists(&connection, table.get_name()).await? {
                 self.create_table(&connection, table).await?;
-                created_tables.push(table.name.clone());
+                created_tables.push(table.get_name().clone());
                 AutoCreationLogger::log_table_created(
-                    &table.name,
-                    &self.instance.database,
+                    table.get_name(),
+                    self.instance.get_database().as_str(),
                     database::PluginType::MySQL,
                 )
                 .await;
             } else {
                 AutoCreationLogger::log_table_exists(
-                    &table.name,
-                    &self.instance.database,
+                    table.get_name(),
+                    self.instance.get_database().as_str(),
                     database::PluginType::MySQL,
                 )
                 .await;
             }
         }
-        for index_sql in &schema.indexes {
+        for index_sql in schema.get_indexes() {
             if let Err(error) = self.execute_sql(&connection, index_sql).await {
                 AutoCreationLogger::log_auto_creation_error(
                     &error,
                     "Index creation",
                     database::PluginType::MySQL,
-                    Some(&self.instance.database),
+                    Some(self.instance.get_database().as_str()),
                 )
                 .await;
             }
         }
-        for constraint_sql in &schema.constraints {
+        for constraint_sql in schema.get_constraints() {
             if let Err(error) = self.execute_sql(&connection, constraint_sql).await {
                 AutoCreationLogger::log_auto_creation_error(
                     &error,
                     "Constraint creation",
                     database::PluginType::MySQL,
-                    Some(&self.instance.database),
+                    Some(self.instance.get_database().as_str()),
                 )
                 .await;
             }
@@ -272,13 +268,12 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
         let _: Result<(), DbErr> = connection.close().await;
         AutoCreationLogger::log_tables_created(
             &created_tables,
-            &self.instance.database,
+            self.instance.get_database().as_str(),
             database::PluginType::MySQL,
         )
         .await;
         Ok(created_tables)
     }
-
     #[instrument_trace]
     async fn verify_connection(&self) -> Result<(), AutoCreationError> {
         let db_url: String = self.instance.get_connection_url();
@@ -305,7 +300,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                 let _: Result<(), DbErr> = connection.close().await;
                 AutoCreationLogger::log_connection_verification(
                     database::PluginType::MySQL,
-                    &self.instance.database,
+                    self.instance.get_database().as_str(),
                     true,
                     None,
                 )
@@ -317,7 +312,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                 let error_msg: String = error.to_string();
                 AutoCreationLogger::log_connection_verification(
                     database::PluginType::MySQL,
-                    &self.instance.database,
+                    self.instance.get_database().as_str(),
                     false,
                     Some(&error_msg),
                 )

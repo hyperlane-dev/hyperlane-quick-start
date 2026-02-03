@@ -39,6 +39,7 @@ impl ServerHook for ResponseHeaderMiddleware {
     #[response_header(DATE => gmt())]
     #[response_header(SERVER => HYPERLANE)]
     #[response_header(CONNECTION => KEEP_ALIVE)]
+    #[response_header(TRACE => uuid::Uuid::new_v4().to_string())]
     #[epilogue_macros(
         response_header(CONTENT_TYPE => content_type),
         response_header("SocketAddr" => socket_addr_string)
