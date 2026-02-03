@@ -1881,8 +1881,13 @@ jobs:
           for (const job of currentRunDetail.jobs) {
             for (const step of job.steps) {
               const offset = stepOutputOffsets.get(`stdout_${step.id}`) || 0;
-              const stderrOffset = stepOutputOffsets.get(`stderr_${step.id}`) || 0;
-              offsets.push({ step_id: step.id, offset, stderr_offset: stderrOffset });
+              const stderrOffset =
+                stepOutputOffsets.get(`stderr_${step.id}`) || 0;
+              offsets.push({
+                step_id: step.id,
+                offset,
+                stderr_offset: stderrOffset,
+              });
             }
           }
         }
@@ -1956,6 +1961,15 @@ jobs:
           `step-log-content-${stepId}`,
         );
         if (!logContent) return;
+
+        const step = findStepById(stepId);
+        if (step) {
+          if (isStderr) {
+            step.stderr_output = (step.stderr_output || '') + content;
+          } else {
+            step.output = (step.output || '') + content;
+          }
+        }
 
         if (!expandedSteps.has(stepId)) {
           expandedSteps.add(stepId);

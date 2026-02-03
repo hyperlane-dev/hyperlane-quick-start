@@ -587,6 +587,7 @@ impl CicdService {
                 );
             }
         };
+        let mut output_builder: StepOutputBuilder = StepOutputBuilder::new();
         let build_stdout: String = String::from_utf8_lossy(&build_output.stdout).to_string();
         let build_stderr: String = String::from_utf8_lossy(&build_output.stderr).to_string();
         log_manager
@@ -595,6 +596,8 @@ impl CicdService {
         log_manager
             .append_log(run_id, step_id, &build_stderr, true)
             .await;
+        output_builder.add_stdout(build_stdout.clone());
+        output_builder.add_stderr(build_stderr.clone());
         if !build_output.status.success() {
             let _ = fs::remove_dir_all(&temp_dir).await;
             let _: Result<Output, std::io::Error> = Command::new("docker")
@@ -659,7 +662,10 @@ impl CicdService {
             .output()
             .await;
         match output_result {
-            Ok(run_output) => run_output,
+            Ok(run_output) => {
+                output_builder.add_stdout(run_output);
+                output_builder.build()
+            }
             Err(error) => format!("Error: {error}"),
         }
     }
@@ -1224,7 +1230,7 @@ impl LogStreamManager {
         let _receiver: BroadcastMapReceiver<String> = self
             .broadcast_map
             .subscribe_or_insert(key, DEFAULT_BROADCAST_SENDER_CAPACITY);
-        let mut outputs = self.step_outputs.write().await;
+        let mut outputs = self.get_step_outputs().write().await;
         outputs.insert(
             step_id,
             StepOutput {
@@ -1232,10 +1238,13 @@ impl LogStreamManager {
                 stderr: Arc::new(RwLock::new(String::new())),
             },
         );
-        let mut statuses = self.step_statuses.write().await;
-        statuses.insert(step_id, Arc::new(RwLock::new(CicdStatus::Running)));
-        let mut active = self.active_steps.write().await;
-        active
+        self.step_statuses
+            .write()
+            .await
+            .insert(step_id, Arc::new(RwLock::new(CicdStatus::Running)));
+        self.get_active_steps()
+            .write()
+            .await
             .entry(run_id)
             .or_insert_with(HashSet::new)
             .insert(step_id);
@@ -1252,12 +1261,12 @@ impl LogStreamManager {
         };
         let entry_json: String = serde_json::to_string(&entry).unwrap_or_default();
         let _ = self.broadcast_map.send(key, entry_json);
-        if let Some(output) = self.step_outputs.read().await.get(&step_id) {
+        if let Some(output) = self.get_step_outputs().read().await.get(&step_id) {
             if is_stderr {
-                let mut stderr_guard = output.stderr.write().await;
+                let mut stderr_guard: RwLockWriteGuard<'_, String> = output.stderr.write().await;
                 stderr_guard.push_str(content);
             } else {
-                let mut stdout_guard = output.stdout.write().await;
+                let mut stdout_guard: RwLockWriteGuard<'_, String> = output.stdout.write().await;
                 stdout_guard.push_str(content);
             }
         }
@@ -1283,44 +1292,57 @@ impl LogStreamManager {
 
     #[instrument_trace]
     pub async fn get_step_output(&self, _run_id: i32, step_id: i32) -> Option<String> {
-        self.step_outputs.read().await.get(&step_id).map(|output| {
-            let stdout_guard: RwLockReadGuard<'_, String> = output.stdout.blocking_read();
-            let stderr_guard: RwLockReadGuard<'_, String> = output.stderr.blocking_read();
-            let mut result: String = String::new();
-            if !stdout_guard.is_empty() {
-                result.push_str("[Stdout]\n");
-                result.push_str(&stdout_guard);
+        let step_outputs: RwLockReadGuard<'_, HashMap<i32, StepOutput>> =
+            self.get_step_outputs().read().await;
+        let output: &StepOutput = step_outputs.get(&step_id)?;
+        let stdout_guard: RwLockReadGuard<'_, String> = output.get_stdout().read().await;
+        let stderr_guard: RwLockReadGuard<'_, String> = output.stderr.read().await;
+        let mut result: String = String::new();
+        if !stdout_guard.is_empty() {
+            result.push_str("[Stdout]\n");
+            result.push_str(&stdout_guard);
+        }
+        if !stderr_guard.is_empty() {
+            if !result.is_empty() {
+                result.push('\n');
             }
-            if !stderr_guard.is_empty() {
-                if !result.is_empty() {
-                    result.push('\n');
-                }
-                result.push_str("[Stderr]\n");
-                result.push_str(&stderr_guard);
-            }
-            result
-        })
+            result.push_str("[Stderr]\n");
+            result.push_str(&stderr_guard);
+        }
+        Some(result)
     }
 
     #[instrument_trace]
     pub async fn get_step_stdout(&self, _run_id: i32, step_id: i32) -> Option<String> {
-        self.step_outputs.read().await.get(&step_id).map(|output| {
-            let stdout_guard: RwLockReadGuard<'_, String> = output.stdout.blocking_read();
-            stdout_guard.clone()
-        })
+        Some(
+            self.get_step_outputs()
+                .read()
+                .await
+                .get(&step_id)?
+                .stdout
+                .read()
+                .await
+                .clone(),
+        )
     }
 
     #[instrument_trace]
     pub async fn get_step_stderr(&self, _run_id: i32, step_id: i32) -> Option<String> {
-        self.step_outputs.read().await.get(&step_id).map(|output| {
-            let stderr_guard: RwLockReadGuard<'_, String> = output.stderr.blocking_read();
-            stderr_guard.clone()
-        })
+        Some(
+            self.get_step_outputs()
+                .read()
+                .await
+                .get(&step_id)?
+                .stderr
+                .read()
+                .await
+                .clone(),
+        )
     }
 
     #[instrument_trace]
     pub async fn get_run_step_ids(&self, run_id: i32) -> Vec<i32> {
-        self.active_steps
+        self.get_active_steps()
             .read()
             .await
             .get(&run_id)
@@ -1330,14 +1352,14 @@ impl LogStreamManager {
 
     #[instrument_trace]
     pub async fn end_step_stream(&self, run_id: i32, step_id: i32) {
-        if let Some(steps) = self.active_steps.write().await.get_mut(&run_id) {
+        if let Some(steps) = self.get_active_steps().write().await.get_mut(&run_id) {
             steps.remove(&step_id);
         }
     }
 
     #[instrument_trace]
     pub async fn end_run_streams(&self, run_id: i32) {
-        self.active_steps.write().await.remove(&run_id);
+        self.get_active_steps().write().await.remove(&run_id);
     }
 }
 
