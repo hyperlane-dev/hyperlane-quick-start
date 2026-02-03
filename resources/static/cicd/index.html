@@ -1797,11 +1797,14 @@ jobs:
             if (currentRunDetail.jobs) {
               for (const job of currentRunDetail.jobs) {
                 for (const step of job.steps) {
-                  if (step.output) {
-                    stepOutputOffsets.set(step.id, step.output.length);
-                  } else {
-                    stepOutputOffsets.set(step.id, 0);
-                  }
+                  stepOutputOffsets.set(
+                    `stdout_${step.id}`,
+                    step.output ? step.output.length : 0,
+                  );
+                  stepOutputOffsets.set(
+                    `stderr_${step.id}`,
+                    step.stderr_output ? step.stderr_output.length : 0,
+                  );
                 }
               }
             }
@@ -1957,11 +1960,6 @@ jobs:
       }
 
       function appendStepLog(stepId, content, isStderr = false) {
-        const logContent = document.getElementById(
-          `step-log-content-${stepId}`,
-        );
-        if (!logContent) return;
-
         const step = findStepById(stepId);
         if (step) {
           if (isStderr) {
@@ -1971,15 +1969,13 @@ jobs:
           }
         }
 
+        const logContent = document.getElementById(
+          `step-log-content-${stepId}`,
+        );
+        if (!logContent) return;
+
         if (!expandedSteps.has(stepId)) {
-          expandedSteps.add(stepId);
-          logContent.classList.remove('collapsed');
-          const toggleIcon = document.querySelector(
-            `#step-log-${stepId} .step-log-toggle-icon`,
-          );
-          if (toggleIcon) {
-            toggleIcon.classList.remove('collapsed');
-          }
+          return;
         }
 
         const lines = content.split('\n');
@@ -1990,8 +1986,7 @@ jobs:
         for (const line of lines) {
           if (line.trim()) {
             const coloredLine = colorizeLogLine(line);
-            const lineClass = isStderr ? 'log-error' : '';
-            html += `<div class="log-line ${lineClass}"><span class="log-timestamp">${timestampStr}</span>${coloredLine}</div>`;
+            html += `<div class="log-line"><span class="log-timestamp">${timestampStr}</span>${coloredLine}</div>`;
           }
         }
 
@@ -2095,13 +2090,16 @@ jobs:
 
               const logContent = stepEl.querySelector('.step-log-content');
               if (logContent && expandedSteps.has(s.id)) {
-                const currentOffset = stepOutputOffsets.get(s.id) || 0;
+                const stdoutOffsetKey = `stdout_${s.id}`;
+                const currentOffset =
+                  stepOutputOffsets.get(stdoutOffsetKey) || 0;
                 const serverOutputLength = s.output ? s.output.length : 0;
-                if (currentOffset <= serverOutputLength) {
+                if (currentOffset < serverOutputLength) {
                   logContent.innerHTML = formatLogOutput(
                     s.output,
                     s.started_at,
                   );
+                  stepOutputOffsets.set(stdoutOffsetKey, serverOutputLength);
                 }
               }
             }
