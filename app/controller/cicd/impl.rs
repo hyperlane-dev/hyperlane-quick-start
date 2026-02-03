@@ -435,22 +435,26 @@ impl ServerHook for RunLogsSseRoute {
         };
         ctx.send().await;
         let log_manager: &LogStreamManager = get_log_stream_manager();
-        let step_ids: Vec<i32> = log_manager.get_run_step_ids(run_id).await;
+        let mut step_ids: Vec<i32> = log_manager.get_run_step_ids(run_id).await;
         if step_ids.is_empty() {
-            let completion_event: String = format!(
-                "event: complete\ndata: {{\"run_id\":{run_id},\"reason\":\"no_active_streams\"}}{HTTP_DOUBLE_BR}"
-            );
-            ctx.set_response_body(&completion_event)
-                .await
-                .send_body()
-                .await;
-            ctx.closed().await;
-            return;
+            sleep(Duration::from_millis(500)).await;
+            step_ids = log_manager.get_run_step_ids(run_id).await;
+            if step_ids.is_empty() {
+                let completion_event: String = format!(
+                    "event: complete\ndata: {{\"run_id\":{run_id},\"reason\":\"no_active_streams\"}}{HTTP_DOUBLE_BR}"
+                );
+                ctx.set_response_body(&completion_event)
+                    .await
+                    .send_body()
+                    .await;
+                ctx.closed().await;
+                return;
+            }
         }
-        let mut receivers: Vec<Receiver<LogEntry>> = Vec::new();
+        let mut receivers: Vec<(i32, BroadcastMapReceiver<String>)> = Vec::new();
         for step_id in &step_ids {
-            if let Some(receiver) = log_manager.subscribe_to_step(run_id, *step_id).await {
-                receivers.push(receiver);
+            if let Some(receiver) = log_manager.create_step_receiver(run_id, *step_id).await {
+                receivers.push((*step_id, receiver));
             }
         }
         if receivers.is_empty() {
@@ -464,7 +468,6 @@ impl ServerHook for RunLogsSseRoute {
             ctx.closed().await;
             return;
         }
-        let mut interval_timer: Interval = interval(Duration::from_millis(100));
         let timeout_duration: Duration = Duration::from_secs(3600);
         let start_time: Instant = Instant::now();
         loop {
@@ -479,31 +482,19 @@ impl ServerHook for RunLogsSseRoute {
                 break;
             }
             let mut has_activity: bool = false;
-            for (idx, receiver) in receivers.iter_mut().enumerate() {
-                let step_id: i32 = step_ids[idx];
-                match receiver.try_recv() {
-                    Ok(log_entry) => {
+            for (step_id, receiver) in receivers.iter_mut() {
+                while let Ok(entry_json) = receiver.try_recv() {
+                    if let Ok(entry) = serde_json::from_str::<LogEntry>(&entry_json) {
                         has_activity = true;
                         let log_event: String = format!(
                             "event: log\ndata: {{\"step_id\":{},\"timestamp\":{},\"is_stderr\":{},\"content\":\"{}\"}}{}",
                             step_id,
-                            log_entry.get_timestamp(),
-                            log_entry.get_is_stderr(),
-                            Self::escape_json_string(log_entry.get_content()),
+                            entry.get_timestamp(),
+                            entry.get_is_stderr(),
+                            Self::escape_json_string(entry.get_content()),
                             HTTP_DOUBLE_BR
                         );
                         ctx.set_response_body(&log_event).await.send_body().await;
-                    }
-                    Err(TryRecvError::Empty) => {}
-                    Err(TryRecvError::Lagged(_)) => {
-                        has_activity = true;
-                        let lag_event: String = format!(
-                            "event: notice\ndata: {{\"step_id\":{step_id},\"message\":\"log_buffer_lagged\"}}{HTTP_DOUBLE_BR}"
-                        );
-                        ctx.set_response_body(&lag_event).await.send_body().await;
-                    }
-                    Err(TryRecvError::Closed) => {
-                        continue;
                     }
                 }
             }
@@ -520,13 +511,15 @@ impl ServerHook for RunLogsSseRoute {
             }
             for step_id in &current_step_ids {
                 if !step_ids.contains(step_id) {
-                    if let Some(receiver) = log_manager.subscribe_to_step(run_id, *step_id).await {
-                        receivers.push(receiver);
+                    if let Some(receiver) = log_manager.create_step_receiver(run_id, *step_id).await
+                    {
+                        receivers.push((*step_id, receiver));
+                        step_ids.push(*step_id);
                     }
                 }
             }
             if !has_activity {
-                interval_timer.tick().await;
+                sleep(Duration::from_millis(10)).await;
             }
         }
         ctx.closed().await;

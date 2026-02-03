@@ -15,7 +15,7 @@ pub(super) struct StepOutputBuilder {
     pub(super) timeout_secs: u64,
 }
 
-#[derive(Clone, Data, Debug)]
+#[derive(Clone, Data, Debug, Serialize, Deserialize)]
 pub struct LogEntry {
     #[get(type(copy), pub(crate))]
     pub(super) step_id: i32,
@@ -30,8 +30,6 @@ pub struct LogEntry {
 #[derive(Clone, Data, Debug)]
 pub struct StepStream {
     #[get(pub(crate))]
-    pub(super) sender: broadcast::Sender<LogEntry>,
-    #[get(pub(crate))]
     pub(super) output: Arc<RwLock<String>>,
     #[get(pub(crate))]
     pub(super) status: Arc<RwLock<CicdStatus>>,
@@ -40,5 +38,11 @@ pub struct StepStream {
 #[derive(Clone, Data, Debug)]
 pub struct LogStreamManager {
     #[get(pub(crate))]
-    pub(super) streams: Arc<RwLock<HashMap<i32, HashMap<i32, StepStream>>>>,
+    pub(super) broadcast_map: Arc<BroadcastMap<String>>,
+    #[get(pub(crate))]
+    pub(super) step_outputs: Arc<RwLock<HashMap<i32, Arc<RwLock<String>>>>>,
+    #[get(pub(crate))]
+    pub(super) step_statuses: Arc<RwLock<HashMap<i32, Arc<RwLock<CicdStatus>>>>>,
+    #[get(pub(crate))]
+    pub(super) active_steps: Arc<RwLock<HashMap<i32, HashSet<i32>>>>,
 }

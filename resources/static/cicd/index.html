@@ -1821,17 +1821,15 @@ jobs:
         if (typeof EventSource !== 'undefined') {
           startLogEventSource(runId);
         } else {
-          startLegacyPolling(runId);
+          detailPollingInterval = setInterval(async () => {
+            if (!currentRunDetail) return;
+            try {
+              await pollIncrementalDetail(runId);
+            } catch (error) {
+              console.error('Error polling run detail:', error);
+            }
+          }, 2000);
         }
-
-        detailPollingInterval = setInterval(async () => {
-          if (!currentRunDetail) return;
-          try {
-            await pollIncrementalDetail(runId);
-          } catch (error) {
-            console.error('Error polling run detail:', error);
-          }
-        }, 2000);
       }
 
       function startLogEventSource(runId) {
@@ -1969,6 +1967,9 @@ jobs:
         }
 
         if (html) {
+          if (logContent.innerHTML.includes('No output available')) {
+            logContent.innerHTML = '';
+          }
           logContent.insertAdjacentHTML('beforeend', html);
           logContent.scrollTop = logContent.scrollHeight;
         }
@@ -2065,7 +2066,14 @@ jobs:
 
               const logContent = stepEl.querySelector('.step-log-content');
               if (logContent && expandedSteps.has(s.id)) {
-                logContent.innerHTML = formatLogOutput(s.output, s.started_at);
+                const currentOffset = stepOutputOffsets.get(s.id) || 0;
+                const serverOutputLength = s.output ? s.output.length : 0;
+                if (currentOffset <= serverOutputLength) {
+                  logContent.innerHTML = formatLogOutput(
+                    s.output,
+                    s.started_at,
+                  );
+                }
               }
             }
           });

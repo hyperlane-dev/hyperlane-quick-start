@@ -13,7 +13,4 @@ use {
     service::cicd::*,
 };
 
-use tokio::{
-    sync::broadcast::{Receiver, error::TryRecvError},
-    time::{Duration, Instant, Interval, interval},
-};
+use tokio::time::{Duration, Instant, sleep};

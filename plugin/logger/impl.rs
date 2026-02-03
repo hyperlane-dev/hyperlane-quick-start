@@ -98,6 +98,7 @@ impl Logger {
         Self::read().trace(data, log_handler);
     }
 
+    #[instrument_trace]
     pub fn log_debug<T>(data: T)
     where
         T: AsRef<str>,
@@ -105,6 +106,7 @@ impl Logger {
         Self::read().debug(data, log_handler);
     }
 
+    #[instrument_trace]
     pub fn log_info<T>(data: T)
     where
         T: AsRef<str>,
@@ -112,6 +114,7 @@ impl Logger {
         Self::read().info(data, log_handler);
     }
 
+    #[instrument_trace]
     pub fn log_warn<T>(data: T)
     where
         T: AsRef<str>,
@@ -119,6 +122,7 @@ impl Logger {
         Self::read().warn(data, log_handler);
     }
 
+    #[instrument_trace]
     pub fn log_error<T>(data: T)
     where
         T: AsRef<str>,

@@ -89,10 +89,12 @@ impl CicdStatus {
         )
     }
 
+    #[instrument_trace]
     pub fn is_active(self) -> bool {
         self == CicdStatus::Running
     }
 
+    #[instrument_trace]
     pub fn is_pending(self) -> bool {
         self == CicdStatus::Pending
     }

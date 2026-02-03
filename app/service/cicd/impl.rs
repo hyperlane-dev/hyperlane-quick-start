@@ -2,7 +2,7 @@ use super::*;
 
 impl From<Model> for PipelineDto {
     fn from(model: Model) -> Self {
-        let mut dto = Self::default();
+        let mut dto: PipelineDto = Self::default();
         dto.set_id(model.get_id())
             .set_name(model.get_name().clone())
             .set_description(model.try_get_description().clone())
@@ -16,7 +16,7 @@ impl From<Model> for PipelineDto {
 impl From<mapper::cicd::run::Model> for RunDto {
     fn from(model: mapper::cicd::run::Model) -> Self {
         let status: CicdStatus = model.get_status().parse().unwrap_or_default();
-        let mut dto = Self::default();
+        let mut dto: RunDto = Self::default();
         dto.set_id(model.get_id())
             .set_pipeline_id(model.get_pipeline_id())
             .set_pipeline_name(None)
@@ -36,7 +36,7 @@ impl From<mapper::cicd::run::Model> for RunDto {
 impl From<mapper::cicd::job::Model> for JobDto {
     fn from(model: mapper::cicd::job::Model) -> Self {
         let status: CicdStatus = model.get_status().parse().unwrap_or_default();
-        let mut dto = Self::default();
+        let mut dto: JobDto = Self::default();
         dto.set_id(model.get_id())
             .set_run_id(model.get_run_id())
             .set_name(model.get_name().clone())
@@ -52,7 +52,7 @@ impl From<mapper::cicd::job::Model> for JobDto {
 impl From<mapper::cicd::step::Model> for StepDto {
     fn from(model: mapper::cicd::step::Model) -> Self {
         let status: CicdStatus = model.get_status().parse().unwrap_or_default();
-        let mut dto = Self::default();
+        let mut dto: StepDto = Self::default();
         dto.set_id(model.get_id())
             .set_job_id(model.get_job_id())
             .set_name(model.get_name().clone())
@@ -214,7 +214,7 @@ impl CicdService {
         let mut has_error: bool = false;
         for job in jobs {
             let job_id: i32 = job.get_id();
-            let mut param = UpdateJobStatusParam::default();
+            let mut param: UpdateJobStatusParam = UpdateJobStatusParam::default();
             param
                 .set_job_id(job_id)
                 .set_status(CicdStatus::Running)
@@ -224,14 +224,14 @@ impl CicdService {
             let mut job_has_error: bool = false;
             for step in steps {
                 let step_id: i32 = step.get_id();
-                let mut param = UpdateStepStatusParam::default();
+                let log_manager: &LogStreamManager = get_log_stream_manager();
+                log_manager.start_step_stream(run_id, step_id).await;
+                let mut param: UpdateStepStatusParam = UpdateStepStatusParam::default();
                 param
                     .set_step_id(step_id)
                     .set_status(CicdStatus::Running)
                     .set_output(None);
                 Self::update_step_status(param).await?;
-                let log_manager: &LogStreamManager = get_log_stream_manager();
-                log_manager.start_step_stream(run_id, step_id).await;
                 let output: String =
                     if step.try_get_image().is_some() && step.try_get_dockerfile().is_none() {
                         Self::execute_image(run_id, &step).await
@@ -252,7 +252,7 @@ impl CicdService {
                     .update_step_status(run_id, step_id, step_status)
                     .await;
                 log_manager.end_step_stream(run_id, step_id).await;
-                let mut param = UpdateStepStatusParam::default();
+                let mut param: UpdateStepStatusParam = UpdateStepStatusParam::default();
                 param
                     .set_step_id(step_id)
                     .set_status(step_status)
@@ -267,7 +267,7 @@ impl CicdService {
             } else {
                 CicdStatus::Success
             };
-            let mut param = UpdateJobStatusParam::default();
+            let mut param: UpdateJobStatusParam = UpdateJobStatusParam::default();
             param
                 .set_job_id(job_id)
                 .set_status(job_status)
@@ -950,9 +950,9 @@ impl CicdService {
 
     #[instrument_trace]
     pub async fn get_run_detail(run_id: i32) -> Result<Option<RunDetailDto>, String> {
-        let run = Self::get_run_by_id(run_id).await?;
+        let run: Option<RunDto> = Self::get_run_by_id(run_id).await?;
         if let Some(run_dto) = run {
-            let jobs = Self::get_jobs_by_run(run_id).await?;
+            let jobs: Vec<JobDto> = Self::get_jobs_by_run(run_id).await?;
             let mut jobs_with_steps: Vec<JobWithStepsDto> = Vec::new();
             for job in jobs {
                 let steps = Self::get_steps_by_job(job.get_id()).await?;
@@ -1170,117 +1170,106 @@ impl StepOutputBuilder {
 }
 
 impl LogStreamManager {
+    #[instrument_trace]
     pub fn new() -> Self {
         Self {
-            streams: Arc::new(RwLock::new(HashMap::new())),
+            broadcast_map: Arc::new(BroadcastMap::new()),
+            step_outputs: Arc::new(RwLock::new(HashMap::new())),
+            step_statuses: Arc::new(RwLock::new(HashMap::new())),
+            active_steps: Arc::new(RwLock::new(HashMap::new())),
         }
     }
 
-    pub async fn start_step_stream(
-        &self,
-        run_id: i32,
-        step_id: i32,
-    ) -> broadcast::Sender<LogEntry> {
-        let mut streams: RwLockWriteGuard<'_, HashMap<i32, HashMap<i32, StepStream>>> =
-            self.streams.write().await;
-        let run_streams: &mut HashMap<i32, StepStream> = streams.entry(run_id).or_default();
-        let (sender, _): (broadcast::Sender<LogEntry>, broadcast::Receiver<LogEntry>) =
-            broadcast::channel(1000);
-        let step_stream: StepStream = StepStream {
-            sender: sender.clone(),
-            output: Arc::new(RwLock::new(String::new())),
-            status: Arc::new(RwLock::new(CicdStatus::Running)),
-        };
-        run_streams.insert(step_id, step_stream);
-        sender
+    #[instrument_trace]
+    fn get_step_key(run_id: i32, step_id: i32) -> String {
+        format!("{run_id}:{step_id}")
     }
 
+    #[instrument_trace]
+    pub async fn start_step_stream(&self, run_id: i32, step_id: i32) {
+        let key: String = Self::get_step_key(run_id, step_id);
+        let _receiver: BroadcastMapReceiver<String> = self
+            .broadcast_map
+            .subscribe_or_insert(key, DEFAULT_BROADCAST_SENDER_CAPACITY);
+        let mut outputs = self.step_outputs.write().await;
+        outputs.insert(step_id, Arc::new(RwLock::new(String::new())));
+        let mut statuses = self.step_statuses.write().await;
+        statuses.insert(step_id, Arc::new(RwLock::new(CicdStatus::Running)));
+        let mut active = self.active_steps.write().await;
+        active
+            .entry(run_id)
+            .or_insert_with(HashSet::new)
+            .insert(step_id);
+    }
+
+    #[instrument_trace]
     pub async fn append_log(&self, run_id: i32, step_id: i32, content: &str, is_stderr: bool) {
-        let streams: RwLockReadGuard<'_, HashMap<i32, HashMap<i32, StepStream>>> =
-            self.streams.read().await;
-        let run_streams: &HashMap<i32, StepStream> = match streams.get(&run_id) {
-            Some(s) => s,
-            None => return,
-        };
-        let stream: &StepStream = match run_streams.get(&step_id) {
-            Some(s) => s,
-            None => return,
-        };
+        let key: String = Self::get_step_key(run_id, step_id);
         let entry: LogEntry = LogEntry {
             step_id,
             content: content.to_string(),
             timestamp: chrono::Utc::now().timestamp_millis(),
             is_stderr,
         };
-        let _ = stream.sender.send(entry);
-        let mut output: RwLockWriteGuard<'_, String> = stream.output.write().await;
-        output.push_str(content);
+        let entry_json: String = serde_json::to_string(&entry).unwrap_or_default();
+        let _ = self.broadcast_map.send(key, entry_json);
+        if let Some(output) = self.step_outputs.read().await.get(&step_id) {
+            let mut output_guard = output.write().await;
+            output_guard.push_str(content);
+        }
     }
 
-    pub async fn update_step_status(&self, run_id: i32, step_id: i32, status: CicdStatus) {
-        let streams: RwLockReadGuard<'_, HashMap<i32, HashMap<i32, StepStream>>> =
-            self.streams.read().await;
-        let run_streams: &HashMap<i32, StepStream> = match streams.get(&run_id) {
-            Some(s) => s,
-            None => return,
-        };
-        let stream: &StepStream = match run_streams.get(&step_id) {
-            Some(s) => s,
-            None => return,
-        };
-        let mut step_status: RwLockWriteGuard<'_, CicdStatus> = stream.status.write().await;
-        *step_status = status;
-    }
-
-    pub async fn get_step_output(&self, run_id: i32, step_id: i32) -> Option<String> {
-        let streams: RwLockReadGuard<'_, HashMap<i32, HashMap<i32, StepStream>>> =
-            self.streams.read().await;
-        let run_streams: &HashMap<i32, StepStream> = streams.get(&run_id)?;
-        let stream: &StepStream = run_streams.get(&step_id)?;
-        let output: RwLockReadGuard<'_, String> = stream.output.read().await;
-        Some(output.clone())
-    }
-
-    pub async fn subscribe_to_step(
+    #[instrument_trace]
+    pub async fn create_step_receiver(
         &self,
         run_id: i32,
         step_id: i32,
-    ) -> Option<broadcast::Receiver<LogEntry>> {
-        let streams: RwLockReadGuard<'_, HashMap<i32, HashMap<i32, StepStream>>> =
-            self.streams.read().await;
-        let run_streams: &HashMap<i32, StepStream> = streams.get(&run_id)?;
-        let stream: &StepStream = run_streams.get(&step_id)?;
-        Some(stream.sender.subscribe())
+    ) -> Option<BroadcastMapReceiver<String>> {
+        let key: String = Self::get_step_key(run_id, step_id);
+        self.broadcast_map.subscribe(key)
     }
 
+    #[instrument_trace]
+    pub async fn update_step_status(&self, _run_id: i32, step_id: i32, status: CicdStatus) {
+        if let Some(step_status) = self.step_statuses.read().await.get(&step_id) {
+            let mut status_guard: RwLockWriteGuard<'_, CicdStatus> = step_status.write().await;
+            *status_guard = status;
+        }
+    }
+
+    #[instrument_trace]
+    pub async fn get_step_output(&self, _run_id: i32, step_id: i32) -> Option<String> {
+        self.step_outputs.read().await.get(&step_id).map(|output| {
+            let output_guard: RwLockReadGuard<'_, String> = output.blocking_read();
+            output_guard.clone()
+        })
+    }
+
+    #[instrument_trace]
     pub async fn get_run_step_ids(&self, run_id: i32) -> Vec<i32> {
-        let streams: RwLockReadGuard<'_, HashMap<i32, HashMap<i32, StepStream>>> =
-            self.streams.read().await;
-        match streams.get(&run_id) {
-            Some(run_streams) => run_streams.keys().copied().collect(),
-            None => Vec::new(),
-        }
+        self.active_steps
+            .read()
+            .await
+            .get(&run_id)
+            .map(|steps| steps.iter().copied().collect())
+            .unwrap_or_default()
     }
 
+    #[instrument_trace]
     pub async fn end_step_stream(&self, run_id: i32, step_id: i32) {
-        let mut streams: RwLockWriteGuard<'_, HashMap<i32, HashMap<i32, StepStream>>> =
-            self.streams.write().await;
-        if let Some(run_streams) = streams.get_mut(&run_id) {
-            run_streams.remove(&step_id);
-            if run_streams.is_empty() {
-                streams.remove(&run_id);
-            }
+        if let Some(steps) = self.active_steps.write().await.get_mut(&run_id) {
+            steps.remove(&step_id);
         }
     }
 
+    #[instrument_trace]
     pub async fn end_run_streams(&self, run_id: i32) {
-        let mut streams: RwLockWriteGuard<'_, HashMap<i32, HashMap<i32, StepStream>>> =
-            self.streams.write().await;
-        streams.remove(&run_id);
+        self.active_steps.write().await.remove(&run_id);
     }
 }
 
 impl Default for LogStreamManager {
+    #[instrument_trace]
     fn default() -> Self {
         Self::new()
     }
