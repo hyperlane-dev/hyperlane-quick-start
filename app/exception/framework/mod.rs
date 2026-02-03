@@ -3,4 +3,4 @@ mod r#struct;
 
 pub use r#struct::*;
 
-use {super::*, model::data_transfer::common::*};
+use {super::*, model::response::common::*};
