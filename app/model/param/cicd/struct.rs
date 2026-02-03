@@ -68,4 +68,7 @@ pub struct StepOffsetParam {
     pub(super) step_id: i32,
     #[get(type(copy), pub)]
     pub(super) offset: usize,
+    #[serde(default)]
+    #[get(type(copy), pub)]
+    pub(super) stderr_offset: usize,
 }

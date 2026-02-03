@@ -1880,8 +1880,9 @@ jobs:
         if (currentRunDetail && currentRunDetail.jobs) {
           for (const job of currentRunDetail.jobs) {
             for (const step of job.steps) {
-              const offset = stepOutputOffsets.get(step.id) || 0;
-              offsets.push({ step_id: step.id, offset });
+              const offset = stepOutputOffsets.get(`stdout_${step.id}`) || 0;
+              const stderrOffset = stepOutputOffsets.get(`stderr_${step.id}`) || 0;
+              offsets.push({ step_id: step.id, offset, stderr_offset: stderrOffset });
             }
           }
         }
@@ -1915,9 +1916,22 @@ jobs:
         if (detail.jobs) {
           for (const jobData of detail.jobs) {
             for (const stepLog of jobData.steps) {
+              const stepId = stepLog.step_id;
+              const offsetKey = `stdout_${stepId}`;
+              const stderrOffsetKey = `stderr_${stepId}`;
+              if (!stepOutputOffsets.has(offsetKey)) {
+                stepOutputOffsets.set(offsetKey, 0);
+              }
+              if (!stepOutputOffsets.has(stderrOffsetKey)) {
+                stepOutputOffsets.set(stderrOffsetKey, 0);
+              }
               if (stepLog.new_output) {
-                appendStepLog(stepLog.step_id, stepLog.new_output);
-                stepOutputOffsets.set(stepLog.step_id, stepLog.output_length);
+                appendStepLog(stepId, stepLog.new_output, false);
+                stepOutputOffsets.set(offsetKey, stepLog.output_length);
+              }
+              if (stepLog.new_stderr) {
+                appendStepLog(stepId, stepLog.new_stderr, true);
+                stepOutputOffsets.set(stderrOffsetKey, stepLog.stderr_length);
               }
             }
           }
@@ -1927,11 +1941,12 @@ jobs:
       function appendRealtimeLog(logData) {
         const { step_id, content, is_stderr } = logData;
 
-        if (!stepOutputOffsets.has(step_id)) {
-          stepOutputOffsets.set(step_id, 0);
+        const offsetKey = is_stderr ? `stderr_${step_id}` : `stdout_${step_id}`;
+        if (!stepOutputOffsets.has(offsetKey)) {
+          stepOutputOffsets.set(offsetKey, 0);
         }
-        const currentOffset = stepOutputOffsets.get(step_id);
-        stepOutputOffsets.set(step_id, currentOffset + content.length);
+        const currentOffset = stepOutputOffsets.get(offsetKey);
+        stepOutputOffsets.set(offsetKey, currentOffset + content.length);
 
         appendStepLog(step_id, content, is_stderr);
       }

@@ -36,11 +36,19 @@ pub struct StepStream {
 }
 
 #[derive(Clone, Data, Debug)]
+pub struct StepOutput {
+    #[get(pub(crate))]
+    pub(super) stdout: Arc<RwLock<String>>,
+    #[get(pub(crate))]
+    pub(super) stderr: Arc<RwLock<String>>,
+}
+
+#[derive(Clone, Data, Debug)]
 pub struct LogStreamManager {
     #[get(pub(crate))]
     pub(super) broadcast_map: Arc<BroadcastMap<String>>,
     #[get(pub(crate))]
-    pub(super) step_outputs: Arc<RwLock<HashMap<i32, Arc<RwLock<String>>>>>,
+    pub(super) step_outputs: Arc<RwLock<HashMap<i32, StepOutput>>>,
     #[get(pub(crate))]
     pub(super) step_statuses: Arc<RwLock<HashMap<i32, Arc<RwLock<CicdStatus>>>>>,
     #[get(pub(crate))]

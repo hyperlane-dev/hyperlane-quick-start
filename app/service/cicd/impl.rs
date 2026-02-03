@@ -1071,34 +1071,67 @@ impl CicdService {
         if let Some(run_dto) = run {
             let jobs: Vec<JobDto> = Self::get_jobs_by_run(run_id).await?;
             let mut jobs_with_steps: Vec<JobWithIncrementalStepsDto> = Vec::new();
+            let log_manager: &LogStreamManager = get_log_stream_manager();
             for job in jobs {
                 let steps: Vec<StepDto> = Self::get_steps_by_job(job.get_id()).await?;
                 let mut step_logs: Vec<StepLogDto> = Vec::new();
                 for step in steps {
+                    let step_id: i32 = step.get_id();
                     let offset: usize = step_offsets
                         .iter()
-                        .find(|o: &&StepOffsetParam| o.get_step_id() == step.get_id())
+                        .find(|o: &&StepOffsetParam| o.get_step_id() == step_id)
                         .map(|o: &StepOffsetParam| o.get_offset())
                         .unwrap_or(0);
-                    let output: Option<String> = step.try_get_output().clone();
-                    let output_str: &str = output.as_deref().unwrap_or("");
-                    let output_length: usize = output_str.len();
-                    let (new_output, final_offset): (Option<String>, usize) =
-                        if offset < output_length {
-                            let new_content: String = output_str[offset..].to_string();
-                            (Some(new_content), output_length)
+                    let stderr_offset: usize = step_offsets
+                        .iter()
+                        .find(|o: &&StepOffsetParam| o.get_step_id() == step_id)
+                        .map(|o: &StepOffsetParam| o.get_stderr_offset())
+                        .unwrap_or(0);
+                    let stdout_opt: Option<String> =
+                        log_manager.get_step_stdout(run_id, step_id).await;
+                    let stderr_opt: Option<String> =
+                        log_manager.get_step_stderr(run_id, step_id).await;
+                    let (stdout_output, stderr_output): (Option<String>, Option<String>) =
+                        match (stdout_opt, stderr_opt) {
+                            (Some(stdout), Some(stderr)) => (Some(stdout), Some(stderr)),
+                            (Some(stdout), None) => (Some(stdout), None),
+                            (None, Some(stderr)) => (None, Some(stderr)),
+                            (None, None) => {
+                                let db_output: Option<String> = step.try_get_output().clone();
+                                (db_output.clone(), None)
+                            }
+                        };
+                    let stdout_str: &str = stdout_output.as_deref().unwrap_or("");
+                    let stderr_str: &str = stderr_output.as_deref().unwrap_or("");
+                    let stdout_length: usize = stdout_str.len();
+                    let stderr_length: usize = stderr_str.len();
+                    let (new_stdout, final_stdout_offset): (Option<String>, usize) =
+                        if offset < stdout_length {
+                            let new_content: String = stdout_str[offset..].to_string();
+                            (Some(new_content), stdout_length)
                         } else {
-                            (None, output_length)
+                            (None, stdout_length)
+                        };
+                    let (new_stderr, final_stderr_offset): (Option<String>, usize) =
+                        if stderr_offset < stderr_length {
+                            let new_content: String = stderr_str[stderr_offset..].to_string();
+                            (Some(new_content), stderr_length)
+                        } else {
+                            (None, stderr_length)
                         };
                     let mut log_dto = StepLogDto::default();
                     log_dto
-                        .set_step_id(step.get_id())
+                        .set_step_id(step_id)
                         .set_step_name(step.get_name().clone())
                         .set_status(*step.get_status())
-                        .set_output(step.try_get_output().clone())
-                        .set_output_length(final_offset)
-                        .set_new_output(new_output)
-                        .set_output_offset(offset);
+                        .set_output(stdout_output)
+                        .set_output_length(final_stdout_offset)
+                        .set_new_output(new_stdout)
+                        .set_output_offset(offset)
+                        .set_stderr_output(stderr_output)
+                        .set_stderr_length(final_stderr_offset)
+                        .set_new_stderr(new_stderr)
+                        .set_stderr_offset(stderr_offset);
                     step_logs.push(log_dto);
                 }
                 let mut job_dto = JobWithIncrementalStepsDto::default();
@@ -1192,7 +1225,13 @@ impl LogStreamManager {
             .broadcast_map
             .subscribe_or_insert(key, DEFAULT_BROADCAST_SENDER_CAPACITY);
         let mut outputs = self.step_outputs.write().await;
-        outputs.insert(step_id, Arc::new(RwLock::new(String::new())));
+        outputs.insert(
+            step_id,
+            StepOutput {
+                stdout: Arc::new(RwLock::new(String::new())),
+                stderr: Arc::new(RwLock::new(String::new())),
+            },
+        );
         let mut statuses = self.step_statuses.write().await;
         statuses.insert(step_id, Arc::new(RwLock::new(CicdStatus::Running)));
         let mut active = self.active_steps.write().await;
@@ -1214,8 +1253,13 @@ impl LogStreamManager {
         let entry_json: String = serde_json::to_string(&entry).unwrap_or_default();
         let _ = self.broadcast_map.send(key, entry_json);
         if let Some(output) = self.step_outputs.read().await.get(&step_id) {
-            let mut output_guard = output.write().await;
-            output_guard.push_str(content);
+            if is_stderr {
+                let mut stderr_guard = output.stderr.write().await;
+                stderr_guard.push_str(content);
+            } else {
+                let mut stdout_guard = output.stdout.write().await;
+                stdout_guard.push_str(content);
+            }
         }
     }
 
@@ -1240,8 +1284,37 @@ impl LogStreamManager {
     #[instrument_trace]
     pub async fn get_step_output(&self, _run_id: i32, step_id: i32) -> Option<String> {
         self.step_outputs.read().await.get(&step_id).map(|output| {
-            let output_guard: RwLockReadGuard<'_, String> = output.blocking_read();
-            output_guard.clone()
+            let stdout_guard: RwLockReadGuard<'_, String> = output.stdout.blocking_read();
+            let stderr_guard: RwLockReadGuard<'_, String> = output.stderr.blocking_read();
+            let mut result: String = String::new();
+            if !stdout_guard.is_empty() {
+                result.push_str("[Stdout]\n");
+                result.push_str(&stdout_guard);
+            }
+            if !stderr_guard.is_empty() {
+                if !result.is_empty() {
+                    result.push('\n');
+                }
+                result.push_str("[Stderr]\n");
+                result.push_str(&stderr_guard);
+            }
+            result
+        })
+    }
+
+    #[instrument_trace]
+    pub async fn get_step_stdout(&self, _run_id: i32, step_id: i32) -> Option<String> {
+        self.step_outputs.read().await.get(&step_id).map(|output| {
+            let stdout_guard: RwLockReadGuard<'_, String> = output.stdout.blocking_read();
+            stdout_guard.clone()
+        })
+    }
+
+    #[instrument_trace]
+    pub async fn get_step_stderr(&self, _run_id: i32, step_id: i32) -> Option<String> {
+        self.step_outputs.read().await.get(&step_id).map(|output| {
+            let stderr_guard: RwLockReadGuard<'_, String> = output.stderr.blocking_read();
+            stderr_guard.clone()
         })
     }
 

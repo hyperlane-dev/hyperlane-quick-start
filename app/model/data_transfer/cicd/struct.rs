@@ -140,6 +140,14 @@ pub struct StepLogDto {
     pub(super) new_output: Option<String>,
     #[get(type(copy), pub)]
     pub(super) output_offset: usize,
+    #[get(pub)]
+    pub(super) stderr_output: Option<String>,
+    #[get(type(copy), pub)]
+    pub(super) stderr_length: usize,
+    #[get(pub)]
+    pub(super) new_stderr: Option<String>,
+    #[get(type(copy), pub)]
+    pub(super) stderr_offset: usize,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
