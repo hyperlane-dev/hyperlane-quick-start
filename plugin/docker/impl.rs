@@ -3,19 +3,27 @@ use super::*;
 impl DockerConfig {
     #[instrument_trace]
     pub fn secure() -> Self {
-        Self::new().cpus(1.0).memory("512m").network(false)
+        Self {
+            cpus: Some(1.0),
+            memory: Some("512m".to_string()),
+            disable_network: true,
+            ..Self::new()
+        }
     }
-
     #[instrument_trace]
     pub fn with_network() -> Self {
-        let mut config: Self = Self::new();
-        config.disable_network = false;
-        config
+        Self {
+            disable_network: false,
+            ..Self::new()
+        }
     }
-
     #[instrument_trace]
     pub fn high_resource() -> Self {
-        Self::new().cpus(4.0).memory("2g")
+        Self {
+            cpus: Some(4.0),
+            memory: Some("2g".to_string()),
+            ..Self::new()
+        }
     }
 }
 
@@ -36,87 +44,39 @@ impl DockerConfig {
             volumes: Vec::new(),
         }
     }
-
     #[instrument_trace]
     pub fn image(mut self, image: &str) -> Self {
-        self.image = image.to_string();
+        self.set_image(image.to_string());
         self
     }
-
     #[instrument_trace]
     pub fn cpus(mut self, cpus: f32) -> Self {
-        self.cpus = Some(cpus);
+        self.set_cpus(Some(cpus));
         self
     }
-
     #[instrument_trace]
     pub fn memory(mut self, memory: &str) -> Self {
-        self.memory = Some(memory.to_string());
+        self.set_memory(Some(memory.to_string()));
         self
     }
-
     #[instrument_trace]
     pub fn network(mut self, enabled: bool) -> Self {
-        self.disable_network = !enabled;
+        self.set_disable_network(!enabled);
         self
     }
-
     #[instrument_trace]
     pub fn volume(mut self, host_path: &str, container_path: &str) -> Self {
-        self.volumes
-            .push((host_path.to_string(), container_path.to_string()));
+        let mut volumes: Vec<(String, String)> = self.get_volumes().to_vec();
+        volumes.push((host_path.to_string(), container_path.to_string()));
+        self.set_volumes(volumes);
         self
     }
-
     #[instrument_trace]
     pub fn env(mut self, key: &str, value: &str) -> Self {
-        self.env_vars.push((key.to_string(), value.to_string()));
+        let mut env_vars: Vec<(String, String)> = self.get_env_vars().to_vec();
+        env_vars.push((key.to_string(), value.to_string()));
+        self.set_env_vars(env_vars);
         self
-    }
-
-    #[instrument_trace]
-    pub fn get_image(&self) -> &String {
-        &self.image
-    }
-
-    #[instrument_trace]
-    pub fn get_shell(&self) -> &String {
-        &self.shell
-    }
-
-    #[instrument_trace]
-    pub fn get_shell_flag(&self) -> &String {
-        &self.shell_flag
-    }
-
-    #[instrument_trace]
-    pub fn get_cpus(&self) -> Option<f32> {
-        self.cpus
-    }
-
-    #[instrument_trace]
-    pub fn get_memory(&self) -> &Option<String> {
-        &self.memory
-    }
-
-    #[instrument_trace]
-    pub fn get_pids_limit(&self) -> Option<i32> {
-        self.pids_limit
-    }
-
-    #[instrument_trace]
-    pub fn is_disable_network(&self) -> bool {
-        self.disable_network
-    }
-
-    #[instrument_trace]
-    pub fn is_read_only(&self) -> bool {
-        self.read_only
-    }
-
-    #[instrument_trace]
-    pub fn get_workdir(&self) -> &String {
-        &self.workdir
     }
 }
 
@@ -134,23 +94,22 @@ impl DockerResult {
             success,
         }
     }
-
     #[instrument_trace]
     pub fn format_output(&self) -> String {
-        if self.success {
-            if self.stdout.is_empty() && self.stderr.is_empty() {
+        if self.get_success() {
+            if self.get_stdout().is_empty() && self.get_stderr().is_empty() {
                 "Command executed successfully (no output)".to_string()
-            } else if self.stdout.is_empty() {
-                format!("Stderr: {}", self.stderr.trim())
+            } else if self.get_stdout().is_empty() {
+                format!("Stderr: {}", self.get_stderr().trim())
             } else {
-                self.stdout.trim().to_string()
+                self.get_stdout().trim().to_string()
             }
         } else {
             format!(
                 "Error: Exit code {}\nStdout: {}\nStderr: {}",
-                self.exit_code,
-                self.stdout.trim(),
-                self.stderr.trim()
+                self.get_exit_code(),
+                self.get_stdout().trim(),
+                self.get_stderr().trim()
             )
         }
     }

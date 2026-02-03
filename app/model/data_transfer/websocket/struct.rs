@@ -1,7 +1,9 @@
 use super::*;
 
-#[derive(Data, Debug, Default, Deserialize, Serialize)]
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]
 pub struct MessageResponse {
-    message: String,
-    time: String,
+    #[get(pub(crate))]
+    pub(super) message: String,
+    #[get(pub(crate))]
+    pub(super) time: String,
 }

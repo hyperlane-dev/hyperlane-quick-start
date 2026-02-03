@@ -1,11 +1,17 @@
 use super::*;
 
-#[derive(Clone, Data, Debug, Default, ToSchema)]
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct UploadedFile {
-    file_name: String,
-    file_path: String,
-    file_size: u64,
-    upload_time: String,
-    file_url: String,
-    content_type: String,
+    #[get(pub)]
+    pub(super) file_name: String,
+    #[get(pub)]
+    pub(super) file_path: String,
+    #[get(type(copy), pub)]
+    pub(super) file_size: u64,
+    #[get(pub)]
+    pub(super) upload_time: String,
+    #[get(pub)]
+    pub(super) file_url: String,
+    #[get(pub)]
+    pub(super) content_type: String,
 }

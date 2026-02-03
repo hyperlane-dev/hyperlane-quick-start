@@ -2,101 +2,158 @@ use super::*;
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct PipelineDto {
-    pub id: i32,
-    pub name: String,
-    pub description: Option<String>,
-    pub config_content: Option<String>,
-    pub created_at: Option<String>,
-    pub updated_at: Option<String>,
+    #[get(type(copy), pub)]
+    pub(super) id: i32,
+    #[get(pub)]
+    pub(super) name: String,
+    #[get(pub)]
+    pub(super) description: Option<String>,
+    #[get(pub)]
+    pub(super) config_content: Option<String>,
+    #[get(pub)]
+    pub(super) created_at: Option<String>,
+    #[get(pub)]
+    pub(super) updated_at: Option<String>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct RunDto {
-    pub id: i32,
-    pub pipeline_id: i32,
-    pub pipeline_name: Option<String>,
-    pub run_number: i32,
-    pub status: CicdStatus,
-    pub triggered_by: Option<String>,
-    pub commit_hash: Option<String>,
-    pub commit_message: Option<String>,
-    pub started_at: Option<String>,
-    pub completed_at: Option<String>,
-    pub duration_ms: i32,
-    pub created_at: Option<String>,
+    #[get(type(copy), pub)]
+    pub(super) id: i32,
+    #[get(type(copy), pub)]
+    pub(super) pipeline_id: i32,
+    #[get(pub)]
+    pub(super) pipeline_name: Option<String>,
+    #[get(type(copy), pub)]
+    pub(super) run_number: i32,
+    #[get(pub)]
+    pub(super) status: CicdStatus,
+    #[get(pub)]
+    pub(super) triggered_by: Option<String>,
+    #[get(pub)]
+    pub(super) commit_hash: Option<String>,
+    #[get(pub)]
+    pub(super) commit_message: Option<String>,
+    #[get(pub)]
+    pub(super) started_at: Option<String>,
+    #[get(pub)]
+    pub(super) completed_at: Option<String>,
+    #[get(type(copy), pub)]
+    pub(super) duration_ms: i32,
+    #[get(pub)]
+    pub(super) created_at: Option<String>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct JobDto {
-    pub id: i32,
-    pub run_id: i32,
-    pub name: String,
-    pub status: CicdStatus,
-    pub runner: Option<String>,
-    pub started_at: Option<String>,
-    pub completed_at: Option<String>,
-    pub duration_ms: i32,
+    #[get(type(copy), pub)]
+    pub(super) id: i32,
+    #[get(type(copy), pub)]
+    pub(super) run_id: i32,
+    #[get(pub)]
+    pub(super) name: String,
+    #[get(pub)]
+    pub(super) status: CicdStatus,
+    #[get(pub)]
+    pub(super) runner: Option<String>,
+    #[get(pub)]
+    pub(super) started_at: Option<String>,
+    #[get(pub)]
+    pub(super) completed_at: Option<String>,
+    #[get(type(copy), pub)]
+    pub(super) duration_ms: i32,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct StepDto {
-    pub id: i32,
-    pub job_id: i32,
-    pub name: String,
-    pub command: Option<String>,
-    pub status: CicdStatus,
-    pub output: Option<String>,
-    pub dockerfile: Option<String>,
-    pub image: Option<String>,
-    pub started_at: Option<String>,
-    pub completed_at: Option<String>,
-    pub duration_ms: i32,
+    #[get(type(copy), pub)]
+    pub(super) id: i32,
+    #[get(type(copy), pub)]
+    pub(super) job_id: i32,
+    #[get(pub)]
+    pub(super) name: String,
+    #[get(pub)]
+    pub(super) command: Option<String>,
+    #[get(pub)]
+    pub(super) status: CicdStatus,
+    #[get(pub)]
+    pub(super) output: Option<String>,
+    #[get(pub)]
+    pub(super) dockerfile: Option<String>,
+    #[get(pub)]
+    pub(super) image: Option<String>,
+    #[get(pub)]
+    pub(super) started_at: Option<String>,
+    #[get(pub)]
+    pub(super) completed_at: Option<String>,
+    #[get(type(copy), pub)]
+    pub(super) duration_ms: i32,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct PipelineDetailDto {
-    pub pipeline: PipelineDto,
-    pub runs: Vec<RunDto>,
+    #[get(pub)]
+    pub(super) pipeline: PipelineDto,
+    #[get(pub)]
+    pub(super) runs: Vec<RunDto>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct RunDetailDto {
-    pub run: RunDto,
-    pub jobs: Vec<JobWithStepsDto>,
+    #[get(pub)]
+    pub(super) run: RunDto,
+    #[get(pub)]
+    pub(super) jobs: Vec<JobWithStepsDto>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct JobWithStepsDto {
-    pub job: JobDto,
-    pub steps: Vec<StepDto>,
+    #[get(pub)]
+    pub(super) job: JobDto,
+    #[get(pub)]
+    pub(super) steps: Vec<StepDto>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct PaginatedRunsDto {
-    pub total: i32,
-    pub runs: Vec<RunDto>,
-    pub has_more: bool,
+    #[get(type(copy), pub)]
+    pub(super) total: i32,
+    #[get(pub)]
+    pub(super) runs: Vec<RunDto>,
+    #[get(type(copy), pub)]
+    pub(super) has_more: bool,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct StepLogDto {
-    pub step_id: i32,
-    pub step_name: String,
-    pub status: CicdStatus,
-    pub output: Option<String>,
-    pub output_length: usize,
-    pub new_output: Option<String>,
-    pub output_offset: usize,
+    #[get(type(copy), pub)]
+    pub(super) step_id: i32,
+    #[get(pub)]
+    pub(super) step_name: String,
+    #[get(pub)]
+    pub(super) status: CicdStatus,
+    #[get(pub)]
+    pub(super) output: Option<String>,
+    #[get(type(copy), pub)]
+    pub(super) output_length: usize,
+    #[get(pub)]
+    pub(super) new_output: Option<String>,
+    #[get(type(copy), pub)]
+    pub(super) output_offset: usize,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct IncrementalRunDetailDto {
-    pub run: RunDto,
-    pub jobs: Vec<JobWithIncrementalStepsDto>,
+    #[get(pub)]
+    pub(super) run: RunDto,
+    #[get(pub)]
+    pub(super) jobs: Vec<JobWithIncrementalStepsDto>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct JobWithIncrementalStepsDto {
-    pub job: JobDto,
-    pub steps: Vec<StepLogDto>,
+    #[get(pub)]
+    pub(super) job: JobDto,
+    #[get(pub)]
+    pub(super) steps: Vec<StepLogDto>,
 }

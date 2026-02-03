@@ -192,11 +192,7 @@ impl UploadService {
     #[response_status_code(200)]
     #[instrument_trace]
     pub async fn set_common_success_response_body<'a>(ctx: &'a Context, url: &'a str) {
-        let mut data: UploadResponse<'_> = UploadResponse {
-            code: 0,
-            url: "",
-            msg: "",
-        };
+        let mut data: UploadResponse<'_> = UploadResponse::default();
         data.set_code(200).set_msg(OK).set_url(url);
         let data_json: ResponseBody = serde_json::to_vec(&data).unwrap_or_default();
         let _: &Context = ctx.set_response_body(&data_json).await;
@@ -205,11 +201,7 @@ impl UploadService {
     #[response_status_code(200)]
     #[instrument_trace]
     pub async fn set_common_error_response_body<'a>(ctx: &'a Context, error: String) {
-        let mut data: UploadResponse<'_> = UploadResponse {
-            code: 0,
-            url: "",
-            msg: "",
-        };
+        let mut data: UploadResponse<'_> = UploadResponse::default();
         data.set_msg(&error);
         let data_json: ResponseBody = serde_json::to_vec(&data).unwrap_or_default();
         let _: &Context = ctx.set_response_body(&data_json).await;
@@ -318,7 +310,7 @@ impl UploadService {
         file_size: u64,
         content_type: String,
     ) -> Result<(PartialContent, String), String> {
-        let start: u64 = *range.get_start();
+        let start: u64 = range.get_start();
         let end: u64 = range
             .try_get_end()
             .unwrap_or(file_size - 1)
@@ -385,8 +377,8 @@ impl UploadService {
         }
         let file_id: &str = file_chunk_data.get_file_id();
         let file_name: &str = file_chunk_data.get_file_name();
-        let chunk_index: &usize = file_chunk_data.get_chunk_index();
-        let total_chunks: &usize = file_chunk_data.get_total_chunks();
+        let chunk_index: usize = file_chunk_data.get_chunk_index();
+        let total_chunks: usize = file_chunk_data.get_total_chunks();
         let base_file_dir: &str = file_chunk_data.get_base_file_dir();
         let save_upload_dir: String = format!("{UPLOAD_DIR}/{base_file_dir}/{file_id}");
         let upload_strategy: ChunkStrategy = ChunkStrategy::new(
@@ -394,12 +386,12 @@ impl UploadService {
             &save_upload_dir,
             file_id,
             file_name,
-            *total_chunks,
+            total_chunks,
             |a, b| format!("{a}.{b}"),
         )
         .map_err(|error| error.to_string())?;
         upload_strategy
-            .save_chunk(&chunk_data, *chunk_index)
+            .save_chunk(&chunk_data, chunk_index)
             .await
             .map_err(|error| error.to_string())?;
         Ok(save_upload_dir.clone())
@@ -411,7 +403,7 @@ impl UploadService {
     ) -> Result<(String, String), String> {
         let file_id: &str = file_chunk_data.get_file_id();
         let file_name: &str = file_chunk_data.get_file_name();
-        let total_chunks: &usize = file_chunk_data.get_total_chunks();
+        let total_chunks: usize = file_chunk_data.get_total_chunks();
         let base_file_dir: &str = file_chunk_data.get_base_file_dir();
         let save_upload_dir: String = format!("{UPLOAD_DIR}/{base_file_dir}/{file_id}");
         let upload_strategy: ChunkStrategy = ChunkStrategy::new(
@@ -419,7 +411,7 @@ impl UploadService {
             &save_upload_dir,
             file_id,
             file_name,
-            *total_chunks,
+            total_chunks,
             |a, b| format!("{a}.{b}"),
         )
         .map_err(|error| error.to_string())?;

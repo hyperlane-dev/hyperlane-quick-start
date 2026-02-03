@@ -1,14 +1,19 @@
 use super::*;
 
-#[derive(CustomDebug, Data, Default, Deserialize, DisplayDebug)]
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]
 pub struct Tracking {
-    url: String,
+    #[get(pub)]
+    pub(super) url: String,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]
 pub struct TrackingRecord {
-    pub socket_addr: String,
-    pub headers: RequestHeaders,
-    pub body: String,
-    pub timestamp: i64,
+    #[get(pub)]
+    pub(super) socket_addr: String,
+    #[get(pub)]
+    pub(super) headers: RequestHeaders,
+    #[get(pub)]
+    pub(super) body: String,
+    #[get(type(copy), pub)]
+    pub(super) timestamp: i64,
 }

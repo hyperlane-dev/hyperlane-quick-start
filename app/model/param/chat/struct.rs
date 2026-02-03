@@ -2,13 +2,18 @@ use super::*;
 
 #[derive(Clone, Data, Default, Deserialize, Serialize, ToSchema)]
 pub struct WebSocketReqData {
-    r#type: MessageType,
-    data: String,
+    #[get(pub(crate))]
+    pub(super) r#type: MessageType,
+    #[get(pub(crate))]
+    pub(super) data: String,
 }
 
-#[derive(Clone, Data, Debug, Deserialize, Serialize, ToSchema)]
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct ChatHistoryParams {
-    pub session_id: String,
-    pub offset: Option<i64>,
-    pub limit: Option<i64>,
+    #[get(pub(crate))]
+    pub(super) session_id: String,
+    #[get(pub(crate))]
+    pub(super) offset: Option<i64>,
+    #[get(pub(crate))]
+    pub(super) limit: Option<i64>,
 }

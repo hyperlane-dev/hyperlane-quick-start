@@ -2,49 +2,70 @@ use super::*;
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct CreatePipelineParam {
-    pub name: String,
-    pub description: Option<String>,
-    pub config_content: Option<String>,
+    #[get(pub)]
+    pub(super) name: String,
+    #[get(pub)]
+    pub(super) description: Option<String>,
+    #[get(pub)]
+    pub(super) config_content: Option<String>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct TriggerRunParam {
-    pub pipeline_id: i32,
-    pub triggered_by: Option<String>,
-    pub commit_hash: Option<String>,
-    pub commit_message: Option<String>,
+    #[get(type(copy), pub)]
+    pub(super) pipeline_id: i32,
+    #[get(pub)]
+    pub(super) triggered_by: Option<String>,
+    #[get(pub)]
+    pub(super) commit_hash: Option<String>,
+    #[get(pub)]
+    pub(super) commit_message: Option<String>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct UpdateJobStatusParam {
-    pub job_id: i32,
-    pub status: CicdStatus,
-    pub runner: Option<String>,
+    #[get(type(copy), pub)]
+    pub(super) job_id: i32,
+    #[get(pub)]
+    pub(super) status: CicdStatus,
+    #[get(pub)]
+    pub(super) runner: Option<String>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct UpdateStepStatusParam {
-    pub step_id: i32,
-    pub status: CicdStatus,
-    pub output: Option<String>,
+    #[get(type(copy), pub)]
+    pub(super) step_id: i32,
+    #[get(pub)]
+    pub(super) status: CicdStatus,
+    #[get(pub)]
+    pub(super) output: Option<String>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct QueryRunsParam {
-    pub pipeline_id: Option<i32>,
-    pub status: Option<CicdStatus>,
-    pub page_size: Option<i32>,
-    pub last_id: Option<i32>,
+    #[get(type(copy), pub)]
+    pub(super) pipeline_id: Option<i32>,
+    #[get(type(copy), pub)]
+    pub(super) status: Option<CicdStatus>,
+    #[get(type(copy), pub)]
+    pub(super) page_size: Option<i32>,
+    #[get(type(copy), pub)]
+    pub(super) last_id: Option<i32>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct IncrementalRunDetailParam {
-    pub run_id: i32,
-    pub step_offsets: Vec<StepOffsetParam>,
+    #[get(type(copy), pub)]
+    pub(super) run_id: i32,
+    #[get(pub)]
+    pub(super) step_offsets: Vec<StepOffsetParam>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct StepOffsetParam {
-    pub step_id: i32,
-    pub offset: usize,
+    #[get(type(copy), pub)]
+    pub(super) step_id: i32,
+    #[get(type(copy), pub)]
+    pub(super) offset: usize,
 }

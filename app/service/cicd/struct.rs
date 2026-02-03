@@ -1,46 +1,44 @@
 use super::*;
 
-/// Result type for a stream reading task.
-///
-/// Inner `Result<String, String>` represents success (stdout/stderr content)
-/// or failure (error message). Outer `Result` wraps the `JoinError` from
-/// the async task join operation.
-pub(super) type StreamResult = Result<Result<String, String>, JoinError>;
-
-/// A pair of stream results for stdout and stderr.
-pub(super) type StreamResultPair = (StreamResult, StreamResult);
-
-/// Result type for timeout-wrapped stream operations.
-///
-/// Contains the `StreamResultPair` on success, or `Elapsed` error on timeout.
-pub(super) type TimeoutResult = Result<StreamResultPair, Elapsed>;
-
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct CicdService;
 
+#[derive(Clone, Data, Debug, Default)]
 pub(super) struct StepOutputBuilder {
+    #[get(pub(crate))]
     pub(super) stdout: String,
+    #[get(pub(crate))]
     pub(super) stderr: String,
+    #[get(type(copy), pub(crate))]
     pub(super) is_timeout: bool,
+    #[get(type(copy), pub(crate))]
     pub(super) timeout_secs: u64,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Data, Debug)]
 pub struct LogEntry {
-    pub step_id: i32,
-    pub content: String,
-    pub timestamp: i64,
-    pub is_stderr: bool,
+    #[get(type(copy), pub(crate))]
+    pub(super) step_id: i32,
+    #[get(pub(crate))]
+    pub(super) content: String,
+    #[get(type(copy), pub(crate))]
+    pub(super) timestamp: i64,
+    #[get(type(copy), pub(crate))]
+    pub(super) is_stderr: bool,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Data, Debug)]
 pub struct StepStream {
-    pub sender: broadcast::Sender<LogEntry>,
-    pub output: Arc<RwLock<String>>,
-    pub status: Arc<RwLock<CicdStatus>>,
+    #[get(pub(crate))]
+    pub(super) sender: broadcast::Sender<LogEntry>,
+    #[get(pub(crate))]
+    pub(super) output: Arc<RwLock<String>>,
+    #[get(pub(crate))]
+    pub(super) status: Arc<RwLock<CicdStatus>>,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Data, Debug)]
 pub struct LogStreamManager {
-    pub streams: Arc<RwLock<HashMap<i32, HashMap<i32, StepStream>>>>,
+    #[get(pub(crate))]
+    pub(super) streams: Arc<RwLock<HashMap<i32, HashMap<i32, StepStream>>>>,
 }

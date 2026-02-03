@@ -1,8 +1,11 @@
 use super::*;
 
-#[derive(Clone, Copy, Data, Debug, Serialize, ToSchema)]
+#[derive(Clone, Copy, Data, Debug, Default, Serialize, ToSchema)]
 pub struct UploadResponse<'a> {
-    pub code: i32,
-    pub url: &'a str,
-    pub msg: &'a str,
+    #[get(type(copy), pub)]
+    pub(super) code: i32,
+    #[get(type(copy), pub)]
+    pub(super) url: &'a str,
+    #[get(type(copy), pub)]
+    pub(super) msg: &'a str,
 }

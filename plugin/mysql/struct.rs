@@ -2,7 +2,9 @@ use super::*;
 
 #[derive(Clone, Data, Debug, New)]
 pub struct MySqlAutoCreation {
-    pub instance: MySqlInstanceConfig,
+    #[get(pub(crate))]
+    pub(super) instance: MySqlInstanceConfig,
     #[new(skip)]
-    pub schema: DatabaseSchema,
+    #[get(pub(crate))]
+    pub(super) schema: DatabaseSchema,
 }

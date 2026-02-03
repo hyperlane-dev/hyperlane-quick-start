@@ -20,15 +20,16 @@ impl TrackingMapper {
 
     #[instrument_trace]
     pub async fn insert(record: TrackingRecord) -> Result<(), DbErr> {
-        let headers_json: String = serde_json::to_string(&record.headers).map_err(|error| {
-            DbErr::Custom(format!("Failed to serialize headers{COLON_SPACE}{error}"))
-        })?;
+        let headers_json: String =
+            serde_json::to_string(record.get_headers()).map_err(|error| {
+                DbErr::Custom(format!("Failed to serialize headers{COLON_SPACE}{error}"))
+            })?;
         spawn(async move {
             let active_model: ActiveModel = ActiveModel {
-                socket_addr: ActiveValue::Set(record.socket_addr),
+                socket_addr: ActiveValue::Set(record.get_socket_addr().clone()),
                 headers: ActiveValue::Set(headers_json),
-                body: ActiveValue::Set(record.body),
-                timestamp: ActiveValue::Set(record.timestamp),
+                body: ActiveValue::Set(record.get_body().clone()),
+                timestamp: ActiveValue::Set(record.get_timestamp()),
                 ..Default::default()
             };
             let db: &DatabaseConnection = Self::get_db_connection();
@@ -93,7 +94,7 @@ impl TrackingMapper {
             .into_iter()
             .filter(|record| {
                 if let Ok(headers) =
-                    serde_json::from_str::<HashMap<String, Vec<String>>>(&record.headers)
+                    serde_json::from_str::<HashMap<String, Vec<String>>>(record.get_headers())
                 {
                     for (key, values) in headers.iter() {
                         if key.to_lowercase().contains(&header_key_lower) {
@@ -110,7 +111,7 @@ impl TrackingMapper {
                         }
                     }
                 } else if let Ok(headers) =
-                    serde_json::from_str::<HashMap<String, String>>(&record.headers)
+                    serde_json::from_str::<HashMap<String, String>>(record.get_headers())
                 {
                     for (key, value) in headers.iter() {
                         if key.to_lowercase().contains(&header_key_lower) {
@@ -164,7 +165,7 @@ impl TrackingMapper {
         let all_records: Vec<Model> = query.order_by_desc(Column::CreatedAt).all(db).await?;
         let filtered_records: Vec<Model> = all_records
             .into_iter()
-            .filter(|record| record.body.contains(&content))
+            .filter(|record| record.get_body().contains(&content))
             .collect();
         let total: i64 = filtered_records.len() as i64;
         let start: usize = ((page - 1) * page_size) as usize;

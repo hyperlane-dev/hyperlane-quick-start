@@ -1,7 +1,9 @@
 use super::*;
 
-#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]
 pub struct RedisRecordDao {
-    pub key: String,
-    pub value: String,
+    #[get(pub(crate))]
+    pub(crate) key: String,
+    #[get(pub(crate))]
+    pub(crate) value: String,
 }

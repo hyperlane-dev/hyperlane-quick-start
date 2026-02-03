@@ -2,30 +2,44 @@ use super::*;
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]
 pub struct ChatMessage {
-    role: String,
-    content: String,
+    #[get(pub)]
+    pub(super) role: String,
+    #[get(pub)]
+    pub(super) content: String,
 }
 
 #[derive(Clone, Data, Debug)]
 pub struct ChatSession {
+    #[get(pub)]
     pub(super) session_id: String,
+    #[get(pub)]
     pub(super) messages: Vec<ChatMessage>,
+    #[get(pub)]
     pub(super) last_activity: Instant,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct OnlineUser {
-    username: String,
-    join_time: String,
+    #[get(pub)]
+    pub(super) username: String,
+    #[get(pub)]
+    pub(super) join_time: String,
 }
 
-#[derive(Clone, Data, Debug, Deserialize, Serialize, ToSchema)]
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct ChatHistory {
-    pub id: i64,
-    pub session_id: String,
-    pub sender_name: String,
-    pub sender_type: String,
-    pub message_type: String,
-    pub content: String,
-    pub created_at: String,
+    #[get(type(copy), pub)]
+    pub(super) id: i64,
+    #[get(pub)]
+    pub(super) session_id: String,
+    #[get(pub)]
+    pub(super) sender_name: String,
+    #[get(pub)]
+    pub(super) sender_type: String,
+    #[get(pub)]
+    pub(super) message_type: String,
+    #[get(pub)]
+    pub(super) content: String,
+    #[get(pub)]
+    pub(super) created_at: String,
 }

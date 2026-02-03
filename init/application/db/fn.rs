@@ -4,22 +4,27 @@ use super::*;
 pub fn build_mysql_schema() -> DatabaseSchema {
     DatabaseSchema::default()
         .add_table(TableSchema::new(
+            Vec::new(),
             "record".to_string(),
             MYSQL_RECORD_SQL.to_string(),
         ))
         .add_table(TableSchema::new(
+            Vec::new(),
             "cicd_pipeline".to_string(),
             CICD_PIPELINE_SQL.to_string(),
         ))
         .add_table(TableSchema::new(
+            Vec::new(),
             "cicd_run".to_string(),
             CICD_RUN_SQL.to_string(),
         ))
         .add_table(TableSchema::new(
+            Vec::new(),
             "cicd_job".to_string(),
             CICD_JOB_SQL.to_string(),
         ))
         .add_table(TableSchema::new(
+            Vec::new(),
             "cicd_step".to_string(),
             CICD_STEP_SQL.to_string(),
         ))
@@ -35,18 +40,22 @@ pub fn build_postgresql_schema() -> DatabaseSchema {
         .collect();
     let mut schema: DatabaseSchema = DatabaseSchema::default()
         .add_table(TableSchema::new(
+            Vec::new(),
             "record".to_string(),
             POSTGRESQL_RECORD_SQL.to_string(),
         ))
         .add_table(TableSchema::new(
+            Vec::new(),
             "chat_history".to_string(),
             POSTGRESQL_CHAT_HISTORY_SQL.to_string(),
         ))
         .add_table(TableSchema::new(
+            Vec::new(),
             "tracking_record".to_string(),
             POSTGRESQL_TRACKING_RECORD_SQL.to_string(),
         ))
         .add_table(TableSchema::new(
+            Vec::new(),
             "shortlink".to_string(),
             POSTGRESQL_SHORTLINK_SQL.to_string(),
         ));

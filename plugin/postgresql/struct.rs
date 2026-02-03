@@ -2,7 +2,9 @@ use super::*;
 
 #[derive(Clone, Data, Debug, New)]
 pub struct PostgreSqlAutoCreation {
-    pub instance: PostgreSqlInstanceConfig,
+    #[get(pub(crate))]
+    pub(super) instance: PostgreSqlInstanceConfig,
     #[new(skip)]
-    pub schema: DatabaseSchema,
+    #[get(pub(crate))]
+    pub(super) schema: DatabaseSchema,
 }

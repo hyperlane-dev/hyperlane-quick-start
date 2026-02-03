@@ -28,7 +28,7 @@ where
                 &error,
                 "Auto-creation process",
                 database::PluginType::MySQL,
-                Some(&instance.database),
+                Some(instance.get_database().as_str()),
             )
             .await;
             if !error.should_continue() {
@@ -48,7 +48,7 @@ where
         };
     connection_result.map_err(|error: DbErr| {
         let error_msg: String = error.to_string();
-        let database_name: String = instance.database.clone();
+        let database_name: String = instance.get_database().clone();
         let error_msg_clone: String = error_msg.clone();
         tokio::spawn(async move {
             database::AutoCreationLogger::log_connection_verification(
@@ -77,7 +77,7 @@ where
         let connections: RwLockReadGuard<'_, HashMap<String, ConnectionCache<DatabaseConnection>>> =
             MYSQL_CONNECTIONS.read().await;
         if let Some(cache) = connections.get(instance_name_str) {
-            match &cache.result {
+            match cache.try_get_result() {
                 Ok(conn) => return Ok(conn.clone()),
                 Err(error) => {
                     if !cache.is_cooldown_expired(cooldown_duration) {
@@ -92,7 +92,7 @@ where
         HashMap<String, ConnectionCache<DatabaseConnection>>,
     > = MYSQL_CONNECTIONS.write().await;
     if let Some(cache) = connections.get(instance_name_str) {
-        match &cache.result {
+        match cache.try_get_result() {
             Ok(conn) => return Ok(conn.clone()),
             Err(error) => {
                 if !cache.is_cooldown_expired(cooldown_duration) {
@@ -123,44 +123,47 @@ pub async fn perform_mysql_auto_creation(
 ) -> Result<AutoCreationResult, AutoCreationError> {
     let start_time: Instant = Instant::now();
     let mut result: AutoCreationResult = AutoCreationResult::default();
-    AutoCreationLogger::log_auto_creation_start(database::PluginType::MySQL, &instance.database)
-        .await;
+    AutoCreationLogger::log_auto_creation_start(
+        database::PluginType::MySQL,
+        instance.get_database(),
+    )
+    .await;
     let auto_creator: MySqlAutoCreation = match schema {
         Some(s) => MySqlAutoCreation::with_schema(instance.clone(), s),
         None => MySqlAutoCreation::new(instance.clone()),
     };
     match auto_creator.create_database_if_not_exists().await {
         Ok(created) => {
-            result.database_created = created;
+            result.set_database_created(created);
         }
         Err(error) => {
             AutoCreationLogger::log_auto_creation_error(
                 &error,
                 "Database creation",
                 database::PluginType::MySQL,
-                Some(&instance.database),
+                Some(instance.get_database()),
             )
             .await;
             if !error.should_continue() {
-                result.duration = start_time.elapsed();
+                result.set_duration(start_time.elapsed());
                 return Err(error);
             }
-            result.errors.push(error.to_string());
+            result.get_mut_errors().push(error.to_string());
         }
     }
     match auto_creator.create_tables_if_not_exist().await {
         Ok(tables) => {
-            result.tables_created = tables;
+            result.set_tables_created(tables);
         }
         Err(error) => {
             AutoCreationLogger::log_auto_creation_error(
                 &error,
                 "Table creation",
                 database::PluginType::MySQL,
-                Some(&instance.database),
+                Some(instance.get_database()),
             )
             .await;
-            result.errors.push(error.to_string());
+            result.get_mut_errors().push(error.to_string());
         }
     }
     if let Err(error) = auto_creator.verify_connection().await {
@@ -168,16 +171,16 @@ pub async fn perform_mysql_auto_creation(
             &error,
             "Connection verification",
             database::PluginType::MySQL,
-            Some(&instance.database),
+            Some(instance.get_database()),
         )
         .await;
         if !error.should_continue() {
-            result.duration = start_time.elapsed();
+            result.set_duration(start_time.elapsed());
             return Err(error);
         }
-        result.errors.push(error.to_string());
+        result.get_mut_errors().push(error.to_string());
     }
-    result.duration = start_time.elapsed();
+    result.set_duration(start_time.elapsed());
     AutoCreationLogger::log_auto_creation_complete(database::PluginType::MySQL, &result).await;
     Ok(result)
 }

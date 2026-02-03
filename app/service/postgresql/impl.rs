@@ -29,7 +29,9 @@ impl PostgresqlService {
             .into_iter()
             .map(|r: Model| {
                 let mut record = PostgresqlRecord::default();
-                record.set_key(r.key).set_value(r.value);
+                record
+                    .set_key(r.get_key().clone())
+                    .set_value(r.get_value().clone());
                 record
             })
             .collect();

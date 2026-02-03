@@ -1,54 +1,87 @@
 use super::*;
 
 #[derive(Clone, Data, Debug, Default)]
-pub struct MySqlInstanceConfig {
-    pub name: String,
-    pub host: String,
-    pub port: usize,
-    pub database: String,
-    pub username: String,
-    pub password: String,
-}
-
-#[derive(Clone, Data, Debug, Default)]
-pub struct PostgreSqlInstanceConfig {
-    pub name: String,
-    pub host: String,
-    pub port: usize,
-    pub database: String,
-    pub username: String,
-    pub password: String,
-}
-
-#[derive(Clone, Data, Debug, Default)]
-pub struct RedisInstanceConfig {
-    pub name: String,
-    pub host: String,
-    pub port: usize,
-    pub username: String,
-    pub password: String,
+pub struct DockerComposeConfig {
+    #[get(pub(crate))]
+    pub(super) mysql_database: Option<String>,
+    #[get(pub(crate))]
+    pub(super) mysql_password: Option<String>,
+    #[get(type(copy), pub(crate))]
+    pub(super) mysql_port: Option<usize>,
+    #[get(pub(crate))]
+    pub(super) mysql_username: Option<String>,
+    #[get(pub(crate))]
+    pub(super) postgresql_database: Option<String>,
+    #[get(pub(crate))]
+    pub(super) postgresql_password: Option<String>,
+    #[get(type(copy), pub(crate))]
+    pub(super) postgresql_port: Option<usize>,
+    #[get(pub(crate))]
+    pub(super) postgresql_username: Option<String>,
+    #[get(pub(crate))]
+    pub(super) redis_password: Option<String>,
+    #[get(type(copy), pub(crate))]
+    pub(super) redis_port: Option<usize>,
+    #[get(pub(crate))]
+    pub(super) redis_username: Option<String>,
 }
 
 #[derive(Clone, Data, Debug, Default)]
 pub struct EnvConfig {
-    pub gpt_api_url: String,
-    pub gpt_model: String,
-    pub mysql_instances: Vec<MySqlInstanceConfig>,
-    pub redis_instances: Vec<RedisInstanceConfig>,
-    pub postgresql_instances: Vec<PostgreSqlInstanceConfig>,
+    #[get(pub)]
+    pub(super) gpt_api_url: String,
+    #[get(pub)]
+    pub(super) gpt_model: String,
+    #[get(pub(crate))]
+    pub(super) mysql_instances: Vec<MySqlInstanceConfig>,
+    #[get(pub(crate))]
+    pub(super) postgresql_instances: Vec<PostgreSqlInstanceConfig>,
+    #[get(pub(crate))]
+    pub(super) redis_instances: Vec<RedisInstanceConfig>,
 }
 
 #[derive(Clone, Data, Debug, Default)]
-pub struct DockerComposeConfig {
-    mysql_port: Option<usize>,
-    mysql_database: Option<String>,
-    mysql_username: Option<String>,
-    mysql_password: Option<String>,
-    redis_port: Option<usize>,
-    redis_username: Option<String>,
-    redis_password: Option<String>,
-    postgresql_port: Option<usize>,
-    postgresql_database: Option<String>,
-    postgresql_username: Option<String>,
-    postgresql_password: Option<String>,
+pub struct MySqlInstanceConfig {
+    #[get(pub(crate))]
+    pub(super) database: String,
+    #[get(pub(crate))]
+    pub(super) host: String,
+    #[get(pub(crate))]
+    pub(super) name: String,
+    #[get(pub(crate))]
+    pub(super) password: String,
+    #[get(type(copy), pub(crate))]
+    pub(super) port: usize,
+    #[get(pub(crate))]
+    pub(super) username: String,
+}
+
+#[derive(Clone, Data, Debug, Default)]
+pub struct PostgreSqlInstanceConfig {
+    #[get(pub(crate))]
+    pub(super) database: String,
+    #[get(pub(crate))]
+    pub(super) host: String,
+    #[get(pub(crate))]
+    pub(super) name: String,
+    #[get(pub(crate))]
+    pub(super) password: String,
+    #[get(type(copy), pub(crate))]
+    pub(super) port: usize,
+    #[get(pub(crate))]
+    pub(super) username: String,
+}
+
+#[derive(Clone, Data, Debug, Default)]
+pub struct RedisInstanceConfig {
+    #[get(pub(crate))]
+    pub(super) host: String,
+    #[get(pub(crate))]
+    pub(super) name: String,
+    #[get(pub(crate))]
+    pub(super) password: String,
+    #[get(type(copy), pub(crate))]
+    pub(super) port: usize,
+    #[get(pub(crate))]
+    pub(super) username: String,
 }

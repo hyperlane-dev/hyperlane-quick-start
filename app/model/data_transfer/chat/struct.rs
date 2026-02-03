@@ -1,22 +1,31 @@
 use super::*;
 
-#[derive(Data, Default, Deserialize, Serialize, ToSchema)]
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct WebSocketRespData {
-    r#type: MessageType,
-    name: String,
-    data: String,
-    time: String,
+    #[get(pub)]
+    pub(super) r#type: MessageType,
+    #[get(pub)]
+    pub(super) name: String,
+    #[get(pub)]
+    pub(super) data: String,
+    #[get(pub)]
+    pub(super) time: String,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct UserListResponse {
-    users: Vec<OnlineUser>,
-    total_count: usize,
+    #[get(pub)]
+    pub(super) users: Vec<OnlineUser>,
+    #[get(type(copy), pub)]
+    pub(super) total_count: usize,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct ChatHistoryResponse {
-    pub messages: Vec<ChatHistory>,
-    pub total: usize,
-    pub has_more: bool,
+    #[get(pub)]
+    pub(super) messages: Vec<ChatHistory>,
+    #[get(type(copy), pub)]
+    pub(super) total: usize,
+    #[get(type(copy), pub)]
+    pub(super) has_more: bool,
 }

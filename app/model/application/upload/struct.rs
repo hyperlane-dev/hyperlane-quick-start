@@ -2,23 +2,34 @@ use super::*;
 
 #[derive(Clone, Data, Debug, Default, ToSchema)]
 pub struct FileChunkData {
-    file_id: String,
-    file_name: String,
-    chunk_index: usize,
-    total_chunks: usize,
-    base_file_dir: String,
+    #[get(pub)]
+    pub(super) file_id: String,
+    #[get(pub)]
+    pub(super) file_name: String,
+    #[get(type(copy), pub)]
+    pub(super) chunk_index: usize,
+    #[get(type(copy), pub)]
+    pub(super) total_chunks: usize,
+    #[get(pub)]
+    pub(super) base_file_dir: String,
 }
 
 #[derive(Clone, Data, Debug, Default, ToSchema)]
 pub struct RangeRequest {
-    start: u64,
-    end: Option<u64>,
+    #[get(type(copy), pub)]
+    pub(super) start: u64,
+    #[get(pub)]
+    pub(super) end: Option<u64>,
 }
 
 #[derive(Clone, Data, Debug, Default, ToSchema)]
 pub struct PartialContent {
-    data: Vec<u8>,
-    content_range: String,
-    content_length: u64,
-    total_size: u64,
+    #[get(pub)]
+    pub(super) data: Vec<u8>,
+    #[get(pub)]
+    pub(super) content_range: String,
+    #[get(type(copy), pub)]
+    pub(super) content_length: u64,
+    #[get(type(copy), pub)]
+    pub(super) total_size: u64,
 }

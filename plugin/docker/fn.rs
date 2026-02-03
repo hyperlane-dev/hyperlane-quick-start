@@ -33,36 +33,36 @@ pub async fn execute_with_config(command: &str, config: &DockerConfig) -> Docker
 #[instrument_trace]
 fn build_docker_args(config: &DockerConfig, command: &str) -> Vec<String> {
     let mut args: Vec<String> = vec!["run".to_string(), "--rm".to_string()];
-    if config.disable_network {
+    if config.get_disable_network() {
         args.push("--network=none".to_string());
     }
-    if let Some(cpus) = config.cpus {
+    if let Some(cpus) = config.get_cpus() {
         args.push(format!("--cpus={cpus}"));
     }
-    if let Some(ref memory) = config.memory {
+    if let Some(memory) = config.try_get_memory() {
         args.push(format!("--memory={memory}"));
     }
-    if let Some(pids_limit) = config.pids_limit {
+    if let Some(pids_limit) = config.get_pids_limit() {
         args.push(format!("--pids-limit={pids_limit}"));
     }
-    if config.read_only {
+    if config.get_read_only() {
         args.push("--read-only".to_string());
         args.push("--tmpfs".to_string());
         args.push("/tmp:rw,noexec,nosuid,size=100m".to_string());
     }
-    for (host_path, container_path) in &config.volumes {
+    for (host_path, container_path) in config.get_volumes() {
         args.push("-v".to_string());
         args.push(format!("{host_path}:{container_path}"));
     }
-    for (key, value) in &config.env_vars {
+    for (key, value) in config.get_env_vars() {
         args.push("-e".to_string());
         args.push(format!("{key}={value}"));
     }
     args.push("-w".to_string());
-    args.push(config.workdir.clone());
-    args.push(config.image.clone());
-    args.push(config.shell.clone());
-    args.push(config.shell_flag.clone());
+    args.push(config.get_workdir().clone());
+    args.push(config.get_image().clone());
+    args.push(config.get_shell().clone());
+    args.push(config.get_shell_flag().clone());
     args.push(command.to_string());
     args
 }

@@ -11,12 +11,12 @@ impl<T: Clone> ConnectionCache<T> {
 
     #[instrument_trace]
     pub fn is_cooldown_expired(&self, cooldown_duration: Duration) -> bool {
-        self.last_attempt.elapsed() >= cooldown_duration
+        self.get_last_attempt().elapsed() >= cooldown_duration
     }
 
     #[instrument_trace]
     pub fn should_retry(&self, cooldown_duration: Duration) -> bool {
-        self.result.is_err() && self.is_cooldown_expired(cooldown_duration)
+        self.try_get_result().is_err() && self.is_cooldown_expired(cooldown_duration)
     }
 }
 
@@ -96,12 +96,12 @@ impl std::error::Error for AutoCreationError {}
 impl AutoCreationResult {
     #[instrument_trace]
     pub fn has_changes(&self) -> bool {
-        self.database_created || !self.tables_created.is_empty()
+        self.get_database_created() || !self.get_tables_created().is_empty()
     }
 
     #[instrument_trace]
     pub fn has_errors(&self) -> bool {
-        !self.errors.is_empty()
+        !self.get_errors().is_empty()
     }
 }
 
@@ -120,7 +120,7 @@ impl Default for AutoCreationResult {
 impl TableSchema {
     #[instrument_trace]
     pub fn with_dependency(mut self, dependency: String) -> Self {
-        self.dependencies.push(dependency);
+        self.get_mut_dependencies().push(dependency);
         self
     }
 }
@@ -128,34 +128,35 @@ impl TableSchema {
 impl DatabaseSchema {
     #[instrument_trace]
     pub fn add_table(mut self, table: TableSchema) -> Self {
-        self.tables.push(table);
+        self.get_mut_tables().push(table);
         self
     }
 
     #[instrument_trace]
     pub fn add_index(mut self, index: String) -> Self {
-        self.indexes.push(index);
+        self.get_mut_indexes().push(index);
         self
     }
 
     #[instrument_trace]
     pub fn add_constraint(mut self, constraint: String) -> Self {
-        self.constraints.push(constraint);
+        self.get_mut_constraints().push(constraint);
         self
     }
 
     #[instrument_trace]
     pub fn ordered_tables(&self) -> Vec<&TableSchema> {
         let mut ordered: Vec<&TableSchema> = Vec::new();
-        let mut remaining: Vec<&TableSchema> = self.tables.iter().collect();
+        let mut remaining: Vec<&TableSchema> = self.get_tables().iter().collect();
         while !remaining.is_empty() {
             let mut added_any: bool = false;
-            remaining.retain(|table| {
-                let dependencies_satisfied = table.dependencies.iter().all(|dep| {
-                    ordered
-                        .iter()
-                        .any(|ordered_table: &&TableSchema| &ordered_table.name == dep)
-                });
+            remaining.retain(|table: &&TableSchema| {
+                let dependencies_satisfied: bool =
+                    table.get_dependencies().iter().all(|dep: &String| {
+                        ordered.iter().any(|ordered_table: &&TableSchema| {
+                            ordered_table.get_name().as_str() == dep.as_str()
+                        })
+                    });
                 if dependencies_satisfied {
                     ordered.push(table);
                     added_any = true;
@@ -184,13 +185,13 @@ impl AutoCreationConfig {
     #[instrument_trace]
     pub fn validate() -> Result<(), String> {
         let env: &'static EnvConfig = Self::get_env();
-        if env.mysql_instances.is_empty() {
+        if env.get_mysql_instances().is_empty() {
             return Err("At least one MySQL instance is required".to_string());
         }
-        if env.postgresql_instances.is_empty() {
+        if env.get_postgresql_instances().is_empty() {
             return Err("At least one PostgreSQL instance is required".to_string());
         }
-        if env.redis_instances.is_empty() {
+        if env.get_redis_instances().is_empty() {
             return Err("At least one Redis instance is required".to_string());
         }
         Ok(())
@@ -207,24 +208,24 @@ impl AutoCreationConfig {
 impl PluginAutoCreationConfig {
     #[instrument_trace]
     pub fn is_plugin_enabled(&self) -> bool {
-        PluginType::from_str(&self.plugin_name).is_ok()
+        PluginType::from_str(self.get_plugin_name()).is_ok()
     }
 
     #[instrument_trace]
     pub fn get_database_name(&self) -> String {
         let env: &'static EnvConfig = AutoCreationConfig::get_env();
-        if let Ok(plugin_type) = PluginType::from_str(&self.plugin_name) {
+        if let Ok(plugin_type) = PluginType::from_str(self.get_plugin_name()) {
             match plugin_type {
                 PluginType::MySQL => {
                     if let Some(instance) = env.get_default_mysql_instance() {
-                        instance.database.clone()
+                        instance.get_database().clone()
                     } else {
                         "unknown".to_string()
                     }
                 }
                 PluginType::PostgreSQL => {
                     if let Some(instance) = env.get_default_postgresql_instance() {
-                        instance.database.clone()
+                        instance.get_database().clone()
                     } else {
                         "unknown".to_string()
                     }
@@ -239,25 +240,35 @@ impl PluginAutoCreationConfig {
     #[instrument_trace]
     pub fn get_connection_info(&self) -> String {
         let env: &'static EnvConfig = AutoCreationConfig::get_env();
-        if let Ok(plugin_type) = PluginType::from_str(&self.plugin_name) {
+        if let Ok(plugin_type) = PluginType::from_str(self.get_plugin_name()) {
             match plugin_type {
                 PluginType::MySQL => {
                     if let Some(instance) = env.get_default_mysql_instance() {
-                        format!("{}:{}:{}", instance.host, instance.port, instance.database)
+                        format!(
+                            "{}:{}:{}",
+                            instance.get_host(),
+                            instance.get_port(),
+                            instance.get_database()
+                        )
                     } else {
                         "unknown".to_string()
                     }
                 }
                 PluginType::PostgreSQL => {
                     if let Some(instance) = env.get_default_postgresql_instance() {
-                        format!("{}:{}:{}", instance.host, instance.port, instance.database)
+                        format!(
+                            "{}:{}:{}",
+                            instance.get_host(),
+                            instance.get_port(),
+                            instance.get_database()
+                        )
                     } else {
                         "unknown".to_string()
                     }
                 }
                 PluginType::Redis => {
                     if let Some(instance) = env.get_default_redis_instance() {
-                        format!("{}:{}", instance.host, instance.port)
+                        format!("{}:{}", instance.get_host(), instance.get_port())
                     } else {
                         "unknown".to_string()
                     }
@@ -282,7 +293,7 @@ impl AutoCreationLogger {
         if result.has_errors() {
             info!(
                 "[AUTO-CREATION] Auto-creation completed for {plugin_type} with warnings{COLON_SPACE}{}",
-                result.errors.join(", ")
+                result.get_errors().join(", ")
             );
         } else {
             info!("[AUTO-CREATION] Auto-creation completed successfully for {plugin_type}");

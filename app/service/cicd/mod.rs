@@ -3,8 +3,11 @@ mod r#fn;
 mod r#impl;
 mod r#static;
 mod r#struct;
+mod r#type;
 
-pub use {r#const::*, r#fn::*, r#static::*, r#struct::*};
+pub use {r#const::*, r#fn::*, r#struct::*};
+
+use {r#static::*, r#type::*};
 
 use {
     super::*,
@@ -28,18 +31,15 @@ use std::{
     path::PathBuf,
     pin::Pin,
     process::{ExitStatus, Output, Stdio},
-    sync::Arc,
+    sync::{Arc, OnceLock},
 };
 
-use {
-    once_cell::sync::Lazy,
-    tokio::{
-        fs,
-        io::{AsyncBufReadExt, AsyncRead, BufReader, Lines},
-        process::{Child, Command},
-        spawn,
-        sync::{RwLock, RwLockReadGuard, RwLockWriteGuard, broadcast},
-        task::{JoinError, JoinHandle},
-        time::{error::Elapsed, timeout},
-    },
+use tokio::{
+    fs,
+    io::{AsyncBufReadExt, AsyncRead, BufReader, Lines},
+    process::{Child, Command},
+    spawn,
+    sync::{RwLock, RwLockReadGuard, RwLockWriteGuard, broadcast},
+    task::{JoinError, JoinHandle},
+    time::{error::Elapsed, timeout},
 };

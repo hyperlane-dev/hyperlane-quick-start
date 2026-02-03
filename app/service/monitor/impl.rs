@@ -58,12 +58,12 @@ impl MonitorService {
                         .set_bytes(WIN_DEFAULT_PACKET_BYTES);
                     conn
                 });
-                let current_packets: u64 = *entry.get_packets();
+                let current_packets: u64 = entry.get_packets();
                 entry.set_packets(current_packets + 1);
                 acc
             });
         let mut top_connections: Vec<ConnectionInfo> = connections.into_values().collect();
-        top_connections.sort_by(|a, b| b.get_packets().cmp(a.get_packets()));
+        top_connections.sort_by_key(|b| std::cmp::Reverse(b.get_packets()));
         top_connections.truncate(TOP_CONNECTIONS_LIMIT);
         top_connections
     }

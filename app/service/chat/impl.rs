@@ -370,10 +370,11 @@ impl ChatService {
         let messages: Vec<ChatHistory> = ChatHistoryMapper::get_history(before_id, limit).await?;
         let total: i64 = ChatHistoryMapper::count_messages().await?;
         let has_more: bool = messages.len() as i64 == limit;
-        Ok(ChatHistoryResponse {
-            messages,
-            total: total as usize,
-            has_more,
-        })
+        let mut response = ChatHistoryResponse::default();
+        response
+            .set_messages(messages)
+            .set_total(total as usize)
+            .set_has_more(has_more);
+        Ok(response)
     }
 }

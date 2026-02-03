@@ -1,8 +1,11 @@
 use super::*;
 
-#[derive(Clone, Data, Default, Deserialize, Serialize, ToSchema)]
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct GomokuWsRequest {
-    r#type: GomokuMessageType,
-    room_id: String,
-    payload: serde_json::Value,
+    #[get(pub)]
+    pub(super) r#type: GomokuMessageType,
+    #[get(pub)]
+    pub(super) room_id: String,
+    #[get(pub)]
+    pub(super) payload: serde_json::Value,
 }

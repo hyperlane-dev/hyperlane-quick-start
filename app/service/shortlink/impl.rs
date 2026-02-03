@@ -18,21 +18,21 @@ impl ShortlinkService {
 
     #[instrument_trace]
     pub async fn insert_shortlink(request: ShortlinkInsertRequest) -> Result<String, String> {
-        if request.url.is_empty() {
+        if request.get_url().is_empty() {
             return Err("URL cannot be empty".to_string());
         }
         let db: DatabaseConnection =
             get_postgresql_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
         let existing_record: Option<Model> = Entity::find()
-            .filter(Column::Url.eq(&request.url))
+            .filter(Column::Url.eq(request.get_url()))
             .one(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
         let record_id: i32 = if let Some(record) = existing_record {
-            record.id
+            record.get_id()
         } else {
             let active_model: ActiveModel = ActiveModel {
-                url: ActiveValue::Set(request.url),
+                url: ActiveValue::Set(request.get_url().clone()),
                 id: ActiveValue::NotSet,
                 created_at: ActiveValue::NotSet,
             };
@@ -40,7 +40,7 @@ impl ShortlinkService {
                 .insert(&db)
                 .await
                 .map_err(|error: DbErr| error.to_string())?;
-            result.id
+            result.get_id()
         };
         Self::encrypt_id(record_id)
     }
@@ -56,14 +56,16 @@ impl ShortlinkService {
             .map_err(|error: DbErr| error.to_string())?;
         match record {
             Some(model) => {
-                let record = ShortlinkRecord {
-                    id: model.id,
-                    url: model.url,
-                    created_at: model
-                        .created_at
-                        .map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string())
-                        .unwrap_or_default(),
-                };
+                let mut record = ShortlinkRecord::default();
+                record
+                    .set_id(model.get_id())
+                    .set_url(model.get_url().clone())
+                    .set_created_at(
+                        model
+                            .try_get_created_at()
+                            .map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string())
+                            .unwrap_or_default(),
+                    );
                 Ok(Some(record))
             }
             None => Ok(None),

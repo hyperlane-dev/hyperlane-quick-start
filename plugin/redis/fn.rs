@@ -25,7 +25,7 @@ where
                 &error,
                 "Auto-creation process",
                 database::PluginType::Redis,
-                Some(&instance.name),
+                Some(instance.get_name().as_str()),
             )
             .await;
             if !error.should_continue() {
@@ -116,7 +116,7 @@ where
     {
         let connections: RwLockReadGuard<'_, RedisConnectionMap> = REDIS_CONNECTIONS.read().await;
         if let Some(cache) = connections.get(instance_name_str) {
-            match &cache.result {
+            match cache.try_get_result() {
                 Ok(conn) => return Ok(conn.clone()),
                 Err(error) => {
                     if !cache.is_cooldown_expired(cooldown_duration) {
@@ -128,7 +128,7 @@ where
     }
     let mut connections: RwLockWriteGuard<'_, RedisConnectionMap> = REDIS_CONNECTIONS.write().await;
     if let Some(cache) = connections.get(instance_name_str) {
-        match &cache.result {
+        match cache.try_get_result() {
             Ok(conn) => return Ok(conn.clone()),
             Err(error) => {
                 if !cache.is_cooldown_expired(cooldown_duration) {
@@ -155,40 +155,41 @@ pub async fn perform_redis_auto_creation(
 ) -> Result<AutoCreationResult, AutoCreationError> {
     let start_time: Instant = Instant::now();
     let mut result: AutoCreationResult = AutoCreationResult::default();
-    AutoCreationLogger::log_auto_creation_start(database::PluginType::Redis, &instance.name).await;
+    AutoCreationLogger::log_auto_creation_start(database::PluginType::Redis, instance.get_name())
+        .await;
     let auto_creator: RedisAutoCreation = RedisAutoCreation::new(instance.clone());
     match auto_creator.create_database_if_not_exists().await {
         Ok(created) => {
-            result.database_created = created;
+            result.set_database_created(created);
         }
         Err(error) => {
             AutoCreationLogger::log_auto_creation_error(
                 &error,
                 "Database validation",
                 database::PluginType::Redis,
-                Some(&instance.name),
+                Some(instance.get_name().as_str()),
             )
             .await;
             if !error.should_continue() {
-                result.duration = start_time.elapsed();
+                result.set_duration(start_time.elapsed());
                 return Err(error);
             }
-            result.errors.push(error.to_string());
+            result.get_mut_errors().push(error.to_string());
         }
     }
     match auto_creator.create_tables_if_not_exist().await {
         Ok(operations) => {
-            result.tables_created = operations;
+            result.set_tables_created(operations);
         }
         Err(error) => {
             AutoCreationLogger::log_auto_creation_error(
                 &error,
                 "Namespace setup",
                 database::PluginType::Redis,
-                Some(&instance.name),
+                Some(instance.get_name().as_str()),
             )
             .await;
-            result.errors.push(error.to_string());
+            result.get_mut_errors().push(error.to_string());
         }
     }
     if let Err(error) = auto_creator.verify_connection().await {
@@ -196,16 +197,16 @@ pub async fn perform_redis_auto_creation(
             &error,
             "Connection verification",
             database::PluginType::Redis,
-            Some(&instance.name),
+            Some(instance.get_name().as_str()),
         )
         .await;
         if !error.should_continue() {
-            result.duration = start_time.elapsed();
+            result.set_duration(start_time.elapsed());
             return Err(error);
         }
-        result.errors.push(error.to_string());
+        result.get_mut_errors().push(error.to_string());
     }
-    result.duration = start_time.elapsed();
+    result.set_duration(start_time.elapsed());
     AutoCreationLogger::log_auto_creation_complete(database::PluginType::Redis, &result).await;
     Ok(result)
 }

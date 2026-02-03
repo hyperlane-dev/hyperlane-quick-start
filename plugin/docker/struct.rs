@@ -1,22 +1,39 @@
-#[derive(Clone, Debug, Default)]
+use super::*;
+
+#[derive(Clone, Data, Debug, Default)]
 pub struct DockerConfig {
-    pub(super) image: String,
-    pub(super) shell: String,
-    pub(super) shell_flag: String,
+    #[get(type(copy), pub)]
     pub(super) cpus: Option<f32>,
-    pub(super) memory: Option<String>,
-    pub(super) pids_limit: Option<i32>,
+    #[get(type(copy), pub)]
     pub(super) disable_network: bool,
-    pub(super) read_only: bool,
-    pub(super) workdir: String,
+    #[get(pub)]
     pub(super) env_vars: Vec<(String, String)>,
+    #[get(pub)]
+    pub(super) image: String,
+    #[get(pub)]
+    pub(super) memory: Option<String>,
+    #[get(type(copy), pub)]
+    pub(super) pids_limit: Option<i32>,
+    #[get(type(copy), pub)]
+    pub(super) read_only: bool,
+    #[get(pub)]
+    pub(super) shell: String,
+    #[get(pub)]
+    pub(super) shell_flag: String,
+    #[get(pub)]
     pub(super) volumes: Vec<(String, String)>,
+    #[get(pub)]
+    pub(super) workdir: String,
 }
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Data, Debug, Default)]
 pub struct DockerResult {
-    pub(super) stdout: String,
-    pub(super) stderr: String,
+    #[get(type(copy), pub(crate))]
     pub(super) exit_code: i32,
+    #[get(type(copy), pub(crate))]
     pub(super) success: bool,
+    #[get(pub(crate))]
+    pub(super) stderr: String,
+    #[get(pub(crate))]
+    pub(super) stdout: String,
 }

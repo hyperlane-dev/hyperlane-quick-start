@@ -105,35 +105,36 @@ impl RssService {
         for file in limited_files {
             let full_url: String = format!("{base_url}{}", file.get_file_url());
             let enclosure: Option<RssEnclosure> = if !file.get_content_type().is_empty() {
-                Some(RssEnclosure {
-                    url: full_url.clone(),
-                    length: *file.get_file_size(),
-                    r#type: file.get_content_type().to_string(),
-                })
+                let mut enclosure_obj = RssEnclosure::default();
+                enclosure_obj
+                    .set_url(full_url.clone())
+                    .set_length(file.get_file_size())
+                    .set_type(file.get_content_type().to_string());
+                Some(enclosure_obj)
             } else {
                 None
             };
-            items.push(RssItem {
-                title: file.get_file_name().to_string(),
-                link: full_url.clone(),
-                description: format!(
+            let mut item = RssItem::default();
+            item.set_title(file.get_file_name().to_string())
+                .set_link(full_url.clone())
+                .set_description(format!(
                     "File{COLON_SPACE}{}, Size{COLON_SPACE}{} bytes, Upload Time{COLON_SPACE}{}.",
                     file.get_file_name(),
                     file.get_file_size(),
                     file.get_upload_time()
-                ),
-                pub_date: Self::format_rfc822_date(file.get_upload_time()),
-                guid: full_url,
-                enclosure,
-            });
+                ))
+                .set_pub_date(Self::format_rfc822_date(file.get_upload_time()))
+                .set_guid(full_url)
+                .set_enclosure(enclosure);
+            items.push(item);
         }
-        let channel: RssChannel = RssChannel {
-            title: "Uploaded Resources Feed".to_string(),
-            link: base_url.to_string(),
-            description: "Subscribe to the latest uploaded resource files".to_string(),
-            language: "en-US".to_string(),
-            items,
-        };
+        let mut channel: RssChannel = RssChannel::default();
+        channel
+            .set_title("Uploaded Resources Feed".to_string())
+            .set_link(base_url.to_string())
+            .set_description("Subscribe to the latest uploaded resource files".to_string())
+            .set_language("en-US".to_string())
+            .set_items(items);
         Self::build_rss_xml(&channel)
     }
 
@@ -152,47 +153,50 @@ impl RssService {
         xml.push_str("{BR}  <channel>");
         xml.push_str(&format!(
             "{BR}    <title>{}</title>",
-            Self::escape_xml(&channel.title)
+            Self::escape_xml(channel.get_title())
         ));
         xml.push_str(&format!(
             "{BR}    <link>{}</link>",
-            Self::escape_xml(&channel.link)
+            Self::escape_xml(channel.get_link())
         ));
         xml.push_str(&format!(
             "{BR}    <description>{}</description>",
-            Self::escape_xml(&channel.description)
+            Self::escape_xml(channel.get_description())
         ));
         xml.push_str(&format!(
             "{BR}    <language>{}</language>",
-            channel.language
+            channel.get_language()
         ));
-        for item in &channel.items {
+        for item in channel.get_items() {
             xml.push_str("{BR}    <item>");
             xml.push_str(&format!(
                 "{BR}      <title>{}</title>",
-                Self::escape_xml(&item.title)
+                Self::escape_xml(item.get_title())
             ));
             xml.push_str(&format!(
                 "{BR}      <link>{}</link>",
-                Self::escape_xml(&item.link)
+                Self::escape_xml(item.get_link())
             ));
             xml.push_str(&format!(
                 "{BR}      <description>{}</description>",
-                Self::escape_xml(&item.description)
+                Self::escape_xml(item.get_description())
             ));
-            if !item.pub_date.is_empty() {
-                xml.push_str(&format!("{BR}      <pubDate>{}</pubDate>", item.pub_date));
+            if !item.get_pub_date().is_empty() {
+                xml.push_str(&format!(
+                    "{BR}      <pubDate>{}</pubDate>",
+                    item.get_pub_date()
+                ));
             }
             xml.push_str(&format!(
                 "{BR}      <guid>{}</guid>",
-                Self::escape_xml(&item.guid)
+                Self::escape_xml(item.get_guid())
             ));
-            if let Some(enclosure) = &item.enclosure {
+            if let Some(enclosure) = item.try_get_enclosure() {
                 xml.push_str(&format!(
                     "{BR}      <enclosure url=\"{}\" length=\"{}\" type=\"{}\" />",
-                    Self::escape_xml(&enclosure.url),
-                    enclosure.length,
-                    Self::escape_xml(&enclosure.r#type)
+                    Self::escape_xml(enclosure.get_url()),
+                    enclosure.get_length(),
+                    Self::escape_xml(enclosure.get_type())
                 ));
             }
             xml.push_str("{BR}    </item>");

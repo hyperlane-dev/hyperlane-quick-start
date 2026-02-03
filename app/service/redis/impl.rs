@@ -10,7 +10,7 @@ impl RedisService {
         };
         let mut conn: Connection = Arc::try_unwrap(conn_arc)
             .map_err(|_| "Failed to get exclusive access to connection")?;
-        let _: () = Commands::set(&mut conn, &dao.key, &dao.value)
+        let _: () = Commands::set(&mut conn, dao.get_key(), dao.get_value())
             .map_err(|error: RedisError| error.to_string())?;
         Ok(())
     }

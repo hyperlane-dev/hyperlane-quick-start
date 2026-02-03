@@ -163,12 +163,12 @@ impl ServerHook for ListRunsRoute {
         let pipeline_id: Option<i32> = querys
             .get("pipeline_id")
             .and_then(|s: &String| s.parse().ok());
-        let param: QueryRunsParam = QueryRunsParam {
-            pipeline_id,
-            status: None,
-            page_size,
-            last_id,
-        };
+        let mut param = QueryRunsParam::default();
+        param
+            .set_pipeline_id(pipeline_id)
+            .set_status(None)
+            .set_page_size(page_size)
+            .set_last_id(last_id);
         match CicdService::query_runs(param).await {
             Ok(result) => {
                 let response: ApiResponse<PaginatedRunsDto> = ApiResponse::success(result);
@@ -464,10 +464,9 @@ impl ServerHook for RunLogsSseRoute {
             ctx.closed().await;
             return;
         }
-        let mut interval: tokio::time::Interval =
-            tokio::time::interval(tokio::time::Duration::from_millis(100));
-        let timeout_duration: tokio::time::Duration = tokio::time::Duration::from_secs(3600);
-        let start_time: tokio::time::Instant = tokio::time::Instant::now();
+        let mut interval_timer: Interval = interval(Duration::from_millis(100));
+        let timeout_duration: Duration = Duration::from_secs(3600);
+        let start_time: Instant = Instant::now();
         loop {
             if start_time.elapsed() > timeout_duration {
                 let timeout_event: String = format!(
@@ -488,9 +487,9 @@ impl ServerHook for RunLogsSseRoute {
                         let log_event: String = format!(
                             "event: log\ndata: {{\"step_id\":{},\"timestamp\":{},\"is_stderr\":{},\"content\":\"{}\"}}{}",
                             step_id,
-                            log_entry.timestamp,
-                            log_entry.is_stderr,
-                            Self::escape_json_string(&log_entry.content),
+                            log_entry.get_timestamp(),
+                            log_entry.get_is_stderr(),
+                            Self::escape_json_string(log_entry.get_content()),
                             HTTP_DOUBLE_BR
                         );
                         ctx.set_response_body(&log_event).await.send_body().await;
@@ -527,7 +526,7 @@ impl ServerHook for RunLogsSseRoute {
                 }
             }
             if !has_activity {
-                interval.tick().await;
+                interval_timer.tick().await;
             }
         }
         ctx.closed().await;

@@ -2,69 +2,69 @@ use super::*;
 
 impl From<Model> for PipelineDto {
     fn from(model: Model) -> Self {
-        Self {
-            id: model.get_id(),
-            name: model.get_name().clone(),
-            description: model.try_get_description().clone(),
-            config_content: model.try_get_config_content().clone(),
-            created_at: model.try_get_created_at().map(|dt| dt.to_string()),
-            updated_at: model.try_get_updated_at().map(|dt| dt.to_string()),
-        }
+        let mut dto = Self::default();
+        dto.set_id(model.get_id())
+            .set_name(model.get_name().clone())
+            .set_description(model.try_get_description().clone())
+            .set_config_content(model.try_get_config_content().clone())
+            .set_created_at(model.try_get_created_at().map(|dt| dt.to_string()))
+            .set_updated_at(model.try_get_updated_at().map(|dt| dt.to_string()));
+        dto
     }
 }
 
 impl From<mapper::cicd::run::Model> for RunDto {
     fn from(model: mapper::cicd::run::Model) -> Self {
         let status: CicdStatus = model.get_status().parse().unwrap_or_default();
-        Self {
-            id: model.get_id(),
-            pipeline_id: model.get_pipeline_id(),
-            pipeline_name: None,
-            run_number: model.get_run_number(),
-            status,
-            triggered_by: model.try_get_triggered_by().clone(),
-            commit_hash: model.try_get_commit_hash().clone(),
-            commit_message: model.try_get_commit_message().clone(),
-            started_at: model.try_get_started_at().map(|dt| dt.to_string()),
-            completed_at: model.try_get_completed_at().map(|dt| dt.to_string()),
-            duration_ms: model.get_duration_ms(),
-            created_at: model.try_get_created_at().map(|dt| dt.to_string()),
-        }
+        let mut dto = Self::default();
+        dto.set_id(model.get_id())
+            .set_pipeline_id(model.get_pipeline_id())
+            .set_pipeline_name(None)
+            .set_run_number(model.get_run_number())
+            .set_status(status)
+            .set_triggered_by(model.try_get_triggered_by().clone())
+            .set_commit_hash(model.try_get_commit_hash().clone())
+            .set_commit_message(model.try_get_commit_message().clone())
+            .set_started_at(model.try_get_started_at().map(|dt| dt.to_string()))
+            .set_completed_at(model.try_get_completed_at().map(|dt| dt.to_string()))
+            .set_duration_ms(model.get_duration_ms())
+            .set_created_at(model.try_get_created_at().map(|dt| dt.to_string()));
+        dto
     }
 }
 
 impl From<mapper::cicd::job::Model> for JobDto {
     fn from(model: mapper::cicd::job::Model) -> Self {
         let status: CicdStatus = model.get_status().parse().unwrap_or_default();
-        Self {
-            id: model.get_id(),
-            run_id: model.get_run_id(),
-            name: model.get_name().clone(),
-            status,
-            runner: model.try_get_runner().clone(),
-            started_at: model.try_get_started_at().map(|dt| dt.to_string()),
-            completed_at: model.try_get_completed_at().map(|dt| dt.to_string()),
-            duration_ms: model.get_duration_ms(),
-        }
+        let mut dto = Self::default();
+        dto.set_id(model.get_id())
+            .set_run_id(model.get_run_id())
+            .set_name(model.get_name().clone())
+            .set_status(status)
+            .set_runner(model.try_get_runner().clone())
+            .set_started_at(model.try_get_started_at().map(|dt| dt.to_string()))
+            .set_completed_at(model.try_get_completed_at().map(|dt| dt.to_string()))
+            .set_duration_ms(model.get_duration_ms());
+        dto
     }
 }
 
 impl From<mapper::cicd::step::Model> for StepDto {
     fn from(model: mapper::cicd::step::Model) -> Self {
         let status: CicdStatus = model.get_status().parse().unwrap_or_default();
-        Self {
-            id: model.get_id(),
-            job_id: model.get_job_id(),
-            name: model.get_name().clone(),
-            command: model.try_get_command().clone(),
-            status,
-            output: model.try_get_output().clone(),
-            dockerfile: model.try_get_dockerfile().clone(),
-            image: model.try_get_image().clone(),
-            started_at: model.try_get_started_at().map(|dt| dt.to_string()),
-            completed_at: model.try_get_completed_at().map(|dt| dt.to_string()),
-            duration_ms: model.get_duration_ms(),
-        }
+        let mut dto = Self::default();
+        dto.set_id(model.get_id())
+            .set_job_id(model.get_job_id())
+            .set_name(model.get_name().clone())
+            .set_command(model.try_get_command().clone())
+            .set_status(status)
+            .set_output(model.try_get_output().clone())
+            .set_dockerfile(model.try_get_dockerfile().clone())
+            .set_image(model.try_get_image().clone())
+            .set_started_at(model.try_get_started_at().map(|dt| dt.to_string()))
+            .set_completed_at(model.try_get_completed_at().map(|dt| dt.to_string()))
+            .set_duration_ms(model.get_duration_ms());
+        dto
     }
 }
 
@@ -73,8 +73,11 @@ impl CicdService {
     pub async fn create_pipeline(param: CreatePipelineParam) -> Result<i32, String> {
         let db: DatabaseConnection =
             get_mysql_connection(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let active_model: PipelineActiveModel =
-            PipelineActiveModel::new(param.name, param.description, param.config_content);
+        let active_model: PipelineActiveModel = PipelineActiveModel::new(
+            param.get_name().clone(),
+            param.try_get_description().clone(),
+            param.try_get_config_content().clone(),
+        );
         let result: Model = active_model
             .insert(&db)
             .await
@@ -109,17 +112,18 @@ impl CicdService {
     pub async fn trigger_run(param: TriggerRunParam) -> Result<i32, String> {
         let db: DatabaseConnection =
             get_mysql_connection(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let pipeline = Self::get_pipeline_by_id_with_config(param.pipeline_id).await?;
+        let pipeline_id: i32 = param.get_pipeline_id();
+        let pipeline = Self::get_pipeline_by_id_with_config(pipeline_id).await?;
         let config_content: String = pipeline
             .and_then(|p| p.try_get_config_content().clone())
             .ok_or_else(|| "Pipeline config content is required".to_string())?;
-        let run_number: i32 = Self::get_next_run_number(param.pipeline_id).await?;
+        let run_number: i32 = Self::get_next_run_number(pipeline_id).await?;
         let active_model: RunActiveModel = RunActiveModel::new(
-            param.pipeline_id,
+            pipeline_id,
             run_number,
-            param.triggered_by,
-            param.commit_hash,
-            param.commit_message,
+            param.try_get_triggered_by().clone(),
+            param.try_get_commit_hash().clone(),
+            param.try_get_commit_message().clone(),
         );
         let run_result = active_model
             .insert(&db)
@@ -155,34 +159,44 @@ impl CicdService {
     ) -> Result<(), String> {
         let config: PipelineConfig = serde_yaml::from_str(config_content)
             .map_err(|error| format!("Failed to parse config: {error}"))?;
-        let pipeline_dockerfile: Option<String> = config.dockerfile;
-        let pipeline_image: Option<String> = config.image;
-        for (job_name, job_config) in config.jobs {
+        let pipeline_dockerfile: Option<String> = config.try_get_dockerfile().clone();
+        let pipeline_image: Option<String> = config.try_get_image().clone();
+        for (job_name, job_config) in config.get_jobs() {
             let job_dockerfile: Option<String> = job_config
-                .dockerfile
+                .try_get_dockerfile()
+                .clone()
                 .or_else(|| pipeline_dockerfile.clone());
-            let job_image: Option<String> = job_config.image.or_else(|| pipeline_image.clone());
+            let job_image: Option<String> = job_config
+                .try_get_image()
+                .clone()
+                .or_else(|| pipeline_image.clone());
             let job_active_model: mapper::cicd::job::ActiveModel =
-                JobActiveModel::new(run_id, job_name);
+                JobActiveModel::new(run_id, job_name.clone());
             let job_result = job_active_model
                 .insert(db)
                 .await
                 .map_err(|error: DbErr| error.to_string())?;
             let job_id: i32 = job_result.get_id();
-            for step_config in job_config.steps {
-                let step_dockerfile: Option<String> =
-                    step_config.dockerfile.or_else(|| job_dockerfile.clone());
+            for step_config in job_config.get_steps() {
+                let step_dockerfile: Option<String> = step_config
+                    .try_get_dockerfile()
+                    .clone()
+                    .or_else(|| job_dockerfile.clone());
                 let step_image: Option<String> = job_image.clone();
                 let step_active_model: mapper::cicd::step::ActiveModel =
                     if step_dockerfile.is_some() || step_image.is_some() {
                         StepActiveModel::new_with_dockerfile(
                             job_id,
-                            step_config.name,
+                            step_config.get_name().clone(),
                             step_dockerfile,
                             step_image,
                         )
                     } else {
-                        StepActiveModel::new(job_id, step_config.name, step_config.run)
+                        StepActiveModel::new(
+                            job_id,
+                            step_config.get_name().clone(),
+                            step_config.try_get_run().clone(),
+                        )
                     };
                 step_active_model
                     .insert(db)
@@ -199,33 +213,34 @@ impl CicdService {
         let jobs: Vec<JobDto> = Self::get_jobs_by_run(run_id).await?;
         let mut has_error: bool = false;
         for job in jobs {
-            let job_id: i32 = job.id;
-            Self::update_job_status(UpdateJobStatusParam {
-                job_id,
-                status: CicdStatus::Running,
-                runner: Some("local-runner".to_string()),
-            })
-            .await?;
+            let job_id: i32 = job.get_id();
+            let mut param = UpdateJobStatusParam::default();
+            param
+                .set_job_id(job_id)
+                .set_status(CicdStatus::Running)
+                .set_runner(Some("local-runner".to_string()));
+            Self::update_job_status(param).await?;
             let steps: Vec<StepDto> = Self::get_steps_by_job(job_id).await?;
             let mut job_has_error: bool = false;
             for step in steps {
-                let step_id: i32 = step.id;
-                Self::update_step_status(UpdateStepStatusParam {
-                    step_id,
-                    status: CicdStatus::Running,
-                    output: None,
-                })
-                .await?;
+                let step_id: i32 = step.get_id();
+                let mut param = UpdateStepStatusParam::default();
+                param
+                    .set_step_id(step_id)
+                    .set_status(CicdStatus::Running)
+                    .set_output(None);
+                Self::update_step_status(param).await?;
                 let log_manager: &LogStreamManager = get_log_stream_manager();
                 log_manager.start_step_stream(run_id, step_id).await;
-                let output: String = if step.image.is_some() && step.dockerfile.is_none() {
-                    Self::execute_image(run_id, &step).await
-                } else if step.dockerfile.is_some() {
-                    Self::execute_dockerfile(run_id, &step).await
-                } else {
-                    let command: String = step.command.unwrap_or_default();
-                    Self::execute_command(run_id, step_id, &command).await
-                };
+                let output: String =
+                    if step.try_get_image().is_some() && step.try_get_dockerfile().is_none() {
+                        Self::execute_image(run_id, &step).await
+                    } else if step.try_get_dockerfile().is_some() {
+                        Self::execute_dockerfile(run_id, &step).await
+                    } else {
+                        let command: String = step.try_get_command().clone().unwrap_or_default();
+                        Self::execute_command(run_id, step_id, &command).await
+                    };
                 let step_status: CicdStatus = if output.starts_with("Error:") {
                     job_has_error = true;
                     has_error = true;
@@ -237,12 +252,12 @@ impl CicdService {
                     .update_step_status(run_id, step_id, step_status)
                     .await;
                 log_manager.end_step_stream(run_id, step_id).await;
-                Self::update_step_status(UpdateStepStatusParam {
-                    step_id,
-                    status: step_status,
-                    output: Some(output),
-                })
-                .await?;
+                let mut param = UpdateStepStatusParam::default();
+                param
+                    .set_step_id(step_id)
+                    .set_status(step_status)
+                    .set_output(Some(output));
+                Self::update_step_status(param).await?;
                 if job_has_error {
                     break;
                 }
@@ -252,12 +267,12 @@ impl CicdService {
             } else {
                 CicdStatus::Success
             };
-            Self::update_job_status(UpdateJobStatusParam {
-                job_id,
-                status: job_status,
-                runner: Some("local-runner".to_string()),
-            })
-            .await?;
+            let mut param = UpdateJobStatusParam::default();
+            param
+                .set_job_id(job_id)
+                .set_status(job_status)
+                .set_runner(Some("local-runner".to_string()));
+            Self::update_job_status(param).await?;
             if job_has_error {
                 break;
             }
@@ -449,19 +464,19 @@ impl CicdService {
     #[instrument_trace]
     fn build_docker_args_for_cicd(config: &DockerConfig, command: &str) -> Vec<String> {
         let mut args: Vec<String> = vec!["run".to_string(), "-d".to_string()];
-        if config.is_disable_network() {
+        if config.get_disable_network() {
             args.push("--network=none".to_string());
         }
         if let Some(cpus) = config.get_cpus() {
             args.push(format!("--cpus={cpus}"));
         }
-        if let Some(memory) = config.get_memory() {
+        if let Some(memory) = config.try_get_memory() {
             args.push(format!("--memory={memory}"));
         }
         if let Some(pids_limit) = config.get_pids_limit() {
             args.push(format!("--pids-limit={pids_limit}"));
         }
-        if config.is_read_only() {
+        if config.get_read_only() {
             args.push("--read-only".to_string());
             args.push("--tmpfs".to_string());
             args.push("/tmp:rw,noexec,nosuid,size=100m".to_string());
@@ -477,11 +492,11 @@ impl CicdService {
 
     #[instrument_trace]
     pub async fn execute_image(run_id: i32, step: &StepDto) -> String {
-        let image: String = match &step.image {
+        let image: String = match step.try_get_image() {
             Some(img) => img.clone(),
             None => return "Error: No image specified".to_string(),
         };
-        let step_id: i32 = step.id;
+        let step_id: i32 = step.get_id();
         let container_name: String = format!(
             "cicd-run-{run_id}-step-{step_id}-{}",
             Utc::now().timestamp()
@@ -526,11 +541,11 @@ impl CicdService {
 
     #[instrument_trace]
     pub async fn execute_dockerfile(run_id: i32, step: &StepDto) -> String {
-        let dockerfile_content: String = match &step.dockerfile {
+        let dockerfile_content: String = match step.try_get_dockerfile() {
             Some(content) => content.clone(),
             None => return "Error: No Dockerfile content".to_string(),
         };
-        let step_id: i32 = step.id;
+        let step_id: i32 = step.get_id();
         let image_tag: String = format!("cicd-run-{run_id}-step-{step_id}");
         let temp_dir: PathBuf = std::env::temp_dir().join(format!("cicd-{run_id}-{step_id}"));
         if let Err(error) = fs::create_dir_all(&temp_dir).await {
@@ -693,15 +708,15 @@ impl CicdService {
     pub async fn query_runs(param: QueryRunsParam) -> Result<PaginatedRunsDto, String> {
         let db: DatabaseConnection =
             get_mysql_connection(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let page_size: i32 = param.page_size.unwrap_or(50);
+        let page_size: i32 = param.try_get_page_size().unwrap_or(50);
         let mut query = RunEntity::find();
-        if let Some(pipeline_id) = param.pipeline_id {
+        if let Some(pipeline_id) = param.try_get_pipeline_id() {
             query = query.filter(RunColumn::PipelineId.eq(pipeline_id));
         }
-        if let Some(status) = param.status {
+        if let Some(status) = param.try_get_status() {
             query = query.filter(RunColumn::Status.eq(status.to_string()));
         }
-        if let Some(last_id) = param.last_id {
+        if let Some(last_id) = param.try_get_last_id() {
             query = query.filter(RunColumn::Id.lt(last_id));
         }
         let total: i32 = RunEntity::find()
@@ -720,11 +735,11 @@ impl CicdService {
         } else {
             models
         };
-        Ok(PaginatedRunsDto {
-            total,
-            runs: runs.into_iter().map(Into::into).collect(),
-            has_more,
-        })
+        let mut dto = PaginatedRunsDto::default();
+        dto.set_total(total)
+            .set_runs(runs.into_iter().map(Into::into).collect())
+            .set_has_more(has_more);
+        Ok(dto)
     }
 
     #[instrument_trace]
@@ -813,17 +828,20 @@ impl CicdService {
         let db: DatabaseConnection =
             get_mysql_connection(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
         let now: NaiveDateTime = Utc::now().naive_utc();
-        if param.status == CicdStatus::Running {
+        let param_status: CicdStatus = *param.get_status();
+        let param_job_id: i32 = param.get_job_id();
+        let param_runner: Option<String> = param.try_get_runner().clone();
+        if param_status == CicdStatus::Running {
             JobEntity::update_many()
-                .filter(JobColumn::Id.eq(param.job_id))
-                .col_expr(JobColumn::Status, Expr::value(param.status.to_string()))
-                .col_expr(JobColumn::Runner, Expr::value(param.runner))
+                .filter(JobColumn::Id.eq(param_job_id))
+                .col_expr(JobColumn::Status, Expr::value(param_status.to_string()))
+                .col_expr(JobColumn::Runner, Expr::value(param_runner))
                 .col_expr(JobColumn::StartedAt, Expr::value(now))
                 .exec(&db)
                 .await
                 .map_err(|error: DbErr| error.to_string())?;
-        } else if param.status.is_terminal() {
-            let job = JobEntity::find_by_id(param.job_id)
+        } else if param_status.is_terminal() {
+            let job = JobEntity::find_by_id(param_job_id)
                 .one(&db)
                 .await
                 .map_err(|error: DbErr| error.to_string())?;
@@ -834,8 +852,8 @@ impl CicdService {
                     - started_at.and_utc().timestamp_millis())
                     as i32;
                 JobEntity::update_many()
-                    .filter(JobColumn::Id.eq(param.job_id))
-                    .col_expr(JobColumn::Status, Expr::value(param.status.to_string()))
+                    .filter(JobColumn::Id.eq(param_job_id))
+                    .col_expr(JobColumn::Status, Expr::value(param_status.to_string()))
                     .col_expr(JobColumn::CompletedAt, Expr::value(now))
                     .col_expr(JobColumn::DurationMs, Expr::value(duration_ms))
                     .exec(&db)
@@ -844,8 +862,8 @@ impl CicdService {
             }
         } else {
             JobEntity::update_many()
-                .filter(JobColumn::Id.eq(param.job_id))
-                .col_expr(JobColumn::Status, Expr::value(param.status.to_string()))
+                .filter(JobColumn::Id.eq(param_job_id))
+                .col_expr(JobColumn::Status, Expr::value(param_status.to_string()))
                 .exec(&db)
                 .await
                 .map_err(|error: DbErr| error.to_string())?;
@@ -887,16 +905,19 @@ impl CicdService {
         let db: DatabaseConnection =
             get_mysql_connection(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
         let now: NaiveDateTime = Utc::now().naive_utc();
-        if param.status == CicdStatus::Running {
+        let param_status: CicdStatus = *param.get_status();
+        let param_step_id: i32 = param.get_step_id();
+        let param_output: Option<String> = param.try_get_output().clone();
+        if param_status == CicdStatus::Running {
             StepEntity::update_many()
-                .filter(StepColumn::Id.eq(param.step_id))
-                .col_expr(StepColumn::Status, Expr::value(param.status.to_string()))
+                .filter(StepColumn::Id.eq(param_step_id))
+                .col_expr(StepColumn::Status, Expr::value(param_status.to_string()))
                 .col_expr(StepColumn::StartedAt, Expr::value(now))
                 .exec(&db)
                 .await
                 .map_err(|error: DbErr| error.to_string())?;
-        } else if param.status.is_terminal() {
-            let step = StepEntity::find_by_id(param.step_id)
+        } else if param_status.is_terminal() {
+            let step = StepEntity::find_by_id(param_step_id)
                 .one(&db)
                 .await
                 .map_err(|error: DbErr| error.to_string())?;
@@ -906,9 +927,9 @@ impl CicdService {
                     - started_at.and_utc().timestamp_millis())
                     as i32;
                 StepEntity::update_many()
-                    .filter(StepColumn::Id.eq(param.step_id))
-                    .col_expr(StepColumn::Status, Expr::value(param.status.to_string()))
-                    .col_expr(StepColumn::Output, Expr::value(param.output))
+                    .filter(StepColumn::Id.eq(param_step_id))
+                    .col_expr(StepColumn::Status, Expr::value(param_status.to_string()))
+                    .col_expr(StepColumn::Output, Expr::value(param_output.clone()))
                     .col_expr(StepColumn::CompletedAt, Expr::value(now))
                     .col_expr(StepColumn::DurationMs, Expr::value(duration_ms))
                     .exec(&db)
@@ -917,9 +938,9 @@ impl CicdService {
             }
         } else {
             StepEntity::update_many()
-                .filter(StepColumn::Id.eq(param.step_id))
-                .col_expr(StepColumn::Status, Expr::value(param.status.to_string()))
-                .col_expr(StepColumn::Output, Expr::value(param.output))
+                .filter(StepColumn::Id.eq(param_step_id))
+                .col_expr(StepColumn::Status, Expr::value(param_status.to_string()))
+                .col_expr(StepColumn::Output, Expr::value(param_output.clone()))
                 .exec(&db)
                 .await
                 .map_err(|error: DbErr| error.to_string())?;
@@ -934,13 +955,14 @@ impl CicdService {
             let jobs = Self::get_jobs_by_run(run_id).await?;
             let mut jobs_with_steps: Vec<JobWithStepsDto> = Vec::new();
             for job in jobs {
-                let steps = Self::get_steps_by_job(job.id).await?;
-                jobs_with_steps.push(JobWithStepsDto { job, steps });
+                let steps = Self::get_steps_by_job(job.get_id()).await?;
+                let mut dto = JobWithStepsDto::default();
+                dto.set_job(job).set_steps(steps);
+                jobs_with_steps.push(dto);
             }
-            Ok(Some(RunDetailDto {
-                run: run_dto,
-                jobs: jobs_with_steps,
-            }))
+            let mut model = RunDetailDto::default();
+            model.set_run(run_dto).set_jobs(jobs_with_steps);
+            Ok(Some(model))
         } else {
             Ok(None)
         }
@@ -1050,15 +1072,15 @@ impl CicdService {
             let jobs: Vec<JobDto> = Self::get_jobs_by_run(run_id).await?;
             let mut jobs_with_steps: Vec<JobWithIncrementalStepsDto> = Vec::new();
             for job in jobs {
-                let steps: Vec<StepDto> = Self::get_steps_by_job(job.id).await?;
+                let steps: Vec<StepDto> = Self::get_steps_by_job(job.get_id()).await?;
                 let mut step_logs: Vec<StepLogDto> = Vec::new();
                 for step in steps {
                     let offset: usize = step_offsets
                         .iter()
-                        .find(|o: &&StepOffsetParam| o.step_id == step.id)
-                        .map(|o: &StepOffsetParam| o.offset)
+                        .find(|o: &&StepOffsetParam| o.get_step_id() == step.get_id())
+                        .map(|o: &StepOffsetParam| o.get_offset())
                         .unwrap_or(0);
-                    let output: Option<String> = step.output.clone();
+                    let output: Option<String> = step.try_get_output().clone();
                     let output_str: &str = output.as_deref().unwrap_or("");
                     let output_length: usize = output_str.len();
                     let (new_output, final_offset): (Option<String>, usize) =
@@ -1068,25 +1090,24 @@ impl CicdService {
                         } else {
                             (None, output_length)
                         };
-                    step_logs.push(StepLogDto {
-                        step_id: step.id,
-                        step_name: step.name.clone(),
-                        status: step.status,
-                        output: step.output.clone(),
-                        output_length: final_offset,
-                        new_output,
-                        output_offset: offset,
-                    });
+                    let mut log_dto = StepLogDto::default();
+                    log_dto
+                        .set_step_id(step.get_id())
+                        .set_step_name(step.get_name().clone())
+                        .set_status(*step.get_status())
+                        .set_output(step.try_get_output().clone())
+                        .set_output_length(final_offset)
+                        .set_new_output(new_output)
+                        .set_output_offset(offset);
+                    step_logs.push(log_dto);
                 }
-                jobs_with_steps.push(JobWithIncrementalStepsDto {
-                    job,
-                    steps: step_logs,
-                });
+                let mut job_dto = JobWithIncrementalStepsDto::default();
+                job_dto.set_job(job).set_steps(step_logs);
+                jobs_with_steps.push(job_dto);
             }
-            Ok(Some(IncrementalRunDetailDto {
-                run: run_dto,
-                jobs: jobs_with_steps,
-            }))
+            let mut detail_dto = IncrementalRunDetailDto::default();
+            detail_dto.set_run(run_dto).set_jobs(jobs_with_steps);
+            Ok(Some(detail_dto))
         } else {
             Ok(None)
         }

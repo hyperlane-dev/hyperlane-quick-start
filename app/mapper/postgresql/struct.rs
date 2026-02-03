@@ -1,9 +1,11 @@
 use super::*;
 
-#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]
 pub struct PostgresqlRecordDao {
-    pub key: String,
-    pub value: String,
+    #[get(pub(crate))]
+    pub(super) key: String,
+    #[get(pub(crate))]
+    pub(super) value: String,
 }
 
 #[derive(
@@ -20,8 +22,11 @@ pub struct PostgresqlRecordDao {
 #[sea_orm(table_name = "record", schema_name = "public")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = true)]
-    pub id: i32,
+    #[get(type(copy), pub(crate))]
+    pub(super) id: i32,
     #[sea_orm(unique)]
-    pub key: String,
-    pub value: String,
+    #[get(pub(crate))]
+    pub(super) key: String,
+    #[get(pub(crate))]
+    pub(super) value: String,
 }

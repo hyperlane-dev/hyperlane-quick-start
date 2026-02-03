@@ -2,5 +2,6 @@ use super::*;
 
 #[derive(Clone, Data, Debug, New)]
 pub struct RedisAutoCreation {
-    pub instance: RedisInstanceConfig,
+    #[get(pub(crate))]
+    pub(super) instance: RedisInstanceConfig,
 }

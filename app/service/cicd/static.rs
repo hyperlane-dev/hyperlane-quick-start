@@ -1,3 +1,3 @@
 use super::*;
 
-pub static LOG_STREAM_MANAGER: Lazy<LogStreamManager> = Lazy::new(LogStreamManager::new);
+pub(super) static LOG_STREAM_MANAGER: OnceLock<LogStreamManager> = OnceLock::new();
