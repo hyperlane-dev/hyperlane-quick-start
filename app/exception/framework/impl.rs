@@ -4,10 +4,8 @@ impl ServerHook for TaskPanicHook {
     #[task_panic_data(task_panic_data)]
     #[instrument_trace]
     async fn new(ctx: &Context) -> Self {
-        let content_type: String =
-            ContentType::format_content_type_with_charset(APPLICATION_JSON, UTF8);
         Self {
-            content_type,
+            content_type: ContentType::format_content_type_with_charset(APPLICATION_JSON, UTF8),
             response_body: task_panic_data.to_string(),
         }
     }
@@ -34,11 +32,9 @@ impl ServerHook for RequestErrorHook {
     #[request_error_data(request_error_data)]
     #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
-        let content_type: String =
-            ContentType::format_content_type_with_charset(APPLICATION_JSON, UTF8);
         Self {
             response_status_code: request_error_data.get_http_status_code(),
-            content_type,
+            content_type: ContentType::format_content_type_with_charset(APPLICATION_JSON, UTF8),
             response_body: request_error_data.to_string(),
         }
     }
@@ -56,7 +52,7 @@ impl ServerHook for RequestErrorHook {
     async fn handle(self, ctx: &Context) {
         if self.get_response_status_code() == HttpStatus::BadRequest.code() {
             ctx.aborted().await;
-            warn!("Context aborted");
+            debug!("Context aborted");
             return;
         }
         if self.get_response_status_code() != HttpStatus::RequestTimeout.code() {
