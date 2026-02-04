@@ -29,8 +29,6 @@
 │   ├── controller           # Interface control layer
 │   ├── domain               # Business domain layer
 │   ├── exception            # Exception handling layer
-│      ├── application       # Application exceptions
-│      ├── framework         # Framework exceptions
 │   ├── mapper               # Data mapping layer
 │   ├── middleware           # Middleware layer
 │   ├── model                # Data model layer
