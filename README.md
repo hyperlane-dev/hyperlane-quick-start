@@ -43,7 +43,6 @@
 ├── config                   # Service configuration
 │   ├── application          # Application configuration
 │   ├── framework            # Framework configuration
-│   ├── server_manager       # Server management configuration
 ├── init                     # Service initialization
 │   ├── application          # Application initialization
 │   ├── framework            # Framework initialization
