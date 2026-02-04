@@ -4,7 +4,7 @@ pub use r#fn::*;
 
 use {
     super::{shutdown::*, *},
-    application::{cicd::*, db::*, env::*, logger::*},
+    application::{cicd::*, db::*, env::*},
     config::*,
 };
 
