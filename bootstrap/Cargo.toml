@@ -1,11 +1,11 @@
 [package]
-name = "hyperlane_app"
-version = "12.2.2"
+name = "hyperlane_bootstrap"
+version = "13.0.3"
 readme = "README.md"
 edition = "2024"
 authors = ["root@ltpp.vip"]
 license = "MIT"
-description = """Hyperlane application module containing core application logic, controllers, services, and middleware components."""
+description = """Hyperlane bootstrap crate providing application initialization and framework lifecycle management."""
 keywords = ["http", "request", "response", "tcp", "cross-platform"]
 repository = "https://github.com/hyperlane-dev/hyperlane-quick-start.git"
 categories = ["network-programming", "web-programming"]
@@ -15,9 +15,9 @@ exclude = ["target", "Cargo.lock", ".github", "tmp", "**/*.pid", "**/*.log"]
 path = "lib.rs"
 
 [dependencies]
+hyperlane_applicationlication = { workspace = true }
 hyperlane_config = { workspace = true }
 hyperlane_plugin = { workspace = true }
-hyperlane_resources = { workspace = true }
 
 serde = { workspace = true }
 tracing = { workspace = true }

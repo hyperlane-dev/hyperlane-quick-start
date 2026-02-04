@@ -1578,7 +1578,7 @@ dependencies = [
 name = "hyperlane-quick-start"
 version = "13.0.1"
 dependencies = [
- "hyperlane_init",
+ "hyperlane_bootstrap",
  "serde",
  "serde_json",
 ]
@@ -1649,7 +1649,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "hyperlane_app"
+name = "hyperlane_application"
 version = "12.2.2"
 dependencies = [
  "hyperlane",
@@ -1672,12 +1672,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "hyperlane_init"
+name = "hyperlane_bootstrap"
 version = "12.2.2"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
- "hyperlane_app",
+ "hyperlane_application",
  "hyperlane_config",
  "hyperlane_plugin",
  "hyperlane_resources",

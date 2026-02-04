@@ -1,6 +1,6 @@
 <center>
 
-## hyperlane-app
+## hyperlane-bootstrap
 
 <img src="https://docs.ltpp.vip/img/hyperlane.png" alt="" height="160">
 
@@ -12,7 +12,7 @@
 
 </center>
 
-> Hyperlane application module containing core application logic, controllers, services, and middleware components.
+> Hyperlane initialization module responsible for application bootstrap, configuration loading, and graceful shutdown coordination.
 
 ## License
 

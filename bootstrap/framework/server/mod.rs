@@ -9,4 +9,4 @@ use {
 };
 
 #[allow(unused_imports)]
-use {hyperlane_app::*, hyperlane_config::framework::*};
+use {hyperlane_application::*, hyperlane_config::framework::*};

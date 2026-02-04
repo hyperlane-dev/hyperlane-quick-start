@@ -1,6 +1,6 @@
 <center>
 
-## hyperlane-init
+## hyperlane-application
 
 <img src="https://docs.ltpp.vip/img/hyperlane.png" alt="" height="160">
 
@@ -12,7 +12,7 @@
 
 </center>
 
-> Hyperlane initialization module responsible for application bootstrap, configuration loading, and graceful shutdown coordination.
+> Hyperlane application module containing core application logic, controllers, services, and middleware components.
 
 ## License
 
