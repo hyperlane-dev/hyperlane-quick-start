@@ -1,6 +1,6 @@
 <center>
 
-## hyperlane-init
+## hyperlane-bootstrap
 
 <img src="https://docs.ltpp.vip/img/hyperlane.png" alt="" height="160">
 

@@ -1,6 +1,6 @@
 <center>
 
-## hyperlane-app
+## hyperlane-application
 
 <img src="https://docs.ltpp.vip/img/hyperlane.png" alt="" height="160">
 
