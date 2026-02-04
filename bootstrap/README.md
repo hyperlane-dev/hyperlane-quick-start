@@ -12,7 +12,7 @@
 
 </center>
 
-> Hyperlane initialization module responsible for application bootstrap, configuration loading, and graceful shutdown coordination.
+> Hyperlane bootstrap crate providing application initialization and framework lifecycle management.
 
 ## License
 
