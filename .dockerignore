@@ -1,0 +1,13 @@
+*.md
+.git/
+tmp/
+logs/
+target/
+upload/
+LICENSE
+process/
+.vscode/
+**/*.log
+**/*.pid
+.gitignore
+**/node_modules/**
