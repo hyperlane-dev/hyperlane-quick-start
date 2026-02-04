@@ -5,5 +5,5 @@ pub use r#struct::*;
 
 use {
     super::*,
-    model::{data_transfer::websocket::*, param::websocket::*},
+    model::{request::websocket::*, response::websocket::*},
 };

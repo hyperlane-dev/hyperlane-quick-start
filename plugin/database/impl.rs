@@ -10,13 +10,13 @@ impl<T: Clone> ConnectionCache<T> {
     }
 
     #[instrument_trace]
-    pub fn is_cooldown_expired(&self, cooldown_duration: Duration) -> bool {
-        self.get_last_attempt().elapsed() >= cooldown_duration
+    pub fn is_expired(&self, duration: Duration) -> bool {
+        self.get_last_attempt().elapsed() >= duration
     }
 
     #[instrument_trace]
-    pub fn should_retry(&self, cooldown_duration: Duration) -> bool {
-        self.try_get_result().is_err() && self.is_cooldown_expired(cooldown_duration)
+    pub fn should_retry(&self, duration: Duration) -> bool {
+        self.try_get_result().is_err() && self.is_expired(duration)
     }
 }
 

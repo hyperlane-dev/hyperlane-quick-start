@@ -6,7 +6,7 @@ pub use r#fn::*;
 
 use {
     super::*,
-    model::{application::monitor::*, data_transfer::common::*},
+    model::{application::monitor::*, response::common::*},
     service::monitor::*,
     r#struct::*,
 };

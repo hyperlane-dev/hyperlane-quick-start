@@ -3,6 +3,6 @@ mod r#struct;
 
 pub use r#struct::*;
 
-use {super::*, mapper::mysql::*, model::param::mysql::*};
+use {super::*, mapper::mysql::*, model::request::mysql::*};
 
 use hyperlane_plugin::mysql::*;

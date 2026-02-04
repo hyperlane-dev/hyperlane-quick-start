@@ -7,5 +7,5 @@ use {
     super::*,
     domain::gomoku::*,
     mapper::{chat::*, gomoku::*},
-    model::{application::gomoku::*, data_transfer::gomoku::*, param::gomoku::*},
+    model::{application::gomoku::*, request::gomoku::*, response::gomoku::*},
 };

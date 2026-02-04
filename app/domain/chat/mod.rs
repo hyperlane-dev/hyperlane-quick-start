@@ -6,7 +6,7 @@ pub use r#struct::*;
 use {
     super::*,
     mapper::chat::*,
-    model::{application::chat::*, data_transfer::chat::*, param::chat::*},
+    model::{application::chat::*, request::chat::*, response::chat::*},
     service::chat::*,
 };
 

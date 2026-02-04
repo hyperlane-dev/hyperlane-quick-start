@@ -9,6 +9,6 @@ use {super::*, r#struct::*};
 use {
     domain::chat::*,
     mapper::chat::*,
-    model::data_transfer::{chat::*, common::*},
+    model::response::{chat::*, common::*},
     service::chat::*,
 };

@@ -6,7 +6,7 @@ pub use r#fn::*;
 
 use {
     super::*,
-    model::{data_transfer::common::*, param::postgresql::*},
+    model::{request::postgresql::*, response::common::*},
     service::postgresql::*,
     r#struct::*,
 };

@@ -6,7 +6,7 @@ pub use r#fn::*;
 
 use {
     super::*,
-    model::{data_transfer::common::*, param::mysql::*},
+    model::{request::mysql::*, response::common::*},
     service::mysql::*,
     r#struct::*,
 };

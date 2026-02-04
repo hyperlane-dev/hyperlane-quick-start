@@ -6,7 +6,7 @@ pub use r#fn::*;
 
 use {
     super::*,
-    model::data_transfer::{common::*, tracking::*},
+    model::response::{common::*, tracking::*},
     service::tracking::*,
     r#struct::*,
 };

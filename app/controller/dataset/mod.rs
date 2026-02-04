@@ -4,4 +4,4 @@ mod r#struct;
 
 pub use r#fn::*;
 
-use {super::*, model::data_transfer::common::*, service::dataset::*, r#struct::*};
+use {super::*, model::response::common::*, service::dataset::*, r#struct::*};

@@ -6,7 +6,7 @@ pub use r#fn::*;
 
 use {
     super::*,
-    model::{data_transfer::common::*, param::redis::*},
+    model::{request::redis::*, response::common::*},
     service::redis::*,
     r#struct::*,
 };

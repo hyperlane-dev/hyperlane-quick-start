@@ -72,13 +72,13 @@ where
     I: AsRef<str>,
 {
     let instance_name_str: &str = instance_name.as_ref();
-    let cooldown_duration: Duration = get_retry_cooldown_duration();
+    let duration: Duration = get_retry_duration();
     {
         if let Some(cache) = POSTGRESQL_CONNECTIONS.read().await.get(instance_name_str) {
             match cache.try_get_result() {
                 Ok(conn) => return Ok(conn.clone()),
                 Err(error) => {
-                    if !cache.is_cooldown_expired(cooldown_duration) {
+                    if !cache.is_expired(duration) {
                         return Err(error.clone());
                     }
                 }
@@ -93,7 +93,7 @@ where
         match cache.try_get_result() {
             Ok(conn) => return Ok(conn.clone()),
             Err(error) => {
-                if !cache.is_cooldown_expired(cooldown_duration) {
+                if !cache.is_expired(duration) {
                     return Err(error.clone());
                 }
             }

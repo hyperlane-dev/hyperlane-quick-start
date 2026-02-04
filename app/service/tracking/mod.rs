@@ -6,5 +6,5 @@ pub use r#struct::*;
 use {
     super::*,
     mapper::tracking::*,
-    model::{application::tracking::*, data_transfer::tracking::*},
+    model::{application::tracking::*, response::tracking::*},
 };

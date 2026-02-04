@@ -3,7 +3,7 @@ mod r#struct;
 
 pub use {super::*, r#struct::*};
 
-use model::{application::rss::*, data_transfer::rss::*};
+use model::{application::rss::*, response::rss::*};
 
 use hyperlane_config::application::{charset::*, upload::*};
 

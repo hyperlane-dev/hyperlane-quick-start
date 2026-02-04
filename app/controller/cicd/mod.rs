@@ -7,8 +7,8 @@ pub use {r#fn::*, r#struct::*};
 use {
     super::*,
     model::{
-        data_transfer::{cicd::*, common::*},
-        param::cicd::*,
+        request::cicd::*,
+        response::{cicd::*, common::*},
     },
     service::cicd::*,
 };

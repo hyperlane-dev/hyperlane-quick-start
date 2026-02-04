@@ -20,8 +20,8 @@ use {
     },
     model::{
         application::cicd::{CicdStatus, PipelineConfig},
-        data_transfer::cicd::*,
-        param::cicd::*,
+        request::cicd::*,
+        response::cicd::*,
     },
 };
 
