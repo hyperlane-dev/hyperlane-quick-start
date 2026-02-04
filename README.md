@@ -25,7 +25,7 @@
 ## Directory Structure
 
 ```txt
-├── app                      # Application service
+├── application              # Application service
 │   ├── controller           # Interface control layer
 │   ├── domain               # Business domain layer
 │   ├── exception            # Exception handling layer
@@ -40,12 +40,12 @@
 │   ├── service              # Business logic layer
 │   ├── utils                # Utility layer
 │   ├── view                 # View layer
+├── bootstrap                     # Service initialization
+│   ├── application          # Application initialization
+│   ├── framework            # Framework initialization
 ├── config                   # Service configuration
 │   ├── application          # Application configuration
 │   ├── framework            # Framework configuration
-├── init                     # Service initialization
-│   ├── application          # Application initialization
-│   ├── framework            # Framework initialization
 ├── plugin                   # Service plugins
 │   ├── database             # Database plugin
 │   ├── env                  # Environment variable plugin
