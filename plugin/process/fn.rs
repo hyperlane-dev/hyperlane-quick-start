@@ -33,15 +33,6 @@ where
             Err(error) => error!("Error stopping server{COLON_SPACE}{error}"),
         };
     };
-    let hot_restart_server = || async {
-        match manager
-            .watch_detached(&["--clear", "--skip-local-deps", "-q", "-x", "run"])
-            .await
-        {
-            Ok(_) => info!("Server started successfully"),
-            Err(error) => error!("Error starting server in background{COLON_SPACE}{error}"),
-        }
-    };
     let restart_server = || async {
         stop_server().await;
         start_server().await;
@@ -55,7 +46,6 @@ where
     match command.as_str() {
         CMD_STOP => stop_server().await,
         CMD_RESTART => restart_server().await,
-        CMD_HOT_RESTART => hot_restart_server().await,
         _ => {
             error!("Invalid command{COLON_SPACE}{command}");
         }

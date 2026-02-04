@@ -25,7 +25,7 @@
 ## Directory Structure
 
 ```txt
-├── app                      # Application service
+├── application              # Application service
 │   ├── controller           # Interface control layer
 │   ├── domain               # Business domain layer
 │   ├── exception            # Exception handling layer
@@ -40,13 +40,12 @@
 │   ├── service              # Business logic layer
 │   ├── utils                # Utility layer
 │   ├── view                 # View layer
+├── bootstrap                     # Service initialization
+│   ├── application          # Application initialization
+│   ├── framework            # Framework initialization
 ├── config                   # Service configuration
 │   ├── application          # Application configuration
 │   ├── framework            # Framework configuration
-│   ├── server_manager       # Server management configuration
-├── init                     # Service initialization
-│   ├── application          # Application initialization
-│   ├── framework            # Framework initialization
 ├── plugin                   # Service plugins
 │   ├── database             # Database plugin
 │   ├── env                  # Environment variable plugin
@@ -67,12 +66,6 @@
 
 ```sh
 cargo run
-```
-
-### hot-restart
-
-```sh
-cargo run hot-restart
 ```
 
 ### started in background
@@ -97,6 +90,18 @@ cargo run restart
 
 ```sh
 cargo run restart -d
+```
+
+## Cli
+
+```sh
+cargo install hyperlane-cli
+```
+
+### help
+
+```sh
+hyperlane-cli -h
 ```
 
 ## Performance

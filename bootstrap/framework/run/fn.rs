@@ -14,5 +14,6 @@ pub fn runtime() -> Runtime {
 
 #[instrument_trace]
 pub fn block_on() {
+    init_log();
     runtime().block_on(create(SERVER_PID_FILE_PATH, create_server));
 }
