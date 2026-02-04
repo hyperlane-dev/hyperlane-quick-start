@@ -29,34 +29,34 @@ impl Log for Logger {
             Level::Warn => ColorType::Use(Color::Yellow),
             Level::Error => ColorType::Use(Color::Red),
         };
-        let mut time_output_builder: OutputBuilder<'_> = OutputBuilder::new();
-        let mut level_output_builder: OutputBuilder<'_> = OutputBuilder::new();
-        let mut location_output_builder: OutputBuilder<'_> = OutputBuilder::new();
-        let mut args_output_builder: OutputBuilder<'_> = OutputBuilder::new();
-        let time_output: Output<'_> = time_output_builder
+        let mut time_output_builder: ColorOutputBuilder<'_> = ColorOutputBuilder::new();
+        let mut level_output_builder: ColorOutputBuilder<'_> = ColorOutputBuilder::new();
+        let mut location_output_builder: ColorOutputBuilder<'_> = ColorOutputBuilder::new();
+        let mut args_output_builder: ColorOutputBuilder<'_> = ColorOutputBuilder::new();
+        let time_output: ColorOutput<'_> = time_output_builder
             .text(&time_text)
             .bold(true)
             .color(ColorType::Use(Color::White))
             .bg_color(ColorType::Use(Color::Black))
             .build();
-        let level_output: Output<'_> = level_output_builder
+        let level_output: ColorOutput<'_> = level_output_builder
             .text(&level_text)
             .bold(true)
             .color(ColorType::Use(Color::White))
             .bg_color(color)
             .build();
-        let location_output: Output<'_> = location_output_builder
+        let location_output: ColorOutput<'_> = location_output_builder
             .text(&location_text)
             .bold(true)
             .color(color)
             .build();
-        let args_output: Output<'_> = args_output_builder
+        let args_output: ColorOutput<'_> = args_output_builder
             .text(&args_text)
             .bold(true)
             .color(color)
             .endl(true)
             .build();
-        OutputListBuilder::new()
+        ColorOutputListBuilder::new()
             .add(time_output)
             .add(level_output)
             .add(location_output)

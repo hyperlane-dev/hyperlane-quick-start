@@ -135,7 +135,7 @@ jobs:
           echo "${{ secrets.CARGO_REGISTRY_TOKEN }}" | cargo login
           PACKAGE_NAME=$(toml get Cargo.toml package.name --raw)
           VERSION=${{ needs.setup.outputs.version }}
-          MAX_RETRY=8
+          MAX_RETRY=36
           SUCCESS=false
           for ((i=1; i<=MAX_RETRY; i++)); do
             echo "🚀 Attempt $i/$MAX_RETRY: releasing $PACKAGE_NAME v$VERSION"

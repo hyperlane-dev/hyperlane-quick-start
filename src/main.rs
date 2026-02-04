@@ -1,3 +1,3 @@
 fn main() {
-    hyperlane_init::framework::run::block_on();
+    hyperlane_bootstrap::framework::run::block_on();
 }

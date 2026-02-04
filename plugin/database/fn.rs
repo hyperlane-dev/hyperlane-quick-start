@@ -11,10 +11,10 @@ pub fn get_connection_timeout_duration() -> Duration {
 
 #[instrument_trace]
 pub fn get_retry_duration() -> Duration {
-    let millis: u64 = std::env::var(ENV_KEY_DB_RETRY_COOLDOWN_MILLIS)
+    let millis: u64 = std::env::var(ENV_KEY_DB_RETRY_INTERVAL_MILLIS)
         .ok()
         .and_then(|value: String| value.parse::<u64>().ok())
-        .unwrap_or(DEFAULT_DB_RETRY_COOLDOWN_MILLIS);
+        .unwrap_or(DEFAULT_DB_RETRY_INTERVAL_MILLIS);
     Duration::from_millis(millis)
 }
 
