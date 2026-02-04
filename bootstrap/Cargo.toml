@@ -15,7 +15,7 @@ exclude = ["target", "Cargo.lock", ".github", "tmp", "**/*.pid", "**/*.log"]
 path = "lib.rs"
 
 [dependencies]
-hyperlane_applicationlication = { workspace = true }
+hyperlane_application = { workspace = true }
 hyperlane_config = { workspace = true }
 hyperlane_plugin = { workspace = true }
 
