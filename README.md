@@ -98,6 +98,18 @@ cargo run restart
 cargo run restart -d
 ```
 
+### fmt-derive
+
+```sh
+cargo run fmt-derive
+```
+
+### fmt
+
+```sh
+cargo run fmt
+```
+
 ## Performance
 
 - [Performance](https://docs.ltpp.vip/hyperlane/speed)

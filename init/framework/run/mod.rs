@@ -2,7 +2,7 @@ mod r#fn;
 
 pub use r#fn::*;
 
-use {super::*, server::*};
+use {super::*, application::logger::*, server::*};
 
 use {hyperlane_config::framework::*, hyperlane_plugin::process::*};
 

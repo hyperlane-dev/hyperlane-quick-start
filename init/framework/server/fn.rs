@@ -21,7 +21,6 @@ pub async fn print_route_matcher(server: &Server) {
 #[hyperlane(server: Server)]
 #[instrument_trace]
 pub async fn create_server() {
-    init_log();
     if let Err(error) = init_env_config() {
         error!("{error}");
     }
