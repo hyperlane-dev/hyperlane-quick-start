@@ -22,6 +22,45 @@
 
 - [Api Docs](https://docs.rs/hyperlane/latest/)
 
+## Directory Structure
+
+```txt
+├── app                      # Application service
+│   ├── controller           # Interface control layer
+│   ├── domain               # Business domain layer
+│   ├── exception            # Exception handling layer
+│      ├── application       # Application exceptions
+│      ├── framework         # Framework exceptions
+│   ├── mapper               # Data mapping layer
+│   ├── middleware           # Middleware layer
+│   ├── model                # Data model layer
+│      ├── request           # Request parameter objects
+│      ├── response          # Response parameter objects
+│   ├── repository           # Data access layer
+│   ├── service              # Business logic layer
+│   ├── utils                # Utility layer
+│   ├── view                 # View layer
+├── config                   # Service configuration
+│   ├── application          # Application configuration
+│   ├── framework            # Framework configuration
+│   ├── server_manager       # Server management configuration
+├── init                     # Service initialization
+│   ├── application          # Application initialization
+│   ├── framework            # Framework initialization
+├── plugin                   # Service plugins
+│   ├── database             # Database plugin
+│   ├── env                  # Environment variable plugin
+│   ├── logger               # Logging plugin
+│   ├── mysql                # MySQL plugin
+│   ├── postgresql           # PostgreSQL plugin
+│   ├── process              # Process management plugin
+│   ├── redis                # Redis plugin
+├── resources                # Service resources
+│   ├── sql                  # SQL files
+│   ├── static               # Static resource files
+│   ├── templates            # Template files
+```
+
 ## Run
 
 ### start
