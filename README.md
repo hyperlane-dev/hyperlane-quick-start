@@ -68,12 +68,6 @@
 cargo run
 ```
 
-### hot-restart
-
-```sh
-cargo run hot-restart
-```
-
 ### started in background
 
 ```sh
@@ -98,16 +92,16 @@ cargo run restart
 cargo run restart -d
 ```
 
-### fmt-derive
+## Cli
 
 ```sh
-cargo run fmt-derive
+cargo install hyperlane-cli
 ```
 
-### fmt
+### help
 
 ```sh
-cargo run fmt
+hyperlane-cli -h
 ```
 
 ## Performance
