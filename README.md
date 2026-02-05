@@ -38,7 +38,7 @@
 │   ├── service              # Business logic layer
 │   ├── utils                # Utility layer
 │   ├── view                 # View layer
-├── bootstrap                     # Service initialization
+├── bootstrap                # Service initialization
 │   ├── application          # Application initialization
 │   ├── framework            # Framework initialization
 ├── config                   # Service configuration
