@@ -313,11 +313,303 @@
 
       @media (max-width: 1200px) {
         .main {
-          grid-template-columns: 1fr;
+          grid-template-columns: 280px 1fr 280px;
+          gap: 20px;
+          padding: 20px 24px 24px;
+        }
+
+        .panel {
+          padding: 16px;
+          gap: 12px;
+        }
+
+        .panel h2 {
+          font-size: 16px;
+        }
+
+        .field input {
+          padding: 8px 10px;
+        }
+
+        button {
+          padding: 8px 10px;
+          font-size: 13px;
         }
 
         .board {
-          width: min(90vw, 640px);
+          width: min(50vw, 600px);
+        }
+      }
+
+      @media (max-width: 1024px) {
+        .main {
+          grid-template-columns: 240px 1fr 240px;
+          gap: 16px;
+          padding: 16px 20px 20px;
+        }
+
+        .header {
+          padding: 16px 20px;
+        }
+
+        .brand {
+          font-size: 16px;
+        }
+
+        .panel {
+          padding: 14px;
+          gap: 10px;
+          border-radius: 16px;
+        }
+
+        .panel h2 {
+          font-size: 15px;
+        }
+
+        .field label {
+          font-size: 11px;
+        }
+
+        .field input {
+          padding: 8px;
+          font-size: 13px;
+        }
+
+        button {
+          padding: 8px;
+          font-size: 12px;
+        }
+
+        .room-info {
+          font-size: 12px;
+          gap: 8px;
+        }
+
+        .board {
+          width: min(55vw, 560px);
+        }
+
+        .sidebar-list span {
+          font-size: 12px;
+        }
+
+        .move-log {
+          max-height: 180px;
+        }
+
+        .move-item {
+          padding: 6px 8px;
+          font-size: 12px;
+        }
+      }
+
+      @media (max-width: 900px) {
+        .main {
+          grid-template-columns: 1fr 1fr;
+          grid-template-rows: auto auto;
+          gap: 16px;
+          padding: 16px;
+        }
+
+        .board-wrapper {
+          grid-column: 1 / -1;
+          order: -1;
+        }
+
+        .board {
+          width: min(70vw, 520px);
+        }
+
+        .panel-scroll {
+          max-height: 250px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .app {
+          height: auto;
+          min-height: 100vh;
+          min-height: 100dvh;
+        }
+
+        .header {
+          padding: 12px 16px;
+        }
+
+        .brand {
+          font-size: 16px;
+          gap: 8px;
+        }
+
+        .brand img {
+          width: 28px;
+          height: 28px;
+        }
+
+        .status {
+          font-size: 12px;
+        }
+
+        .main {
+          grid-template-columns: 1fr;
+          grid-template-rows: auto auto auto;
+          gap: 16px;
+          padding: 16px;
+          overflow: visible;
+          min-height: auto;
+        }
+
+        .panel {
+          padding: 16px;
+          gap: 12px;
+          border-radius: 16px;
+        }
+
+        .panel h2 {
+          font-size: 16px;
+        }
+
+        .field input {
+          padding: 8px 10px;
+          font-size: 16px;
+        }
+
+        button {
+          padding: 10px 8px;
+          font-size: 14px;
+        }
+
+        .room-info {
+          font-size: 13px;
+          gap: 8px;
+        }
+
+        .board-wrapper {
+          order: -1;
+          gap: 12px;
+        }
+
+        .board {
+          width: min(98vw - 32px, 520px);
+          border-radius: 12px;
+        }
+
+        .stone {
+          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+        }
+
+        .stone.white {
+          box-shadow:
+            0 3px 8px rgba(15, 23, 42, 0.2),
+            inset 0 -2px 4px rgba(148, 163, 184, 0.3);
+        }
+
+        .move-log {
+          max-height: 150px;
+        }
+
+        .footer {
+          padding: 12px 16px;
+          font-size: 11px;
+        }
+
+        .cell:hover::after {
+          display: none;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .main {
+          gap: 12px;
+          padding: 12px;
+        }
+
+        .panel {
+          padding: 12px;
+          border-radius: 12px;
+        }
+
+        .actions {
+          gap: 8px;
+        }
+
+        button {
+          padding: 8px 6px;
+          font-size: 13px;
+        }
+
+        .board {
+          width: min(100vw - 24px, 400px);
+          border-radius: 10px;
+        }
+
+        .sidebar-list span {
+          font-size: 12px;
+        }
+
+        .move-item {
+          padding: 6px 8px;
+          font-size: 12px;
+        }
+      }
+
+      @media (max-width: 360px) {
+        .board {
+          width: calc(100vw - 24px);
+          border-radius: 8px;
+        }
+
+        .header {
+          padding: 10px 12px;
+        }
+
+        .brand {
+          font-size: 14px;
+        }
+
+        .brand img {
+          width: 24px;
+          height: 24px;
+        }
+
+        button {
+          font-size: 12px;
+          padding: 8px 4px;
+        }
+      }
+
+      @media (hover: none) and (pointer: coarse) {
+        .cell:active {
+          background: rgba(102, 126, 234, 0.2);
+        }
+
+        button:active {
+          transform: scale(0.97);
+          opacity: 0.9;
+        }
+      }
+
+      @media (orientation: landscape) and (max-height: 600px) {
+        .app {
+          height: auto;
+        }
+
+        .main {
+          grid-template-columns: 1fr 1fr;
+          grid-template-rows: auto auto;
+        }
+
+        .board-wrapper {
+          grid-column: 1 / -1;
+          order: -1;
+        }
+
+        .board {
+          width: min(70vh, 400px);
+        }
+
+        .panel-scroll {
+          max-height: 200px;
         }
       }
     </style>
@@ -634,6 +926,49 @@
 
       userIdInput.value = getUserId();
       connect();
+
+      (function setupMobileOptimizations() {
+        let lastTouchEnd = 0;
+        document.addEventListener(
+          'touchend',
+          (event) => {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) {
+              event.preventDefault();
+            }
+            lastTouchEnd = now;
+          },
+          { passive: false },
+        );
+
+        document.addEventListener(
+          'touchmove',
+          (event) => {
+            if (event.target.closest('.board')) {
+              event.preventDefault();
+            }
+          },
+          { passive: false },
+        );
+
+        const board = document.getElementById('gomokuBoard');
+        if (board) {
+          board.addEventListener(
+            'touchstart',
+            (event) => {
+              const target = event.target;
+              const cell = target.closest('.cell');
+              if (cell) {
+                cell.style.background = 'rgba(102, 126, 234, 0.3)';
+                setTimeout(() => {
+                  cell.style.background = '';
+                }, 150);
+              }
+            },
+            { passive: true },
+          );
+        }
+      })();
     </script>
   </body>
 </html>
