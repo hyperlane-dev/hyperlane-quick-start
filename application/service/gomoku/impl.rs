@@ -418,7 +418,7 @@ impl GomokuWebSocketService {
         for user_id in user_ids {
             let key: BroadcastType<String> = BroadcastType::PointToGroup(user_id.clone());
             let _: Result<Option<ReceiverCount>, SendError<Vec<u8>>> =
-                websocket.send(key, resp_body.clone());
+                websocket.try_send(key, resp_body.clone());
         }
         trace!("Broadcasted message to room {room_id} from {sender_id}");
     }

@@ -39,6 +39,6 @@ impl OnlineService {
         let message: String = format!(r#"{{"type":"online_count","count":{count}}}"#);
         let message_bytes: Vec<u8> = message.into_bytes();
         let _: Result<Option<ReceiverCount>, SendError<Vec<u8>>> =
-            websocket.send(key, message_bytes);
+            websocket.try_send(key, message_bytes);
     }
 }
