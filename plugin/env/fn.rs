@@ -14,68 +14,68 @@ pub fn load_env_config() -> Result<(), String> {
     info!("Environment Configuration Loaded Successfully");
     info!(
         "GPT API URL {}",
-        if config.gpt_api_url.is_empty() {
+        if config.get_gpt_api_url().is_empty() {
             "(not set)"
         } else {
-            &config.gpt_api_url
+            config.get_gpt_api_url()
         }
     );
     info!(
         "GPT Model {}",
-        if config.gpt_model.is_empty() {
+        if config.get_gpt_model().is_empty() {
             "(not set)"
         } else {
-            &config.gpt_model
+            config.get_gpt_model()
         }
     );
     info!("MySQL Configuration:");
-    if config.mysql_instances.is_empty() {
+    if config.get_mysql_instances().is_empty() {
         info!("  (no MySQL instances configured)");
     } else {
-        for instance in &config.mysql_instances {
+        for instance in config.get_mysql_instances() {
             info!(
                 "  Instance '{}' {}:{}@{}:{}/{}",
-                instance.name,
-                instance.username,
+                instance.get_name(),
+                instance.get_username(),
                 "***",
-                instance.host,
-                instance.port,
-                instance.database
+                instance.get_host(),
+                instance.get_port(),
+                instance.get_database()
             );
         }
     }
     info!("PostgreSQL Configuration:");
-    if config.postgresql_instances.is_empty() {
+    if config.get_postgresql_instances().is_empty() {
         info!("  (no PostgreSQL instances configured)");
     } else {
-        for instance in &config.postgresql_instances {
+        for instance in config.get_postgresql_instances() {
             info!(
                 "  Instance '{}' {}:{}@{}:{}/{}",
-                instance.name,
-                instance.username,
+                instance.get_name(),
+                instance.get_username(),
                 "***",
-                instance.host,
-                instance.port,
-                instance.database
+                instance.get_host(),
+                instance.get_port(),
+                instance.get_database()
             );
         }
     }
     info!("Redis Configuration:");
-    if config.redis_instances.is_empty() {
+    if config.get_redis_instances().is_empty() {
         info!("  (no Redis instances configured)");
     } else {
-        for instance in &config.redis_instances {
+        for instance in config.get_redis_instances() {
             info!(
                 "  Instance '{}' {}:{}@{}:{}",
-                instance.name,
-                if instance.username.is_empty() {
+                instance.get_name(),
+                if instance.get_username().is_empty() {
                     "(none)"
                 } else {
-                    &instance.username
+                    instance.get_username()
                 },
                 "***",
-                instance.host,
-                instance.port
+                instance.get_host(),
+                instance.get_port()
             );
         }
     }
