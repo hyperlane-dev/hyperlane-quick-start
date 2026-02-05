@@ -21,16 +21,14 @@ impl RedisAutoCreation {
             let error_msg: String = error.to_string();
             if error_msg.contains("authentication failed") || error_msg.contains("NOAUTH") {
                 AutoCreationError::InsufficientPermissions(format!(
-                    "Redis authentication failed{COLON_SPACE}{error_msg}"
+                    "Redis authentication failed {error_msg}"
                 ))
             } else if error_msg.contains("Connection refused") || error_msg.contains("timeout") {
                 AutoCreationError::ConnectionFailed(format!(
-                    "Cannot connect to Redis server{COLON_SPACE}{error_msg}"
+                    "Cannot connect to Redis server {error_msg}"
                 ))
             } else {
-                AutoCreationError::DatabaseError(format!(
-                    "Redis connection error{COLON_SPACE}{error_msg}"
-                ))
+                AutoCreationError::DatabaseError(format!("Redis connection error {error_msg}"))
             }
         })?;
         let timeout_duration: Duration = get_connection_timeout_duration();
@@ -43,17 +41,17 @@ impl RedisAutoCreation {
                     let error_msg: String = error.to_string();
                     if error_msg.contains("authentication failed") || error_msg.contains("NOAUTH") {
                         AutoCreationError::InsufficientPermissions(format!(
-                            "Redis authentication failed{COLON_SPACE}{error_msg}"
+                            "Redis authentication failed {error_msg}"
                         ))
                     } else if error_msg.contains("Connection refused")
                         || error_msg.contains("timeout")
                     {
                         AutoCreationError::ConnectionFailed(format!(
-                            "Cannot connect to Redis server{COLON_SPACE}{error_msg}"
+                            "Cannot connect to Redis server {error_msg}"
                         ))
                     } else {
                         AutoCreationError::DatabaseError(format!(
-                            "Redis connection error{COLON_SPACE}{error_msg}"
+                            "Redis connection error {error_msg}"
                         ))
                     }
                 })?,
@@ -71,15 +69,14 @@ impl RedisAutoCreation {
         };
         Ok(connection)
     }
+
     #[instrument_trace]
     async fn validate_redis_server(&self) -> Result<(), AutoCreationError> {
         let mut conn: Connection = self.create_mutable_connection().await?;
         let pong: String = redis::cmd("PING")
             .query(&mut conn)
             .map_err(|error: RedisError| {
-                AutoCreationError::ConnectionFailed(format!(
-                    "Redis PING failed{COLON_SPACE}{error}"
-                ))
+                AutoCreationError::ConnectionFailed(format!("Redis PING failed {error}"))
             })?;
         if pong != "PONG" {
             return Err(AutoCreationError::ConnectionFailed(
@@ -92,7 +89,7 @@ impl RedisAutoCreation {
                 .query(&mut conn)
                 .map_err(|error: RedisError| {
                     AutoCreationError::DatabaseError(format!(
-                        "Failed to get Redis server info{COLON_SPACE}{error}"
+                        "Failed to get Redis server info {error}"
                     ))
                 })?;
         if info.contains("redis_version:") {
@@ -106,6 +103,7 @@ impl RedisAutoCreation {
         }
         Ok(())
     }
+
     #[instrument_trace]
     async fn setup_redis_namespace(&self) -> Result<Vec<String>, AutoCreationError> {
         let mut setup_operations: Vec<String> = Vec::new();
@@ -116,7 +114,7 @@ impl RedisAutoCreation {
             .query(&mut conn)
             .map_err(|error: RedisError| {
                 AutoCreationError::DatabaseError(format!(
-                    "Failed to check Redis key existence{COLON_SPACE}{error}"
+                    "Failed to check Redis key existence {error}"
                 ))
             })?;
         if exists == 0 {
@@ -126,7 +124,7 @@ impl RedisAutoCreation {
                 .query(&mut conn)
                 .map_err(|error: RedisError| {
                     AutoCreationError::DatabaseError(format!(
-                        "Failed to set Redis initialization key{COLON_SPACE}{error}"
+                        "Failed to set Redis initialization key {error}"
                     ))
                 })?;
             setup_operations.push(app_key.clone());
@@ -137,7 +135,7 @@ impl RedisAutoCreation {
                 .query(&mut conn)
                 .map_err(|error: RedisError| {
                     AutoCreationError::DatabaseError(format!(
-                        "Failed to set Redis config key{COLON_SPACE}{error}"
+                        "Failed to set Redis config key {error}"
                     ))
                 })?;
             setup_operations.push(config_key);
@@ -157,6 +155,7 @@ impl DatabaseAutoCreation for RedisAutoCreation {
         .await;
         Ok(false)
     }
+
     #[instrument_trace]
     async fn create_tables_if_not_exist(&self) -> Result<Vec<String>, AutoCreationError> {
         let setup_operations: Vec<String> = self.setup_redis_namespace().await?;
@@ -177,6 +176,7 @@ impl DatabaseAutoCreation for RedisAutoCreation {
         }
         Ok(setup_operations)
     }
+
     #[instrument_trace]
     async fn verify_connection(&self) -> Result<(), AutoCreationError> {
         match self.validate_redis_server().await {

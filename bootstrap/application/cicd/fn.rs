@@ -11,7 +11,7 @@ pub async fn init_cicd() {
             }
         }
         Err(error) => {
-            error!("Failed to recover interrupted CICD runs{COLON_SPACE}{error}");
+            error!("Failed to recover interrupted CICD runs {error}");
         }
     }
 }

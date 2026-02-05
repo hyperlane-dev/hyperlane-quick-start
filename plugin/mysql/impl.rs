@@ -18,6 +18,7 @@ impl MySqlAutoCreation {
     pub fn with_schema(instance: MySqlInstanceConfig, schema: DatabaseSchema) -> Self {
         Self { instance, schema }
     }
+
     #[instrument_trace]
     async fn create_admin_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
         let admin_url: String = self.instance.get_admin_url();
@@ -36,19 +37,18 @@ impl MySqlAutoCreation {
             let error_msg: String = error.to_string();
             if error_msg.contains("Access denied") || error_msg.contains("permission") {
                 AutoCreationError::InsufficientPermissions(format!(
-                    "Cannot connect to MySQL server for database creation{COLON_SPACE}{error_msg}"
+                    "Cannot connect to MySQL server for database creation {error_msg}"
                 ))
             } else if error_msg.contains("timeout") || error_msg.contains("Connection refused") {
                 AutoCreationError::ConnectionFailed(format!(
-                    "Cannot connect to MySQL server{COLON_SPACE}{error_msg}"
+                    "Cannot connect to MySQL server {error_msg}"
                 ))
             } else {
-                AutoCreationError::DatabaseError(format!(
-                    "MySQL connection error{COLON_SPACE}{error_msg}"
-                ))
+                AutoCreationError::DatabaseError(format!("MySQL connection error {error_msg}"))
             }
         })
     }
+
     #[instrument_trace]
     async fn database_exists(
         &self,
@@ -62,10 +62,11 @@ impl MySqlAutoCreation {
         match connection.query_all(statement).await {
             Ok(results) => Ok(!results.is_empty()),
             Err(error) => Err(AutoCreationError::DatabaseError(format!(
-                "Failed to check if database exists{COLON_SPACE}{error}"
+                "Failed to check if database exists {error}"
             ))),
         }
     }
+
     #[instrument_trace]
     async fn create_database(
         &self,
@@ -97,13 +98,13 @@ impl MySqlAutoCreation {
                 let error_msg: String = error.to_string();
                 if error_msg.contains("Access denied") || error_msg.contains("permission") {
                     Err(AutoCreationError::InsufficientPermissions(format!(
-                        "Cannot create MySQL database '{}'{COLON_SPACE}{}",
+                        "Cannot create MySQL database '{}' {}",
                         self.instance.get_database().as_str(),
                         error_msg
                     )))
                 } else {
                     Err(AutoCreationError::DatabaseError(format!(
-                        "Failed to create MySQL database '{}'{COLON_SPACE}{}",
+                        "Failed to create MySQL database '{}' {}",
                         self.instance.get_database().as_str(),
                         error_msg
                     )))
@@ -111,33 +112,31 @@ impl MySqlAutoCreation {
             }
         }
     }
+
     #[instrument_trace]
     async fn create_target_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
         let db_url: String = self.instance.get_connection_url();
         let timeout_duration: Duration = get_connection_timeout_duration();
         let timeout_seconds: u64 = timeout_duration.as_secs();
-        let connection_result: Result<DatabaseConnection, DbErr> = match timeout(
-            timeout_duration,
-            Database::connect(&db_url),
-        )
-        .await
-        {
-            Ok(result) => result,
-            Err(_) => {
-                return Err(AutoCreationError::Timeout(format!(
-                    "MySQL database connection timeout after {timeout_seconds} seconds{COLON_SPACE}{}",
-                    self.instance.get_database()
-                )));
-            }
-        };
+        let connection_result: Result<DatabaseConnection, DbErr> =
+            match timeout(timeout_duration, Database::connect(&db_url)).await {
+                Ok(result) => result,
+                Err(_) => {
+                    return Err(AutoCreationError::Timeout(format!(
+                        "MySQL database connection timeout after {timeout_seconds} seconds {}",
+                        self.instance.get_database()
+                    )));
+                }
+            };
         connection_result.map_err(|error: DbErr| {
             AutoCreationError::ConnectionFailed(format!(
-                "Cannot connect to MySQL database '{}'{COLON_SPACE}{}",
+                "Cannot connect to MySQL database '{}' {}",
                 self.instance.get_database().as_str(),
                 error
             ))
         })
     }
+
     #[instrument_trace]
     async fn table_exists<T>(
         &self,
@@ -156,10 +155,11 @@ impl MySqlAutoCreation {
         match connection.query_all(statement).await {
             Ok(results) => Ok(!results.is_empty()),
             Err(error) => Err(AutoCreationError::DatabaseError(format!(
-                "Failed to check if table '{table_name_str}' exists{COLON_SPACE}{error}"
+                "Failed to check if table '{table_name_str}' exists {error}"
             ))),
         }
     }
+
     #[instrument_trace]
     async fn create_table(
         &self,
@@ -174,13 +174,13 @@ impl MySqlAutoCreation {
                 let error_msg: String = error.to_string();
                 if error_msg.contains("Access denied") || error_msg.contains("permission") {
                     Err(AutoCreationError::InsufficientPermissions(format!(
-                        "Cannot create MySQL table '{}'{COLON_SPACE}{}",
+                        "Cannot create MySQL table '{}' {}",
                         table.get_name(),
                         error_msg
                     )))
                 } else {
                     Err(AutoCreationError::SchemaError(format!(
-                        "Failed to create MySQL table '{}'{COLON_SPACE}{}",
+                        "Failed to create MySQL table '{}' {}",
                         table.get_name(),
                         error_msg
                     )))
@@ -188,6 +188,7 @@ impl MySqlAutoCreation {
             }
         }
     }
+
     #[instrument_trace]
     async fn execute_sql<S>(
         &self,
@@ -201,10 +202,11 @@ impl MySqlAutoCreation {
         match connection.execute(statement).await {
             Ok(_) => Ok(()),
             Err(error) => Err(AutoCreationError::DatabaseError(format!(
-                "Failed to execute SQL{COLON_SPACE}{error}"
+                "Failed to execute SQL {error}"
             ))),
         }
     }
+
     #[instrument_trace]
     fn get_database_schema(&self) -> &DatabaseSchema {
         &self.schema
@@ -219,6 +221,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
         let _: Result<(), DbErr> = admin_connection.close().await;
         result
     }
+
     #[instrument_trace]
     async fn create_tables_if_not_exist(&self) -> Result<Vec<String>, AutoCreationError> {
         let connection: DatabaseConnection = self.create_target_connection().await?;
@@ -274,6 +277,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
         .await;
         Ok(created_tables)
     }
+
     #[instrument_trace]
     async fn verify_connection(&self) -> Result<(), AutoCreationError> {
         let db_url: String = self.instance.get_connection_url();
@@ -290,7 +294,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
             };
         let connection: DatabaseConnection = connection_result.map_err(|error: DbErr| {
             AutoCreationError::ConnectionFailed(format!(
-                "Failed to verify MySQL connection{COLON_SPACE}{error}"
+                "Failed to verify MySQL connection {error}"
             ))
         })?;
         let statement: Statement =
@@ -318,7 +322,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                 )
                 .await;
                 Err(AutoCreationError::ConnectionFailed(format!(
-                    "MySQL connection verification failed{COLON_SPACE}{error_msg}"
+                    "MySQL connection verification failed {error_msg}"
                 )))
             }
         }

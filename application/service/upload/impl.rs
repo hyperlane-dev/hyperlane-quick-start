@@ -262,14 +262,14 @@ impl UploadService {
     #[instrument_trace]
     pub async fn read_file_range(path: &str, start: u64, length: u64) -> Result<Vec<u8>, String> {
         use std::io::{Read, Seek, SeekFrom};
-        let mut file: std::fs::File = std::fs::File::open(path)
-            .map_err(|error| format!("Failed to open file{COLON_SPACE}{error}"))?;
+        let mut file: std::fs::File =
+            std::fs::File::open(path).map_err(|error| format!("Failed to open file {error}"))?;
         file.seek(SeekFrom::Start(start))
-            .map_err(|error| format!("Failed to seek file{COLON_SPACE}{error}"))?;
+            .map_err(|error| format!("Failed to seek file {error}"))?;
         let mut buffer: Vec<u8> = vec![0; length as usize];
         let bytes_read: usize = file
             .read(&mut buffer)
-            .map_err(|error| format!("Failed to read file{COLON_SPACE}{error}"))?;
+            .map_err(|error| format!("Failed to read file {error}"))?;
         buffer.truncate(bytes_read);
         Ok(buffer)
     }

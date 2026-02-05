@@ -1576,11 +1576,15 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "14.0.9"
+version = "14.0.12"
 dependencies = [
+ "hyperlane",
+ "hyperlane-utils",
  "hyperlane_bootstrap",
+ "hyperlane_config",
+ "hyperlane_plugin",
  "serde",
- "serde_json",
+ "tracing",
 ]
 
 [[package]]
@@ -1650,7 +1654,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_application"
-version = "14.0.9"
+version = "14.0.11"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
@@ -1663,7 +1667,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_bootstrap"
-version = "14.0.9"
+version = "14.0.11"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
@@ -1677,7 +1681,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_config"
-version = "14.0.9"
+version = "14.0.11"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
@@ -1687,7 +1691,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_plugin"
-version = "14.0.9"
+version = "14.0.11"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
@@ -1697,7 +1701,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_resources"
-version = "14.0.9"
+version = "14.0.11"
 
 [[package]]
 name = "iana-time-zone"
@@ -3257,7 +3261,6 @@ version = "1.0.149"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "83fc039473c5595ace860d8c4fafa220ff474b3fc6bfdb4293327f1a37e94d86"
 dependencies = [
- "indexmap 2.13.0",
  "itoa",
  "memchr",
  "serde",

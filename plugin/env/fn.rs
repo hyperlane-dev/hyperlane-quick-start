@@ -13,7 +13,7 @@ pub fn load_env_config() -> Result<(), String> {
         .map_err(|_| "Failed to initialize global environment configuration".to_string())?;
     info!("Environment Configuration Loaded Successfully");
     info!(
-        "GPT API URL{COLON_SPACE}{}",
+        "GPT API URL {}",
         if config.gpt_api_url.is_empty() {
             "(not set)"
         } else {
@@ -21,7 +21,7 @@ pub fn load_env_config() -> Result<(), String> {
         }
     );
     info!(
-        "GPT Model{COLON_SPACE}{}",
+        "GPT Model {}",
         if config.gpt_model.is_empty() {
             "(not set)"
         } else {
@@ -34,7 +34,7 @@ pub fn load_env_config() -> Result<(), String> {
     } else {
         for instance in &config.mysql_instances {
             info!(
-                "  Instance '{}'{COLON_SPACE}{}:{}@{}:{}/{}",
+                "  Instance '{}' {}:{}@{}:{}/{}",
                 instance.name,
                 instance.username,
                 "***",
@@ -50,7 +50,7 @@ pub fn load_env_config() -> Result<(), String> {
     } else {
         for instance in &config.postgresql_instances {
             info!(
-                "  Instance '{}'{COLON_SPACE}{}:{}@{}:{}/{}",
+                "  Instance '{}' {}:{}@{}:{}/{}",
                 instance.name,
                 instance.username,
                 "***",
@@ -66,7 +66,7 @@ pub fn load_env_config() -> Result<(), String> {
     } else {
         for instance in &config.redis_instances {
             info!(
-                "  Instance '{}'{COLON_SPACE}{}:{}@{}:{}",
+                "  Instance '{}' {}:{}@{}:{}",
                 instance.name,
                 if instance.username.is_empty() {
                     "(none)"

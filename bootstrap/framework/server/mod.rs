@@ -4,9 +4,9 @@ pub use r#fn::*;
 
 use {
     super::{shutdown::*, *},
-    application::{cicd::*, db::*, env::*},
+    application::{db::*, env::*},
     config::*,
 };
 
 #[allow(unused_imports)]
-use {hyperlane_application::*, hyperlane_config::framework::*};
+use {hyperlane_application::*, hyperlane_config::framework::*, hyperlane_plugin::shutdown::*};

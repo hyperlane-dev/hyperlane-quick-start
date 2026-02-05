@@ -43,7 +43,7 @@ impl ServerHook for TrackingQueryRoute {
             Ok(req) => req,
             Err(error) => {
                 let error_response: ApiResponse<()> =
-                    ApiResponse::error(format!("Invalid request body{COLON_SPACE}{error}"));
+                    ApiResponse::error(format!("Invalid request body {error}"));
                 ctx.set_response_body(&error_response.to_json_bytes()).await;
                 return;
             }

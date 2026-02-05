@@ -12,7 +12,7 @@ impl DatasetService {
                 let response_text: String = response.text().get_body();
                 Ok(response_text)
             }
-            Err(error) => Err(format!("Failed to fetch dataset{COLON_SPACE}{error}")),
+            Err(error) => Err(format!("Failed to fetch dataset {error}")),
         }
     }
 }

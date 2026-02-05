@@ -15,7 +15,7 @@ impl TrackingService {
             .set_timestamp(timestamp);
         TrackingMapper::insert(record)
             .await
-            .map_err(|error| format!("Failed to insert tracking record{COLON_SPACE}{error}"))
+            .map_err(|error| format!("Failed to insert tracking record {error}"))
     }
 
     #[instrument_trace]
@@ -43,7 +43,7 @@ impl TrackingService {
                 page_size,
             )
             .await
-            .map_err(|error| format!("Failed to query by header{COLON_SPACE}{error}"))?
+            .map_err(|error| format!("Failed to query by header {error}"))?
         } else if request.try_get_body_content().clone().is_some() {
             let content: String = request.try_get_body_content().clone().unwrap();
             TrackingMapper::query_by_body_content(
@@ -55,7 +55,7 @@ impl TrackingService {
                 page_size,
             )
             .await
-            .map_err(|error| format!("Failed to query by body content{COLON_SPACE}{error}"))?
+            .map_err(|error| format!("Failed to query by body content {error}"))?
         } else {
             TrackingMapper::query(
                 *request.try_get_start_time(),
@@ -65,7 +65,7 @@ impl TrackingService {
                 page_size,
             )
             .await
-            .map_err(|error| format!("Failed to query tracking records{COLON_SPACE}{error}"))?
+            .map_err(|error| format!("Failed to query tracking records {error}"))?
         };
         let records: Vec<TrackingRecordDTO> = models
             .into_iter()

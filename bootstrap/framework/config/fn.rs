@@ -15,6 +15,6 @@ pub async fn init_server_config(server: &Server) {
     config.nodelay(SERVER_NODELAY).await;
     server.server_config(config.clone()).await;
     server.request_config(request_config).await;
-    debug!("Server config{COLON_SPACE}{:?}", config);
+    debug!("Server config {:?}", config);
     info!("Server initialization successful");
 }

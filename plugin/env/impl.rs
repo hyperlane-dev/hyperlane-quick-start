@@ -91,6 +91,7 @@ impl EnvConfig {
     pub(crate) fn get_default_redis_instance(&self) -> Option<&RedisInstanceConfig> {
         self.get_redis_instances().first()
     }
+
     #[instrument_trace]
     pub(crate) fn load() -> Result<Self, String> {
         let docker_config: DockerComposeConfig =
@@ -102,12 +103,11 @@ impl EnvConfig {
             data.push_str(&format!(
                 "{ENV_KEY_DB_CONNECTION_TIMEOUT_MILLIS}={DEFAULT_DB_CONNECTION_TIMEOUT_MILLIS}{BR}"
             ));
-            write_to_file(ENV_FILE_PATH, data.as_bytes()).map_err(|error| {
-                format!("Failed to create example env file{COLON_SPACE}{error}")
-            })?;
+            write_to_file(ENV_FILE_PATH, data.as_bytes())
+                .map_err(|error| format!("Failed to create example env file {error}"))?;
         }
         dotenvy::from_path(ENV_FILE_PATH)
-            .map_err(|error| format!("Failed to load env file{COLON_SPACE}{error}"))?;
+            .map_err(|error| format!("Failed to load env file {error}"))?;
         let get_env = |key: &str| -> Option<String> { std::env::var(key).ok() };
         let get_env_usize = |key: &str| -> Option<usize> {
             std::env::var(key).ok().and_then(|value| value.parse().ok())
@@ -273,12 +273,13 @@ impl EnvConfig {
         }
         Ok(config)
     }
+
     #[instrument_trace]
     fn load_from_docker_compose() -> Result<DockerComposeConfig, String> {
         let docker_compose_content: Vec<u8> = read_from_file(DOCKER_COMPOSE_FILE_PATH)
-            .map_err(|error| format!("Failed to read docker-compose.yml{COLON_SPACE}{error}"))?;
+            .map_err(|error| format!("Failed to read docker-compose.yml {error}"))?;
         let yaml: serde_yaml::Value = serde_yaml::from_slice(&docker_compose_content)
-            .map_err(|error| format!("Failed to parse docker-compose.yml{COLON_SPACE}{error}"))?;
+            .map_err(|error| format!("Failed to parse docker-compose.yml {error}"))?;
         let mut config: DockerComposeConfig = DockerComposeConfig::default();
         if let Some(mysql) = yaml
             .get(DOCKER_YAML_SERVICES)
