@@ -1,5 +1,69 @@
 use super::*;
 
+impl RoomBroadcastManager {
+    #[instrument_trace]
+    pub fn new() -> Self {
+        Self {
+            broadcast_map: Arc::new(BroadcastMap::new()),
+            user_subscriptions: Arc::new(RwLock::new(HashMap::new())),
+        }
+    }
+
+    #[instrument_trace]
+    pub async fn subscribe_to_room(&self, user_id: &str, room_id: &str) {
+        let mut subs: RwLockWriteGuard<'_, HashMap<String, String>> =
+            self.user_subscriptions.write().await;
+        if let Some(old_room) = subs.get(user_id) {
+            if old_room == room_id {
+                trace!("User {user_id} already subscribed to room {room_id}");
+                return;
+            }
+            trace!("User {user_id} switching from room {old_room} to {room_id}");
+        }
+        let _receiver: BroadcastMapReceiver<String> = self
+            .broadcast_map
+            .subscribe_or_insert(room_id.to_string(), 128);
+        subs.insert(user_id.to_string(), room_id.to_string());
+        trace!("User {user_id} subscribed to room {room_id}");
+    }
+
+    #[instrument_trace]
+    pub async fn unsubscribe_user(&self, user_id: &str) {
+        let mut subs: RwLockWriteGuard<'_, HashMap<String, String>> =
+            self.user_subscriptions.write().await;
+        if let Some(room_id) = subs.remove(user_id) {
+            trace!("User {user_id} unsubscribed from room {room_id}");
+        }
+    }
+
+    #[instrument_trace]
+    pub fn broadcast_to_room(&self, room_id: &str, message: &str) {
+        if self
+            .broadcast_map
+            .send(room_id.to_string(), message.to_string())
+            .is_err()
+        {
+            trace!("Failed to broadcast to room {room_id}: no active receivers");
+        } else {
+            trace!("Broadcasted message to room {room_id}");
+        }
+    }
+
+    #[instrument_trace]
+    pub async fn get_user_room(&self, user_id: &str) -> Option<String> {
+        let subs: RwLockReadGuard<'_, HashMap<String, String>> =
+            self.user_subscriptions.read().await;
+        subs.get(user_id).cloned()
+    }
+}
+
+impl Default for RoomBroadcastManager {
+    #[instrument_trace]
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ServerHook for GomokuConnectedHook {
     #[instrument_trace]
     async fn new(_ctx: &Context) -> Self {
@@ -8,7 +72,15 @@ impl ServerHook for GomokuConnectedHook {
 
     #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        let _user_id: String = GomokuWebSocketService::get_user_id(ctx).await;
+        let user_id: String = GomokuWebSocketService::get_user_id(ctx).await;
+        if user_id.is_empty() {
+            return;
+        }
+        if let Some(room_id) = GomokuRoomMapper::get_user_room(&user_id).await {
+            let manager: &RoomBroadcastManager = get_room_broadcast_manager();
+            manager.subscribe_to_room(&user_id, &room_id).await;
+            trace!("User {user_id} connected and subscribed to room {room_id}");
+        }
     }
 }
 
@@ -64,6 +136,8 @@ impl ServerHook for GomokuClosedHook {
         if user_id.is_empty() {
             return;
         }
+        let manager: &RoomBroadcastManager = get_room_broadcast_manager();
+        manager.unsubscribe_user(&user_id).await;
         let room_id: Option<String> = GomokuRoomMapper::get_user_room(&user_id).await;
         if let Some(room_id) = room_id {
             if let Some(mut room) = GomokuRoomMapper::get_room(&room_id).await {
@@ -80,7 +154,9 @@ impl ServerHook for GomokuClosedHook {
                         json!(room),
                     )
                     .unwrap_or_default();
-                    GomokuWebSocketService::broadcast_room(&room_id, &user_id, &resp_body).await;
+                    if let Ok(message) = String::from_utf8(resp_body.clone()) {
+                        manager.broadcast_to_room(&room_id, &message);
+                    }
                 }
             }
             GomokuRoomMapper::remove_user_room(&user_id).await;
@@ -153,6 +229,8 @@ impl GomokuWebSocketService {
         let room: GomokuRoom = GomokuDomain::create_room(&room_id, sender_id);
         GomokuRoomMapper::save_room(room.clone()).await;
         GomokuRoomMapper::set_user_room(sender_id, &room_id).await;
+        let manager: &RoomBroadcastManager = get_room_broadcast_manager();
+        manager.subscribe_to_room(sender_id, &room_id).await;
         let resp_body: ResponseBody = Self::build_response_body(
             GomokuMessageType::RoomState,
             &room_id,
@@ -173,6 +251,8 @@ impl GomokuWebSocketService {
             .ok_or("Room not found".to_string())?;
         let _color: StoneColor = GomokuDomain::add_player(&mut room, sender_id)?;
         GomokuRoomMapper::set_user_room(sender_id, &room_id).await;
+        let manager: &RoomBroadcastManager = get_room_broadcast_manager();
+        manager.subscribe_to_room(sender_id, &room_id).await;
         if room.get_status() == &GameStatus::Waiting && room.get_players().len() == 2 {
             GomokuDomain::start_game(&mut room)?;
         }
@@ -200,6 +280,8 @@ impl GomokuWebSocketService {
             return Err("Already in room".to_string());
         }
         GomokuRoomMapper::set_user_room(sender_id, &room_id).await;
+        let manager: &RoomBroadcastManager = get_room_broadcast_manager();
+        manager.subscribe_to_room(sender_id, &room_id).await;
         GomokuRoomMapper::save_room(room.clone()).await;
         let resp_body: ResponseBody = Self::build_response_body(
             GomokuMessageType::RoomState,
@@ -232,6 +314,8 @@ impl GomokuWebSocketService {
         if !removed {
             return Err("User not in room".to_string());
         }
+        let manager: &RoomBroadcastManager = get_room_broadcast_manager();
+        manager.unsubscribe_user(sender_id).await;
         GomokuRoomMapper::remove_user_room(sender_id).await;
         if room.get_players().is_empty() && room.get_spectators().is_empty() {
             GomokuRoomMapper::remove_room(&room_id).await;
@@ -341,12 +425,10 @@ impl GomokuWebSocketService {
 
     #[instrument_trace]
     pub async fn broadcast_room(room_id: &str, sender_id: &str, resp_body: &ResponseBody) {
-        let websocket: &WebSocket = get_global_websocket();
-        let mut targets: Vec<String> = GomokuRoomMapper::get_room_user_ids(room_id).await;
-        targets.retain(|item| item != sender_id);
-        for user_id in targets {
-            let key: BroadcastType<String> = BroadcastType::PointToGroup(user_id);
-            let _res: BroadcastMapSendResult<Vec<u8>> = websocket.send(key, resp_body.clone());
+        let manager: &RoomBroadcastManager = get_room_broadcast_manager();
+        if let Ok(message) = String::from_utf8(resp_body.clone()) {
+            manager.broadcast_to_room(room_id, &message);
+            trace!("Broadcasted message to room {room_id} from {sender_id}");
         }
     }
 

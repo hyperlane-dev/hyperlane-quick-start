@@ -425,6 +425,11 @@
         room: null,
         role: '-',
         myColor: null,
+        reconnectAttempts: 0,
+        maxReconnectAttempts: 5,
+        reconnectInterval: 1000,
+        reconnectTimer: null,
+        isManualClose: false,
       };
 
       const boardEl = document.getElementById('gomokuBoard');
@@ -460,13 +465,21 @@
 
       function connect() {
         if (state.socket) {
+          state.isManualClose = true;
           state.socket.close();
+          state.isManualClose = false;
+        }
+        if (state.reconnectAttempts >= state.maxReconnectAttempts) {
+          console.error('Max reconnection attempts reached');
+          statusText.textContent = 'Connection failed';
+          return;
         }
         state.socket = new WebSocket(wsUrl());
         setStatus(false);
 
         state.socket.onopen = () => {
           setStatus(true);
+          state.reconnectAttempts = 0;
         };
 
         state.socket.onmessage = (event) => {
@@ -480,13 +493,27 @@
 
         state.socket.onclose = () => {
           setStatus(false);
+          if (!state.isManualClose) {
+            state.reconnectAttempts++;
+            const delay = state.reconnectInterval * state.reconnectAttempts;
+            if (state.reconnectTimer) {
+              clearTimeout(state.reconnectTimer);
+            }
+            state.reconnectTimer = setTimeout(() => {
+              connect();
+            }, delay);
+          }
+        };
+
+        state.socket.onerror = (error) => {
+          console.error('WebSocket error:', error);
+          setStatus(false);
         };
       }
 
       function sendMessage(type, roomId, payload) {
         if (!state.socket || state.socket.readyState !== WebSocket.OPEN) {
-          connect();
-          setTimeout(() => sendMessage(type, roomId, payload), 300);
+          console.warn('WebSocket not connected, message queued');
           return;
         }
         const message = {
