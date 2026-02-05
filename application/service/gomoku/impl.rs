@@ -80,6 +80,16 @@ impl ServerHook for GomokuConnectedHook {
             let manager: &RoomBroadcastManager = get_room_broadcast_manager();
             manager.subscribe_to_room(&user_id, &room_id).await;
             trace!("User {user_id} connected and subscribed to room {room_id}");
+            if let Some(room) = GomokuRoomMapper::get_room(&room_id).await {
+                let resp_body: ResponseBody = GomokuWebSocketService::build_response_body(
+                    GomokuMessageType::RoomState,
+                    &room_id,
+                    &user_id,
+                    json!(room),
+                )
+                .unwrap_or_default();
+                ctx.set_response_body(&resp_body).await;
+            }
         }
     }
 }
@@ -138,29 +148,7 @@ impl ServerHook for GomokuClosedHook {
         }
         let manager: &RoomBroadcastManager = get_room_broadcast_manager();
         manager.unsubscribe_user(&user_id).await;
-        let room_id: Option<String> = GomokuRoomMapper::get_user_room(&user_id).await;
-        if let Some(room_id) = room_id {
-            if let Some(mut room) = GomokuRoomMapper::get_room(&room_id).await {
-                let removed: bool = GomokuDomain::remove_user(&mut room, &user_id);
-                if removed {
-                    GomokuRoomMapper::save_room(room.clone()).await;
-                    if room.get_players().is_empty() && room.get_spectators().is_empty() {
-                        GomokuRoomMapper::remove_room(&room_id).await;
-                    }
-                    let resp_body: ResponseBody = GomokuWebSocketService::build_response_body(
-                        GomokuMessageType::RoomState,
-                        &room_id,
-                        &user_id,
-                        json!(room),
-                    )
-                    .unwrap_or_default();
-                    if let Ok(message) = String::from_utf8(resp_body.clone()) {
-                        manager.broadcast_to_room(&room_id, &message);
-                    }
-                }
-            }
-            GomokuRoomMapper::remove_user_room(&user_id).await;
-        }
+        trace!("User {user_id} disconnected, unsubscribed from WebSocket only");
     }
 }
 
@@ -425,25 +413,14 @@ impl GomokuWebSocketService {
 
     #[instrument_trace]
     pub async fn broadcast_room(room_id: &str, sender_id: &str, resp_body: &ResponseBody) {
-        let manager: &RoomBroadcastManager = get_room_broadcast_manager();
-        if let Ok(message) = String::from_utf8(resp_body.clone()) {
-            manager.broadcast_to_room(room_id, &message);
-            trace!("Broadcasted message to room {room_id} from {sender_id}");
+        let user_ids: Vec<String> = GomokuRoomMapper::get_room_user_ids(room_id).await;
+        let websocket: &WebSocket = get_global_websocket();
+        for user_id in user_ids {
+            let key: BroadcastType<String> = BroadcastType::PointToGroup(user_id.clone());
+            let _: Result<Option<ReceiverCount>, SendError<Vec<u8>>> =
+                websocket.send(key, resp_body.clone());
         }
-        if let Ok(message_bytes) = serde_json::from_slice::<serde_json::Value>(resp_body)
-            .and_then(|value| serde_json::to_vec(&value))
-        {
-            let user_ids: Vec<String> = GomokuRoomMapper::get_room_user_ids(room_id).await;
-            let websocket: &WebSocket = get_global_websocket();
-            for user_id in user_ids {
-                if user_id == sender_id {
-                    continue;
-                }
-                let key: BroadcastType<String> = BroadcastType::PointToGroup(user_id.clone());
-                let _: Result<Option<ReceiverCount>, SendError<Vec<u8>>> =
-                    websocket.send(key, message_bytes.clone());
-            }
-        }
+        trace!("Broadcasted message to room {room_id} from {sender_id}");
     }
 
     #[instrument_trace]
