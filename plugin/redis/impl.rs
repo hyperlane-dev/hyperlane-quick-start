@@ -71,6 +71,7 @@ impl RedisAutoCreation {
         };
         Ok(connection)
     }
+
     #[instrument_trace]
     async fn validate_redis_server(&self) -> Result<(), AutoCreationError> {
         let mut conn: Connection = self.create_mutable_connection().await?;
@@ -106,6 +107,7 @@ impl RedisAutoCreation {
         }
         Ok(())
     }
+
     #[instrument_trace]
     async fn setup_redis_namespace(&self) -> Result<Vec<String>, AutoCreationError> {
         let mut setup_operations: Vec<String> = Vec::new();
@@ -157,6 +159,7 @@ impl DatabaseAutoCreation for RedisAutoCreation {
         .await;
         Ok(false)
     }
+
     #[instrument_trace]
     async fn create_tables_if_not_exist(&self) -> Result<Vec<String>, AutoCreationError> {
         let setup_operations: Vec<String> = self.setup_redis_namespace().await?;
@@ -177,6 +180,7 @@ impl DatabaseAutoCreation for RedisAutoCreation {
         }
         Ok(setup_operations)
     }
+
     #[instrument_trace]
     async fn verify_connection(&self) -> Result<(), AutoCreationError> {
         match self.validate_redis_server().await {

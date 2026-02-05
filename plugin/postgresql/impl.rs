@@ -18,6 +18,7 @@ impl PostgreSqlAutoCreation {
     pub fn with_schema(instance: PostgreSqlInstanceConfig, schema: DatabaseSchema) -> Self {
         Self { instance, schema }
     }
+
     #[instrument_trace]
     async fn create_admin_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
         let admin_url: String = self.instance.get_admin_url();
@@ -49,6 +50,7 @@ impl PostgreSqlAutoCreation {
             }
         })
     }
+
     #[instrument_trace]
     async fn create_target_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
         let db_url: String = self.instance.get_connection_url();
@@ -75,6 +77,7 @@ impl PostgreSqlAutoCreation {
             ))
         })
     }
+
     #[instrument_trace]
     async fn database_exists(
         &self,
@@ -92,6 +95,7 @@ impl PostgreSqlAutoCreation {
             ))),
         }
     }
+
     #[instrument_trace]
     async fn create_database(
         &self,
@@ -144,6 +148,7 @@ impl PostgreSqlAutoCreation {
             }
         }
     }
+
     #[instrument_trace]
     async fn table_exists<T>(
         &self,
@@ -165,6 +170,7 @@ impl PostgreSqlAutoCreation {
             ))),
         }
     }
+
     #[instrument_trace]
     async fn create_table(
         &self,
@@ -193,6 +199,7 @@ impl PostgreSqlAutoCreation {
             }
         }
     }
+
     #[instrument_trace]
     async fn execute_sql<S>(
         &self,
@@ -210,6 +217,7 @@ impl PostgreSqlAutoCreation {
             ))),
         }
     }
+
     #[instrument_trace]
     fn get_database_schema(&self) -> &DatabaseSchema {
         &self.schema
@@ -224,6 +232,7 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
         let _: Result<(), DbErr> = admin_connection.close().await;
         result
     }
+
     #[instrument_trace]
     async fn create_tables_if_not_exist(&self) -> Result<Vec<String>, AutoCreationError> {
         let connection: DatabaseConnection = self.create_target_connection().await?;
@@ -279,6 +288,7 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
         .await;
         Ok(created_tables)
     }
+
     #[instrument_trace]
     async fn verify_connection(&self) -> Result<(), AutoCreationError> {
         let connection: DatabaseConnection = self.create_target_connection().await?;

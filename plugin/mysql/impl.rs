@@ -18,6 +18,7 @@ impl MySqlAutoCreation {
     pub fn with_schema(instance: MySqlInstanceConfig, schema: DatabaseSchema) -> Self {
         Self { instance, schema }
     }
+
     #[instrument_trace]
     async fn create_admin_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
         let admin_url: String = self.instance.get_admin_url();
@@ -49,6 +50,7 @@ impl MySqlAutoCreation {
             }
         })
     }
+
     #[instrument_trace]
     async fn database_exists(
         &self,
@@ -66,6 +68,7 @@ impl MySqlAutoCreation {
             ))),
         }
     }
+
     #[instrument_trace]
     async fn create_database(
         &self,
@@ -111,6 +114,7 @@ impl MySqlAutoCreation {
             }
         }
     }
+
     #[instrument_trace]
     async fn create_target_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
         let db_url: String = self.instance.get_connection_url();
@@ -138,6 +142,7 @@ impl MySqlAutoCreation {
             ))
         })
     }
+
     #[instrument_trace]
     async fn table_exists<T>(
         &self,
@@ -160,6 +165,7 @@ impl MySqlAutoCreation {
             ))),
         }
     }
+
     #[instrument_trace]
     async fn create_table(
         &self,
@@ -188,6 +194,7 @@ impl MySqlAutoCreation {
             }
         }
     }
+
     #[instrument_trace]
     async fn execute_sql<S>(
         &self,
@@ -205,6 +212,7 @@ impl MySqlAutoCreation {
             ))),
         }
     }
+
     #[instrument_trace]
     fn get_database_schema(&self) -> &DatabaseSchema {
         &self.schema
@@ -219,6 +227,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
         let _: Result<(), DbErr> = admin_connection.close().await;
         result
     }
+
     #[instrument_trace]
     async fn create_tables_if_not_exist(&self) -> Result<Vec<String>, AutoCreationError> {
         let connection: DatabaseConnection = self.create_target_connection().await?;
@@ -274,6 +283,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
         .await;
         Ok(created_tables)
     }
+
     #[instrument_trace]
     async fn verify_connection(&self) -> Result<(), AutoCreationError> {
         let db_url: String = self.instance.get_connection_url();

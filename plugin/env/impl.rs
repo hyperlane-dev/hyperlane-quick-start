@@ -91,6 +91,7 @@ impl EnvConfig {
     pub(crate) fn get_default_redis_instance(&self) -> Option<&RedisInstanceConfig> {
         self.get_redis_instances().first()
     }
+
     #[instrument_trace]
     pub(crate) fn load() -> Result<Self, String> {
         let docker_config: DockerComposeConfig =
@@ -273,6 +274,7 @@ impl EnvConfig {
         }
         Ok(config)
     }
+
     #[instrument_trace]
     fn load_from_docker_compose() -> Result<DockerComposeConfig, String> {
         let docker_compose_content: Vec<u8> = read_from_file(DOCKER_COMPOSE_FILE_PATH)
