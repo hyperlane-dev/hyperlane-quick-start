@@ -8,7 +8,7 @@ pub use {r#fn::*, r#static::*, r#struct::*};
 use {
     super::*,
     domain::gomoku::*,
-    mapper::gomoku::*,
+    mapper::{chat::*, gomoku::*},
     model::{application::gomoku::*, request::gomoku::*, response::gomoku::*},
 };
 
@@ -19,4 +19,4 @@ use std::{
     sync::{Arc, OnceLock},
 };
 
-use tokio::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
+use tokio::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard, broadcast::error::SendError};

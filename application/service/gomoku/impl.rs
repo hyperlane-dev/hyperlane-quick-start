@@ -430,6 +430,20 @@ impl GomokuWebSocketService {
             manager.broadcast_to_room(room_id, &message);
             trace!("Broadcasted message to room {room_id} from {sender_id}");
         }
+        if let Ok(message_bytes) = serde_json::from_slice::<serde_json::Value>(resp_body)
+            .and_then(|value| serde_json::to_vec(&value))
+        {
+            let user_ids: Vec<String> = GomokuRoomMapper::get_room_user_ids(room_id).await;
+            let websocket: &WebSocket = get_global_websocket();
+            for user_id in user_ids {
+                if user_id == sender_id {
+                    continue;
+                }
+                let key: BroadcastType<String> = BroadcastType::PointToGroup(user_id.clone());
+                let _: Result<Option<ReceiverCount>, SendError<Vec<u8>>> =
+                    websocket.send(key, message_bytes.clone());
+            }
+        }
     }
 
     #[instrument_trace]
