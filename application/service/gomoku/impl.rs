@@ -40,7 +40,7 @@ impl RoomBroadcastManager {
     pub fn broadcast_to_room(&self, room_id: &str, message: &str) {
         if self
             .broadcast_map
-            .send(room_id.to_string(), message.to_string())
+            .try_send(room_id.to_string(), message.to_string())
             .is_err()
         {
             trace!("Failed to broadcast to room {room_id}: no active receivers");
