@@ -114,7 +114,7 @@ impl ChatService {
     #[instrument_trace]
     pub fn broadcast_online_count(key: BroadcastType<String>, message: ResponseBody) {
         let websocket: &WebSocket = get_global_websocket();
-        let _: BroadcastMapSendResult<Vec<u8>> = websocket.send(key, message);
+        let _: Result<Option<ReceiverCount>, SendError<Vec<u8>>> = websocket.send(key, message);
     }
 
     #[instrument_trace]
@@ -163,7 +163,8 @@ impl ChatService {
         let websocket: &WebSocket = get_global_websocket();
         let path: String = ctx.get_request_path().await;
         let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
-        let _: BroadcastMapSendResult<Vec<u8>> = websocket.send(key, gpt_resp_json.clone());
+        let _: Result<Option<ReceiverCount>, SendError<Vec<u8>>> =
+            websocket.send(key, gpt_resp_json.clone());
         ctx.set_response_body(&gpt_resp_json).await;
         let session_id_clone: String = session_id.clone();
         let api_response_clone: String = api_response.clone();

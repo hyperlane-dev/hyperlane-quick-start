@@ -38,6 +38,7 @@ impl OnlineService {
         let websocket: &WebSocket = get_global_websocket();
         let message: String = format!(r#"{{"type":"online_count","count":{count}}}"#);
         let message_bytes: Vec<u8> = message.into_bytes();
-        let _: BroadcastMapSendResult<Vec<u8>> = websocket.send(key, message_bytes);
+        let _: Result<Option<ReceiverCount>, SendError<Vec<u8>>> =
+            websocket.send(key, message_bytes);
     }
 }
