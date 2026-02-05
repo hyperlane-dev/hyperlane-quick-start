@@ -44,9 +44,7 @@ impl MySqlAutoCreation {
                     "Cannot connect to MySQL server {error_msg}"
                 ))
             } else {
-                AutoCreationError::DatabaseError(format!(
-                    "MySQL connection error {error_msg}"
-                ))
+                AutoCreationError::DatabaseError(format!("MySQL connection error {error_msg}"))
             }
         })
     }
@@ -120,20 +118,16 @@ impl MySqlAutoCreation {
         let db_url: String = self.instance.get_connection_url();
         let timeout_duration: Duration = get_connection_timeout_duration();
         let timeout_seconds: u64 = timeout_duration.as_secs();
-        let connection_result: Result<DatabaseConnection, DbErr> = match timeout(
-            timeout_duration,
-            Database::connect(&db_url),
-        )
-        .await
-        {
-            Ok(result) => result,
-            Err(_) => {
-                return Err(AutoCreationError::Timeout(format!(
-                    "MySQL database connection timeout after {timeout_seconds} seconds {}",
-                    self.instance.get_database()
-                )));
-            }
-        };
+        let connection_result: Result<DatabaseConnection, DbErr> =
+            match timeout(timeout_duration, Database::connect(&db_url)).await {
+                Ok(result) => result,
+                Err(_) => {
+                    return Err(AutoCreationError::Timeout(format!(
+                        "MySQL database connection timeout after {timeout_seconds} seconds {}",
+                        self.instance.get_database()
+                    )));
+                }
+            };
         connection_result.map_err(|error: DbErr| {
             AutoCreationError::ConnectionFailed(format!(
                 "Cannot connect to MySQL database '{}' {}",

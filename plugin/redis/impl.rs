@@ -28,9 +28,7 @@ impl RedisAutoCreation {
                     "Cannot connect to Redis server {error_msg}"
                 ))
             } else {
-                AutoCreationError::DatabaseError(format!(
-                    "Redis connection error {error_msg}"
-                ))
+                AutoCreationError::DatabaseError(format!("Redis connection error {error_msg}"))
             }
         })?;
         let timeout_duration: Duration = get_connection_timeout_duration();
@@ -78,9 +76,7 @@ impl RedisAutoCreation {
         let pong: String = redis::cmd("PING")
             .query(&mut conn)
             .map_err(|error: RedisError| {
-                AutoCreationError::ConnectionFailed(format!(
-                    "Redis PING failed {error}"
-                ))
+                AutoCreationError::ConnectionFailed(format!("Redis PING failed {error}"))
             })?;
         if pong != "PONG" {
             return Err(AutoCreationError::ConnectionFailed(
