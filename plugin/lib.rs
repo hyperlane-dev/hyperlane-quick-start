@@ -5,6 +5,7 @@ pub mod mysql;
 pub mod postgresql;
 pub mod process;
 pub mod redis;
+pub mod shutdown;
 
 use {
     hyperlane::*,

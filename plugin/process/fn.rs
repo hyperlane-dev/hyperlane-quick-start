@@ -8,7 +8,7 @@ where
     Fut: Future<Output = ()> + Send + 'static,
 {
     let args: Vec<String> = args().collect();
-    debug!("Process create args{COLON_SPACE}{args:?}");
+    debug!("Process create args {args:?}");
     let mut manager: ServerManager = ServerManager::new();
     manager
         .set_pid_file(pid_path.as_ref())
@@ -19,7 +19,7 @@ where
             match manager.start_daemon().await {
                 Ok(_) => info!("Server started in background successfully"),
                 Err(error) => {
-                    error!("Error starting server in background{COLON_SPACE}{error}")
+                    error!("Error starting server in background {error}")
                 }
             };
         } else {
@@ -30,7 +30,7 @@ where
     let stop_server = || async {
         match manager.stop().await {
             Ok(_) => info!("Server stopped successfully"),
-            Err(error) => error!("Error stopping server{COLON_SPACE}{error}"),
+            Err(error) => error!("Error stopping server {error}"),
         };
     };
     let restart_server = || async {
@@ -47,7 +47,7 @@ where
         CMD_STOP => stop_server().await,
         CMD_RESTART => restart_server().await,
         _ => {
-            error!("Invalid command{COLON_SPACE}{command}");
+            error!("Invalid command {command}");
         }
     }
 }

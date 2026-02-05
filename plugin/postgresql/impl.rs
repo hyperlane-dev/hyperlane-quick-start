@@ -37,16 +37,14 @@ impl PostgreSqlAutoCreation {
             let error_msg: String = error.to_string();
             if error_msg.contains("authentication failed") || error_msg.contains("permission") {
                 AutoCreationError::InsufficientPermissions(format!(
-                    "Cannot connect to PostgreSQL server for database creation{COLON_SPACE}{error_msg}"
+                    "Cannot connect to PostgreSQL server for database creation {error_msg}"
                 ))
             } else if error_msg.contains("timeout") || error_msg.contains("Connection refused") {
                 AutoCreationError::ConnectionFailed(format!(
-                    "Cannot connect to PostgreSQL server{COLON_SPACE}{error_msg}"
+                    "Cannot connect to PostgreSQL server {error_msg}"
                 ))
             } else {
-                AutoCreationError::DatabaseError(format!(
-                    "PostgreSQL connection error{COLON_SPACE}{error_msg}"
-                ))
+                AutoCreationError::DatabaseError(format!("PostgreSQL connection error {error_msg}"))
             }
         })
     }
@@ -56,23 +54,19 @@ impl PostgreSqlAutoCreation {
         let db_url: String = self.instance.get_connection_url();
         let timeout_duration: Duration = get_connection_timeout_duration();
         let timeout_seconds: u64 = timeout_duration.as_secs();
-        let connection_result: Result<DatabaseConnection, DbErr> = match timeout(
-            timeout_duration,
-            Database::connect(&db_url),
-        )
-        .await
-        {
-            Ok(result) => result,
-            Err(_) => {
-                return Err(AutoCreationError::Timeout(format!(
-                    "PostgreSQL database connection timeout after {timeout_seconds} seconds{COLON_SPACE}{}",
-                    self.instance.get_database().as_str()
-                )));
-            }
-        };
+        let connection_result: Result<DatabaseConnection, DbErr> =
+            match timeout(timeout_duration, Database::connect(&db_url)).await {
+                Ok(result) => result,
+                Err(_) => {
+                    return Err(AutoCreationError::Timeout(format!(
+                        "PostgreSQL database connection timeout after {timeout_seconds} seconds {}",
+                        self.instance.get_database().as_str()
+                    )));
+                }
+            };
         connection_result.map_err(|error: DbErr| {
             AutoCreationError::ConnectionFailed(format!(
-                "Cannot connect to PostgreSQL database '{}'{COLON_SPACE}{error}",
+                "Cannot connect to PostgreSQL database '{}' {error}",
                 self.instance.get_database().as_str(),
             ))
         })
@@ -91,7 +85,7 @@ impl PostgreSqlAutoCreation {
         match connection.query_all(statement).await {
             Ok(results) => Ok(!results.is_empty()),
             Err(error) => Err(AutoCreationError::DatabaseError(format!(
-                "Failed to check if database exists{COLON_SPACE}{error}"
+                "Failed to check if database exists {error}"
             ))),
         }
     }
@@ -127,7 +121,7 @@ impl PostgreSqlAutoCreation {
                 let error_msg: String = error.to_string();
                 if error_msg.contains("permission denied") || error_msg.contains("must be owner") {
                     Err(AutoCreationError::InsufficientPermissions(format!(
-                        "Cannot create PostgreSQL database '{}'{COLON_SPACE}{}",
+                        "Cannot create PostgreSQL database '{}' {}",
                         self.instance.get_database().as_str(),
                         error_msg
                     )))
@@ -140,7 +134,7 @@ impl PostgreSqlAutoCreation {
                     Ok(false)
                 } else {
                     Err(AutoCreationError::DatabaseError(format!(
-                        "Failed to create PostgreSQL database '{}'{COLON_SPACE}{}",
+                        "Failed to create PostgreSQL database '{}' {}",
                         self.instance.get_database().as_str(),
                         error_msg
                     )))
@@ -166,7 +160,7 @@ impl PostgreSqlAutoCreation {
         match connection.query_all(statement).await {
             Ok(results) => Ok(!results.is_empty()),
             Err(error) => Err(AutoCreationError::DatabaseError(format!(
-                "Failed to check if table '{table_name_str}' exists{COLON_SPACE}{error}"
+                "Failed to check if table '{table_name_str}' exists {error}"
             ))),
         }
     }
@@ -185,13 +179,13 @@ impl PostgreSqlAutoCreation {
                 let error_msg: String = error.to_string();
                 if error_msg.contains("permission denied") {
                     Err(AutoCreationError::InsufficientPermissions(format!(
-                        "Cannot create PostgreSQL table '{}'{COLON_SPACE}{}",
+                        "Cannot create PostgreSQL table '{}' {}",
                         table.get_name(),
                         error_msg
                     )))
                 } else {
                     Err(AutoCreationError::SchemaError(format!(
-                        "Failed to create PostgreSQL table '{}'{COLON_SPACE}{}",
+                        "Failed to create PostgreSQL table '{}' {}",
                         table.get_name(),
                         error_msg
                     )))
@@ -213,7 +207,7 @@ impl PostgreSqlAutoCreation {
         match connection.execute(statement).await {
             Ok(_) => Ok(()),
             Err(error) => Err(AutoCreationError::DatabaseError(format!(
-                "Failed to execute SQL{COLON_SPACE}{error}"
+                "Failed to execute SQL {error}"
             ))),
         }
     }
@@ -317,7 +311,7 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
                 )
                 .await;
                 Err(AutoCreationError::ConnectionFailed(format!(
-                    "PostgreSQL connection verification failed{COLON_SPACE}{error_msg}"
+                    "PostgreSQL connection verification failed {error_msg}"
                 )))
             }
         }

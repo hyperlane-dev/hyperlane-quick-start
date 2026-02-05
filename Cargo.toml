@@ -40,9 +40,13 @@ serde = { version = "1.0.228", features = ["derive"] }
 
 [dependencies]
 hyperlane_bootstrap = { workspace = true }
+hyperlane_config = { workspace = true }
+hyperlane_plugin = { workspace = true }
 
 serde = { workspace = true }
-serde_json = { version = "1.0.149", features = ["preserve_order"] }
+tracing = { workspace = true }
+hyperlane = { workspace = true }
+hyperlane-utils = { workspace = true }
 
 [patch.crates-io]
 hyperlane_application = { path = "application" }

@@ -21,15 +21,15 @@ impl RedisAutoCreation {
             let error_msg: String = error.to_string();
             if error_msg.contains("authentication failed") || error_msg.contains("NOAUTH") {
                 AutoCreationError::InsufficientPermissions(format!(
-                    "Redis authentication failed{COLON_SPACE}{error_msg}"
+                    "Redis authentication failed {error_msg}"
                 ))
             } else if error_msg.contains("Connection refused") || error_msg.contains("timeout") {
                 AutoCreationError::ConnectionFailed(format!(
-                    "Cannot connect to Redis server{COLON_SPACE}{error_msg}"
+                    "Cannot connect to Redis server {error_msg}"
                 ))
             } else {
                 AutoCreationError::DatabaseError(format!(
-                    "Redis connection error{COLON_SPACE}{error_msg}"
+                    "Redis connection error {error_msg}"
                 ))
             }
         })?;
@@ -43,17 +43,17 @@ impl RedisAutoCreation {
                     let error_msg: String = error.to_string();
                     if error_msg.contains("authentication failed") || error_msg.contains("NOAUTH") {
                         AutoCreationError::InsufficientPermissions(format!(
-                            "Redis authentication failed{COLON_SPACE}{error_msg}"
+                            "Redis authentication failed {error_msg}"
                         ))
                     } else if error_msg.contains("Connection refused")
                         || error_msg.contains("timeout")
                     {
                         AutoCreationError::ConnectionFailed(format!(
-                            "Cannot connect to Redis server{COLON_SPACE}{error_msg}"
+                            "Cannot connect to Redis server {error_msg}"
                         ))
                     } else {
                         AutoCreationError::DatabaseError(format!(
-                            "Redis connection error{COLON_SPACE}{error_msg}"
+                            "Redis connection error {error_msg}"
                         ))
                     }
                 })?,
@@ -79,7 +79,7 @@ impl RedisAutoCreation {
             .query(&mut conn)
             .map_err(|error: RedisError| {
                 AutoCreationError::ConnectionFailed(format!(
-                    "Redis PING failed{COLON_SPACE}{error}"
+                    "Redis PING failed {error}"
                 ))
             })?;
         if pong != "PONG" {
@@ -93,7 +93,7 @@ impl RedisAutoCreation {
                 .query(&mut conn)
                 .map_err(|error: RedisError| {
                     AutoCreationError::DatabaseError(format!(
-                        "Failed to get Redis server info{COLON_SPACE}{error}"
+                        "Failed to get Redis server info {error}"
                     ))
                 })?;
         if info.contains("redis_version:") {
@@ -118,7 +118,7 @@ impl RedisAutoCreation {
             .query(&mut conn)
             .map_err(|error: RedisError| {
                 AutoCreationError::DatabaseError(format!(
-                    "Failed to check Redis key existence{COLON_SPACE}{error}"
+                    "Failed to check Redis key existence {error}"
                 ))
             })?;
         if exists == 0 {
@@ -128,7 +128,7 @@ impl RedisAutoCreation {
                 .query(&mut conn)
                 .map_err(|error: RedisError| {
                     AutoCreationError::DatabaseError(format!(
-                        "Failed to set Redis initialization key{COLON_SPACE}{error}"
+                        "Failed to set Redis initialization key {error}"
                     ))
                 })?;
             setup_operations.push(app_key.clone());
@@ -139,7 +139,7 @@ impl RedisAutoCreation {
                 .query(&mut conn)
                 .map_err(|error: RedisError| {
                     AutoCreationError::DatabaseError(format!(
-                        "Failed to set Redis config key{COLON_SPACE}{error}"
+                        "Failed to set Redis config key {error}"
                     ))
                 })?;
             setup_operations.push(config_key);

@@ -31,7 +31,7 @@ pub async fn initialize_auto_creation_with_schema(
 ) -> Result<(), String> {
     if let Err(error) = AutoCreationConfig::validate() {
         return Err(format!(
-            "Auto-creation configuration validation failed{COLON_SPACE}{error}"
+            "Auto-creation configuration validation failed {error}"
         ));
     }
     let env: &'static EnvConfig = get_global_env_config();
@@ -40,7 +40,7 @@ pub async fn initialize_auto_creation_with_schema(
         match mysql::perform_mysql_auto_creation(instance, mysql_schema.clone()).await {
             Ok(result) => {
                 initialization_results.push(format!(
-                    "MySQL ({}) {COLON_SPACE}{}",
+                    "MySQL ({})  {}",
                     instance.get_name(),
                     if result.has_changes() {
                         "initialized with changes"
@@ -52,7 +52,7 @@ pub async fn initialize_auto_creation_with_schema(
             Err(error) => {
                 if !error.should_continue() {
                     return Err(format!(
-                        "MySQL ({}) auto-creation failed{COLON_SPACE}{error}",
+                        "MySQL ({}) auto-creation failed {error}",
                         instance.get_name()
                     ));
                 }
@@ -69,7 +69,7 @@ pub async fn initialize_auto_creation_with_schema(
         {
             Ok(result) => {
                 initialization_results.push(format!(
-                    "PostgreSQL ({}) {COLON_SPACE}{}",
+                    "PostgreSQL ({})  {}",
                     instance.get_name(),
                     if result.has_changes() {
                         "initialized with changes"
@@ -81,7 +81,7 @@ pub async fn initialize_auto_creation_with_schema(
             Err(error) => {
                 if !error.should_continue() {
                     return Err(format!(
-                        "PostgreSQL ({}) auto-creation failed{COLON_SPACE}{error}",
+                        "PostgreSQL ({}) auto-creation failed {error}",
                         instance.get_name()
                     ));
                 }
@@ -96,7 +96,7 @@ pub async fn initialize_auto_creation_with_schema(
         match redis::perform_redis_auto_creation(instance).await {
             Ok(result) => {
                 initialization_results.push(format!(
-                    "Redis ({}) {COLON_SPACE}{}",
+                    "Redis ({})  {}",
                     instance.get_name(),
                     if result.has_changes() {
                         "initialized with changes"
@@ -108,7 +108,7 @@ pub async fn initialize_auto_creation_with_schema(
             Err(error) => {
                 if !error.should_continue() {
                     return Err(format!(
-                        "Redis ({}) auto-creation failed{COLON_SPACE}{error}",
+                        "Redis ({}) auto-creation failed {error}",
                         instance.get_name()
                     ));
                 }
@@ -123,7 +123,7 @@ pub async fn initialize_auto_creation_with_schema(
         info!("[AUTO-CREATION] No plugins enabled for auto-creation");
     } else {
         let results_summary: String = initialization_results.join(", ");
-        info!("[AUTO-CREATION] Initialization complete{COLON_SPACE}{results_summary}");
+        info!("[AUTO-CREATION] Initialization complete {results_summary}");
     }
     Ok(())
 }

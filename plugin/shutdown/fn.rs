@@ -10,8 +10,8 @@ fn default_shutdown() -> SharedAsyncTaskFactory<()> {
 }
 
 #[instrument_trace]
-pub fn set_shutdown(shutdown: SharedAsyncTaskFactory<()>) {
-    drop(SHUTDOWN.set(shutdown));
+pub fn set_shutdown(shutdown: &SharedAsyncTaskFactory<()>) {
+    drop(SHUTDOWN.set(shutdown.clone()));
 }
 
 #[instrument_trace]
