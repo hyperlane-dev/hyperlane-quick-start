@@ -1042,17 +1042,17 @@ impl LinuxMemoryInfo {
     }
 
     fn calculate_usage(&self) -> (u64, u64, f64) {
-        let available: u64 = if *self.get_available() == 0 && *self.get_total() > 0 {
-            *self.get_free() + *self.get_buffers() + *self.get_cached()
+        let available: u64 = if self.get_available() == 0 && self.get_total() > 0 {
+            self.get_free() + self.get_buffers() + self.get_cached()
         } else {
-            *self.get_available()
+            self.get_available()
         };
         let used: u64 = self.get_total().saturating_sub(available);
-        let usage: f64 = if *self.get_total() > 0 {
-            (used as f64 / *self.get_total() as f64) * 100.0
+        let usage: f64 = if self.get_total() > 0 {
+            (used as f64 / self.get_total() as f64) * 100.0
         } else {
             0.0
         };
-        (used, *self.get_total(), usage)
+        (used, self.get_total(), usage)
     }
 }
