@@ -7,9 +7,9 @@ impl ServerHook for TrackingViewRoute {
     }
 
     #[prologue_macros(
-        get_method,
-        response_header(CONTENT_TYPE => TEXT_HTML),
-        response_body(TRACKING_HTML)
+        methods(get, post),
+        response_status_code(302),
+        response_header(LOCATION => "/static/tracking/index.html")
     )]
     #[instrument_trace]
     async fn handle(self, ctx: &Context) {}
