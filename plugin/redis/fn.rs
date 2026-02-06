@@ -138,7 +138,7 @@ where
     }
     connections.remove(instance_name_str);
     drop(connections);
-    let new_connection: Result<Arc<RwLock<Connection>>, String> =
+    let new_connection: Result<ArcRwLock<Connection>, String> =
         connection_redis_db(instance_name_str).await;
     let mut connections: RwLockWriteGuard<'_, RedisConnectionMap> = REDIS_CONNECTIONS.write().await;
     connections.insert(

@@ -66,7 +66,7 @@ pub async fn init_db() {
         Some(postgresql_schema.clone()),
     )
     .await;
-    let _: Result<Arc<RwLock<Connection>>, String> =
+    let _: Result<ArcRwLock<Connection>, String> =
         connection_redis_db(DEFAULT_REDIS_INSTANCE_NAME).await;
     match initialize_auto_creation_with_schema(Some(mysql_schema), Some(postgresql_schema), None)
         .await
