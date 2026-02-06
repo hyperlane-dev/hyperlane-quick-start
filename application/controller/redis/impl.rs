@@ -8,23 +8,11 @@ impl ServerHook for ListRecordsRoute {
 
     #[prologue_macros(
         methods(get, post),
-        request_query_option("keys" => keys_opt),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
     async fn handle(self, ctx: &Context) {
-        let keys: Vec<String> = match keys_opt {
-            Some(k) => k.split(',').map(|s: &str| s.to_string()).collect(),
-            None => {
-                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                    ResponseCode::BadRequest,
-                    "Keys parameter is required",
-                );
-                ctx.set_response_body(&response.to_json_bytes()).await;
-                return;
-            }
-        };
-        match RedisService::get_all_redis_records(keys).await {
+        match RedisService::get_all_redis_records().await {
             Ok(records) => {
                 let response: ApiResponse<Vec<RedisRecord>> = ApiResponse::success(records);
                 ctx.set_response_body(&response.to_json_bytes()).await
