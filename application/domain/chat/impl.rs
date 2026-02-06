@@ -68,8 +68,8 @@ impl ChatSession {
 
 impl ChatDomain {
     #[instrument_trace]
-    pub fn get_global_chat_sessions() -> &'static Arc<RwLock<HashMap<String, ChatSession>>> {
-        GLOBAL_CHAT_SESSIONS.get_or_init(|| Arc::new(RwLock::new(HashMap::new())))
+    pub fn get_global_chat_sessions() -> &'static ArcRwLock<HashMap<String, ChatSession>> {
+        GLOBAL_CHAT_SESSIONS.get_or_init(|| arc_rwlock(HashMap::new()))
     }
 
     #[instrument_trace]
@@ -99,8 +99,8 @@ impl ChatDomain {
     }
 
     #[instrument_trace]
-    pub fn get_global_online_users() -> &'static Arc<RwLock<HashMap<String, OnlineUser>>> {
-        GLOBAL_ONLINE_USERS.get_or_init(|| Arc::new(RwLock::new(HashMap::new())))
+    pub fn get_global_online_users() -> &'static ArcRwLock<HashMap<String, OnlineUser>> {
+        GLOBAL_ONLINE_USERS.get_or_init(|| arc_rwlock(HashMap::new()))
     }
 
     #[instrument_trace]

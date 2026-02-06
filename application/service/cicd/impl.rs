@@ -1217,9 +1217,9 @@ impl LogStreamManager {
     pub fn new() -> Self {
         Self {
             broadcast_map: Arc::new(BroadcastMap::new()),
-            step_outputs: Arc::new(RwLock::new(HashMap::new())),
-            step_statuses: Arc::new(RwLock::new(HashMap::new())),
-            active_steps: Arc::new(RwLock::new(HashMap::new())),
+            step_outputs: arc_rwlock(HashMap::new()),
+            step_statuses: arc_rwlock(HashMap::new()),
+            active_steps: arc_rwlock(HashMap::new()),
         }
     }
 
@@ -1238,14 +1238,14 @@ impl LogStreamManager {
         outputs.insert(
             step_id,
             StepOutput {
-                stdout: Arc::new(RwLock::new(String::new())),
-                stderr: Arc::new(RwLock::new(String::new())),
+                stdout: arc_rwlock(String::new()),
+                stderr: arc_rwlock(String::new()),
             },
         );
         self.step_statuses
             .write()
             .await
-            .insert(step_id, Arc::new(RwLock::new(CicdStatus::Running)));
+            .insert(step_id, arc_rwlock(CicdStatus::Running));
         self.get_active_steps()
             .write()
             .await

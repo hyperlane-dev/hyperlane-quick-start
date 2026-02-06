@@ -11,4 +11,6 @@ use {
 
 use std::sync::Arc;
 
+use tokio::sync::RwLock;
+
 use {redis::Connection, sea_orm::DatabaseConnection};

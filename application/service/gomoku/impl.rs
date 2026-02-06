@@ -5,7 +5,7 @@ impl RoomBroadcastManager {
     pub fn new() -> Self {
         Self {
             broadcast_map: Arc::new(BroadcastMap::new()),
-            user_subscriptions: Arc::new(RwLock::new(HashMap::new())),
+            user_subscriptions: arc_rwlock(HashMap::new()),
         }
     }
 
