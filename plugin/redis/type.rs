@@ -1,5 +1,3 @@
 use super::*;
 
-pub type RedisConnectionResult = Result<Arc<Connection>, String>;
-
-pub type RedisConnectionMap = HashMap<String, ConnectionCache<Arc<Connection>>>;
+pub type RedisConnectionMap = HashMap<String, ConnectionCache<ArcRwLock<Connection>>>;

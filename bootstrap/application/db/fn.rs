@@ -6,7 +6,8 @@ pub async fn init_db() {
         connection_mysql_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await;
     let _: Result<DatabaseConnection, String> =
         connection_postgresql_db(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await;
-    let _: Result<Arc<Connection>, String> = connection_redis_db(DEFAULT_REDIS_INSTANCE_NAME).await;
+    let _: Result<ArcRwLock<Connection>, String> =
+        connection_redis_db(DEFAULT_REDIS_INSTANCE_NAME).await;
     match initialize_auto_creation().await {
         Ok(_) => {
             info!("Auto-creation initialization successful");
