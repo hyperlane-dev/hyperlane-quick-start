@@ -209,6 +209,10 @@ impl CicdService {
 
     #[instrument_trace]
     pub async fn execute_run(run_id: i32) -> Result<(), String> {
+        if !is_docker_available().await {
+            let _: Result<(), String> = Self::complete_run(run_id, CicdStatus::Failure).await;
+            return Err("Docker is not installed or not available".to_string());
+        }
         Self::start_run(run_id).await?;
         let jobs: Vec<JobDto> = Self::get_jobs_by_run(run_id).await?;
         let mut has_error: bool = false;
