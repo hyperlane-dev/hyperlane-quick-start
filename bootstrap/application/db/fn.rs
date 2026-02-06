@@ -5,11 +5,6 @@ pub fn build_mysql_schema() -> DatabaseSchema {
     DatabaseSchema::default()
         .add_table(TableSchema::new(
             Vec::new(),
-            "record".to_string(),
-            MYSQL_RECORD_SQL.to_string(),
-        ))
-        .add_table(TableSchema::new(
-            Vec::new(),
             "cicd_pipeline".to_string(),
             CICD_PIPELINE_SQL.to_string(),
         ))
@@ -39,11 +34,6 @@ pub fn build_postgresql_schema() -> DatabaseSchema {
         .map(|s| format!("{s};"))
         .collect();
     let mut schema: DatabaseSchema = DatabaseSchema::default()
-        .add_table(TableSchema::new(
-            Vec::new(),
-            "record".to_string(),
-            POSTGRESQL_RECORD_SQL.to_string(),
-        ))
         .add_table(TableSchema::new(
             Vec::new(),
             "chat_history".to_string(),
