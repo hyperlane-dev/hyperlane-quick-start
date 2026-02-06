@@ -149,6 +149,27 @@
         box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
       }
 
+      .form-row {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+      }
+
+      .form-row .form-group {
+        flex: 1;
+        margin-bottom: 0;
+        min-width: 0;
+      }
+
+      .form-row .form-group input {
+        width: 100%;
+      }
+
+      .form-row .btn {
+        white-space: nowrap;
+        margin-top: 0;
+      }
+
       .btn {
         padding: 12px 24px;
         border: none;
@@ -415,6 +436,19 @@
           width: 95%;
           padding: 20px;
         }
+
+        .form-row {
+          flex-direction: column;
+        }
+
+        .form-row .form-group {
+          width: 100%;
+          margin-bottom: 12px;
+        }
+
+        .form-row .btn {
+          width: 100%;
+        }
       }
     </style>
   </head>
@@ -436,13 +470,15 @@
 
       <div class="card">
         <h2>Add New Record</h2>
-        <div class="form-group">
-          <input id="create-key" placeholder="Key" type="text" />
+        <div class="form-row">
+          <div class="form-group">
+            <input id="create-key" placeholder="Key" type="text" />
+          </div>
+          <div class="form-group">
+            <input id="create-value" placeholder="Value" type="text" />
+          </div>
+          <button class="btn btn-primary" id="create-btn">Add Record</button>
         </div>
-        <div class="form-group">
-          <input id="create-value" placeholder="Value" type="text" />
-        </div>
-        <button class="btn btn-primary" id="create-btn">Add Record</button>
       </div>
 
       <div class="card" id="records">
