@@ -30,17 +30,17 @@ pub struct LogEntry {
 #[derive(Clone, Data, Debug)]
 pub struct StepStream {
     #[get(pub(crate))]
-    pub(super) output: Arc<RwLock<String>>,
+    pub(super) output: ArcRwLock<String>,
     #[get(pub(crate))]
-    pub(super) status: Arc<RwLock<CicdStatus>>,
+    pub(super) status: ArcRwLock<CicdStatus>,
 }
 
 #[derive(Clone, Data, Debug)]
 pub struct StepOutput {
     #[get(pub(crate))]
-    pub(super) stdout: Arc<RwLock<String>>,
+    pub(super) stdout: ArcRwLock<String>,
     #[get(pub(crate))]
-    pub(super) stderr: Arc<RwLock<String>>,
+    pub(super) stderr: ArcRwLock<String>,
 }
 
 #[derive(Clone, Data, Debug)]
@@ -48,9 +48,9 @@ pub struct LogStreamManager {
     #[get(pub(crate))]
     pub(super) broadcast_map: Arc<BroadcastMap<String>>,
     #[get(pub(crate))]
-    pub(super) step_outputs: Arc<RwLock<HashMap<i32, StepOutput>>>,
+    pub(super) step_outputs: ArcRwLock<HashMap<i32, StepOutput>>,
     #[get(pub(crate))]
-    pub(super) step_statuses: Arc<RwLock<HashMap<i32, Arc<RwLock<CicdStatus>>>>>,
+    pub(super) step_statuses: ArcRwLock<HashMap<i32, ArcRwLock<CicdStatus>>>,
     #[get(pub(crate))]
-    pub(super) active_steps: Arc<RwLock<HashMap<i32, HashSet<i32>>>>,
+    pub(super) active_steps: ArcRwLock<HashMap<i32, HashSet<i32>>>,
 }

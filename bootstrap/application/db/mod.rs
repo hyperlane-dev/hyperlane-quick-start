@@ -9,6 +9,4 @@ use {
     hyperlane_resources::*,
 };
 
-use std::sync::Arc;
-
 use {redis::Connection, sea_orm::DatabaseConnection};

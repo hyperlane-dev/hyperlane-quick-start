@@ -42,7 +42,7 @@ use tokio::{
     io::{AsyncBufReadExt, AsyncRead, BufReader, Lines},
     process::{Child, Command},
     spawn,
-    sync::{RwLock, RwLockReadGuard, RwLockWriteGuard},
+    sync::{RwLockReadGuard, RwLockWriteGuard},
     task::{JoinError, JoinHandle},
     time::{error::Elapsed, timeout},
 };

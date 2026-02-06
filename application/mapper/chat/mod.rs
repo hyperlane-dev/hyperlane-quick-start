@@ -11,9 +11,4 @@ use {super::*, model::application::chat::*};
 
 use hyperlane_plugin::postgresql::*;
 
-use std::{
-    collections::HashMap,
-    sync::{Arc, OnceLock},
-};
-
-use tokio::sync::RwLock;
+use std::{collections::HashMap, sync::OnceLock};

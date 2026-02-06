@@ -2,11 +2,11 @@ use super::*;
 
 #[instrument_trace]
 pub fn init_network_capture_globals() {
-    let _: Result<(), Arc<RwLock<Option<NetworkStats>>>> =
+    let _: Result<(), ArcRwLock<Option<NetworkStats>>> =
         NETWORK_CAPTURE_STATS.set(arc_rwlock(None));
-    let _: Result<(), Arc<RwLock<CaptureStatus>>> =
+    let _: Result<(), ArcRwLock<CaptureStatus>> =
         CAPTURE_STATUS.set(arc_rwlock(CaptureStatus::Stopped));
-    let _: Result<(), Arc<RwLock<HashMap<String, ConnectionInfo>>>> =
+    let _: Result<(), ArcRwLock<HashMap<String, ConnectionInfo>>> =
         ACTIVE_CONNECTIONS.set(arc_rwlock(HashMap::new()));
 }
 
