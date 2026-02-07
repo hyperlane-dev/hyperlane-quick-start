@@ -1,6 +1,6 @@
 use {
     hyperlane_bootstrap::{
-        application::{cicd::*, db::*, env::*, logger::*},
+        application::{cicd::*, db::*, env::*, logger::*, monitor::*},
         framework::{runtime::*, server::*},
     },
     hyperlane_config::framework::*,
@@ -18,6 +18,7 @@ fn main() {
     runtime().block_on(async move {
         init_db().await;
         init_cicd().await;
+        init_monitor().await;
         create(SERVER_PID_FILE_PATH, init_server).await;
     });
 }

@@ -131,3 +131,39 @@ pub struct SystemInfo {
     #[get(type(copy), pub)]
     pub(super) total_disk: u64,
 }
+
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
+pub struct PerformanceDataPoint {
+    #[get(type(copy), pub)]
+    pub(super) timestamp: u64,
+    #[get(type(copy), pub)]
+    pub(super) cpu_usage: f64,
+    #[get(type(copy), pub)]
+    pub(super) memory_usage: f64,
+    #[get(type(copy), pub)]
+    pub(super) memory_used: u64,
+    #[get(type(copy), pub)]
+    pub(super) disk_usage: f64,
+    #[get(type(copy), pub)]
+    pub(super) disk_used: u64,
+    #[get(type(copy), pub)]
+    pub(super) network_rx: u64,
+    #[get(type(copy), pub)]
+    pub(super) network_tx: u64,
+    #[get(type(copy), pub)]
+    pub(super) load_average: f64,
+    #[get(type(copy), pub)]
+    pub(super) active_connections: u32,
+    #[get(type(copy), pub)]
+    pub(super) process_count: u32,
+}
+
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
+pub struct PerformanceHistoryResponse {
+    #[get(pub)]
+    pub(super) data_points: Vec<PerformanceDataPoint>,
+    #[get(type(copy), pub)]
+    pub(super) total_points: usize,
+    #[get(type(copy), pub)]
+    pub(super) time_range_seconds: u64,
+}

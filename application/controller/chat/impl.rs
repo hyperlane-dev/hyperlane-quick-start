@@ -30,7 +30,7 @@ impl ServerHook for ChatRoute {
         let websocket: &WebSocket = get_global_websocket();
         let path: String = ctx.get_request_path().await;
         let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
-        let cfg: WebSocketConfig<String> = WebSocketConfig::new()
+        let config: WebSocketConfig<String> = WebSocketConfig::new()
             .set_context(ctx.clone())
             .set_broadcast_type(key)
             .set_request_config_data(RequestConfigData::default())
@@ -38,7 +38,7 @@ impl ServerHook for ChatRoute {
             .set_request_hook::<ChatRequestHook>()
             .set_sended_hook::<ChatSendedHook>()
             .set_closed_hook::<ChatClosedHook>();
-        websocket.run(cfg).await;
+        websocket.run(config).await;
     }
 }
 

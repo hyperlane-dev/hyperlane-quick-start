@@ -9,6 +9,7 @@ impl ServerHook for ServerStatusRoute {
     #[prologue_macros(
         get_method,
         response_header(CONTENT_TYPE => TEXT_EVENT_STREAM),
+        response_body(vec![]),
         send
     )]
     #[instrument_trace]
@@ -16,7 +17,7 @@ impl ServerHook for ServerStatusRoute {
         loop {
             let server_status: ServerStatus = MonitorService::get_server_status().await;
             let status_json: String = serde_json::to_string(&server_status).unwrap_or_default();
-            let sse_data: String = format!("data {status_json}{DOUBLE_BR}");
+            let sse_data: String = format!("data: {status_json}{BR}{BR}");
             let send_result: Result<(), ResponseError> =
                 ctx.set_response_body(&sse_data).await.try_send_body().await;
             if send_result.is_err() {
@@ -74,5 +75,25 @@ impl ServerHook for NetworkCaptureStreamRoute {
     #[instrument_trace]
     async fn handle(self, ctx: &Context) {
         MonitorService::get_network_capture_stream(ctx).await;
+    }
+}
+
+impl ServerHook for PerformanceHistoryRoute {
+    #[instrument_trace]
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(
+        get_method,
+        response_header(CONTENT_TYPE => APPLICATION_JSON)
+    )]
+    #[instrument_trace]
+    async fn handle(self, ctx: &Context) {
+        let history_response: PerformanceHistoryResponse =
+            MonitorService::get_performance_history_response().await;
+        let response: ApiResponse<PerformanceHistoryResponse> =
+            ApiResponse::success(history_response);
+        ctx.set_response_body(&response.to_json_bytes()).await;
     }
 }

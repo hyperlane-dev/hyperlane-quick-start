@@ -51,3 +51,16 @@ pub fn openapi_monitor_network_capture_data() {}
 )]
 #[instrument_trace]
 pub fn openapi_monitor_network_capture_stream() {}
+
+#[utoipa::path(
+    get,
+    path = "/api/server/performance/history",
+    responses(
+        (status = 200, description = "Success", body = PerformanceHistoryResponse),
+        (status = 400, description = "Bad Request"),
+        (status = 404, description = "Not Found"),
+        (status = 500, description = "Internal Server Error")
+    )
+)]
+#[instrument_trace]
+pub fn openapi_monitor_performance_history() {}

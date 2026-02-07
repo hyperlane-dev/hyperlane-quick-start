@@ -15,3 +15,7 @@ pub struct NetworkCaptureRoute;
 #[route("/api/network/capture/stream")]
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct NetworkCaptureStreamRoute;
+
+#[route("/api/server/performance/history")]
+#[derive(Clone, Copy, Data, Debug, Default)]
+pub struct PerformanceHistoryRoute;

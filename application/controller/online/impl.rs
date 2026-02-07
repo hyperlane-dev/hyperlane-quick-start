@@ -12,12 +12,12 @@ impl ServerHook for OnlineRoute {
         let websocket: &WebSocket = get_global_websocket();
         let path: String = ctx.get_request_path().await;
         let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
-        let cfg: WebSocketConfig<String> = WebSocketConfig::new()
+        let config: WebSocketConfig<String> = WebSocketConfig::new()
             .set_context(ctx.clone())
             .set_broadcast_type(key)
             .set_request_config_data(RequestConfigData::default())
             .set_connected_hook::<OnlineConnectedHook>()
             .set_closed_hook::<OnlineClosedHook>();
-        websocket.run(cfg).await;
+        websocket.run(config).await;
     }
 }

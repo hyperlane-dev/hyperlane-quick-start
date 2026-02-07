@@ -17,7 +17,7 @@ impl ServerHook for GomokuRoute {
             user_id
         };
         let key: BroadcastType<String> = BroadcastType::PointToGroup(key_value);
-        let cfg: WebSocketConfig<String> = WebSocketConfig::new()
+        let config: WebSocketConfig<String> = WebSocketConfig::new()
             .set_context(ctx.clone())
             .set_broadcast_type(key)
             .set_request_config_data(RequestConfigData::default())
@@ -25,6 +25,6 @@ impl ServerHook for GomokuRoute {
             .set_request_hook::<GomokuRequestHook>()
             .set_sended_hook::<GomokuSendedHook>()
             .set_closed_hook::<GomokuClosedHook>();
-        websocket.run(cfg).await;
+        websocket.run(config).await;
     }
 }

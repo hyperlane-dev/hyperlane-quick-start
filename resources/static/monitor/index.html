@@ -322,7 +322,6 @@
 
       .metric-icon {
         font-size: 1.5rem;
-        filter: drop-shadow(0 0 10px currentColor);
       }
 
       .metric-value {
@@ -772,7 +771,7 @@
           this.maxReconnectAttempts = 5;
           this.reconnectInterval = 3000;
 
-          this.maxDataPoints = 60;
+          this.maxDataPoints = 86400;
           this.dataHistory = {
             cpu: [],
             memory: [],
@@ -783,13 +782,135 @@
           };
 
           this.charts = {};
+          this.isHistoryLoaded = false;
 
           this.init();
         }
 
         init() {
           this.initCharts();
-          this.connectSSE();
+          this.loadSystemInfo();
+          this.loadHistoryData().then(() => {
+            this.connectSSE();
+          });
+        }
+
+        async loadSystemInfo() {
+          try {
+            const response = await fetch('/api/server/info');
+            if (!response.ok) {
+              throw new Error('Failed to load system info');
+            }
+            const result = await response.json();
+            if (result.data) {
+              this.updateSystemOverview(result.data);
+            }
+          } catch (error) {
+            console.error('Failed to load system info:', error);
+          }
+        }
+
+        updateSystemOverview(data) {
+          document.getElementById('hostname').textContent =
+            data.hostname || '-';
+          document.getElementById('osName').textContent = data.os_name || '-';
+          document.getElementById('cpuModel').textContent =
+            data.cpu_model || '-';
+          document.getElementById('cpuCores').textContent =
+            data.cpu_cores || '-';
+          document.getElementById('totalMemory').textContent = this.formatBytes(
+            data.total_memory,
+          );
+          document.getElementById('totalDisk').textContent = this.formatBytes(
+            data.total_disk,
+          );
+        }
+
+        async loadHistoryData() {
+          this.updateConnectionStatus('Loading history...', false);
+          try {
+            const response = await fetch('/api/server/performance/history');
+            if (!response.ok) {
+              throw new Error('Failed to load history data');
+            }
+            const result = await response.json();
+            if (result.data && result.data.data_points) {
+              this.processHistoryData(result.data.data_points);
+              this.isHistoryLoaded = true;
+            }
+          } catch (error) {
+            console.error('Failed to load history data:', error);
+          }
+        }
+
+        processHistoryData(dataPoints) {
+          if (!dataPoints || dataPoints.length === 0) {
+            return;
+          }
+
+          this.dataHistory.timestamps = [];
+          this.dataHistory.cpu = [];
+          this.dataHistory.memory = [];
+          this.dataHistory.disk = [];
+          this.dataHistory.networkRx = [];
+          this.dataHistory.networkTx = [];
+
+          dataPoints.forEach((point) => {
+            const pointTimestamp = point.timestamp * 1000;
+            const date = new Date(pointTimestamp);
+            const timeLabel = date.toLocaleTimeString();
+
+            this.dataHistory.timestamps.push(timeLabel);
+            this.dataHistory.cpu.push(point.cpu_usage);
+            this.dataHistory.memory.push(point.memory_usage);
+            this.dataHistory.disk.push(point.disk_usage);
+            this.dataHistory.networkRx.push(point.network_rx / 1024 / 1024);
+            this.dataHistory.networkTx.push(point.network_tx / 1024 / 1024);
+          });
+
+          this.updateAllCharts();
+
+          if (dataPoints.length > 0) {
+            const latest = dataPoints[dataPoints.length - 1];
+            this.updateMetricsFromDataPoint(latest);
+          }
+        }
+
+        updateMetricsFromDataPoint(data) {
+          document.getElementById('cpuUsage').innerHTML =
+            `${data.cpu_usage.toFixed(1)}<span class="metric-unit">%</span>`;
+          document.getElementById('cpuProgress').style.width =
+            `${data.cpu_usage}%`;
+
+          document.getElementById('memoryUsage').innerHTML =
+            `${data.memory_usage.toFixed(1)}<span class="metric-unit">%</span>`;
+          document.getElementById('memoryProgress').style.width =
+            `${data.memory_usage}%`;
+
+          document.getElementById('diskUsage').innerHTML =
+            `${data.disk_usage.toFixed(1)}<span class="metric-unit">%</span>`;
+          document.getElementById('diskProgress').style.width =
+            `${data.disk_usage}%`;
+
+          const rxMB = (data.network_rx / 1024 / 1024).toFixed(2);
+          const txMB = (data.network_tx / 1024 / 1024).toFixed(2);
+          document.getElementById('networkRx').innerHTML =
+            `${rxMB}<span class="metric-unit">MB</span>`;
+          document.getElementById('networkTx').textContent = `${txMB} MB`;
+
+          document.getElementById('loadAverage').textContent =
+            data.load_average.toFixed(2);
+          document.getElementById('activeConnections').textContent =
+            data.active_connections;
+          document.getElementById('processCount').textContent =
+            data.process_count;
+        }
+
+        updateAllCharts() {
+          this.updateChart('cpu', this.dataHistory.cpu);
+          this.updateChart('memory', this.dataHistory.memory);
+          this.updateChart('disk', this.dataHistory.disk);
+          this.updateNetworkChart();
         }
 
         initCharts() {
@@ -1005,7 +1126,6 @@
               `Reconnecting... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`,
               false,
             );
-
             setTimeout(() => {
               this.connectSSE();
             }, this.reconnectInterval);
@@ -1072,16 +1192,14 @@
         }
 
         updateChartData(data) {
-          const now = new Date();
-          const timeLabel = now.toLocaleTimeString();
-
+          const date = new Date(data.timestamp * 1000);
+          const timeLabel = date.toLocaleTimeString();
           this.dataHistory.timestamps.push(timeLabel);
           this.dataHistory.cpu.push(data.cpu_usage);
           this.dataHistory.memory.push(data.memory_usage);
           this.dataHistory.disk.push(data.disk_usage);
           this.dataHistory.networkRx.push(data.network_rx / 1024 / 1024);
           this.dataHistory.networkTx.push(data.network_tx / 1024 / 1024);
-
           if (this.dataHistory.timestamps.length > this.maxDataPoints) {
             this.dataHistory.timestamps.shift();
             this.dataHistory.cpu.shift();
@@ -1090,7 +1208,6 @@
             this.dataHistory.networkRx.shift();
             this.dataHistory.networkTx.shift();
           }
-
           this.updateChart('cpu', this.dataHistory.cpu);
           this.updateChart('memory', this.dataHistory.memory);
           this.updateChart('disk', this.dataHistory.disk);
