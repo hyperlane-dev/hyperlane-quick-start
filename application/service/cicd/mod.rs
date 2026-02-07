@@ -12,12 +12,7 @@ use {r#static::*, r#type::*};
 
 use {
     super::*,
-    mapper::cicd::{
-        job::{JobActiveModel, JobColumn, JobEntity},
-        pipeline::{Model, PipelineActiveModel, PipelineColumn, PipelineEntity},
-        run::{RunActiveModel, RunColumn, RunEntity},
-        step::{StepActiveModel, StepColumn, StepEntity},
-    },
+    mapper::cicd::{job::*, pipeline::*, run::*, step::*},
     model::{
         application::cicd::{CicdStatus, PipelineConfig},
         request::cicd::*,

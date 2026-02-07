@@ -1,7 +1,7 @@
 use super::*;
 
-impl From<Model> for PipelineDto {
-    fn from(model: Model) -> Self {
+impl From<CicdPipelineModel> for PipelineDto {
+    fn from(model: CicdPipelineModel) -> Self {
         let mut dto: PipelineDto = Self::default();
         dto.set_id(model.get_id())
             .set_name(model.get_name().clone())
@@ -13,8 +13,8 @@ impl From<Model> for PipelineDto {
     }
 }
 
-impl From<mapper::cicd::run::Model> for RunDto {
-    fn from(model: mapper::cicd::run::Model) -> Self {
+impl From<CicdRunModel> for RunDto {
+    fn from(model: CicdRunModel) -> Self {
         let status: CicdStatus = model.get_status().parse().unwrap_or_default();
         let mut dto: RunDto = Self::default();
         dto.set_id(model.get_id())
@@ -33,8 +33,8 @@ impl From<mapper::cicd::run::Model> for RunDto {
     }
 }
 
-impl From<mapper::cicd::job::Model> for JobDto {
-    fn from(model: mapper::cicd::job::Model) -> Self {
+impl From<CicdJobModel> for JobDto {
+    fn from(model: CicdJobModel) -> Self {
         let status: CicdStatus = model.get_status().parse().unwrap_or_default();
         let mut dto: JobDto = Self::default();
         dto.set_id(model.get_id())
@@ -49,8 +49,8 @@ impl From<mapper::cicd::job::Model> for JobDto {
     }
 }
 
-impl From<mapper::cicd::step::Model> for StepDto {
-    fn from(model: mapper::cicd::step::Model) -> Self {
+impl From<CicdStepModel> for StepDto {
+    fn from(model: CicdStepModel) -> Self {
         let status: CicdStatus = model.get_status().parse().unwrap_or_default();
         let mut dto: StepDto = Self::default();
         dto.set_id(model.get_id())
@@ -78,7 +78,7 @@ impl CicdService {
             param.try_get_description().clone(),
             param.try_get_config_content().clone(),
         );
-        let result: Model = active_model
+        let result: CicdPipelineModel = active_model
             .insert(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
@@ -89,7 +89,7 @@ impl CicdService {
     pub async fn get_pipeline_by_id(id: i32) -> Result<Option<PipelineDto>, String> {
         let db: DatabaseConnection =
             get_mysql_connection(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let result: Option<Model> = PipelineEntity::find_by_id(id)
+        let result: Option<CicdPipelineModel> = PipelineEntity::find_by_id(id)
             .one(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
@@ -100,7 +100,7 @@ impl CicdService {
     pub async fn get_all_pipelines() -> Result<Vec<PipelineDto>, String> {
         let db: DatabaseConnection =
             get_mysql_connection(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let models: Vec<Model> = PipelineEntity::find()
+        let models: Vec<CicdPipelineModel> = PipelineEntity::find()
             .order_by_desc(PipelineColumn::CreatedAt)
             .all(&db)
             .await
@@ -141,10 +141,10 @@ impl CicdService {
     }
 
     #[instrument_trace]
-    async fn get_pipeline_by_id_with_config(id: i32) -> Result<Option<Model>, String> {
+    async fn get_pipeline_by_id_with_config(id: i32) -> Result<Option<CicdPipelineModel>, String> {
         let db: DatabaseConnection =
             get_mysql_connection(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let result: Option<Model> = PipelineEntity::find_by_id(id)
+        let result: Option<CicdPipelineModel> = PipelineEntity::find_by_id(id)
             .one(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
@@ -694,7 +694,7 @@ impl CicdService {
     pub async fn get_run_by_id(id: i32) -> Result<Option<RunDto>, String> {
         let db: DatabaseConnection =
             get_mysql_connection(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let result: Option<mapper::cicd::run::Model> = RunEntity::find_by_id(id)
+        let result: Option<CicdRunModel> = RunEntity::find_by_id(id)
             .one(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
@@ -705,7 +705,7 @@ impl CicdService {
     pub async fn get_runs_by_pipeline(pipeline_id: i32) -> Result<Vec<RunDto>, String> {
         let db: DatabaseConnection =
             get_mysql_connection(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let models: Vec<mapper::cicd::run::Model> = RunEntity::find()
+        let models: Vec<CicdRunModel> = RunEntity::find()
             .filter(RunColumn::PipelineId.eq(pipeline_id))
             .order_by_desc(RunColumn::CreatedAt)
             .all(&db)
@@ -733,14 +733,14 @@ impl CicdService {
             .count(&db)
             .await
             .map_err(|error: DbErr| error.to_string())? as i32;
-        let models: Vec<mapper::cicd::run::Model> = query
+        let models: Vec<CicdRunModel> = query
             .order_by_desc(RunColumn::Id)
             .limit((page_size + 1) as u64)
             .all(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
         let has_more: bool = models.len() > page_size as usize;
-        let runs: Vec<mapper::cicd::run::Model> = if has_more {
+        let runs: Vec<CicdRunModel> = if has_more {
             models.into_iter().take(page_size as usize).collect()
         } else {
             models
@@ -813,7 +813,7 @@ impl CicdService {
         let db: DatabaseConnection =
             get_mysql_connection(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
         let active_model: JobActiveModel = JobActiveModel::new(run_id, name);
-        let result: mapper::cicd::job::Model = active_model
+        let result: CicdJobModel = active_model
             .insert(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
@@ -824,7 +824,7 @@ impl CicdService {
     pub async fn get_jobs_by_run(run_id: i32) -> Result<Vec<JobDto>, String> {
         let db: DatabaseConnection =
             get_mysql_connection(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let models: Vec<mapper::cicd::job::Model> = JobEntity::find()
+        let models: Vec<CicdJobModel> = JobEntity::find()
             .filter(JobColumn::RunId.eq(run_id))
             .order_by_asc(JobColumn::CreatedAt)
             .all(&db)
@@ -890,7 +890,7 @@ impl CicdService {
         let db: DatabaseConnection =
             get_mysql_connection(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
         let active_model: StepActiveModel = StepActiveModel::new(job_id, name, command);
-        let result: mapper::cicd::step::Model = active_model
+        let result: CicdStepModel = active_model
             .insert(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
@@ -901,7 +901,7 @@ impl CicdService {
     pub async fn get_steps_by_job(job_id: i32) -> Result<Vec<StepDto>, String> {
         let db: DatabaseConnection =
             get_mysql_connection(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let models: Vec<mapper::cicd::step::Model> = StepEntity::find()
+        let models: Vec<CicdStepModel> = StepEntity::find()
             .filter(StepColumn::JobId.eq(job_id))
             .order_by_asc(StepColumn::CreatedAt)
             .all(&db)
@@ -982,7 +982,7 @@ impl CicdService {
     pub async fn recover_interrupted_runs() -> Result<u32, String> {
         let db: DatabaseConnection =
             get_mysql_connection(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let running_runs: Vec<mapper::cicd::run::Model> = RunEntity::find()
+        let running_runs: Vec<CicdRunModel> = RunEntity::find()
             .filter(RunColumn::Status.eq(CicdStatus::Running.to_string()))
             .all(&db)
             .await
@@ -995,7 +995,7 @@ impl CicdService {
         let error_message: &str = "[System] Task was interrupted due to server restart";
         for run in running_runs {
             let run_id: i32 = run.get_id();
-            let jobs: Vec<mapper::cicd::job::Model> = JobEntity::find()
+            let jobs: Vec<CicdJobModel> = JobEntity::find()
                 .filter(JobColumn::RunId.eq(run_id))
                 .filter(JobColumn::Status.eq(CicdStatus::Running.to_string()))
                 .all(&db)
@@ -1018,7 +1018,7 @@ impl CicdService {
                     .exec(&db)
                     .await
                     .map_err(|error: DbErr| error.to_string())?;
-                let steps: Vec<mapper::cicd::step::Model> = StepEntity::find()
+                let steps: Vec<CicdStepModel> = StepEntity::find()
                     .filter(StepColumn::JobId.eq(job_id))
                     .filter(StepColumn::Status.eq(CicdStatus::Running.to_string()))
                     .all(&db)

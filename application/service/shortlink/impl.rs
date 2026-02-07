@@ -36,7 +36,7 @@ impl ShortlinkService {
                 id: ActiveValue::NotSet,
                 created_at: ActiveValue::NotSet,
             };
-            let result: mapper::shortlink::Model = active_model
+            let result: ShortlinkModel = active_model
                 .insert(&db)
                 .await
                 .map_err(|error: DbErr| error.to_string())?;
