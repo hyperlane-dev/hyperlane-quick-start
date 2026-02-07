@@ -1,7 +1,7 @@
 use super::*;
 
 #[instrument_trace]
-fn get_mysql_connection_map()
+fn get_or_init_mysql_connection_map()
 -> &'static RwLock<HashMap<String, ConnectionCache<DatabaseConnection>>> {
     MYSQL_CONNECTIONS.get_or_init(|| RwLock::new(HashMap::new()))
 }
@@ -15,7 +15,7 @@ where
     I: AsRef<str>,
 {
     let instance_name_str: &str = instance_name.as_ref();
-    let env: &'static EnvConfig = get_global_env_config();
+    let env: &'static EnvConfig = get_or_init_global_env_config();
     let instance: &MySqlInstanceConfig = env
         .get_mysql_instance(instance_name_str)
         .ok_or_else(|| format!("MySQL instance '{instance_name_str}' not found"))?;
@@ -80,7 +80,7 @@ where
     let instance_name_str: &str = instance_name.as_ref();
     let duration: Duration = get_retry_duration();
     {
-        if let Some(cache) = get_mysql_connection_map()
+        if let Some(cache) = get_or_init_mysql_connection_map()
             .read()
             .await
             .get(instance_name_str)
@@ -98,7 +98,7 @@ where
     let mut connections: RwLockWriteGuard<
         '_,
         HashMap<String, ConnectionCache<DatabaseConnection>>,
-    > = get_mysql_connection_map().write().await;
+    > = get_or_init_mysql_connection_map().write().await;
     if let Some(cache) = connections.get(instance_name_str) {
         match cache.try_get_result() {
             Ok(conn) => return Ok(conn.clone()),
@@ -116,7 +116,7 @@ where
     let mut connections: RwLockWriteGuard<
         '_,
         HashMap<String, ConnectionCache<DatabaseConnection>>,
-    > = get_mysql_connection_map().write().await;
+    > = get_or_init_mysql_connection_map().write().await;
     connections.insert(
         instance_name_str.to_string(),
         ConnectionCache::new(new_connection.clone()),

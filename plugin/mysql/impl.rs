@@ -3,7 +3,7 @@ use super::*;
 impl Default for MySqlAutoCreation {
     #[instrument_trace]
     fn default() -> Self {
-        let env: &'static EnvConfig = get_global_env_config();
+        let env: &'static EnvConfig = get_or_init_global_env_config();
         if let Some(instance) = env.get_default_mysql_instance() {
             Self::new(instance.clone())
         } else {
