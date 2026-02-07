@@ -6,7 +6,6 @@ pub use {r#fn::*, r#static::*, r#type::*};
 
 use {super::*, model::application::upload::*};
 
-use {
-    once_cell::sync::Lazy,
-    tokio::sync::{RwLockReadGuard, RwLockWriteGuard},
-};
+use std::sync::OnceLock;
+
+use tokio::sync::{RwLockReadGuard, RwLockWriteGuard};
