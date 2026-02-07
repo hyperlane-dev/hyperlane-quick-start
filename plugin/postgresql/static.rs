@@ -1,5 +1,5 @@
 use super::*;
 
-pub static POSTGRESQL_CONNECTIONS: Lazy<
+pub static POSTGRESQL_CONNECTIONS: OnceLock<
     RwLock<HashMap<String, ConnectionCache<DatabaseConnection>>>,
-> = Lazy::new(|| RwLock::new(HashMap::new()));
+> = OnceLock::new();

@@ -13,6 +13,7 @@ use hyperlane_utils::redis::*;
 
 use std::{
     collections::HashMap,
+    sync::OnceLock,
     time::{Duration, Instant},
 };
 
