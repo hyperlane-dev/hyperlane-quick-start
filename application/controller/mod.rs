@@ -3,7 +3,6 @@ pub mod cicd;
 pub mod dataset;
 pub mod gomoku;
 pub mod health_check;
-pub mod hello;
 pub mod index;
 pub mod log;
 pub mod monitor;

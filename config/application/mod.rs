@@ -1,6 +1,5 @@
 pub mod charset;
 pub mod dataset;
-pub mod hello;
 pub mod logger;
 pub mod logo_img;
 pub mod shortlink;

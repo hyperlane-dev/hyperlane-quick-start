@@ -1,4 +1,4 @@
-pub const ENV_FILE_PATH: &str = "/shell/.env";
+pub const ENV_FILE_PATH: &str = "./.env";
 pub const DOCKER_COMPOSE_FILE_PATH: &str = "./docker-compose.yml";
 pub const ENV_KEY_GPT_API_URL: &str = "GPT_API_URL";
 pub const ENV_KEY_GPT_MODEL: &str = "GPT_MODEL";
