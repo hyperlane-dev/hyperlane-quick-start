@@ -10,6 +10,5 @@ pub mod shutdown;
 use {
     hyperlane::*,
     hyperlane_utils::{log::*, *},
-    once_cell::sync::Lazy,
     sea_orm::{ConnectionTrait, Database, DatabaseBackend, DatabaseConnection, DbErr, Statement},
 };

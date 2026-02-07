@@ -1,6 +1,11 @@
 use super::*;
 
 #[instrument_trace]
+fn get_redis_connection_map() -> &'static RwLock<RedisConnectionMap> {
+    REDIS_CONNECTIONS.get_or_init(|| RwLock::new(HashMap::new()))
+}
+
+#[instrument_trace]
 pub async fn connection_redis_db<I>(instance_name: I) -> Result<ArcRwLock<Connection>, String>
 where
     I: AsRef<str>,
@@ -13,7 +18,7 @@ where
     match perform_redis_auto_creation(instance).await {
         Ok(result) => {
             if result.has_changes() {
-                database::AutoCreationLogger::log_auto_creation_complete(
+                AutoCreationLogger::log_auto_creation_complete(
                     database::PluginType::Redis,
                     &result,
                 )
@@ -21,7 +26,7 @@ where
             }
         }
         Err(error) => {
-            database::AutoCreationLogger::log_auto_creation_error(
+            AutoCreationLogger::log_auto_creation_error(
                 &error,
                 "Auto-creation process",
                 database::PluginType::Redis,
@@ -39,7 +44,7 @@ where
         let instance_name_clone: String = instance_name_str.to_string();
         let error_msg_clone: String = error_msg.clone();
         tokio::spawn(async move {
-            database::AutoCreationLogger::log_connection_verification(
+            AutoCreationLogger::log_connection_verification(
                 database::PluginType::Redis,
                 &instance_name_clone,
                 false,
@@ -60,7 +65,7 @@ where
                 let instance_name_clone: String = instance_name_str.to_string();
                 let error_msg_clone: String = error_msg.clone();
                 tokio::spawn(async move {
-                    database::AutoCreationLogger::log_connection_verification(
+                    AutoCreationLogger::log_connection_verification(
                         database::PluginType::Redis,
                         &instance_name_clone,
                         false,
@@ -75,7 +80,7 @@ where
                 let instance_name_clone: String = instance_name_str.to_string();
                 let error_msg_clone: String = error_msg.clone();
                 tokio::spawn(async move {
-                    database::AutoCreationLogger::log_connection_verification(
+                    AutoCreationLogger::log_connection_verification(
                         database::PluginType::Redis,
                         &instance_name_clone,
                         false,
@@ -92,7 +97,7 @@ where
             let instance_name_clone: String = instance_name_str.to_string();
             let error_msg_clone: String = error_msg.clone();
             tokio::spawn(async move {
-                database::AutoCreationLogger::log_connection_verification(
+                AutoCreationLogger::log_connection_verification(
                     database::PluginType::Redis,
                     &instance_name_clone,
                     false,
@@ -114,7 +119,11 @@ where
     let instance_name_str: &str = instance_name.as_ref();
     let duration: Duration = get_retry_duration();
     {
-        if let Some(cache) = REDIS_CONNECTIONS.read().await.get(instance_name_str) {
+        if let Some(cache) = get_redis_connection_map()
+            .read()
+            .await
+            .get(instance_name_str)
+        {
             match cache.try_get_result() {
                 Ok(conn) => return Ok(conn.clone()),
                 Err(error) => {
@@ -125,7 +134,8 @@ where
             }
         }
     }
-    let mut connections: RwLockWriteGuard<'_, RedisConnectionMap> = REDIS_CONNECTIONS.write().await;
+    let mut connections: RwLockWriteGuard<'_, RedisConnectionMap> =
+        get_redis_connection_map().write().await;
     if let Some(cache) = connections.get(instance_name_str) {
         match cache.try_get_result() {
             Ok(conn) => return Ok(conn.clone()),
@@ -140,7 +150,8 @@ where
     drop(connections);
     let new_connection: Result<ArcRwLock<Connection>, String> =
         connection_redis_db(instance_name_str).await;
-    let mut connections: RwLockWriteGuard<'_, RedisConnectionMap> = REDIS_CONNECTIONS.write().await;
+    let mut connections: RwLockWriteGuard<'_, RedisConnectionMap> =
+        get_redis_connection_map().write().await;
     connections.insert(
         instance_name_str.to_string(),
         ConnectionCache::new(new_connection.clone()),

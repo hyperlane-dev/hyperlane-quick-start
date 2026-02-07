@@ -10,6 +10,7 @@ use {super::*, database::*, env::*, r#static::*};
 
 use std::{
     collections::HashMap,
+    sync::OnceLock,
     time::{Duration, Instant},
 };
 

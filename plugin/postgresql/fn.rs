@@ -1,6 +1,12 @@
 use super::*;
 
 #[instrument_trace]
+fn get_postgresql_connection_map()
+-> &'static RwLock<HashMap<String, ConnectionCache<DatabaseConnection>>> {
+    POSTGRESQL_CONNECTIONS.get_or_init(|| RwLock::new(HashMap::new()))
+}
+
+#[instrument_trace]
 pub async fn connection_postgresql_db<I>(
     instance_name: I,
     schema: Option<DatabaseSchema>,
@@ -16,7 +22,7 @@ where
     match perform_postgresql_auto_creation(instance, schema.clone()).await {
         Ok(result) => {
             if result.has_changes() {
-                database::AutoCreationLogger::log_auto_creation_complete(
+                AutoCreationLogger::log_auto_creation_complete(
                     database::PluginType::PostgreSQL,
                     &result,
                 )
@@ -24,7 +30,7 @@ where
             }
         }
         Err(error) => {
-            database::AutoCreationLogger::log_auto_creation_error(
+            AutoCreationLogger::log_auto_creation_error(
                 &error,
                 "Auto-creation process",
                 database::PluginType::PostgreSQL,
@@ -51,7 +57,7 @@ where
         let database_name: String = instance.get_database().clone();
         let error_msg_clone: String = error_msg.clone();
         tokio::spawn(async move {
-            database::AutoCreationLogger::log_connection_verification(
+            AutoCreationLogger::log_connection_verification(
                 database::PluginType::PostgreSQL,
                 &database_name,
                 false,
@@ -74,7 +80,11 @@ where
     let instance_name_str: &str = instance_name.as_ref();
     let duration: Duration = get_retry_duration();
     {
-        if let Some(cache) = POSTGRESQL_CONNECTIONS.read().await.get(instance_name_str) {
+        if let Some(cache) = get_postgresql_connection_map()
+            .read()
+            .await
+            .get(instance_name_str)
+        {
             match cache.try_get_result() {
                 Ok(conn) => return Ok(conn.clone()),
                 Err(error) => {
@@ -88,7 +98,7 @@ where
     let mut connections: RwLockWriteGuard<
         '_,
         HashMap<String, ConnectionCache<DatabaseConnection>>,
-    > = POSTGRESQL_CONNECTIONS.write().await;
+    > = get_postgresql_connection_map().write().await;
     if let Some(cache) = connections.get(instance_name_str) {
         match cache.try_get_result() {
             Ok(conn) => return Ok(conn.clone()),
@@ -106,7 +116,7 @@ where
     let mut connections: RwLockWriteGuard<
         '_,
         HashMap<String, ConnectionCache<DatabaseConnection>>,
-    > = POSTGRESQL_CONNECTIONS.write().await;
+    > = get_postgresql_connection_map().write().await;
     connections.insert(
         instance_name_str.to_string(),
         ConnectionCache::new(new_connection.clone()),

@@ -1,6 +1,4 @@
 use super::*;
 
 pub(super) static LOGGER: Logger = Logger;
-
-pub(super) static FILE_LOGGER: Lazy<RwLock<FileLogger>> =
-    Lazy::new(|| RwLock::new(FileLogger::default()));
+pub(super) static FILE_LOGGER: OnceLock<RwLock<FileLogger>> = OnceLock::new();

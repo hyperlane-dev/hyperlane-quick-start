@@ -10,11 +10,11 @@ use {super::*, database::*, env::*, r#static::*};
 
 use std::{
     collections::HashMap,
+    sync::OnceLock,
     time::{Duration, Instant},
 };
 
 use {
-    once_cell::sync::Lazy,
     sea_orm::{ConnectionTrait, Database, DatabaseBackend, DatabaseConnection, DbErr, Statement},
     tokio::{
         sync::{RwLock, RwLockWriteGuard},
