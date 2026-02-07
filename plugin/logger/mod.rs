@@ -6,6 +6,6 @@ pub use r#struct::*;
 
 use {super::*, r#static::*};
 
-use std::fmt::Arguments;
+use std::{fmt::Arguments, sync::OnceLock};
 
 use hyperlane::tokio::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};

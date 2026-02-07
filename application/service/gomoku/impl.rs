@@ -20,9 +20,8 @@ impl RoomBroadcastManager {
             }
             trace!("User {user_id} switching from room {old_room} to {room_id}");
         }
-        let _receiver: BroadcastMapReceiver<String> = self
-            .broadcast_map
-            .subscribe_or_insert(room_id.to_string(), 128);
+        let _receiver: BroadcastMapReceiver<String> =
+            self.broadcast_map.subscribe_or_insert(room_id, 128);
         subs.insert(user_id.to_string(), room_id.to_string());
         trace!("User {user_id} subscribed to room {room_id}");
     }
@@ -40,7 +39,7 @@ impl RoomBroadcastManager {
     pub fn broadcast_to_room(&self, room_id: &str, message: &str) {
         if self
             .broadcast_map
-            .try_send(room_id.to_string(), message.to_string())
+            .try_send(room_id, message.to_string())
             .is_err()
         {
             trace!("Failed to broadcast to room {room_id}: no active receivers");
