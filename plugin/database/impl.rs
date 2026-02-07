@@ -178,13 +178,8 @@ impl DatabaseSchema {
 
 impl AutoCreationConfig {
     #[instrument_trace]
-    pub fn get_env() -> &'static env::EnvConfig {
-        env::get_global_env_config()
-    }
-
-    #[instrument_trace]
     pub fn validate() -> Result<(), String> {
-        let env: &'static EnvConfig = Self::get_env();
+        let env: &'static EnvConfig = get_or_init_global_env_config();
         if env.get_mysql_instances().is_empty() {
             return Err("At least one MySQL instance is required".to_string());
         }
@@ -213,7 +208,7 @@ impl PluginAutoCreationConfig {
 
     #[instrument_trace]
     pub fn get_database_name(&self) -> String {
-        let env: &'static EnvConfig = AutoCreationConfig::get_env();
+        let env: &'static EnvConfig = get_or_init_global_env_config();
         if let Ok(plugin_type) = PluginType::from_str(self.get_plugin_name()) {
             match plugin_type {
                 PluginType::MySQL => {
@@ -239,7 +234,7 @@ impl PluginAutoCreationConfig {
 
     #[instrument_trace]
     pub fn get_connection_info(&self) -> String {
-        let env: &'static EnvConfig = AutoCreationConfig::get_env();
+        let env: &'static EnvConfig = get_or_init_global_env_config();
         if let Ok(plugin_type) = PluginType::from_str(self.get_plugin_name()) {
             match plugin_type {
                 PluginType::MySQL => {

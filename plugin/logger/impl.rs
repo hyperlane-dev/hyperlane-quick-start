@@ -77,16 +77,12 @@ impl Log for Logger {
 }
 
 impl Logger {
-    fn get_file_logger() -> &'static RwLock<FileLogger> {
-        FILE_LOGGER.get_or_init(|| RwLock::new(FileLogger::default()))
-    }
-
     fn read() -> RwLockReadGuard<'static, FileLogger> {
-        Self::get_file_logger().try_read().unwrap()
+        get_or_init_file_logger().try_read().unwrap()
     }
 
     fn write() -> RwLockWriteGuard<'static, FileLogger> {
-        Self::get_file_logger().try_write().unwrap()
+        get_or_init_file_logger().try_write().unwrap()
     }
 
     pub fn init(level: LevelFilter, file_logger: FileLogger) {

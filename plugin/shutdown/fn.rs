@@ -15,6 +15,6 @@ pub fn set_shutdown(shutdown: &SharedAsyncTaskFactory<()>) {
 }
 
 #[instrument_trace]
-pub fn get_shutdown() -> SharedAsyncTaskFactory<()> {
+pub fn get_or_init_shutdown() -> SharedAsyncTaskFactory<()> {
     SHUTDOWN.get_or_init(default_shutdown).clone()
 }

@@ -11,7 +11,7 @@ where
     I: AsRef<str>,
 {
     let instance_name_str: &str = instance_name.as_ref();
-    let env: &'static EnvConfig = get_global_env_config();
+    let env: &'static EnvConfig = get_or_init_global_env_config();
     let instance: &RedisInstanceConfig = env
         .get_redis_instance(instance_name_str)
         .ok_or_else(|| format!("Redis instance '{instance_name_str}' not found"))?;

@@ -34,7 +34,7 @@ pub async fn initialize_auto_creation_with_schema(
             "Auto-creation configuration validation failed {error}"
         ));
     }
-    let env: &'static EnvConfig = get_global_env_config();
+    let env: &'static EnvConfig = get_or_init_global_env_config();
     let mut initialization_results: Vec<String> = Vec::new();
     for instance in env.get_mysql_instances() {
         match mysql::perform_mysql_auto_creation(instance, mysql_schema.clone()).await {
