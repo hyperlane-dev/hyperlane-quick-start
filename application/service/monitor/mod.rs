@@ -1,13 +1,17 @@
 mod r#impl;
+mod r#static;
 mod r#struct;
 
 pub use r#struct::*;
 
-use {super::*, mapper::monitor::*, model::application::monitor::*};
+use {super::*, mapper::monitor::*, model::application::monitor::*, r#static::*};
 
 use std::{
-    sync::LazyLock,
+    sync::OnceLock,
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
-use tokio::sync::RwLock;
+use {
+    sysinfo::{Cpu, Disks, Networks, System},
+    tokio::sync::{RwLock, RwLockReadGuard},
+};

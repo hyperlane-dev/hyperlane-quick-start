@@ -1,30 +1,34 @@
 use super::*;
 
-use sysinfo::{Disks, Networks, System};
-
-static SYSTEM: LazyLock<RwLock<System>> = LazyLock::new(|| RwLock::new(System::new_all()));
-static NETWORKS: LazyLock<RwLock<Networks>> =
-    LazyLock::new(|| RwLock::new(Networks::new_with_refreshed_list()));
-
 impl MonitorService {
     #[instrument_trace]
+    fn get_or_init_system() -> &'static RwLock<System> {
+        SYSTEM.get_or_init(|| RwLock::new(System::new_all()))
+    }
+
+    #[instrument_trace]
+    fn get_or_init_networks() -> &'static RwLock<Networks> {
+        NETWORKS.get_or_init(|| RwLock::new(Networks::new_with_refreshed_list()))
+    }
+
+    #[instrument_trace]
     async fn refresh_system() {
-        SYSTEM.write().await.refresh_all();
+        Self::get_or_init_system().write().await.refresh_all();
     }
 
     #[instrument_trace]
     async fn refresh_networks() {
-        NETWORKS.write().await.refresh(true);
+        Self::get_or_init_networks().write().await.refresh(true);
     }
 
     #[instrument_trace]
     async fn refresh_cpu() {
-        SYSTEM.write().await.refresh_cpu_all();
+        Self::get_or_init_system().write().await.refresh_cpu_all();
     }
 
     #[instrument_trace]
     async fn refresh_memory() {
-        SYSTEM.write().await.refresh_memory();
+        Self::get_or_init_system().write().await.refresh_memory();
     }
 
     #[instrument_trace]
@@ -120,7 +124,7 @@ impl MonitorService {
         let mut stats: NetworkStats = NetworkStats::default();
         let mut total_packets: u64 = 0;
         let mut total_bytes: u64 = 0;
-        let networks = NETWORKS.read().await;
+        let networks: RwLockReadGuard<'_, Networks> = Self::get_or_init_networks().read().await;
         for (interface_name, network) in networks.iter() {
             if interface_name.contains("lo") || interface_name.contains("Loopback") {
                 continue;
@@ -216,8 +220,8 @@ impl MonitorService {
     #[instrument_trace]
     async fn get_cpu_usage() -> f64 {
         Self::refresh_cpu().await;
-        let system = SYSTEM.read().await;
-        let cpus = system.cpus();
+        let system: RwLockReadGuard<'_, System> = Self::get_or_init_system().read().await;
+        let cpus: &[Cpu] = system.cpus();
         if !cpus.is_empty() {
             let total_usage: f32 = cpus.iter().map(|cpu| cpu.cpu_usage()).sum();
             return (total_usage / cpus.len() as f32) as f64;
@@ -228,7 +232,7 @@ impl MonitorService {
     #[instrument_trace]
     async fn get_memory_info() -> (u64, u64, f64) {
         Self::refresh_memory().await;
-        let system = SYSTEM.read().await;
+        let system: RwLockReadGuard<'_, System> = Self::get_or_init_system().read().await;
         let total: u64 = system.total_memory();
         let used: u64 = system.used_memory();
         let usage: f64 = if total > 0 {
@@ -259,7 +263,7 @@ impl MonitorService {
     #[instrument_trace]
     async fn get_network_info() -> (u64, u64) {
         Self::refresh_networks().await;
-        let networks = NETWORKS.read().await;
+        let networks: RwLockReadGuard<'_, Networks> = Self::get_or_init_networks().read().await;
         let mut rx_bytes: u64 = 0;
         let mut tx_bytes: u64 = 0;
         for (_, network) in networks.iter() {
@@ -276,8 +280,8 @@ impl MonitorService {
 
     #[instrument_trace]
     async fn get_load_average() -> f64 {
-        let system = SYSTEM.read().await;
-        let cpus = system.cpus();
+        let system: RwLockReadGuard<'_, System> = Self::get_or_init_system().read().await;
+        let cpus: &[Cpu] = system.cpus();
         if !cpus.is_empty() {
             let total_usage: f32 = cpus.iter().map(|cpu| cpu.cpu_usage()).sum();
             let avg_usage: f64 = (total_usage / cpus.len() as f32) as f64;
@@ -288,14 +292,12 @@ impl MonitorService {
 
     #[instrument_trace]
     async fn get_active_connections() -> u32 {
-        let system = SYSTEM.read().await;
-        system.processes().len() as u32
+        Self::get_or_init_system().read().await.processes().len() as u32
     }
 
     #[instrument_trace]
     async fn get_process_count() -> u32 {
-        let system = SYSTEM.read().await;
-        system.processes().len() as u32
+        Self::get_or_init_system().read().await.processes().len() as u32
     }
 
     #[instrument_trace]
@@ -320,13 +322,12 @@ impl MonitorService {
 
     #[instrument_trace]
     async fn get_cpu_cores() -> u32 {
-        let system = SYSTEM.read().await;
-        system.cpus().len() as u32
+        Self::get_or_init_system().read().await.cpus().len() as u32
     }
 
     #[instrument_trace]
     async fn get_cpu_model() -> String {
-        let system = SYSTEM.read().await;
+        let system: RwLockReadGuard<'_, System> = Self::get_or_init_system().read().await;
         if let Some(cpu) = system.cpus().first() {
             return cpu.brand().to_string();
         }
@@ -336,8 +337,7 @@ impl MonitorService {
     #[instrument_trace]
     async fn get_total_memory() -> u64 {
         Self::refresh_memory().await;
-        let system = SYSTEM.read().await;
-        system.total_memory()
+        Self::get_or_init_system().read().await.total_memory()
     }
 
     #[instrument_trace]

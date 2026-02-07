@@ -8,6 +8,6 @@ pub use {r#const::*, r#fn::*, r#static::*, r#struct::*};
 
 use {super::*, model::application::monitor::*};
 
-use std::{collections::HashMap, sync::LazyLock};
+use std::{collections::HashMap, sync::OnceLock};
 
 use tokio::sync::RwLock;
