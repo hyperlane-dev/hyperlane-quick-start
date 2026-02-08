@@ -1,4 +1,7 @@
 use super::*;
 
-#[derive(Clone, Copy, Data, Debug, Default)]
-pub struct ConfigBootstrap;
+#[derive(Clone, Data, Debug, Default)]
+pub struct ConfigBootstrap {
+    pub(super) server_config: ServerConfig,
+    pub(super) request_config: RequestConfig,
+}

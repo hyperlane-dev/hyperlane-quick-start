@@ -1,10 +1,9 @@
 use super::*;
 
 impl BootstrapAsyncInit for ConfigBootstrap {
+    #[hyperlane(server_config: ServerConfig)]
     async fn init() -> Self {
-        let server: Server = Server::default();
         let request_config: RequestConfig = RequestConfig::default();
-        let server_config: ServerConfig = ServerConfig::default();
         request_config
             .max_body_size(SERVER_REQUEST_MAX_BODY_SIZE)
             .await
@@ -14,10 +13,11 @@ impl BootstrapAsyncInit for ConfigBootstrap {
         server_config.port(SERVER_PORT).await;
         server_config.ttl(SERVER_TTI).await;
         server_config.nodelay(SERVER_NODELAY).await;
-        server.server_config(server_config.clone()).await;
-        server.request_config(request_config).await;
         debug!("Server config {server_config:?}");
         info!("Server initialization successful");
-        Self
+        Self {
+            server_config,
+            request_config,
+        }
     }
 }
