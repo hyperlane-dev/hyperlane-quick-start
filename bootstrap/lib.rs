@@ -1,7 +1,8 @@
 pub mod application;
+pub mod common;
 pub mod framework;
 
-use hyperlane_plugin::common::*;
+use common::*;
 
 use {
     hyperlane::*,

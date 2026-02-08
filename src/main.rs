@@ -1,10 +1,11 @@
 use {
     hyperlane_bootstrap::{
         application::{db::*, env::*, logger::*},
+        common::*,
         framework::{runtime::*, server::*},
     },
     hyperlane_config::framework::*,
-    hyperlane_plugin::{common::*, process::*},
+    hyperlane_plugin::process::*,
 };
 
 use hyperlane_utils::log::*;
