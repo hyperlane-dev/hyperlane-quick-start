@@ -20,9 +20,14 @@ impl ServerBootstrap {
 }
 
 impl BootstrapAsyncInit for ServerBootstrap {
+    #[hyperlane(server: Server)]
     async fn init() -> Self {
-        ConfigBootstrap::init().await;
-        let server: Server = Server::default();
+        let config: ConfigBootstrap = ConfigBootstrap::init().await;
+        server
+            .request_config(config.get_request_config().clone())
+            .await
+            .server_config(config.get_server_config().clone())
+            .await;
         match server.run().await {
             Ok(server_hook) => {
                 let host_port: String = format!("{SERVER_HOST}{COLON}{SERVER_PORT}");
