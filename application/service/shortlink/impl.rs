@@ -22,7 +22,7 @@ impl ShortlinkService {
             return Err("URL cannot be empty".to_string());
         }
         let db: DatabaseConnection =
-            get_postgresql_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
         let existing_record: Option<Model> = Entity::find()
             .filter(Column::Url.eq(request.get_url()))
             .one(&db)
@@ -49,7 +49,7 @@ impl ShortlinkService {
     pub async fn query_shortlink(encrypted_id: String) -> Result<Option<ShortlinkRecord>, String> {
         let id: i32 = Self::decrypt_id(&encrypted_id)?;
         let db: DatabaseConnection =
-            get_postgresql_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
         let record: Option<Model> = Entity::find_by_id(id)
             .one(&db)
             .await

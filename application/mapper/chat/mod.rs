@@ -15,6 +15,6 @@ pub use {
 
 use {super::*, model::application::chat::*};
 
-use hyperlane_plugin::postgresql::*;
+use hyperlane_plugin::{common::*, postgresql::*};
 
 use std::{collections::HashMap, sync::OnceLock};

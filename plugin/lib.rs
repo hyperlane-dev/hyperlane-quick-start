@@ -1,3 +1,4 @@
+pub mod common;
 pub mod database;
 pub mod docker;
 pub mod env;
@@ -7,6 +8,8 @@ pub mod postgresql;
 pub mod process;
 pub mod redis;
 pub mod shutdown;
+
+use common::*;
 
 use {
     hyperlane::*,

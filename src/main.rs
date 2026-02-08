@@ -1,6 +1,7 @@
 use {
     hyperlane_bootstrap::{
         application::{cicd::*, db::*, env::*, logger::*, monitor::*},
+        common::*,
         framework::{runtime::*, server::*},
     },
     hyperlane_config::framework::*,
@@ -10,15 +11,16 @@ use {
 use hyperlane_utils::log::*;
 
 fn main() {
-    init_log();
-    if let Err(error) = init_env_config() {
-        error!("{error}");
-    }
+    LoggerBootstrap::init();
+    EnvBootstrap::init();
     info!("Environment configuration loaded successfully");
-    runtime().block_on(async move {
-        init_db().await;
+    RuntimeBootstrap::init().get_runtime().block_on(async move {
+        DbBootstrap::init().await;
         init_cicd().await;
         init_monitor().await;
-        create(SERVER_PID_FILE_PATH, init_server).await;
+        ProcessPlugin::create(SERVER_PID_FILE_PATH, || async {
+            ServerBootstrap::init().await;
+        })
+        .await;
     });
 }

@@ -9,7 +9,7 @@ impl TrackingMapper {
             tokio::task::block_in_place(|| {
                 tokio::runtime::Handle::current().block_on(async {
                     let db: DatabaseConnection =
-                        get_postgresql_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None)
+                        PostgreSqlPlugin::connection_db(DEFAULT_POSTGRESQL_INSTANCE_NAME, None)
                             .await
                             .expect("Failed to connect to PostgreSQL database");
                     db

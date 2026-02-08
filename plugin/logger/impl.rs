@@ -1,5 +1,13 @@
 use super::*;
 
+impl GetOrInit for LoggerPlugin {
+    type Instance = RwLock<FileLogger>;
+
+    fn get_or_init() -> &'static Self::Instance {
+        FILE_LOGGER.get_or_init(|| RwLock::new(FileLogger::default()))
+    }
+}
+
 impl Log for Logger {
     fn enabled(&self, metadata: &Metadata) -> bool {
         metadata.level() <= max_level()
@@ -78,11 +86,11 @@ impl Log for Logger {
 
 impl Logger {
     fn read() -> RwLockReadGuard<'static, FileLogger> {
-        get_or_init_file_logger().try_read().unwrap()
+        LoggerPlugin::get_or_init().try_read().unwrap()
     }
 
     fn write() -> RwLockWriteGuard<'static, FileLogger> {
-        get_or_init_file_logger().try_write().unwrap()
+        LoggerPlugin::get_or_init().try_write().unwrap()
     }
 
     pub fn init(level: LevelFilter, file_logger: FileLogger) {

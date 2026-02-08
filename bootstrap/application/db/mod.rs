@@ -1,11 +1,12 @@
-mod r#fn;
+mod r#impl;
+mod r#struct;
 
-pub use r#fn::*;
+pub use r#struct::*;
 
 use super::*;
 
 use {
-    hyperlane_plugin::{database::*, mysql::*, postgresql::*, redis::*},
+    hyperlane_plugin::{common::*, database::*, mysql::*, postgresql::*, redis::*},
     hyperlane_resources::*,
 };
 

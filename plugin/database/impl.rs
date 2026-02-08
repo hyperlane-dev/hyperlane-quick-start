@@ -1,5 +1,134 @@
 use super::*;
 
+impl DatabasePlugin {
+    #[instrument_trace]
+    pub fn get_connection_timeout_duration() -> Duration {
+        let timeout_seconds: u64 = std::env::var(ENV_KEY_DB_CONNECTION_TIMEOUT_MILLIS)
+            .ok()
+            .and_then(|value: String| value.parse::<u64>().ok())
+            .unwrap_or(DEFAULT_DB_CONNECTION_TIMEOUT_MILLIS);
+        Duration::from_millis(timeout_seconds)
+    }
+
+    #[instrument_trace]
+    pub fn get_retry_duration() -> Duration {
+        let millis: u64 = std::env::var(ENV_KEY_DB_RETRY_INTERVAL_MILLIS)
+            .ok()
+            .and_then(|value: String| value.parse::<u64>().ok())
+            .unwrap_or(DEFAULT_DB_RETRY_INTERVAL_MILLIS);
+        Duration::from_millis(millis)
+    }
+
+    #[instrument_trace]
+    pub async fn initialize_auto_creation() -> Result<(), String> {
+        Self::initialize_auto_creation_with_schema(None, None, None).await
+    }
+
+    #[instrument_trace]
+    pub async fn initialize_auto_creation_with_schema(
+        mysql_schema: Option<DatabaseSchema>,
+        postgresql_schema: Option<DatabaseSchema>,
+        _redis_schema: Option<()>,
+    ) -> Result<(), String> {
+        if let Err(error) = AutoCreationConfig::validate() {
+            return Err(format!(
+                "Auto-creation configuration validation failed {error}"
+            ));
+        }
+        let env: &'static EnvConfig = EnvPlugin::get_or_init();
+        let mut initialization_results: Vec<String> = Vec::new();
+        for instance in env.get_mysql_instances() {
+            match MySqlPlugin::perform_auto_creation(instance, mysql_schema.clone()).await {
+                Ok(result) => {
+                    initialization_results.push(format!(
+                        "MySQL ({})  {}",
+                        instance.get_name(),
+                        if result.has_changes() {
+                            "initialized with changes"
+                        } else {
+                            "verified"
+                        }
+                    ));
+                }
+                Err(error) => {
+                    if !error.should_continue() {
+                        return Err(format!(
+                            "MySQL ({}) auto-creation failed {error}",
+                            instance.get_name()
+                        ));
+                    }
+                    initialization_results.push(format!(
+                        "MySQL ({}) : failed but continuing ({error})",
+                        instance.get_name()
+                    ));
+                }
+            }
+        }
+        for instance in env.get_postgresql_instances() {
+            match PostgreSqlPlugin::perform_auto_creation(instance, postgresql_schema.clone()).await
+            {
+                Ok(result) => {
+                    initialization_results.push(format!(
+                        "PostgreSQL ({})  {}",
+                        instance.get_name(),
+                        if result.has_changes() {
+                            "initialized with changes"
+                        } else {
+                            "verified"
+                        }
+                    ));
+                }
+                Err(error) => {
+                    if !error.should_continue() {
+                        return Err(format!(
+                            "PostgreSQL ({}) auto-creation failed {error}",
+                            instance.get_name()
+                        ));
+                    }
+                    initialization_results.push(format!(
+                        "PostgreSQL ({}) : failed but continuing ({error})",
+                        instance.get_name()
+                    ));
+                }
+            }
+        }
+        for instance in env.get_redis_instances() {
+            match RedisPlugin::perform_auto_creation(instance, None).await {
+                Ok(result) => {
+                    initialization_results.push(format!(
+                        "Redis ({})  {}",
+                        instance.get_name(),
+                        if result.has_changes() {
+                            "initialized with changes"
+                        } else {
+                            "verified"
+                        }
+                    ));
+                }
+                Err(error) => {
+                    if !error.should_continue() {
+                        return Err(format!(
+                            "Redis ({}) auto-creation failed {error}",
+                            instance.get_name()
+                        ));
+                    }
+                    initialization_results.push(format!(
+                        "Redis ({}) : failed but continuing ({error})",
+                        instance.get_name()
+                    ));
+                }
+            }
+        }
+        if initialization_results.is_empty() {
+            info!("[AUTO-CREATION] No plugins enabled for auto-creation");
+        } else {
+            let results_summary: String = initialization_results.join(", ");
+            info!("[AUTO-CREATION] Initialization complete {results_summary}");
+        }
+        Ok(())
+    }
+}
+
 impl<T: Clone> ConnectionCache<T> {
     #[instrument_trace]
     pub fn new(result: Result<T, String>) -> Self {
@@ -179,7 +308,7 @@ impl DatabaseSchema {
 impl AutoCreationConfig {
     #[instrument_trace]
     pub fn validate() -> Result<(), String> {
-        let env: &'static EnvConfig = get_or_init_global_env_config();
+        let env: &'static EnvConfig = EnvPlugin::get_or_init();
         if env.get_mysql_instances().is_empty() {
             return Err("At least one MySQL instance is required".to_string());
         }
@@ -208,7 +337,7 @@ impl PluginAutoCreationConfig {
 
     #[instrument_trace]
     pub fn get_database_name(&self) -> String {
-        let env: &'static EnvConfig = get_or_init_global_env_config();
+        let env: &'static EnvConfig = EnvPlugin::get_or_init();
         if let Ok(plugin_type) = PluginType::from_str(self.get_plugin_name()) {
             match plugin_type {
                 PluginType::MySQL => {
@@ -234,7 +363,7 @@ impl PluginAutoCreationConfig {
 
     #[instrument_trace]
     pub fn get_connection_info(&self) -> String {
-        let env: &'static EnvConfig = get_or_init_global_env_config();
+        let env: &'static EnvConfig = EnvPlugin::get_or_init();
         if let Ok(plugin_type) = PluginType::from_str(self.get_plugin_name()) {
             match plugin_type {
                 PluginType::MySQL => {

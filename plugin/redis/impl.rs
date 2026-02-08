@@ -1,10 +1,258 @@
 use super::*;
 
+impl GetOrInit for RedisPlugin {
+    type Instance = RwLock<RedisConnectionMap>;
+
+    #[instrument_trace]
+    fn get_or_init() -> &'static Self::Instance {
+        REDIS_CONNECTIONS.get_or_init(|| RwLock::new(HashMap::new()))
+    }
+}
+
+impl DatabaseConnectionPlugin for RedisPlugin {
+    type InstanceConfig = RedisInstanceConfig;
+
+    type AutoCreation = RedisAutoCreation;
+
+    type Connection = ArcRwLock<Connection>;
+
+    type ConnectionCache = RwLock<RedisConnectionMap>;
+
+    #[instrument_trace]
+    fn plugin_type() -> PluginType {
+        PluginType::Redis
+    }
+
+    #[instrument_trace]
+    async fn connection_db<I>(
+        instance_name: I,
+        _schema: Option<DatabaseSchema>,
+    ) -> Result<Self::Connection, String>
+    where
+        I: AsRef<str> + Send,
+    {
+        let instance_name_str: &str = instance_name.as_ref();
+        let env: &'static EnvConfig = EnvPlugin::get_or_init();
+        let instance: &RedisInstanceConfig = env
+            .get_redis_instance(instance_name_str)
+            .ok_or_else(|| format!("Redis instance '{instance_name_str}' not found"))?;
+        match Self::perform_auto_creation(instance, _schema).await {
+            Ok(result) => {
+                if result.has_changes() {
+                    AutoCreationLogger::log_auto_creation_complete(
+                        database::PluginType::Redis,
+                        &result,
+                    )
+                    .await;
+                }
+            }
+            Err(error) => {
+                AutoCreationLogger::log_auto_creation_error(
+                    &error,
+                    "Auto-creation process",
+                    database::PluginType::Redis,
+                    Some(instance.get_name().as_str()),
+                )
+                .await;
+                if !error.should_continue() {
+                    return Err(error.to_string());
+                }
+            }
+        }
+        let db_url: String = instance.get_connection_url();
+        let client: Client = Client::open(db_url).map_err(|error: redis::RedisError| {
+            let error_msg: String = error.to_string();
+            let instance_name_clone: String = instance_name_str.to_string();
+            let error_msg_clone: String = error_msg.clone();
+            spawn(async move {
+                AutoCreationLogger::log_connection_verification(
+                    database::PluginType::Redis,
+                    &instance_name_clone,
+                    false,
+                    Some(&error_msg_clone),
+                )
+                .await;
+            });
+            error_msg
+        })?;
+        let timeout_duration: Duration = DatabasePlugin::get_connection_timeout_duration();
+        let timeout_seconds: u64 = timeout_duration.as_secs();
+        let connection_task: JoinHandle<Result<Connection, RedisError>> =
+            spawn_blocking(move || client.get_connection());
+        let connection: Connection = match timeout(timeout_duration, connection_task).await {
+            Ok(join_result) => match join_result {
+                Ok(result) => result.map_err(|error: redis::RedisError| {
+                    let error_msg: String = error.to_string();
+                    let instance_name_clone: String = instance_name_str.to_string();
+                    let error_msg_clone: String = error_msg.clone();
+                    spawn(async move {
+                        AutoCreationLogger::log_connection_verification(
+                            database::PluginType::Redis,
+                            &instance_name_clone,
+                            false,
+                            Some(&error_msg_clone),
+                        )
+                        .await;
+                    });
+                    error_msg
+                })?,
+                Err(_) => {
+                    let error_msg: String = "Redis connection task failed".to_string();
+                    let instance_name_clone: String = instance_name_str.to_string();
+                    let error_msg_clone: String = error_msg.clone();
+                    spawn(async move {
+                        AutoCreationLogger::log_connection_verification(
+                            database::PluginType::Redis,
+                            &instance_name_clone,
+                            false,
+                            Some(&error_msg_clone),
+                        )
+                        .await;
+                    });
+                    return Err(error_msg);
+                }
+            },
+            Err(_) => {
+                let error_msg: String =
+                    format!("Redis connection timeout after {timeout_seconds} seconds");
+                let instance_name_clone: String = instance_name_str.to_string();
+                let error_msg_clone: String = error_msg.clone();
+                spawn(async move {
+                    AutoCreationLogger::log_connection_verification(
+                        database::PluginType::Redis,
+                        &instance_name_clone,
+                        false,
+                        Some(&error_msg_clone),
+                    )
+                    .await;
+                });
+                return Err(error_msg);
+            }
+        };
+        Ok(arc_rwlock(connection))
+    }
+
+    #[instrument_trace]
+    async fn get_connection<I>(
+        instance_name: I,
+        schema: Option<DatabaseSchema>,
+    ) -> Result<Self::Connection, String>
+    where
+        I: AsRef<str> + Send,
+    {
+        let instance_name_str: &str = instance_name.as_ref();
+        let duration: Duration = DatabasePlugin::get_retry_duration();
+        {
+            if let Some(cache) = Self::get_or_init().read().await.get(instance_name_str) {
+                match cache.try_get_result() {
+                    Ok(conn) => return Ok(conn.clone()),
+                    Err(error) => {
+                        if !cache.is_expired(duration) {
+                            return Err(error.clone());
+                        }
+                    }
+                }
+            }
+        }
+        let mut connections: RwLockWriteGuard<'_, RedisConnectionMap> =
+            Self::get_or_init().write().await;
+        if let Some(cache) = connections.get(instance_name_str) {
+            match cache.try_get_result() {
+                Ok(conn) => return Ok(conn.clone()),
+                Err(error) => {
+                    if !cache.is_expired(duration) {
+                        return Err(error.clone());
+                    }
+                }
+            }
+        }
+        connections.remove(instance_name_str);
+        drop(connections);
+        let new_connection: Result<ArcRwLock<Connection>, String> =
+            Self::connection_db(instance_name_str, schema).await;
+        let mut connections: RwLockWriteGuard<'_, RedisConnectionMap> =
+            Self::get_or_init().write().await;
+        connections.insert(
+            instance_name_str.to_string(),
+            ConnectionCache::new(new_connection.clone()),
+        );
+        new_connection
+    }
+
+    #[instrument_trace]
+    async fn perform_auto_creation(
+        instance: &Self::InstanceConfig,
+        schema: Option<DatabaseSchema>,
+    ) -> Result<AutoCreationResult, AutoCreationError> {
+        let start_time: Instant = Instant::now();
+        let mut result: AutoCreationResult = AutoCreationResult::default();
+        AutoCreationLogger::log_auto_creation_start(
+            database::PluginType::Redis,
+            instance.get_name(),
+        )
+        .await;
+        let auto_creator: RedisAutoCreation = match schema {
+            Some(s) => RedisAutoCreation::with_schema(instance.clone(), s),
+            None => RedisAutoCreation::new(instance.clone()),
+        };
+        match auto_creator.create_database_if_not_exists().await {
+            Ok(created) => {
+                result.set_database_created(created);
+            }
+            Err(error) => {
+                AutoCreationLogger::log_auto_creation_error(
+                    &error,
+                    "Database validation",
+                    database::PluginType::Redis,
+                    Some(instance.get_name().as_str()),
+                )
+                .await;
+                if !error.should_continue() {
+                    result.set_duration(start_time.elapsed());
+                    return Err(error);
+                }
+                result.get_mut_errors().push(error.to_string());
+            }
+        }
+        match auto_creator.create_tables_if_not_exist().await {
+            Ok(operations) => {
+                result.set_tables_created(operations);
+            }
+            Err(error) => {
+                AutoCreationLogger::log_auto_creation_error(
+                    &error,
+                    "Namespace setup",
+                    database::PluginType::Redis,
+                    Some(instance.get_name().as_str()),
+                )
+                .await;
+                result.get_mut_errors().push(error.to_string());
+            }
+        }
+        if let Err(error) = auto_creator.verify_connection().await {
+            AutoCreationLogger::log_auto_creation_error(
+                &error,
+                "Connection verification",
+                database::PluginType::Redis,
+                Some(instance.get_name().as_str()),
+            )
+            .await;
+            if !error.should_continue() {
+                result.set_duration(start_time.elapsed());
+                return Err(error);
+            }
+            result.get_mut_errors().push(error.to_string());
+        }
+        result.set_duration(start_time.elapsed());
+        AutoCreationLogger::log_auto_creation_complete(database::PluginType::Redis, &result).await;
+        Ok(result)
+    }
+}
+
 impl Default for RedisAutoCreation {
     #[instrument_trace]
     fn default() -> Self {
-        let env: &'static EnvConfig = get_or_init_global_env_config();
-        if let Some(instance) = env.get_default_redis_instance() {
+        if let Some(instance) = EnvPlugin::get_or_init().get_default_redis_instance() {
             Self::new(instance.clone())
         } else {
             let default_instance: RedisInstanceConfig = RedisInstanceConfig::default();
@@ -31,10 +279,10 @@ impl RedisAutoCreation {
                 AutoCreationError::DatabaseError(format!("Redis connection error {error_msg}"))
             }
         })?;
-        let timeout_duration: Duration = get_connection_timeout_duration();
+        let timeout_duration: Duration = DatabasePlugin::get_connection_timeout_duration();
         let timeout_seconds: u64 = timeout_duration.as_secs();
-        let connection_task: tokio::task::JoinHandle<Result<Connection, RedisError>> =
-            tokio::task::spawn_blocking(move || client.get_connection());
+        let connection_task: JoinHandle<Result<Connection, RedisError>> =
+            spawn_blocking(move || client.get_connection());
         let connection: Connection = match timeout(timeout_duration, connection_task).await {
             Ok(join_result) => match join_result {
                 Ok(result) => result.map_err(|error: RedisError| {
@@ -145,6 +393,24 @@ impl RedisAutoCreation {
 }
 
 impl DatabaseAutoCreation for RedisAutoCreation {
+    type InstanceConfig = RedisInstanceConfig;
+
+    #[instrument_trace]
+    fn new(instance: Self::InstanceConfig) -> Self {
+        Self {
+            instance,
+            schema: DatabaseSchema::default(),
+        }
+    }
+
+    #[instrument_trace]
+    fn with_schema(instance: Self::InstanceConfig, schema: DatabaseSchema) -> Self
+    where
+        Self: Sized,
+    {
+        Self { instance, schema }
+    }
+
     #[instrument_trace]
     async fn create_database_if_not_exists(&self) -> Result<bool, AutoCreationError> {
         self.validate_redis_server().await?;

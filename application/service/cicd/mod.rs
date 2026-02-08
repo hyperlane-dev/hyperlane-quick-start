@@ -20,7 +20,7 @@ use {
     },
 };
 
-use hyperlane_plugin::{docker::*, mysql::*};
+use hyperlane_plugin::{common::*, docker::*, mysql::*};
 
 use hyperlane_utils::*;
 

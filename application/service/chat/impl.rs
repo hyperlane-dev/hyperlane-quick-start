@@ -270,7 +270,7 @@ impl ChatService {
 
     #[instrument_trace]
     async fn call_gpt_api_with_context(session: &ChatSession) -> Result<String, String> {
-        let config: &EnvConfig = get_global_env_config();
+        let config: &EnvConfig = EnvPlugin::get_or_init();
         let gpt_model: &str = config.get_gpt_model();
         let messages: Vec<serde_json::Value> = Self::build_gpt_request_messages(session);
         let body: serde_json::Value = json!({

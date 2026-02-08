@@ -1,5 +1,8 @@
 use super::*;
 
+#[derive(Clone, Copy, Data, Debug, Default)]
+pub struct MySqlPlugin;
+
 #[derive(Clone, Data, Debug, New)]
 pub struct MySqlAutoCreation {
     #[get(pub(crate))]

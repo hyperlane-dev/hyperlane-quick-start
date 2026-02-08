@@ -1,5 +1,8 @@
 use super::*;
 
+#[derive(Clone, Copy, Data, Debug, Default)]
+pub struct DatabasePlugin;
+
 #[derive(Clone, Data, Debug)]
 pub struct ConnectionCache<T: Clone> {
     #[get(type(copy), pub(crate))]

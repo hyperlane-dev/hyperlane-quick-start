@@ -32,7 +32,7 @@ impl ChatHistoryMapper {
         content: &str,
     ) -> Result<(), String> {
         let db: DatabaseConnection =
-            get_postgresql_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::connection_db(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
         let active_model: ActiveModel = ActiveModel {
             id: ActiveValue::NotSet,
             session_id: ActiveValue::Set(session_id.to_string()),
@@ -63,7 +63,7 @@ impl ChatHistoryMapper {
         limit: i64,
     ) -> Result<Vec<ChatHistory>, String> {
         let db: DatabaseConnection =
-            get_postgresql_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::connection_db(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
         let mut query: Select<Entity> = Entity::find();
         if let Some(id) = before_id {
             query = query.filter(Column::Id.lt(id));
@@ -81,7 +81,7 @@ impl ChatHistoryMapper {
     #[instrument_trace]
     pub async fn count_messages() -> Result<i64, String> {
         let db: DatabaseConnection =
-            get_postgresql_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::connection_db(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
         let count: u64 = Entity::find()
             .count(&db)
             .await

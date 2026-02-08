@@ -1,5 +1,8 @@
 use super::*;
 
+#[derive(Clone, Copy, Data, Debug, Default)]
+pub struct PostgreSqlPlugin;
+
 #[derive(Clone, Data, Debug, New)]
 pub struct PostgreSqlAutoCreation {
     #[get(pub(crate))]

@@ -1,5 +1,8 @@
 use super::*;
 
+#[derive(Clone, Copy, Data, Debug, Default)]
+pub struct EnvPlugin;
+
 #[derive(Clone, Data, Debug, Default)]
 pub struct DockerComposeConfig {
     #[get(pub(crate))]

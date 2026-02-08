@@ -10,6 +10,6 @@ pub use {
 
 use {super::*, model::application::tracking::*, r#static::*};
 
-use hyperlane_plugin::postgresql::*;
+use hyperlane_plugin::{common::*, postgresql::*};
 
 use std::{collections::HashMap, sync::OnceLock};
