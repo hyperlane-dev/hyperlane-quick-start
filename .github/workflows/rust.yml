@@ -159,6 +159,7 @@ jobs:
           if [ "$SUCCESS" != "true" ]; then
             echo "❌ $pkg release failed after $MAX_RETRY attempts"
           fi
+          cargo build --release --all-features
 
   release:
     needs: [setup, check, tests, clippy, build, publish]
