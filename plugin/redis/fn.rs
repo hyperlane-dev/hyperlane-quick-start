@@ -11,7 +11,7 @@ where
     I: AsRef<str>,
 {
     let instance_name_str: &str = instance_name.as_ref();
-    let env: &'static EnvConfig = get_or_init_global_env_config();
+    let env: &'static EnvConfig = EnvPlugin::get_or_init_global_env_config();
     let instance: &RedisInstanceConfig = env
         .get_redis_instance(instance_name_str)
         .ok_or_else(|| format!("Redis instance '{instance_name_str}' not found"))?;
@@ -54,7 +54,7 @@ where
         });
         error_msg
     })?;
-    let timeout_duration: Duration = get_connection_timeout_duration();
+    let timeout_duration: Duration = DatabasePlugin::get_connection_timeout_duration();
     let timeout_seconds: u64 = timeout_duration.as_secs();
     let connection_task: JoinHandle<Result<Connection, RedisError>> =
         spawn_blocking(move || client.get_connection());
@@ -117,7 +117,7 @@ where
     I: AsRef<str>,
 {
     let instance_name_str: &str = instance_name.as_ref();
-    let duration: Duration = get_retry_duration();
+    let duration: Duration = DatabasePlugin::get_retry_duration();
     {
         if let Some(cache) = get_redis_connection_map()
             .read()

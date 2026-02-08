@@ -1,5 +1,11 @@
 use super::*;
 
+impl EnvPlugin {
+    pub fn get_or_init_file_logger() -> &'static RwLock<FileLogger> {
+        FILE_LOGGER.get_or_init(|| RwLock::new(FileLogger::default()))
+    }
+}
+
 impl Log for Logger {
     fn enabled(&self, metadata: &Metadata) -> bool {
         metadata.level() <= max_level()
@@ -78,11 +84,11 @@ impl Log for Logger {
 
 impl Logger {
     fn read() -> RwLockReadGuard<'static, FileLogger> {
-        get_or_init_file_logger().try_read().unwrap()
+        EnvPlugin::get_or_init_file_logger().try_read().unwrap()
     }
 
     fn write() -> RwLockWriteGuard<'static, FileLogger> {
-        get_or_init_file_logger().try_write().unwrap()
+        EnvPlugin::get_or_init_file_logger().try_write().unwrap()
     }
 
     pub fn init(level: LevelFilter, file_logger: FileLogger) {

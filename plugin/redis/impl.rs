@@ -3,7 +3,7 @@ use super::*;
 impl Default for RedisAutoCreation {
     #[instrument_trace]
     fn default() -> Self {
-        let env: &'static EnvConfig = get_or_init_global_env_config();
+        let env: &'static EnvConfig = EnvPlugin::get_or_init_global_env_config();
         if let Some(instance) = env.get_default_redis_instance() {
             Self::new(instance.clone())
         } else {
@@ -31,7 +31,7 @@ impl RedisAutoCreation {
                 AutoCreationError::DatabaseError(format!("Redis connection error {error_msg}"))
             }
         })?;
-        let timeout_duration: Duration = get_connection_timeout_duration();
+        let timeout_duration: Duration = DatabasePlugin::get_connection_timeout_duration();
         let timeout_seconds: u64 = timeout_duration.as_secs();
         let connection_task: tokio::task::JoinHandle<Result<Connection, RedisError>> =
             tokio::task::spawn_blocking(move || client.get_connection());
