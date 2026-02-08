@@ -1,22 +1,42 @@
 use super::*;
 
-impl RedisPlugin {
+impl GetOrInit for RedisPlugin {
+    type Instance = RwLock<RedisConnectionMap>;
+
     #[instrument_trace]
-    fn get_or_init() -> &'static RwLock<RedisConnectionMap> {
+    fn get_or_init() -> &'static Self::Instance {
         REDIS_CONNECTIONS.get_or_init(|| RwLock::new(HashMap::new()))
+    }
+}
+
+impl DatabaseConnectionPlugin for RedisPlugin {
+    type InstanceConfig = RedisInstanceConfig;
+
+    type AutoCreation = RedisAutoCreation;
+
+    type Connection = ArcRwLock<Connection>;
+
+    type ConnectionCache = RwLock<RedisConnectionMap>;
+
+    #[instrument_trace]
+    fn plugin_type() -> PluginType {
+        PluginType::Redis
     }
 
     #[instrument_trace]
-    pub async fn connection_db<I>(instance_name: I) -> Result<ArcRwLock<Connection>, String>
+    async fn connection_db<I>(
+        instance_name: I,
+        _schema: Option<DatabaseSchema>,
+    ) -> Result<Self::Connection, String>
     where
-        I: AsRef<str>,
+        I: AsRef<str> + Send,
     {
         let instance_name_str: &str = instance_name.as_ref();
         let env: &'static EnvConfig = EnvPlugin::get_or_init();
         let instance: &RedisInstanceConfig = env
             .get_redis_instance(instance_name_str)
             .ok_or_else(|| format!("Redis instance '{instance_name_str}' not found"))?;
-        match Self::perform_auto_creation(instance).await {
+        match Self::perform_auto_creation(instance, _schema).await {
             Ok(result) => {
                 if result.has_changes() {
                     AutoCreationLogger::log_auto_creation_complete(
@@ -113,9 +133,12 @@ impl RedisPlugin {
     }
 
     #[instrument_trace]
-    pub async fn get_connection<I>(instance_name: I) -> Result<ArcRwLock<Connection>, String>
+    async fn get_connection<I>(
+        instance_name: I,
+        schema: Option<DatabaseSchema>,
+    ) -> Result<Self::Connection, String>
     where
-        I: AsRef<str>,
+        I: AsRef<str> + Send,
     {
         let instance_name_str: &str = instance_name.as_ref();
         let duration: Duration = DatabasePlugin::get_retry_duration();
@@ -146,7 +169,7 @@ impl RedisPlugin {
         connections.remove(instance_name_str);
         drop(connections);
         let new_connection: Result<ArcRwLock<Connection>, String> =
-            Self::connection_db(instance_name_str).await;
+            Self::connection_db(instance_name_str, schema).await;
         let mut connections: RwLockWriteGuard<'_, RedisConnectionMap> =
             Self::get_or_init().write().await;
         connections.insert(
@@ -157,8 +180,9 @@ impl RedisPlugin {
     }
 
     #[instrument_trace]
-    pub async fn perform_auto_creation(
-        instance: &RedisInstanceConfig,
+    async fn perform_auto_creation(
+        instance: &Self::InstanceConfig,
+        schema: Option<DatabaseSchema>,
     ) -> Result<AutoCreationResult, AutoCreationError> {
         let start_time: Instant = Instant::now();
         let mut result: AutoCreationResult = AutoCreationResult::default();
@@ -167,7 +191,10 @@ impl RedisPlugin {
             instance.get_name(),
         )
         .await;
-        let auto_creator: RedisAutoCreation = RedisAutoCreation::new(instance.clone());
+        let auto_creator: RedisAutoCreation = match schema {
+            Some(s) => RedisAutoCreation::with_schema(instance.clone(), s),
+            None => RedisAutoCreation::new(instance.clone()),
+        };
         match auto_creator.create_database_if_not_exists().await {
             Ok(created) => {
                 result.set_database_created(created);
@@ -366,6 +393,24 @@ impl RedisAutoCreation {
 }
 
 impl DatabaseAutoCreation for RedisAutoCreation {
+    type InstanceConfig = RedisInstanceConfig;
+
+    #[instrument_trace]
+    fn new(instance: Self::InstanceConfig) -> Self {
+        Self {
+            instance,
+            schema: DatabaseSchema::default(),
+        }
+    }
+
+    #[instrument_trace]
+    fn with_schema(instance: Self::InstanceConfig, schema: DatabaseSchema) -> Self
+    where
+        Self: Sized,
+    {
+        Self { instance, schema }
+    }
+
     #[instrument_trace]
     async fn create_database_if_not_exists(&self) -> Result<bool, AutoCreationError> {
         self.validate_redis_server().await?;

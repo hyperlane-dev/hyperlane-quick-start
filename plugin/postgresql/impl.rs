@@ -1,25 +1,42 @@
 use super::*;
 
-impl PostgreSqlPlugin {
+impl GetOrInit for PostgreSqlPlugin {
+    type Instance = RwLock<HashMap<String, ConnectionCache<DatabaseConnection>>>;
+
     #[instrument_trace]
-    pub fn get_or_init() -> &'static RwLock<HashMap<String, ConnectionCache<DatabaseConnection>>> {
+    fn get_or_init() -> &'static Self::Instance {
         POSTGRESQL_CONNECTIONS.get_or_init(|| RwLock::new(HashMap::new()))
+    }
+}
+
+impl DatabaseConnectionPlugin for PostgreSqlPlugin {
+    type InstanceConfig = PostgreSqlInstanceConfig;
+
+    type AutoCreation = PostgreSqlAutoCreation;
+
+    type Connection = DatabaseConnection;
+
+    type ConnectionCache = RwLock<HashMap<String, ConnectionCache<Self::Connection>>>;
+
+    #[instrument_trace]
+    fn plugin_type() -> PluginType {
+        PluginType::PostgreSQL
     }
 
     #[instrument_trace]
-    pub async fn connection_db<I>(
+    async fn connection_db<I>(
         instance_name: I,
         schema: Option<DatabaseSchema>,
-    ) -> Result<DatabaseConnection, String>
+    ) -> Result<Self::Connection, String>
     where
-        I: AsRef<str>,
+        I: AsRef<str> + Send,
     {
         let instance_name_str: &str = instance_name.as_ref();
         let env: &'static EnvConfig = EnvPlugin::get_or_init();
         let instance: &PostgreSqlInstanceConfig = env
             .get_postgresql_instance(instance_name_str)
             .ok_or_else(|| format!("PostgreSQL instance '{instance_name_str}' not found"))?;
-        match PostgreSqlPlugin::perform_auto_creation(instance, schema.clone()).await {
+        match Self::perform_auto_creation(instance, schema.clone()).await {
             Ok(result) => {
                 if result.has_changes() {
                     AutoCreationLogger::log_auto_creation_complete(PluginType::PostgreSQL, &result)
@@ -67,21 +84,17 @@ impl PostgreSqlPlugin {
     }
 
     #[instrument_trace]
-    pub async fn get_connection<I>(
+    async fn get_connection<I>(
         instance_name: I,
         schema: Option<DatabaseSchema>,
-    ) -> Result<DatabaseConnection, String>
+    ) -> Result<Self::Connection, String>
     where
-        I: AsRef<str>,
+        I: AsRef<str> + Send,
     {
         let instance_name_str: &str = instance_name.as_ref();
         let duration: Duration = DatabasePlugin::get_retry_duration();
         {
-            if let Some(cache) = PostgreSqlPlugin::get_or_init()
-                .read()
-                .await
-                .get(instance_name_str)
-            {
+            if let Some(cache) = Self::get_or_init().read().await.get(instance_name_str) {
                 match cache.try_get_result() {
                     Ok(conn) => return Ok(conn.clone()),
                     Err(error) => {
@@ -95,7 +108,7 @@ impl PostgreSqlPlugin {
         let mut connections: RwLockWriteGuard<
             '_,
             HashMap<String, ConnectionCache<DatabaseConnection>>,
-        > = PostgreSqlPlugin::get_or_init().write().await;
+        > = Self::get_or_init().write().await;
         if let Some(cache) = connections.get(instance_name_str) {
             match cache.try_get_result() {
                 Ok(conn) => return Ok(conn.clone()),
@@ -109,11 +122,11 @@ impl PostgreSqlPlugin {
         connections.remove(instance_name_str);
         drop(connections);
         let new_connection: Result<DatabaseConnection, String> =
-            PostgreSqlPlugin::connection_db(instance_name_str, schema).await;
+            Self::connection_db(instance_name_str, schema).await;
         let mut connections: RwLockWriteGuard<
             '_,
             HashMap<String, ConnectionCache<DatabaseConnection>>,
-        > = PostgreSqlPlugin::get_or_init().write().await;
+        > = Self::get_or_init().write().await;
         connections.insert(
             instance_name_str.to_string(),
             ConnectionCache::new(new_connection.clone()),
@@ -122,8 +135,8 @@ impl PostgreSqlPlugin {
     }
 
     #[instrument_trace]
-    pub async fn perform_auto_creation(
-        instance: &PostgreSqlInstanceConfig,
+    async fn perform_auto_creation(
+        instance: &Self::InstanceConfig,
         schema: Option<DatabaseSchema>,
     ) -> Result<AutoCreationResult, AutoCreationError> {
         let start_time: Instant = Instant::now();
@@ -205,11 +218,6 @@ impl Default for PostgreSqlAutoCreation {
 }
 
 impl PostgreSqlAutoCreation {
-    #[instrument_trace]
-    pub fn with_schema(instance: PostgreSqlInstanceConfig, schema: DatabaseSchema) -> Self {
-        Self { instance, schema }
-    }
-
     #[instrument_trace]
     async fn create_admin_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
         let admin_url: String = self.instance.get_admin_url();
@@ -410,6 +418,24 @@ impl PostgreSqlAutoCreation {
 }
 
 impl DatabaseAutoCreation for PostgreSqlAutoCreation {
+    type InstanceConfig = PostgreSqlInstanceConfig;
+
+    #[instrument_trace]
+    fn new(instance: Self::InstanceConfig) -> Self {
+        Self {
+            instance,
+            schema: DatabaseSchema::default(),
+        }
+    }
+
+    #[instrument_trace]
+    fn with_schema(instance: Self::InstanceConfig, schema: DatabaseSchema) -> Self
+    where
+        Self: Sized,
+    {
+        Self { instance, schema }
+    }
+
     #[instrument_trace]
     async fn create_database_if_not_exists(&self) -> Result<bool, AutoCreationError> {
         let admin_connection: DatabaseConnection = self.create_admin_connection().await?;

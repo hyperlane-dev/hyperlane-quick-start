@@ -1,5 +1,13 @@
 use super::*;
 
+impl GetOrInit for ShutdownPlugin {
+    type Instance = SharedAsyncTaskFactory<()>;
+
+    fn get_or_init() -> &'static Self::Instance {
+        SHUTDOWN.get_or_init(Self::get_init)
+    }
+}
+
 impl ShutdownPlugin {
     #[instrument_trace]
     pub fn get_init() -> SharedAsyncTaskFactory<()> {
@@ -8,11 +16,6 @@ impl ShutdownPlugin {
                 warn!("Not set shutdown, using default");
             })
         })
-    }
-
-    #[instrument_trace]
-    pub fn get_or_init() -> SharedAsyncTaskFactory<()> {
-        SHUTDOWN.get_or_init(Self::get_init).clone()
     }
 
     #[instrument_trace]

@@ -7,7 +7,7 @@ impl BootstrapAsyncInit for DbBootstrap {
         let _: Result<DatabaseConnection, String> =
             PostgreSqlPlugin::connection_db(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await;
         let _: Result<ArcRwLock<Connection>, String> =
-            RedisPlugin::connection_db(DEFAULT_REDIS_INSTANCE_NAME).await;
+            RedisPlugin::connection_db(DEFAULT_REDIS_INSTANCE_NAME, None).await;
         match DatabasePlugin::initialize_auto_creation().await {
             Ok(_) => {
                 info!("Auto-creation initialization successful");

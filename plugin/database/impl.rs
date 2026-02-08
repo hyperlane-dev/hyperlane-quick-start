@@ -93,7 +93,7 @@ impl DatabasePlugin {
             }
         }
         for instance in env.get_redis_instances() {
-            match RedisPlugin::perform_auto_creation(instance).await {
+            match RedisPlugin::perform_auto_creation(instance, None).await {
                 Ok(result) => {
                     initialization_results.push(format!(
                         "Redis ({})  {}",

@@ -7,4 +7,7 @@ pub struct RedisPlugin;
 pub struct RedisAutoCreation {
     #[get(pub(crate))]
     pub(super) instance: RedisInstanceConfig,
+    #[new(skip)]
+    #[get(pub(crate))]
+    pub(super) schema: DatabaseSchema,
 }

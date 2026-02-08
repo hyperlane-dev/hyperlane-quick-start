@@ -8,6 +8,8 @@ pub mod process;
 pub mod redis;
 pub mod shutdown;
 
+use common::*;
+
 use {
     hyperlane::*,
     hyperlane_utils::{log::*, *},

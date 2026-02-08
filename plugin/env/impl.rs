@@ -1,11 +1,15 @@
 use super::*;
 
-impl EnvPlugin {
+impl GetOrInit for EnvPlugin {
+    type Instance = EnvConfig;
+
     #[instrument_trace]
-    pub fn get_or_init() -> &'static EnvConfig {
+    fn get_or_init() -> &'static Self::Instance {
         GLOBAL_ENV_CONFIG.get_or_init(EnvConfig::default)
     }
+}
 
+impl EnvPlugin {
     #[instrument_trace]
     pub fn try_get_config() -> Result<(), String> {
         let config: EnvConfig = EnvConfig::load()?;

@@ -5,7 +5,7 @@ mod r#struct;
 
 pub use {r#const::*, r#struct::*};
 
-use {super::*, database::*, env::*, r#static::*};
+use {super::*, common::DatabaseAutoCreation, common::*, database::*, env::*, r#static::*};
 
 use std::{
     collections::HashMap,

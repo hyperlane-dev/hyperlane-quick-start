@@ -1,7 +1,9 @@
 use super::*;
 
-impl LoggerPlugin {
-    pub fn get_or_init() -> &'static RwLock<FileLogger> {
+impl GetOrInit for LoggerPlugin {
+    type Instance = RwLock<FileLogger>;
+
+    fn get_or_init() -> &'static Self::Instance {
         FILE_LOGGER.get_or_init(|| RwLock::new(FileLogger::default()))
     }
 }
