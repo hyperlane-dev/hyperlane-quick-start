@@ -13,5 +13,8 @@ use std::{
 
 use {
     sysinfo::{Cpu, Disks, Networks, System},
-    tokio::sync::{RwLock, RwLockReadGuard},
+    tokio::{
+        spawn,
+        sync::{RwLock, RwLockReadGuard},
+    },
 };

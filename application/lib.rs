@@ -24,7 +24,6 @@ use {
     serde_json::json,
     serde_with::skip_serializing_none,
     tokio::{
-        runtime::Runtime,
         spawn,
         time::{Duration, sleep},
     },

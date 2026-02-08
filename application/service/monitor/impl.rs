@@ -35,31 +35,24 @@ impl MonitorService {
     pub async fn start_network_capture() {
         init_network_capture_globals();
         set_capture_status(CaptureStatus::Running).await;
-        let _handle: std::thread::JoinHandle<()> = std::thread::spawn(|| {
-            let rt: Runtime = Runtime::new().unwrap();
-            rt.block_on(async {
-                loop {
-                    if let Some(stats) = Self::capture_network_data().await {
-                        set_network_stats(stats).await;
-                    }
-                    std::thread::sleep(Duration::from_secs(CAPTURE_INTERVAL_SECONDS));
+        spawn(async {
+            loop {
+                if let Some(stats) = Self::capture_network_data().await {
+                    set_network_stats(stats).await;
                 }
-            });
+                sleep(Duration::from_secs(MONITOR_INTERVAL_SECONDS)).await;
+            }
         });
     }
 
     #[instrument_trace]
     pub async fn start_performance_data_collection() {
-        let _handle: std::thread::JoinHandle<()> = std::thread::spawn(|| {
-            let rt: Runtime = Runtime::new().unwrap();
-            rt.block_on(async {
-                loop {
-                    let data_point: PerformanceDataPoint =
-                        Self::collect_performance_data_point().await;
-                    add_performance_data_point(data_point).await;
-                    sleep(Duration::from_secs(1)).await;
-                }
-            });
+        spawn(async {
+            loop {
+                let data_point: PerformanceDataPoint = Self::collect_performance_data_point().await;
+                add_performance_data_point(data_point).await;
+                sleep(Duration::from_secs(MONITOR_INTERVAL_SECONDS)).await;
+            }
         });
     }
 

@@ -16,8 +16,8 @@ fn main() {
     info!("Environment configuration loaded successfully");
     RuntimeBootstrap::init().get_runtime().block_on(async move {
         DbBootstrap::init().await;
-        init_cicd().await;
-        init_monitor().await;
+        CicdBootstrap::init().await;
+        MonitorBootstrap::init().await;
         ProcessPlugin::create(SERVER_PID_FILE_PATH, || async {
             ServerBootstrap::init().await;
         })
