@@ -17,6 +17,6 @@ fn main() {
     info!("Environment configuration loaded successfully");
     runtime().block_on(async move {
         init_db().await;
-        create(SERVER_PID_FILE_PATH, init_server).await;
+        ProcessPlugin::create(SERVER_PID_FILE_PATH, init_server).await;
     });
 }

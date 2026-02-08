@@ -2,12 +2,12 @@ use super::*;
 
 impl EnvPlugin {
     #[instrument_trace]
-    pub fn get_or_init_global_env_config() -> &'static EnvConfig {
+    pub fn get_or_init() -> &'static EnvConfig {
         GLOBAL_ENV_CONFIG.get_or_init(EnvConfig::default)
     }
 
     #[instrument_trace]
-    pub fn load_env_config() -> Result<(), String> {
+    pub fn try_get_config() -> Result<(), String> {
         let config: EnvConfig = EnvConfig::load()?;
         GLOBAL_ENV_CONFIG
             .set(config.clone())

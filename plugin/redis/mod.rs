@@ -1,11 +1,10 @@
 mod r#const;
-mod r#fn;
 mod r#impl;
 mod r#static;
 mod r#struct;
 mod r#type;
 
-pub use {r#const::*, r#fn::*, r#struct::*, r#type::*};
+pub use {r#const::*, r#struct::*, r#type::*};
 
 use {super::*, database::*, env::*, r#static::*};
 
@@ -18,6 +17,7 @@ use std::{
 };
 
 use tokio::{
+    spawn,
     sync::{RwLock, RwLockWriteGuard},
     task::{JoinHandle, spawn_blocking},
     time::timeout,

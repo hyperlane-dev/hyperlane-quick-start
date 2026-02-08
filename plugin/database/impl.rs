@@ -35,10 +35,10 @@ impl DatabasePlugin {
                 "Auto-creation configuration validation failed {error}"
             ));
         }
-        let env: &'static EnvConfig = EnvPlugin::get_or_init_global_env_config();
+        let env: &'static EnvConfig = EnvPlugin::get_or_init();
         let mut initialization_results: Vec<String> = Vec::new();
         for instance in env.get_mysql_instances() {
-            match MySqlPlugin::perform_mysql_auto_creation(instance, mysql_schema.clone()).await {
+            match MySqlPlugin::perform_auto_creation(instance, mysql_schema.clone()).await {
                 Ok(result) => {
                     initialization_results.push(format!(
                         "MySQL ({})  {}",
@@ -65,11 +65,7 @@ impl DatabasePlugin {
             }
         }
         for instance in env.get_postgresql_instances() {
-            match PostgreSqlPlugin::perform_postgresql_auto_creation(
-                instance,
-                postgresql_schema.clone(),
-            )
-            .await
+            match PostgreSqlPlugin::perform_auto_creation(instance, postgresql_schema.clone()).await
             {
                 Ok(result) => {
                     initialization_results.push(format!(
@@ -97,7 +93,7 @@ impl DatabasePlugin {
             }
         }
         for instance in env.get_redis_instances() {
-            match redis::perform_redis_auto_creation(instance).await {
+            match RedisPlugin::perform_auto_creation(instance).await {
                 Ok(result) => {
                     initialization_results.push(format!(
                         "Redis ({})  {}",
@@ -312,7 +308,7 @@ impl DatabaseSchema {
 impl AutoCreationConfig {
     #[instrument_trace]
     pub fn validate() -> Result<(), String> {
-        let env: &'static EnvConfig = EnvPlugin::get_or_init_global_env_config();
+        let env: &'static EnvConfig = EnvPlugin::get_or_init();
         if env.get_mysql_instances().is_empty() {
             return Err("At least one MySQL instance is required".to_string());
         }
@@ -341,7 +337,7 @@ impl PluginAutoCreationConfig {
 
     #[instrument_trace]
     pub fn get_database_name(&self) -> String {
-        let env: &'static EnvConfig = EnvPlugin::get_or_init_global_env_config();
+        let env: &'static EnvConfig = EnvPlugin::get_or_init();
         if let Ok(plugin_type) = PluginType::from_str(self.get_plugin_name()) {
             match plugin_type {
                 PluginType::MySQL => {
@@ -367,7 +363,7 @@ impl PluginAutoCreationConfig {
 
     #[instrument_trace]
     pub fn get_connection_info(&self) -> String {
-        let env: &'static EnvConfig = EnvPlugin::get_or_init_global_env_config();
+        let env: &'static EnvConfig = EnvPlugin::get_or_init();
         if let Ok(plugin_type) = PluginType::from_str(self.get_plugin_name()) {
             match plugin_type {
                 PluginType::MySQL => {

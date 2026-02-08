@@ -5,7 +5,7 @@ mod r#trait;
 
 pub use {r#enum::*, r#struct::*, r#trait::*};
 
-use {super::*, env::*, mysql::*, postgresql::*};
+use {super::*, env::*, mysql::*, postgresql::*, redis::*};
 
 use std::{
     str::FromStr,

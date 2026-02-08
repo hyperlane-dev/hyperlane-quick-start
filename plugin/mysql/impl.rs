@@ -2,13 +2,12 @@ use super::*;
 
 impl MySqlPlugin {
     #[instrument_trace]
-    fn get_or_init_mysql_connection_map()
-    -> &'static RwLock<HashMap<String, ConnectionCache<DatabaseConnection>>> {
+    fn get_or_init() -> &'static RwLock<HashMap<String, ConnectionCache<DatabaseConnection>>> {
         MYSQL_CONNECTIONS.get_or_init(|| RwLock::new(HashMap::new()))
     }
 
     #[instrument_trace]
-    pub async fn connection_mysql_db<I>(
+    pub async fn connection_db<I>(
         instance_name: I,
         schema: Option<DatabaseSchema>,
     ) -> Result<DatabaseConnection, String>
@@ -16,25 +15,22 @@ impl MySqlPlugin {
         I: AsRef<str>,
     {
         let instance_name_str: &str = instance_name.as_ref();
-        let env: &'static EnvConfig = EnvPlugin::get_or_init_global_env_config();
+        let env: &'static EnvConfig = EnvPlugin::get_or_init();
         let instance: &MySqlInstanceConfig = env
             .get_mysql_instance(instance_name_str)
             .ok_or_else(|| format!("MySQL instance '{instance_name_str}' not found"))?;
-        match MySqlPlugin::perform_mysql_auto_creation(instance, schema.clone()).await {
+        match MySqlPlugin::perform_auto_creation(instance, schema.clone()).await {
             Ok(result) => {
                 if result.has_changes() {
-                    AutoCreationLogger::log_auto_creation_complete(
-                        database::PluginType::MySQL,
-                        &result,
-                    )
-                    .await;
+                    AutoCreationLogger::log_auto_creation_complete(PluginType::MySQL, &result)
+                        .await;
                 }
             }
             Err(error) => {
                 AutoCreationLogger::log_auto_creation_error(
                     &error,
                     "Auto-creation process",
-                    database::PluginType::MySQL,
+                    PluginType::MySQL,
                     Some(instance.get_database().as_str()),
                 )
                 .await;
@@ -57,9 +53,9 @@ impl MySqlPlugin {
             let error_msg: String = error.to_string();
             let database_name: String = instance.get_database().clone();
             let error_msg_clone: String = error_msg.clone();
-            tokio::spawn(async move {
+            spawn(async move {
                 AutoCreationLogger::log_connection_verification(
-                    database::PluginType::MySQL,
+                    PluginType::MySQL,
                     &database_name,
                     false,
                     Some(&error_msg_clone),
@@ -71,7 +67,7 @@ impl MySqlPlugin {
     }
 
     #[instrument_trace]
-    pub async fn get_mysql_connection<I>(
+    pub async fn get_connection<I>(
         instance_name: I,
         schema: Option<DatabaseSchema>,
     ) -> Result<DatabaseConnection, String>
@@ -81,7 +77,7 @@ impl MySqlPlugin {
         let instance_name_str: &str = instance_name.as_ref();
         let duration: Duration = DatabasePlugin::get_retry_duration();
         {
-            if let Some(cache) = MySqlPlugin::get_or_init_mysql_connection_map()
+            if let Some(cache) = MySqlPlugin::get_or_init()
                 .read()
                 .await
                 .get(instance_name_str)
@@ -99,9 +95,7 @@ impl MySqlPlugin {
         let mut connections: RwLockWriteGuard<
             '_,
             HashMap<String, ConnectionCache<DatabaseConnection>>,
-        > = MySqlPlugin::get_or_init_mysql_connection_map()
-            .write()
-            .await;
+        > = MySqlPlugin::get_or_init().write().await;
         if let Some(cache) = connections.get(instance_name_str) {
             match cache.try_get_result() {
                 Ok(conn) => return Ok(conn.clone()),
@@ -115,13 +109,11 @@ impl MySqlPlugin {
         connections.remove(instance_name_str);
         drop(connections);
         let new_connection: Result<DatabaseConnection, String> =
-            MySqlPlugin::connection_mysql_db(instance_name_str, schema).await;
+            MySqlPlugin::connection_db(instance_name_str, schema).await;
         let mut connections: RwLockWriteGuard<
             '_,
             HashMap<String, ConnectionCache<DatabaseConnection>>,
-        > = MySqlPlugin::get_or_init_mysql_connection_map()
-            .write()
-            .await;
+        > = MySqlPlugin::get_or_init().write().await;
         connections.insert(
             instance_name_str.to_string(),
             ConnectionCache::new(new_connection.clone()),
@@ -130,17 +122,14 @@ impl MySqlPlugin {
     }
 
     #[instrument_trace]
-    pub async fn perform_mysql_auto_creation(
+    pub async fn perform_auto_creation(
         instance: &MySqlInstanceConfig,
         schema: Option<DatabaseSchema>,
     ) -> Result<AutoCreationResult, AutoCreationError> {
         let start_time: Instant = Instant::now();
         let mut result: AutoCreationResult = AutoCreationResult::default();
-        AutoCreationLogger::log_auto_creation_start(
-            database::PluginType::MySQL,
-            instance.get_database(),
-        )
-        .await;
+        AutoCreationLogger::log_auto_creation_start(PluginType::MySQL, instance.get_database())
+            .await;
         let auto_creator: MySqlAutoCreation = match schema {
             Some(s) => MySqlAutoCreation::with_schema(instance.clone(), s),
             None => MySqlAutoCreation::new(instance.clone()),
@@ -153,7 +142,7 @@ impl MySqlPlugin {
                 AutoCreationLogger::log_auto_creation_error(
                     &error,
                     "Database creation",
-                    database::PluginType::MySQL,
+                    PluginType::MySQL,
                     Some(instance.get_database()),
                 )
                 .await;
@@ -172,7 +161,7 @@ impl MySqlPlugin {
                 AutoCreationLogger::log_auto_creation_error(
                     &error,
                     "Table creation",
-                    database::PluginType::MySQL,
+                    PluginType::MySQL,
                     Some(instance.get_database()),
                 )
                 .await;
@@ -183,7 +172,7 @@ impl MySqlPlugin {
             AutoCreationLogger::log_auto_creation_error(
                 &error,
                 "Connection verification",
-                database::PluginType::MySQL,
+                PluginType::MySQL,
                 Some(instance.get_database()),
             )
             .await;
@@ -194,7 +183,7 @@ impl MySqlPlugin {
             result.get_mut_errors().push(error.to_string());
         }
         result.set_duration(start_time.elapsed());
-        AutoCreationLogger::log_auto_creation_complete(database::PluginType::MySQL, &result).await;
+        AutoCreationLogger::log_auto_creation_complete(PluginType::MySQL, &result).await;
         Ok(result)
     }
 }
@@ -202,7 +191,7 @@ impl MySqlPlugin {
 impl Default for MySqlAutoCreation {
     #[instrument_trace]
     fn default() -> Self {
-        let env: &'static EnvConfig = EnvPlugin::get_or_init_global_env_config();
+        let env: &'static EnvConfig = EnvPlugin::get_or_init();
         if let Some(instance) = env.get_default_mysql_instance() {
             Self::new(instance.clone())
         } else {
@@ -274,7 +263,7 @@ impl MySqlAutoCreation {
         if self.database_exists(connection).await? {
             AutoCreationLogger::log_database_exists(
                 self.instance.get_database().as_str(),
-                database::PluginType::MySQL,
+                PluginType::MySQL,
             )
             .await;
             return Ok(false);
@@ -288,7 +277,7 @@ impl MySqlAutoCreation {
             Ok(_) => {
                 AutoCreationLogger::log_database_created(
                     self.instance.get_database().as_str(),
-                    database::PluginType::MySQL,
+                    PluginType::MySQL,
                 )
                 .await;
                 Ok(true)
@@ -363,7 +352,7 @@ impl MySqlAutoCreation {
     async fn create_table(
         &self,
         connection: &DatabaseConnection,
-        table: &database::TableSchema,
+        table: &TableSchema,
     ) -> Result<(), AutoCreationError> {
         let statement: Statement =
             Statement::from_string(DatabaseBackend::MySql, table.get_sql().clone());
@@ -433,14 +422,14 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                 AutoCreationLogger::log_table_created(
                     table.get_name(),
                     self.instance.get_database().as_str(),
-                    database::PluginType::MySQL,
+                    PluginType::MySQL,
                 )
                 .await;
             } else {
                 AutoCreationLogger::log_table_exists(
                     table.get_name(),
                     self.instance.get_database().as_str(),
-                    database::PluginType::MySQL,
+                    PluginType::MySQL,
                 )
                 .await;
             }
@@ -450,7 +439,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                 AutoCreationLogger::log_auto_creation_error(
                     &error,
                     "Index creation",
-                    database::PluginType::MySQL,
+                    PluginType::MySQL,
                     Some(self.instance.get_database().as_str()),
                 )
                 .await;
@@ -461,7 +450,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                 AutoCreationLogger::log_auto_creation_error(
                     &error,
                     "Constraint creation",
-                    database::PluginType::MySQL,
+                    PluginType::MySQL,
                     Some(self.instance.get_database().as_str()),
                 )
                 .await;
@@ -471,7 +460,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
         AutoCreationLogger::log_tables_created(
             &created_tables,
             self.instance.get_database().as_str(),
-            database::PluginType::MySQL,
+            PluginType::MySQL,
         )
         .await;
         Ok(created_tables)
@@ -502,7 +491,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
             Ok(_) => {
                 let _: Result<(), DbErr> = connection.close().await;
                 AutoCreationLogger::log_connection_verification(
-                    database::PluginType::MySQL,
+                    PluginType::MySQL,
                     self.instance.get_database().as_str(),
                     true,
                     None,
@@ -514,7 +503,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                 let _: Result<(), DbErr> = connection.close().await;
                 let error_msg: String = error.to_string();
                 AutoCreationLogger::log_connection_verification(
-                    database::PluginType::MySQL,
+                    PluginType::MySQL,
                     self.instance.get_database().as_str(),
                     false,
                     Some(&error_msg),

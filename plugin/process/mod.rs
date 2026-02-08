@@ -1,8 +1,9 @@
 mod r#const;
-mod r#fn;
+mod r#impl;
+mod r#struct;
 
-pub use {r#const::*, r#fn::*};
+pub use r#struct::*;
 
-use super::*;
+use {super::*, r#const::*};
 
 use std::{env::args, future::Future};

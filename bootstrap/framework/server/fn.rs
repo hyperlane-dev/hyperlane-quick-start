@@ -27,7 +27,7 @@ pub async fn init_server() {
             let host_port: String = format!("{SERVER_HOST}{COLON}{SERVER_PORT}");
             print_route_matcher(&server).await;
             info!("Server listen in {host_port}");
-            set_shutdown(server_hook.get_shutdown_hook());
+            ShutdownPlugin::set(server_hook.get_shutdown_hook());
             server_hook.wait().await;
         }
         Err(server_error) => error!("Server run error {server_error}"),
