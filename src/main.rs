@@ -10,13 +10,13 @@ use {
 use hyperlane_utils::log::*;
 
 fn main() {
-    init_log();
-    if let Err(error) = init_env_config() {
+    LoggerBootstrap::init();
+    if let Err(error) = EnvBootstrap::init() {
         error!("{error}");
     }
     info!("Environment configuration loaded successfully");
-    runtime().block_on(async move {
-        init_db().await;
-        ProcessPlugin::create(SERVER_PID_FILE_PATH, init_server).await;
+    RuntimeBootstrap::init().block_on(async move {
+        DbBootstrap::init().await;
+        ProcessPlugin::create(SERVER_PID_FILE_PATH, ServerBootstrap::init).await;
     });
 }
