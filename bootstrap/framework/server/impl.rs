@@ -1,8 +1,7 @@
 use super::*;
 
 impl ServerBootstrap {
-    #[instrument_trace]
-    pub async fn print_route_matcher(server: &Server) {
+    async fn print_route_matcher(server: &Server) {
         let route_matcher: RouteMatcher = server.get_route_matcher().await;
         for key in route_matcher.get_static_route().keys() {
             info!("Static route {key}");
@@ -18,11 +17,12 @@ impl ServerBootstrap {
             }
         }
     }
+}
 
-    #[hyperlane(server: Server)]
-    #[instrument_trace]
-    pub async fn init() {
-        ConfigBootstrap::init(&server).await;
+impl BootstrapAsyncInit for ServerBootstrap {
+    async fn init() -> Self {
+        ConfigBootstrap::init().await;
+        let server: Server = Server::default();
         match server.run().await {
             Ok(server_hook) => {
                 let host_port: String = format!("{SERVER_HOST}{COLON}{SERVER_PORT}");
@@ -33,5 +33,6 @@ impl ServerBootstrap {
             }
             Err(server_error) => error!("Server run error {server_error}"),
         }
+        Self
     }
 }

@@ -1,8 +1,7 @@
 use super::*;
 
-impl DbBootstrap {
-    #[instrument_trace]
-    pub async fn init() {
+impl BootstrapAsyncInit for DbBootstrap {
+    async fn init() -> Self {
         let _: Result<DatabaseConnection, String> =
             MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await;
         let _: Result<DatabaseConnection, String> =
@@ -17,5 +16,6 @@ impl DbBootstrap {
                 error!("Auto-creation initialization failed {error}");
             }
         };
+        Self
     }
 }

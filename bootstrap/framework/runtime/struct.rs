@@ -1,4 +1,6 @@
 use super::*;
 
-#[derive(Clone, Copy, Data, Debug, Default)]
-pub struct RuntimeBootstrap;
+#[derive(Data, Debug)]
+pub struct RuntimeBootstrap {
+    pub(super) runtime: Runtime,
+}

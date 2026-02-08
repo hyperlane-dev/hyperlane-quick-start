@@ -1,8 +1,10 @@
 use super::*;
 
-impl EnvBootstrap {
-    #[instrument_trace]
-    pub fn init() -> Result<(), String> {
-        EnvPlugin::try_get_config()
+impl BootstrapSyncInit for EnvBootstrap {
+    fn init() -> Self {
+        if let Err(error) = EnvPlugin::try_get_config() {
+            error!("{error}");
+        }
+        Self
     }
 }

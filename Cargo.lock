@@ -1674,6 +1674,7 @@ dependencies = [
 name = "hyperlane_bootstrap"
 version = "14.1.7"
 dependencies = [
+ "async-trait",
  "hyperlane",
  "hyperlane-utils",
  "hyperlane_application",

@@ -37,6 +37,7 @@ tracing = "0.1.44"
 hyperlane = "14.1.2"
 hyperlane-utils = "20.3.2"
 serde = { version = "1.0.228", features = ["derive"] }
+async-trait = "0.1.86"
 
 [dependencies]
 hyperlane_bootstrap = { workspace = true }
