@@ -353,7 +353,6 @@ impl CicdService {
         step_id: i32,
         log_manager: &LogStreamManager,
     ) -> Result<String, String> {
-        use tokio::io::AsyncReadExt;
         let mut reader: ChildStdout = reader;
         let mut output_buffer: Vec<u8> = Vec::new();
         match reader.read_to_end(&mut output_buffer).await {
