@@ -20,22 +20,19 @@ use {
     },
 };
 
-use hyperlane_plugin::{common::*, docker::*, mysql::*};
+use hyperlane_plugin::{common::*, mysql::*};
 
 use hyperlane_utils::*;
 
 use std::{
     collections::{HashMap, HashSet},
-    path::PathBuf,
-    pin::Pin,
-    process::{ExitStatus, Output, Stdio},
+    process::{ExitStatus, Stdio},
     sync::{Arc, OnceLock},
 };
 
 use tokio::{
-    fs,
-    io::{AsyncBufReadExt, AsyncRead, BufReader, Lines},
-    process::{Child, Command},
+    io::AsyncReadExt,
+    process::{Child, ChildStderr, ChildStdout, Command},
     spawn,
     sync::{RwLockReadGuard, RwLockWriteGuard},
     task::{JoinError, JoinHandle},

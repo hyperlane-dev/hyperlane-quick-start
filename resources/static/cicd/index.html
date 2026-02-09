@@ -439,71 +439,6 @@
         overflow: hidden;
       }
 
-      .config-mode-toggle {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 8px;
-      }
-
-      .toggle-label {
-        font-size: 14px;
-        font-weight: 500;
-        color: #c9d1d9;
-      }
-
-      .toggle-switch {
-        position: relative;
-        display: inline-block;
-        width: 48px;
-        height: 24px;
-      }
-
-      .toggle-switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-      }
-
-      .toggle-slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #30363d;
-        transition: 0.3s;
-        border-radius: 24px;
-      }
-
-      .toggle-slider:before {
-        position: absolute;
-        content: '';
-        height: 18px;
-        width: 18px;
-        left: 3px;
-        bottom: 3px;
-        background-color: #c9d1d9;
-        transition: 0.3s;
-        border-radius: 50%;
-      }
-
-      .toggle-switch input:checked + .toggle-slider {
-        background-color: #238636;
-      }
-
-      .toggle-switch input:checked + .toggle-slider:before {
-        transform: translateX(24px);
-        background-color: #fff;
-      }
-
-      .mode-hint {
-        font-size: 12px;
-        color: #8b949e;
-        margin-left: auto;
-      }
-
       .modal {
         display: none;
         position: fixed;
@@ -766,19 +701,6 @@
         color: #a5d6ff;
         text-decoration: underline;
         cursor: pointer;
-      }
-
-      .log-docker-step {
-        color: #ff7b72;
-        font-weight: 500;
-      }
-
-      .log-docker-done {
-        color: #3fb950;
-      }
-
-      .log-docker-cache {
-        color: #f0883e;
       }
 
       .step-log-container {
@@ -1286,21 +1208,7 @@
             />
           </div>
           <div class="form-group">
-            <div class="config-mode-toggle">
-              <span class="toggle-label">Use Dockerfile</span>
-              <label class="toggle-switch">
-                <input
-                  type="checkbox"
-                  id="create-mode-dockerfile"
-                  onchange="toggleCreateMode()"
-                />
-                <span class="toggle-slider"></span>
-              </label>
-              <span class="mode-hint" id="create-mode-hint">YAML mode</span>
-            </div>
-            <label class="form-label" id="create-config-label"
-              >Pipeline Config (YAML)</label
-            >
+            <label class="form-label" id="create-config-label">Pipeline Config (YAML)</label>
             <textarea class="form-textarea" id="create-config">
 name: Hello World Pipeline
 jobs:
@@ -1308,8 +1216,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Hello World Step
-        run: echo 'hello world'</textarea
-            >
+        run: echo 'hello world'</textarea>
           </div>
         </div>
         <div class="modal-footer">
@@ -1496,11 +1403,7 @@ jobs:
       function showCreateModal() {
         document.getElementById('create-name').value = '';
         document.getElementById('create-description').value = '';
-        document.getElementById('create-mode-dockerfile').checked = false;
         document.getElementById('create-config').value = DEFAULT_CONFIG;
-        document.getElementById('create-config-label').textContent =
-          'Pipeline Config (YAML)';
-        document.getElementById('create-mode-hint').textContent = 'YAML mode';
         document.getElementById('create-modal').classList.add('active');
         setTimeout(() => {
           setupAutoResizeTextarea('create-config');
@@ -1563,38 +1466,6 @@ jobs:
     steps:
       - name: Hello World Step
         run: echo 'hello world'`;
-
-      const DOCKERFILE_CONFIG = `name: Docker Build Pipeline
-image: alpine:latest
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Build with Dockerfile
-        dockerfile: |
-          FROM alpine:latest
-          RUN echo 'Building from Dockerfile...'
-          CMD echo 'Hello from Docker container!'`;
-
-      function toggleCreateMode() {
-        const isDockerfileMode = document.getElementById(
-          'create-mode-dockerfile',
-        ).checked;
-        const configTextarea = document.getElementById('create-config');
-        const configLabel = document.getElementById('create-config-label');
-        const modeHint = document.getElementById('create-mode-hint');
-
-        if (isDockerfileMode) {
-          configTextarea.value = DOCKERFILE_CONFIG;
-          configLabel.textContent = 'Pipeline Config (Dockerfile Mode)';
-          modeHint.textContent = 'Dockerfile mode';
-        } else {
-          configTextarea.value = DEFAULT_CONFIG;
-          configLabel.textContent = 'Pipeline Config (YAML)';
-          modeHint.textContent = 'YAML mode';
-        }
-        setupAutoResizeTextarea('create-config');
-      }
 
       async function createPipeline() {
         const configValue = document
@@ -2271,27 +2142,6 @@ jobs:
           html.startsWith('[Run Failed]')
         ) {
           return `<span class="log-section">${html}</span>`;
-        }
-
-        if (html.match(/^#\d+\s+\[.+\]/)) {
-          html = html.replace(
-            /^(#\d+\s+\[.+?\])/,
-            '<span class="log-docker-step">$1</span>',
-          );
-        }
-
-        if (html.includes('DONE')) {
-          html = html.replace(
-            /(DONE\s+\d+\.\d+s|DONE)/g,
-            '<span class="log-docker-done">$1</span>',
-          );
-        }
-
-        if (html.includes('CACHED')) {
-          html = html.replace(
-            /(CACHED)/g,
-            '<span class="log-docker-cache">$1</span>',
-          );
         }
 
         const errorPatterns = [

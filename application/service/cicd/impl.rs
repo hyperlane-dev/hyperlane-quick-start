@@ -59,8 +59,6 @@ impl From<CicdStepModel> for StepDto {
             .set_command(model.try_get_command().clone())
             .set_status(status)
             .set_output(model.try_get_output().clone())
-            .set_dockerfile(model.try_get_dockerfile().clone())
-            .set_image(model.try_get_image().clone())
             .set_started_at(model.try_get_started_at().map(|dt| dt.to_string()))
             .set_completed_at(model.try_get_completed_at().map(|dt| dt.to_string()))
             .set_duration_ms(model.get_duration_ms());
@@ -159,17 +157,7 @@ impl CicdService {
     ) -> Result<(), String> {
         let config: PipelineConfig = serde_yaml::from_str(config_content)
             .map_err(|error| format!("Failed to parse config: {error}"))?;
-        let pipeline_dockerfile: Option<String> = config.try_get_dockerfile().clone();
-        let pipeline_image: Option<String> = config.try_get_image().clone();
         for (job_name, job_config) in config.get_jobs() {
-            let job_dockerfile: Option<String> = job_config
-                .try_get_dockerfile()
-                .clone()
-                .or_else(|| pipeline_dockerfile.clone());
-            let job_image: Option<String> = job_config
-                .try_get_image()
-                .clone()
-                .or_else(|| pipeline_image.clone());
             let job_active_model: mapper::cicd::job::ActiveModel =
                 JobActiveModel::new(run_id, job_name.clone());
             let job_result = job_active_model
@@ -178,26 +166,11 @@ impl CicdService {
                 .map_err(|error: DbErr| error.to_string())?;
             let job_id: i32 = job_result.get_id();
             for step_config in job_config.get_steps() {
-                let step_dockerfile: Option<String> = step_config
-                    .try_get_dockerfile()
-                    .clone()
-                    .or_else(|| job_dockerfile.clone());
-                let step_image: Option<String> = job_image.clone();
-                let step_active_model: mapper::cicd::step::ActiveModel =
-                    if step_dockerfile.is_some() || step_image.is_some() {
-                        StepActiveModel::new_with_dockerfile(
-                            job_id,
-                            step_config.get_name().clone(),
-                            step_dockerfile,
-                            step_image,
-                        )
-                    } else {
-                        StepActiveModel::new(
-                            job_id,
-                            step_config.get_name().clone(),
-                            step_config.try_get_run().clone(),
-                        )
-                    };
+                let step_active_model: mapper::cicd::step::ActiveModel = StepActiveModel::new(
+                    job_id,
+                    step_config.get_name().clone(),
+                    step_config.try_get_run().clone(),
+                );
                 step_active_model
                     .insert(db)
                     .await
@@ -209,10 +182,6 @@ impl CicdService {
 
     #[instrument_trace]
     pub async fn execute_run(run_id: i32) -> Result<(), String> {
-        if !is_docker_available().await {
-            let _: Result<(), String> = Self::complete_run(run_id, CicdStatus::Failure).await;
-            return Err("Docker is not installed or not available".to_string());
-        }
         Self::start_run(run_id).await?;
         let jobs: Vec<JobDto> = Self::get_jobs_by_run(run_id).await?;
         let mut has_error: bool = false;
@@ -236,15 +205,8 @@ impl CicdService {
                     .set_status(CicdStatus::Running)
                     .set_output(None);
                 Self::update_step_status(param).await?;
-                let output: String =
-                    if step.try_get_image().is_some() && step.try_get_dockerfile().is_none() {
-                        Self::execute_image(run_id, &step).await
-                    } else if step.try_get_dockerfile().is_some() {
-                        Self::execute_dockerfile(run_id, &step).await
-                    } else {
-                        let command: String = step.try_get_command().clone().unwrap_or_default();
-                        Self::execute_command(run_id, step_id, &command).await
-                    };
+                let command: String = step.try_get_command().clone().unwrap_or_default();
+                let output: String = Self::execute_command(run_id, step_id, &command).await;
                 let step_status: CicdStatus = if output.starts_with("Error:") {
                     job_has_error = true;
                     has_error = true;
@@ -297,29 +259,9 @@ impl CicdService {
         if command.is_empty() {
             return "No command to execute".to_string();
         }
-        let config: DockerConfig = DockerConfig::secure();
-        let run_args: Vec<String> = Self::build_docker_args_for_cicd(&config, command);
-        let container_id_output: Output =
-            match Command::new("docker").args(&run_args).output().await {
-                Ok(output) => output,
-                Err(error) => {
-                    return format!("Error: Failed to run Docker container: {error}");
-                }
-            };
-        if !container_id_output.status.success() {
-            let stderr: String = String::from_utf8_lossy(&container_id_output.stderr).to_string();
-            return format!("Error: Failed to start container: {stderr}");
-        }
-        let container_id: String = String::from_utf8_lossy(&container_id_output.stdout)
-            .trim()
-            .to_string();
         let log_manager: &LogStreamManager = get_log_stream_manager();
         let output_result: Result<String, String> =
-            Self::stream_container_logs(run_id, step_id, &container_id, log_manager).await;
-        let _: Result<Output, std::io::Error> = Command::new("docker")
-            .args(["rm", "-f", &container_id])
-            .output()
-            .await;
+            Self::execute_shell_command(run_id, step_id, command, log_manager).await;
         match output_result {
             Ok(output) => output,
             Err(error) => format!("Error: {error}"),
@@ -327,350 +269,125 @@ impl CicdService {
     }
 
     #[instrument_trace]
-    async fn stream_container_logs(
+    async fn execute_shell_command(
         run_id: i32,
         step_id: i32,
-        container_id: &str,
+        command: &str,
         log_manager: &LogStreamManager,
     ) -> Result<String, String> {
-        let container_id: String = container_id.to_string();
-        let log_manager: LogStreamManager = log_manager.clone();
+        let is_windows: bool = cfg!(target_os = "windows");
+        let shell: String = if is_windows {
+            std::env::var("COMSPEC").unwrap_or_else(|_| "cmd.exe".to_string())
+        } else {
+            std::env::var("SHELL").unwrap_or_else(|_| "bash".to_string())
+        };
+        let mut cmd: Command = Command::new(&shell);
+        if is_windows {
+            cmd.arg("/C").arg(command);
+        } else {
+            cmd.arg("-c").arg(command);
+        }
+        let mut child: Child = match cmd.stdout(Stdio::piped()).stderr(Stdio::piped()).spawn() {
+            Ok(c) => c,
+            Err(error) => return Err(format!("Failed to spawn shell process: {error}")),
+        };
+        let stdout: ChildStdout = child
+            .stdout
+            .take()
+            .ok_or_else(|| "Failed to take stdout".to_string())?;
+        let stderr: ChildStderr = child
+            .stderr
+            .take()
+            .ok_or_else(|| "Failed to take stderr".to_string())?;
         let stdout_handle: JoinHandle<Result<String, String>> = {
-            let container_id: String = container_id.clone();
             let log_manager: LogStreamManager = log_manager.clone();
-            spawn(async move {
-                let child: Child = match Command::new("docker")
-                    .args(["logs", "-f", &container_id])
-                    .stdout(Stdio::piped())
-                    .stderr(Stdio::null())
-                    .spawn()
-                {
-                    Ok(c) => c,
-                    Err(error) => return Err(format!("Failed to spawn docker logs: {error}")),
-                };
-                Self::read_stdout_stream(child, run_id, step_id, &log_manager).await
-            })
+            spawn(
+                async move { Self::read_stdout_stream(stdout, run_id, step_id, &log_manager).await },
+            )
         };
         let stderr_handle: JoinHandle<Result<String, String>> = {
-            let container_id: String = container_id.clone();
             let log_manager: LogStreamManager = log_manager.clone();
-            spawn(async move {
-                let child: Child = match Command::new("docker")
-                    .args(["logs", "-f", &container_id])
-                    .stdout(Stdio::null())
-                    .stderr(Stdio::piped())
-                    .spawn()
-                {
-                    Ok(c) => c,
-                    Err(error) => return Err(format!("Failed to spawn docker logs: {error}")),
-                };
-                Self::read_stderr_stream(child, run_id, step_id, &log_manager).await
-            })
+            spawn(
+                async move { Self::read_stderr_stream(stderr, run_id, step_id, &log_manager).await },
+            )
         };
-        let timeout_result: TimeoutResult = timeout(TASK_TIMEOUT, async {
+        let timeout_result: Result<
+            (StreamResult, StreamResult, std::io::Result<ExitStatus>),
+            Elapsed,
+        > = timeout(TASK_TIMEOUT, async move {
             let stdout_result: StreamResult = stdout_handle.await;
             let stderr_result: StreamResult = stderr_handle.await;
-            (stdout_result, stderr_result)
+            let exit_status: std::io::Result<ExitStatus> = child.wait().await;
+            (stdout_result, stderr_result, exit_status)
         })
         .await;
         let mut output_builder: StepOutputBuilder = StepOutputBuilder::new();
-        let is_timeout: bool = timeout_result.is_err();
-        if is_timeout {
-            let _: Result<Output, std::io::Error> = Command::new("docker")
-                .args(["stop", "-t", "10", &container_id])
-                .output()
-                .await;
-            let logs_after_stop: Output = Command::new("docker")
-                .args(["logs", &container_id])
-                .output()
-                .await
-                .unwrap_or_else(|_| Output {
-                    status: ExitStatus::default(),
-                    stdout: Vec::new(),
-                    stderr: Vec::new(),
-                });
-            let stdout: String = String::from_utf8_lossy(&logs_after_stop.stdout).to_string();
-            let stderr: String = String::from_utf8_lossy(&logs_after_stop.stderr).to_string();
-            log_manager
-                .append_log(run_id, step_id, &stdout, false)
-                .await;
-            log_manager.append_log(run_id, step_id, &stderr, true).await;
-            output_builder.add_stdout(stdout);
-            output_builder.add_stderr(stderr);
-            output_builder.mark_timeout(TASK_TIMEOUT.as_secs());
-        } else {
-            let (stdout_result, stderr_result): StreamResultPair = match timeout_result {
-                Ok(results) => results,
-                Err(_) => (Ok(Ok(String::new())), Ok(Ok(String::new()))),
-            };
-            let stdout: String = stdout_result
-                .unwrap_or(Ok(String::new()))
-                .unwrap_or_default();
-            let stderr: String = stderr_result
-                .unwrap_or(Ok(String::new()))
-                .unwrap_or_default();
-            output_builder.add_stdout(stdout);
-            output_builder.add_stderr(stderr);
+        match timeout_result {
+            Ok((stdout_result, stderr_result, exit_status)) => {
+                let stdout: String = stdout_result
+                    .unwrap_or(Ok(String::new()))
+                    .unwrap_or_default();
+                let stderr: String = stderr_result
+                    .unwrap_or(Ok(String::new()))
+                    .unwrap_or_default();
+                output_builder.add_stdout(stdout);
+                output_builder.add_stderr(stderr);
+                if let Ok(status) = exit_status {
+                    if !status.success() {
+                        let exit_code: i32 = status.code().unwrap_or(-1);
+                        return Err(format!("Command exited with code {exit_code}"));
+                    }
+                }
+            }
+            Err(_) => {
+                output_builder.mark_timeout(TASK_TIMEOUT.as_secs());
+            }
         }
         Ok(output_builder.build())
     }
 
     #[instrument_trace]
     async fn read_stdout_stream(
-        mut child: Child,
+        reader: ChildStdout,
         run_id: i32,
         step_id: i32,
         log_manager: &LogStreamManager,
     ) -> Result<String, String> {
-        let mut lines: Lines<BufReader<Pin<Box<dyn AsyncRead + Send>>>> = match child.stdout.take()
-        {
-            Some(s) => BufReader::new(Box::pin(s) as Pin<Box<dyn AsyncRead + Send>>),
-            None => return Ok(String::new()),
+        use tokio::io::AsyncReadExt;
+        let mut reader: ChildStdout = reader;
+        let mut output_buffer: Vec<u8> = Vec::new();
+        match reader.read_to_end(&mut output_buffer).await {
+            Ok(_) => {
+                let output: String = String::from_utf8_lossy(&output_buffer).to_string();
+                if !output.is_empty() {
+                    log_manager
+                        .append_log(run_id, step_id, &output, false)
+                        .await;
+                }
+                Ok(output)
+            }
+            Err(error) => Err(format!("Failed to read stdout: {error}")),
         }
-        .lines();
-        let mut output_buffer: String = String::new();
-        while let Ok(Some(line)) = lines.next_line().await {
-            let line_with_newline: String = format!("{line}\n");
-            log_manager
-                .append_log(run_id, step_id, &line_with_newline, false)
-                .await;
-            output_buffer.push_str(&line_with_newline);
-        }
-        let _ = child.wait().await;
-        Ok(output_buffer)
     }
 
     #[instrument_trace]
     async fn read_stderr_stream(
-        mut child: Child,
+        reader: ChildStderr,
         run_id: i32,
         step_id: i32,
         log_manager: &LogStreamManager,
     ) -> Result<String, String> {
-        let mut lines: Lines<BufReader<Pin<Box<dyn AsyncRead + Send>>>> = match child.stderr.take()
-        {
-            Some(s) => BufReader::new(Box::pin(s) as Pin<Box<dyn AsyncRead + Send>>),
-            None => return Ok(String::new()),
-        }
-        .lines();
-        let mut output_buffer: String = String::new();
-        while let Ok(Some(line)) = lines.next_line().await {
-            let line_with_newline: String = format!("{line}\n");
-            log_manager
-                .append_log(run_id, step_id, &line_with_newline, true)
-                .await;
-            output_buffer.push_str(&line_with_newline);
-        }
-        let _ = child.wait().await;
-        Ok(output_buffer)
-    }
-
-    #[instrument_trace]
-    fn build_docker_args_for_cicd(config: &DockerConfig, command: &str) -> Vec<String> {
-        let mut args: Vec<String> = vec!["run".to_string(), "-d".to_string()];
-        if config.get_disable_network() {
-            args.push("--network=none".to_string());
-        }
-        if let Some(cpus) = config.get_cpus() {
-            args.push(format!("--cpus={cpus}"));
-        }
-        if let Some(memory) = config.try_get_memory() {
-            args.push(format!("--memory={memory}"));
-        }
-        if let Some(pids_limit) = config.get_pids_limit() {
-            args.push(format!("--pids-limit={pids_limit}"));
-        }
-        if config.get_read_only() {
-            args.push("--read-only".to_string());
-            args.push("--tmpfs".to_string());
-            args.push("/tmp:rw,noexec,nosuid,size=100m".to_string());
-        }
-        args.push("-w".to_string());
-        args.push(config.get_workdir().clone());
-        args.push(config.get_image().clone());
-        args.push(config.get_shell().clone());
-        args.push(config.get_shell_flag().clone());
-        args.push(command.to_string());
-        args
-    }
-
-    #[instrument_trace]
-    pub async fn execute_image(run_id: i32, step: &StepDto) -> String {
-        let image: String = match step.try_get_image() {
-            Some(img) => img.clone(),
-            None => return "Error: No image specified".to_string(),
-        };
-        let step_id: i32 = step.get_id();
-        let container_name: String = format!(
-            "cicd-run-{run_id}-step-{step_id}-{}",
-            Utc::now().timestamp()
-        );
-        let run_args: Vec<String> = vec![
-            "run".to_string(),
-            "-d".to_string(),
-            "--name".to_string(),
-            container_name.clone(),
-            "--network=none".to_string(),
-            "--cpus=1".to_string(),
-            "--memory=512m".to_string(),
-            "--pids-limit=100".to_string(),
-            image.clone(),
-        ];
-        let container_id_output: Output =
-            match Command::new("docker").args(&run_args).output().await {
-                Ok(output) => output,
-                Err(error) => {
-                    return format!("Error: Failed to run Docker container: {error}");
+        let mut reader: ChildStderr = reader;
+        let mut output_buffer: Vec<u8> = Vec::new();
+        match reader.read_to_end(&mut output_buffer).await {
+            Ok(_) => {
+                let output: String = String::from_utf8_lossy(&output_buffer).to_string();
+                if !output.is_empty() {
+                    log_manager.append_log(run_id, step_id, &output, true).await;
                 }
-            };
-        if !container_id_output.status.success() {
-            let stderr: String = String::from_utf8_lossy(&container_id_output.stderr).to_string();
-            return format!("Error: Failed to start container: {stderr}");
-        }
-        let container_id: String = String::from_utf8_lossy(&container_id_output.stdout)
-            .trim()
-            .to_string();
-        let log_manager: &LogStreamManager = get_log_stream_manager();
-        let output_result: Result<String, String> =
-            Self::stream_container_logs(run_id, step_id, &container_id, log_manager).await;
-        let _: Result<Output, std::io::Error> = Command::new("docker")
-            .args(["rm", "-f", &container_id])
-            .output()
-            .await;
-        match output_result {
-            Ok(output) => output,
-            Err(error) => format!("Error: {error}"),
-        }
-    }
-
-    #[instrument_trace]
-    pub async fn execute_dockerfile(run_id: i32, step: &StepDto) -> String {
-        let dockerfile_content: String = match step.try_get_dockerfile() {
-            Some(content) => content.clone(),
-            None => return "Error: No Dockerfile content".to_string(),
-        };
-        let step_id: i32 = step.get_id();
-        let image_tag: String = format!("cicd-run-{run_id}-step-{step_id}");
-        let temp_dir: PathBuf = std::env::temp_dir().join(format!("cicd-{run_id}-{step_id}"));
-        if let Err(error) = fs::create_dir_all(&temp_dir).await {
-            return format!("Error: Failed to create temp directory: {error}");
-        }
-        let dockerfile_path: PathBuf = temp_dir.join("Dockerfile");
-        if let Err(error) = fs::write(&dockerfile_path, dockerfile_content).await {
-            return format!("Error: Failed to write Dockerfile: {error}");
-        }
-        let log_manager: &LogStreamManager = get_log_stream_manager();
-        let build_log_header: String = "[Build Log]\n".to_string();
-        log_manager
-            .append_log(run_id, step_id, &build_log_header, false)
-            .await;
-        let build_result: Result<Result<Output, std::io::Error>, Elapsed> = timeout(
-            TASK_TIMEOUT,
-            Command::new("docker")
-                .args([
-                    "build",
-                    "--progress=plain",
-                    "-t",
-                    &image_tag,
-                    temp_dir.to_str().unwrap_or("."),
-                ])
-                .output(),
-        )
-        .await;
-        let build_output: Output = match build_result {
-            Ok(Ok(output)) => output,
-            Ok(Err(error)) => {
-                let _ = fs::remove_dir_all(&temp_dir).await;
-                return format!("Error: Failed to build Docker image: {error}");
+                Ok(output)
             }
-            Err(_) => {
-                let _ = fs::remove_dir_all(&temp_dir).await;
-                return format!(
-                    "Error: Docker build timeout after {} seconds",
-                    TASK_TIMEOUT.as_secs()
-                );
-            }
-        };
-        let mut output_builder: StepOutputBuilder = StepOutputBuilder::new();
-        let build_stdout: String = String::from_utf8_lossy(&build_output.stdout).to_string();
-        let build_stderr: String = String::from_utf8_lossy(&build_output.stderr).to_string();
-        log_manager
-            .append_log(run_id, step_id, &build_stdout, false)
-            .await;
-        log_manager
-            .append_log(run_id, step_id, &build_stderr, true)
-            .await;
-        output_builder.add_stdout(build_stdout.clone());
-        output_builder.add_stderr(build_stderr.clone());
-        if !build_output.status.success() {
-            let _ = fs::remove_dir_all(&temp_dir).await;
-            let _: Result<Output, std::io::Error> = Command::new("docker")
-                .args(["rmi", &image_tag])
-                .output()
-                .await;
-            return format!(
-                "Error: Docker build failed\nStdout: {}\nStderr: {}",
-                build_stdout.trim(),
-                build_stderr.trim()
-            );
-        }
-        let container_name: String = format!("cicd-run-{run_id}-step-{step_id}-run");
-        let run_args: Vec<String> = vec![
-            "run".to_string(),
-            "-d".to_string(),
-            "--name".to_string(),
-            container_name.clone(),
-            "--network=none".to_string(),
-            "--cpus=1".to_string(),
-            "--memory=512m".to_string(),
-            "--pids-limit=100".to_string(),
-            image_tag.clone(),
-        ];
-        let container_id_output: Output =
-            match Command::new("docker").args(&run_args).output().await {
-                Ok(output) => output,
-                Err(error) => {
-                    let _ = fs::remove_dir_all(&temp_dir).await;
-                    let _: Result<Output, std::io::Error> = Command::new("docker")
-                        .args(["rmi", &image_tag])
-                        .output()
-                        .await;
-                    return format!("Error: Failed to run Docker container: {error}");
-                }
-            };
-        if !container_id_output.status.success() {
-            let stderr: String = String::from_utf8_lossy(&container_id_output.stderr).to_string();
-            let _ = fs::remove_dir_all(&temp_dir).await;
-            let _: Result<Output, std::io::Error> = Command::new("docker")
-                .args(["rmi", &image_tag])
-                .output()
-                .await;
-            return format!("Error: Failed to start container: {stderr}");
-        }
-        let container_id: String = String::from_utf8_lossy(&container_id_output.stdout)
-            .trim()
-            .to_string();
-        let run_log_header: String = "\n[Run Output]\n".to_string();
-        log_manager
-            .append_log(run_id, step_id, &run_log_header, false)
-            .await;
-        let output_result: Result<String, String> =
-            Self::stream_container_logs(run_id, step_id, &container_id, log_manager).await;
-        let _: Result<Output, std::io::Error> = Command::new("docker")
-            .args(["rm", "-f", &container_id])
-            .output()
-            .await;
-        let _ = fs::remove_dir_all(&temp_dir).await;
-        let _: Result<Output, std::io::Error> = Command::new("docker")
-            .args(["rmi", &image_tag])
-            .output()
-            .await;
-        match output_result {
-            Ok(run_output) => {
-                output_builder.add_stdout(run_output);
-                output_builder.build()
-            }
-            Err(error) => format!("Error: {error}"),
+            Err(error) => Err(format!("Failed to read stderr: {error}")),
         }
     }
 

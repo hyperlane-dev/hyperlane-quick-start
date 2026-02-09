@@ -102,12 +102,6 @@ pub struct PipelineConfig {
     pub(super) name: Option<String>,
     #[get(pub)]
     pub(super) jobs: HashMap<String, JobConfig>,
-    #[get(pub)]
-    pub(super) dockerfile: Option<String>,
-    #[get(pub)]
-    pub(super) image: Option<String>,
-    #[get(pub)]
-    pub(super) context: Option<String>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]
@@ -117,10 +111,6 @@ pub struct JobConfig {
     pub(super) runs_on: Option<String>,
     #[get(pub)]
     pub(super) steps: Vec<StepConfig>,
-    #[get(pub)]
-    pub(super) dockerfile: Option<String>,
-    #[get(pub)]
-    pub(super) image: Option<String>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]
@@ -129,6 +119,4 @@ pub struct StepConfig {
     pub(super) name: String,
     #[get(pub)]
     pub(super) run: Option<String>,
-    #[get(pub)]
-    pub(super) dockerfile: Option<String>,
 }

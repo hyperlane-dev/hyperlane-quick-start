@@ -79,10 +79,6 @@ pub struct StepDto {
     #[get(pub)]
     pub(super) output: Option<String>,
     #[get(pub)]
-    pub(super) dockerfile: Option<String>,
-    #[get(pub)]
-    pub(super) image: Option<String>,
-    #[get(pub)]
     pub(super) started_at: Option<String>,
     #[get(pub)]
     pub(super) completed_at: Option<String>,
