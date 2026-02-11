@@ -149,8 +149,8 @@ impl RssService {
     #[instrument_trace]
     fn build_rss_xml(channel: &RssChannel) -> String {
         let mut xml: String = String::from(r#"<?xml version="1.0" encoding="UTF-8"?>"#);
-        xml.push_str("{BR}<rss version=\"2.0\">");
-        xml.push_str("{BR}  <channel>");
+        xml.push_str(&format!("{BR}<rss version=\"2.0\">"));
+        xml.push_str(&format!("{BR}  <channel>"));
         xml.push_str(&format!(
             "{BR}    <title>{}</title>",
             Self::escape_xml(channel.get_title())
@@ -168,7 +168,7 @@ impl RssService {
             channel.get_language()
         ));
         for item in channel.get_items() {
-            xml.push_str("{BR}    <item>");
+            xml.push_str(&format!("{BR}    <item>"));
             xml.push_str(&format!(
                 "{BR}      <title>{}</title>",
                 Self::escape_xml(item.get_title())
@@ -199,10 +199,10 @@ impl RssService {
                     Self::escape_xml(enclosure.get_type())
                 ));
             }
-            xml.push_str("{BR}    </item>");
+            xml.push_str(&format!("{BR}    </item>"));
         }
-        xml.push_str("{BR}  </channel>");
-        xml.push_str("{BR}</rss>");
+        xml.push_str(&format!("{BR}  </channel>"));
+        xml.push_str(&format!("{BR}</rss>"));
         xml
     }
 
