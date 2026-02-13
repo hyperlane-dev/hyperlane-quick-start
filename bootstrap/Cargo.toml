@@ -23,4 +23,3 @@ serde = { workspace = true }
 tracing = { workspace = true }
 hyperlane = { workspace = true }
 hyperlane-utils = { workspace = true }
-async-trait = { workspace = true }
