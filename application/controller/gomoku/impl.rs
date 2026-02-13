@@ -20,7 +20,6 @@ impl ServerHook for GomokuRoute {
         let config: WebSocketConfig<String> = WebSocketConfig::new()
             .set_context(ctx.clone())
             .set_broadcast_type(key)
-            .set_request_config_data(RequestConfigData::default())
             .set_connected_hook::<GomokuConnectedHook>()
             .set_request_hook::<GomokuRequestHook>()
             .set_sended_hook::<GomokuSendedHook>()

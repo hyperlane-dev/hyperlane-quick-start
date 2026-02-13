@@ -15,7 +15,6 @@ impl ServerHook for OnlineRoute {
         let config: WebSocketConfig<String> = WebSocketConfig::new()
             .set_context(ctx.clone())
             .set_broadcast_type(key)
-            .set_request_config_data(RequestConfigData::default())
             .set_connected_hook::<OnlineConnectedHook>()
             .set_closed_hook::<OnlineClosedHook>();
         websocket.run(config).await;
