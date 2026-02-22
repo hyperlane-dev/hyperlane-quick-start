@@ -3,7 +3,7 @@ use super::*;
 impl ServerHook for TaskPanicHook {
     #[task_panic_data(task_panic_data)]
     #[instrument_trace]
-    async fn new(ctx: &Context) -> Self {
+    async fn new(ctx: &mut Context) -> Self {
         Self {
             content_type: ContentType::format_content_type_with_charset(APPLICATION_JSON, UTF8),
             response_body: task_panic_data.to_string(),
@@ -19,8 +19,8 @@ impl ServerHook for TaskPanicHook {
     )]
     #[epilogue_macros(response_body(&response_body), try_send)]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
-        debug!("TaskPanicHook request => {}", ctx.get_request().await);
+    async fn handle(self, ctx: &mut Context) {
+        debug!("TaskPanicHook request => {}", ctx.get_request());
         error!("TaskPanicHook => {}", self.get_response_body());
         let api_response: ApiResponse<()> =
             ApiResponse::error_with_code(ResponseCode::InternalError, self.get_response_body());
@@ -31,7 +31,7 @@ impl ServerHook for TaskPanicHook {
 impl ServerHook for RequestErrorHook {
     #[request_error_data(request_error_data)]
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self {
             response_status_code: request_error_data.get_http_status_code(),
             content_type: ContentType::format_content_type_with_charset(APPLICATION_JSON, UTF8),
@@ -49,14 +49,14 @@ impl ServerHook for RequestErrorHook {
     )]
     #[epilogue_macros(response_body(&response_body), try_send)]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
+    async fn handle(self, ctx: &mut Context) {
         if self.get_response_status_code() == HttpStatus::BadRequest.code() {
-            ctx.aborted().await;
+            ctx.set_aborted(true);
             debug!("Context aborted");
             return;
         }
         if self.get_response_status_code() != HttpStatus::RequestTimeout.code() {
-            debug!("RequestErrorHook request => {}", ctx.get_request().await);
+            debug!("RequestErrorHook request => {}", ctx.get_request());
             error!("RequestErrorHook => {}", self.get_response_body());
         }
         let api_response: ApiResponse<()> =

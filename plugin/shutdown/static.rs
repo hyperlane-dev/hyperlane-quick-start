@@ -1,3 +1,3 @@
 use super::*;
 
-pub(super) static SHUTDOWN: OnceLock<SharedAsyncTaskFactory<()>> = OnceLock::new();
+pub(super) static SHUTDOWN: OnceLock<ServerControlHookHandler<()>> = OnceLock::new();
