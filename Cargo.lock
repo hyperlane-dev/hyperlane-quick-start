@@ -1593,9 +1593,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-macros"
-version = "16.1.0"
+version = "16.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d08d2dcfc287eff07c668ccd60a01d191b60933802b90bded1325ec53cd0d299"
+checksum = "15e91ad95da3f88d18641e0a4c72847c7976149a6cca040d64de82f5b37a6b51"
 dependencies = [
  "hyperlane",
  "proc-macro2",
@@ -1615,7 +1615,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "16.1.0"
+version = "16.1.1"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
@@ -1634,9 +1634,9 @@ checksum = "9b6f580fff377190b818d8c2ef52f68d1296490916da4923fe90287b7c80028c"
 
 [[package]]
 name = "hyperlane-utils"
-version = "22.1.0"
+version = "22.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "16bcf76d20484630f32ebb54946c058a0333d9099c16304f96d431d78f99ffe4"
+checksum = "ca41a5a3916c425d05f0b1f803cc6156fead190816f3b4938ae4be917d6fdb76"
 dependencies = [
  "ahash 0.8.12",
  "base64",
@@ -1697,7 +1697,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_application"
-version = "16.0.1"
+version = "16.1.0"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
@@ -1710,7 +1710,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_bootstrap"
-version = "16.0.1"
+version = "16.1.0"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
@@ -1724,7 +1724,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_config"
-version = "16.0.1"
+version = "16.1.0"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
@@ -1734,7 +1734,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_plugin"
-version = "16.0.1"
+version = "16.1.0"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
@@ -1744,7 +1744,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_resources"
-version = "16.0.1"
+version = "16.1.0"
 
 [[package]]
 name = "iana-time-zone"
