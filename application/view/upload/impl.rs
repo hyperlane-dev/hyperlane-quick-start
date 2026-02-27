@@ -58,10 +58,7 @@ impl ServerHook for UploadFileRoute {
                 .set_header(ACCEPT_RANGES, BYTES)
                 .set_header(CACHE_CONTROL, CACHE_CONTROL_STATIC_ASSETS)
                 .set_header(EXPIRES, EXPIRES_FAR_FUTURE)
-                .set_header(
-                    CONTENT_LENGTH,
-                    partial_content.get_total_size().to_string(),
-                );
+                .set_header(CONTENT_LENGTH, partial_content.get_total_size().to_string());
             if has_range_request {
                 ctx.get_mut_response()
                     .set_status_code(HttpStatus::PartialContent.code())

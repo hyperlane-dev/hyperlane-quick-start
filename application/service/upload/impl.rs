@@ -14,8 +14,7 @@ impl UploadService {
             Some(id) => Ok(id),
             None => {
                 spawn({
-                    let ctx_addr: usize = ctx.into();
-                    let ctx: &'static mut Context = ctx_addr.into();
+                    let ctx: &'static mut Context = context!(ctx);
                     async move {
                         Self::set_common_error_response_body(
                             ctx,
@@ -39,8 +38,7 @@ impl UploadService {
                 Ok(t) => Ok(t),
                 Err(_) => {
                     spawn({
-                        let ctx_addr: usize = ctx.into();
-                        let ctx: &'static mut Context = ctx_addr.into();
+                        let ctx: &'static mut Context = context!(ctx);
                         async move {
                             Self::set_common_error_response_body(
                                 ctx,
@@ -54,8 +52,7 @@ impl UploadService {
             },
             None => {
                 spawn({
-                    let ctx_addr: usize = ctx.into();
-                    let ctx: &'static mut Context = ctx_addr.into();
+                    let ctx: &'static mut Context = context!(ctx);
                     async move {
                         Self::set_common_error_response_body(
                             ctx,
@@ -75,8 +72,7 @@ impl UploadService {
             Some(name) => Ok(urlencoding::decode(&name).unwrap_or_default().into_owned()),
             None => {
                 spawn({
-                    let ctx_addr: usize = ctx.into();
-                    let ctx: &'static mut Context = ctx_addr.into();
+                    let ctx: &'static mut Context = context!(ctx);
                     async move {
                         Self::set_common_error_response_body(
                             ctx,
