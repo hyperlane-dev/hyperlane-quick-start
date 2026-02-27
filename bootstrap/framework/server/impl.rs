@@ -2,7 +2,7 @@ use super::*;
 
 impl ServerBootstrap {
     async fn print_route_matcher(server: &Server) {
-        let route_matcher: RouteMatcher = server.get_route_matcher().await;
+        let route_matcher: &RouteMatcher = server.get_route_matcher();
         for key in route_matcher.get_static_route().keys() {
             info!("Static route {key}");
         }
@@ -24,10 +24,8 @@ impl BootstrapAsyncInit for ServerBootstrap {
     async fn init() -> Self {
         let config: ConfigBootstrap = ConfigBootstrap::init().await;
         server
-            .request_config(config.get_request_config().clone())
-            .await
-            .server_config(config.get_server_config().clone())
-            .await;
+            .request_config(*config.get_request_config())
+            .server_config(config.get_server_config().clone());
         match server.run().await {
             Ok(server_hook) => {
                 let host_port: String = format!("{SERVER_HOST}{COLON}{SERVER_PORT}");

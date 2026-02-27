@@ -2,23 +2,23 @@ use super::*;
 
 impl ServerHook for HttpRequestMiddleware {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(
-        reject(ctx.get_request_is_http_version().await),
+        reject(ctx.get_request().get_version().is_http()),
         send,
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
-        ctx.closed().await;
+    async fn handle(self, ctx: &mut Context) {
+        ctx.set_closed(true);
     }
 }
 
 impl ServerHook for CrossMiddleware {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
@@ -27,12 +27,12 @@ impl ServerHook for CrossMiddleware {
     #[response_header(ACCESS_CONTROL_ALLOW_METHODS => ALL_METHODS)]
     #[response_header(ACCESS_CONTROL_ALLOW_HEADERS => WILDCARD_ANY)]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {}
+    async fn handle(self, ctx: &mut Context) {}
 }
 
 impl ServerHook for ResponseHeaderMiddleware {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
@@ -45,7 +45,7 @@ impl ServerHook for ResponseHeaderMiddleware {
         response_header("SocketAddr" => socket_addr_string)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
+    async fn handle(self, ctx: &mut Context) {
         let socket_addr_string: String = ctx.get_socket_addr_string().await;
         let content_type: String = ContentType::format_content_type_with_charset(TEXT_HTML, UTF8);
     }
@@ -53,45 +53,45 @@ impl ServerHook for ResponseHeaderMiddleware {
 
 impl ServerHook for ResponseStatusCodeMiddleware {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
     #[response_status_code(200)]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {}
+    async fn handle(self, ctx: &mut Context) {}
 }
 
 impl ServerHook for ResponseBodyMiddleware {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
     #[epilogue_macros(response_body(TEMPLATES_INDEX_HTML.replace("{{ time }}", &time())))]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {}
+    async fn handle(self, ctx: &mut Context) {}
 }
 
 impl ServerHook for OptionMethodMiddleware {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(
-        filter(ctx.get_request_is_options_method().await),
+        filter(ctx.get_request().get_method().is_options()),
         send
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
-        ctx.aborted().await;
+    async fn handle(self, ctx: &mut Context) {
+        ctx.set_aborted(true);
     }
 }
 
 impl ServerHook for UpgradeMiddleware {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
@@ -102,9 +102,9 @@ impl ServerHook for UpgradeMiddleware {
         response_body(&vec![]),
         response_header(UPGRADE => WEBSOCKET),
         response_header(CONNECTION => UPGRADE),
-        response_header(SEC_WEBSOCKET_ACCEPT => WebSocketFrame::generate_accept_key(ctx.try_get_request_header_back(SEC_WEBSOCKET_KEY).await.unwrap())),
+        response_header(SEC_WEBSOCKET_ACCEPT => WebSocketFrame::generate_accept_key(ctx.get_request().get_header_back(SEC_WEBSOCKET_KEY))),
         send
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {}
+    async fn handle(self, ctx: &mut Context) {}
 }
