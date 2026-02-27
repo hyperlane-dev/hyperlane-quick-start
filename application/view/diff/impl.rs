@@ -1,7 +1,7 @@
 use super::*;
 impl ServerHook for DiffViewRoute {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
@@ -11,5 +11,5 @@ impl ServerHook for DiffViewRoute {
         response_header(LOCATION => "/static/diff/index.html")
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {}
+    async fn handle(self, ctx: &mut Context) {}
 }

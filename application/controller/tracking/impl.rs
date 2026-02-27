@@ -2,7 +2,7 @@ use super::*;
 
 impl ServerHook for TrackingReportRoute {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
@@ -11,16 +11,17 @@ impl ServerHook for TrackingReportRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
-        let body: RequestBody = ctx.get_request_body().await;
+    async fn handle(self, ctx: &mut Context) {
+        let body: RequestBody = ctx.get_request().get_body().clone();
         match TrackingService::save_tracking_record(ctx, &body).await {
             Ok(_) => {
                 let response: ApiResponse<()> = ApiResponse::default_success();
-                ctx.set_response_body(&response.to_json_bytes()).await;
+                ctx.get_mut_response().set_body(response.to_json_bytes());
             }
             Err(error) => {
                 let error_response: ApiResponse<()> = ApiResponse::error(&error);
-                ctx.set_response_body(&error_response.to_json_bytes()).await;
+                ctx.get_mut_response()
+                    .set_body(error_response.to_json_bytes());
             }
         }
     }
@@ -28,7 +29,7 @@ impl ServerHook for TrackingReportRoute {
 
 impl ServerHook for TrackingQueryRoute {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
@@ -37,25 +38,27 @@ impl ServerHook for TrackingQueryRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
-        let body: RequestBody = ctx.get_request_body().await;
-        let request: TrackingQueryRequest = match serde_json::from_slice(&body) {
+    async fn handle(self, ctx: &mut Context) {
+        let body: &RequestBody = ctx.get_request().get_body();
+        let request: TrackingQueryRequest = match serde_json::from_slice(body) {
             Ok(req) => req,
             Err(error) => {
                 let error_response: ApiResponse<()> =
                     ApiResponse::error(format!("Invalid request body {error}"));
-                ctx.set_response_body(&error_response.to_json_bytes()).await;
+                ctx.get_mut_response()
+                    .set_body(error_response.to_json_bytes());
                 return;
             }
         };
         match TrackingService::query_tracking_records(request).await {
             Ok(result) => {
                 let response: ApiResponse<TrackingQueryResponse> = ApiResponse::success(result);
-                ctx.set_response_body(&response.to_json_bytes()).await;
+                ctx.get_mut_response().set_body(response.to_json_bytes());
             }
             Err(error) => {
                 let error_response: ApiResponse<()> = ApiResponse::error(&error);
-                ctx.set_response_body(&error_response.to_json_bytes()).await;
+                ctx.get_mut_response()
+                    .set_body(error_response.to_json_bytes());
             }
         }
     }

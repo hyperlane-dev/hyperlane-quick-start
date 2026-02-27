@@ -2,7 +2,7 @@ use super::*;
 
 impl ServerHook for RedisViewRoute {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
@@ -12,5 +12,5 @@ impl ServerHook for RedisViewRoute {
         response_header(LOCATION => "/static/redis/index.html")
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {}
+    async fn handle(self, ctx: &mut Context) {}
 }

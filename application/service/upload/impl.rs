@@ -9,15 +9,16 @@ impl UploadService {
     }
 
     #[instrument_trace]
-    fn validate_file_id(file_id_opt: Option<String>, ctx: &Context) -> Result<String, ()> {
+    fn validate_file_id(file_id_opt: Option<String>, ctx: &mut Context) -> Result<String, ()> {
         match file_id_opt {
             Some(id) => Ok(id),
             None => {
-                tokio::spawn({
-                    let ctx = ctx.clone();
+                spawn({
+                    let ctx_addr: usize = ctx.into();
+                    let ctx: &'static mut Context = ctx_addr.into();
                     async move {
                         Self::set_common_error_response_body(
-                            &ctx,
+                            ctx,
                             ChunkStrategyError::MissingFileId.to_string(),
                         )
                         .await;
@@ -29,16 +30,20 @@ impl UploadService {
     }
 
     #[instrument_trace]
-    fn validate_total_chunks(total_chunks_opt: Option<String>, ctx: &Context) -> Result<usize, ()> {
+    fn validate_total_chunks(
+        total_chunks_opt: Option<String>,
+        ctx: &mut Context,
+    ) -> Result<usize, ()> {
         match total_chunks_opt {
             Some(total) => match total.parse::<usize>() {
                 Ok(t) => Ok(t),
                 Err(_) => {
-                    tokio::spawn({
-                        let ctx = ctx.clone();
+                    spawn({
+                        let ctx_addr: usize = ctx.into();
+                        let ctx: &'static mut Context = ctx_addr.into();
                         async move {
                             Self::set_common_error_response_body(
-                                &ctx,
+                                ctx,
                                 ChunkStrategyError::InvalidTotalChunks.to_string(),
                             )
                             .await;
@@ -48,11 +53,12 @@ impl UploadService {
                 }
             },
             None => {
-                tokio::spawn({
-                    let ctx = ctx.clone();
+                spawn({
+                    let ctx_addr: usize = ctx.into();
+                    let ctx: &'static mut Context = ctx_addr.into();
                     async move {
                         Self::set_common_error_response_body(
-                            &ctx,
+                            ctx,
                             ChunkStrategyError::MissingTotalChunks.to_string(),
                         )
                         .await;
@@ -64,15 +70,16 @@ impl UploadService {
     }
 
     #[instrument_trace]
-    fn validate_file_name(file_name_opt: Option<String>, ctx: &Context) -> Result<String, ()> {
+    fn validate_file_name(file_name_opt: Option<String>, ctx: &mut Context) -> Result<String, ()> {
         match file_name_opt {
             Some(name) => Ok(urlencoding::decode(&name).unwrap_or_default().into_owned()),
             None => {
-                tokio::spawn({
-                    let ctx = ctx.clone();
+                spawn({
+                    let ctx_addr: usize = ctx.into();
+                    let ctx: &'static mut Context = ctx_addr.into();
                     async move {
                         Self::set_common_error_response_body(
-                            &ctx,
+                            ctx,
                             ChunkStrategyError::MissingFileName.to_string(),
                         )
                         .await;
@@ -112,7 +119,7 @@ impl UploadService {
     #[request_header_option(CHUNKIFY_FILE_NAME_HEADER => file_name_opt)]
     #[request_header_option(CHUNKIFY_DIRECTORY_HEADER => base_file_dir_opt)]
     #[instrument_trace]
-    pub async fn get_register_file_chunk_data<'a>(ctx: &'a Context) -> OptionFileChunkData {
+    pub async fn get_register_file_chunk_data<'a>(ctx: &mut Context) -> OptionFileChunkData {
         let file_id: String = Self::validate_file_id(file_id_opt, ctx).ok()?;
         let total_chunks: usize = Self::validate_total_chunks(total_chunks_opt, ctx).ok()?;
         let file_name: String = Self::validate_file_name(file_name_opt, ctx).ok()?;
@@ -128,7 +135,7 @@ impl UploadService {
 
     #[instrument_trace]
     pub async fn get_save_file_chunk_data(
-        ctx: &Context,
+        ctx: &mut Context,
         file_id_opt: Option<String>,
         chunk_index_opt: Option<String>,
     ) -> OptionFileChunkData {
@@ -172,7 +179,7 @@ impl UploadService {
 
     #[instrument_trace]
     pub async fn get_merge_file_chunk_data(
-        ctx: &Context,
+        ctx: &mut Context,
         file_id_opt: Option<String>,
     ) -> OptionFileChunkData {
         let file_id: String = match file_id_opt {
@@ -191,20 +198,20 @@ impl UploadService {
 
     #[response_status_code(200)]
     #[instrument_trace]
-    pub async fn set_common_success_response_body<'a>(ctx: &'a Context, url: &'a str) {
+    pub async fn set_common_success_response_body<'a>(ctx: &mut Context, url: &'a str) {
         let mut data: UploadResponse<'_> = UploadResponse::default();
         data.set_code(200).set_msg(OK).set_url(url);
         let data_json: ResponseBody = serde_json::to_vec(&data).unwrap_or_default();
-        let _: &Context = ctx.set_response_body(&data_json).await;
+        ctx.get_mut_response().set_body(&data_json);
     }
 
     #[response_status_code(200)]
     #[instrument_trace]
-    pub async fn set_common_error_response_body<'a>(ctx: &'a Context, error: String) {
+    pub async fn set_common_error_response_body<'a>(ctx: &mut Context, error: String) {
         let mut data: UploadResponse<'_> = UploadResponse::default();
         data.set_msg(&error);
         let data_json: ResponseBody = serde_json::to_vec(&data).unwrap_or_default();
-        let _: &Context = ctx.set_response_body(&data_json).await;
+        ctx.get_mut_response().set_body(&data_json);
     }
 
     #[instrument_trace]

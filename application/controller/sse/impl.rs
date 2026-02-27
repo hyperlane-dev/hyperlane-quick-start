@@ -2,7 +2,7 @@ use super::*;
 
 impl ServerHook for SseRoute {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
@@ -12,14 +12,13 @@ impl ServerHook for SseRoute {
         response_header(CONTENT_TYPE => TEXT_EVENT_STREAM)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
+    async fn handle(self, ctx: &mut Context) {
         ctx.send().await;
         for i in 0..10 {
-            ctx.set_response_body(&format!("data:{i}{HTTP_DOUBLE_BR}"))
-                .await
-                .send_body()
-                .await;
+            ctx.get_mut_response()
+                .set_body(format!("data:{i}{HTTP_DOUBLE_BR}"));
+            ctx.send_body().await;
         }
-        ctx.closed().await;
+        ctx.set_closed(true);
     }
 }

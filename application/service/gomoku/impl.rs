@@ -65,12 +65,12 @@ impl Default for RoomBroadcastManager {
 
 impl ServerHook for GomokuConnectedHook {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
+    async fn handle(self, ctx: &mut Context) {
         let user_id: String = GomokuWebSocketService::get_user_id(ctx).await;
         if user_id.is_empty() {
             return;
@@ -87,7 +87,7 @@ impl ServerHook for GomokuConnectedHook {
                     json!(room),
                 )
                 .unwrap_or_default();
-                ctx.set_response_body(&resp_body).await;
+                ctx.get_mut_response().set_body(&resp_body);
             }
         }
     }
@@ -95,13 +95,13 @@ impl ServerHook for GomokuConnectedHook {
 
 impl ServerHook for GomokuRequestHook {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
     #[request_body_json_result(req_data_res: GomokuWsRequest)]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
+    async fn handle(self, ctx: &mut Context) {
         let req_data: GomokuWsRequest = req_data_res.unwrap();
         if GomokuWebSocketService::handle_ping_request(ctx, &req_data).await {
             return;
@@ -109,7 +109,7 @@ impl ServerHook for GomokuRequestHook {
         let sender_id: String = GomokuWebSocketService::get_user_id(ctx).await;
         match GomokuWebSocketService::handle_request(ctx, &req_data, &sender_id).await {
             Ok((resp_body, room_id)) => {
-                ctx.set_response_body(&resp_body).await;
+                ctx.get_mut_response().set_body(&resp_body);
                 if !room_id.is_empty() {
                     GomokuWebSocketService::broadcast_room(&room_id, &sender_id, &resp_body).await;
                 }
@@ -117,7 +117,7 @@ impl ServerHook for GomokuRequestHook {
             Err(error) => {
                 let resp_body: ResponseBody =
                     GomokuWebSocketService::error_response(&sender_id, &req_data, error);
-                ctx.set_response_body(&resp_body).await;
+                ctx.get_mut_response().set_body(&resp_body);
             }
         }
     }
@@ -125,22 +125,22 @@ impl ServerHook for GomokuRequestHook {
 
 impl ServerHook for GomokuSendedHook {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
     #[instrument_trace]
-    async fn handle(self, _ctx: &Context) {}
+    async fn handle(self, _ctx: &mut Context) {}
 }
 
 impl ServerHook for GomokuClosedHook {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
+    async fn handle(self, ctx: &mut Context) {
         let user_id: String = GomokuWebSocketService::get_user_id(ctx).await;
         if user_id.is_empty() {
             return;
@@ -153,13 +153,13 @@ impl ServerHook for GomokuClosedHook {
 
 impl GomokuWebSocketService {
     #[instrument_trace]
-    pub async fn get_user_id(ctx: &Context) -> String {
+    pub async fn get_user_id(ctx: &mut Context) -> String {
         #[request_query_option("uid" => uid_opt)]
-        async fn get_uid(_ctx: &Context) -> Option<String> {
+        async fn get_uid(_ctx: &mut Context) -> Option<String> {
             uid_opt
         }
         #[request_query_option("user_id" => user_id_opt)]
-        async fn get_user_id(_ctx: &Context) -> Option<String> {
+        async fn get_user_id(_ctx: &mut Context) -> Option<String> {
             user_id_opt
         }
         let uid: Option<String> = get_uid(ctx).await;
@@ -168,7 +168,7 @@ impl GomokuWebSocketService {
     }
 
     #[instrument_trace]
-    pub async fn handle_ping_request(ctx: &Context, req_data: &GomokuWsRequest) -> bool {
+    pub async fn handle_ping_request(ctx: &mut Context, req_data: &GomokuWsRequest) -> bool {
         if req_data.get_type() == &GomokuMessageType::Ping {
             let sender_id: String = Self::get_user_id(ctx).await;
             let resp_body: ResponseBody = Self::build_response_body(
@@ -178,7 +178,7 @@ impl GomokuWebSocketService {
                 json!({}),
             )
             .unwrap_or_default();
-            ctx.set_response_body(&resp_body).await;
+            ctx.get_mut_response().set_body(&resp_body);
             return true;
         }
         false
@@ -186,7 +186,7 @@ impl GomokuWebSocketService {
 
     #[instrument_trace]
     pub async fn handle_request(
-        _ctx: &Context,
+        _ctx: &mut Context,
         req_data: &GomokuWsRequest,
         sender_id: &str,
     ) -> Result<(ResponseBody, String), String> {

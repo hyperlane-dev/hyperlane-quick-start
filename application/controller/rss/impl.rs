@@ -2,7 +2,7 @@ use super::*;
 
 impl ServerHook for RssFeedRoute {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
@@ -20,7 +20,7 @@ impl ServerHook for RssFeedRoute {
         response_body(rss_xml)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
+    async fn handle(self, ctx: &mut Context) {
         let limit: Option<usize> = limit_opt.and_then(|l| l.parse().ok());
         let offset: Option<usize> = offset_opt.and_then(|o| o.parse().ok());
         let host: String = host_opt.unwrap_or_else(|| LOCALHOST.to_string());

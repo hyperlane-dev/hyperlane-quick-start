@@ -134,19 +134,19 @@ impl MonitorService {
 
     #[response_header(CONTENT_TYPE => APPLICATION_JSON)]
     #[instrument_trace]
-    pub async fn get_network_capture_data(ctx: &Context) {
+    pub async fn get_network_capture_data(ctx: &mut Context) {
         let response_data: NetworkStats = get_network_stats().await.unwrap_or_default();
         if let Ok(json) = serde_json::to_vec(&response_data) {
-            ctx.set_response_body(&json).await;
+            ctx.get_mut_response().set_body(&json);
         }
     }
 
     #[instrument_trace]
-    pub async fn get_network_capture_stream(ctx: &Context) {
+    pub async fn get_network_capture_stream(ctx: &mut Context) {
         let response_data: NetworkStats = get_network_stats().await.unwrap_or_default();
         if let Ok(json) = serde_json::to_string(&response_data) {
             let event: String = format!("{SSE_DATA_PREFIX}{json}{DOUBLE_BR}");
-            ctx.set_response_body(&event).await;
+            ctx.get_mut_response().set_body(&event);
         }
     }
 

@@ -21,7 +21,7 @@ impl WebSocketReqData {
     }
 
     #[instrument_trace]
-    pub async fn into_resp(&self, ctx: &Context) -> WebSocketRespData {
+    pub async fn into_resp(&self, ctx: &mut Context) -> WebSocketRespData {
         let name: String = ChatService::get_name(ctx).await;
         let mut resp: WebSocketRespData = WebSocketRespData::default();
         resp.set_type(*self.get_type())
@@ -34,7 +34,7 @@ impl WebSocketReqData {
 
 impl WebSocketRespData {
     #[instrument_trace]
-    pub async fn from<T: ToString>(msg_type: MessageType, ctx: &Context, data: T) -> Self {
+    pub async fn from<T: ToString>(msg_type: MessageType, ctx: &mut Context, data: T) -> Self {
         let name: String = ChatService::get_name(ctx).await;
         let mut resp_data: Self = Self::default();
         resp_data
@@ -52,7 +52,7 @@ impl WebSocketRespData {
     #[instrument_trace]
     pub async fn get_json_data<T: ToString>(
         msg_type: MessageType,
-        ctx: &Context,
+        ctx: &mut Context,
         data: T,
     ) -> serde_json::Result<ResponseBody> {
         serde_json::to_vec(&WebSocketRespData::from(msg_type, ctx, data).await)

@@ -2,10 +2,13 @@ use super::*;
 
 impl TrackingService {
     #[instrument_trace]
-    pub async fn save_tracking_record(ctx: &Context, request: &RequestBody) -> Result<(), String> {
+    pub async fn save_tracking_record(
+        ctx: &mut Context,
+        request: &RequestBody,
+    ) -> Result<(), String> {
         let socket_addr: String = ctx.get_socket_addr_string().await;
         let timestamp: i64 = Utc::now().timestamp_millis();
-        let headers: RequestHeaders = ctx.get_request_headers().await;
+        let headers: RequestHeaders = ctx.get_request().get_headers().clone();
         let body_str: String = String::from_utf8_lossy(request).to_string();
         let mut record: TrackingRecord = TrackingRecord::default();
         record

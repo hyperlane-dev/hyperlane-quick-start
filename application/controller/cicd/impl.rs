@@ -2,7 +2,7 @@ use super::*;
 
 impl ServerHook for CreatePipelineRoute {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
@@ -12,25 +12,25 @@ impl ServerHook for CreatePipelineRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
+    async fn handle(self, ctx: &mut Context) {
         let param: CreatePipelineParam = match param {
             Ok(data) => data,
             Err(error) => {
                 let response: ApiResponse<()> =
                     ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error);
-                ctx.set_response_body(&response.to_json_bytes()).await;
+                ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
         };
         match CicdService::create_pipeline(param).await {
             Ok(id) => {
                 let response: ApiResponse<i32> = ApiResponse::success(id);
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
                 let response: ApiResponse<()> =
                     ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
     }
@@ -38,7 +38,7 @@ impl ServerHook for CreatePipelineRoute {
 
 impl ServerHook for ListPipelinesRoute {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
@@ -47,16 +47,16 @@ impl ServerHook for ListPipelinesRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
+    async fn handle(self, ctx: &mut Context) {
         match CicdService::get_all_pipelines().await {
             Ok(pipelines) => {
                 let response: ApiResponse<Vec<PipelineDto>> = ApiResponse::success(pipelines);
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
                 let response: ApiResponse<()> =
                     ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
     }
@@ -64,7 +64,7 @@ impl ServerHook for ListPipelinesRoute {
 
 impl ServerHook for GetPipelineRoute {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
@@ -73,35 +73,39 @@ impl ServerHook for GetPipelineRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
-        let querys: RequestQuerys = ctx.get_request_querys().await;
-        let id: i32 = match querys.get("id").and_then(|s: &String| s.parse().ok()) {
+    async fn handle(self, ctx: &mut Context) {
+        let id: i32 = match ctx
+            .get_request()
+            .get_querys()
+            .get("id")
+            .and_then(|s: &String| s.parse().ok())
+        {
             Some(id) => id,
             None => {
                 let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
                     ResponseCode::BadRequest,
                     "Missing or invalid id parameter",
                 );
-                ctx.set_response_body(&response.to_json_bytes()).await;
+                ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
         };
         match CicdService::get_pipeline_by_id(id).await {
             Ok(Some(pipeline)) => {
                 let response: ApiResponse<PipelineDto> = ApiResponse::success(pipeline);
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Ok(None) => {
                 let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
                     ResponseCode::NotFound,
                     "Pipeline not found",
                 );
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
                 let response: ApiResponse<()> =
                     ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
     }
@@ -109,7 +113,7 @@ impl ServerHook for GetPipelineRoute {
 
 impl ServerHook for TriggerRunRoute {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
@@ -119,25 +123,25 @@ impl ServerHook for TriggerRunRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
+    async fn handle(self, ctx: &mut Context) {
         let param: TriggerRunParam = match param {
             Ok(data) => data,
             Err(error) => {
                 let response: ApiResponse<()> =
                     ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error);
-                ctx.set_response_body(&response.to_json_bytes()).await;
+                ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
         };
         match CicdService::trigger_run(param).await {
             Ok(id) => {
                 let response: ApiResponse<i32> = ApiResponse::success(id);
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
                 let response: ApiResponse<()> =
                     ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
     }
@@ -145,7 +149,7 @@ impl ServerHook for TriggerRunRoute {
 
 impl ServerHook for ListRunsRoute {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
@@ -154,8 +158,8 @@ impl ServerHook for ListRunsRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
-        let querys: RequestQuerys = ctx.get_request_querys().await;
+    async fn handle(self, ctx: &mut Context) {
+        let querys: &RequestQuerys = ctx.get_request().get_querys();
         let page_size: Option<i32> = querys
             .get("page_size")
             .and_then(|s: &String| s.parse().ok());
@@ -172,12 +176,12 @@ impl ServerHook for ListRunsRoute {
         match CicdService::query_runs(param).await {
             Ok(result) => {
                 let response: ApiResponse<PaginatedRunsDto> = ApiResponse::success(result);
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
                 let response: ApiResponse<()> =
                     ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
     }
@@ -185,7 +189,7 @@ impl ServerHook for ListRunsRoute {
 
 impl ServerHook for GetRunRoute {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
@@ -194,8 +198,8 @@ impl ServerHook for GetRunRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
-        let querys: RequestQuerys = ctx.get_request_querys().await;
+    async fn handle(self, ctx: &mut Context) {
+        let querys: &RequestQuerys = ctx.get_request().get_querys();
         let id: i32 = match querys.get("id").and_then(|s: &String| s.parse().ok()) {
             Some(id) => id,
             None => {
@@ -203,24 +207,24 @@ impl ServerHook for GetRunRoute {
                     ResponseCode::BadRequest,
                     "Missing or invalid id parameter",
                 );
-                ctx.set_response_body(&response.to_json_bytes()).await;
+                ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
         };
         match CicdService::get_run_by_id(id).await {
             Ok(Some(run)) => {
                 let response: ApiResponse<RunDto> = ApiResponse::success(run);
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Ok(None) => {
                 let response: ApiResponse<()> =
                     ApiResponse::<()>::error_with_code(ResponseCode::NotFound, "Run not found");
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
                 let response: ApiResponse<()> =
                     ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
     }
@@ -228,7 +232,7 @@ impl ServerHook for GetRunRoute {
 
 impl ServerHook for GetRunDetailRoute {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
@@ -237,33 +241,37 @@ impl ServerHook for GetRunDetailRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
-        let querys: RequestQuerys = ctx.get_request_querys().await;
-        let id: i32 = match querys.get("id").and_then(|s: &String| s.parse().ok()) {
+    async fn handle(self, ctx: &mut Context) {
+        let id: i32 = match ctx
+            .get_request()
+            .get_querys()
+            .get("id")
+            .and_then(|s: &String| s.parse().ok())
+        {
             Some(id) => id,
             None => {
                 let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
                     ResponseCode::BadRequest,
                     "Missing or invalid id parameter",
                 );
-                ctx.set_response_body(&response.to_json_bytes()).await;
+                ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
         };
         match CicdService::get_run_detail(id).await {
             Ok(Some(detail)) => {
                 let response: ApiResponse<RunDetailDto> = ApiResponse::success(detail);
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Ok(None) => {
                 let response: ApiResponse<()> =
                     ApiResponse::<()>::error_with_code(ResponseCode::NotFound, "Run not found");
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
                 let response: ApiResponse<()> =
                     ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
     }
@@ -271,7 +279,7 @@ impl ServerHook for GetRunDetailRoute {
 
 impl ServerHook for UpdateJobRoute {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
@@ -281,13 +289,13 @@ impl ServerHook for UpdateJobRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
+    async fn handle(self, ctx: &mut Context) {
         let param: UpdateJobStatusParam = match param {
             Ok(data) => data,
             Err(error) => {
                 let response: ApiResponse<()> =
                     ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error);
-                ctx.set_response_body(&response.to_json_bytes()).await;
+                ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
         };
@@ -295,12 +303,12 @@ impl ServerHook for UpdateJobRoute {
             Ok(()) => {
                 let response: ApiResponse<()> =
                     ApiResponse::success_without_data("Job status updated successfully");
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
                 let response: ApiResponse<()> =
                     ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
     }
@@ -308,7 +316,7 @@ impl ServerHook for UpdateJobRoute {
 
 impl ServerHook for UpdateStepRoute {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
@@ -318,13 +326,13 @@ impl ServerHook for UpdateStepRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
+    async fn handle(self, ctx: &mut Context) {
         let param: UpdateStepStatusParam = match param {
             Ok(data) => data,
             Err(error) => {
                 let response: ApiResponse<()> =
                     ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error);
-                ctx.set_response_body(&response.to_json_bytes()).await;
+                ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
         };
@@ -332,12 +340,12 @@ impl ServerHook for UpdateStepRoute {
             Ok(()) => {
                 let response: ApiResponse<()> =
                     ApiResponse::success_without_data("Step status updated successfully");
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
                 let response: ApiResponse<()> =
                     ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
     }
@@ -345,7 +353,7 @@ impl ServerHook for UpdateStepRoute {
 
 impl ServerHook for GetIncrementalRunDetailRoute {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
@@ -354,8 +362,8 @@ impl ServerHook for GetIncrementalRunDetailRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
-        let querys: RequestQuerys = ctx.get_request_querys().await;
+    async fn handle(self, ctx: &mut Context) {
+        let querys: &RequestQuerys = ctx.get_request().get_querys();
         let run_id: i32 = match querys.get("run_id").and_then(|s: &String| s.parse().ok()) {
             Some(id) => id,
             None => {
@@ -363,7 +371,7 @@ impl ServerHook for GetIncrementalRunDetailRoute {
                     ResponseCode::BadRequest,
                     "Missing or invalid run_id parameter",
                 );
-                ctx.set_response_body(&response.to_json_bytes()).await;
+                ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
         };
@@ -376,17 +384,17 @@ impl ServerHook for GetIncrementalRunDetailRoute {
         match CicdService::get_incremental_run_detail(run_id, step_offsets).await {
             Ok(Some(detail)) => {
                 let response: ApiResponse<IncrementalRunDetailDto> = ApiResponse::success(detail);
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Ok(None) => {
                 let response: ApiResponse<()> =
                     ApiResponse::<()>::error_with_code(ResponseCode::NotFound, "Run not found");
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
                 let response: ApiResponse<()> =
                     ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
     }
@@ -394,7 +402,7 @@ impl ServerHook for GetIncrementalRunDetailRoute {
 
 impl ServerHook for CicdViewRoute {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
@@ -404,12 +412,12 @@ impl ServerHook for CicdViewRoute {
         response_header(LOCATION => "/static/cicd/index.html")
     )]
     #[instrument_trace]
-    async fn handle(self, _ctx: &Context) {}
+    async fn handle(self, _ctx: &mut Context) {}
 }
 
 impl ServerHook for RunLogsSseRoute {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
@@ -420,8 +428,8 @@ impl ServerHook for RunLogsSseRoute {
         response_header(CONNECTION => KEEP_ALIVE)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
-        let querys: RequestQuerys = ctx.get_request_querys().await;
+    async fn handle(self, ctx: &mut Context) {
+        let querys: &RequestQuerys = ctx.get_request().get_querys();
         let run_id: i32 = match querys.get("run_id").and_then(|s: &String| s.parse().ok()) {
             Some(id) => id,
             None => {
@@ -429,7 +437,7 @@ impl ServerHook for RunLogsSseRoute {
                     ResponseCode::BadRequest,
                     "Missing or invalid run_id parameter",
                 );
-                ctx.set_response_body(&response.to_json_bytes()).await;
+                ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
         };
@@ -443,11 +451,9 @@ impl ServerHook for RunLogsSseRoute {
                 let completion_event: String = format!(
                     "event: complete\ndata: {{\"run_id\":{run_id},\"reason\":\"no_active_streams\"}}{HTTP_DOUBLE_BR}"
                 );
-                ctx.set_response_body(&completion_event)
-                    .await
-                    .send_body()
-                    .await;
-                ctx.closed().await;
+                ctx.get_mut_response().set_body(&completion_event);
+                ctx.send_body().await;
+                ctx.set_closed(true);
                 return;
             }
         }
@@ -461,11 +467,9 @@ impl ServerHook for RunLogsSseRoute {
             let completion_event: String = format!(
                 "event: complete\ndata: {{\"run_id\":{run_id},\"reason\":\"no_active_streams\"}}{HTTP_DOUBLE_BR}"
             );
-            ctx.set_response_body(&completion_event)
-                .await
-                .send_body()
-                .await;
-            ctx.closed().await;
+            ctx.get_mut_response().set_body(&completion_event);
+            ctx.send_body().await;
+            ctx.set_closed(true);
             return;
         }
         let timeout_duration: Duration = Duration::from_secs(3600);
@@ -475,10 +479,8 @@ impl ServerHook for RunLogsSseRoute {
                 let timeout_event: String = format!(
                     "event: complete\ndata: {{\"run_id\":{run_id},\"reason\":\"timeout\"}}{HTTP_DOUBLE_BR}"
                 );
-                ctx.set_response_body(&timeout_event)
-                    .await
-                    .send_body()
-                    .await;
+                ctx.get_mut_response().set_body(&timeout_event);
+                ctx.send_body().await;
                 break;
             }
             let mut has_activity: bool = false;
@@ -494,7 +496,8 @@ impl ServerHook for RunLogsSseRoute {
                             Self::escape_json_string(entry.get_content()),
                             HTTP_DOUBLE_BR
                         );
-                        ctx.set_response_body(&log_event).await.send_body().await;
+                        ctx.get_mut_response().set_body(&log_event);
+                        ctx.send_body().await;
                     }
                 }
             }
@@ -503,10 +506,8 @@ impl ServerHook for RunLogsSseRoute {
                 let completion_event: String = format!(
                     "event: complete\ndata: {{\"run_id\":{run_id},\"reason\":\"run_completed\"}}{HTTP_DOUBLE_BR}"
                 );
-                ctx.set_response_body(&completion_event)
-                    .await
-                    .send_body()
-                    .await;
+                ctx.get_mut_response().set_body(&completion_event);
+                ctx.send_body().await;
                 break;
             }
             for step_id in &current_step_ids {
@@ -522,7 +523,7 @@ impl ServerHook for RunLogsSseRoute {
                 sleep(Duration::from_millis(10)).await;
             }
         }
-        ctx.closed().await;
+        ctx.set_closed(true);
     }
 }
 

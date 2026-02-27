@@ -2,7 +2,7 @@ use super::*;
 
 impl ServerHook for ListRecordsRoute {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
@@ -11,16 +11,16 @@ impl ServerHook for ListRecordsRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
+    async fn handle(self, ctx: &mut Context) {
         match RedisService::get_all_redis_records().await {
             Ok(records) => {
                 let response: ApiResponse<Vec<RedisRecord>> = ApiResponse::success(records);
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
                 let response =
                     ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
     }
@@ -28,7 +28,7 @@ impl ServerHook for ListRecordsRoute {
 
 impl ServerHook for CreateRecordRoute {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
@@ -38,13 +38,13 @@ impl ServerHook for CreateRecordRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
+    async fn handle(self, ctx: &mut Context) {
         let record: RedisRecord = match record_opt {
             Ok(data) => data,
             Err(error) => {
                 let response: ApiResponse<()> =
                     ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error);
-                ctx.set_response_body(&response.to_json_bytes()).await;
+                ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
         };
@@ -52,12 +52,12 @@ impl ServerHook for CreateRecordRoute {
             Ok(_) => {
                 let response =
                     ApiResponse::<()>::success_without_data("Record created successfully");
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
                 let response =
                     ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
     }
@@ -65,7 +65,7 @@ impl ServerHook for CreateRecordRoute {
 
 impl ServerHook for UpdateRecordRoute {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
@@ -75,13 +75,13 @@ impl ServerHook for UpdateRecordRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
+    async fn handle(self, ctx: &mut Context) {
         let record: RedisRecord = match record_opt {
             Ok(data) => data,
             Err(error) => {
                 let response: ApiResponse<()> =
                     ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error);
-                ctx.set_response_body(&response.to_json_bytes()).await;
+                ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
         };
@@ -89,12 +89,12 @@ impl ServerHook for UpdateRecordRoute {
             Ok(_) => {
                 let response =
                     ApiResponse::<()>::success_without_data("Record updated successfully");
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
                 let response =
                     ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
     }
@@ -102,7 +102,7 @@ impl ServerHook for UpdateRecordRoute {
 
 impl ServerHook for DeleteRecordRoute {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
@@ -111,8 +111,8 @@ impl ServerHook for DeleteRecordRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
-        let querys: RequestQuerys = ctx.get_request_querys().await;
+    async fn handle(self, ctx: &mut Context) {
+        let querys: &RequestQuerys = ctx.get_request().get_querys();
         let key: &String = match querys.get("key") {
             Some(k) => k,
             None => {
@@ -120,7 +120,7 @@ impl ServerHook for DeleteRecordRoute {
                     ResponseCode::BadRequest,
                     "Key parameter is required",
                 );
-                ctx.set_response_body(&response.to_json_bytes()).await;
+                ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
         };
@@ -128,12 +128,12 @@ impl ServerHook for DeleteRecordRoute {
             Ok(_) => {
                 let response =
                     ApiResponse::<()>::success_without_data("Record deleted successfully");
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
                 let response =
                     ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
-                ctx.set_response_body(&response.to_json_bytes()).await
+                ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
     }

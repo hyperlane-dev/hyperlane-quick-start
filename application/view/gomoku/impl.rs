@@ -2,7 +2,7 @@ use super::*;
 
 impl ServerHook for GomokuViewRoute {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
@@ -12,5 +12,5 @@ impl ServerHook for GomokuViewRoute {
         response_header(LOCATION => "/static/gomoku/index.html")
     )]
     #[instrument_trace]
-    async fn handle(self, _ctx: &Context) {}
+    async fn handle(self, _ctx: &mut Context) {}
 }

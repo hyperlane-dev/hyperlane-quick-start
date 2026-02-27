@@ -2,44 +2,46 @@ use super::*;
 
 impl ServerHook for ChatConnectedHook {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
+    async fn handle(self, ctx: &mut Context) {
         let websocket: &WebSocket = get_global_websocket();
-        let path: String = ctx.get_request_path().await;
-        let key: BroadcastType<String> = BroadcastType::PointToGroup(path.clone());
+        let path: String = ctx.get_request().get_path().clone();
+        let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
         let receiver_count: ReceiverCount = websocket.receiver_count(key.clone());
         let resp_data: ResponseBody =
             ChatService::create_online_count_message(ctx, receiver_count.to_string()).await;
-        ctx.set_response_body(resp_data.clone()).await;
+        ctx.get_mut_response().set_body(resp_data.clone());
         ChatService::broadcast_online_count(key, resp_data.clone());
     }
 }
 
 impl ServerHook for ChatRequestHook {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
     #[request_body_json_result(req_data_res: WebSocketReqData)]
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
+    async fn handle(self, ctx: &mut Context) {
         let req_data: WebSocketReqData = req_data_res.unwrap();
         if ChatService::handle_ping_request(ctx, &req_data).await {
             return;
         }
         let resp_data: WebSocketRespData = req_data.into_resp(ctx).await;
         let resp_data: ResponseBody = serde_json::to_vec(&resp_data).unwrap();
-        ctx.set_response_body(&resp_data).await;
+        ctx.get_mut_response().set_body(&resp_data);
         let session_id: String = ChatService::get_name(ctx).await;
-        clone!(req_data, ctx, session_id => {
+        clone!(req_data, session_id => {
             let req_msg: &String = req_data.get_data();
             if ChatService::is_gpt_mentioned(req_msg) {
                 let req_msg_clone: String = req_msg.clone();
+                let ctx_addr: usize = ctx.into();
+                let ctx: &'static mut Context =  ctx_addr.into();
                 spawn(async move {
                     ChatService::process_gpt_request(session_id, req_msg_clone, ctx).await;
                 });
@@ -50,19 +52,19 @@ impl ServerHook for ChatRequestHook {
 
 impl ServerHook for ChatSendedHook {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
+    async fn handle(self, ctx: &mut Context) {
         let request: String = get_request_json(ctx).await;
         let response: String = get_response_json(ctx).await;
         info!("{request}{BR}{response}");
-        let response_body: ResponseBody = ctx.get_response().await.get_body().clone();
+        let response_body: ResponseBody = ctx.get_response().get_body().clone();
         if let Ok(resp_data) = serde_json::from_slice::<WebSocketRespData>(&response_body) {
             if *resp_data.get_type() == MessageType::OnlineCount {
-                ctx.aborted().await;
+                ctx.set_aborted(true);
                 return;
             }
         }
@@ -73,36 +75,36 @@ impl ServerHook for ChatSendedHook {
 
 impl ServerHook for ChatClosedHook {
     #[instrument_trace]
-    async fn new(_ctx: &Context) -> Self {
+    async fn new(_ctx: &mut Context) -> Self {
         Self
     }
 
     #[instrument_trace]
-    async fn handle(self, ctx: &Context) {
+    async fn handle(self, ctx: &mut Context) {
         let websocket: &WebSocket = get_global_websocket();
-        let path: String = ctx.get_request_path().await;
+        let path: String = ctx.get_request().get_path().clone();
         let key: BroadcastType<String> = BroadcastType::PointToGroup(path.clone());
         let receiver_count: ReceiverCount = websocket.receiver_count_after_closed(key);
         let username: String = ChatService::get_name(ctx).await;
         ChatDomain::remove_online_user(&username).await;
         let resp_data: ResponseBody =
             ChatService::create_online_count_message(ctx, receiver_count.to_string()).await;
-        ctx.set_response_body(&resp_data).await;
+        ctx.get_mut_response().set_body(&resp_data);
     }
 }
 
 impl ChatService {
     #[instrument_trace]
-    pub async fn pre_ws_upgrade(ctx: Context) {
+    pub async fn pre_ws_upgrade(ctx: &mut Context) {
         let addr: String = ctx.get_socket_addr_string().await;
         let encode_addr: String = Encode::execute(CHARSETS, &addr).unwrap_or_default();
-        ctx.set_response_header(HEADER_X_CLIENT_ADDR, &encode_addr)
-            .await;
+        ctx.get_mut_response()
+            .set_header(HEADER_X_CLIENT_ADDR, &encode_addr);
     }
 
     #[instrument_trace]
     pub async fn create_online_count_message(
-        ctx: &Context,
+        ctx: &mut Context,
         receiver_count: String,
     ) -> ResponseBody {
         let data: String = format!("{ONLINE_CONNECTIONS} {receiver_count}");
@@ -126,12 +128,12 @@ impl ChatService {
     }
 
     #[instrument_trace]
-    pub async fn handle_ping_request(ctx: &Context, req_data: &WebSocketReqData) -> bool {
+    pub async fn handle_ping_request(ctx: &mut Context, req_data: &WebSocketReqData) -> bool {
         if req_data.is_ping() {
             let resp_data: WebSocketRespData =
-                WebSocketRespData::from(MessageType::Pang, ctx, "").await;
+                WebSocketRespData::from(MessageType::Pang, ctx, EMPTY_STR).await;
             let resp_data: ResponseBody = serde_json::to_vec(&resp_data).unwrap();
-            ctx.set_response_body(&resp_data).await;
+            ctx.get_mut_response().set_body(&resp_data);
             return true;
         }
         false
@@ -145,7 +147,7 @@ impl ChatService {
     }
 
     #[instrument_trace]
-    pub async fn process_gpt_request(session_id: String, message: String, ctx: Context) {
+    pub async fn process_gpt_request(session_id: String, message: String, ctx: &mut Context) {
         let mut session: ChatSession = ChatDomain::get_or_create_session(&session_id).await;
         let cleaned_msg: String = Self::remove_mentions(&message);
         session.add_message(ROLE_USER.to_string(), cleaned_msg);
@@ -158,14 +160,14 @@ impl ChatService {
             Err(error) => format!("API call failed {error}"),
         };
         let gpt_resp_data: WebSocketRespData =
-            WebSocketRespData::from(MessageType::GptResponse, &ctx, &api_response).await;
+            WebSocketRespData::from(MessageType::GptResponse, ctx, &api_response).await;
         let gpt_resp_json: ResponseBody = serde_json::to_vec(&gpt_resp_data).unwrap();
         let websocket: &WebSocket = get_global_websocket();
-        let path: String = ctx.get_request_path().await;
+        let path: String = ctx.get_request().get_path().clone();
         let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
         let _: Result<Option<ReceiverCount>, SendError<Vec<u8>>> =
             websocket.try_send(key, gpt_resp_json.clone());
-        ctx.set_response_body(&gpt_resp_json).await;
+        ctx.get_mut_response().set_body(&gpt_resp_json);
         let session_id_clone: String = session_id.clone();
         let api_response_clone: String = api_response.clone();
         spawn(async move {
@@ -259,10 +261,10 @@ impl ChatService {
     }
 
     #[instrument_trace]
-    pub async fn get_name(ctx: &Context) -> String {
+    pub async fn get_name(ctx: &mut Context) -> String {
         #[request_query_option("uuid" => uuid_opt)]
         #[instrument_trace]
-        async fn inner(_ctx: &Context) -> String {
+        async fn inner(_ctx: &mut Context) -> String {
             uuid_opt.unwrap_or_default()
         }
         inner(ctx).await
