@@ -42,11 +42,19 @@ impl ServerHook for ResponseHeaderMiddleware {
     #[response_header(TRACE => uuid::Uuid::new_v4().to_string())]
     #[epilogue_macros(
         response_header(CONTENT_TYPE => content_type),
-        response_header("SocketAddr" => socket_addr_string)
+        response_header("SocketAddr" => socket_addr)
     )]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
-        let socket_addr_string: String = ctx.get_socket_addr_string().await;
+        let mut socket_addr: String = String::new();
+        if let Some(stream) = ctx.try_get_stream().as_ref() {
+            socket_addr = stream
+                .read()
+                .await
+                .peer_addr()
+                .map(|data| data.to_string())
+                .unwrap_or_default();
+        }
         let content_type: String = ContentType::format_content_type_with_charset(TEXT_HTML, UTF8);
     }
 }
