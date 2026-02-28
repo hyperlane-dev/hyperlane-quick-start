@@ -3,6 +3,18 @@ use super::*;
 #[derive(utoipa::OpenApi)]
 #[openapi(
     paths(
+        controller::account_booking::openapi_user_register,
+        controller::account_booking::openapi_user_login,
+        controller::account_booking::openapi_user_create,
+        controller::account_booking::openapi_user_update,
+        controller::account_booking::openapi_user_change_password,
+        controller::account_booking::openapi_user_approve,
+        controller::account_booking::openapi_user_list,
+        controller::account_booking::openapi_user_get,
+        controller::account_booking::openapi_record_create,
+        controller::account_booking::openapi_record_update,
+        controller::account_booking::openapi_record_list,
+        controller::account_booking::openapi_record_get,
         controller::chat::openapi_get_online_users,
         controller::cicd::openapi_create_pipeline,
         controller::cicd::openapi_list_pipelines,
