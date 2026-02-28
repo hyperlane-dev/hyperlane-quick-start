@@ -6,7 +6,16 @@ impl TrackingService {
         ctx: &mut Context,
         request: &RequestBody,
     ) -> Result<(), String> {
-        let socket_addr: String = ctx.get_socket_addr_string().await;
+        let mut socket_addr: String = String::new();
+        if let Some(stream) = ctx.try_get_stream().as_ref() {
+            socket_addr = stream
+                .read()
+                .await
+                .peer_addr()
+                .ok()
+                .map(|data| data.to_string())
+                .unwrap_or_default();
+        }
         let timestamp: i64 = Utc::now().timestamp_millis();
         let headers: RequestHeaders = ctx.get_request().get_headers().clone();
         let body_str: String = String::from_utf8_lossy(request).to_string();

@@ -95,8 +95,17 @@ impl ServerHook for ChatClosedHook {
 impl ChatService {
     #[instrument_trace]
     pub async fn pre_ws_upgrade(ctx: &mut Context) {
-        let addr: String = ctx.get_socket_addr_string().await;
-        let encode_addr: String = Encode::execute(CHARSETS, &addr).unwrap_or_default();
+        let mut socket_addr: String = String::new();
+        if let Some(stream) = ctx.try_get_stream().as_ref() {
+            socket_addr = stream
+                .read()
+                .await
+                .peer_addr()
+                .ok()
+                .map(|data| data.to_string())
+                .unwrap_or_default();
+        }
+        let encode_addr: String = Encode::execute(CHARSETS, &socket_addr).unwrap_or_default();
         ctx.get_mut_response()
             .set_header(HEADER_X_CLIENT_ADDR, &encode_addr);
     }
