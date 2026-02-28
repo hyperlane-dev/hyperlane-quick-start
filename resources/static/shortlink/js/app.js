@@ -53,7 +53,7 @@ const ShortlinkApp = {
           this.setCustomValidity('Please enter a URL to shorten');
         } else if (this.validity.typeMismatch) {
           this.setCustomValidity(
-            'Please enter a valid URL starting with http:// or https://'
+            'Please enter a valid URL starting with http:// or https://',
           );
         }
       });
@@ -146,7 +146,7 @@ const ShortlinkApp = {
       console.error('Error generating shortlink:', error);
       this.showError(
         error.message ||
-          'An unexpected error occurred while generating the shortlink'
+          'An unexpected error occurred while generating the shortlink',
       );
     } finally {
       this.showLoading(false);

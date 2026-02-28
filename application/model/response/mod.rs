@@ -1,3 +1,4 @@
+pub mod account_booking;
 pub mod chat;
 pub mod cicd;
 pub mod common;

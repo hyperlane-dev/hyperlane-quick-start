@@ -10,6 +10,7 @@ impl DockerConfig {
             ..Self::new()
         }
     }
+
     #[instrument_trace]
     pub fn with_network() -> Self {
         Self {
@@ -17,6 +18,7 @@ impl DockerConfig {
             ..Self::new()
         }
     }
+
     #[instrument_trace]
     pub fn high_resource() -> Self {
         Self {
@@ -44,26 +46,31 @@ impl DockerConfig {
             volumes: Vec::new(),
         }
     }
+
     #[instrument_trace]
     pub fn image(mut self, image: &str) -> Self {
         self.set_image(image.to_string());
         self
     }
+
     #[instrument_trace]
     pub fn cpus(mut self, cpus: f32) -> Self {
         self.set_cpus(Some(cpus));
         self
     }
+
     #[instrument_trace]
     pub fn memory(mut self, memory: &str) -> Self {
         self.set_memory(Some(memory.to_string()));
         self
     }
+
     #[instrument_trace]
     pub fn network(mut self, enabled: bool) -> Self {
         self.set_disable_network(!enabled);
         self
     }
+
     #[instrument_trace]
     pub fn volume(mut self, host_path: &str, container_path: &str) -> Self {
         let mut volumes: Vec<(String, String)> = self.get_volumes().to_vec();
@@ -71,6 +78,7 @@ impl DockerConfig {
         self.set_volumes(volumes);
         self
     }
+
     #[instrument_trace]
     pub fn env(mut self, key: &str, value: &str) -> Self {
         let mut env_vars: Vec<(String, String)> = self.get_env_vars().to_vec();
@@ -94,6 +102,7 @@ impl DockerResult {
             success,
         }
     }
+
     #[instrument_trace]
     pub fn format_output(&self) -> String {
         if self.get_success() {

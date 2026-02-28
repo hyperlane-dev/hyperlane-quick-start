@@ -31,7 +31,7 @@ const ChatHistory = {
 
     try {
       let url = `/api/chat/history?session_id=${encodeURIComponent(
-        this.sessionId
+        this.sessionId,
       )}&limit=${this.limit}`;
 
       if (this.beforeId !== null) {
@@ -105,7 +105,7 @@ const ChatHistory = {
       typeof getAvatarGradient === 'function'
         ? getAvatarGradient(msg.sender_name)
         : `linear-gradient(135deg, ${getAvatarColor(
-            msg.sender_name
+            msg.sender_name,
           )}, ${getAvatarColor(msg.sender_name)})`;
     const avatarText = getAvatarText(msg.sender_name);
 
@@ -118,7 +118,7 @@ const ChatHistory = {
 
     const processedContent = this.processMessageContent(
       msg.content,
-      msg.message_type
+      msg.message_type,
     );
 
     messageDiv.innerHTML = `

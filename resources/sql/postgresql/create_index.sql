@@ -11,3 +11,13 @@ CREATE INDEX IF NOT EXISTS idx_tracking_created_at ON tracking_record (created_a
 CREATE UNIQUE INDEX IF NOT EXISTS idx_shortlink_url ON shortlink (url);
 
 CREATE INDEX IF NOT EXISTS idx_shortlink_created_at ON shortlink (created_at);
+
+CREATE INDEX IF NOT EXISTS idx_account_booking_record_user_id ON account_booking_record (user_id);
+
+CREATE INDEX IF NOT EXISTS idx_account_booking_record_bill_no ON account_booking_record (bill_no);
+
+CREATE INDEX IF NOT EXISTS idx_account_booking_record_bill_date ON account_booking_record (bill_date);
+
+CREATE INDEX IF NOT EXISTS idx_account_booking_user_username ON account_booking_user (username);
+
+CREATE INDEX IF NOT EXISTS idx_account_booking_user_status ON account_booking_user (status);

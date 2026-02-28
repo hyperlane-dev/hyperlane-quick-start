@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Account Booking - Hyperlane</title>
+    <link rel="icon" href="https://docs.ltpp.vip/img/hyperlane.png" />
+    <link href="./css/style.css" rel="stylesheet" />
+    <script src="./js/app.js" defer></script>
+  </head>
+  <body>
+    <div id="app">
+      <div id="login-page" class="login-page">
+        <div class="login-container">
+          <div class="login-header">
+            <h1>Account Booking</h1>
+            <p>Manage your finances efficiently</p>
+          </div>
+          <form id="login-form" class="login-form">
+            <div class="form-group">
+              <label class="form-label">Username</label>
+              <input
+                type="text"
+                id="login-username"
+                class="form-input"
+                placeholder="Enter username"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <input
+                type="password"
+                id="login-password"
+                class="form-input"
+                placeholder="Enter password"
+                required
+              />
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">
+              Login
+            </button>
+          </form>
+          <div class="login-footer">
+            <p>Default: root / root</p>
+            <p>
+              Don't have an account? <a href="#" id="show-register">Register</a>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div id="register-page" class="login-page hidden">
+        <div class="login-container">
+          <div class="login-header">
+            <h1>Create Account</h1>
+            <p>Register for a new account</p>
+          </div>
+          <form id="register-form" class="login-form">
+            <div class="form-group">
+              <label class="form-label">Username *</label>
+              <input
+                type="text"
+                id="reg-username"
+                class="form-input"
+                placeholder="Choose a username"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password *</label>
+              <input
+                type="password"
+                id="reg-password"
+                class="form-input"
+                placeholder="Choose a password"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nickname</label>
+              <input
+                type="text"
+                id="reg-nickname"
+                class="form-input"
+                placeholder="Your nickname"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input
+                type="email"
+                id="reg-email"
+                class="form-input"
+                placeholder="Your email"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone</label>
+              <input
+                type="tel"
+                id="reg-phone"
+                class="form-input"
+                placeholder="Your phone number"
+              />
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">
+              Register
+            </button>
+          </form>
+          <div class="login-footer">
+            <p>
+              Already have an account? <a href="#" id="show-login">Login</a>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div id="main-app" class="main-app hidden">
+        <aside class="sidebar">
+          <div class="sidebar-header">
+            <h2>Account Booking</h2>
+          </div>
+          <nav class="sidebar-nav">
+            <div class="nav-item active" data-page="dashboard">
+              <span class="nav-icon">📊</span>
+              <span>Dashboard</span>
+            </div>
+            <div class="nav-item" data-page="records">
+              <span class="nav-icon">📝</span>
+              <span>Records</span>
+            </div>
+            <div class="nav-item admin-only hidden" data-page="users">
+              <span class="nav-icon">👥</span>
+              <span>Users</span>
+            </div>
+            <div class="nav-item" data-page="profile">
+              <span class="nav-icon">⚙️</span>
+              <span>Profile</span>
+            </div>
+          </nav>
+          <div class="sidebar-footer">
+            <div class="user-info">
+              <span id="current-user">User</span>
+              <span id="user-role" class="role-badge">user</span>
+            </div>
+            <button id="logout-btn" class="btn btn-sm">Logout</button>
+          </div>
+        </aside>
+
+        <main class="main-content">
+          <header class="content-header">
+            <h1 id="page-title">Dashboard</h1>
+          </header>
+
+          <div id="dashboard-page" class="page-content">
+            <div class="stats-grid">
+              <div class="stat-card income">
+                <div class="stat-label">Total Income</div>
+                <div class="stat-value" id="total-income">$0.00</div>
+              </div>
+              <div class="stat-card expense">
+                <div class="stat-label">Total Expense</div>
+                <div class="stat-value" id="total-expense">$0.00</div>
+              </div>
+              <div class="stat-card balance">
+                <div class="stat-label">Balance</div>
+                <div class="stat-value" id="total-balance">$0.00</div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">Recent Records</span>
+                <button
+                  class="btn btn-primary btn-sm"
+                  onclick="showCreateRecordModal()"
+                >
+                  + New Record
+                </button>
+              </div>
+              <div class="card-body">
+                <div id="recent-records-list" class="record-list">
+                  <div class="empty-state">
+                    <div class="empty-state-icon">📝</div>
+                    <div class="empty-state-title">No records yet</div>
+                    <p>Create your first record to get started</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="records-page" class="page-content hidden">
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">All Records</span>
+                <button
+                  class="btn btn-primary btn-sm"
+                  onclick="showCreateRecordModal()"
+                >
+                  + New Record
+                </button>
+              </div>
+              <div class="card-body">
+                <div class="filter-bar">
+                  <div class="filter-group">
+                    <label class="filter-label">Date Range</label>
+                    <input
+                      type="date"
+                      id="filter-start-date"
+                      class="form-input form-input-sm"
+                      lang="en"
+                    />
+                    <span>to</span>
+                    <input
+                      type="date"
+                      id="filter-end-date"
+                      class="form-input form-input-sm"
+                      lang="en"
+                    />
+                  </div>
+                  <div class="filter-group">
+                    <label class="filter-label">Category</label>
+                    <select
+                      id="filter-category"
+                      class="form-select form-select-sm"
+                    >
+                      <option value="">All</option>
+                      <option value="food">Food</option>
+                      <option value="transport">Transport</option>
+                      <option value="shopping">Shopping</option>
+                      <option value="entertainment">Entertainment</option>
+                      <option value="salary">Salary</option>
+                      <option value="investment">Investment</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                  <div class="filter-group">
+                    <label class="filter-label">Type</label>
+                    <select id="filter-type" class="form-select form-select-sm">
+                      <option value="">All</option>
+                      <option value="income">Income</option>
+                      <option value="expense">Expense</option>
+                    </select>
+                  </div>
+                  <button
+                    class="btn btn-primary btn-sm"
+                    onclick="applyFilters()"
+                  >
+                    Filter
+                  </button>
+                  <button class="btn btn-sm" onclick="resetFilters()">
+                    Reset
+                  </button>
+                </div>
+                <div id="all-records-list" class="record-list">
+                  <div class="empty-state">
+                    <div class="empty-state-icon">📝</div>
+                    <div class="empty-state-title">No records found</div>
+                    <p>Create a new record or adjust filters</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="users-page" class="page-content hidden">
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">User Management</span>
+                <button
+                  class="btn btn-primary btn-sm"
+                  onclick="showCreateUserModal()"
+                >
+                  + New User
+                </button>
+              </div>
+              <div class="card-body">
+                <div id="users-list" class="user-list">
+                  <div class="empty-state">
+                    <div class="empty-state-icon">👥</div>
+                    <div class="empty-state-title">No users found</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="profile-page" class="page-content hidden">
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">Profile Settings</span>
+              </div>
+              <div class="card-body">
+                <form id="profile-form" class="profile-form">
+                  <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input
+                      type="text"
+                      id="profile-username"
+                      class="form-input"
+                      readonly
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Nickname</label>
+                    <input
+                      type="text"
+                      id="profile-nickname"
+                      class="form-input"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="profile-email" class="form-input" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Phone</label>
+                    <input type="tel" id="profile-phone" class="form-input" />
+                  </div>
+                  <button type="submit" class="btn btn-primary">
+                    Save Changes
+                  </button>
+                </form>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">Change Password</span>
+              </div>
+              <div class="card-body">
+                <form id="password-form" class="profile-form">
+                  <div class="form-group">
+                    <label class="form-label">Current Password</label>
+                    <input
+                      type="password"
+                      id="old-password"
+                      class="form-input"
+                      required
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">New Password</label>
+                    <input
+                      type="password"
+                      id="new-password"
+                      class="form-input"
+                      required
+                    />
+                  </div>
+                  <button type="submit" class="btn btn-primary">
+                    Change Password
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <div class="modal" id="record-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="modal-title" id="record-modal-title">New Record</span>
+          <button class="modal-close" onclick="closeModal('record-modal')">
+            &times;
+          </button>
+        </div>
+        <form id="record-form">
+          <div class="modal-body">
+            <div class="form-group">
+              <label class="form-label">Type *</label>
+              <select id="record-type" class="form-select" required>
+                <option value="expense">Expense</option>
+                <option value="income">Income</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Amount *</label>
+              <input
+                type="number"
+                id="record-amount"
+                class="form-input"
+                step="0.01"
+                min="0"
+                placeholder="0.00"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Category *</label>
+              <select id="record-category" class="form-select" required>
+                <option value="food">Food</option>
+                <option value="transport">Transport</option>
+                <option value="shopping">Shopping</option>
+                <option value="entertainment">Entertainment</option>
+                <option value="salary">Salary</option>
+                <option value="investment">Investment</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Date *</label>
+              <input type="date" id="record-date" class="form-input" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Description</label>
+              <textarea
+                id="record-description"
+                class="form-textarea"
+                placeholder="Enter description..."
+              ></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn"
+              onclick="closeModal('record-modal')"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal" id="user-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="modal-title" id="user-modal-title">New User</span>
+          <button class="modal-close" onclick="closeModal('user-modal')">
+            &times;
+          </button>
+        </div>
+        <form id="user-form">
+          <div class="modal-body">
+            <div class="form-group">
+              <label class="form-label">Username *</label>
+              <input
+                type="text"
+                id="user-username"
+                class="form-input"
+                placeholder="Enter username"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password *</label>
+              <input
+                type="password"
+                id="user-password"
+                class="form-input"
+                placeholder="Enter password"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Role *</label>
+              <select id="user-role-select" class="form-select" required>
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nickname</label>
+              <input
+                type="text"
+                id="user-nickname"
+                class="form-input"
+                placeholder="Enter nickname"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input
+                type="email"
+                id="user-email"
+                class="form-input"
+                placeholder="Enter email"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone</label>
+              <input
+                type="tel"
+                id="user-phone"
+                class="form-input"
+                placeholder="Enter phone"
+              />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn"
+              onclick="closeModal('user-modal')"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="toast-container" id="toast-container"></div>
+  </body>
+</html>

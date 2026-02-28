@@ -10,10 +10,11 @@ pub mod utils;
 pub mod view;
 
 use {
-    chrono::{NaiveDateTime, Utc},
+    chrono::{NaiveDate, NaiveDateTime, Utc},
     hyperlane::*,
     hyperlane_utils::{log::*, *},
     redis::RedisError,
+    rust_decimal::Decimal,
     sea_orm::{
         ActiveModelBehavior, ActiveModelTrait, ActiveValue, ColumnTrait, DatabaseConnection, DbErr,
         DeriveActiveModelBehavior, DeriveEntityModel, DerivePrimaryKey, DeriveRelation,

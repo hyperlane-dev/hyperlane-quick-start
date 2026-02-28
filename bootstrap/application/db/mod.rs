@@ -10,4 +10,8 @@ use {
     hyperlane_resources::*,
 };
 
-use {redis::Connection, sea_orm::DatabaseConnection};
+use {
+    redis::Connection,
+    sea_orm::DatabaseConnection,
+    sqlx::{Executor, PgPool, postgres::PgPoolOptions},
+};

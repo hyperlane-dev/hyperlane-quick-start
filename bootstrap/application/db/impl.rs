@@ -49,11 +49,40 @@ impl DbBootstrap {
                 Vec::new(),
                 "shortlink".to_string(),
                 POSTGRESQL_SHORTLINK_SQL.to_string(),
+            ))
+            .add_table(TableSchema::new(
+                Vec::new(),
+                "account_booking".to_string(),
+                POSTGRESQL_ACCOUNT_BOOKING_SQL.to_string(),
             ));
         for index in indexes {
             schema = schema.add_index(index);
         }
         schema
+    }
+
+    #[instrument_trace]
+    pub async fn init_postgresql_data() -> Result<(), String> {
+        let _: DatabaseConnection =
+            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+        let pool: PgPool = PgPoolOptions::new()
+            .connect("postgres://postgres:postgres@localhost/hyperlane")
+            .await
+            .map_err(|e: sqlx::Error| e.to_string())?;
+        let result: Result<(), sqlx::Error> = pool
+            .execute(POSTGRESQL_ACCOUNT_BOOKING_DATA_SQL)
+            .await
+            .map(|_| ());
+        match result {
+            Ok(_) => {
+                info!("Account booking data initialized successfully");
+                Ok(())
+            }
+            Err(error) => {
+                error!("Account booking data initialization failed: {error}");
+                Err(error.to_string())
+            }
+        }
     }
 }
 
@@ -78,6 +107,7 @@ impl BootstrapAsyncInit for DbBootstrap {
                 error!("Auto-creation initialization failed {error}");
             }
         };
+        let _: Result<(), String> = Self::init_postgresql_data().await;
         Self
     }
 }
