@@ -34,8 +34,8 @@ hyperlane_plugin = { path = "plugin", version = "16.1.2" }
 hyperlane_resources = { path = "resources", version = "16.1.2" }
 
 tracing = "0.1.44"
-hyperlane = "18.0.0"
-hyperlane-utils = "23.0.0"
+hyperlane = "18.0.1"
+hyperlane-utils = "23.0.1"
 serde = { version = "1.0.228", features = ["derive"] }
 
 [dependencies]

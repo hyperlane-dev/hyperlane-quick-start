@@ -101,7 +101,6 @@ impl ChatService {
                 .read()
                 .await
                 .peer_addr()
-                .ok()
                 .map(|data| data.to_string())
                 .unwrap_or_default();
         }
