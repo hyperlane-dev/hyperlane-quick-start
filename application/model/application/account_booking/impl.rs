@@ -22,15 +22,6 @@ impl std::str::FromStr for UserRole {
 
 impl JwtConfigEnum {
     #[instrument_trace]
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            JwtConfigEnum::SecretKey => "hyperlane_account_booking_secret_key",
-            JwtConfigEnum::Expiration => "86400",
-            JwtConfigEnum::Issuer => "hyperlane_account_booking",
-        }
-    }
-
-    #[instrument_trace]
     pub fn expiration_as_u64(&self) -> u64 {
         match self {
             JwtConfigEnum::Expiration => 86400,
@@ -42,6 +33,10 @@ impl JwtConfigEnum {
 impl std::fmt::Display for JwtConfigEnum {
     #[instrument_trace]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.as_str())
+        match self {
+            JwtConfigEnum::SecretKey => write!(f, "hyperlane_account_booking_secret_key"),
+            JwtConfigEnum::Expiration => write!(f, "86400"),
+            JwtConfigEnum::Issuer => write!(f, "hyperlane_account_booking"),
+        }
     }
 }

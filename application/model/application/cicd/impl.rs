@@ -55,33 +55,6 @@ impl FromStr for TriggerType {
 }
 
 impl CicdStatus {
-    #[instrument_trace]
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            Self::Pending => "pending",
-            Self::Running => "running",
-            Self::Success => "success",
-            Self::Failure => "failure",
-            Self::Cancelled => "cancelled",
-            Self::Skipped => "skipped",
-        }
-    }
-}
-
-impl TriggerType {
-    #[instrument_trace]
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            Self::Push => "push",
-            Self::PullRequest => "pull_request",
-            Self::Manual => "manual",
-            Self::Schedule => "schedule",
-            Self::Webhook => "webhook",
-        }
-    }
-}
-
-impl CicdStatus {
     pub fn is_terminal(self) -> bool {
         matches!(
             self,

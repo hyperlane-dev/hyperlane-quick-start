@@ -780,10 +780,8 @@ impl AccountBookingService {
                 .iter()
                 .filter(|r| *r.get_bill_date() == current_date)
                 .collect();
-            let unique_users: std::collections::HashSet<i32> = day_records
-                .iter()
-                .map(|r| r.get_user_id())
-                .collect();
+            let unique_users: std::collections::HashSet<i32> =
+                day_records.iter().map(|r| r.get_user_id()).collect();
             active_users.push(unique_users.len() as i64);
             new_records.push(day_records.len() as i64);
             current_date += chrono::Duration::days(1);
