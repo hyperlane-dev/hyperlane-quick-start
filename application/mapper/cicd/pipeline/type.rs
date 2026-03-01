@@ -1,5 +1,6 @@
 use super::*;
 
-pub type PipelineEntity = Entity;
-pub type PipelineActiveModel = ActiveModel;
-pub type PipelineColumn = Column;
+pub type CicdPipelineEntity = Entity;
+pub type CicdPipelineActiveModel = ActiveModel;
+pub type CicdPipelineColumn = Column;
+pub type CicdPipelineModel = Model;

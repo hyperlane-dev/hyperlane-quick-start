@@ -125,22 +125,6 @@ pub fn openapi_user_get() {}
 pub fn openapi_record_create() {}
 
 #[utoipa::path(
-    post,
-    path = "/api/account_booking/record/update/{id}",
-    params(
-        ("id" = i32, Path, description = "Record ID")
-    ),
-    responses(
-        (status = 200, description = "Record updated successfully"),
-        (status = 400, description = "Bad request"),
-        (status = 404, description = "Record not found"),
-        (status = 500, description = "Internal server error")
-    )
-)]
-#[instrument_trace]
-pub fn openapi_record_update() {}
-
-#[utoipa::path(
     get,
     path = "/api/account_booking/record/list",
     responses(
@@ -166,3 +150,16 @@ pub fn openapi_record_list() {}
 )]
 #[instrument_trace]
 pub fn openapi_record_get() {}
+
+#[utoipa::path(
+    get,
+    path = "/api/account_booking/overview/statistics",
+    responses(
+        (status = 200, description = "Statistics retrieved successfully"),
+        (status = 401, description = "Unauthorized"),
+        (status = 403, description = "Forbidden"),
+        (status = 500, description = "Internal server error")
+    )
+)]
+#[instrument_trace]
+pub fn openapi_overview_statistics() {}

@@ -5,6 +5,7 @@ impl ServerHook for UserRegisterRoute {
     async fn new(_ctx: &mut Context) -> Self {
         Self
     }
+
     #[prologue_macros(post_method, request_body_json_result(request_opt: RegisterRequest), response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
@@ -37,6 +38,7 @@ impl ServerHook for UserLoginRoute {
     async fn new(_ctx: &mut Context) -> Self {
         Self
     }
+
     #[prologue_macros(post_method, request_body_json_result(request_opt: LoginRequest), response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
@@ -50,15 +52,42 @@ impl ServerHook for UserLoginRoute {
             }
         };
         match AccountBookingService::login_user(request).await {
-            Ok(login_response) => {
-                let response: ApiResponse<LoginResponse> =
-                    ApiResponse::<LoginResponse>::success(login_response);
-                ctx.get_mut_response().set_body(response.to_json_bytes())
+            Ok((user_response, user_id, role)) => {
+                let jwt_config: JwtConfig = JwtConfig::new(
+                    JwtConfigEnum::SecretKey.to_string(),
+                    JwtConfigEnum::Expiration.expiration_as_u64(),
+                    JwtConfigEnum::Issuer.to_string(),
+                );
+                let jwt_service: JwtService = JwtService::from(jwt_config);
+                let mut extra_claims: HashMap<String, serde_json::Value> = HashMap::new();
+                extra_claims.insert("user_id".to_string(), json!(user_id));
+                extra_claims.insert("role".to_string(), json!(role));
+                let token_result: Result<JwtToken, String> = jwt_service
+                    .generate_token_with_extra_claims(user_response.get_username(), extra_claims);
+                match token_result {
+                    Ok(jwt_token) => {
+                        let token_str: String = jwt_token.get_token().to_string();
+                        let cookie_value: String =
+                            format!("token={token_str}; Path=/; Max-Age=86400; HttpOnly");
+                        ctx.get_mut_response()
+                            .set_header("Set-Cookie", &cookie_value);
+                        let mut login_response: LoginResponse = LoginResponse::default();
+                        login_response.set_user(user_response).set_token(token_str);
+                        let response: ApiResponse<LoginResponse> =
+                            ApiResponse::<LoginResponse>::success(login_response);
+                        ctx.get_mut_response().set_body(response.to_json_bytes());
+                    }
+                    Err(error) => {
+                        let response: ApiResponse<()> =
+                            ApiResponse::<()>::error_with_code(ResponseCode::InternalError, error);
+                        ctx.get_mut_response().set_body(response.to_json_bytes());
+                    }
+                }
             }
             Err(error) => {
                 let response: ApiResponse<()> =
                     ApiResponse::<()>::error_with_code(ResponseCode::Unauthorized, error);
-                ctx.get_mut_response().set_body(response.to_json_bytes())
+                ctx.get_mut_response().set_body(response.to_json_bytes());
             }
         };
     }
@@ -69,6 +98,7 @@ impl ServerHook for UserCreateRoute {
     async fn new(_ctx: &mut Context) -> Self {
         Self
     }
+
     #[prologue_macros(post_method, request_body_json_result(request_opt: CreateUserRequest), response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
@@ -101,6 +131,7 @@ impl ServerHook for UserUpdateRoute {
     async fn new(_ctx: &mut Context) -> Self {
         Self
     }
+
     #[prologue_macros(post_method, route_param_option(ID_KEY => id_opt), request_body_json_result(request_opt: UpdateUserRequest), response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
@@ -154,6 +185,7 @@ impl ServerHook for UserChangePasswordRoute {
     async fn new(_ctx: &mut Context) -> Self {
         Self
     }
+
     #[prologue_macros(post_method, route_param_option(ID_KEY => id_opt), request_body_json_result(request_opt: ChangePasswordRequest), response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
@@ -206,6 +238,7 @@ impl ServerHook for UserApproveRoute {
     async fn new(_ctx: &mut Context) -> Self {
         Self
     }
+
     #[prologue_macros(post_method, route_param_option(ID_KEY => id_opt), request_body_json_result(request_opt: ApproveUserRequest), response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
@@ -259,6 +292,7 @@ impl ServerHook for UserListRoute {
     async fn new(_ctx: &mut Context) -> Self {
         Self
     }
+
     #[prologue_macros(get_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
@@ -282,6 +316,7 @@ impl ServerHook for UserGetRoute {
     async fn new(_ctx: &mut Context) -> Self {
         Self
     }
+
     #[prologue_macros(get_method, route_param_option(ID_KEY => id_opt), response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
@@ -331,6 +366,7 @@ impl ServerHook for RecordCreateRoute {
     async fn new(_ctx: &mut Context) -> Self {
         Self
     }
+
     #[prologue_macros(post_method, request_body_json_result(request_opt: CreateRecordRequest), response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
@@ -343,73 +379,60 @@ impl ServerHook for RecordCreateRoute {
                 return;
             }
         };
-        let user_id: i32 = 1;
-        match AccountBookingService::create_record(user_id, request).await {
-            Ok(record) => {
-                let response: ApiResponse<RecordResponse> =
-                    ApiResponse::<RecordResponse>::success(record);
-                ctx.get_mut_response().set_body(response.to_json_bytes())
-            }
+        let current_user_id: i32 = match AccountBookingService::extract_user_from_cookie(ctx) {
+            Ok(id) => id,
             Err(error) => {
                 let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
-                ctx.get_mut_response().set_body(response.to_json_bytes())
+                    ApiResponse::<()>::error_with_code(ResponseCode::Unauthorized, error);
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+                return;
             }
         };
-    }
-}
-
-impl ServerHook for RecordUpdateRoute {
-    #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
-        Self
-    }
-    #[prologue_macros(post_method, route_param_option(ID_KEY => id_opt), request_body_json_result(request_opt: UpdateRecordRequest), response_header(CONTENT_TYPE => APPLICATION_JSON))]
-    #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
-        let record_id: i32 = match id_opt {
-            Some(id_str) => match id_str.parse::<i32>() {
-                Ok(id) => id,
-                Err(_) => {
+        let current_user: UserResponse =
+            match AccountBookingService::get_user(current_user_id).await {
+                Ok(Some(user_info)) => user_info,
+                Ok(None) => {
                     let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                        ResponseCode::BadRequest,
-                        "Invalid record ID",
+                        ResponseCode::Unauthorized,
+                        "User not found",
                     );
                     ctx.get_mut_response().set_body(response.to_json_bytes());
                     return;
                 }
-            },
-            None => {
-                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                    ResponseCode::BadRequest,
-                    "Record ID is required",
-                );
-                ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                Err(error) => {
+                    let response: ApiResponse<()> =
+                        ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                    ctx.get_mut_response().set_body(response.to_json_bytes());
+                    return;
+                }
+            };
+        let target_user_id: i32 = match request.try_get_target_user_id() {
+            Some(target_id) => {
+                let user_role: UserRole = current_user.get_role().parse().unwrap_or_default();
+                if !user_role.is_admin() {
+                    let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
+                        ResponseCode::Forbidden,
+                        "Only admin can create records for other users",
+                    );
+                    ctx.get_mut_response().set_body(response.to_json_bytes());
+                    return;
+                }
+                target_id
             }
+            None => current_user_id,
         };
-        let request: UpdateRecordRequest = match request_opt {
-            Ok(data) => data,
-            Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error);
-                ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
-            }
-        };
-        let user_id: i32 = 1;
-        match AccountBookingService::update_record(record_id, user_id, request).await {
+        match AccountBookingService::create_record(target_user_id, request).await {
             Ok(record) => {
                 let response: ApiResponse<RecordResponse> =
                     ApiResponse::<RecordResponse>::success(record);
-                ctx.get_mut_response().set_body(response.to_json_bytes())
+                ctx.get_mut_response().set_body(response.to_json_bytes());
             }
             Err(error) => {
                 let response: ApiResponse<()> =
                     ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
-                ctx.get_mut_response().set_body(response.to_json_bytes())
+                ctx.get_mut_response().set_body(response.to_json_bytes());
             }
-        };
+        }
     }
 }
 
@@ -418,6 +441,7 @@ impl ServerHook for RecordListRoute {
     async fn new(_ctx: &mut Context) -> Self {
         Self
     }
+
     #[prologue_macros(get_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
     #[request_query_option("user_id" => user_id_opt)]
@@ -425,12 +449,46 @@ impl ServerHook for RecordListRoute {
     #[request_query_option("end_date" => end_date_opt)]
     #[request_query_option("category" => category_opt)]
     #[request_query_option("transaction_type" => transaction_type_opt)]
+    #[request_query_option("last_id" => last_id_opt)]
+    #[request_query_option("limit" => limit_opt)]
     async fn handle(self, ctx: &mut Context) {
-        let mut query: RecordQueryRequest = RecordQueryRequest::default();
-        if let Some(user_id_str) = user_id_opt {
-            if let Ok(user_id) = user_id_str.parse::<i32>() {
-                query.set_user_id(Some(user_id));
+        let current_user_id: i32 = match AccountBookingService::extract_user_from_cookie(ctx) {
+            Ok(id) => id,
+            Err(error) => {
+                let response: ApiResponse<()> =
+                    ApiResponse::<()>::error_with_code(ResponseCode::Unauthorized, error);
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+                return;
             }
+        };
+        let current_user: UserResponse =
+            match AccountBookingService::get_user(current_user_id).await {
+                Ok(Some(user_info)) => user_info,
+                Ok(None) => {
+                    let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
+                        ResponseCode::Unauthorized,
+                        "User not found",
+                    );
+                    ctx.get_mut_response().set_body(response.to_json_bytes());
+                    return;
+                }
+                Err(error) => {
+                    let response: ApiResponse<()> =
+                        ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                    ctx.get_mut_response().set_body(response.to_json_bytes());
+                    return;
+                }
+            };
+        let mut query: RecordQueryRequest = RecordQueryRequest::default();
+        let user_role: UserRole = current_user.get_role().parse().unwrap_or_default();
+        if user_role.is_admin() {
+            if let Some(user_id_str) = user_id_opt {
+                if let Ok(user_id) = user_id_str.parse::<i32>() {
+                    query.set_user_id(Some(user_id));
+                }
+            }
+        } else {
+            query.set_user_id(Some(current_user_id));
         }
         if let Some(start_date_str) = start_date_opt {
             if let Ok(start_date) = NaiveDate::parse_from_str(&start_date_str, "%Y-%m-%d") {
@@ -447,6 +505,16 @@ impl ServerHook for RecordListRoute {
         }
         if let Some(transaction_type) = transaction_type_opt {
             query.set_transaction_type(Some(transaction_type));
+        }
+        if let Some(last_id_str) = last_id_opt {
+            if let Ok(last_id) = last_id_str.parse::<i32>() {
+                query.set_last_id(Some(last_id));
+            }
+        }
+        if let Some(limit_str) = limit_opt {
+            if let Ok(limit) = limit_str.parse::<i32>() {
+                query.set_limit(Some(limit));
+            }
         }
         match AccountBookingService::list_records(query).await {
             Ok(list_response) => {
@@ -468,6 +536,7 @@ impl ServerHook for RecordGetRoute {
     async fn new(_ctx: &mut Context) -> Self {
         Self
     }
+
     #[prologue_macros(get_method, route_param_option(ID_KEY => id_opt), response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
@@ -501,6 +570,66 @@ impl ServerHook for RecordGetRoute {
             Ok(None) => {
                 let response: ApiResponse<()> =
                     ApiResponse::<()>::error_with_code(ResponseCode::NotFound, "Record not found");
+                ctx.get_mut_response().set_body(response.to_json_bytes())
+            }
+            Err(error) => {
+                let response: ApiResponse<()> =
+                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                ctx.get_mut_response().set_body(response.to_json_bytes())
+            }
+        };
+    }
+}
+
+impl ServerHook for OverviewStatisticsRoute {
+    #[instrument_trace]
+    async fn new(_ctx: &mut Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(get_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
+    #[instrument_trace]
+    async fn handle(self, ctx: &mut Context) {
+        let current_user_id: i32 = match AccountBookingService::extract_user_from_cookie(ctx) {
+            Ok(id) => id,
+            Err(error) => {
+                let response: ApiResponse<()> =
+                    ApiResponse::<()>::error_with_code(ResponseCode::Unauthorized, error);
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+                return;
+            }
+        };
+        let current_user: UserResponse =
+            match AccountBookingService::get_user(current_user_id).await {
+                Ok(Some(user_info)) => user_info,
+                Ok(None) => {
+                    let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
+                        ResponseCode::Unauthorized,
+                        "User not found",
+                    );
+                    ctx.get_mut_response().set_body(response.to_json_bytes());
+                    return;
+                }
+                Err(error) => {
+                    let response: ApiResponse<()> =
+                        ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                    ctx.get_mut_response().set_body(response.to_json_bytes());
+                    return;
+                }
+            };
+        let user_role: UserRole = current_user.get_role().parse().unwrap_or_default();
+        if !user_role.is_admin() {
+            let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
+                ResponseCode::Forbidden,
+                "Only admin can access overview statistics",
+            );
+            ctx.get_mut_response().set_body(response.to_json_bytes());
+            return;
+        }
+        match AccountBookingService::get_overview_statistics().await {
+            Ok(statistics) => {
+                let response: ApiResponse<OverviewStatisticsResponse> =
+                    ApiResponse::<OverviewStatisticsResponse>::success(statistics);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {

@@ -11,30 +11,27 @@ use super::*;
     PartialEq,
     Serialize,
 )]
-#[sea_orm(table_name = "account_booking_user", schema_name = "public")]
+#[sea_orm(table_name = "account_booking_record", schema_name = "public")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = true)]
     #[get(type(copy), pub(crate))]
     pub(super) id: i32,
     #[get(pub(crate))]
-    pub(super) username: String,
+    pub(super) bill_no: String,
+    #[get(type(copy), pub(crate))]
+    pub(super) user_id: i32,
     #[get(pub(crate))]
-    pub(super) password_hash: String,
+    pub(super) amount: Decimal,
     #[get(pub(crate))]
-    pub(super) nickname: Option<String>,
+    pub(super) category: String,
     #[get(pub(crate))]
-    pub(super) email: Option<String>,
+    pub(super) transaction_type: String,
     #[get(pub(crate))]
-    pub(super) phone: Option<String>,
+    pub(super) description: Option<String>,
     #[get(pub(crate))]
-    pub(super) role: String,
-    #[get(pub(crate))]
-    pub(super) status: String,
+    pub(super) bill_date: NaiveDate,
     #[get(pub(crate))]
     pub(super) created_at: Option<NaiveDateTime>,
     #[get(pub(crate))]
     pub(super) updated_at: Option<NaiveDateTime>,
 }
-
-#[derive(Clone, Debug, EnumIter, DeriveRelation)]
-pub enum Relation {}

@@ -1,5 +1,6 @@
 use super::*;
 
-pub type JobEntity = Entity;
-pub type JobActiveModel = ActiveModel;
-pub type JobColumn = Column;
+pub type CicdJobEntity = Entity;
+pub type CicdJobActiveModel = ActiveModel;
+pub type CicdJobColumn = Column;
+pub type CicdJobModel = Model;

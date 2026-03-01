@@ -5,6 +5,7 @@ impl ServerHook for AccountBookingViewRoute {
     async fn new(_ctx: &mut Context) -> Self {
         Self
     }
+
     #[prologue_macros(
         methods(get, post),
         response_status_code(302),

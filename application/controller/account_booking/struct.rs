@@ -36,10 +36,6 @@ pub struct UserGetRoute;
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct RecordCreateRoute;
 
-#[route("/api/account_booking/record/update/{id}")]
-#[derive(Clone, Copy, Data, Debug, Default)]
-pub struct RecordUpdateRoute;
-
 #[route("/api/account_booking/record/list")]
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct RecordListRoute;
@@ -47,3 +43,7 @@ pub struct RecordListRoute;
 #[route("/api/account_booking/record/get/{id}")]
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct RecordGetRoute;
+
+#[route("/api/account_booking/overview/statistics")]
+#[derive(Clone, Copy, Data, Debug, Default)]
+pub struct OverviewStatisticsRoute;

@@ -12,7 +12,6 @@ use super::*;
         controller::account_booking::openapi_user_list,
         controller::account_booking::openapi_user_get,
         controller::account_booking::openapi_record_create,
-        controller::account_booking::openapi_record_update,
         controller::account_booking::openapi_record_list,
         controller::account_booking::openapi_record_get,
         controller::chat::openapi_get_online_users,

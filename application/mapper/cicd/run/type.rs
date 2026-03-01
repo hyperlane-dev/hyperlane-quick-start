@@ -1,5 +1,6 @@
 use super::*;
 
-pub type RunEntity = Entity;
-pub type RunActiveModel = ActiveModel;
-pub type RunColumn = Column;
+pub type CicdRunEntity = Entity;
+pub type CicdRunActiveModel = ActiveModel;
+pub type CicdRunColumn = Column;
+pub type CicdRunModel = Model;

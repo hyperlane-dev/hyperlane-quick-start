@@ -2,11 +2,9 @@ mod r#enum;
 mod r#impl;
 mod r#static;
 mod r#struct;
+mod r#type;
 
-pub use {
-    r#enum::*,
-    r#struct::{Model as TrackingRecordModel, *},
-};
+pub use {r#enum::*, r#struct::*, r#type::*};
 
 use {super::*, model::application::tracking::*, r#static::*};
 

@@ -97,7 +97,7 @@ impl TrackingMapper {
                     for (key, values) in headers.iter() {
                         if key.to_lowercase().contains(&header_key_lower) {
                             if let Some(ref expected_value) = header_value {
-                                let expected_lower = expected_value.to_lowercase();
+                                let expected_lower: String = expected_value.to_lowercase();
                                 for value in values {
                                     if value.to_lowercase().contains(&expected_lower) {
                                         return true;

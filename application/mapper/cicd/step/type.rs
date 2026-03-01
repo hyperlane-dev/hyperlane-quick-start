@@ -1,5 +1,6 @@
 use super::*;
 
-pub type StepEntity = Entity;
-pub type StepActiveModel = ActiveModel;
-pub type StepColumn = Column;
+pub type CicdStepEntity = Entity;
+pub type CicdStepActiveModel = ActiveModel;
+pub type CicdStepColumn = Column;
+pub type CicdStepModel = Model;

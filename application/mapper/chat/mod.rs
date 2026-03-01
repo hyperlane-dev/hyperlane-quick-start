@@ -4,14 +4,9 @@ mod r#fn;
 mod r#impl;
 mod r#static;
 mod r#struct;
+mod r#type;
 
-pub use {
-    r#const::*,
-    r#enum::*,
-    r#fn::*,
-    r#static::*,
-    r#struct::{Model as ChatHistoryModel, *},
-};
+pub use {r#const::*, r#enum::*, r#fn::*, r#static::*, r#struct::*, r#type::*};
 
 use {super::*, model::application::chat::*};
 

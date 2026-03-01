@@ -70,20 +70,8 @@ pub struct CreateRecordRequest {
     pub(super) description: Option<String>,
     #[get(type(copy), pub)]
     pub(super) bill_date: NaiveDate,
-}
-
-#[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]
-pub struct UpdateRecordRequest {
-    #[get(pub)]
-    pub(super) amount: Option<Decimal>,
-    #[get(pub)]
-    pub(super) category: Option<String>,
-    #[get(pub)]
-    pub(super) transaction_type: Option<String>,
-    #[get(pub)]
-    pub(super) description: Option<String>,
-    #[get(pub)]
-    pub(super) bill_date: Option<NaiveDate>,
+    #[get(type(copy), pub)]
+    pub(super) target_user_id: Option<i32>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]
@@ -98,6 +86,10 @@ pub struct RecordQueryRequest {
     pub(super) category: Option<String>,
     #[get(pub)]
     pub(super) transaction_type: Option<String>,
+    #[get(type(copy), pub)]
+    pub(super) last_id: Option<i32>,
+    #[get(type(copy), pub)]
+    pub(super) limit: Option<i32>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]

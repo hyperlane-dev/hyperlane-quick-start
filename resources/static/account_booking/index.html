@@ -6,6 +6,7 @@
     <title>Account Booking - Hyperlane</title>
     <link rel="icon" href="https://docs.ltpp.vip/img/hyperlane.png" />
     <link href="./css/style.css" rel="stylesheet" />
+    <script src="./js/echarts.js"></script>
     <script src="./js/app.js" defer></script>
   </head>
   <body>
@@ -130,6 +131,10 @@
               <span class="nav-icon">📝</span>
               <span>Records</span>
             </div>
+            <div class="nav-item admin-only hidden" data-page="overview">
+              <span class="nav-icon">📈</span>
+              <span>Overview</span>
+            </div>
             <div class="nav-item admin-only hidden" data-page="users">
               <span class="nav-icon">👥</span>
               <span>Users</span>
@@ -172,7 +177,7 @@
               <div class="card-header">
                 <span class="card-title">Recent Records</span>
                 <button
-                  class="btn btn-primary btn-sm"
+                  class="btn btn-primary btn-sm admin-only hidden"
                   onclick="showCreateRecordModal()"
                 >
                   + New Record
@@ -190,12 +195,108 @@
             </div>
           </div>
 
+          <div id="overview-page" class="page-content hidden">
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-label">Today's Transactions</div>
+                <div class="stat-value" id="today-transactions">0</div>
+                <div class="stat-change" id="today-transactions-change">--</div>
+              </div>
+              <div class="stat-card income">
+                <div class="stat-label">Today's Income</div>
+                <div class="stat-value" id="today-income">$0.00</div>
+                <div class="stat-change" id="today-income-change">--</div>
+              </div>
+              <div class="stat-card expense">
+                <div class="stat-label">Today's Expense</div>
+                <div class="stat-value" id="today-expense">$0.00</div>
+                <div class="stat-change" id="today-expense-change">--</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">New Users (Today)</div>
+                <div class="stat-value" id="today-new-users">0</div>
+                <div class="stat-change" id="today-new-users-change">--</div>
+              </div>
+            </div>
+            <div class="charts-grid">
+              <div class="card chart-card">
+                <div class="card-header">
+                  <span class="card-title"
+                    >Daily Transaction Trend (30 Days)</span
+                  >
+                </div>
+                <div class="card-body">
+                  <div id="trend-chart" class="chart-container"></div>
+                </div>
+              </div>
+              <div class="card chart-card">
+                <div class="card-header">
+                  <span class="card-title">Income vs Expense Comparison</span>
+                </div>
+                <div class="card-body">
+                  <div id="compare-chart" class="chart-container"></div>
+                </div>
+              </div>
+              <div class="card chart-card">
+                <div class="card-header">
+                  <span class="card-title">Category Distribution</span>
+                </div>
+                <div class="card-body">
+                  <div id="category-chart" class="chart-container"></div>
+                </div>
+              </div>
+              <div class="card chart-card">
+                <div class="card-header">
+                  <span class="card-title">User Growth Trend</span>
+                </div>
+                <div class="card-body">
+                  <div id="user-growth-chart" class="chart-container"></div>
+                </div>
+              </div>
+              <div class="card chart-card">
+                <div class="card-header">
+                  <span class="card-title">Transaction Type Distribution</span>
+                </div>
+                <div class="card-body">
+                  <div
+                    id="type-distribution-chart"
+                    class="chart-container"
+                  ></div>
+                </div>
+              </div>
+              <div class="card chart-card">
+                <div class="card-header">
+                  <span class="card-title">Daily Transaction Count</span>
+                </div>
+                <div class="card-body">
+                  <div id="count-trend-chart" class="chart-container"></div>
+                </div>
+              </div>
+              <div class="card chart-card">
+                <div class="card-header">
+                  <span class="card-title">Category Amount Distribution</span>
+                </div>
+                <div class="card-body">
+                  <div id="category-amount-chart" class="chart-container"></div>
+                </div>
+              </div>
+              <div class="card chart-card">
+                <div class="card-header">
+                  <span class="card-title">User Activity Trend</span>
+                </div>
+                <div class="card-body">
+                  <div id="user-activity-chart" class="chart-container"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div id="records-page" class="page-content hidden">
             <div class="card">
               <div class="card-header">
                 <span class="card-title">All Records</span>
                 <button
-                  class="btn btn-primary btn-sm"
+                  class="btn btn-primary btn-sm admin-only hidden"
                   onclick="showCreateRecordModal()"
                 >
                   + New Record
@@ -260,6 +361,31 @@
                     <p>Create a new record or adjust filters</p>
                   </div>
                 </div>
+                <div id="pagination-container" class="pagination-container">
+                  <div class="pagination-info">
+                    <span id="pagination-total">Total: 0 records</span>
+                    <span id="pagination-range">Showing 0 - 0</span>
+                  </div>
+                  <div class="pagination-controls">
+                    <button
+                      id="pagination-prev"
+                      class="btn btn-sm"
+                      onclick="goToPrevPage()"
+                      disabled
+                    >
+                      ← Previous
+                    </button>
+                    <span id="pagination-page">Page 1</span>
+                    <button
+                      id="pagination-next"
+                      class="btn btn-sm"
+                      onclick="goToNextPage()"
+                      disabled
+                    >
+                      Next →
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -267,7 +393,9 @@
           <div id="users-page" class="page-content hidden">
             <div class="card">
               <div class="card-header">
-                <span class="card-title">User Management</span>
+                <span class="card-title"
+                  >User Management (Click user to view records)</span
+                >
                 <button
                   class="btn btn-primary btn-sm"
                   onclick="showCreateUserModal()"
@@ -280,6 +408,134 @@
                   <div class="empty-state">
                     <div class="empty-state-icon">👥</div>
                     <div class="empty-state-title">No users found</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="user-records-page" class="page-content hidden">
+            <div class="stats-grid">
+              <div class="stat-card income">
+                <div class="stat-label">Total Income</div>
+                <div class="stat-value" id="user-total-income">$0.00</div>
+              </div>
+              <div class="stat-card expense">
+                <div class="stat-label">Total Expense</div>
+                <div class="stat-value" id="user-total-expense">$0.00</div>
+              </div>
+              <div class="stat-card balance">
+                <div class="stat-label">Balance</div>
+                <div class="stat-value" id="user-total-balance">$0.00</div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title" id="user-records-title"
+                  >User Records</span
+                >
+                <div>
+                  <button class="btn btn-sm" onclick="navigateTo('users')">
+                    ← Back to Users
+                  </button>
+                  <button
+                    class="btn btn-primary btn-sm"
+                    onclick="
+                      showCreateRecordModal(viewingUserId, viewingUserName)
+                    "
+                  >
+                    + New Record
+                  </button>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="filter-bar">
+                  <div class="filter-group">
+                    <label class="filter-label">Date Range</label>
+                    <input
+                      type="date"
+                      id="user-filter-start-date"
+                      class="form-input form-input-sm"
+                      lang="en"
+                    />
+                    <span>to</span>
+                    <input
+                      type="date"
+                      id="user-filter-end-date"
+                      class="form-input form-input-sm"
+                      lang="en"
+                    />
+                  </div>
+                  <div class="filter-group">
+                    <label class="filter-label">Category</label>
+                    <select
+                      id="user-filter-category"
+                      class="form-select form-select-sm"
+                    >
+                      <option value="">All</option>
+                      <option value="food">Food</option>
+                      <option value="transport">Transport</option>
+                      <option value="shopping">Shopping</option>
+                      <option value="entertainment">Entertainment</option>
+                      <option value="salary">Salary</option>
+                      <option value="investment">Investment</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                  <div class="filter-group">
+                    <label class="filter-label">Type</label>
+                    <select
+                      id="user-filter-type"
+                      class="form-select form-select-sm"
+                    >
+                      <option value="">All</option>
+                      <option value="income">Income</option>
+                      <option value="expense">Expense</option>
+                    </select>
+                  </div>
+                  <button
+                    class="btn btn-primary btn-sm"
+                    onclick="applyUserRecordFilters()"
+                  >
+                    Filter
+                  </button>
+                  <button class="btn btn-sm" onclick="resetUserRecordFilters()">
+                    Reset
+                  </button>
+                </div>
+                <div id="user-records-list" class="record-list">
+                  <div class="empty-state">
+                    <div class="empty-state-icon">📝</div>
+                    <div class="empty-state-title">No records found</div>
+                    <p>No records for this user yet</p>
+                  </div>
+                </div>
+                <div
+                  id="user-pagination-container"
+                  class="pagination-container"
+                >
+                  <div class="pagination-info">
+                    <span id="user-pagination-total">Total: 0 records</span>
+                    <span id="user-pagination-range">Showing 0 - 0</span>
+                  </div>
+                  <div class="pagination-controls">
+                    <button
+                      id="user-pagination-prev"
+                      class="btn btn-sm"
+                      onclick="goToUserRecordPrevPage()"
+                      disabled
+                    >
+                      ← Previous
+                    </button>
+                    <span id="user-pagination-page">Page 1</span>
+                    <button
+                      id="user-pagination-next"
+                      class="btn btn-sm"
+                      onclick="goToUserRecordNextPage()"
+                      disabled
+                    >
+                      Next →
+                    </button>
                   </div>
                 </div>
               </div>
@@ -406,11 +662,12 @@
             </div>
             <div class="form-group">
               <label class="form-label">Description</label>
-              <textarea
+              <input
+                type="text"
                 id="record-description"
-                class="form-textarea"
+                class="form-input"
                 placeholder="Enter description..."
-              ></textarea>
+              />
             </div>
           </div>
           <div class="modal-footer">
