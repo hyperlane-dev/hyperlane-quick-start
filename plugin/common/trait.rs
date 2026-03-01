@@ -54,5 +54,7 @@ pub trait DatabaseAutoCreation: Clone + Send + Sync + 'static {
         &self,
     ) -> impl Future<Output = Result<Vec<String>, AutoCreationError>> + Send;
 
+    fn init_data(&self) -> impl Future<Output = Result<(), AutoCreationError>> + Send;
+
     fn verify_connection(&self) -> impl Future<Output = Result<(), AutoCreationError>> + Send;
 }
