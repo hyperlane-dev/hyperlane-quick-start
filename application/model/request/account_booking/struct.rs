@@ -30,7 +30,6 @@ pub struct UpdateUserRequest {
     pub(super) nickname: Option<String>,
     pub(super) email: Option<String>,
     pub(super) phone: Option<String>,
-    pub(super) role: Option<String>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]

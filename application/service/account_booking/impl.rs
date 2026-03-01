@@ -165,9 +165,6 @@ impl AccountBookingService {
                 if let Some(phone) = request.try_get_phone() {
                     active_model.phone = ActiveValue::Set(Some(phone.clone()));
                 }
-                if let Some(role) = request.try_get_role() {
-                    active_model.role = ActiveValue::Set(role.clone());
-                }
                 active_model.updated_at = ActiveValue::Set(Some(Local::now().naive_local()));
                 let result: AccountBookingUserModel = active_model
                     .update(&db)

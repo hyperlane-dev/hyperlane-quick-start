@@ -135,7 +135,7 @@ impl ServerHook for UserUpdateRoute {
     #[prologue_macros(post_method, route_param_option(ID_KEY => id_opt), request_body_json_result(request_opt: UpdateUserRequest), response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
-        let user_id: i32 = match id_opt {
+        let target_user_id: i32 = match id_opt {
             Some(id_str) => match id_str.parse::<i32>() {
                 Ok(id) => id,
                 Err(_) => {
@@ -156,6 +156,42 @@ impl ServerHook for UserUpdateRoute {
                 return;
             }
         };
+        let current_user_id: i32 = match AccountBookingService::extract_user_from_cookie(ctx) {
+            Ok(id) => id,
+            Err(error) => {
+                let response: ApiResponse<()> =
+                    ApiResponse::<()>::error_with_code(ResponseCode::Unauthorized, error);
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+                return;
+            }
+        };
+        let current_user: UserResponse =
+            match AccountBookingService::get_user(current_user_id).await {
+                Ok(Some(user_info)) => user_info,
+                Ok(None) => {
+                    let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
+                        ResponseCode::Unauthorized,
+                        "User not found",
+                    );
+                    ctx.get_mut_response().set_body(response.to_json_bytes());
+                    return;
+                }
+                Err(error) => {
+                    let response: ApiResponse<()> =
+                        ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                    ctx.get_mut_response().set_body(response.to_json_bytes());
+                    return;
+                }
+            };
+        let user_role: UserRole = current_user.get_role().parse().unwrap_or_default();
+        if !user_role.is_admin() && current_user_id != target_user_id {
+            let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
+                ResponseCode::Forbidden,
+                "You can only update your own data",
+            );
+            ctx.get_mut_response().set_body(response.to_json_bytes());
+            return;
+        }
         let request: UpdateUserRequest = match request_opt {
             Ok(data) => data,
             Err(error) => {
@@ -165,7 +201,7 @@ impl ServerHook for UserUpdateRoute {
                 return;
             }
         };
-        match AccountBookingService::update_user(user_id, request).await {
+        match AccountBookingService::update_user(target_user_id, request).await {
             Ok(user) => {
                 let response: ApiResponse<UserResponse> =
                     ApiResponse::<UserResponse>::success(user);
