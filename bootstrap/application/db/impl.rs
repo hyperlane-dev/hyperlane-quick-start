@@ -1,88 +1,86 @@
 use super::*;
 
+impl std::fmt::Display for MysqlTableName {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            MysqlTableName::CicdPipeline => write!(f, "cicd_pipeline"),
+            MysqlTableName::CicdRun => write!(f, "cicd_run"),
+            MysqlTableName::CicdJob => write!(f, "cicd_job"),
+            MysqlTableName::CicdStep => write!(f, "cicd_step"),
+        }
+    }
+}
+
+impl std::fmt::Display for PostgresqlTableName {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            PostgresqlTableName::ChatHistory => write!(f, "chat_history"),
+            PostgresqlTableName::TrackingRecord => write!(f, "tracking_record"),
+            PostgresqlTableName::Shortlink => write!(f, "shortlink"),
+            PostgresqlTableName::AccountBooking => write!(f, "account_booking"),
+        }
+    }
+}
+
 impl DbBootstrap {
     #[instrument_trace]
     pub fn build_mysql_schema() -> DatabaseSchema {
         DatabaseSchema::default()
             .add_table(TableSchema::new(
                 Vec::new(),
-                "cicd_pipeline".to_string(),
-                CICD_PIPELINE_SQL.to_string(),
+                MysqlTableName::CicdPipeline.to_string(),
+                MYSQL_CICD_PIPELINE_TABLE_SQL.to_string(),
             ))
             .add_table(TableSchema::new(
                 Vec::new(),
-                "cicd_run".to_string(),
-                CICD_RUN_SQL.to_string(),
+                MysqlTableName::CicdRun.to_string(),
+                MYSQL_CICD_RUN_TABLE_SQL.to_string(),
             ))
             .add_table(TableSchema::new(
                 Vec::new(),
-                "cicd_job".to_string(),
-                CICD_JOB_SQL.to_string(),
+                MysqlTableName::CicdJob.to_string(),
+                MYSQL_CICD_JOB_TABLE_SQL.to_string(),
             ))
             .add_table(TableSchema::new(
                 Vec::new(),
-                "cicd_step".to_string(),
-                CICD_STEP_SQL.to_string(),
+                MysqlTableName::CicdStep.to_string(),
+                MYSQL_CICD_STEP_TABLE_SQL.to_string(),
             ))
     }
 
     #[instrument_trace]
     pub fn build_postgresql_schema() -> DatabaseSchema {
-        let indexes: Vec<String> = POSTGRESQL_CREATE_INDEX_SQL
-            .split(';')
-            .map(|s| s.trim())
-            .filter(|s| !s.is_empty() && !s.starts_with("--"))
-            .map(|s| format!("{s};"))
-            .collect();
-        let mut schema: DatabaseSchema = DatabaseSchema::default()
+        DatabaseSchema::default()
             .add_table(TableSchema::new(
                 Vec::new(),
-                "chat_history".to_string(),
-                POSTGRESQL_CHAT_HISTORY_SQL.to_string(),
+                PostgresqlTableName::ChatHistory.to_string(),
+                POSTGRESQL_CHAT_HISTORY_TABLE_SQL.to_string(),
+            ))
+            .add_index(POSTGRESQL_CHAT_HISTORY_INDEX_SQL.to_string())
+            .add_table(TableSchema::new(
+                Vec::new(),
+                PostgresqlTableName::TrackingRecord.to_string(),
+                POSTGRESQL_TRACKING_RECORD_TABLE_SQL.to_string(),
+            ))
+            .add_index(POSTGRESQL_TRACKING_RECORD_INDEX_SQL.to_string())
+            .add_table(TableSchema::new(
+                Vec::new(),
+                PostgresqlTableName::Shortlink.to_string(),
+                POSTGRESQL_SHORTLINK_TABLE_SQL.to_string(),
+            ))
+            .add_index(POSTGRESQL_SHORTLINK_INDEX_SQL.to_string())
+            .add_table(TableSchema::new(
+                vec!["account_booking_user".to_string()],
+                "account_booking_record".to_string(),
+                POSTGRESQL_ACCOUNT_BOOKING_RECORD_TABLE_SQL.to_string(),
             ))
             .add_table(TableSchema::new(
                 Vec::new(),
-                "tracking_record".to_string(),
-                POSTGRESQL_TRACKING_RECORD_SQL.to_string(),
+                "account_booking_user".to_string(),
+                POSTGRESQL_ACCOUNT_BOOKING_USER_TABLE_SQL.to_string(),
             ))
-            .add_table(TableSchema::new(
-                Vec::new(),
-                "shortlink".to_string(),
-                POSTGRESQL_SHORTLINK_SQL.to_string(),
-            ))
-            .add_table(TableSchema::new(
-                Vec::new(),
-                "account_booking".to_string(),
-                POSTGRESQL_ACCOUNT_BOOKING_SQL.to_string(),
-            ));
-        for index in indexes {
-            schema = schema.add_index(index);
-        }
-        schema
-    }
-
-    #[instrument_trace]
-    pub async fn init_postgresql_data() -> Result<(), String> {
-        let _: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
-        let pool: PgPool = PgPoolOptions::new()
-            .connect("postgres://postgres:postgres@localhost/hyperlane")
-            .await
-            .map_err(|e: sqlx::Error| e.to_string())?;
-        let result: Result<(), sqlx::Error> = pool
-            .execute(POSTGRESQL_ACCOUNT_BOOKING_DATA_SQL)
-            .await
-            .map(|_| ());
-        match result {
-            Ok(_) => {
-                info!("Account booking data initialized successfully");
-                Ok(())
-            }
-            Err(error) => {
-                error!("Account booking data initialization failed: {error}");
-                Err(error.to_string())
-            }
-        }
+            .add_index(POSTGRESQL_ACCOUNT_BOOKING_INDEX_SQL.to_string())
+            .add_init_data(POSTGRESQL_ACCOUNT_BOOKING_DATA_SQL.to_string())
     }
 }
 
@@ -99,15 +97,6 @@ impl BootstrapAsyncInit for DbBootstrap {
         .await;
         let _: Result<ArcRwLock<Connection>, String> =
             RedisPlugin::get_connection(DEFAULT_REDIS_INSTANCE_NAME, None).await;
-        match DatabasePlugin::initialize_auto_creation().await {
-            Ok(_) => {
-                info!("Auto-creation initialization successful");
-            }
-            Err(error) => {
-                error!("Auto-creation initialization failed {error}");
-            }
-        };
-        let _: Result<(), String> = Self::init_postgresql_data().await;
         Self
     }
 }

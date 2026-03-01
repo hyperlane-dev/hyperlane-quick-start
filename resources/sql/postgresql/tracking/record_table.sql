@@ -1,4 +1,4 @@
-CREATE TABLE tracking_record (
+CREATE TABLE IF NOT EXISTS tracking_record (
     id BIGSERIAL PRIMARY KEY,
     socket_addr VARCHAR(255) NOT NULL,
     headers TEXT NOT NULL,

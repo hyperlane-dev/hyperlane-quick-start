@@ -1,4 +1,4 @@
-CREATE TABLE chat_history (
+CREATE TABLE IF NOT EXISTS chat_history (
     id BIGSERIAL PRIMARY KEY,
     session_id VARCHAR(255) NOT NULL,
     sender_name VARCHAR(255) NOT NULL,

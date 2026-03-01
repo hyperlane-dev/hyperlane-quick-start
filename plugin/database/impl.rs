@@ -267,6 +267,12 @@ impl DatabaseSchema {
     }
 
     #[instrument_trace]
+    pub fn add_init_data(mut self, init_data: String) -> Self {
+        self.get_mut_init_data().push(init_data);
+        self
+    }
+
+    #[instrument_trace]
     pub fn ordered_tables(&self) -> Vec<&TableSchema> {
         let mut ordered: Vec<&TableSchema> = Vec::new();
         let mut remaining: Vec<&TableSchema> = self.get_tables().iter().collect();
