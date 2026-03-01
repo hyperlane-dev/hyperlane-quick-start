@@ -6,23 +6,16 @@ pub struct DockerConfig {
     pub(super) cpus: Option<f32>,
     #[get(type(copy), pub)]
     pub(super) disable_network: bool,
-    #[get(pub)]
     pub(super) env_vars: Vec<(String, String)>,
-    #[get(pub)]
     pub(super) image: String,
-    #[get(pub)]
     pub(super) memory: Option<String>,
     #[get(type(copy), pub)]
     pub(super) pids_limit: Option<i32>,
     #[get(type(copy), pub)]
     pub(super) read_only: bool,
-    #[get(pub)]
     pub(super) shell: String,
-    #[get(pub)]
     pub(super) shell_flag: String,
-    #[get(pub)]
     pub(super) volumes: Vec<(String, String)>,
-    #[get(pub)]
     pub(super) workdir: String,
 }
 

@@ -310,6 +310,43 @@ body {
 input[type='date'].form-input {
   appearance: none;
   -webkit-appearance: none;
+  background-color: #0d1117;
+  color: #c9d1d9;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+input[type='date'].form-input::-webkit-calendar-picker-indicator {
+  filter: invert(0.7);
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+input[type='date'].form-input::-webkit-calendar-picker-indicator:hover {
+  filter: invert(0.9);
+  opacity: 1;
+}
+
+input[type='date'].form-input::-webkit-datetime-edit {
+  color: #c9d1d9;
+}
+
+input[type='date'].form-input::-webkit-datetime-edit-fields-wrapper {
+  color: #c9d1d9;
+}
+
+input[type='date'].form-input::-webkit-datetime-edit-text {
+  color: #8b949e;
+}
+
+input[type='date'].form-input::-webkit-datetime-edit-month-field,
+input[type='date'].form-input::-webkit-datetime-edit-day-field,
+input[type='date'].form-input::-webkit-datetime-edit-year-field {
+  color: #c9d1d9;
+}
+
+input[type='date'].form-input::placeholder {
+  color: #8b949e;
 }
 
 input[type='number'].form-input::-webkit-outer-spin-button,
@@ -424,6 +461,8 @@ input[type='number'].form-input {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  max-height: 600px;
+  overflow-y: auto;
 }
 
 .record-item {
@@ -435,11 +474,42 @@ input[type='number'].form-input {
   border: 1px solid #30363d;
   border-radius: 8px;
   transition: all 0.2s;
+  cursor: pointer;
+  user-select: none;
 }
 
 .record-item:hover {
   border-color: #58a6ff;
   background: #161b22;
+}
+
+.record-item:active {
+  transform: scale(0.995);
+}
+
+.loading-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 20px;
+  color: #8b949e;
+  font-size: 14px;
+}
+
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #30363d;
+  border-top-color: #58a6ff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .record-type {
@@ -490,6 +560,27 @@ input[type='number'].form-input {
   font-family: monospace;
 }
 
+.record-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.record-meta-item {
+  font-size: 11px;
+  color: #6e7681;
+  font-family: monospace;
+}
+
+.record-meta-label {
+  color: #8b949e;
+}
+
+.record-meta-value {
+  color: #c9d1d9;
+}
+
 .record-amount {
   font-size: 16px;
   font-weight: 600;
@@ -508,6 +599,30 @@ input[type='number'].form-input {
   font-size: 12px;
   color: #8b949e;
   text-align: right;
+}
+
+.record-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.btn-print {
+  margin-top: 8px;
+  padding: 4px 12px;
+  background: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #c9d1d9;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-print:hover {
+  background: #30363d;
+  border-color: #58a6ff;
 }
 
 .record-actions {

@@ -296,10 +296,19 @@ impl ServerHook for UserListRoute {
     #[prologue_macros(get_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
-        match AccountBookingService::list_users().await {
-            Ok(users) => {
-                let response: ApiResponse<Vec<UserResponse>> =
-                    ApiResponse::<Vec<UserResponse>>::success(users);
+        let querys: &RequestQuerys = ctx.get_request().get_querys();
+        let keyword: Option<String> = querys.get("keyword").cloned();
+        let last_id: Option<i32> = querys.get("last_id").and_then(|s: &String| s.parse().ok());
+        let limit: Option<i32> = querys.get("limit").and_then(|s: &String| s.parse().ok());
+        let mut query: UserListQueryRequest = UserListQueryRequest::default();
+        query
+            .set_keyword(keyword)
+            .set_last_id(last_id)
+            .set_limit(limit);
+        match AccountBookingService::list_users(query).await {
+            Ok(data) => {
+                let response: ApiResponse<UserListResponse> =
+                    ApiResponse::<UserListResponse>::success(data);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {

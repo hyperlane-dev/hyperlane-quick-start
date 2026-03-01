@@ -10,6 +10,15 @@ let allRecords = [];
 let totalRecords = 0;
 let currentPageNum = 1;
 let pageFirstIds = [null];
+let recentRecordsLastId = null;
+let recentRecordsHasMore = false;
+let recentRecordsLoading = false;
+let usersLastId = null;
+let usersHasMore = false;
+let usersLimit = 20;
+let allUsers = [];
+let usersCurrentPage = 1;
+let usersPageFirstIds = [null];
 
 const API_BASE = '/api/account_booking';
 
@@ -763,13 +772,21 @@ function handleLogout() {
 }
 
 async function loadDashboard() {
+  recentRecordsLastId = null;
+  recentRecordsHasMore = false;
   await loadRecentRecords();
+  initRecentRecordsScroll();
 }
 
-async function loadRecentRecords() {
+async function loadRecentRecords(append = false) {
+  if (recentRecordsLoading) return;
+  recentRecordsLoading = true;
   try {
     const params = new URLSearchParams();
-    params.append('limit', 5);
+    params.append('limit', 20);
+    if (recentRecordsLastId) {
+      params.append('last_id', recentRecordsLastId);
+    }
     if (currentUser && currentUser.role !== 'admin') {
       params.append('user_id', currentUser.id);
     }
@@ -778,26 +795,78 @@ async function loadRecentRecords() {
     });
     const result = await response.json();
     if (result.code === 200) {
-      renderRecentRecords(result.data.records);
-      updateStats(result.data);
+      recentRecordsHasMore = result.data.has_more;
+      recentRecordsLastId = result.data.last_id;
+      renderRecentRecords(result.data.records, append);
+      if (!append) {
+        updateStats(result.data);
+      }
     }
   } catch (error) {
     console.error('Error loading records:', error);
+  } finally {
+    recentRecordsLoading = false;
   }
 }
 
-function renderRecentRecords(records) {
+function renderRecentRecords(records, append = false) {
   const container = document.getElementById('recent-records-list');
   if (!records || records.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-state-icon">📝</div>
-        <div class="empty-state-title">No records yet</div>
-        <p>Create your first record to get started</p>
-      </div>`;
+    if (!append) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">📝</div>
+          <div class="empty-state-title">No records yet</div>
+          <p>Create your first record to get started</p>
+        </div>`;
+    }
     return;
   }
-  container.innerHTML = records.map((r) => renderRecordItem(r)).join('');
+  const html = records.map((r) => renderRecordItem(r)).join('');
+  if (append) {
+    const loader = container.querySelector('.loading-more');
+    if (loader) loader.remove();
+    container.insertAdjacentHTML('beforeend', html);
+  } else {
+    container.innerHTML = html;
+  }
+}
+
+function initRecentRecordsScroll() {
+  const container = document.getElementById('recent-records-list');
+  if (!container) return;
+  container.addEventListener('scroll', () => {
+    if (!recentRecordsHasMore || recentRecordsLoading) return;
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    if (scrollTop + clientHeight >= scrollHeight - 50) {
+      showLoadingMore();
+      loadRecentRecords(true);
+    }
+  });
+}
+
+function showLoadingMore() {
+  const container = document.getElementById('recent-records-list');
+  if (!container) return;
+  const existing = container.querySelector('.loading-more');
+  if (existing) return;
+  const loader = document.createElement('div');
+  loader.className = 'loading-more';
+  loader.innerHTML =
+    '<div class="loading-spinner"></div><span>Loading more...</span>';
+  container.appendChild(loader);
+}
+
+function copyBillNo(billNo) {
+  if (!billNo) return;
+  navigator.clipboard
+    .writeText(billNo)
+    .then(() => {
+      showToast(`Bill No "${billNo}" copied to clipboard`, 'success', 2000);
+    })
+    .catch(() => {
+      showToast('Failed to copy Bill No', 'error', 2000);
+    });
 }
 
 function renderRecordItem(record) {
@@ -805,17 +874,24 @@ function renderRecordItem(record) {
   const amountClass =
     record.transaction_type === 'income' ? 'income' : 'expense';
   const amountPrefix = record.transaction_type === 'income' ? '+' : '-';
+  const recordJson = JSON.stringify(record).replace(/"/g, '&quot;');
   return `
-    <div class="record-item">
+    <div class="record-item" data-bill-no="${escapeHtml(record.bill_no)}" ondblclick="copyBillNo('${escapeHtml(record.bill_no)}')">
       <div class="record-type ${record.transaction_type}">${typeIcon}</div>
       <div class="record-info">
         <div class="record-category">${escapeHtml(record.category)}</div>
         <div class="record-description">${escapeHtml(record.description || '')}</div>
-        <div class="record-user-id">User ID: ${record.user_id}</div>
+        <div class="record-meta-row">
+          <span class="record-meta-item"><span class="record-meta-label">ID:</span> <span class="record-meta-value">${record.id}</span></span>
+          <span class="record-meta-item"><span class="record-meta-label">Bill No:</span> <span class="record-meta-value">${escapeHtml(record.bill_no)}</span></span>
+          <span class="record-meta-item" onclick="event.stopPropagation(); viewUserRecords(${record.user_id}, 'User ${record.user_id}');" style="cursor: pointer;"><span class="record-meta-label">User ID:</span> <span class="record-meta-value" style="color: #58a6ff; text-decoration: underline;">${record.user_id}</span></span>
+        </div>
       </div>
-      <div>
+      <div class="record-right">
         <div class="record-amount ${amountClass}">${amountPrefix}$${formatAmount(record.amount)}</div>
         <div class="record-date">${formatDate(record.bill_date)}</div>
+        ${record.created_at ? `<div class="record-date">Created: ${formatDate(record.created_at)}</div>` : ''}
+        <button class="btn-print" onclick="event.stopPropagation(); printRecordData(JSON.parse(this.dataset.record));" data-record="${recordJson}">🖨️ Print</button>
       </div>
     </div>`;
 }
@@ -947,30 +1023,34 @@ function renderAllRecords(records) {
     return;
   }
   container.innerHTML = records
-    .map(
-      (r) => `
-    <div class="record-item">
+    .map((r) => {
+      const rJson = JSON.stringify(r).replace(/"/g, '&quot;');
+      return `
+    <div class="record-item" data-bill-no="${escapeHtml(r.bill_no)}" ondblclick="copyBillNo('${escapeHtml(r.bill_no)}')">
       <div class="record-type ${r.transaction_type}">${r.transaction_type === 'income' ? '💰' : '💸'}</div>
       <div class="record-info">
         <div class="record-category">${escapeHtml(r.category)}</div>
         <div class="record-description">${escapeHtml(r.description || '')}</div>
-        <div class="record-user-id">User ID: ${r.user_id}</div>
+        <div class="record-meta-row">
+          <span class="record-meta-item"><span class="record-meta-label">ID:</span> <span class="record-meta-value">${r.id}</span></span>
+          <span class="record-meta-item"><span class="record-meta-label">Bill No:</span> <span class="record-meta-value">${escapeHtml(r.bill_no)}</span></span>
+          <span class="record-meta-item" onclick="event.stopPropagation(); viewUserRecords(${r.user_id}, 'User ${r.user_id}');" style="cursor: pointer;"><span class="record-meta-label">User ID:</span> <span class="record-meta-value" style="color: #58a6ff; text-decoration: underline;">${r.user_id}</span></span>
+        </div>
       </div>
-      <div>
+      <div class="record-right">
         <div class="record-amount ${r.transaction_type}">${r.transaction_type === 'income' ? '+' : '-'}$${formatAmount(r.amount)}</div>
         <div class="record-date">${formatDate(r.bill_date)}</div>
+        ${r.created_at ? `<div class="record-date">Created: ${formatDate(r.created_at)}</div>` : ''}
+        <button class="btn-print" onclick="event.stopPropagation(); printRecordData(JSON.parse(this.dataset.record));" data-record="${rJson}">🖨️ Print</button>
       </div>
-    </div>`,
-    )
+    </div>`;
+    })
     .join('');
 }
 
 function showCreateRecordModal(targetUserId = null, targetUserName = null) {
   document.getElementById('record-modal-title').textContent = 'New Record';
   document.getElementById('record-form').reset();
-  document.getElementById('record-date').value = new Date()
-    .toISOString()
-    .split('T')[0];
   if (targetUserId && targetUserName) {
     document.getElementById('record-modal-title').textContent =
       `New Record for ${targetUserName}`;
@@ -984,7 +1064,6 @@ async function handleRecordSubmit(e) {
     transaction_type: document.getElementById('record-type').value,
     amount: parseFloat(document.getElementById('record-amount').value),
     category: document.getElementById('record-category').value,
-    bill_date: document.getElementById('record-date').value,
     description: document.getElementById('record-description').value || null,
   };
   if (
@@ -1009,12 +1088,6 @@ async function handleRecordSubmit(e) {
       if (currentPage === 'dashboard') loadDashboard();
       else if (currentPage === 'records') loadRecords();
       else if (currentPage === 'user-records') loadUserRecords();
-      const shouldPrint = confirm(
-        'Record created successfully! Do you want to print this record?',
-      );
-      if (shouldPrint) {
-        printRecordData(result.data);
-      }
     } else {
       showToast(result.message || 'Operation failed', 'error');
     }
@@ -1075,7 +1148,7 @@ function printRecordData(record) {
       <div class="bill-no">Bill No: ${record.bill_no}</div>
     </div>
     <div class="receipt-body">
-      <div class="amount-display ${amountClass}">${amountPrefix}$${record.amount}</div>
+      <div class="amount-display ${amountClass}">${amountPrefix}¥${record.amount}</div>
       <div class="field-row">
         <span class="field-label">Record ID</span>
         <span class="field-value">${record.id}</span>
@@ -1084,6 +1157,42 @@ function printRecordData(record) {
         <span class="field-label">User ID</span>
         <span class="field-value">${record.user_id}</span>
       </div>
+      ${
+        record.username
+          ? `
+      <div class="field-row">
+        <span class="field-label">Username</span>
+        <span class="field-value">${escapeHtml(record.username)}</span>
+      </div>`
+          : ''
+      }
+      ${
+        record.nickname
+          ? `
+      <div class="field-row">
+        <span class="field-label">Nickname</span>
+        <span class="field-value">${escapeHtml(record.nickname)}</span>
+      </div>`
+          : ''
+      }
+      ${
+        record.phone
+          ? `
+      <div class="field-row">
+        <span class="field-label">Phone</span>
+        <span class="field-value">${escapeHtml(record.phone)}</span>
+      </div>`
+          : ''
+      }
+      ${
+        record.email
+          ? `
+      <div class="field-row">
+        <span class="field-label">Email</span>
+        <span class="field-value">${escapeHtml(record.email)}</span>
+      </div>`
+          : ''
+      }
       <div class="field-row">
         <span class="field-label">Transaction Type</span>
         <span class="field-value">${transactionTypeLabel}</span>
@@ -1098,11 +1207,11 @@ function printRecordData(record) {
       </div>
       <div class="field-row">
         <span class="field-label">Description</span>
-        <span class="field-value">${record.description || 'N/A'}</span>
+        <span class="field-value">${record.description || ''}</span>
       </div>
       <div class="field-row">
         <span class="field-label">Created At</span>
-        <span class="field-value">${record.created_at || 'N/A'}</span>
+        <span class="field-value">${record.created_at || ''}</span>
       </div>
       <div class="field-row">
         <span class="field-label">Status</span>
@@ -1110,7 +1219,6 @@ function printRecordData(record) {
       </div>
     </div>
     <div class="receipt-footer">
-      <p>Thank you for using our service</p>
       <p class="no-print">Printed on: ${new Date().toLocaleString()}</p>
     </div>
   </div>
@@ -1123,22 +1231,95 @@ function printRecordData(record) {
   </script>
 </body>
 </html>
-  `;
+`;
   printWindow.document.write(htmlContent);
   printWindow.document.close();
 }
 
-async function loadUsers() {
+async function loadUsers(pageDirection = null) {
   try {
-    const response = await fetch(`${API_BASE}/user/list`, {
+    const keyword = document
+      .getElementById('user-search-keyword')
+      ?.value.trim();
+    const params = new URLSearchParams();
+    params.append('limit', usersLimit);
+    if (keyword) {
+      params.append('keyword', keyword);
+    }
+    let lastId = null;
+    if (
+      pageDirection === 'next' &&
+      usersPageFirstIds.length > usersCurrentPage
+    ) {
+      lastId = usersPageFirstIds[usersCurrentPage];
+    } else if (pageDirection === 'prev' && usersCurrentPage > 1) {
+      lastId = usersPageFirstIds[usersCurrentPage - 2];
+    }
+    if (lastId !== undefined && lastId !== null) {
+      params.append('last_id', lastId);
+    }
+    const url = `${API_BASE}/user/list?${params.toString()}`;
+    const response = await fetch(url, {
       credentials: 'include',
     });
     const result = await response.json();
     if (result.code === 200) {
-      renderUsers(result.data);
+      const data = result.data;
+      allUsers = data.users;
+      usersHasMore = data.has_more;
+      usersLastId = data.last_id;
+      if (pageDirection === 'next') {
+        usersCurrentPage++;
+        if (
+          data.users.length > 0 &&
+          !usersPageFirstIds.includes(data.users[0]?.id)
+        ) {
+          usersPageFirstIds.push(data.users[0]?.id);
+        }
+      } else if (pageDirection === 'prev') {
+        usersCurrentPage--;
+      } else {
+        usersCurrentPage = 1;
+        usersPageFirstIds = [null];
+        if (data.users.length > 0) {
+          usersPageFirstIds.push(data.users[0]?.id);
+        }
+      }
+      renderUsers(allUsers);
+      renderUsersPagination();
     }
   } catch (error) {
     showToast('Error loading users', 'error');
+  }
+}
+
+function handleUserSearch(event) {
+  if (event.key === 'Enter') {
+    usersCurrentPage = 1;
+    usersPageFirstIds = [null];
+    loadUsers();
+  }
+}
+
+function resetUserSearch() {
+  const searchInput = document.getElementById('user-search-keyword');
+  if (searchInput) {
+    searchInput.value = '';
+  }
+  usersCurrentPage = 1;
+  usersPageFirstIds = [null];
+  loadUsers();
+}
+
+function goToUsersNextPage() {
+  if (usersHasMore) {
+    loadUsers('next');
+  }
+}
+
+function goToUsersPrevPage() {
+  if (usersCurrentPage > 1) {
+    loadUsers('prev');
   }
 }
 
@@ -1169,6 +1350,27 @@ function renderUsers(users) {
     </div>`,
     )
     .join('');
+}
+
+function renderUsersPagination() {
+  const paginationContainer = document.getElementById('users-pagination');
+  if (!paginationContainer) return;
+  const startUser = (usersCurrentPage - 1) * usersLimit + 1;
+  const endUser = startUser + allUsers.length - 1;
+  const totalText =
+    usersHasMore || usersCurrentPage > 1 ? `Page ${usersCurrentPage}` : '';
+  const rangeText =
+    allUsers.length > 0 ? `Showing ${startUser} - ${endUser}` : 'Showing 0 - 0';
+  paginationContainer.innerHTML = `
+    <div class="pagination-info">
+      <span class="pagination-total">${totalText}</span>
+      <span class="pagination-range">${rangeText}</span>
+    </div>
+    <div class="pagination-controls">
+      <button id="users-pagination-prev" class="btn btn-secondary btn-sm" onclick="goToUsersPrevPage()" ${usersCurrentPage <= 1 ? 'disabled' : ''}>← Prev</button>
+      <button id="users-pagination-next" class="btn btn-secondary btn-sm" onclick="goToUsersNextPage()" ${!usersHasMore ? 'disabled' : ''}>Next →</button>
+    </div>
+  `;
 }
 
 function showCreateUserModal() {
@@ -1258,20 +1460,27 @@ function renderUserRecords(records) {
     return;
   }
   container.innerHTML = records
-    .map(
-      (r) => `
-    <div class="record-item">
+    .map((r) => {
+      const rJson = JSON.stringify(r).replace(/"/g, '&quot;');
+      return `
+    <div class="record-item" data-bill-no="${escapeHtml(r.bill_no)}" ondblclick="copyBillNo('${escapeHtml(r.bill_no)}')">
       <div class="record-type ${r.transaction_type}">${r.transaction_type === 'income' ? '💰' : '💸'}</div>
       <div class="record-info">
         <div class="record-category">${escapeHtml(r.category)}</div>
         <div class="record-description">${escapeHtml(r.description || '')}</div>
+        <div class="record-meta-row">
+          <span class="record-meta-item"><span class="record-meta-label">ID:</span> <span class="record-meta-value">${r.id}</span></span>
+          <span class="record-meta-item"><span class="record-meta-label">Bill No:</span> <span class="record-meta-value">${escapeHtml(r.bill_no)}</span></span>
+        </div>
       </div>
-      <div>
+      <div class="record-right">
         <div class="record-amount ${r.transaction_type}">${r.transaction_type === 'income' ? '+' : '-'}$${formatAmount(r.amount)}</div>
         <div class="record-date">${formatDate(r.bill_date)}</div>
+        ${r.created_at ? `<div class="record-date">Created: ${formatDate(r.created_at)}</div>` : ''}
+        <button class="btn-print" onclick="event.stopPropagation(); printRecordData(JSON.parse(this.dataset.record));" data-record="${rJson}">🖨️ Print</button>
       </div>
-    </div>`,
-    )
+    </div>`;
+    })
     .join('');
 }
 

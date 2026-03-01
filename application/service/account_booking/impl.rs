@@ -243,14 +243,57 @@ impl AccountBookingService {
     }
 
     #[instrument_trace]
-    pub async fn list_users() -> Result<Vec<UserResponse>, String> {
+    pub async fn list_users(query: UserListQueryRequest) -> Result<UserListResponse, String> {
         let db: DatabaseConnection =
             PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
-        let users: Vec<AccountBookingUserModel> = AccountBookingUserEntity::find()
+        let mut base_select: Select<AccountBookingUserEntity> = AccountBookingUserEntity::find();
+        if let Some(keyword) = query.try_get_keyword() {
+            let keyword_pattern: String = format!("%{keyword}%");
+            let mut condition: Condition = Condition::any()
+                .add(AccountBookingUserColumn::Username.like(keyword_pattern.clone()))
+                .add(AccountBookingUserColumn::Nickname.like(keyword_pattern.clone()))
+                .add(AccountBookingUserColumn::Email.like(keyword_pattern.clone()))
+                .add(AccountBookingUserColumn::Phone.like(keyword_pattern.clone()));
+            if let Ok(user_id) = keyword.parse::<i32>() {
+                condition = condition.add(AccountBookingUserColumn::Id.eq(user_id));
+            }
+            base_select = base_select.filter(condition);
+        }
+        let total_count_u64: u64 = base_select
+            .clone()
+            .count(&db)
+            .await
+            .map_err(|error: DbErr| error.to_string())?;
+        let total_count: i64 = total_count_u64 as i64;
+        let mut paged_select: Select<AccountBookingUserEntity> = base_select;
+        if let Some(last_id) = query.try_get_last_id() {
+            paged_select = paged_select.filter(AccountBookingUserColumn::Id.lt(last_id));
+        }
+        paged_select = paged_select.order_by_desc(AccountBookingUserColumn::Id);
+        let limit: i32 = query.try_get_limit().unwrap_or(20);
+        let limit_with_extra: i32 = limit + 1;
+        paged_select = paged_select.limit(limit_with_extra as u64);
+        let paged_users: Vec<AccountBookingUserModel> = paged_select
             .all(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
-        Ok(users.iter().map(Self::model_to_user_response).collect())
+        let has_more: bool = paged_users.len() > limit as usize;
+        let paged_users: Vec<AccountBookingUserModel> =
+            paged_users.into_iter().take(limit as usize).collect();
+        let last_id: Option<i32> = paged_users
+            .last()
+            .map(|u: &AccountBookingUserModel| u.get_id());
+        let user_responses: Vec<UserResponse> = paged_users
+            .iter()
+            .map(Self::model_to_user_response)
+            .collect();
+        let mut response: UserListResponse = UserListResponse::default();
+        response
+            .set_users(user_responses)
+            .set_has_more(has_more)
+            .set_last_id(last_id)
+            .set_total_count(total_count);
+        Ok(response)
     }
 
     #[instrument_trace]
@@ -291,6 +334,9 @@ impl AccountBookingService {
         let db: DatabaseConnection =
             PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
         let bill_no: String = Self::generate_bill_no();
+        let bill_date: NaiveDate = request
+            .try_get_bill_date()
+            .unwrap_or_else(|| Local::now().naive_local().date());
         let active_model: AccountBookingRecordActiveModel = AccountBookingRecordActiveModel {
             bill_no: ActiveValue::Set(bill_no.clone()),
             user_id: ActiveValue::Set(user_id),
@@ -298,7 +344,7 @@ impl AccountBookingService {
             category: ActiveValue::Set(request.get_category().clone()),
             transaction_type: ActiveValue::Set(request.get_transaction_type().clone()),
             description: ActiveValue::Set(request.try_get_description().clone()),
-            bill_date: ActiveValue::Set(request.get_bill_date()),
+            bill_date: ActiveValue::Set(bill_date),
             id: ActiveValue::NotSet,
             created_at: ActiveValue::NotSet,
             updated_at: ActiveValue::NotSet,
@@ -373,10 +419,8 @@ impl AccountBookingService {
         let last_id: Option<i32> = paged_records
             .last()
             .map(|r: &AccountBookingRecordModel| r.get_id());
-        let record_responses: Vec<RecordResponse> = paged_records
-            .iter()
-            .map(Self::model_to_record_response)
-            .collect();
+        let record_responses: Vec<RecordResponse> =
+            Self::enrich_records_with_users(&db, paged_records).await?;
         let mut response: RecordListResponse = RecordListResponse::default();
         response
             .set_records(record_responses)
@@ -398,7 +442,71 @@ impl AccountBookingService {
                 .one(&db)
                 .await
                 .map_err(|error: DbErr| error.to_string())?;
-        Ok(record.map(|model: AccountBookingRecordModel| Self::model_to_record_response(&model)))
+        match record {
+            Some(model) => {
+                let mut response: RecordResponse = Self::model_to_record_response(&model);
+                Self::enrich_record_with_user(&db, &mut response).await?;
+                Ok(Some(response))
+            }
+            None => Ok(None),
+        }
+    }
+
+    #[instrument_trace]
+    async fn enrich_records_with_users(
+        db: &DatabaseConnection,
+        records: Vec<AccountBookingRecordModel>,
+    ) -> Result<Vec<RecordResponse>, String> {
+        let user_ids: Vec<i32> = records
+            .iter()
+            .map(|r: &AccountBookingRecordModel| r.get_user_id())
+            .collect::<std::collections::HashSet<i32>>()
+            .into_iter()
+            .collect();
+        let users: Vec<AccountBookingUserModel> = AccountBookingUserEntity::find()
+            .filter(AccountBookingUserColumn::Id.is_in(user_ids))
+            .all(db)
+            .await
+            .map_err(|error: DbErr| error.to_string())?;
+        let user_map: std::collections::HashMap<i32, AccountBookingUserModel> = users
+            .into_iter()
+            .map(|u: AccountBookingUserModel| (u.get_id(), u))
+            .collect();
+        let responses: Vec<RecordResponse> = records
+            .iter()
+            .map(|record: &AccountBookingRecordModel| {
+                let mut response: RecordResponse = Self::model_to_record_response(record);
+                if let Some(user) = user_map.get(&response.get_user_id()) {
+                    response
+                        .set_username(Some(user.get_username().clone()))
+                        .set_nickname(user.try_get_nickname().clone())
+                        .set_email(user.try_get_email().clone())
+                        .set_phone(user.try_get_phone().clone());
+                }
+                response
+            })
+            .collect();
+        Ok(responses)
+    }
+
+    #[instrument_trace]
+    async fn enrich_record_with_user(
+        db: &DatabaseConnection,
+        response: &mut RecordResponse,
+    ) -> Result<(), String> {
+        let user: Option<AccountBookingUserModel> =
+            AccountBookingUserEntity::find_by_id(response.get_user_id())
+                .one(db)
+                .await
+                .map_err(|error: DbErr| error.to_string())?;
+        if let Some(user) = user {
+            response
+                .set_username(Some(user.get_username().clone()))
+                .set_nickname(user.try_get_nickname().clone())
+                .set_email(user.try_get_email().clone())
+                .set_phone(user.try_get_phone().clone());
+        }
+        Ok(())
     }
 
     #[instrument_trace]

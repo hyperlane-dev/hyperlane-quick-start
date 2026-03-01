@@ -31,9 +31,7 @@ pub struct DockerComposeConfig {
 
 #[derive(Clone, Data, Debug, Default)]
 pub struct EnvConfig {
-    #[get(pub)]
     pub(super) gpt_api_url: String,
-    #[get(pub)]
     pub(super) gpt_model: String,
     #[get(pub(crate))]
     pub(super) mysql_instances: Vec<MySqlInstanceConfig>,
