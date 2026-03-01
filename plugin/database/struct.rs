@@ -65,6 +65,8 @@ pub struct DatabaseSchema {
     #[get(pub(crate))]
     pub(super) indexes: Vec<String>,
     #[get(pub(crate))]
+    pub(super) init_data: Vec<String>,
+    #[get(pub(crate))]
     pub(super) tables: Vec<TableSchema>,
 }
 

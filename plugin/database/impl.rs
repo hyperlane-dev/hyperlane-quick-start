@@ -149,13 +149,13 @@ impl<T: Clone> ConnectionCache<T> {
     }
 }
 
-impl PluginType {
+impl fmt::Display for PluginType {
     #[instrument_trace]
-    pub fn as_str(&self) -> &'static str {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::MySQL => "MySQL",
-            Self::PostgreSQL => "PostgreSQL",
-            Self::Redis => "Redis",
+            Self::MySQL => write!(f, "MySQL"),
+            Self::PostgreSQL => write!(f, "PostgreSQL"),
+            Self::Redis => write!(f, "Redis"),
         }
     }
 }
@@ -171,13 +171,6 @@ impl FromStr for PluginType {
             "Redis" => Ok(Self::Redis),
             _ => Err(()),
         }
-    }
-}
-
-impl std::fmt::Display for PluginType {
-    #[instrument_trace]
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.as_str())
     }
 }
 
@@ -270,6 +263,12 @@ impl DatabaseSchema {
     #[instrument_trace]
     pub fn add_constraint(mut self, constraint: String) -> Self {
         self.get_mut_constraints().push(constraint);
+        self
+    }
+
+    #[instrument_trace]
+    pub fn add_init_data(mut self, init_data: String) -> Self {
+        self.get_mut_init_data().push(init_data);
         self
     }
 

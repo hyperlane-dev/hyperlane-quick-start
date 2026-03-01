@@ -7,6 +7,7 @@ pub use {r#enum::*, r#struct::*};
 use {super::*, env::*, mysql::*, postgresql::*, redis::*};
 
 use std::{
+    fmt,
     str::FromStr,
     time::{Duration, Instant},
 };

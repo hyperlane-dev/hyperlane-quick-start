@@ -181,6 +181,26 @@ impl DatabaseConnectionPlugin for MySqlPlugin {
                 result.get_mut_errors().push(error.to_string());
             }
         }
+        if let Err(error) = auto_creator.create_indexes().await {
+            AutoCreationLogger::log_auto_creation_error(
+                &error,
+                "Index creation",
+                PluginType::MySQL,
+                Some(instance.get_database().as_str()),
+            )
+            .await;
+            result.get_mut_errors().push(error.to_string());
+        }
+        if let Err(error) = auto_creator.init_data().await {
+            AutoCreationLogger::log_auto_creation_error(
+                &error,
+                "Init data",
+                PluginType::MySQL,
+                Some(instance.get_database().as_str()),
+            )
+            .await;
+            result.get_mut_errors().push(error.to_string());
+        }
         if let Err(error) = auto_creator.verify_connection().await {
             AutoCreationLogger::log_auto_creation_error(
                 &error,
@@ -407,6 +427,36 @@ impl MySqlAutoCreation {
     fn get_database_schema(&self) -> &DatabaseSchema {
         &self.schema
     }
+
+    #[instrument_trace]
+    async fn create_indexes(&self) -> Result<(), AutoCreationError> {
+        let connection: DatabaseConnection = self.create_target_connection().await?;
+        let schema: &DatabaseSchema = self.get_database_schema();
+        for index_sql in schema.get_indexes() {
+            if let Err(error) = self.execute_sql(&connection, index_sql).await {
+                AutoCreationLogger::log_auto_creation_error(
+                    &error,
+                    "Index creation",
+                    PluginType::MySQL,
+                    Some(self.instance.get_database().as_str()),
+                )
+                .await;
+            }
+        }
+        for constraint_sql in schema.get_constraints() {
+            if let Err(error) = self.execute_sql(&connection, constraint_sql).await {
+                AutoCreationLogger::log_auto_creation_error(
+                    &error,
+                    "Constraint creation",
+                    PluginType::MySQL,
+                    Some(self.instance.get_database().as_str()),
+                )
+                .await;
+            }
+        }
+        let _: Result<(), DbErr> = connection.close().await;
+        Ok(())
+    }
 }
 
 impl DatabaseAutoCreation for MySqlAutoCreation {
@@ -460,28 +510,6 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                 .await;
             }
         }
-        for index_sql in schema.get_indexes() {
-            if let Err(error) = self.execute_sql(&connection, index_sql).await {
-                AutoCreationLogger::log_auto_creation_error(
-                    &error,
-                    "Index creation",
-                    PluginType::MySQL,
-                    Some(self.instance.get_database().as_str()),
-                )
-                .await;
-            }
-        }
-        for constraint_sql in schema.get_constraints() {
-            if let Err(error) = self.execute_sql(&connection, constraint_sql).await {
-                AutoCreationLogger::log_auto_creation_error(
-                    &error,
-                    "Constraint creation",
-                    PluginType::MySQL,
-                    Some(self.instance.get_database().as_str()),
-                )
-                .await;
-            }
-        }
         let _: Result<(), DbErr> = connection.close().await;
         AutoCreationLogger::log_tables_created(
             &created_tables,
@@ -490,6 +518,25 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
         )
         .await;
         Ok(created_tables)
+    }
+
+    #[instrument_trace]
+    async fn init_data(&self) -> Result<(), AutoCreationError> {
+        let connection: DatabaseConnection = self.create_target_connection().await?;
+        let schema: &DatabaseSchema = self.get_database_schema();
+        for init_data_sql in schema.get_init_data() {
+            if let Err(error) = self.execute_sql(&connection, init_data_sql).await {
+                AutoCreationLogger::log_auto_creation_error(
+                    &error,
+                    "Init data insertion",
+                    PluginType::MySQL,
+                    Some(self.instance.get_database().as_str()),
+                )
+                .await;
+            }
+        }
+        let _: Result<(), DbErr> = connection.close().await;
+        Ok(())
     }
 
     #[instrument_trace]

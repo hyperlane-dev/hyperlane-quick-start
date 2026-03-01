@@ -444,6 +444,11 @@ impl DatabaseAutoCreation for RedisAutoCreation {
     }
 
     #[instrument_trace]
+    async fn init_data(&self) -> Result<(), AutoCreationError> {
+        Ok(())
+    }
+
+    #[instrument_trace]
     async fn verify_connection(&self) -> Result<(), AutoCreationError> {
         match self.validate_redis_server().await {
             Ok(_) => {
