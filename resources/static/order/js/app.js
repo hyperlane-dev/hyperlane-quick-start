@@ -58,11 +58,20 @@ function initEventListeners() {
   document
     .getElementById('password-form')
     ?.addEventListener('submit', handlePasswordSubmit);
+  document
+    .getElementById('mobile-menu-btn')
+    ?.addEventListener('click', toggleMobileSidebar);
+  document
+    .getElementById('sidebar-overlay')
+    ?.addEventListener('click', closeMobileSidebar);
 
   document.querySelectorAll('.nav-item').forEach((item) => {
     item.addEventListener('click', () => {
       const page = item.dataset.page;
-      if (page) navigateTo(page);
+      if (page) {
+        navigateTo(page);
+        closeMobileSidebar();
+      }
     });
   });
 
@@ -71,6 +80,24 @@ function initEventListeners() {
       if (e.target === modal) closeModal(modal.id);
     });
   });
+}
+
+function toggleMobileSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  if (sidebar && overlay) {
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('active');
+  }
+}
+
+function closeMobileSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  if (sidebar && overlay) {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('active');
+  }
 }
 
 function showPage(pageId) {

@@ -984,9 +984,31 @@ input[type='number'].form-input {
   color: #c9d1d9;
 }
 
+.mobile-menu-btn {
+  display: none;
+}
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 99;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.sidebar-overlay.active {
+  display: block;
+  opacity: 1;
+}
+
 @media (max-width: 768px) {
   .sidebar {
-    width: 100%;
+    width: 260px;
     transform: translateX(-100%);
     transition: transform 0.3s;
   }
@@ -997,6 +1019,27 @@ input[type='number'].form-input {
 
   .main-content {
     margin-left: 0;
+    padding: 16px;
+  }
+
+  .mobile-menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: #21262d;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    color: #c9d1d9;
+    font-size: 20px;
+    cursor: pointer;
+    margin-right: 12px;
+  }
+
+  .content-header {
+    display: flex;
+    align-items: center;
   }
 
   .stats-grid {
@@ -1013,15 +1056,102 @@ input[type='number'].form-input {
     align-items: stretch;
   }
 
-  .record-item,
+  .record-item {
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .record-info {
+    flex: 1;
+    min-width: 0;
+    order: 2;
+    width: calc(100% - 60px);
+  }
+
+  .record-type {
+    order: 1;
+  }
+
+  .record-right {
+    width: 100%;
+    order: 3;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid #30363d;
+    margin-top: 4px;
+  }
+
+  .record-amount {
+    text-align: left;
+    font-size: 15px;
+  }
+
+  .record-date {
+    text-align: left;
+    font-size: 11px;
+  }
+
+  .record-right .btn-print {
+    margin-top: 0;
+  }
+
+  .record-meta-row {
+    gap: 8px;
+  }
+
+  .record-meta-item {
+    font-size: 10px;
+  }
+
+  .record-description {
+    font-size: 11px;
+  }
+
   .user-item {
     flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .user-info-details {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .user-status {
+    order: 3;
   }
 
   .record-actions,
   .user-actions {
     width: 100%;
-    margin-top: 12px;
+    margin-top: 8px;
+    justify-content: flex-end;
+  }
+
+  .card-header {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .card-header .card-title {
+    flex: 1 1 100%;
+  }
+
+  .card-header > div {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .card-header > div .btn,
+  .card-header > .btn {
+    flex: 1;
+    min-width: fit-content;
   }
 
   #records-page .card,
