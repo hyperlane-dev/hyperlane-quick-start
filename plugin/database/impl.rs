@@ -1,5 +1,79 @@
 use super::*;
 
+impl fmt::Display for PluginType {
+    #[instrument_trace]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::MySQL => write!(f, "MySQL"),
+            Self::PostgreSQL => write!(f, "PostgreSQL"),
+            Self::Redis => write!(f, "Redis"),
+        }
+    }
+}
+
+impl FromStr for PluginType {
+    type Err = ();
+
+    #[instrument_trace]
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "MySQL" => Ok(Self::MySQL),
+            "PostgreSQL" => Ok(Self::PostgreSQL),
+            "Redis" => Ok(Self::Redis),
+            _ => Err(()),
+        }
+    }
+}
+
+impl std::fmt::Display for AutoCreationError {
+    #[instrument_trace]
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::InsufficientPermissions(msg) => {
+                write!(f, "Insufficient permissions {msg}")
+            }
+            Self::ConnectionFailed(msg) => write!(f, "Connection failed {msg}"),
+            Self::SchemaError(msg) => write!(f, "Schema error {msg}"),
+            Self::Timeout(msg) => write!(f, "Timeout {msg}"),
+            Self::DatabaseError(msg) => write!(f, "Database error {msg}"),
+        }
+    }
+}
+
+impl std::error::Error for AutoCreationError {}
+
+impl AutoCreationError {
+    #[instrument_trace]
+    pub fn should_continue(&self) -> bool {
+        match self {
+            Self::InsufficientPermissions(_) => true,
+            Self::ConnectionFailed(_) => false,
+            Self::SchemaError(_) => true,
+            Self::Timeout(_) => true,
+            Self::DatabaseError(_) => true,
+        }
+    }
+
+    #[instrument_trace]
+    pub fn user_message(&self) -> &str {
+        match self {
+            Self::InsufficientPermissions(msg) => msg,
+            Self::ConnectionFailed(msg) => msg,
+            Self::SchemaError(msg) => msg,
+            Self::Timeout(msg) => msg,
+            Self::DatabaseError(msg) => msg,
+        }
+    }
+}
+
+impl TableSchema {
+    #[instrument_trace]
+    pub fn with_dependency(mut self, dependency: String) -> Self {
+        self.get_mut_dependencies().push(dependency);
+        self
+    }
+}
+
 impl DatabasePlugin {
     #[instrument_trace]
     pub fn get_connection_timeout_duration() -> Duration {
@@ -149,72 +223,6 @@ impl<T: Clone> ConnectionCache<T> {
     }
 }
 
-impl fmt::Display for PluginType {
-    #[instrument_trace]
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::MySQL => write!(f, "MySQL"),
-            Self::PostgreSQL => write!(f, "PostgreSQL"),
-            Self::Redis => write!(f, "Redis"),
-        }
-    }
-}
-
-impl FromStr for PluginType {
-    type Err = ();
-
-    #[instrument_trace]
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "MySQL" => Ok(Self::MySQL),
-            "PostgreSQL" => Ok(Self::PostgreSQL),
-            "Redis" => Ok(Self::Redis),
-            _ => Err(()),
-        }
-    }
-}
-
-impl AutoCreationError {
-    #[instrument_trace]
-    pub fn should_continue(&self) -> bool {
-        match self {
-            Self::InsufficientPermissions(_) => true,
-            Self::ConnectionFailed(_) => false,
-            Self::SchemaError(_) => true,
-            Self::Timeout(_) => true,
-            Self::DatabaseError(_) => true,
-        }
-    }
-
-    #[instrument_trace]
-    pub fn user_message(&self) -> &str {
-        match self {
-            Self::InsufficientPermissions(msg) => msg,
-            Self::ConnectionFailed(msg) => msg,
-            Self::SchemaError(msg) => msg,
-            Self::Timeout(msg) => msg,
-            Self::DatabaseError(msg) => msg,
-        }
-    }
-}
-
-impl std::fmt::Display for AutoCreationError {
-    #[instrument_trace]
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::InsufficientPermissions(msg) => {
-                write!(f, "Insufficient permissions {msg}")
-            }
-            Self::ConnectionFailed(msg) => write!(f, "Connection failed {msg}"),
-            Self::SchemaError(msg) => write!(f, "Schema error {msg}"),
-            Self::Timeout(msg) => write!(f, "Timeout {msg}"),
-            Self::DatabaseError(msg) => write!(f, "Database error {msg}"),
-        }
-    }
-}
-
-impl std::error::Error for AutoCreationError {}
-
 impl AutoCreationResult {
     #[instrument_trace]
     pub fn has_changes(&self) -> bool {
@@ -224,26 +232,6 @@ impl AutoCreationResult {
     #[instrument_trace]
     pub fn has_errors(&self) -> bool {
         !self.get_errors().is_empty()
-    }
-}
-
-impl Default for AutoCreationResult {
-    #[instrument_trace]
-    fn default() -> Self {
-        Self {
-            database_created: false,
-            tables_created: Vec::new(),
-            errors: Vec::new(),
-            duration: Duration::from_secs(0),
-        }
-    }
-}
-
-impl TableSchema {
-    #[instrument_trace]
-    pub fn with_dependency(mut self, dependency: String) -> Self {
-        self.get_mut_dependencies().push(dependency);
-        self
     }
 }
 
