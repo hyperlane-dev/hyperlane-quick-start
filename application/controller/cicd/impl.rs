@@ -159,10 +159,12 @@ impl ServerHook for ListRunsRoute {
     )]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
+        const MAX_PAGE_SIZE: i32 = 100;
         let querys: &RequestQuerys = ctx.get_request().get_querys();
         let page_size: Option<i32> = querys
             .get("page_size")
-            .and_then(|s: &String| s.parse().ok());
+            .and_then(|s: &String| s.parse().ok())
+            .map(|p: i32| p.min(MAX_PAGE_SIZE));
         let last_id: Option<i32> = querys.get("last_id").and_then(|s: &String| s.parse().ok());
         let pipeline_id: Option<i32> = querys
             .get("pipeline_id")

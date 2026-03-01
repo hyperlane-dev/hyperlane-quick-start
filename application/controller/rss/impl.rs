@@ -21,7 +21,10 @@ impl ServerHook for RssFeedRoute {
     )]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
-        let limit: Option<usize> = limit_opt.and_then(|l| l.parse().ok());
+        const MAX_LIMIT: usize = 100;
+        let limit: Option<usize> = limit_opt
+            .and_then(|l| l.parse().ok())
+            .map(|l: usize| l.min(MAX_LIMIT));
         let offset: Option<usize> = offset_opt.and_then(|o| o.parse().ok());
         let host: String = host_opt.unwrap_or_else(|| LOCALHOST.to_string());
         let base_url: String = format!("{HTTP_LOWERCASE}://{host}");

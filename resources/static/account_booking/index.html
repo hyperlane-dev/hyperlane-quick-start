@@ -176,12 +176,6 @@
             <div class="card">
               <div class="card-header">
                 <span class="card-title">Recent Records</span>
-                <button
-                  class="btn btn-primary btn-sm admin-only hidden"
-                  onclick="showCreateRecordModal()"
-                >
-                  + New Record
-                </button>
               </div>
               <div class="card-body">
                 <div id="recent-records-list" class="record-list">
@@ -307,24 +301,37 @@
                   <div class="filter-group">
                     <label class="filter-label">Date Range</label>
                     <input
-                      type="date"
+                      type="text"
                       id="filter-start-date"
                       class="form-input form-input-sm"
-                      lang="en"
+                      placeholder="YYYY-MM-DD"
                     />
                     <span>to</span>
                     <input
-                      type="date"
+                      type="text"
                       id="filter-end-date"
                       class="form-input form-input-sm"
-                      lang="en"
+                      placeholder="YYYY-MM-DD"
                     />
+                  </div>
+                  <div class="filter-group">
+                    <label class="filter-label">Type</label>
+                    <select
+                      id="filter-type"
+                      class="form-select form-select-sm"
+                      onchange="applyFilters()"
+                    >
+                      <option value="">All</option>
+                      <option value="income">Income</option>
+                      <option value="expense">Expense</option>
+                    </select>
                   </div>
                   <div class="filter-group">
                     <label class="filter-label">Category</label>
                     <select
                       id="filter-category"
                       class="form-select form-select-sm"
+                      onchange="applyFilters()"
                     >
                       <option value="">All</option>
                       <option value="food">Food</option>
@@ -336,23 +343,6 @@
                       <option value="other">Other</option>
                     </select>
                   </div>
-                  <div class="filter-group">
-                    <label class="filter-label">Type</label>
-                    <select id="filter-type" class="form-select form-select-sm">
-                      <option value="">All</option>
-                      <option value="income">Income</option>
-                      <option value="expense">Expense</option>
-                    </select>
-                  </div>
-                  <button
-                    class="btn btn-primary btn-sm"
-                    onclick="applyFilters()"
-                  >
-                    Filter
-                  </button>
-                  <button class="btn btn-sm" onclick="resetFilters()">
-                    Reset
-                  </button>
                 </div>
                 <div id="all-records-list" class="record-list">
                   <div class="empty-state">
@@ -466,17 +456,17 @@
                   <div class="filter-group">
                     <label class="filter-label">Date Range</label>
                     <input
-                      type="date"
+                      type="text"
                       id="user-filter-start-date"
                       class="form-input form-input-sm"
-                      lang="en"
+                      placeholder="YYYY-MM-DD"
                     />
                     <span>to</span>
                     <input
-                      type="date"
+                      type="text"
                       id="user-filter-end-date"
                       class="form-input form-input-sm"
-                      lang="en"
+                      placeholder="YYYY-MM-DD"
                     />
                   </div>
                   <div class="filter-group">
@@ -484,6 +474,7 @@
                     <select
                       id="user-filter-category"
                       class="form-select form-select-sm"
+                      onchange="applyUserRecordFilters()"
                     >
                       <option value="">All</option>
                       <option value="food">Food</option>
@@ -500,21 +491,13 @@
                     <select
                       id="user-filter-type"
                       class="form-select form-select-sm"
+                      onchange="applyUserRecordFilters()"
                     >
                       <option value="">All</option>
                       <option value="income">Income</option>
                       <option value="expense">Expense</option>
                     </select>
                   </div>
-                  <button
-                    class="btn btn-primary btn-sm"
-                    onclick="applyUserRecordFilters()"
-                  >
-                    Filter
-                  </button>
-                  <button class="btn btn-sm" onclick="resetUserRecordFilters()">
-                    Reset
-                  </button>
                 </div>
                 <div id="user-records-list" class="record-list">
                   <div class="empty-state">

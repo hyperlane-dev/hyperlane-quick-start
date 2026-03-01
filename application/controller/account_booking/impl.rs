@@ -296,10 +296,50 @@ impl ServerHook for UserListRoute {
     #[prologue_macros(get_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
+        let current_user_id: i32 = match AccountBookingService::extract_user_from_cookie(ctx) {
+            Ok(id) => id,
+            Err(error) => {
+                let response: ApiResponse<()> =
+                    ApiResponse::<()>::error_with_code(ResponseCode::Unauthorized, error);
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+                return;
+            }
+        };
+        let current_user: UserResponse =
+            match AccountBookingService::get_user(current_user_id).await {
+                Ok(Some(user_info)) => user_info,
+                Ok(None) => {
+                    let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
+                        ResponseCode::Unauthorized,
+                        "User not found",
+                    );
+                    ctx.get_mut_response().set_body(response.to_json_bytes());
+                    return;
+                }
+                Err(error) => {
+                    let response: ApiResponse<()> =
+                        ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                    ctx.get_mut_response().set_body(response.to_json_bytes());
+                    return;
+                }
+            };
+        let user_role: UserRole = current_user.get_role().parse().unwrap_or_default();
+        if !user_role.is_admin() {
+            let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
+                ResponseCode::Forbidden,
+                "Only admin can access user list",
+            );
+            ctx.get_mut_response().set_body(response.to_json_bytes());
+            return;
+        }
+        const MAX_LIMIT: i32 = 100;
         let querys: &RequestQuerys = ctx.get_request().get_querys();
         let keyword: Option<String> = querys.get("keyword").cloned();
         let last_id: Option<i32> = querys.get("last_id").and_then(|s: &String| s.parse().ok());
-        let limit: Option<i32> = querys.get("limit").and_then(|s: &String| s.parse().ok());
+        let limit: Option<i32> = querys
+            .get("limit")
+            .and_then(|s: &String| s.parse().ok())
+            .map(|l: i32| l.min(MAX_LIMIT));
         let mut query: UserListQueryRequest = UserListQueryRequest::default();
         query
             .set_keyword(keyword)
@@ -415,6 +455,15 @@ impl ServerHook for RecordCreateRoute {
                     return;
                 }
             };
+        let user_role: UserRole = current_user.get_role().parse().unwrap_or_default();
+        if !user_role.is_admin() {
+            let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
+                ResponseCode::Forbidden,
+                "Only admin can create records",
+            );
+            ctx.get_mut_response().set_body(response.to_json_bytes());
+            return;
+        }
         let target_user_id: i32 = match request.try_get_target_user_id() {
             Some(target_id) => {
                 let user_role: UserRole = current_user.get_role().parse().unwrap_or_default();
@@ -520,9 +569,10 @@ impl ServerHook for RecordListRoute {
                 query.set_last_id(Some(last_id));
             }
         }
+        const MAX_LIMIT: i32 = 100;
         if let Some(limit_str) = limit_opt {
             if let Ok(limit) = limit_str.parse::<i32>() {
-                query.set_limit(Some(limit));
+                query.set_limit(Some(limit.min(MAX_LIMIT)));
             }
         }
         match AccountBookingService::list_records(query).await {

@@ -126,7 +126,6 @@
         margin-bottom: 30px;
         box-shadow: 0 4px 20px rgba(102, 126, 234, 0.15);
         position: relative;
-        overflow: hidden;
       }
 
       .search-panel::before {
@@ -246,6 +245,220 @@
       .form-input[type='datetime-local']::-webkit-datetime-edit-hour-field,
       .form-input[type='datetime-local']::-webkit-datetime-edit-minute-field {
         color: #6c757d;
+      }
+
+      /* Custom DateTime Picker Styles */
+      .datetime-picker-wrapper {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+      }
+
+      .datetime-picker-input {
+        width: 100%;
+        padding: 12px 35px 12px 12px;
+        background: white;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        color: #6c757d;
+        font-size: 1rem;
+        font-family: inherit;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .datetime-picker-input:hover {
+        border-color: #667eea;
+      }
+
+      .datetime-picker-input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      .datetime-picker-icon {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #667eea;
+        font-size: 16px;
+        pointer-events: none;
+      }
+
+      .datetime-picker-calendar {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        margin-top: 8px;
+        background: white;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 16px;
+        z-index: 1000;
+        box-shadow: 0 8px 30px rgba(102, 126, 234, 0.2);
+        min-width: 320px;
+        display: none;
+      }
+
+      .datetime-picker-calendar.active {
+        display: block;
+      }
+
+      .datetime-picker-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #e9ecef;
+      }
+
+      .datetime-picker-nav {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+        border-radius: 6px;
+        color: white;
+        width: 32px;
+        height: 32px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        transition: all 0.3s ease;
+      }
+
+      .datetime-picker-nav:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      }
+
+      .datetime-picker-month-year {
+        font-size: 16px;
+        font-weight: 600;
+        color: #2c3e50;
+      }
+
+      .datetime-picker-weekdays {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+
+      .datetime-picker-weekday {
+        text-align: center;
+        font-size: 12px;
+        color: #6c757d;
+        padding: 8px;
+        text-transform: uppercase;
+        font-weight: 600;
+      }
+
+      .datetime-picker-days {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+
+      .datetime-picker-day {
+        aspect-ratio: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        color: #2c3e50;
+        background: transparent;
+        border: 2px solid transparent;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .datetime-picker-day:hover:not(.disabled):not(.selected) {
+        background: linear-gradient(135deg, #f0f4ff 0%, #faf8ff 100%);
+        border-color: #667eea;
+      }
+
+      .datetime-picker-day.selected {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-color: #667eea;
+        color: white;
+      }
+
+      .datetime-picker-day.disabled {
+        color: #adb5bd;
+        cursor: not-allowed;
+      }
+
+      .datetime-picker-day.other-month {
+        color: #adb5bd;
+      }
+
+      .datetime-picker-time {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px;
+        border-top: 2px solid #e9ecef;
+        margin-bottom: 12px;
+      }
+
+      .datetime-picker-time-label {
+        font-size: 14px;
+        color: #6c757d;
+        font-weight: 500;
+      }
+
+      .datetime-picker-time-input {
+        width: 60px;
+        padding: 6px;
+        border: 2px solid #e9ecef;
+        border-radius: 6px;
+        text-align: center;
+        font-size: 14px;
+        color: #2c3e50;
+      }
+
+      .datetime-picker-time-input:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      .datetime-picker-footer {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .datetime-picker-btn {
+        padding: 8px 16px;
+        background: #e9ecef;
+        border: none;
+        border-radius: 6px;
+        color: #6c757d;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        flex: 1;
+      }
+
+      .datetime-picker-btn:hover {
+        background: #dee2e6;
+      }
+
+      .datetime-picker-btn.primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+      }
+
+      .datetime-picker-btn.primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
       }
 
       .button-group {
@@ -817,11 +1030,21 @@
         <div class="search-grid">
           <div class="form-group">
             <label class="form-label">Start Time</label>
-            <input class="form-input" id="startTime" type="datetime-local" />
+            <input
+              class="form-input"
+              id="startTime"
+              type="text"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
           </div>
           <div class="form-group">
             <label class="form-label">End Time</label>
-            <input class="form-input" id="endTime" type="datetime-local" />
+            <input
+              class="form-input"
+              id="endTime"
+              type="text"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
           </div>
           <div class="form-group">
             <label class="form-label">Socket Address</label>
@@ -859,17 +1082,6 @@
               type="text"
             />
           </div>
-          <div class="form-group">
-            <label class="form-label">Page Size</label>
-            <input
-              class="form-input"
-              id="pageSize"
-              max="100"
-              min="1"
-              type="number"
-              value="20"
-            />
-          </div>
         </div>
         <div class="button-group">
           <button class="btn btn-primary" onclick="app.search()">
@@ -893,10 +1105,6 @@
           <div class="stat-label">Total Pages</div>
           <div class="stat-value" id="totalPages">0</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-label">Page Size</div>
-          <div class="stat-value" id="pageSizeDisplay">20</div>
-        </div>
       </div>
       <div class="results-panel">
         <div class="results-title">📊 Query Results</div>
@@ -915,18 +1123,276 @@
       </div>
     </div>
     <script>
+      /**
+       * Custom DateTime Picker Component for Tracking
+       */
+      class DateTimePicker {
+        constructor(inputId, options = {}) {
+          this.inputId = inputId;
+          this.input = document.getElementById(inputId);
+          if (!this.input) return;
+          this.onChange = options.onChange || (() => {});
+          this.currentDate = new Date();
+          this.selectedDate = null;
+          this.selectedHour = 0;
+          this.selectedMinute = 0;
+          this.isOpen = false;
+          this.init();
+        }
+
+        init() {
+          this.createWrapper();
+          this.createCalendar();
+          this.bindEvents();
+          this.setInitialValue();
+        }
+
+        createWrapper() {
+          const parent = this.input.parentNode;
+          this.wrapper = document.createElement('div');
+          this.wrapper.className = 'datetime-picker-wrapper';
+          parent.insertBefore(this.wrapper, this.input);
+          this.wrapper.appendChild(this.input);
+          this.input.className = 'datetime-picker-input';
+          this.input.readOnly = true;
+          const icon = document.createElement('span');
+          icon.className = 'datetime-picker-icon';
+          icon.innerHTML = '📅';
+          this.wrapper.appendChild(icon);
+        }
+
+        createCalendar() {
+          this.calendar = document.createElement('div');
+          this.calendar.className = 'datetime-picker-calendar';
+          this.calendar.innerHTML = `
+            <div class="datetime-picker-header">
+              <button class="datetime-picker-nav" data-nav="prev">‹</button>
+              <span class="datetime-picker-month-year"></span>
+              <button class="datetime-picker-nav" data-nav="next">›</button>
+            </div>
+            <div class="datetime-picker-weekdays">
+              <div class="datetime-picker-weekday">Su</div>
+              <div class="datetime-picker-weekday">Mo</div>
+              <div class="datetime-picker-weekday">Tu</div>
+              <div class="datetime-picker-weekday">We</div>
+              <div class="datetime-picker-weekday">Th</div>
+              <div class="datetime-picker-weekday">Fr</div>
+              <div class="datetime-picker-weekday">Sa</div>
+            </div>
+            <div class="datetime-picker-days"></div>
+            <div class="datetime-picker-time">
+              <span class="datetime-picker-time-label">Time:</span>
+              <input type="number" class="datetime-picker-time-input" id="${this.inputId}-hour" min="0" max="23" value="00" />
+              <span>:</span>
+              <input type="number" class="datetime-picker-time-input" id="${this.inputId}-minute" min="0" max="59" value="00" />
+            </div>
+            <div class="datetime-picker-footer">
+              <button class="datetime-picker-btn" data-action="now">Now</button>
+              <button class="datetime-picker-btn primary" data-action="confirm">Confirm</button>
+              <button class="datetime-picker-btn" data-action="clear">Clear</button>
+            </div>
+          `;
+          this.wrapper.appendChild(this.calendar);
+          this.daysContainer = this.calendar.querySelector(
+            '.datetime-picker-days',
+          );
+          this.monthYearLabel = this.calendar.querySelector(
+            '.datetime-picker-month-year',
+          );
+          this.hourInput = this.calendar.querySelector(`#${this.inputId}-hour`);
+          this.minuteInput = this.calendar.querySelector(
+            `#${this.inputId}-minute`,
+          );
+        }
+
+        bindEvents() {
+          this.input.addEventListener('click', () => this.toggle());
+          this.calendar.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const nav = e.target.closest('[data-nav]');
+            const day = e.target.closest('.datetime-picker-day');
+            const action = e.target.closest('[data-action]');
+            if (nav) {
+              this.navigate(nav.dataset.nav);
+            } else if (day && !day.classList.contains('disabled')) {
+              this.selectDate(day.dataset.date);
+            } else if (action) {
+              this.handleAction(action.dataset.action);
+            }
+          });
+          [this.hourInput, this.minuteInput].forEach((input) => {
+            input.addEventListener('change', () => this.validateTime());
+            input.addEventListener('click', (e) => e.stopPropagation());
+          });
+          document.addEventListener('click', (e) => {
+            if (!this.wrapper.contains(e.target)) {
+              this.close();
+            }
+          });
+        }
+
+        validateTime() {
+          let hour = parseInt(this.hourInput.value) || 0;
+          let minute = parseInt(this.minuteInput.value) || 0;
+          hour = Math.max(0, Math.min(23, hour));
+          minute = Math.max(0, Math.min(59, minute));
+          this.hourInput.value = String(hour).padStart(2, '0');
+          this.minuteInput.value = String(minute).padStart(2, '0');
+          this.selectedHour = hour;
+          this.selectedMinute = minute;
+        }
+
+        setInitialValue() {
+          if (this.input.value) {
+            const date = new Date(this.input.value.replace(' ', 'T'));
+            if (!isNaN(date)) {
+              this.selectedDate = date;
+              this.currentDate = new Date(date);
+              this.selectedHour = date.getHours();
+              this.selectedMinute = date.getMinutes();
+              this.hourInput.value = String(this.selectedHour).padStart(2, '0');
+              this.minuteInput.value = String(this.selectedMinute).padStart(
+                2,
+                '0',
+              );
+            }
+          }
+        }
+
+        toggle() {
+          this.isOpen ? this.close() : this.open();
+        }
+
+        open() {
+          this.isOpen = true;
+          this.calendar.classList.add('active');
+          this.renderCalendar();
+        }
+
+        close() {
+          this.isOpen = false;
+          this.calendar.classList.remove('active');
+        }
+
+        navigate(direction) {
+          if (direction === 'prev') {
+            this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+          } else {
+            this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+          }
+          this.renderCalendar();
+        }
+
+        selectDate(dateStr) {
+          this.selectedDate = new Date(dateStr);
+          this.renderCalendar();
+        }
+
+        handleAction(action) {
+          if (action === 'now') {
+            const now = new Date();
+            this.currentDate = new Date(now);
+            this.selectedDate = new Date(now);
+            this.selectedHour = now.getHours();
+            this.selectedMinute = now.getMinutes();
+            this.hourInput.value = String(this.selectedHour).padStart(2, '0');
+            this.minuteInput.value = String(this.selectedMinute).padStart(
+              2,
+              '0',
+            );
+            this.renderCalendar();
+          } else if (action === 'confirm') {
+            this.confirmSelection();
+          } else if (action === 'clear') {
+            this.selectedDate = null;
+            this.input.value = '';
+            this.onChange('');
+            this.close();
+          }
+        }
+
+        confirmSelection() {
+          if (!this.selectedDate) return;
+          this.validateTime();
+          const year = this.selectedDate.getFullYear();
+          const month = String(this.selectedDate.getMonth() + 1).padStart(
+            2,
+            '0',
+          );
+          const day = String(this.selectedDate.getDate()).padStart(2, '0');
+          const hour = String(this.selectedHour).padStart(2, '0');
+          const minute = String(this.selectedMinute).padStart(2, '0');
+          const dateTimeStr = `${year}-${month}-${day} ${hour}:${minute}`;
+          this.input.value = dateTimeStr;
+          this.onChange(dateTimeStr);
+          this.close();
+        }
+
+        renderCalendar() {
+          const year = this.currentDate.getFullYear();
+          const month = this.currentDate.getMonth();
+          this.monthYearLabel.textContent = new Date(
+            year,
+            month,
+          ).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+          });
+          const firstDay = new Date(year, month, 1).getDay();
+          const daysInMonth = new Date(year, month + 1, 0).getDate();
+          const daysInPrevMonth = new Date(year, month, 0).getDate();
+          const today = new Date();
+          let html = '';
+          for (let i = firstDay - 1; i >= 0; i--) {
+            const day = daysInPrevMonth - i;
+            html += `<div class="datetime-picker-day other-month">${day}</div>`;
+          }
+          for (let day = 1; day <= daysInMonth; day++) {
+            const dateStr = this.formatDate(new Date(year, month, day));
+            const isSelected =
+              this.selectedDate &&
+              this.formatDate(this.selectedDate) === dateStr;
+            let classes = 'datetime-picker-day';
+            if (isSelected) classes += ' selected';
+            html += `<div class="${classes}" data-date="${dateStr}">${day}</div>`;
+          }
+          const remainingCells = 42 - (firstDay + daysInMonth);
+          for (let day = 1; day <= remainingCells; day++) {
+            html += `<div class="datetime-picker-day other-month">${day}</div>`;
+          }
+          this.daysContainer.innerHTML = html;
+        }
+
+        formatDate(date) {
+          const y = date.getFullYear();
+          const m = String(date.getMonth() + 1).padStart(2, '0');
+          const d = String(date.getDate()).padStart(2, '0');
+          return `${y}-${m}-${d}`;
+        }
+      }
+
+      /**
+       * Initialize custom datetime pickers
+       */
+      function initDateTimePickers() {
+        const startPicker = new DateTimePicker('startTime', {
+          onChange: () => {},
+        });
+        const endPicker = new DateTimePicker('endTime', {
+          onChange: () => {},
+        });
+      }
+
       class TrackingApp {
         constructor() {
           this.currentPage = 1;
-          this.pageSize = 20;
+          this.pageSize = 50;
           this.totalRecords = 0;
           this.apiBase = '/api/tracking';
         }
 
         async search(page = 1) {
           this.currentPage = page;
-          this.pageSize =
-            parseInt(document.getElementById('pageSize').value) || 20;
 
           const requestBody = {
             page: page,
@@ -996,8 +1462,6 @@
           document.getElementById('totalRecords').textContent = data.total;
           document.getElementById('currentPage').textContent = data.page;
           document.getElementById('totalPages').textContent = totalPages;
-          document.getElementById('pageSizeDisplay').textContent =
-            data.page_size;
 
           const container = document.getElementById('resultsContainer');
 
@@ -1199,7 +1663,6 @@
           document.getElementById('headerKey').value = '';
           document.getElementById('headerValue').value = '';
           document.getElementById('bodyContent').value = '';
-          document.getElementById('pageSize').value = '20';
 
           this.search();
         }
@@ -1208,6 +1671,7 @@
       const app = new TrackingApp();
 
       window.addEventListener('DOMContentLoaded', () => {
+        initDateTimePickers();
         app.search();
       });
 

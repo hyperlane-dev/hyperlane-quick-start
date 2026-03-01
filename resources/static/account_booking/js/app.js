@@ -95,6 +95,7 @@ function checkAuth() {
 function showMainApp() {
   showPage('main-app');
   updateUserInfo();
+  initDatePickers();
   const routeState = parseRouteHash();
   if (routeState.page) {
     if (routeState.page === 'user-records' && routeState.userId) {
@@ -234,9 +235,11 @@ async function loadOverview() {
       initCountTrendChart(data.transaction_count_trend);
       initCategoryAmountChart(data.category_amount_distribution);
       initUserActivityChart(data.user_activity);
+    } else {
+      showToast(result.message || 'Error loading overview data', 'error');
     }
   } catch (error) {
-    showToast('Error loading overview data', 'error');
+    showToast('Network error: ' + error.message, 'error');
   }
 }
 
@@ -801,9 +804,11 @@ async function loadRecentRecords(append = false) {
       if (!append) {
         updateStats(result.data);
       }
+    } else {
+      showToast(result.message || 'Error loading records', 'error');
     }
   } catch (error) {
-    console.error('Error loading records:', error);
+    showToast('Network error: ' + error.message, 'error');
   } finally {
     recentRecordsLoading = false;
   }
@@ -966,9 +971,11 @@ async function applyFilters(pageDirection = null) {
       renderAllRecords(allRecords);
       updateStats(data);
       renderPagination();
+    } else {
+      showToast(result.message || 'Error loading records', 'error');
     }
   } catch (error) {
-    showToast('Error loading records', 'error');
+    showToast('Network error: ' + error.message, 'error');
   }
 }
 
@@ -1287,9 +1294,11 @@ async function loadUsers(pageDirection = null) {
       }
       renderUsers(allUsers);
       renderUsersPagination();
+    } else {
+      showToast(result.message || 'Error loading users', 'error');
     }
   } catch (error) {
-    showToast('Error loading users', 'error');
+    showToast('Network error: ' + error.message, 'error');
   }
 }
 
@@ -1344,7 +1353,7 @@ function renderUsers(users) {
       </div>
       <div class="user-status ${u.status}">${u.status}</div>
       <div class="user-actions" onclick="event.stopPropagation();">
-        ${u.status === 'pending' ? `<button class="btn btn-sm btn-primary" onclick="approveUser(${u.id}, true)">Approve</button>` : ''}
+        ${u.status !== 'approved' ? `<button class="btn btn-sm btn-primary" onclick="approveUser(${u.id}, true)">Approve</button>` : ''}
         ${u.status === 'pending' ? `<button class="btn btn-sm btn-danger" onclick="approveUser(${u.id}, false)">Reject</button>` : ''}
       </div>
     </div>`,
@@ -1442,9 +1451,11 @@ async function applyUserRecordFilters(pageDirection = null) {
       renderUserRecords(allRecords);
       updateUserRecordStats(data);
       renderUserRecordPagination();
+    } else {
+      showToast(result.message || 'Error loading records', 'error');
     }
   } catch (error) {
-    showToast('Error loading records', 'error');
+    showToast('Network error: ' + error.message, 'error');
   }
 }
 
@@ -1700,5 +1711,204 @@ function formatDate(dateStr) {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
+  });
+}
+
+class DatePicker {
+  constructor(inputId, options = {}) {
+    this.inputId = inputId;
+    this.input = document.getElementById(inputId);
+    if (!this.input) return;
+    this.onChange = options.onChange || (() => {});
+    this.currentDate = new Date();
+    this.selectedDate = null;
+    this.isOpen = false;
+    this.init();
+  }
+
+  init() {
+    this.createWrapper();
+    this.createCalendar();
+    this.bindEvents();
+    this.setInitialValue();
+  }
+
+  createWrapper() {
+    const parent = this.input.parentNode;
+    this.wrapper = document.createElement('div');
+    this.wrapper.className = 'date-picker-wrapper';
+    this.wrapper.style.position = 'relative';
+    this.wrapper.style.display = 'inline-block';
+    parent.insertBefore(this.wrapper, this.input);
+    this.wrapper.appendChild(this.input);
+    this.input.className = 'date-picker-input';
+    this.input.readOnly = true;
+    this.input.placeholder = 'YYYY-MM-DD';
+    const icon = document.createElement('span');
+    icon.className = 'date-picker-icon';
+    icon.innerHTML = '📅';
+    this.wrapper.appendChild(icon);
+  }
+
+  createCalendar() {
+    this.calendar = document.createElement('div');
+    this.calendar.className = 'date-picker-calendar';
+    this.calendar.innerHTML = `
+      <div class="date-picker-header">
+        <button class="date-picker-nav" data-nav="prev">‹</button>
+        <span class="date-picker-month-year"></span>
+        <button class="date-picker-nav" data-nav="next">›</button>
+      </div>
+      <div class="date-picker-weekdays">
+        <div class="date-picker-weekday">Su</div>
+        <div class="date-picker-weekday">Mo</div>
+        <div class="date-picker-weekday">Tu</div>
+        <div class="date-picker-weekday">We</div>
+        <div class="date-picker-weekday">Th</div>
+        <div class="date-picker-weekday">Fr</div>
+        <div class="date-picker-weekday">Sa</div>
+      </div>
+      <div class="date-picker-days"></div>
+      <div class="date-picker-footer">
+        <button class="date-picker-btn" data-action="today">Today</button>
+        <button class="date-picker-btn primary" data-action="clear">Clear</button>
+      </div>
+    `;
+    this.wrapper.appendChild(this.calendar);
+    this.daysContainer = this.calendar.querySelector('.date-picker-days');
+    this.monthYearLabel = this.calendar.querySelector(
+      '.date-picker-month-year',
+    );
+  }
+
+  bindEvents() {
+    this.input.addEventListener('click', () => this.toggle());
+    this.calendar.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const nav = e.target.closest('[data-nav]');
+      const day = e.target.closest('.date-picker-day');
+      const action = e.target.closest('[data-action]');
+      if (nav) {
+        this.navigate(nav.dataset.nav);
+      } else if (day && !day.classList.contains('disabled')) {
+        this.selectDate(day.dataset.date);
+      } else if (action) {
+        this.handleAction(action.dataset.action);
+      }
+    });
+    document.addEventListener('click', (e) => {
+      if (!this.wrapper.contains(e.target)) {
+        this.close();
+      }
+    });
+  }
+
+  setInitialValue() {
+    if (this.input.value) {
+      this.selectedDate = new Date(this.input.value);
+      this.currentDate = new Date(this.input.value);
+    }
+  }
+
+  toggle() {
+    this.isOpen ? this.close() : this.open();
+  }
+
+  open() {
+    this.isOpen = true;
+    this.calendar.classList.add('active');
+    this.renderCalendar();
+  }
+
+  close() {
+    this.isOpen = false;
+    this.calendar.classList.remove('active');
+  }
+
+  navigate(direction) {
+    if (direction === 'prev') {
+      this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+    } else {
+      this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+    }
+    this.renderCalendar();
+  }
+
+  selectDate(dateStr) {
+    this.selectedDate = new Date(dateStr);
+    this.input.value = dateStr;
+    this.onChange(dateStr);
+    this.close();
+  }
+
+  handleAction(action) {
+    if (action === 'today') {
+      const today = new Date();
+      this.currentDate = new Date(today);
+      this.selectDate(this.formatDate(today));
+    } else if (action === 'clear') {
+      this.selectedDate = null;
+      this.input.value = '';
+      this.onChange('');
+      this.close();
+    }
+  }
+
+  renderCalendar() {
+    const year = this.currentDate.getFullYear();
+    const month = this.currentDate.getMonth();
+    this.monthYearLabel.textContent = new Date(year, month).toLocaleDateString(
+      'en-US',
+      {
+        year: 'numeric',
+        month: 'long',
+      },
+    );
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const daysInPrevMonth = new Date(year, month, 0).getDate();
+    const today = new Date();
+    let html = '';
+    for (let i = firstDay - 1; i >= 0; i--) {
+      const day = daysInPrevMonth - i;
+      html += `<div class="date-picker-day other-month">${day}</div>`;
+    }
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateStr = this.formatDate(new Date(year, month, day));
+      const isSelected =
+        this.selectedDate && this.formatDate(this.selectedDate) === dateStr;
+      const isToday = this.formatDate(today) === dateStr;
+      let classes = 'date-picker-day';
+      if (isSelected) classes += ' selected';
+      if (isToday) classes += ' date-picker-today';
+      html += `<div class="${classes}" data-date="${dateStr}">${day}</div>`;
+    }
+    const remainingCells = 42 - (firstDay + daysInMonth);
+    for (let day = 1; day <= remainingCells; day++) {
+      html += `<div class="date-picker-day other-month">${day}</div>`;
+    }
+    this.daysContainer.innerHTML = html;
+  }
+
+  formatDate(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+}
+
+function initDatePickers() {
+  const startDatePicker = new DatePicker('filter-start-date', {
+    onChange: () => applyFilters(),
+  });
+  const endDatePicker = new DatePicker('filter-end-date', {
+    onChange: () => applyFilters(),
+  });
+  const userStartDatePicker = new DatePicker('user-filter-start-date', {
+    onChange: () => applyUserRecordFilters(),
+  });
+  const userEndDatePicker = new DatePicker('user-filter-end-date', {
+    onChange: () => applyUserRecordFilters(),
   });
 }
