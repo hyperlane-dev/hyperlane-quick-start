@@ -1,7 +1,7 @@
-CREATE TABLE IF NOT EXISTS account_booking_record (
+CREATE TABLE IF NOT EXISTS order_record (
     id SERIAL PRIMARY KEY,
     bill_no VARCHAR(32) UNIQUE NOT NULL,
-    user_id INTEGER NOT NULL REFERENCES account_booking_user (id),
+    user_id INTEGER NOT NULL REFERENCES order_user (id),
     amount DECIMAL(15, 2) NOT NULL,
     category VARCHAR(50) NOT NULL,
     transaction_type VARCHAR(20) NOT NULL,

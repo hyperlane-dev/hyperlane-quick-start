@@ -4,4 +4,4 @@ use super::*;
 pub struct PasswordUtil;
 
 #[derive(Clone, Copy, Data, Debug, Default)]
-pub struct AccountBookingService;
+pub struct OrderService;

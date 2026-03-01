@@ -9,5 +9,5 @@ pub enum PostgresqlTableName {
     ChatHistory,
     TrackingRecord,
     Shortlink,
-    AccountBooking,
+    Order,
 }

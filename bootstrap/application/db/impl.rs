@@ -17,7 +17,7 @@ impl std::fmt::Display for PostgresqlTableName {
             PostgresqlTableName::ChatHistory => write!(f, "chat_history"),
             PostgresqlTableName::TrackingRecord => write!(f, "tracking_record"),
             PostgresqlTableName::Shortlink => write!(f, "shortlink"),
-            PostgresqlTableName::AccountBooking => write!(f, "account_booking"),
+            PostgresqlTableName::Order => write!(f, "order"),
         }
     }
 }
@@ -70,17 +70,17 @@ impl DbBootstrap {
             ))
             .add_index(POSTGRESQL_SHORTLINK_INDEX_SQL.to_string())
             .add_table(TableSchema::new(
-                vec!["account_booking_user".to_string()],
-                "account_booking_record".to_string(),
-                POSTGRESQL_ACCOUNT_BOOKING_RECORD_TABLE_SQL.to_string(),
+                vec!["order_user".to_string()],
+                "order_record".to_string(),
+                POSTGRESQL_ORDER_RECORD_TABLE_SQL.to_string(),
             ))
             .add_table(TableSchema::new(
                 Vec::new(),
-                "account_booking_user".to_string(),
-                POSTGRESQL_ACCOUNT_BOOKING_USER_TABLE_SQL.to_string(),
+                "order_user".to_string(),
+                POSTGRESQL_ORDER_USER_TABLE_SQL.to_string(),
             ))
-            .add_index(POSTGRESQL_ACCOUNT_BOOKING_INDEX_SQL.to_string())
-            .add_init_data(POSTGRESQL_ACCOUNT_BOOKING_DATA_SQL.to_string())
+            .add_index(POSTGRESQL_ORDER_INDEX_SQL.to_string())
+            .add_init_data(POSTGRESQL_ORDER_DATA_SQL.to_string())
     }
 }
 

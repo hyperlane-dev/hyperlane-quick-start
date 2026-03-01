@@ -34,9 +34,9 @@ impl std::fmt::Display for JwtConfigEnum {
     #[instrument_trace]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            JwtConfigEnum::SecretKey => write!(f, "hyperlane_account_booking_secret_key"),
+            JwtConfigEnum::SecretKey => write!(f, "hyperlane_order_secret_key"),
             JwtConfigEnum::Expiration => write!(f, "86400"),
-            JwtConfigEnum::Issuer => write!(f, "hyperlane_account_booking"),
+            JwtConfigEnum::Issuer => write!(f, "hyperlane_order"),
         }
     }
 }

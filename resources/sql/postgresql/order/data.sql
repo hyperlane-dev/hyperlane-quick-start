@@ -1,5 +1,5 @@
 INSERT INTO
-    account_booking_user (
+    order_user (
         username,
         password_hash,
         nickname,
@@ -12,5 +12,4 @@ VALUES (
         'Administrator',
         'admin',
         'approved'
-    )
-ON CONFLICT (username) DO NOTHING;
+    ) ON CONFLICT (username) DO NOTHING;

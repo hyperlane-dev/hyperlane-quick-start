@@ -11,7 +11,7 @@ use super::*;
     PartialEq,
     Serialize,
 )]
-#[sea_orm(table_name = "account_booking_record", schema_name = "public")]
+#[sea_orm(table_name = "order_record", schema_name = "public")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = true)]
     #[get(type(copy), pub(crate))]

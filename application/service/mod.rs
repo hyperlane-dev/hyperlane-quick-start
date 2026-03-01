@@ -1,4 +1,3 @@
-pub mod account_booking;
 pub mod chat;
 pub mod cicd;
 pub mod dataset;
@@ -6,6 +5,7 @@ pub mod gomoku;
 pub mod log;
 pub mod monitor;
 pub mod online;
+pub mod order;
 pub mod redis;
 pub mod rss;
 pub mod shortlink;

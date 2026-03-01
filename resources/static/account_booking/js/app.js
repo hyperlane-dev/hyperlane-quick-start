@@ -20,7 +20,7 @@ let allUsers = [];
 let usersCurrentPage = 1;
 let usersPageFirstIds = [null];
 
-const API_BASE = '/api/account_booking';
+const API_BASE = '/api/order';
 
 document.addEventListener('DOMContentLoaded', () => {
   initEventListeners();
@@ -81,8 +81,8 @@ function showPage(pageId) {
 }
 
 function checkAuth() {
-  const savedUser = localStorage.getItem('account_booking_user');
-  const savedToken = localStorage.getItem('account_booking_token');
+  const savedUser = localStorage.getItem('order_user');
+  const savedToken = localStorage.getItem('order_token');
   if (savedUser && savedToken) {
     currentUser = JSON.parse(savedUser);
     currentToken = savedToken;
@@ -719,8 +719,8 @@ async function handleLogin(e) {
     if (result.code === 200) {
       currentUser = result.data.user;
       currentToken = result.data.token;
-      localStorage.setItem('account_booking_user', JSON.stringify(currentUser));
-      localStorage.setItem('account_booking_token', currentToken);
+      localStorage.setItem('order_user', JSON.stringify(currentUser));
+      localStorage.setItem('order_token', currentToken);
       showToast('Login successful!', 'success');
       showMainApp();
     } else {
@@ -767,8 +767,8 @@ function handleLogout() {
   currentToken = null;
   viewingUserId = null;
   viewingUserName = null;
-  localStorage.removeItem('account_booking_user');
-  localStorage.removeItem('account_booking_token');
+  localStorage.removeItem('order_user');
+  localStorage.removeItem('order_token');
   window.location.hash = '';
   showPage('login-page');
   showToast('Logged out successfully', 'info');
@@ -1625,7 +1625,7 @@ async function handleProfileSubmit(e) {
     const result = await response.json();
     if (result.code === 200) {
       currentUser = { ...currentUser, ...result.data };
-      localStorage.setItem('account_booking_user', JSON.stringify(currentUser));
+      localStorage.setItem('order_user', JSON.stringify(currentUser));
       updateUserInfo();
       showToast('Profile updated!', 'success');
     } else {

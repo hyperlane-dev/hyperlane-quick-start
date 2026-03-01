@@ -1,49 +1,49 @@
 use super::*;
 
-#[route("/api/account_booking/user/register")]
+#[route("/api/order/user/register")]
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct UserRegisterRoute;
 
-#[route("/api/account_booking/user/login")]
+#[route("/api/order/user/login")]
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct UserLoginRoute;
 
-#[route("/api/account_booking/user/create")]
+#[route("/api/order/user/create")]
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct UserCreateRoute;
 
-#[route("/api/account_booking/user/update/{id}")]
+#[route("/api/order/user/update/{id}")]
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct UserUpdateRoute;
 
-#[route("/api/account_booking/user/change_password/{id}")]
+#[route("/api/order/user/change_password/{id}")]
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct UserChangePasswordRoute;
 
-#[route("/api/account_booking/user/approve/{id}")]
+#[route("/api/order/user/approve/{id}")]
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct UserApproveRoute;
 
-#[route("/api/account_booking/user/list")]
+#[route("/api/order/user/list")]
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct UserListRoute;
 
-#[route("/api/account_booking/user/get/{id}")]
+#[route("/api/order/user/get/{id}")]
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct UserGetRoute;
 
-#[route("/api/account_booking/record/create")]
+#[route("/api/order/record/create")]
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct RecordCreateRoute;
 
-#[route("/api/account_booking/record/list")]
+#[route("/api/order/record/list")]
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct RecordListRoute;
 
-#[route("/api/account_booking/record/get/{id}")]
+#[route("/api/order/record/get/{id}")]
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct RecordGetRoute;
 
-#[route("/api/account_booking/overview/statistics")]
+#[route("/api/order/overview/statistics")]
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct OverviewStatisticsRoute;

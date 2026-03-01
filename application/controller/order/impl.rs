@@ -18,7 +18,7 @@ impl ServerHook for UserRegisterRoute {
                 return;
             }
         };
-        match AccountBookingService::register_user(request).await {
+        match OrderService::register_user(request).await {
             Ok(user) => {
                 let response: ApiResponse<UserResponse> =
                     ApiResponse::<UserResponse>::success(user);
@@ -51,7 +51,7 @@ impl ServerHook for UserLoginRoute {
                 return;
             }
         };
-        match AccountBookingService::login_user(request).await {
+        match OrderService::login_user(request).await {
             Ok((user_response, user_id, role)) => {
                 let jwt_config: JwtConfig = JwtConfig::new(
                     JwtConfigEnum::SecretKey.to_string(),
@@ -111,7 +111,7 @@ impl ServerHook for UserCreateRoute {
                 return;
             }
         };
-        match AccountBookingService::create_user(request).await {
+        match OrderService::create_user(request).await {
             Ok(user) => {
                 let response: ApiResponse<UserResponse> =
                     ApiResponse::<UserResponse>::success(user);
@@ -156,7 +156,7 @@ impl ServerHook for UserUpdateRoute {
                 return;
             }
         };
-        let current_user_id: i32 = match AccountBookingService::extract_user_from_cookie(ctx) {
+        let current_user_id: i32 = match OrderService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
                 let response: ApiResponse<()> =
@@ -165,24 +165,23 @@ impl ServerHook for UserUpdateRoute {
                 return;
             }
         };
-        let current_user: UserResponse =
-            match AccountBookingService::get_user(current_user_id).await {
-                Ok(Some(user_info)) => user_info,
-                Ok(None) => {
-                    let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                        ResponseCode::Unauthorized,
-                        "User not found",
-                    );
-                    ctx.get_mut_response().set_body(response.to_json_bytes());
-                    return;
-                }
-                Err(error) => {
-                    let response: ApiResponse<()> =
-                        ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
-                    ctx.get_mut_response().set_body(response.to_json_bytes());
-                    return;
-                }
-            };
+        let current_user: UserResponse = match OrderService::get_user(current_user_id).await {
+            Ok(Some(user_info)) => user_info,
+            Ok(None) => {
+                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
+                    ResponseCode::Unauthorized,
+                    "User not found",
+                );
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+                return;
+            }
+            Err(error) => {
+                let response: ApiResponse<()> =
+                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+                return;
+            }
+        };
         let user_role: UserRole = current_user.get_role().parse().unwrap_or_default();
         if !user_role.is_admin() && current_user_id != target_user_id {
             let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
@@ -201,7 +200,7 @@ impl ServerHook for UserUpdateRoute {
                 return;
             }
         };
-        match AccountBookingService::update_user(target_user_id, request).await {
+        match OrderService::update_user(target_user_id, request).await {
             Ok(user) => {
                 let response: ApiResponse<UserResponse> =
                     ApiResponse::<UserResponse>::success(user);
@@ -255,7 +254,7 @@ impl ServerHook for UserChangePasswordRoute {
                 return;
             }
         };
-        match AccountBookingService::change_password(user_id, request).await {
+        match OrderService::change_password(user_id, request).await {
             Ok(_) => {
                 let response: ApiResponse<()> = ApiResponse::<()>::success(());
                 ctx.get_mut_response().set_body(response.to_json_bytes())
@@ -308,7 +307,7 @@ impl ServerHook for UserApproveRoute {
                 return;
             }
         };
-        match AccountBookingService::approve_user(user_id, request.get_approved()).await {
+        match OrderService::approve_user(user_id, request.get_approved()).await {
             Ok(user) => {
                 let response: ApiResponse<UserResponse> =
                     ApiResponse::<UserResponse>::success(user);
@@ -332,7 +331,7 @@ impl ServerHook for UserListRoute {
     #[prologue_macros(get_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
-        let current_user_id: i32 = match AccountBookingService::extract_user_from_cookie(ctx) {
+        let current_user_id: i32 = match OrderService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
                 let response: ApiResponse<()> =
@@ -341,24 +340,23 @@ impl ServerHook for UserListRoute {
                 return;
             }
         };
-        let current_user: UserResponse =
-            match AccountBookingService::get_user(current_user_id).await {
-                Ok(Some(user_info)) => user_info,
-                Ok(None) => {
-                    let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                        ResponseCode::Unauthorized,
-                        "User not found",
-                    );
-                    ctx.get_mut_response().set_body(response.to_json_bytes());
-                    return;
-                }
-                Err(error) => {
-                    let response: ApiResponse<()> =
-                        ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
-                    ctx.get_mut_response().set_body(response.to_json_bytes());
-                    return;
-                }
-            };
+        let current_user: UserResponse = match OrderService::get_user(current_user_id).await {
+            Ok(Some(user_info)) => user_info,
+            Ok(None) => {
+                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
+                    ResponseCode::Unauthorized,
+                    "User not found",
+                );
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+                return;
+            }
+            Err(error) => {
+                let response: ApiResponse<()> =
+                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+                return;
+            }
+        };
         let user_role: UserRole = current_user.get_role().parse().unwrap_or_default();
         if !user_role.is_admin() {
             let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
@@ -381,7 +379,7 @@ impl ServerHook for UserListRoute {
             .set_keyword(keyword)
             .set_last_id(last_id)
             .set_limit(limit);
-        match AccountBookingService::list_users(query).await {
+        match OrderService::list_users(query).await {
             Ok(data) => {
                 let response: ApiResponse<UserListResponse> =
                     ApiResponse::<UserListResponse>::success(data);
@@ -426,7 +424,7 @@ impl ServerHook for UserGetRoute {
                 return;
             }
         };
-        match AccountBookingService::get_user(user_id).await {
+        match OrderService::get_user(user_id).await {
             Ok(Some(user)) => {
                 let response: ApiResponse<UserResponse> =
                     ApiResponse::<UserResponse>::success(user);
@@ -464,7 +462,7 @@ impl ServerHook for RecordCreateRoute {
                 return;
             }
         };
-        let current_user_id: i32 = match AccountBookingService::extract_user_from_cookie(ctx) {
+        let current_user_id: i32 = match OrderService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
                 let response: ApiResponse<()> =
@@ -473,24 +471,23 @@ impl ServerHook for RecordCreateRoute {
                 return;
             }
         };
-        let current_user: UserResponse =
-            match AccountBookingService::get_user(current_user_id).await {
-                Ok(Some(user_info)) => user_info,
-                Ok(None) => {
-                    let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                        ResponseCode::Unauthorized,
-                        "User not found",
-                    );
-                    ctx.get_mut_response().set_body(response.to_json_bytes());
-                    return;
-                }
-                Err(error) => {
-                    let response: ApiResponse<()> =
-                        ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
-                    ctx.get_mut_response().set_body(response.to_json_bytes());
-                    return;
-                }
-            };
+        let current_user: UserResponse = match OrderService::get_user(current_user_id).await {
+            Ok(Some(user_info)) => user_info,
+            Ok(None) => {
+                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
+                    ResponseCode::Unauthorized,
+                    "User not found",
+                );
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+                return;
+            }
+            Err(error) => {
+                let response: ApiResponse<()> =
+                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+                return;
+            }
+        };
         let user_role: UserRole = current_user.get_role().parse().unwrap_or_default();
         if !user_role.is_admin() {
             let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
@@ -515,7 +512,7 @@ impl ServerHook for RecordCreateRoute {
             }
             None => current_user_id,
         };
-        match AccountBookingService::create_record(target_user_id, request).await {
+        match OrderService::create_record(target_user_id, request).await {
             Ok(record) => {
                 let response: ApiResponse<RecordResponse> =
                     ApiResponse::<RecordResponse>::success(record);
@@ -546,7 +543,7 @@ impl ServerHook for RecordListRoute {
     #[request_query_option("last_id" => last_id_opt)]
     #[request_query_option("limit" => limit_opt)]
     async fn handle(self, ctx: &mut Context) {
-        let current_user_id: i32 = match AccountBookingService::extract_user_from_cookie(ctx) {
+        let current_user_id: i32 = match OrderService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
                 let response: ApiResponse<()> =
@@ -555,24 +552,23 @@ impl ServerHook for RecordListRoute {
                 return;
             }
         };
-        let current_user: UserResponse =
-            match AccountBookingService::get_user(current_user_id).await {
-                Ok(Some(user_info)) => user_info,
-                Ok(None) => {
-                    let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                        ResponseCode::Unauthorized,
-                        "User not found",
-                    );
-                    ctx.get_mut_response().set_body(response.to_json_bytes());
-                    return;
-                }
-                Err(error) => {
-                    let response: ApiResponse<()> =
-                        ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
-                    ctx.get_mut_response().set_body(response.to_json_bytes());
-                    return;
-                }
-            };
+        let current_user: UserResponse = match OrderService::get_user(current_user_id).await {
+            Ok(Some(user_info)) => user_info,
+            Ok(None) => {
+                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
+                    ResponseCode::Unauthorized,
+                    "User not found",
+                );
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+                return;
+            }
+            Err(error) => {
+                let response: ApiResponse<()> =
+                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+                return;
+            }
+        };
         let mut query: RecordQueryRequest = RecordQueryRequest::default();
         let user_role: UserRole = current_user.get_role().parse().unwrap_or_default();
         if user_role.is_admin() {
@@ -611,7 +607,7 @@ impl ServerHook for RecordListRoute {
                 query.set_limit(Some(limit.min(MAX_LIMIT)));
             }
         }
-        match AccountBookingService::list_records(query).await {
+        match OrderService::list_records(query).await {
             Ok(list_response) => {
                 let response: ApiResponse<RecordListResponse> =
                     ApiResponse::<RecordListResponse>::success(list_response);
@@ -656,7 +652,7 @@ impl ServerHook for RecordGetRoute {
                 return;
             }
         };
-        match AccountBookingService::get_record(record_id).await {
+        match OrderService::get_record(record_id).await {
             Ok(Some(record)) => {
                 let response: ApiResponse<RecordResponse> =
                     ApiResponse::<RecordResponse>::success(record);
@@ -685,7 +681,7 @@ impl ServerHook for OverviewStatisticsRoute {
     #[prologue_macros(get_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
-        let current_user_id: i32 = match AccountBookingService::extract_user_from_cookie(ctx) {
+        let current_user_id: i32 = match OrderService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
                 let response: ApiResponse<()> =
@@ -694,24 +690,23 @@ impl ServerHook for OverviewStatisticsRoute {
                 return;
             }
         };
-        let current_user: UserResponse =
-            match AccountBookingService::get_user(current_user_id).await {
-                Ok(Some(user_info)) => user_info,
-                Ok(None) => {
-                    let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                        ResponseCode::Unauthorized,
-                        "User not found",
-                    );
-                    ctx.get_mut_response().set_body(response.to_json_bytes());
-                    return;
-                }
-                Err(error) => {
-                    let response: ApiResponse<()> =
-                        ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
-                    ctx.get_mut_response().set_body(response.to_json_bytes());
-                    return;
-                }
-            };
+        let current_user: UserResponse = match OrderService::get_user(current_user_id).await {
+            Ok(Some(user_info)) => user_info,
+            Ok(None) => {
+                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
+                    ResponseCode::Unauthorized,
+                    "User not found",
+                );
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+                return;
+            }
+            Err(error) => {
+                let response: ApiResponse<()> =
+                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+                return;
+            }
+        };
         let user_role: UserRole = current_user.get_role().parse().unwrap_or_default();
         if !user_role.is_admin() {
             let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
@@ -721,7 +716,7 @@ impl ServerHook for OverviewStatisticsRoute {
             ctx.get_mut_response().set_body(response.to_json_bytes());
             return;
         }
-        match AccountBookingService::get_overview_statistics().await {
+        match OrderService::get_overview_statistics().await {
             Ok(statistics) => {
                 let response: ApiResponse<OverviewStatisticsResponse> =
                     ApiResponse::<OverviewStatisticsResponse>::success(statistics);

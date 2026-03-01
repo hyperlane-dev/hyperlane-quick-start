@@ -2,7 +2,7 @@ use super::*;
 
 #[utoipa::path(
     post,
-    path = "/api/account_booking/user/register",
+    path = "/api/order/user/register",
     responses(
         (status = 200, description = "User registered successfully"),
         (status = 400, description = "Bad request"),
@@ -14,7 +14,7 @@ pub fn openapi_user_register() {}
 
 #[utoipa::path(
     post,
-    path = "/api/account_booking/user/login",
+    path = "/api/order/user/login",
     responses(
         (status = 200, description = "User logged in successfully"),
         (status = 400, description = "Bad request"),
@@ -27,7 +27,7 @@ pub fn openapi_user_login() {}
 
 #[utoipa::path(
     post,
-    path = "/api/account_booking/user/create",
+    path = "/api/order/user/create",
     responses(
         (status = 200, description = "User created successfully"),
         (status = 400, description = "Bad request"),
@@ -39,7 +39,7 @@ pub fn openapi_user_create() {}
 
 #[utoipa::path(
     post,
-    path = "/api/account_booking/user/update/{id}",
+    path = "/api/order/user/update/{id}",
     params(
         ("id" = i32, Path, description = "User ID")
     ),
@@ -55,7 +55,7 @@ pub fn openapi_user_update() {}
 
 #[utoipa::path(
     post,
-    path = "/api/account_booking/user/change_password/{id}",
+    path = "/api/order/user/change_password/{id}",
     params(
         ("id" = i32, Path, description = "User ID")
     ),
@@ -71,7 +71,7 @@ pub fn openapi_user_change_password() {}
 
 #[utoipa::path(
     post,
-    path = "/api/account_booking/user/approve/{id}",
+    path = "/api/order/user/approve/{id}",
     params(
         ("id" = i32, Path, description = "User ID")
     ),
@@ -87,7 +87,7 @@ pub fn openapi_user_approve() {}
 
 #[utoipa::path(
     get,
-    path = "/api/account_booking/user/list",
+    path = "/api/order/user/list",
     responses(
         (status = 200, description = "List of users retrieved successfully"),
         (status = 500, description = "Internal server error")
@@ -98,7 +98,7 @@ pub fn openapi_user_list() {}
 
 #[utoipa::path(
     get,
-    path = "/api/account_booking/user/get/{id}",
+    path = "/api/order/user/get/{id}",
     params(
         ("id" = i32, Path, description = "User ID")
     ),
@@ -114,7 +114,7 @@ pub fn openapi_user_get() {}
 
 #[utoipa::path(
     post,
-    path = "/api/account_booking/record/create",
+    path = "/api/order/record/create",
     responses(
         (status = 200, description = "Record created successfully"),
         (status = 400, description = "Bad request"),
@@ -126,7 +126,7 @@ pub fn openapi_record_create() {}
 
 #[utoipa::path(
     get,
-    path = "/api/account_booking/record/list",
+    path = "/api/order/record/list",
     responses(
         (status = 200, description = "List of records retrieved successfully"),
         (status = 500, description = "Internal server error")
@@ -137,7 +137,7 @@ pub fn openapi_record_list() {}
 
 #[utoipa::path(
     get,
-    path = "/api/account_booking/record/get/{id}",
+    path = "/api/order/record/get/{id}",
     params(
         ("id" = i32, Path, description = "Record ID")
     ),
@@ -153,7 +153,7 @@ pub fn openapi_record_get() {}
 
 #[utoipa::path(
     get,
-    path = "/api/account_booking/overview/statistics",
+    path = "/api/order/overview/statistics",
     responses(
         (status = 200, description = "Statistics retrieved successfully"),
         (status = 401, description = "Unauthorized"),

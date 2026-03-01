@@ -10,4 +10,4 @@ use super::*;
     tag = "health"
 )]
 #[instrument_trace]
-pub fn openapi_health_check() {}
+pub fn openapi_health() {}

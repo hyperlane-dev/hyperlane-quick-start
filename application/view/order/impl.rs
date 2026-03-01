@@ -1,6 +1,6 @@
 use super::*;
 
-impl ServerHook for AccountBookingViewRoute {
+impl ServerHook for OrderViewRoute {
     #[instrument_trace]
     async fn new(_ctx: &mut Context) -> Self {
         Self
@@ -9,7 +9,7 @@ impl ServerHook for AccountBookingViewRoute {
     #[prologue_macros(
         methods(get, post),
         response_status_code(302),
-        response_header(LOCATION => "/static/account_booking/index.html")
+        response_header(LOCATION => "/static/order/index.html")
     )]
     #[instrument_trace]
     async fn handle(self, _ctx: &mut Context) {}

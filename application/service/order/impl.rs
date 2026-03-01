@@ -15,7 +15,7 @@ impl PasswordUtil {
     }
 }
 
-impl AccountBookingService {
+impl OrderService {
     #[instrument_trace]
     pub fn extract_user_from_cookie(ctx: &Context) -> Result<i32, String> {
         let token: String = match ctx.get_request().try_get_cookie("token") {
@@ -52,8 +52,8 @@ impl AccountBookingService {
     pub async fn register_user(request: RegisterRequest) -> Result<UserResponse, String> {
         let db: DatabaseConnection =
             PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
-        let existing_user: Option<AccountBookingUserModel> = AccountBookingUserEntity::find()
-            .filter(AccountBookingUserColumn::Username.eq(request.get_username().clone()))
+        let existing_user: Option<OrderUserModel> = OrderUserEntity::find()
+            .filter(OrderUserColumn::Username.eq(request.get_username().clone()))
             .one(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
@@ -61,7 +61,7 @@ impl AccountBookingService {
             return Err("Username already exists".to_string());
         }
         let password_hash: String = PasswordUtil::hash_password(request.get_password());
-        let active_model: AccountBookingUserActiveModel = AccountBookingUserActiveModel {
+        let active_model: OrderUserActiveModel = OrderUserActiveModel {
             username: ActiveValue::Set(request.get_username().clone()),
             password_hash: ActiveValue::Set(password_hash),
             nickname: ActiveValue::Set(request.try_get_nickname().clone()),
@@ -73,7 +73,7 @@ impl AccountBookingService {
             created_at: ActiveValue::NotSet,
             updated_at: ActiveValue::NotSet,
         };
-        let result: AccountBookingUserModel = active_model
+        let result: OrderUserModel = active_model
             .insert(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
@@ -84,8 +84,8 @@ impl AccountBookingService {
     pub async fn login_user(request: LoginRequest) -> Result<(UserResponse, i32, String), String> {
         let db: DatabaseConnection =
             PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
-        let user: Option<AccountBookingUserModel> = AccountBookingUserEntity::find()
-            .filter(AccountBookingUserColumn::Username.eq(request.get_username().clone()))
+        let user: Option<OrderUserModel> = OrderUserEntity::find()
+            .filter(OrderUserColumn::Username.eq(request.get_username().clone()))
             .one(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
@@ -114,8 +114,8 @@ impl AccountBookingService {
     pub async fn create_user(request: CreateUserRequest) -> Result<UserResponse, String> {
         let db: DatabaseConnection =
             PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
-        let existing_user: Option<AccountBookingUserModel> = AccountBookingUserEntity::find()
-            .filter(AccountBookingUserColumn::Username.eq(request.get_username().clone()))
+        let existing_user: Option<OrderUserModel> = OrderUserEntity::find()
+            .filter(OrderUserColumn::Username.eq(request.get_username().clone()))
             .one(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
@@ -123,7 +123,7 @@ impl AccountBookingService {
             return Err("Username already exists".to_string());
         }
         let password_hash: String = PasswordUtil::hash_password(request.get_password());
-        let active_model: AccountBookingUserActiveModel = AccountBookingUserActiveModel {
+        let active_model: OrderUserActiveModel = OrderUserActiveModel {
             username: ActiveValue::Set(request.get_username().clone()),
             password_hash: ActiveValue::Set(password_hash),
             nickname: ActiveValue::Set(request.try_get_nickname().clone()),
@@ -135,7 +135,7 @@ impl AccountBookingService {
             created_at: ActiveValue::NotSet,
             updated_at: ActiveValue::NotSet,
         };
-        let result: AccountBookingUserModel = active_model
+        let result: OrderUserModel = active_model
             .insert(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
@@ -149,13 +149,13 @@ impl AccountBookingService {
     ) -> Result<UserResponse, String> {
         let db: DatabaseConnection =
             PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
-        let user: Option<AccountBookingUserModel> = AccountBookingUserEntity::find_by_id(user_id)
+        let user: Option<OrderUserModel> = OrderUserEntity::find_by_id(user_id)
             .one(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
         match user {
             Some(model) => {
-                let mut active_model: AccountBookingUserActiveModel = model.into();
+                let mut active_model: OrderUserActiveModel = model.into();
                 if let Some(nickname) = request.try_get_nickname() {
                     active_model.nickname = ActiveValue::Set(Some(nickname.clone()));
                 }
@@ -166,7 +166,7 @@ impl AccountBookingService {
                     active_model.phone = ActiveValue::Set(Some(phone.clone()));
                 }
                 active_model.updated_at = ActiveValue::Set(Some(Local::now().naive_local()));
-                let result: AccountBookingUserModel = active_model
+                let result: OrderUserModel = active_model
                     .update(&db)
                     .await
                     .map_err(|error: DbErr| error.to_string())?;
@@ -183,7 +183,7 @@ impl AccountBookingService {
     ) -> Result<(), String> {
         let db: DatabaseConnection =
             PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
-        let user: Option<AccountBookingUserModel> = AccountBookingUserEntity::find_by_id(user_id)
+        let user: Option<OrderUserModel> = OrderUserEntity::find_by_id(user_id)
             .one(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
@@ -198,7 +198,7 @@ impl AccountBookingService {
                 }
                 let new_password_hash: String =
                     PasswordUtil::hash_password(request.get_new_password());
-                let mut active_model: AccountBookingUserActiveModel = model.into();
+                let mut active_model: OrderUserActiveModel = model.into();
                 active_model.password_hash = ActiveValue::Set(new_password_hash);
                 active_model.updated_at = ActiveValue::Set(Some(Local::now().naive_local()));
                 active_model
@@ -215,13 +215,13 @@ impl AccountBookingService {
     pub async fn approve_user(user_id: i32, approved: bool) -> Result<UserResponse, String> {
         let db: DatabaseConnection =
             PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
-        let user: Option<AccountBookingUserModel> = AccountBookingUserEntity::find_by_id(user_id)
+        let user: Option<OrderUserModel> = OrderUserEntity::find_by_id(user_id)
             .one(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
         match user {
             Some(model) => {
-                let mut active_model: AccountBookingUserActiveModel = model.into();
+                let mut active_model: OrderUserActiveModel = model.into();
                 let status: String = if approved {
                     "approved".to_string()
                 } else {
@@ -229,7 +229,7 @@ impl AccountBookingService {
                 };
                 active_model.status = ActiveValue::Set(status);
                 active_model.updated_at = ActiveValue::Set(Some(Local::now().naive_local()));
-                let result: AccountBookingUserModel = active_model
+                let result: OrderUserModel = active_model
                     .update(&db)
                     .await
                     .map_err(|error: DbErr| error.to_string())?;
@@ -243,16 +243,16 @@ impl AccountBookingService {
     pub async fn list_users(query: UserListQueryRequest) -> Result<UserListResponse, String> {
         let db: DatabaseConnection =
             PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
-        let mut base_select: Select<AccountBookingUserEntity> = AccountBookingUserEntity::find();
+        let mut base_select: Select<OrderUserEntity> = OrderUserEntity::find();
         if let Some(keyword) = query.try_get_keyword() {
             let keyword_pattern: String = format!("%{keyword}%");
             let mut condition: Condition = Condition::any()
-                .add(AccountBookingUserColumn::Username.like(keyword_pattern.clone()))
-                .add(AccountBookingUserColumn::Nickname.like(keyword_pattern.clone()))
-                .add(AccountBookingUserColumn::Email.like(keyword_pattern.clone()))
-                .add(AccountBookingUserColumn::Phone.like(keyword_pattern.clone()));
+                .add(OrderUserColumn::Username.like(keyword_pattern.clone()))
+                .add(OrderUserColumn::Nickname.like(keyword_pattern.clone()))
+                .add(OrderUserColumn::Email.like(keyword_pattern.clone()))
+                .add(OrderUserColumn::Phone.like(keyword_pattern.clone()));
             if let Ok(user_id) = keyword.parse::<i32>() {
-                condition = condition.add(AccountBookingUserColumn::Id.eq(user_id));
+                condition = condition.add(OrderUserColumn::Id.eq(user_id));
             }
             base_select = base_select.filter(condition);
         }
@@ -262,24 +262,22 @@ impl AccountBookingService {
             .await
             .map_err(|error: DbErr| error.to_string())?;
         let total_count: i64 = total_count_u64 as i64;
-        let mut paged_select: Select<AccountBookingUserEntity> = base_select;
+        let mut paged_select: Select<OrderUserEntity> = base_select;
         if let Some(last_id) = query.try_get_last_id() {
-            paged_select = paged_select.filter(AccountBookingUserColumn::Id.lt(last_id));
+            paged_select = paged_select.filter(OrderUserColumn::Id.lt(last_id));
         }
-        paged_select = paged_select.order_by_desc(AccountBookingUserColumn::Id);
+        paged_select = paged_select.order_by_desc(OrderUserColumn::Id);
         let limit: i32 = query.try_get_limit().unwrap_or(20);
         let limit_with_extra: i32 = limit + 1;
         paged_select = paged_select.limit(limit_with_extra as u64);
-        let paged_users: Vec<AccountBookingUserModel> = paged_select
+        let paged_users: Vec<OrderUserModel> = paged_select
             .all(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
         let has_more: bool = paged_users.len() > limit as usize;
-        let paged_users: Vec<AccountBookingUserModel> =
+        let paged_users: Vec<OrderUserModel> =
             paged_users.into_iter().take(limit as usize).collect();
-        let last_id: Option<i32> = paged_users
-            .last()
-            .map(|u: &AccountBookingUserModel| u.get_id());
+        let last_id: Option<i32> = paged_users.last().map(|u: &OrderUserModel| u.get_id());
         let user_responses: Vec<UserResponse> = paged_users
             .iter()
             .map(Self::model_to_user_response)
@@ -297,15 +295,15 @@ impl AccountBookingService {
     pub async fn get_user(user_id: i32) -> Result<Option<UserResponse>, String> {
         let db: DatabaseConnection =
             PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
-        let user: Option<AccountBookingUserModel> = AccountBookingUserEntity::find_by_id(user_id)
+        let user: Option<OrderUserModel> = OrderUserEntity::find_by_id(user_id)
             .one(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
-        Ok(user.map(|model: AccountBookingUserModel| Self::model_to_user_response(&model)))
+        Ok(user.map(|model: OrderUserModel| Self::model_to_user_response(&model)))
     }
 
     #[instrument_trace]
-    fn model_to_user_response(model: &AccountBookingUserModel) -> UserResponse {
+    fn model_to_user_response(model: &OrderUserModel) -> UserResponse {
         let mut response: UserResponse = UserResponse::default();
         let created_at: Option<String> = model
             .try_get_created_at()
@@ -334,7 +332,7 @@ impl AccountBookingService {
         let bill_date: NaiveDate = request
             .try_get_bill_date()
             .unwrap_or_else(|| Local::now().naive_local().date());
-        let active_model: AccountBookingRecordActiveModel = AccountBookingRecordActiveModel {
+        let active_model: OrderRecordActiveModel = OrderRecordActiveModel {
             bill_no: ActiveValue::Set(bill_no.clone()),
             user_id: ActiveValue::Set(user_id),
             amount: ActiveValue::Set(request.get_amount()),
@@ -346,7 +344,7 @@ impl AccountBookingService {
             created_at: ActiveValue::NotSet,
             updated_at: ActiveValue::NotSet,
         };
-        let result: AccountBookingRecordModel = active_model
+        let result: OrderRecordModel = active_model
             .insert(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
@@ -357,24 +355,22 @@ impl AccountBookingService {
     pub async fn list_records(query: RecordQueryRequest) -> Result<RecordListResponse, String> {
         let db: DatabaseConnection =
             PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
-        let mut base_select: Select<AccountBookingRecordEntity> =
-            AccountBookingRecordEntity::find();
+        let mut base_select: Select<OrderRecordEntity> = OrderRecordEntity::find();
         if let Some(user_id) = query.try_get_user_id() {
-            base_select = base_select.filter(AccountBookingRecordColumn::UserId.eq(user_id));
+            base_select = base_select.filter(OrderRecordColumn::UserId.eq(user_id));
         }
         if let Some(start_date) = query.try_get_start_date() {
-            base_select = base_select.filter(AccountBookingRecordColumn::BillDate.gte(*start_date));
+            base_select = base_select.filter(OrderRecordColumn::BillDate.gte(*start_date));
         }
         if let Some(end_date) = query.try_get_end_date() {
-            base_select = base_select.filter(AccountBookingRecordColumn::BillDate.lte(*end_date));
+            base_select = base_select.filter(OrderRecordColumn::BillDate.lte(*end_date));
         }
         if let Some(category) = query.try_get_category() {
-            base_select =
-                base_select.filter(AccountBookingRecordColumn::Category.eq(category.clone()));
+            base_select = base_select.filter(OrderRecordColumn::Category.eq(category.clone()));
         }
         if let Some(transaction_type) = query.try_get_transaction_type() {
-            base_select = base_select
-                .filter(AccountBookingRecordColumn::TransactionType.eq(transaction_type.clone()));
+            base_select =
+                base_select.filter(OrderRecordColumn::TransactionType.eq(transaction_type.clone()));
         }
         let total_count_u64: u64 = base_select
             .clone()
@@ -382,7 +378,7 @@ impl AccountBookingService {
             .await
             .map_err(|error: DbErr| error.to_string())?;
         let total_count: i64 = total_count_u64 as i64;
-        let all_records: Vec<AccountBookingRecordModel> = base_select
+        let all_records: Vec<OrderRecordModel> = base_select
             .clone()
             .all(&db)
             .await
@@ -398,24 +394,22 @@ impl AccountBookingService {
             }
         }
         let balance: Decimal = total_income - total_expense;
-        let mut paged_select: Select<AccountBookingRecordEntity> = base_select;
+        let mut paged_select: Select<OrderRecordEntity> = base_select;
         if let Some(last_id) = query.try_get_last_id() {
-            paged_select = paged_select.filter(AccountBookingRecordColumn::Id.lt(last_id));
+            paged_select = paged_select.filter(OrderRecordColumn::Id.lt(last_id));
         }
-        paged_select = paged_select.order_by_desc(AccountBookingRecordColumn::Id);
+        paged_select = paged_select.order_by_desc(OrderRecordColumn::Id);
         let limit: i32 = query.try_get_limit().unwrap_or(20);
         let limit_with_extra: i32 = limit + 1;
         paged_select = paged_select.limit(limit_with_extra as u64);
-        let paged_records: Vec<AccountBookingRecordModel> = paged_select
+        let paged_records: Vec<OrderRecordModel> = paged_select
             .all(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
         let has_more: bool = paged_records.len() > limit as usize;
-        let paged_records: Vec<AccountBookingRecordModel> =
+        let paged_records: Vec<OrderRecordModel> =
             paged_records.into_iter().take(limit as usize).collect();
-        let last_id: Option<i32> = paged_records
-            .last()
-            .map(|r: &AccountBookingRecordModel| r.get_id());
+        let last_id: Option<i32> = paged_records.last().map(|r: &OrderRecordModel| r.get_id());
         let record_responses: Vec<RecordResponse> =
             Self::enrich_records_with_users(&db, paged_records).await?;
         let mut response: RecordListResponse = RecordListResponse::default();
@@ -434,11 +428,10 @@ impl AccountBookingService {
     pub async fn get_record(record_id: i32) -> Result<Option<RecordResponse>, String> {
         let db: DatabaseConnection =
             PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
-        let record: Option<AccountBookingRecordModel> =
-            AccountBookingRecordEntity::find_by_id(record_id)
-                .one(&db)
-                .await
-                .map_err(|error: DbErr| error.to_string())?;
+        let record: Option<OrderRecordModel> = OrderRecordEntity::find_by_id(record_id)
+            .one(&db)
+            .await
+            .map_err(|error: DbErr| error.to_string())?;
         match record {
             Some(model) => {
                 let mut response: RecordResponse = Self::model_to_record_response(&model);
@@ -452,26 +445,26 @@ impl AccountBookingService {
     #[instrument_trace]
     async fn enrich_records_with_users(
         db: &DatabaseConnection,
-        records: Vec<AccountBookingRecordModel>,
+        records: Vec<OrderRecordModel>,
     ) -> Result<Vec<RecordResponse>, String> {
         let user_ids: Vec<i32> = records
             .iter()
-            .map(|r: &AccountBookingRecordModel| r.get_user_id())
+            .map(|r: &OrderRecordModel| r.get_user_id())
             .collect::<std::collections::HashSet<i32>>()
             .into_iter()
             .collect();
-        let users: Vec<AccountBookingUserModel> = AccountBookingUserEntity::find()
-            .filter(AccountBookingUserColumn::Id.is_in(user_ids))
+        let users: Vec<OrderUserModel> = OrderUserEntity::find()
+            .filter(OrderUserColumn::Id.is_in(user_ids))
             .all(db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
-        let user_map: std::collections::HashMap<i32, AccountBookingUserModel> = users
+        let user_map: std::collections::HashMap<i32, OrderUserModel> = users
             .into_iter()
-            .map(|u: AccountBookingUserModel| (u.get_id(), u))
+            .map(|u: OrderUserModel| (u.get_id(), u))
             .collect();
         let responses: Vec<RecordResponse> = records
             .iter()
-            .map(|record: &AccountBookingRecordModel| {
+            .map(|record: &OrderRecordModel| {
                 let mut response: RecordResponse = Self::model_to_record_response(record);
                 if let Some(user) = user_map.get(&response.get_user_id()) {
                     response
@@ -491,11 +484,10 @@ impl AccountBookingService {
         db: &DatabaseConnection,
         response: &mut RecordResponse,
     ) -> Result<(), String> {
-        let user: Option<AccountBookingUserModel> =
-            AccountBookingUserEntity::find_by_id(response.get_user_id())
-                .one(db)
-                .await
-                .map_err(|error: DbErr| error.to_string())?;
+        let user: Option<OrderUserModel> = OrderUserEntity::find_by_id(response.get_user_id())
+            .one(db)
+            .await
+            .map_err(|error: DbErr| error.to_string())?;
         if let Some(user) = user {
             response
                 .set_username(Some(user.get_username().clone()))
@@ -507,7 +499,7 @@ impl AccountBookingService {
     }
 
     #[instrument_trace]
-    fn model_to_record_response(model: &AccountBookingRecordModel) -> RecordResponse {
+    fn model_to_record_response(model: &OrderRecordModel) -> RecordResponse {
         let mut response: RecordResponse = RecordResponse::default();
         let created_at: Option<String> = model
             .try_get_created_at()
@@ -589,8 +581,8 @@ impl AccountBookingService {
         db: &DatabaseConnection,
         date: NaiveDate,
     ) -> Result<(i64, Decimal, Decimal), String> {
-        let records: Vec<AccountBookingRecordModel> = AccountBookingRecordEntity::find()
-            .filter(AccountBookingRecordColumn::BillDate.eq(date))
+        let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
+            .filter(OrderRecordColumn::BillDate.eq(date))
             .all(db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
@@ -612,9 +604,9 @@ impl AccountBookingService {
     async fn get_new_users_count(db: &DatabaseConnection, date: NaiveDate) -> Result<i64, String> {
         let start_of_day: NaiveDateTime = date.and_hms_opt(0, 0, 0).unwrap();
         let end_of_day: NaiveDateTime = date.and_hms_opt(23, 59, 59).unwrap();
-        let count_u64: u64 = AccountBookingUserEntity::find()
-            .filter(AccountBookingUserColumn::CreatedAt.gte(start_of_day))
-            .filter(AccountBookingUserColumn::CreatedAt.lte(end_of_day))
+        let count_u64: u64 = OrderUserEntity::find()
+            .filter(OrderUserColumn::CreatedAt.gte(start_of_day))
+            .filter(OrderUserColumn::CreatedAt.lte(end_of_day))
             .count(db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
@@ -625,10 +617,10 @@ impl AccountBookingService {
     async fn get_daily_trend(db: &DatabaseConnection, days: i64) -> Result<DailyTrend, String> {
         let end_date: NaiveDate = Local::now().naive_local().date();
         let start_date: NaiveDate = end_date - chrono::Duration::days(days);
-        let records: Vec<AccountBookingRecordModel> = AccountBookingRecordEntity::find()
-            .filter(AccountBookingRecordColumn::BillDate.gte(start_date))
-            .filter(AccountBookingRecordColumn::BillDate.lte(end_date))
-            .order_by_asc(AccountBookingRecordColumn::BillDate)
+        let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
+            .filter(OrderRecordColumn::BillDate.gte(start_date))
+            .filter(OrderRecordColumn::BillDate.lte(end_date))
+            .order_by_asc(OrderRecordColumn::BillDate)
             .all(db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
@@ -638,7 +630,7 @@ impl AccountBookingService {
         let mut current_date: NaiveDate = start_date;
         while current_date <= end_date {
             dates.push(current_date.to_string());
-            let day_records: Vec<&AccountBookingRecordModel> = records
+            let day_records: Vec<&OrderRecordModel> = records
                 .iter()
                 .filter(|r| *r.get_bill_date() == current_date)
                 .collect();
@@ -686,9 +678,9 @@ impl AccountBookingService {
                 NaiveDate::from_ymd_opt(year, month + 1, 1).unwrap_or_default()
                     - chrono::Duration::days(1)
             };
-            let records: Vec<AccountBookingRecordModel> = AccountBookingRecordEntity::find()
-                .filter(AccountBookingRecordColumn::BillDate.gte(start_date))
-                .filter(AccountBookingRecordColumn::BillDate.lte(end_date))
+            let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
+                .filter(OrderRecordColumn::BillDate.gte(start_date))
+                .filter(OrderRecordColumn::BillDate.lte(end_date))
                 .all(db)
                 .await
                 .map_err(|error: DbErr| error.to_string())?;
@@ -716,8 +708,8 @@ impl AccountBookingService {
     async fn get_category_distribution(
         db: &DatabaseConnection,
     ) -> Result<Vec<CategoryItem>, String> {
-        let records: Vec<AccountBookingRecordModel> = AccountBookingRecordEntity::find()
-            .filter(AccountBookingRecordColumn::TransactionType.eq("expense"))
+        let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
+            .filter(OrderRecordColumn::TransactionType.eq("expense"))
             .all(db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
@@ -755,9 +747,9 @@ impl AccountBookingService {
             dates.push(current_date.to_string());
             let start_of_day: NaiveDateTime = current_date.and_hms_opt(0, 0, 0).unwrap();
             let end_of_day: NaiveDateTime = current_date.and_hms_opt(23, 59, 59).unwrap();
-            let count_u64: u64 = AccountBookingUserEntity::find()
-                .filter(AccountBookingUserColumn::CreatedAt.gte(start_of_day))
-                .filter(AccountBookingUserColumn::CreatedAt.lte(end_of_day))
+            let count_u64: u64 = OrderUserEntity::find()
+                .filter(OrderUserColumn::CreatedAt.gte(start_of_day))
+                .filter(OrderUserColumn::CreatedAt.lte(end_of_day))
                 .count(db)
                 .await
                 .map_err(|error: DbErr| error.to_string())?;
@@ -774,7 +766,7 @@ impl AccountBookingService {
     async fn get_transaction_type_distribution(
         db: &DatabaseConnection,
     ) -> Result<TransactionTypeDistribution, String> {
-        let records: Vec<AccountBookingRecordModel> = AccountBookingRecordEntity::find()
+        let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
             .all(db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
@@ -807,10 +799,10 @@ impl AccountBookingService {
     ) -> Result<TransactionCountTrend, String> {
         let end_date: NaiveDate = Local::now().naive_local().date();
         let start_date: NaiveDate = end_date - chrono::Duration::days(days);
-        let records: Vec<AccountBookingRecordModel> = AccountBookingRecordEntity::find()
-            .filter(AccountBookingRecordColumn::BillDate.gte(start_date))
-            .filter(AccountBookingRecordColumn::BillDate.lte(end_date))
-            .order_by_asc(AccountBookingRecordColumn::BillDate)
+        let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
+            .filter(OrderRecordColumn::BillDate.gte(start_date))
+            .filter(OrderRecordColumn::BillDate.lte(end_date))
+            .order_by_asc(OrderRecordColumn::BillDate)
             .all(db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
@@ -836,8 +828,8 @@ impl AccountBookingService {
     async fn get_category_amount_distribution(
         db: &DatabaseConnection,
     ) -> Result<Vec<CategoryAmountItem>, String> {
-        let records: Vec<AccountBookingRecordModel> = AccountBookingRecordEntity::find()
-            .filter(AccountBookingRecordColumn::TransactionType.eq("expense"))
+        let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
+            .filter(OrderRecordColumn::TransactionType.eq("expense"))
             .all(db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
@@ -872,16 +864,16 @@ impl AccountBookingService {
         let mut dates: Vec<String> = Vec::new();
         let mut active_users: Vec<i64> = Vec::new();
         let mut new_records: Vec<i64> = Vec::new();
-        let records: Vec<AccountBookingRecordModel> = AccountBookingRecordEntity::find()
-            .filter(AccountBookingRecordColumn::BillDate.gte(start_date))
-            .filter(AccountBookingRecordColumn::BillDate.lte(end_date))
+        let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
+            .filter(OrderRecordColumn::BillDate.gte(start_date))
+            .filter(OrderRecordColumn::BillDate.lte(end_date))
             .all(db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
         let mut current_date: NaiveDate = start_date;
         while current_date <= end_date {
             dates.push(current_date.to_string());
-            let day_records: Vec<&AccountBookingRecordModel> = records
+            let day_records: Vec<&OrderRecordModel> = records
                 .iter()
                 .filter(|r| *r.get_bill_date() == current_date)
                 .collect();
