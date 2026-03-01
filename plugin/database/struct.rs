@@ -36,7 +36,7 @@ pub struct ErrorContext {
     pub(super) timestamp: std::time::SystemTime,
 }
 
-#[derive(Clone, Data, Debug)]
+#[derive(Clone, Data, Debug, Default)]
 pub struct AutoCreationResult {
     #[get(type(copy), pub(crate))]
     pub(super) database_created: bool,
