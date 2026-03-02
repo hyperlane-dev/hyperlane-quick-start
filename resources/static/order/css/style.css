@@ -684,6 +684,7 @@ input[type='number'].form-input {
   font-size: 16px;
   font-weight: 600;
   text-align: right;
+  padding: 0 16px;
 }
 
 .record-amount.income {
@@ -1091,6 +1092,7 @@ input[type='number'].form-input {
   .record-amount {
     text-align: left;
     font-size: 15px;
+    padding: 0 12px;
   }
 
   .record-date {
@@ -1212,6 +1214,17 @@ input[type='number'].form-input {
   .record-meta-item {
     flex-shrink: 0;
   }
+
+  .date-picker-wrapper {
+    display: flex;
+    width: 100%;
+  }
+
+  .date-picker-input {
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+  }
 }
 
 .pagination-container {
@@ -1313,7 +1326,9 @@ input[type='number'].form-input {
 }
 
 .date-picker-input {
-  width: 120px;
+  flex: 1;
+  width: 100%;
+  min-width: 0;
   padding: 6px 8px;
   padding-right: 30px;
   background: #0d1117;
