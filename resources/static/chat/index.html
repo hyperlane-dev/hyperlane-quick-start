@@ -1419,6 +1419,7 @@
             alt=""
             class="nav-logo"
             src="https://docs.ltpp.vip/img/hyperlane.png"
+            onerror="this.style.display = 'none'"
           />
           <h1 class="nav-title">
             <a href="https://github.com/hyperlane-dev/hyperlane" target="_blank"
@@ -2277,6 +2278,7 @@
             document
               .getElementById('uploadButton')
               .classList.remove('disabled');
+            document.querySelector('.btn-upload').disabled = false;
             break;
           case 'connecting':
             text.textContent = 'Connecting';

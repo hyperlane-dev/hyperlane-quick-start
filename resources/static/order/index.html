@@ -8,6 +8,7 @@
     <link href="./css/style.css" rel="stylesheet" />
     <script src="./js/echarts.js"></script>
     <script src="./js/qrcode.js"></script>
+    <script src="./js/qr.js"></script>
     <script src="./js/app.js" defer></script>
   </head>
   <body>
@@ -15,7 +16,20 @@
       <div id="login-page" class="login-page">
         <div class="login-container">
           <div class="login-header">
-            <h1>Order</h1>
+            <h1>
+              <a
+                href="https://github.com/hyperlane-dev/hyperlane"
+                target="_blank"
+              >
+                <img
+                  src="https://docs.ltpp.vip/img/hyperlane.png"
+                  alt=""
+                  class="nav-logo"
+                  onerror="this.style.display = 'none'"
+                />
+                <span>Hyperlane Order</span>
+              </a>
+            </h1>
             <p>Manage your finances efficiently</p>
           </div>
           <form id="login-form" class="login-form">
@@ -111,7 +125,20 @@
       <div id="main-app" class="main-app hidden">
         <aside class="sidebar">
           <div class="sidebar-header">
-            <h2>Order</h2>
+            <h2>
+              <a
+                href="https://github.com/hyperlane-dev/hyperlane"
+                target="_blank"
+              >
+                <img
+                  src="https://docs.ltpp.vip/img/hyperlane.png"
+                  alt=""
+                  class="nav-logo"
+                  onerror="this.style.display = 'none'"
+                />
+                <span>Hyperlane Order</span>
+              </a>
+            </h2>
           </div>
           <nav class="sidebar-nav">
             <div class="nav-item active" data-page="dashboard">
@@ -818,7 +845,5 @@
         </div>
       </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
   </body>
 </html>

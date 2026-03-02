@@ -2120,6 +2120,9 @@ let scanCanvasElement = null;
 let scanCanvasContext = null;
 let scanCurrentFacingMode = 'environment';
 let isScanning = false;
+let lastScannedData = null;
+let lastScanTime = 0;
+const SCAN_COOLDOWN_MS = 1000;
 
 function initScanFeature() {
   const scanBtn = document.getElementById('scan-btn');
@@ -2154,6 +2157,8 @@ async function startScanning() {
   if (!scanCanvasContext) {
     return;
   }
+  lastScannedData = null;
+  lastScanTime = 0;
   const errorDiv = document.getElementById('scan-error');
   if (errorDiv) {
     errorDiv.classList.add('hidden');
@@ -2231,15 +2236,20 @@ function tickScan() {
       inversionAttempts: 'attemptBoth',
     });
     if (code && code.data) {
-      handleScanResult(code.data);
-      return;
+      const now = Date.now();
+      const isDuplicate =
+        code.data === lastScannedData && now - lastScanTime < SCAN_COOLDOWN_MS;
+      if (!isDuplicate) {
+        lastScannedData = code.data;
+        lastScanTime = now;
+        handleScanResult(code.data);
+      }
     }
   }
   scanAnimationId = requestAnimationFrame(tickScan);
 }
 
 async function handleScanResult(qrData) {
-  stopScanning();
   const userId = parseInt(qrData, 10);
   if (isNaN(userId)) {
     showScanError('Invalid QR code. Expected user ID.');
@@ -2251,13 +2261,16 @@ async function handleScanResult(qrData) {
     });
     const result = await response.json();
     if (result.code === 200 && result.data) {
+      stopScanning();
       const userData = result.data;
       closeScanModal();
       closeMobileSidebar();
       viewUserRecords(userData.id, userData.username);
       showToast(`Found user: ${userData.username}`, 'success');
     } else if (result.code === 404) {
-      showScanError('User not found. Please check the QR code.');
+      showScanError(
+        `User ID ${userId} not found. Please scan another QR code.`,
+      );
     } else {
       showScanError(result.message || 'Failed to find user');
     }

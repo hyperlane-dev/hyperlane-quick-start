@@ -20,7 +20,7 @@
           (e = {
             exports: {},
           }).exports,
-          e
+          e,
         ),
       e.exports
     ),
@@ -57,10 +57,10 @@
               : {
                   value: r,
                   enumerable: !0,
-                }
-          )
+                },
+          ),
         ),
-        r
+        r,
       );
   var m,
     u = P(() => {
@@ -76,7 +76,7 @@
     be,
     ft = P(() => {
       u();
-      (Fv = 0),
+      ((Fv = 0),
         (be = {
           readFileSync: (r) => self[r] || '',
           statSync: () => ({
@@ -85,7 +85,7 @@
           promises: {
             readFile: (r) => Promise.resolve(self[r] || ''),
           },
-        });
+        }));
     });
   var Fs = x((oP, gf) => {
     u();
@@ -96,12 +96,12 @@
           throw new TypeError('`maxSize` must be a number greater than 0');
         if (typeof e.maxAge == 'number' && e.maxAge === 0)
           throw new TypeError('`maxAge` must be a number greater than 0');
-        (this.maxSize = e.maxSize),
+        ((this.maxSize = e.maxSize),
           (this.maxAge = e.maxAge || 1 / 0),
           (this.onEviction = e.onEviction),
           (this.cache = new Map()),
           (this.oldCache = new Map()),
-          (this._size = 0);
+          (this._size = 0));
       }
       _emitEvictions(e) {
         if (typeof this.onEviction == 'function')
@@ -125,16 +125,16 @@
         return this._getItemValue(e, i);
       }
       _set(e, t) {
-        this.cache.set(e, t),
+        (this.cache.set(e, t),
           this._size++,
           this._size >= this.maxSize &&
             ((this._size = 0),
             this._emitEvictions(this.oldCache),
             (this.oldCache = this.cache),
-            (this.cache = new Map()));
+            (this.cache = new Map())));
       }
       _moveToRecent(e, t) {
-        this.oldCache.delete(e), this._set(e, t);
+        (this.oldCache.delete(e), this._set(e, t));
       }
       *_entriesAscending() {
         for (let e of this.oldCache) {
@@ -155,7 +155,7 @@
         if (this.oldCache.has(e)) {
           let t = this.oldCache.get(e);
           if (this._deleteIfExpired(e, t) === !1)
-            return this._moveToRecent(e, t), t.value;
+            return (this._moveToRecent(e, t), t.value);
         }
       }
       set(
@@ -163,7 +163,7 @@
         t,
         {
           maxAge: i = this.maxAge === 1 / 0 ? void 0 : Date.now() + this.maxAge,
-        } = {}
+        } = {},
       ) {
         this.cache.has(e)
           ? this.cache.set(e, {
@@ -179,8 +179,8 @@
         return this.cache.has(e)
           ? !this._deleteIfExpired(e, this.cache.get(e))
           : this.oldCache.has(e)
-          ? !this._deleteIfExpired(e, this.oldCache.get(e))
-          : !1;
+            ? !this._deleteIfExpired(e, this.oldCache.get(e))
+            : !1;
       }
       peek(e) {
         if (this.cache.has(e)) return this._peek(e, this.cache);
@@ -188,17 +188,17 @@
       }
       delete(e) {
         let t = this.cache.delete(e);
-        return t && this._size--, this.oldCache.delete(e) || t;
+        return (t && this._size--, this.oldCache.delete(e) || t);
       }
       clear() {
-        this.cache.clear(), this.oldCache.clear(), (this._size = 0);
+        (this.cache.clear(), this.oldCache.clear(), (this._size = 0));
       }
       resize(e) {
         if (!(e && e > 0))
           throw new TypeError('`maxSize` must be a number greater than 0');
         let t = [...this._entriesAscending()],
           i = t.length - e;
-        i < 0
+        (i < 0
           ? ((this.cache = new Map(t)),
             (this.oldCache = new Map()),
             (this._size = t.length))
@@ -206,7 +206,7 @@
             (this.oldCache = new Map(t.slice(i))),
             (this.cache = new Map()),
             (this._size = 0)),
-          (this.maxSize = e);
+          (this.maxSize = e));
       }
       *keys() {
         for (let [e] of this) yield e;
@@ -465,14 +465,14 @@
     return r === void 0
       ? e
       : Array.isArray(r)
-      ? r
-      : [
-          ...new Set(
-            e
-              .filter((i) => r !== !1 && r[i] !== !1)
-              .concat(Object.keys(r).filter((i) => r[i] !== !1))
-          ),
-        ];
+        ? r
+        : [
+            ...new Set(
+              e
+                .filter((i) => r !== !1 && r[i] !== !1)
+                .concat(Object.keys(r).filter((i) => r[i] !== !1)),
+            ),
+          ];
   }
   var Sf = P(() => {
     u();
@@ -488,7 +488,7 @@
         {},
         {
           get: () => String,
-        }
+        },
       );
     });
   function js(r, e, t) {
@@ -515,7 +515,7 @@
           ['content-problems'].includes(r) ||
             js(
               Qe.bold(Qe.yellow('warn')),
-              ...(Array.isArray(r) ? [r] : [e, r])
+              ...(Array.isArray(r) ? [r] : [e, r]),
             );
         },
         risk(r, e) {
@@ -907,14 +907,14 @@
     return Ki.future.includes(e)
       ? r.future === 'all' || (r?.future?.[e] ?? Of[e] ?? !1)
       : Ki.experimental.includes(e)
-      ? r.experimental === 'all' || (r?.experimental?.[e] ?? Of[e] ?? !1)
-      : !1;
+        ? r.experimental === 'all' || (r?.experimental?.[e] ?? Of[e] ?? !1)
+        : !1;
   }
   function Tf(r) {
     return r.experimental === 'all'
       ? Ki.experimental
       : Object.keys(r?.experimental ?? {}).filter(
-          (e) => Ki.experimental.includes(e) && r.experimental[e]
+          (e) => Ki.experimental.includes(e) && r.experimental[e],
         );
   }
   function Rf(r) {
@@ -934,7 +934,7 @@
       u();
       Qi();
       Be();
-      (Of = {
+      ((Of = {
         optimizeUniversalDefaults: !1,
         generalizedModifiers: !0,
         disableColorOpacityUtilitiesByDefault: !1,
@@ -948,10 +948,10 @@
             'relativeContentPathsByDefault',
           ],
           experimental: ['optimizeUniversalDefaults', 'generalizedModifiers'],
-        });
+        }));
     });
   function Pf(r) {
-    (() => {
+    ((() => {
       if (
         r.purge ||
         !r.content ||
@@ -966,12 +966,12 @@
             : !(
                 typeof t?.raw != 'string' ||
                 (t?.extension && typeof t?.extension != 'string')
-              )
+              ),
         );
       if (typeof r.content == 'object' && r.content !== null) {
         if (
           Object.keys(r.content).some(
-            (t) => !['files', 'relative', 'extract', 'transform'].includes(t)
+            (t) => !['files', 'relative', 'extract', 'transform'].includes(t),
           )
         )
           return !1;
@@ -983,7 +983,7 @@
                 : !(
                     typeof t?.raw != 'string' ||
                     (t?.extension && typeof t?.extension != 'string')
-                  )
+                  ),
             )
           )
             return !1;
@@ -1027,12 +1027,12 @@
         return Array.isArray(n)
           ? n
           : Array.isArray(t?.safelist)
-          ? t.safelist
-          : Array.isArray(i?.safelist)
-          ? i.safelist
-          : Array.isArray(i?.options?.safelist)
-          ? i.options.safelist
-          : [];
+            ? t.safelist
+            : Array.isArray(i?.safelist)
+              ? i.safelist
+              : Array.isArray(i?.options?.safelist)
+                ? i.options.safelist
+                : [];
       })()),
       (r.blocklist = (() => {
         let { blocklist: t } = r;
@@ -1065,30 +1065,30 @@
           return Array.isArray(i)
             ? i
             : Array.isArray(i?.content)
-            ? i.content
-            : Array.isArray(t)
-            ? t
-            : Array.isArray(t?.content)
-            ? t.content
-            : Array.isArray(t?.files)
-            ? t.files
-            : [];
+              ? i.content
+              : Array.isArray(t)
+                ? t
+                : Array.isArray(t?.content)
+                  ? t.content
+                  : Array.isArray(t?.files)
+                    ? t.files
+                    : [];
         })(),
         extract: (() => {
           let t = (() =>
               r.purge?.extract
                 ? r.purge.extract
                 : r.content?.extract
-                ? r.content.extract
-                : r.purge?.extract?.DEFAULT
-                ? r.purge.extract.DEFAULT
-                : r.content?.extract?.DEFAULT
-                ? r.content.extract.DEFAULT
-                : r.purge?.options?.extractors
-                ? r.purge.options.extractors
-                : r.content?.options?.extractors
-                ? r.content.options.extractors
-                : {})(),
+                  ? r.content.extract
+                  : r.purge?.extract?.DEFAULT
+                    ? r.purge.extract.DEFAULT
+                    : r.content?.extract?.DEFAULT
+                      ? r.content.extract.DEFAULT
+                      : r.purge?.options?.extractors
+                        ? r.purge.options.extractors
+                        : r.content?.options?.extractors
+                          ? r.content.options.extractors
+                          : {})(),
             i = {},
             n = (() => {
               if (r.purge?.options?.defaultExtractor)
@@ -1109,12 +1109,12 @@
               r.purge?.transform
                 ? r.purge.transform
                 : r.content?.transform
-                ? r.content.transform
-                : r.purge?.transform?.DEFAULT
-                ? r.purge.transform.DEFAULT
-                : r.content?.transform?.DEFAULT
-                ? r.content.transform.DEFAULT
-                : {})(),
+                  ? r.content.transform
+                  : r.purge?.transform?.DEFAULT
+                    ? r.purge.transform.DEFAULT
+                    : r.content?.transform?.DEFAULT
+                      ? r.content.transform.DEFAULT
+                      : {})(),
             i = {};
           return (
             typeof t == 'function'
@@ -1123,15 +1123,15 @@
             i
           );
         })(),
-      });
+      }));
     for (let t of r.content.files)
       if (typeof t == 'string' && /{([^,]*?)}/g.test(t)) {
         G.warn('invalid-glob-braces', [
           `The glob pattern ${zs(
-            t
+            t,
           )} in your Tailwind CSS configuration is invalid.`,
           `Update it to ${zs(
-            t.replace(/{([^,]*?)}/g, '$1')
+            t.replace(/{([^,]*?)}/g, '$1'),
           )} to silence this warning.`,
         ]);
         break;
@@ -1155,8 +1155,8 @@
     return Array.isArray(r)
       ? r.map((e) => St(e))
       : typeof r == 'object' && r !== null
-      ? Object.fromEntries(Object.entries(r).map(([e, t]) => [e, St(t)]))
-      : r;
+        ? Object.fromEntries(Object.entries(r).map(([e, t]) => [e, St(t)]))
+        : r;
   }
   var Xi = P(() => {
     u();
@@ -1336,14 +1336,14 @@
       };
     let t = r
       .replace(zv, (s, a, o, l, c) =>
-        ['#', a, a, o, o, l, l, c ? c + c : ''].join('')
+        ['#', a, a, o, o, l, l, c ? c + c : ''].join(''),
       )
       .match(jv);
     if (t !== null)
       return {
         mode: 'rgb',
         color: [parseInt(t[1], 16), parseInt(t[2], 16), parseInt(t[3], 16)].map(
-          (s) => s.toString()
+          (s) => s.toString(),
         ),
         alpha: t[4] ? (parseInt(t[4], 16) / 255).toString() : void 0,
       };
@@ -1357,13 +1357,13 @@
           alpha: n[1],
         }
       : (!e && n.length !== 3) ||
-        (n.length < 3 && !n.some((s) => /^var\(.*?\)$/.test(s)))
-      ? null
-      : {
-          mode: i[1],
-          color: n,
-          alpha: i[5]?.toString?.(),
-        };
+          (n.length < 3 && !n.some((s) => /^var\(.*?\)$/.test(s)))
+        ? null
+        : {
+            mode: i[1],
+            color: n,
+            alpha: i[5]?.toString?.(),
+          };
   }
   function Gs({ mode: r, color: e, alpha: t }) {
     let i = t !== void 0;
@@ -1382,18 +1382,18 @@
     Qs = P(() => {
       u();
       Df();
-      (jv = /^#([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i),
+      ((jv = /^#([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i),
         (zv = /^#([a-f\d])([a-f\d])([a-f\d])([a-f\d])?$/i),
         (At = /(?:\d+|\d*\.\d+)%?/),
         (Ji = /(?:\s*,\s*|\s+)/),
         (qf = /\s*[,/]\s*/),
         (Ct = /var\(--(?:[^ )]*?)(?:,(?:[^ )]*?|var\(--[^ )]*?\)))?\)/),
         (Uv = new RegExp(
-          `^(rgba?)\\(\\s*(${At.source}|${Ct.source})(?:${Ji.source}(${At.source}|${Ct.source}))?(?:${Ji.source}(${At.source}|${Ct.source}))?(?:${qf.source}(${At.source}|${Ct.source}))?\\s*\\)$`
+          `^(rgba?)\\(\\s*(${At.source}|${Ct.source})(?:${Ji.source}(${At.source}|${Ct.source}))?(?:${Ji.source}(${At.source}|${Ct.source}))?(?:${qf.source}(${At.source}|${Ct.source}))?\\s*\\)$`,
         )),
         (Vv = new RegExp(
-          `^(hsla?)\\(\\s*((?:${At.source})(?:deg|rad|grad|turn)?|${Ct.source})(?:${Ji.source}(${At.source}|${Ct.source}))?(?:${Ji.source}(${At.source}|${Ct.source}))?(?:${qf.source}(${At.source}|${Ct.source}))?\\s*\\)$`
-        ));
+          `^(hsla?)\\(\\s*((?:${At.source})(?:deg|rad|grad|turn)?|${Ct.source})(?:${Ji.source}(${At.source}|${Ct.source}))?(?:${Ji.source}(${At.source}|${Ct.source}))?(?:${qf.source}(${At.source}|${Ct.source}))?\\s*\\)$`,
+        )));
     });
   function Je(r, e, t) {
     if (typeof r == 'function')
@@ -1422,26 +1422,26 @@
               opacityVariable: t,
               opacityValue: `var(${t}, 1)`,
             }),
-          ])
+          ]),
         ),
       };
     let n = $r(r);
     return n === null
       ? Object.fromEntries(i.map((s) => [s, r]))
       : n.alpha !== void 0
-      ? Object.fromEntries(i.map((s) => [s, r]))
-      : {
-          [t]: '1',
-          ...Object.fromEntries(
-            i.map((s) => [
-              s,
-              Gs({
-                ...n,
-                alpha: `var(${t}, 1)`,
-              }),
-            ])
-          ),
-        };
+        ? Object.fromEntries(i.map((s) => [s, r]))
+        : {
+            [t]: '1',
+            ...Object.fromEntries(
+              i.map((s) => [
+                s,
+                Gs({
+                  ...n,
+                  alpha: `var(${t}, 1)`,
+                }),
+              ]),
+            ),
+          };
   }
   var Lr = P(() => {
     u();
@@ -1454,7 +1454,7 @@
       s = !1;
     for (let a = 0; a < r.length; a++) {
       let o = r[a];
-      t.length === 0 &&
+      (t.length === 0 &&
         o === e[0] &&
         !s &&
         (e.length === 1 || r.slice(a, a + e.length) === e) &&
@@ -1465,9 +1465,9 @@
           : ((o === ')' && t[t.length - 1] === '(') ||
               (o === ']' && t[t.length - 1] === '[') ||
               (o === '}' && t[t.length - 1] === '{')) &&
-            t.pop();
+            t.pop());
     }
-    return i.push(r.slice(n)), i;
+    return (i.push(r.slice(n)), i);
   }
   var zt = P(() => {
     u();
@@ -1481,21 +1481,21 @@
         s = i.split(Wv),
         a = new Set();
       for (let o of s)
-        ($f.lastIndex = 0),
+        (($f.lastIndex = 0),
           !a.has('KEYWORD') && Hv.has(o)
             ? ((n.keyword = o), a.add('KEYWORD'))
             : $f.test(o)
-            ? a.has('X')
-              ? a.has('Y')
-                ? a.has('BLUR')
-                  ? a.has('SPREAD') || ((n.spread = o), a.add('SPREAD'))
-                  : ((n.blur = o), a.add('BLUR'))
-                : ((n.y = o), a.add('Y'))
-              : ((n.x = o), a.add('X'))
-            : n.color
-            ? (n.unknown || (n.unknown = []), n.unknown.push(o))
-            : (n.color = o);
-      return (n.valid = n.x !== void 0 && n.y !== void 0), n;
+              ? a.has('X')
+                ? a.has('Y')
+                  ? a.has('BLUR')
+                    ? a.has('SPREAD') || ((n.spread = o), a.add('SPREAD'))
+                    : ((n.blur = o), a.add('BLUR'))
+                  : ((n.y = o), a.add('Y'))
+                : ((n.x = o), a.add('X'))
+              : n.color
+                ? (n.unknown || (n.unknown = []), n.unknown.push(o))
+                : (n.color = o));
+      return ((n.valid = n.x !== void 0 && n.y !== void 0), n);
     });
   }
   function Lf(r) {
@@ -1505,7 +1505,7 @@
           ? [e.keyword, e.x, e.y, e.blur, e.spread, e.color]
               .filter(Boolean)
               .join(' ')
-          : e.raw
+          : e.raw,
       )
       .join(', ');
   }
@@ -1515,9 +1515,9 @@
     Ys = P(() => {
       u();
       zt();
-      (Hv = new Set(['inset', 'inherit', 'initial', 'revert', 'unset'])),
+      ((Hv = new Set(['inset', 'inherit', 'initial', 'revert', 'unset'])),
         (Wv = /\ +(?![^(]*\))/g),
-        ($f = /^-?(\d+|\.\d+)(.*?)$/g);
+        ($f = /^-?(\d+|\.\d+)(.*?)$/g));
     });
   function Ks(r) {
     return Gv.some((e) => new RegExp(`^${e}\\(.*\\)`).test(r));
@@ -1527,18 +1527,18 @@
     return r.startsWith('--') && !i
       ? `var(${r})`
       : r.includes('url(')
-      ? r
-          .split(/(url\(.*?\))/g)
-          .filter(Boolean)
-          .map((n) => (/^url\(.*?\)$/.test(n) ? n : K(n, e, !1)))
-          .join('')
-      : ((r = r
-          .replace(/([^\\])_+/g, (n, s) => s + ' '.repeat(n.length - 1))
-          .replace(/^_/g, ' ')
-          .replace(/\\_/g, '_')),
-        t && (r = r.trim()),
-        (r = Yv(r)),
-        r);
+        ? r
+            .split(/(url\(.*?\))/g)
+            .filter(Boolean)
+            .map((n) => (/^url\(.*?\)$/.test(n) ? n : K(n, e, !1)))
+            .join('')
+        : ((r = r
+            .replace(/([^\\])_+/g, (n, s) => s + ' '.repeat(n.length - 1))
+            .replace(/^_/g, ' ')
+            .replace(/\\_/g, '_')),
+          t && (r = r.trim()),
+          (r = Yv(r)),
+          r);
   }
   function Ye(r) {
     return (
@@ -1603,22 +1603,22 @@
               b !== -1 && b < d && (d = b);
             }
             let p = i.slice(a, d);
-            return (a += p.length - 1), p;
+            return ((a += p.length - 1), p);
           },
           c = i[a];
         if (o('var')) n += l([')', ',']);
         else if (t.some((f) => o(f))) {
           let f = t.find((d) => o(d));
-          (n += f), (a += f.length - 1);
+          ((n += f), (a += f.length - 1));
         } else
           e.some((f) => o(f))
             ? (n += l([')']))
             : o('[')
-            ? (n += l([']']))
-            : ['+', '-', '*', '/'].includes(c) &&
-              !['(', '+', '-', '*', '/', ','].includes(s())
-            ? (n += ` ${c} `)
-            : (n += c);
+              ? (n += l([']']))
+              : ['+', '-', '*', '/'].includes(c) &&
+                  !['(', '+', '-', '*', '/', ','].includes(s())
+                ? (n += ` ${c} `)
+                : (n += c);
       }
       return n.replace(/\s+/g, ' ');
     });
@@ -1655,11 +1655,11 @@
         i.startsWith('var(')
           ? !0
           : $r(i, {
-              loose: !0,
-            }) !== null
-          ? (e++, !0)
-          : !1
-      )
+                loose: !0,
+              }) !== null
+            ? (e++, !0)
+            : !1
+      ),
     )
       ? e > 0
       : !1;
@@ -1672,13 +1672,13 @@
         i.startsWith('var(')
           ? !0
           : Xs(i) ||
-            ex(i) ||
-            ['element(', 'image(', 'cross-fade(', 'image-set('].some((n) =>
-              i.startsWith(n)
-            )
-          ? (e++, !0)
-          : !1
-      )
+              ex(i) ||
+              ['element(', 'image(', 'cross-fade(', 'image-set('].some((n) =>
+                i.startsWith(n),
+              )
+            ? (e++, !0)
+            : !1
+      ),
     )
       ? e > 0
       : !1;
@@ -1694,7 +1694,7 @@
       (i) => (
         (i = K(i)),
         i.startsWith('var(') ? !0 : tx.has(i) || Nr(i) || Mr(i) ? (e++, !0) : !1
-      )
+      ),
     )
       ? e > 0
       : !1;
@@ -1707,9 +1707,9 @@
         i.startsWith('var(')
           ? !0
           : (i.includes(' ') && !/(['"])([^"']+)\1/g.test(i)) || /^\d/g.test(i)
-          ? !1
-          : (e++, !0)
-      )
+            ? !1
+            : (e++, !0)
+      ),
     )
       ? e > 0
       : !1;
@@ -1753,7 +1753,7 @@
         'view-timeline',
         'position-try',
       ]);
-      (Kv = [
+      ((Kv = [
         'cm',
         'mm',
         'Q',
@@ -1786,7 +1786,7 @@
         'cqmin',
         'cqmax',
       ]),
-        (Xv = `(?:${Kv.join('|')})`);
+        (Xv = `(?:${Kv.join('|')})`));
       Zv = new Set(['thin', 'medium', 'thick']);
       Jv = new Set([
         'conic-gradient',
@@ -1831,8 +1831,8 @@
       return i.length === 1 && e.includes(i[0])
         ? !0
         : i.length !== 1 && i.length !== 2
-        ? !1
-        : i.every((n) => Nr(n) || Mr(n) || n === 'auto');
+          ? !1
+          : i.every((n) => Nr(n) || Mr(n) || n === 'auto');
     });
   }
   var Gf = P(() => {
@@ -1842,8 +1842,8 @@
   });
   function Qf(r, e) {
     r.walkClasses((t) => {
-      (t.value = e(t.value)),
-        t.raws && t.raws.value && (t.raws.value = jt(t.raws.value));
+      ((t.value = e(t.value)),
+        t.raws && t.raws.value && (t.raws.value = jt(t.raws.value)));
     });
   }
   function Yf(r, e) {
@@ -1864,8 +1864,8 @@
     return i !== void 0
       ? i
       : e.supportsNegativeValues && r.startsWith('-')
-      ? sx(r.slice(1), e.values, t)
-      : Yf(r, t);
+        ? sx(r.slice(1), e.values, t)
+        : Yf(r, t);
   }
   function _t(r) {
     return r.startsWith('[') && r.endsWith(']');
@@ -1881,8 +1881,8 @@
       e === -1 || e === r.length - 1
         ? [r, void 0]
         : _t(r) && !r.includes(']/[')
-        ? [r, void 0]
-        : [r.slice(0, e), r.slice(e + 1)]
+          ? [r, void 0]
+          : [r.slice(0, e), r.slice(e + 1)]
     );
   }
   function Xt(r) {
@@ -1906,8 +1906,8 @@
           _t(n)
             ? Je(s, Xf(n))
             : t.theme?.opacity?.[n] === void 0
-            ? void 0
-            : Je(s, t.theme.opacity[n]));
+              ? void 0
+              : Je(s, t.theme.opacity[n]));
     }
     return tn(r, e, {
       validate: Bf,
@@ -1978,7 +1978,7 @@
       Gi();
       Gf();
       ct();
-      (Js = {
+      ((Js = {
         any: tn,
         color: ax,
         url: qe(Xs),
@@ -1996,7 +1996,7 @@
         shadow: qe(Nf),
         size: qe(Wf),
       }),
-        (Zf = Object.keys(Js));
+        (Zf = Object.keys(Js)));
     });
   function X(r) {
     return typeof r == 'function' ? r({}) : r;
@@ -2027,9 +2027,9 @@
     return r.reduce(
       (e, { extend: t }) =>
         jr(e, t, (i, n) =>
-          i === void 0 ? [n] : Array.isArray(i) ? [n, ...i] : [n, i]
+          i === void 0 ? [n] : Array.isArray(i) ? [n, ...i] : [n, i],
         ),
-      {}
+      {},
     );
   }
   function cx(r) {
@@ -2047,7 +2047,7 @@
     return jr(e, r, (t, i) =>
       !Zt(t) && !i.some(Zt)
         ? jr({}, t, ...i, Jf)
-        : (n, s) => jr({}, ...[t, ...i].map((a) => ux(a, n, s)), Jf)
+        : (n, s) => jr({}, ...[t, ...i].map((a) => ux(a, n, s)), Jf),
     );
   }
   function* dx(r) {
@@ -2058,7 +2058,7 @@
     if (i !== null) {
       let [, n, s] = i,
         a = kt(n);
-      (a.alpha = s), yield a;
+      ((a.alpha = s), yield a);
     }
   }
   function hx(r) {
@@ -2067,11 +2067,11 @@
         let s = 0,
           a = r;
         for (; a != null && s < n.length; )
-          (a = a[n[s++]]),
+          ((a = a[n[s++]]),
             (a =
               Zt(a) && (n.alpha === void 0 || s <= n.length - 1)
                 ? a(e, ia)
-                : a);
+                : a));
         if (a !== void 0) {
           if (n.alpha !== void 0) {
             let o = Xt(a);
@@ -2089,7 +2089,7 @@
       }),
       Object.keys(r).reduce(
         (t, i) => ((t[i] = Zt(r[i]) ? r[i](e, ia) : r[i]), t),
-        {}
+        {},
       )
     );
   }
@@ -2101,8 +2101,8 @@
         let i = t?.plugins ?? [];
         i.length !== 0 &&
           i.forEach((n) => {
-            n.__isOptionsFunction && (n = n()),
-              (e = [...e, ...ec([n?.config ?? {}])]);
+            (n.__isOptionsFunction && (n = n()),
+              (e = [...e, ...ec([n?.config ?? {}])]));
           });
       }),
       e
@@ -2116,7 +2116,7 @@
               corePlugins: t,
             })
           : kf(i, t),
-      vf
+      vf,
     );
   }
   function gx(r) {
@@ -2138,8 +2138,8 @@
           corePlugins: mx(e.map((t) => t.corePlugins)),
           plugins: gx(r.map((t) => t?.plugins ?? [])),
         },
-        ...e
-      )
+        ...e,
+      ),
     );
   }
   var ia,
@@ -2164,7 +2164,7 @@
             .filter((e) => r[e] !== '0')
             .reduce((e, t) => {
               let i = xt(r[t]);
-              return i !== void 0 && (e[`-${t}`] = i), e;
+              return (i !== void 0 && (e[`-${t}`] = i), e);
             }, {});
         },
         breakpoints(r) {
@@ -2175,7 +2175,7 @@
                 ...e,
                 [`screen-${t}`]: r[t],
               }),
-              {}
+              {},
             );
         },
       };
@@ -3402,18 +3402,18 @@
     return sn(r) && r.config === void 0 && !bx(r)
       ? null
       : sn(r) && r.config !== void 0 && ac(r.config)
-      ? me.resolve(r.config)
-      : sn(r) && r.config !== void 0 && sn(r.config)
-      ? null
-      : ac(r)
-      ? me.resolve(r)
-      : wx();
+        ? me.resolve(r.config)
+        : sn(r) && r.config !== void 0 && sn(r.config)
+          ? null
+          : ac(r)
+            ? me.resolve(r)
+            : wx();
   }
   function wx() {
     for (let r of yx)
       try {
         let e = me.resolve(r);
-        return be.accessSync(e), e;
+        return (be.accessSync(e), e);
       } catch (e) {}
     return null;
   }
@@ -3455,7 +3455,7 @@
       Jt = class extends Error {
         constructor(e, t, i, n, s, a) {
           super(e);
-          (this.name = 'CssSyntaxError'),
+          ((this.name = 'CssSyntaxError'),
             (this.reason = e),
             s && (this.file = s),
             n && (this.source = n),
@@ -3469,14 +3469,14 @@
                   (this.endLine = i.line),
                   (this.endColumn = i.column))),
             this.setMessage(),
-            Error.captureStackTrace && Error.captureStackTrace(this, Jt);
+            Error.captureStackTrace && Error.captureStackTrace(this, Jt));
         }
         setMessage() {
-          (this.message = this.plugin ? this.plugin + ': ' : ''),
+          ((this.message = this.plugin ? this.plugin + ': ' : ''),
             (this.message += this.file ? this.file : '<css input>'),
             typeof this.line != 'undefined' &&
               (this.message += ':' + this.line + ':' + this.column),
-            (this.message += ': ' + this.reason);
+            (this.message += ': ' + this.reason));
         }
         showSourceCode(e) {
           if (!this.source) return '';
@@ -3487,7 +3487,7 @@
             s = (f) => f;
           if (e) {
             let { bold: f, gray: d, red: p } = uc.createColors(!0);
-            (n = (h) => f(p(h))), (i = (h) => d(h)), fc && (s = (h) => fc(h));
+            ((n = (h) => f(p(h))), (i = (h) => d(h)), fc && (s = (h) => fc(h)));
           }
           let a = t.split(/\r?\n/),
             o = Math.max(this.line - 3, 0),
@@ -3601,13 +3601,13 @@
         e.type === 'decl'
           ? (i = this.raw(e, null, 'beforeDecl'))
           : e.type === 'comment'
-          ? (i = this.raw(e, null, 'beforeComment'))
-          : t === 'before'
-          ? (i = this.raw(e, null, 'beforeRule'))
-          : (i = this.raw(e, null, 'beforeClose'));
+            ? (i = this.raw(e, null, 'beforeComment'))
+            : t === 'before'
+              ? (i = this.raw(e, null, 'beforeRule'))
+              : (i = this.raw(e, null, 'beforeClose'));
         let n = e.parent,
           s = 0;
-        for (; n && n.type !== 'root'; ) (s += 1), (n = n.parent);
+        for (; n && n.type !== 'root'; ) ((s += 1), (n = n.parent));
         if (
           i.includes(`
 `)
@@ -3621,11 +3621,11 @@
         let i = this.raw(e, 'between', 'beforeOpen');
         this.builder(t + i + '{', e, 'start');
         let n;
-        e.nodes && e.nodes.length
+        (e.nodes && e.nodes.length
           ? (this.body(e), (n = this.raw(e, 'after')))
           : (n = this.raw(e, 'after', 'emptyBody')),
           n && this.builder(n),
-          this.builder('}', e, 'end');
+          this.builder('}', e, 'end'));
       }
       body(e) {
         let t = e.nodes.length - 1;
@@ -3634,7 +3634,7 @@
         for (let n = 0; n < e.nodes.length; n++) {
           let s = e.nodes[n],
             a = this.raw(s, 'before');
-          a && this.builder(a), this.stringify(s, t !== n || i);
+          (a && this.builder(a), this.stringify(s, t !== n || i));
         }
       }
       comment(e) {
@@ -3645,9 +3645,9 @@
       decl(e, t) {
         let i = this.raw(e, 'between', 'colon'),
           n = e.prop + i + this.rawValue(e, 'value');
-        e.important && (n += e.raws.important || ' !important'),
+        (e.important && (n += e.raws.important || ' !important'),
           t && (n += ';'),
-          this.builder(n, e);
+          this.builder(n, e));
       }
       document(e) {
         this.body(e);
@@ -3679,7 +3679,7 @@
                 if (((n = l.raws[t]), typeof n != 'undefined')) return !1;
               });
         }
-        return typeof n == 'undefined' && (n = pc[i]), (a.rawCache[i] = n), n;
+        return (typeof n == 'undefined' && (n = pc[i]), (a.rawCache[i] = n), n);
       }
       rawBeforeClose(e) {
         let t;
@@ -3775,7 +3775,7 @@
         return (
           e.walkDecls((i) => {
             if (typeof i.raws.between != 'undefined')
-              return (t = i.raws.between.replace(/[^\s:]/g, '')), !1;
+              return ((t = i.raws.between.replace(/[^\s:]/g, '')), !1);
           }),
           t
         );
@@ -3809,7 +3809,7 @@
             ) {
               let s = i.raws.before.split(`
 `);
-              return (t = s[s.length - 1]), (t = t.replace(/\S/g, '')), !1;
+              return ((t = s[s.length - 1]), (t = t.replace(/\S/g, '')), !1);
             }
           }),
           t
@@ -3836,18 +3836,18 @@
         return n && n.value === i ? n.raw : i;
       }
       root(e) {
-        this.body(e), e.raws.after && this.builder(e.raws.after);
+        (this.body(e), e.raws.after && this.builder(e.raws.after));
       }
       rule(e) {
-        this.block(e, this.rawValue(e, 'selector')),
-          e.raws.ownSemicolon && this.builder(e.raws.ownSemicolon, e, 'end');
+        (this.block(e, this.rawValue(e, 'selector')),
+          e.raws.ownSemicolon && this.builder(e.raws.ownSemicolon, e, 'end'));
       }
       stringify(e, t) {
         if (!this[e.type])
           throw new Error(
             'Unknown AST node type ' +
               e.type +
-              '. Maybe you need to change PostCSS stringifier.'
+              '. Maybe you need to change PostCSS stringifier.',
           );
         this[e.type](e, t);
       }
@@ -3888,10 +3888,10 @@
         i === 'parent' && s === 'object'
           ? e && (t[i] = e)
           : i === 'source'
-          ? (t[i] = n)
-          : Array.isArray(n)
-          ? (t[i] = n.map((a) => da(a, t)))
-          : (s === 'object' && n !== null && (n = da(n)), (t[i] = n));
+            ? (t[i] = n)
+            : Array.isArray(n)
+              ? (t[i] = n.map((a) => da(a, t)))
+              : (s === 'object' && n !== null && (n = da(n)), (t[i] = n));
       }
       return t;
     }
@@ -3915,7 +3915,7 @@
     }
     var un = class {
       constructor(e = {}) {
-        (this.raws = {}), (this[Hr] = !1), (this[Cx] = !0);
+        ((this.raws = {}), (this[Hr] = !1), (this[Cx] = !0));
         for (let t in e)
           if (t === 'nodes') {
             this.nodes = [];
@@ -3933,25 +3933,25 @@
           let t = this.source;
           e.stack = e.stack.replace(
             /\n\s{4}at /,
-            `$&${t.input.from}:${t.start.line}:${t.start.column}$&`
+            `$&${t.input.from}:${t.start.line}:${t.start.column}$&`,
           );
         }
         return e;
       }
       after(e) {
-        return this.parent.insertAfter(this, e), this;
+        return (this.parent.insertAfter(this, e), this);
       }
       assign(e = {}) {
         for (let t in e) this[t] = e[t];
         return this;
       }
       before(e) {
-        return this.parent.insertBefore(this, e), this;
+        return (this.parent.insertBefore(this, e), this);
       }
       cleanRaws(e) {
-        delete this.raws.before,
+        (delete this.raws.before,
           delete this.raws.after,
-          e || delete this.raws.between;
+          e || delete this.raws.between);
       }
       clone(e = {}) {
         let t = da(this);
@@ -3960,11 +3960,11 @@
       }
       cloneAfter(e = {}) {
         let t = this.clone(e);
-        return this.parent.insertAfter(this, t), t;
+        return (this.parent.insertAfter(this, t), t);
       }
       cloneBefore(e = {}) {
         let t = this.clone(e);
-        return this.parent.insertBefore(this, t), t;
+        return (this.parent.insertBefore(this, t), t);
       }
       error(e, t = {}) {
         if (this.source) {
@@ -3979,7 +3979,7 @@
               column: i.column,
               line: i.line,
             },
-            t
+            t,
           );
         }
         return new kx(e);
@@ -3990,8 +3990,8 @@
             return t === 'proxyOf'
               ? e
               : t === 'root'
-              ? () => e.root().toProxy()
-              : e[t];
+                ? () => e.root().toProxy()
+                : e[t];
           },
           set(e, t, i) {
             return (
@@ -4031,7 +4031,7 @@
           let n = this.source.input.css
             .slice(
               Wr(this.source.input.css, this.source.start),
-              Wr(this.source.input.css, this.source.end)
+              Wr(this.source.input.css, this.source.end),
             )
             .indexOf(e.word);
           n !== -1 && (t = this.positionInside(n));
@@ -4077,14 +4077,14 @@
           let s = this.source.input.css
             .slice(
               Wr(this.source.input.css, this.source.start),
-              Wr(this.source.input.css, this.source.end)
+              Wr(this.source.input.css, this.source.end),
             )
             .indexOf(e.word);
           s !== -1 &&
             ((t = this.positionInside(s)),
             (i = this.positionInside(s + e.word.length)));
         } else
-          e.start
+          (e.start
             ? (t = {
                 column: e.start.column,
                 line: e.start.line,
@@ -4096,8 +4096,8 @@
                   line: e.end.line,
                 })
               : typeof e.endIndex == 'number'
-              ? (i = this.positionInside(e.endIndex))
-              : e.index && (i = this.positionInside(e.index + 1));
+                ? (i = this.positionInside(e.endIndex))
+                : e.index && (i = this.positionInside(e.index + 1)));
         return (
           (i.line < t.line || (i.line === t.line && i.column <= t.column)) &&
             (i = {
@@ -4128,8 +4128,8 @@
             n === this
               ? (i = !0)
               : i
-              ? (this.parent.insertAfter(t, n), (t = n))
-              : this.parent.insertBefore(t, n);
+                ? (this.parent.insertAfter(t, n), (t = n))
+                : this.parent.insertBefore(t, n);
           i || this.remove();
         }
         return this;
@@ -4154,20 +4154,20 @@
           let o = this[a];
           if (Array.isArray(o))
             i[a] = o.map((l) =>
-              typeof l == 'object' && l.toJSON ? l.toJSON(null, t) : l
+              typeof l == 'object' && l.toJSON ? l.toJSON(null, t) : l,
             );
           else if (typeof o == 'object' && o.toJSON) i[a] = o.toJSON(null, t);
           else if (a === 'source') {
             let l = t.get(o.input);
-            l == null && ((l = s), t.set(o.input, s), s++),
+            (l == null && ((l = s), t.set(o.input, s), s++),
               (i[a] = {
                 end: o.end,
                 inputId: l,
                 start: o.start,
-              });
+              }));
           } else i[a] = o;
         }
-        return n && (i.inputs = [...t.keys()].map((a) => a.toJSON())), i;
+        return (n && (i.inputs = [...t.keys()].map((a) => a.toJSON())), i);
       }
       toProxy() {
         return (
@@ -4249,7 +4249,7 @@
       ma;
     function Ac(r) {
       return r.map(
-        (e) => (e.nodes && (e.nodes = Ac(e.nodes)), delete e.source, e)
+        (e) => (e.nodes && (e.nodes = Ac(e.nodes)), delete e.source, e),
       );
     }
     function Cc(r) {
@@ -4261,7 +4261,7 @@
           let i = this.normalize(t, this.last);
           for (let n of i) this.proxyOf.nodes.push(n);
         }
-        return this.markDirty(), this;
+        return (this.markDirty(), this);
       }
       cleanRaws(e) {
         if ((super.cleanRaws(e), this.nodes))
@@ -4276,20 +4276,19 @@
           ;
           this.indexes[t] < this.proxyOf.nodes.length &&
           ((i = this.indexes[t]), (n = e(this.proxyOf.nodes[i], i)), n !== !1);
-
         )
           this.indexes[t] += 1;
-        return delete this.indexes[t], n;
+        return (delete this.indexes[t], n);
       }
       every(e) {
         return this.nodes.every(e);
       }
       getIterator() {
-        this.lastEach || (this.lastEach = 0),
+        (this.lastEach || (this.lastEach = 0),
           this.indexes || (this.indexes = {}),
-          (this.lastEach += 1);
+          (this.lastEach += 1));
         let e = this.lastEach;
-        return (this.indexes[e] = 0), e;
+        return ((this.indexes[e] = 0), e);
       }
       getProxyProcessor() {
         return {
@@ -4297,23 +4296,25 @@
             return t === 'proxyOf'
               ? e
               : e[t]
-              ? t === 'each' || (typeof t == 'string' && t.startsWith('walk'))
-                ? (...i) =>
-                    e[t](
-                      ...i.map((n) =>
-                        typeof n == 'function' ? (s, a) => n(s.toProxy(), a) : n
+                ? t === 'each' || (typeof t == 'string' && t.startsWith('walk'))
+                  ? (...i) =>
+                      e[t](
+                        ...i.map((n) =>
+                          typeof n == 'function'
+                            ? (s, a) => n(s.toProxy(), a)
+                            : n,
+                        ),
                       )
-                    )
-                : t === 'every' || t === 'some'
-                ? (i) => e[t]((n, ...s) => i(n.toProxy(), ...s))
-                : t === 'root'
-                ? () => e.root().toProxy()
-                : t === 'nodes'
-                ? e.nodes.map((i) => i.toProxy())
-                : t === 'first' || t === 'last'
-                ? e[t].toProxy()
-                : e[t]
-              : e[t];
+                  : t === 'every' || t === 'some'
+                    ? (i) => e[t]((n, ...s) => i(n.toProxy(), ...s))
+                    : t === 'root'
+                      ? () => e.root().toProxy()
+                      : t === 'nodes'
+                        ? e.nodes.map((i) => i.toProxy())
+                        : t === 'first' || t === 'last'
+                          ? e[t].toProxy()
+                          : e[t]
+                : e[t];
           },
           set(e, t, i) {
             return (
@@ -4338,8 +4339,8 @@
         for (let a of n) this.proxyOf.nodes.splice(i + 1, 0, a);
         let s;
         for (let a in this.indexes)
-          (s = this.indexes[a]), i < s && (this.indexes[a] = s + n.length);
-        return this.markDirty(), this;
+          ((s = this.indexes[a]), i < s && (this.indexes[a] = s + n.length));
+        return (this.markDirty(), this);
       }
       insertBefore(e, t) {
         let i = this.index(e),
@@ -4349,8 +4350,8 @@
         for (let o of s) this.proxyOf.nodes.splice(i, 0, o);
         let a;
         for (let o in this.indexes)
-          (a = this.indexes[o]), i <= a && (this.indexes[o] = a + s.length);
-        return this.markDirty(), this;
+          ((a = this.indexes[o]), i <= a && (this.indexes[o] = a + s.length));
+        return (this.markDirty(), this);
       }
       normalize(e, t) {
         if (typeof e == 'string') e = Ac(kc(e).nodes);
@@ -4365,8 +4366,8 @@
         else if (e.prop) {
           if (typeof e.value == 'undefined')
             throw new Error('Value field is missed in node creation');
-          typeof e.value != 'string' && (e.value = String(e.value)),
-            (e = [new wc(e)]);
+          (typeof e.value != 'string' && (e.value = String(e.value)),
+            (e = [new wc(e)]));
         } else if (e.selector || e.selectors) e = [new ma(e)];
         else if (e.name) e = [new ha(e)];
         else if (e.text) e = [new bc(e)];
@@ -4384,7 +4385,7 @@
               (n.raws.before = t.raws.before.replace(/\S/g, '')),
             (n.parent = this.proxyOf),
             n
-          )
+          ),
         );
       }
       prepend(...e) {
@@ -4395,23 +4396,23 @@
           for (let n in this.indexes)
             this.indexes[n] = this.indexes[n] + i.length;
         }
-        return this.markDirty(), this;
+        return (this.markDirty(), this);
       }
       push(e) {
-        return (e.parent = this), this.proxyOf.nodes.push(e), this;
+        return ((e.parent = this), this.proxyOf.nodes.push(e), this);
       }
       removeAll() {
         for (let e of this.proxyOf.nodes) e.parent = void 0;
-        return (this.proxyOf.nodes = []), this.markDirty(), this;
+        return ((this.proxyOf.nodes = []), this.markDirty(), this);
       }
       removeChild(e) {
-        (e = this.index(e)),
+        ((e = this.index(e)),
           (this.proxyOf.nodes[e].parent = void 0),
-          this.proxyOf.nodes.splice(e, 1);
+          this.proxyOf.nodes.splice(e, 1));
         let t;
         for (let i in this.indexes)
-          (t = this.indexes[i]), t >= e && (this.indexes[i] = t - 1);
-        return this.markDirty(), this;
+          ((t = this.indexes[i]), t >= e && (this.indexes[i] = t - 1));
+        return (this.markDirty(), this);
       }
       replaceValues(e, t, i) {
         return (
@@ -4436,7 +4437,7 @@
           } catch (s) {
             throw t.addToError(s);
           }
-          return n !== !1 && t.walk && (n = t.walk(e)), n;
+          return (n !== !1 && t.walk && (n = t.walk(e)), n);
         });
       }
       walkAtRules(e, t) {
@@ -4509,20 +4510,20 @@
     _c.exports = Fe;
     Fe.default = Fe;
     Fe.rebuild = (r) => {
-      r.type === 'atrule'
+      (r.type === 'atrule'
         ? Object.setPrototypeOf(r, ha.prototype)
         : r.type === 'rule'
-        ? Object.setPrototypeOf(r, ma.prototype)
-        : r.type === 'decl'
-        ? Object.setPrototypeOf(r, wc.prototype)
-        : r.type === 'comment'
-        ? Object.setPrototypeOf(r, bc.prototype)
-        : r.type === 'root' && Object.setPrototypeOf(r, Sc.prototype),
+          ? Object.setPrototypeOf(r, ma.prototype)
+          : r.type === 'decl'
+            ? Object.setPrototypeOf(r, wc.prototype)
+            : r.type === 'comment'
+              ? Object.setPrototypeOf(r, bc.prototype)
+              : r.type === 'root' && Object.setPrototypeOf(r, Sc.prototype),
         (r[xc] = !0),
         r.nodes &&
           r.nodes.forEach((e) => {
             Fe.rebuild(e);
-          });
+          }));
     };
   });
   var pn = x((O3, Oc) => {
@@ -4535,10 +4536,10 @@
           this.type = 'atrule';
         }
         append(...e) {
-          return this.proxyOf.nodes || (this.nodes = []), super.append(...e);
+          return (this.proxyOf.nodes || (this.nodes = []), super.append(...e));
         }
         prepend(...e) {
-          return this.proxyOf.nodes || (this.nodes = []), super.prepend(...e);
+          return (this.proxyOf.nodes || (this.nodes = []), super.prepend(...e));
         }
       };
     Oc.exports = Kr;
@@ -4640,8 +4641,8 @@
               !this.file && n && (this.file = this.mapResolve(n));
             }
           }
-          this.file || (this.id = '<input css ' + Dx(6) + '>'),
-            this.map && (this.map.file = this.from);
+          (this.file || (this.id = '<input css ' + Dx(6) + '>'),
+            this.map && (this.map.file = this.from));
         }
         error(e, t, i, n = {}) {
           let s, a, o;
@@ -4650,15 +4651,15 @@
               f = i;
             if (typeof c.offset == 'number') {
               let d = this.fromOffset(c.offset);
-              (t = d.line), (i = d.col);
-            } else (t = c.line), (i = c.column);
+              ((t = d.line), (i = d.col));
+            } else ((t = c.line), (i = c.column));
             if (typeof f.offset == 'number') {
               let d = this.fromOffset(f.offset);
-              (a = d.line), (s = d.col);
-            } else (a = f.line), (s = f.column);
+              ((a = d.line), (s = d.col));
+            } else ((a = f.line), (s = f.column));
           } else if (!i) {
             let c = this.fromOffset(t);
-            (t = c.line), (i = c.col);
+            ((t = c.line), (i = c.col));
           }
           let l = this.origin(t, i, a, s);
           return (
@@ -4679,7 +4680,7 @@
                       },
                   l.source,
                   l.file,
-                  n.plugin
+                  n.plugin,
                 ))
               : (o = new Mc(
                   e,
@@ -4697,7 +4698,7 @@
                       },
                   this.css,
                   this.file,
-                  n.plugin
+                  n.plugin,
                 )),
             (o.input = {
               column: i,
@@ -4721,7 +4722,7 @@
             i = new Array(s.length);
             let a = 0;
             for (let o = 0, l = s.length; o < l; o++)
-              (i[o] = a), (a += s[o].length + 1);
+              ((i[o] = a), (a += s[o].length + 1));
             this[va] = i;
           }
           t = i[i.length - 1];
@@ -4767,7 +4768,7 @@
             ? (l = hn(a.source))
             : (l = new URL(
                 a.source,
-                this.map.consumer().sourceRoot || hn(this.map.mapFile)
+                this.map.consumer().sourceRoot || hn(this.map.mapFile),
               ));
           let c = {
             column: a.column,
@@ -4780,10 +4781,10 @@
             if (Lc) c.file = Lc(l);
             else
               throw new Error(
-                'file: protocol is not available in this PostCSS build'
+                'file: protocol is not available in this PostCSS build',
               );
           let f = s.sourceContentFor(a.source);
-          return f && (c.source = f), c;
+          return (f && (c.source = f), c);
         }
         toJSON() {
           let e = {};
@@ -4815,7 +4816,7 @@
       Ut = class extends Fc {
         constructor(e) {
           super(e);
-          (this.type = 'root'), this.nodes || (this.nodes = []);
+          ((this.type = 'root'), this.nodes || (this.nodes = []));
         }
         normalize(e, t, i) {
           let n = super.normalize(e);
@@ -4878,21 +4879,21 @@
           l = '',
           c = !1;
         for (let f of r)
-          c
+          (c
             ? (c = !1)
             : f === '\\'
-            ? (c = !0)
-            : o
-            ? f === l && (o = !1)
-            : f === '"' || f === "'"
-            ? ((o = !0), (l = f))
-            : f === '('
-            ? (a += 1)
-            : f === ')'
-            ? a > 0 && (a -= 1)
-            : a === 0 && e.includes(f) && (s = !0),
-            s ? (n !== '' && i.push(n.trim()), (n = ''), (s = !1)) : (n += f);
-        return (t || n !== '') && i.push(n.trim()), i;
+              ? (c = !0)
+              : o
+                ? f === l && (o = !1)
+                : f === '"' || f === "'"
+                  ? ((o = !0), (l = f))
+                  : f === '('
+                    ? (a += 1)
+                    : f === ')'
+                      ? a > 0 && (a -= 1)
+                      : a === 0 && e.includes(f) && (s = !0),
+            s ? (n !== '' && i.push(n.trim()), (n = ''), (s = !1)) : (n += f));
+        return ((t || n !== '') && i.push(n.trim()), i);
       },
     };
     Vc.exports = Zr;
@@ -4906,7 +4907,7 @@
       Jr = class extends Hc {
         constructor(e) {
           super(e);
-          (this.type = 'rule'), this.nodes || (this.nodes = []);
+          ((this.type = 'rule'), this.nodes || (this.nodes = []));
         }
         get selectors() {
           return Nx.comma(this.selector);
@@ -4941,17 +4942,17 @@
             ...n,
             __proto__: zx.prototype,
           };
-          s.map &&
+          (s.map &&
             (s.map = {
               ...s.map,
               __proto__: Ux.prototype,
             }),
-            e.push(s);
+            e.push(s));
         }
       }
       if ((i.nodes && (i.nodes = r.nodes.map((n) => ei(n, e))), i.source)) {
         let { inputId: n, ...s } = i.source;
-        (i.source = s), n != null && (i.source.input = e[n]);
+        ((i.source = s), n != null && (i.source.input = e[n]));
       }
       if (i.type === 'root') return new Vx(i);
       if (i.type === 'decl') return new jx(i);
@@ -5043,9 +5044,9 @@
           case xn:
           case wn: {
             l = y;
-            do (l += 1), (s = i.charCodeAt(l));
+            do ((l += 1), (s = i.charCodeAt(l)));
             while (s === ti || s === bn || s === vn || s === xn || s === wn);
-            (f = ['space', i.slice(y, l)]), (y = l - 1);
+            ((f = ['space', i.slice(y, l)]), (y = l - 1));
             break;
           }
           case Wx:
@@ -5079,42 +5080,42 @@
                     l = y;
                     break;
                   } else E('bracket');
-                for (p = l; i.charCodeAt(p - 1) === yn; ) (p -= 1), (d = !d);
+                for (p = l; i.charCodeAt(p - 1) === yn; ) ((p -= 1), (d = !d));
               } while (d);
-              (f = ['brackets', i.slice(y, l + 1), y, l]), (y = l);
+              ((f = ['brackets', i.slice(y, l + 1), y, l]), (y = l));
             } else
-              (l = i.indexOf(')', y + 1)),
+              ((l = i.indexOf(')', y + 1)),
                 (a = i.slice(y, l + 1)),
                 l === -1 || r1.test(a)
                   ? (f = ['(', '(', y])
-                  : ((f = ['brackets', a, y, l]), (y = l));
+                  : ((f = ['brackets', a, y, l]), (y = l)));
             break;
           }
           case Sa:
           case Kc: {
-            (c = s === Sa ? "'" : '"'), (l = y);
+            ((c = s === Sa ? "'" : '"'), (l = y));
             do {
               if (((d = !1), (l = i.indexOf(c, l + 1)), l === -1))
                 if (n || F) {
                   l = y + 1;
                   break;
                 } else E('string');
-              for (p = l; i.charCodeAt(p - 1) === yn; ) (p -= 1), (d = !d);
+              for (p = l; i.charCodeAt(p - 1) === yn; ) ((p -= 1), (d = !d));
             } while (d);
-            (f = ['string', i.slice(y, l + 1), y, l]), (y = l);
+            ((f = ['string', i.slice(y, l + 1), y, l]), (y = l));
             break;
           }
           case t1: {
-            (kn.lastIndex = y + 1),
+            ((kn.lastIndex = y + 1),
               kn.test(i),
               kn.lastIndex === 0 ? (l = i.length - 1) : (l = kn.lastIndex - 2),
               (f = ['at-word', i.slice(y, l + 1), y, l]),
-              (y = l);
+              (y = l));
             break;
           }
           case yn: {
             for (l = y, o = !0; i.charCodeAt(l + 1) === yn; )
-              (l += 1), (o = !o);
+              ((l += 1), (o = !o));
             if (
               ((s = i.charCodeAt(l + 1)),
               o &&
@@ -5129,7 +5130,7 @@
               for (; Zc.test(i.charAt(l + 1)); ) l += 1;
               i.charCodeAt(l + 1) === ti && (l += 1);
             }
-            (f = ['word', i.slice(y, l + 1), y, l]), (y = l);
+            ((f = ['word', i.slice(y, l + 1), y, l]), (y = l));
             break;
           }
           default: {
@@ -5149,7 +5150,7 @@
             break;
           }
         }
-        return y++, f;
+        return (y++, f);
       }
       function N(R) {
         k.push(R);
@@ -5184,7 +5185,7 @@
     }
     var ip = class {
       constructor(e) {
-        (this.input = e),
+        ((this.input = e),
           (this.root = new a1()),
           (this.current = this.root),
           (this.spaces = ''),
@@ -5197,13 +5198,13 @@
               line: 1,
               offset: 0,
             },
-          });
+          }));
       }
       atrule(e) {
         let t = new i1();
-        (t.name = e[1].slice(1)),
+        ((t.name = e[1].slice(1)),
           t.name === '' && this.unnamedAtrule(t, e),
-          this.init(t, e[2]);
+          this.init(t, e[2]));
         let i,
           n,
           s,
@@ -5218,14 +5219,14 @@
             i === '(' || i === '['
               ? c.push(i === '(' ? ')' : ']')
               : i === '{' && c.length > 0
-              ? c.push('}')
-              : i === c[c.length - 1] && c.pop(),
+                ? c.push('}')
+                : i === c[c.length - 1] && c.pop(),
             c.length === 0)
           )
             if (i === ';') {
-              (t.source.end = this.getPosition(e[2])),
+              ((t.source.end = this.getPosition(e[2])),
                 t.source.end.offset++,
-                (this.semicolon = !0);
+                (this.semicolon = !0));
               break;
             } else if (i === '{') {
               o = !0;
@@ -5247,7 +5248,7 @@
             break;
           }
         }
-        (t.raws.between = this.spacesAndCommentsFromEnd(l)),
+        ((t.raws.between = this.spacesAndCommentsFromEnd(l)),
           l.length
             ? ((t.raws.afterName = this.spacesAndCommentsFromStart(l)),
               this.raw(t, 'params', l),
@@ -5258,7 +5259,7 @@
                 (this.spaces = t.raws.between),
                 (t.raws.between = '')))
             : ((t.raws.afterName = ''), (t.params = '')),
-          o && ((t.nodes = []), (this.current = t));
+          o && ((t.nodes = []), (this.current = t)));
       }
       checkMissedSemicolon(e) {
         let t = this.colon(e);
@@ -5272,7 +5273,7 @@
         );
         throw this.input.error(
           'Missed semicolon',
-          n[0] === 'word' ? n[3] + 1 : n[2]
+          n[0] === 'word' ? n[3] + 1 : n[2],
         );
       }
       colon(e) {
@@ -5299,15 +5300,15 @@
       }
       comment(e) {
         let t = new n1();
-        this.init(t, e[2]),
+        (this.init(t, e[2]),
           (t.source.end = this.getPosition(e[3] || e[2])),
-          t.source.end.offset++;
+          t.source.end.offset++);
         let i = e[1].slice(2, -2);
         if (/^\s*$/.test(i))
-          (t.text = ''), (t.raws.left = i), (t.raws.right = '');
+          ((t.text = ''), (t.raws.left = i), (t.raws.right = ''));
         else {
           let n = i.match(/^(\s*)([^]*\S)(\s*)$/);
-          (t.text = n[2]), (t.raws.left = n[1]), (t.raws.right = n[3]);
+          ((t.text = n[2]), (t.raws.left = n[1]), (t.raws.right = n[3]));
         }
       }
       createTokenizer() {
@@ -5322,14 +5323,12 @@
             i.source.end = this.getPosition(n[3] || n[2] || l1(e)),
             i.source.end.offset++;
           e[0][0] !== 'word';
-
         )
-          e.length === 1 && this.unknownWord(e),
-            (i.raws.before += e.shift()[1]);
+          (e.length === 1 && this.unknownWord(e),
+            (i.raws.before += e.shift()[1]));
         for (
           i.source.start = this.getPosition(e[0][2]), i.prop = '';
           e.length;
-
         ) {
           let c = e[0][0];
           if (c === ':' || c === 'space' || c === 'comment') break;
@@ -5342,8 +5341,8 @@
             i.raws.between += s[1];
             break;
           } else
-            s[0] === 'word' && /\w/.test(s[1]) && this.unknownWord([s]),
-              (i.raws.between += s[1]);
+            (s[0] === 'word' && /\w/.test(s[1]) && this.unknownWord([s]),
+              (i.raws.between += s[1]));
         (i.prop[0] === '_' || i.prop[0] === '*') &&
           ((i.raws.before += i.prop[0]), (i.prop = i.prop.slice(1)));
         let a = [],
@@ -5351,7 +5350,6 @@
         for (
           ;
           e.length && ((o = e[0][0]), !(o !== 'space' && o !== 'comment'));
-
         )
           a.push(e.shift());
         this.precheckMissedSemicolon(e);
@@ -5359,8 +5357,8 @@
           if (((s = e[c]), s[1].toLowerCase() === '!important')) {
             i.important = !0;
             let f = this.stringFrom(e, c);
-            (f = this.spacesFromEnd(e) + f),
-              f !== ' !important' && (i.raws.important = f);
+            ((f = this.spacesFromEnd(e) + f),
+              f !== ' !important' && (i.raws.important = f));
             break;
           } else if (s[1].toLowerCase() === 'important') {
             let f = e.slice(0),
@@ -5375,10 +5373,10 @@
           }
           if (s[0] !== 'space' && s[0] !== 'comment') break;
         }
-        e.some((c) => c[0] !== 'space' && c[0] !== 'comment') &&
+        (e.some((c) => c[0] !== 'space' && c[0] !== 'comment') &&
           ((i.raws.between += a.map((c) => c[1]).join('')), (a = [])),
           this.raw(i, 'value', a.concat(e), t),
-          i.value.includes(':') && !t && this.checkMissedSemicolon(e);
+          i.value.includes(':') && !t && this.checkMissedSemicolon(e));
       }
       doubleColon(e) {
         throw this.input.error(
@@ -5388,18 +5386,18 @@
           },
           {
             offset: e[2] + e[1].length,
-          }
+          },
         );
       }
       emptyRule(e) {
         let t = new tp();
-        this.init(t, e[2]),
+        (this.init(t, e[2]),
           (t.selector = ''),
           (t.raws.between = ''),
-          (this.current = t);
+          (this.current = t));
       }
       end(e) {
-        this.current.nodes &&
+        (this.current.nodes &&
           this.current.nodes.length &&
           (this.current.raws.semicolon = this.semicolon),
           (this.semicolon = !1),
@@ -5410,16 +5408,16 @@
             ? ((this.current.source.end = this.getPosition(e[2])),
               this.current.source.end.offset++,
               (this.current = this.current.parent))
-            : this.unexpectedClose(e);
+            : this.unexpectedClose(e));
       }
       endFile() {
-        this.current.parent && this.unclosedBlock(),
+        (this.current.parent && this.unclosedBlock(),
           this.current.nodes &&
             this.current.nodes.length &&
             (this.current.raws.semicolon = this.semicolon),
           (this.current.raws.after =
             (this.current.raws.after || '') + this.spaces),
-          (this.root.source.end = this.getPosition(this.tokenizer.position()));
+          (this.root.source.end = this.getPosition(this.tokenizer.position())));
       }
       freeSemicolon(e) {
         if (((this.spaces += e[1]), this.current.nodes)) {
@@ -5439,14 +5437,14 @@
         };
       }
       init(e, t) {
-        this.current.push(e),
+        (this.current.push(e),
           (e.source = {
             input: this.input,
             start: this.getPosition(t),
           }),
           (e.raws.before = this.spaces),
           (this.spaces = ''),
-          e.type !== 'comment' && (this.semicolon = !1);
+          e.type !== 'comment' && (this.semicolon = !1));
       }
       other(e) {
         let t = !1,
@@ -5459,8 +5457,8 @@
           c = e;
         for (; c; ) {
           if (((i = c[0]), l.push(c), i === '(' || i === '['))
-            s || (s = c), a.push(i === '(' ? ')' : ']');
-          else if (o && n && i === '{') s || (s = c), a.push('}');
+            (s || (s = c), a.push(i === '(' ? ')' : ']'));
+          else if (o && n && i === '{') (s || (s = c), a.push('}'));
           else if (a.length === 0)
             if (i === ';')
               if (n) {
@@ -5471,7 +5469,7 @@
               this.rule(l);
               return;
             } else if (i === '}') {
-              this.tokenizer.back(l.pop()), (t = !0);
+              (this.tokenizer.back(l.pop()), (t = !0));
               break;
             } else i === ':' && (n = !0);
           else i === a[a.length - 1] && (a.pop(), a.length === 0 && (s = null));
@@ -5487,7 +5485,6 @@
               ;
               l.length &&
               ((c = l[l.length - 1][0]), !(c !== 'space' && c !== 'comment'));
-
             )
               this.tokenizer.back(l.pop());
           this.decl(l, o);
@@ -5531,19 +5528,19 @@
           f,
           d;
         for (let p = 0; p < o; p += 1)
-          (s = i[p]),
+          ((s = i[p]),
             (a = s[0]),
             a === 'space' && p === o - 1 && !n
               ? (c = !1)
               : a === 'comment'
-              ? ((d = i[p - 1] ? i[p - 1][0] : 'empty'),
-                (f = i[p + 1] ? i[p + 1][0] : 'empty'),
-                !rp[d] && !rp[f]
-                  ? l.slice(-1) === ','
-                    ? (c = !1)
-                    : (l += s[1])
-                  : (c = !1))
-              : (l += s[1]);
+                ? ((d = i[p - 1] ? i[p - 1][0] : 'empty'),
+                  (f = i[p + 1] ? i[p + 1][0] : 'empty'),
+                  !rp[d] && !rp[f]
+                    ? l.slice(-1) === ','
+                      ? (c = !1)
+                      : (l += s[1])
+                    : (c = !1))
+                : (l += s[1]));
         if (!c) {
           let p = i.reduce((h, b) => h + b[1], '');
           e.raws[t] = {
@@ -5556,10 +5553,10 @@
       rule(e) {
         e.pop();
         let t = new tp();
-        this.init(t, e[0][2]),
+        (this.init(t, e[0][2]),
           (t.raws.between = this.spacesAndCommentsFromEnd(e)),
           this.raw(t, 'selector', e),
-          (this.current = t);
+          (this.current = t));
       }
       spacesAndCommentsFromEnd(e) {
         let t,
@@ -5568,7 +5565,6 @@
           ;
           e.length &&
           ((t = e[e.length - 1][0]), !(t !== 'space' && t !== 'comment'));
-
         )
           i = e.pop()[1] + i;
         return i;
@@ -5579,7 +5575,6 @@
         for (
           ;
           e.length && ((t = e[0][0]), !(t !== 'space' && t !== 'comment'));
-
         )
           i += e.shift()[1];
         return i;
@@ -5594,7 +5589,7 @@
       stringFrom(e, t) {
         let i = '';
         for (let n = t; n < e.length; n++) i += e[n][1];
-        return e.splice(t, e.length - t), i;
+        return (e.splice(t, e.length - t), i);
       }
       unclosedBlock() {
         let e = this.current.source.start;
@@ -5608,7 +5603,7 @@
           },
           {
             offset: e[2] + 1,
-          }
+          },
         );
       }
       unexpectedClose(e) {
@@ -5619,7 +5614,7 @@
           },
           {
             offset: e[2] + 1,
-          }
+          },
         );
       }
       unknownWord(e) {
@@ -5630,7 +5625,7 @@
           },
           {
             offset: e[0][2] + e[0][1].length,
-          }
+          },
         );
       }
       unnamedAtrule(e, t) {
@@ -5641,7 +5636,7 @@
           },
           {
             offset: t[2] + t[1].length,
-          }
+          },
         );
       }
     };
@@ -5676,10 +5671,10 @@
           ((this.type = 'warning'), (this.text = e), t.node && t.node.source)
         ) {
           let i = t.node.rangeBy(t);
-          (this.line = i.start.line),
+          ((this.line = i.start.line),
             (this.column = i.start.column),
             (this.endLine = i.end.line),
-            (this.endColumn = i.end.column);
+            (this.endColumn = i.end.column));
         }
         for (let i in t) this[i] = t[i];
       }
@@ -5691,8 +5686,8 @@
               word: this.word,
             }).message
           : this.plugin
-          ? this.plugin + ': ' + this.text
-          : this.text;
+            ? this.plugin + ': ' + this.text
+            : this.text;
       }
     };
     op.exports = _n;
@@ -5704,12 +5699,12 @@
     var p1 = Aa(),
       En = class {
         constructor(e, t, i) {
-          (this.processor = e),
+          ((this.processor = e),
             (this.messages = []),
             (this.root = t),
             (this.opts = i),
             (this.css = void 0),
-            (this.map = void 0);
+            (this.map = void 0));
         }
         toString() {
           return this.css;
@@ -5720,7 +5715,7 @@
               this.lastPlugin.postcssPlugin &&
               (t.plugin = this.lastPlugin.postcssPlugin));
           let i = new p1(e, t);
-          return this.messages.push(i), i;
+          return (this.messages.push(i), i);
         }
         warnings() {
           return this.messages.filter((e) => e.type === 'warning');
@@ -5799,10 +5794,10 @@
         e && r.append
           ? [t, t + '-' + e, rr, t + 'Exit', t + 'Exit-' + e]
           : e
-          ? [t, t + '-' + e, t + 'Exit', t + 'Exit-' + e]
-          : r.append
-          ? [t, rr, t + 'Exit']
-          : [t, t + 'Exit']
+            ? [t, t + '-' + e, t + 'Exit', t + 'Exit-' + e]
+            : r.append
+              ? [t, rr, t + 'Exit']
+              : [t, t + 'Exit']
       );
     }
     function dp(r) {
@@ -5811,8 +5806,8 @@
         r.type === 'document'
           ? (e = ['Document', rr, 'DocumentExit'])
           : r.type === 'root'
-          ? (e = ['Root', rr, 'RootExit'])
-          : (e = pp(r)),
+            ? (e = ['Root', rr, 'RootExit'])
+            : (e = pp(r)),
         {
           eventIndex: 0,
           events: e,
@@ -5824,12 +5819,12 @@
       );
     }
     function _a(r) {
-      return (r[tt] = !1), r.nodes && r.nodes.forEach((e) => _a(e)), r;
+      return ((r[tt] = !1), r.nodes && r.nodes.forEach((e) => _a(e)), r);
     }
     var Ea = {},
       pt = class {
         constructor(e, t, i) {
-          (this.stringified = !1), (this.processed = !1);
+          ((this.stringified = !1), (this.processed = !1));
           let n;
           if (
             typeof t == 'object' &&
@@ -5838,24 +5833,24 @@
           )
             n = _a(t);
           else if (t instanceof pt || t instanceof cp)
-            (n = _a(t.root)),
+            ((n = _a(t.root)),
               t.map &&
                 (typeof i.map == 'undefined' && (i.map = {}),
                 i.map.inline || (i.map.inline = !1),
-                (i.map.prev = t.map));
+                (i.map.prev = t.map)));
           else {
             let s = g1;
-            i.syntax && (s = i.syntax.parse),
+            (i.syntax && (s = i.syntax.parse),
               i.parser && (s = i.parser),
-              s.parse && (s = s.parse);
+              s.parse && (s = s.parse));
             try {
               n = s(t, i);
             } catch (a) {
-              (this.processed = !0), (this.error = a);
+              ((this.processed = !0), (this.error = a));
             }
             n && !n[w1] && d1.rebuild(n);
           }
-          (this.result = new cp(e, n, i)),
+          ((this.result = new cp(e, n, i)),
             (this.helpers = {
               ...Ea,
               postcss: Ea,
@@ -5867,16 +5862,16 @@
                     ...s,
                     ...s.prepare(this.result),
                   }
-                : s
-            ));
+                : s,
+            )));
         }
         async() {
           return this.error
             ? Promise.reject(this.error)
             : this.processed
-            ? Promise.resolve(this.result)
-            : (this.processing || (this.processing = this.runAsync()),
-              this.processing);
+              ? Promise.resolve(this.result)
+              : (this.processing || (this.processing = this.runAsync()),
+                this.processing);
         }
         catch(e) {
           return this.async().catch(e);
@@ -5886,17 +5881,17 @@
         }
         getAsyncError() {
           throw new Error(
-            'Use process(css).then(cb) to work with async plugins'
+            'Use process(css).then(cb) to work with async plugins',
           );
         }
         handleError(e, t) {
           let i = this.result.lastPlugin;
           try {
-            t && t.addToError(e),
+            (t && t.addToError(e),
               (this.error = e),
               e.name === 'CssSyntaxError' && !e.plugin
                 ? ((e.plugin = i.postcssPlugin), e.setMessage())
-                : i.postcssVersion;
+                : i.postcssVersion);
           } catch (n) {
             console && console.error && console.error(n);
           }
@@ -5905,15 +5900,15 @@
         prepareVisitors() {
           this.listeners = {};
           let e = (t, i, n) => {
-            this.listeners[i] || (this.listeners[i] = []),
-              this.listeners[i].push([t, n]);
+            (this.listeners[i] || (this.listeners[i] = []),
+              this.listeners[i].push([t, n]));
           };
           for (let t of this.plugins)
             if (typeof t == 'object')
               for (let i in t) {
                 if (!x1[i] && /^[A-Z]/.test(i))
                   throw new Error(
-                    `Unknown event ${i} in ${t.postcssPlugin}. Try to update PostCSS (${this.processor.version} now).`
+                    `Unknown event ${i} in ${t.postcssPlugin}. Try to update PostCSS (${this.processor.version} now).`,
                   );
                 if (!k1[i])
                   if (typeof t[i] == 'object')
@@ -5966,7 +5961,7 @@
                 }
               }
           }
-          return (this.processed = !0), this.stringify();
+          return ((this.processed = !0), this.stringify());
         }
         runOnRoot(e) {
           this.result.lastPlugin = e;
@@ -5974,7 +5969,7 @@
             if (typeof e == 'object' && e.Once) {
               if (this.result.root.type === 'document') {
                 let t = this.result.root.nodes.map((i) =>
-                  e.Once(i, this.helpers)
+                  e.Once(i, this.helpers),
                 );
                 return ri(t[0]) ? Promise.all(t) : t;
               }
@@ -5988,15 +5983,17 @@
         stringify() {
           if (this.error) throw this.error;
           if (this.stringified) return this.result;
-          (this.stringified = !0), this.sync();
+          ((this.stringified = !0), this.sync());
           let e = this.result.opts,
             t = b1;
-          e.syntax && (t = e.syntax.stringify),
+          (e.syntax && (t = e.syntax.stringify),
             e.stringifier && (t = e.stringifier),
-            t.stringify && (t = t.stringify);
+            t.stringify && (t = t.stringify));
           let n = new m1(t, this.result.root, this.result.opts).generate();
           return (
-            (this.result.css = n[0]), (this.result.map = n[1]), this.result
+            (this.result.css = n[0]),
+            (this.result.map = n[1]),
+            this.result
           );
         }
         sync() {
@@ -6010,7 +6007,7 @@
           }
           if ((this.prepareVisitors(), this.hasListener)) {
             let e = this.result.root;
-            for (; !e[tt]; ) (e[tt] = !0), this.walkSync(e);
+            for (; !e[tt]; ) ((e[tt] = !0), this.walkSync(e));
             if (this.listeners.OnceExit)
               if (e.type === 'document')
                 for (let t of e.nodes)
@@ -6048,10 +6045,10 @@
           }
           if (n.length > 0 && t.visitorIndex < n.length) {
             let [a, o] = n[t.visitorIndex];
-            (t.visitorIndex += 1),
+            ((t.visitorIndex += 1),
               t.visitorIndex === n.length &&
                 ((t.visitors = []), (t.visitorIndex = 0)),
-              (this.result.lastPlugin = a);
+              (this.result.lastPlugin = a));
             try {
               return o(i.toProxy(), this.helpers);
             } catch (l) {
@@ -6063,10 +6060,10 @@
               o;
             for (; (o = i.nodes[i.indexes[a]]); )
               if (((i.indexes[a] += 1), !o[tt])) {
-                (o[tt] = !0), e.push(dp(o));
+                ((o[tt] = !0), e.push(dp(o)));
                 return;
               }
-            (t.iterator = 0), delete i.indexes[a];
+            ((t.iterator = 0), delete i.indexes[a]);
           }
           let s = t.events;
           for (; t.eventIndex < s.length; ) {
@@ -6143,16 +6140,16 @@
       Q3 = Ca(),
       Tn = class {
         constructor(e, t, i) {
-          (t = t.toString()),
+          ((t = t.toString()),
             (this.stringified = !1),
             (this._processor = e),
             (this._css = t),
             (this._opts = i),
-            (this._map = void 0);
+            (this._map = void 0));
           let n,
             s = _1;
-          (this.result = new C1(this._processor, n, this._opts)),
-            (this.result.css = t);
+          ((this.result = new C1(this._processor, n, this._opts)),
+            (this.result.css = t));
           let a = this;
           Object.defineProperty(this.result, 'root', {
             get() {
@@ -6162,8 +6159,8 @@
           let o = new S1(s, n, this._opts, t);
           if (o.isMap()) {
             let [l, c] = o.generate();
-            l && (this.result.css = l), c && (this.result.map = c);
-          } else o.clearAnnotation(), (this.result.css = o.css);
+            (l && (this.result.css = l), c && (this.result.map = c));
+          } else (o.clearAnnotation(), (this.result.css = o.css));
         }
         async() {
           return this.error
@@ -6217,7 +6214,7 @@
             this.error = i;
           }
           if (this.error) throw this.error;
-          return (this._root = e), e;
+          return ((this._root = e), e);
         }
         get [Symbol.toStringTag]() {
           return 'NoWorkResult';
@@ -6235,7 +6232,7 @@
       R1 = tr(),
       ir = class {
         constructor(e = []) {
-          (this.version = '8.4.49'), (this.plugins = this.normalize(e));
+          ((this.version = '8.4.49'), (this.plugins = this.normalize(e)));
         }
         normalize(e) {
           let t = [];
@@ -6261,7 +6258,8 @@
         }
         use(e) {
           return (
-            (this.plugins = this.plugins.concat(this.normalize([e]))), this
+            (this.plugins = this.plugins.concat(this.normalize([e]))),
+            this
           );
         }
       };
@@ -6292,7 +6290,7 @@
       F1 = Vr(),
       j1 = Aa();
     function J(...r) {
-      return r.length === 1 && Array.isArray(r[0]) && (r = r[0]), new Ta(r);
+      return (r.length === 1 && Array.isArray(r[0]) && (r = r[0]), new Ta(r));
     }
     J.plugin = function (e, t) {
       let i = !1;
@@ -6304,23 +6302,27 @@
           console.warn(
             e +
               `: postcss.plugin was deprecated. Migration guide:
-https://evilmartians.com/chronicles/postcss-8-plugin-migration`
+https://evilmartians.com/chronicles/postcss-8-plugin-migration`,
           ),
           m.env.LANG &&
             m.env.LANG.startsWith('cn') &&
             console.warn(
               e +
                 `: \u91CC\u9762 postcss.plugin \u88AB\u5F03\u7528. \u8FC1\u79FB\u6307\u5357:
-https://www.w3ctech.com/topic/2226`
+https://www.w3ctech.com/topic/2226`,
             ));
         let o = t(...a);
-        return (o.postcssPlugin = e), (o.postcssVersion = new Ta().version), o;
+        return (
+          (o.postcssPlugin = e),
+          (o.postcssVersion = new Ta().version),
+          o
+        );
       }
       let s;
       return (
         Object.defineProperty(n, 'postcss', {
           get() {
-            return s || (s = n()), s;
+            return (s || (s = n()), s);
           },
         }),
         (n.process = function (a, o, l) {
@@ -6384,7 +6386,7 @@ https://www.w3ctech.com/topic/2226`
     xI,
     Ot = P(() => {
       u();
-      (re = pe($e())),
+      ((re = pe($e())),
         (ee = re.default),
         (Z3 = re.default.stringify),
         (J3 = re.default.fromJSON),
@@ -6409,7 +6411,7 @@ https://www.w3ctech.com/topic/2226`
         (bI = re.default.Input),
         (wI = re.default.Rule),
         (vI = re.default.Root),
-        (xI = re.default.Node);
+        (xI = re.default.Node));
     });
   var Ra = x((SI, _p) => {
     u();
@@ -6451,11 +6453,11 @@ https://www.w3ctech.com/topic/2226`
         if (r[i] === '\\') {
           var n = z1(r.slice(i + 1, i + 7));
           if (n !== void 0) {
-            (t += n[0]), (i += n[1]);
+            ((t += n[0]), (i += n[1]));
             continue;
           }
           if (r[i + 1] === '\\') {
-            (t += '\\'), i++;
+            ((t += '\\'), i++);
             continue;
           }
           r.length === i + 1 && (t += r[i]);
@@ -6502,7 +6504,7 @@ https://www.w3ctech.com/topic/2226`
         t[i - 1] = arguments[i];
       for (; t.length > 0; ) {
         var n = t.shift();
-        r[n] || (r[n] = {}), (r = r[n]);
+        (r[n] || (r[n] = {}), (r = r[n]));
       }
     }
     Rp.exports = Dn.default;
@@ -6517,9 +6519,9 @@ https://www.w3ctech.com/topic/2226`
         e = e + r.slice(i, t);
         var n = r.indexOf('*/', t + 2);
         if (n < 0) return e;
-        (i = n + 2), (t = r.indexOf('/*', i));
+        ((i = n + 2), (t = r.indexOf('/*', i)));
       }
-      return (e = e + r.slice(i)), e;
+      return ((e = e + r.slice(i)), e);
     }
     Ip.exports = qn.default;
   });
@@ -6553,10 +6555,10 @@ https://www.w3ctech.com/topic/2226`
     function $p(r, e) {
       for (var t = 0; t < e.length; t++) {
         var i = e[t];
-        (i.enumerable = i.enumerable || !1),
+        ((i.enumerable = i.enumerable || !1),
           (i.configurable = !0),
           'value' in i && (i.writable = !0),
-          Object.defineProperty(r, i.key, i);
+          Object.defineProperty(r, i.key, i));
       }
     }
     function Z1(r, e, t) {
@@ -6579,20 +6581,20 @@ https://www.w3ctech.com/topic/2226`
             n === 'parent' && a === 'object'
               ? t && (i[n] = t)
               : s instanceof Array
-              ? (i[n] = s.map(function (o) {
-                  return r(o, i);
-                }))
-              : (i[n] = r(s, i));
+                ? (i[n] = s.map(function (o) {
+                    return r(o, i);
+                  }))
+                : (i[n] = r(s, i));
           }
         return i;
       },
       ek = (function () {
         function r(t) {
-          t === void 0 && (t = {}),
+          (t === void 0 && (t = {}),
             Object.assign(this, t),
             (this.spaces = this.spaces || {}),
             (this.spaces.before = this.spaces.before || ''),
-            (this.spaces.after = this.spaces.after || '');
+            (this.spaces.after = this.spaces.after || ''));
         }
         var e = r.prototype;
         return (
@@ -6627,16 +6629,16 @@ https://www.w3ctech.com/topic/2226`
             this.raws || (this.raws = {});
             var a = this[i],
               o = this.raws[i];
-            (this[i] = a + n),
+            ((this[i] = a + n),
               o || s !== n
                 ? (this.raws[i] = (o || a) + s)
-                : delete this.raws[i];
+                : delete this.raws[i]);
           }),
           (e.setPropertyAndEscape = function (i, n, s) {
-            this.raws || (this.raws = {}), (this[i] = n), (this.raws[i] = s);
+            (this.raws || (this.raws = {}), (this[i] = n), (this.raws[i] = s));
           }),
           (e.setPropertyWithoutEscape = function (i, n) {
-            (this[i] = n), this.raws && delete this.raws[i];
+            ((this[i] = n), this.raws && delete this.raws[i]);
           }),
           (e.isAtPosition = function (i, n) {
             if (this.source && this.source.start && this.source.end)
@@ -6673,19 +6675,19 @@ https://www.w3ctech.com/topic/2226`
                 );
               },
               set: function (i) {
-                (0, qp.ensureObject)(this, 'raws', 'spaces'),
-                  (this.raws.spaces.before = i);
+                ((0, qp.ensureObject)(this, 'raws', 'spaces'),
+                  (this.raws.spaces.before = i));
               },
             },
             {
               key: 'rawSpaceAfter',
               get: function () {
                 var i = this.raws && this.raws.spaces && this.raws.spaces.after;
-                return i === void 0 && (i = this.spaces.after), i || '';
+                return (i === void 0 && (i = this.spaces.after), i || '');
               },
               set: function (i) {
-                (0, qp.ensureObject)(this, 'raws', 'spaces'),
-                  (this.raws.spaces.after = i);
+                ((0, qp.ensureObject)(this, 'raws', 'spaces'),
+                  (this.raws.spaces.after = i));
               },
             },
           ]),
@@ -6769,7 +6771,7 @@ https://www.w3ctech.com/topic/2226`
             ? Object.defineProperty(i, s, a)
             : (i[s] = r[s]);
         }
-      return (i.default = r), t && t.set(r, i), i;
+      return ((i.default = r), t && t.set(r, i), i);
     }
     function mk(r) {
       return r && r.__esModule
@@ -6827,10 +6829,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     function Bp(r, e) {
       for (var t = 0; t < e.length; t++) {
         var i = e[t];
-        (i.enumerable = i.enumerable || !1),
+        ((i.enumerable = i.enumerable || !1),
           (i.configurable = !0),
           'value' in i && (i.writable = !0),
-          Object.defineProperty(r, i.key, i);
+          Object.defineProperty(r, i.key, i));
       }
     }
     function bk(r, e, t) {
@@ -6844,16 +6846,16 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       );
     }
     function wk(r, e) {
-      (r.prototype = Object.create(e.prototype)),
+      ((r.prototype = Object.create(e.prototype)),
         (r.prototype.constructor = r),
-        Pa(r, e);
+        Pa(r, e));
     }
     function Pa(r, e) {
       return (
         (Pa = Object.setPrototypeOf
           ? Object.setPrototypeOf.bind()
           : function (i, n) {
-              return (i.__proto__ = n), i;
+              return ((i.__proto__ = n), i);
             }),
         Pa(r, e)
       );
@@ -6862,15 +6864,15 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       wk(e, r);
       function e(i) {
         var n;
-        return (n = r.call(this, i) || this), n.nodes || (n.nodes = []), n;
+        return ((n = r.call(this, i) || this), n.nodes || (n.nodes = []), n);
       }
       var t = e.prototype;
       return (
         (t.append = function (n) {
-          return (n.parent = this), this.nodes.push(n), this;
+          return ((n.parent = this), this.nodes.push(n), this);
         }),
         (t.prepend = function (n) {
-          return (n.parent = this), this.nodes.unshift(n), this;
+          return ((n.parent = this), this.nodes.unshift(n), this);
         }),
         (t.at = function (n) {
           return this.nodes[n];
@@ -6879,12 +6881,12 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           return typeof n == 'number' ? n : this.nodes.indexOf(n);
         }),
         (t.removeChild = function (n) {
-          (n = this.index(n)),
+          ((n = this.index(n)),
             (this.at(n).parent = void 0),
-            this.nodes.splice(n, 1);
+            this.nodes.splice(n, 1));
           var s;
           for (var a in this.indexes)
-            (s = this.indexes[a]), s >= n && (this.indexes[a] = s - 1);
+            ((s = this.indexes[a]), s >= n && (this.indexes[a] = s - 1));
           return this;
         }),
         (t.removeAll = function () {
@@ -6892,7 +6894,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             var a = s.value;
             a.parent = void 0;
           }
-          return (this.nodes = []), this;
+          return ((this.nodes = []), this);
         }),
         (t.empty = function () {
           return this.removeAll();
@@ -6900,19 +6902,19 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         (t.insertAfter = function (n, s) {
           s.parent = this;
           var a = this.index(n);
-          this.nodes.splice(a + 1, 0, s), (s.parent = this);
+          (this.nodes.splice(a + 1, 0, s), (s.parent = this));
           var o;
           for (var l in this.indexes)
-            (o = this.indexes[l]), a <= o && (this.indexes[l] = o + 1);
+            ((o = this.indexes[l]), a <= o && (this.indexes[l] = o + 1));
           return this;
         }),
         (t.insertBefore = function (n, s) {
           s.parent = this;
           var a = this.index(n);
-          this.nodes.splice(a, 0, s), (s.parent = this);
+          (this.nodes.splice(a, 0, s), (s.parent = this));
           var o;
           for (var l in this.indexes)
-            (o = this.indexes[l]), o <= a && (this.indexes[l] = o + 1);
+            ((o = this.indexes[l]), o <= a && (this.indexes[l] = o + 1));
           return this;
         }),
         (t._findChildAtPosition = function (n, s) {
@@ -6921,8 +6923,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             this.each(function (o) {
               if (o.atPosition) {
                 var l = o.atPosition(n, s);
-                if (l) return (a = l), !1;
-              } else if (o.isAtPosition(n, s)) return (a = o), !1;
+                if (l) return ((a = l), !1);
+              } else if (o.isAtPosition(n, s)) return ((a = o), !1);
             }),
             a
           );
@@ -6940,16 +6942,15 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             Object.assign(this.source.end, this.last.source.end));
         }),
         (t.each = function (n) {
-          this.lastEach || (this.lastEach = 0),
+          (this.lastEach || (this.lastEach = 0),
             this.indexes || (this.indexes = {}),
-            this.lastEach++;
+            this.lastEach++);
           var s = this.lastEach;
           if (((this.indexes[s] = 0), !!this.length)) {
             for (
               var a, o;
               this.indexes[s] < this.length &&
               ((a = this.indexes[s]), (o = n(this.at(a), a)), o !== !1);
-
             )
               this.indexes[s] += 1;
             if ((delete this.indexes[s], o === !1)) return !1;
@@ -7091,10 +7092,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     function jp(r, e) {
       for (var t = 0; t < e.length; t++) {
         var i = e[t];
-        (i.enumerable = i.enumerable || !1),
+        ((i.enumerable = i.enumerable || !1),
           (i.configurable = !0),
           'value' in i && (i.writable = !0),
-          Object.defineProperty(r, i.key, i);
+          Object.defineProperty(r, i.key, i));
       }
     }
     function Ak(r, e, t) {
@@ -7108,16 +7109,16 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       );
     }
     function Ck(r, e) {
-      (r.prototype = Object.create(e.prototype)),
+      ((r.prototype = Object.create(e.prototype)),
         (r.prototype.constructor = r),
-        Ia(r, e);
+        Ia(r, e));
     }
     function Ia(r, e) {
       return (
         (Ia = Object.setPrototypeOf
           ? Object.setPrototypeOf.bind()
           : function (i, n) {
-              return (i.__proto__ = n), i;
+              return ((i.__proto__ = n), i);
             }),
         Ia(r, e)
       );
@@ -7126,13 +7127,13 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       Ck(e, r);
       function e(i) {
         var n;
-        return (n = r.call(this, i) || this), (n.type = kk.ROOT), n;
+        return ((n = r.call(this, i) || this), (n.type = kk.ROOT), n);
       }
       var t = e.prototype;
       return (
         (t.toString = function () {
           var n = this.reduce(function (s, a) {
-            return s.push(String(a)), s;
+            return (s.push(String(a)), s);
           }, []).join(',');
           return this.trailingComma ? n + ',' : n;
         }),
@@ -7168,16 +7169,16 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           };
     }
     function Rk(r, e) {
-      (r.prototype = Object.create(e.prototype)),
+      ((r.prototype = Object.create(e.prototype)),
         (r.prototype.constructor = r),
-        qa(r, e);
+        qa(r, e));
     }
     function qa(r, e) {
       return (
         (qa = Object.setPrototypeOf
           ? Object.setPrototypeOf.bind()
           : function (i, n) {
-              return (i.__proto__ = n), i;
+              return ((i.__proto__ = n), i);
             }),
         qa(r, e)
       );
@@ -7186,7 +7187,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       Rk(e, r);
       function e(t) {
         var i;
-        return (i = r.call(this, t) || this), (i.type = Ok.SELECTOR), i;
+        return ((i = r.call(this, t) || this), (i.type = Ok.SELECTOR), i);
       }
       return e;
     })(Ek.default);
@@ -7208,8 +7209,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       Lk = /[ -,\.\/:-@\[\]\^`\{-~]/,
       Mk = /(^|\\+)?(\\[A-F0-9]{1,6})\x20(?![a-fA-F0-9\x20])/g,
       La = function r(e, t) {
-        (t = qk(t, r.options)),
-          t.quotes != 'single' && t.quotes != 'double' && (t.quotes = 'single');
+        ((t = qk(t, r.options)),
+          t.quotes != 'single' &&
+            t.quotes != 'double' &&
+            (t.quotes = 'single'));
         for (
           var i = t.quotes == 'double' ? '"' : "'",
             n = t.isIdentifier,
@@ -7218,7 +7221,6 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             o = 0,
             l = e.length;
           o < l;
-
         ) {
           var c = e.charAt(o++),
             f = c.charCodeAt(),
@@ -7237,12 +7239,12 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 ? (d = '\\' + c)
                 : (d = '\\' + f.toString(16).toUpperCase() + ' ')
               : /[\t\n\f\r\x0B]/.test(c)
-              ? (d = '\\' + f.toString(16).toUpperCase() + ' ')
-              : c == '\\' ||
-                (!n && ((c == '"' && i == c) || (c == "'" && i == c))) ||
-                (n && Lk.test(c))
-              ? (d = '\\' + c)
-              : (d = c);
+                ? (d = '\\' + f.toString(16).toUpperCase() + ' ')
+                : c == '\\' ||
+                    (!n && ((c == '"' && i == c) || (c == "'" && i == c))) ||
+                    (n && Lk.test(c))
+                  ? (d = '\\' + c)
+                  : (d = c);
           a += d;
         }
         return (
@@ -7284,10 +7286,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     function Wp(r, e) {
       for (var t = 0; t < e.length; t++) {
         var i = e[t];
-        (i.enumerable = i.enumerable || !1),
+        ((i.enumerable = i.enumerable || !1),
           (i.configurable = !0),
           'value' in i && (i.writable = !0),
-          Object.defineProperty(r, i.key, i);
+          Object.defineProperty(r, i.key, i));
       }
     }
     function zk(r, e, t) {
@@ -7301,16 +7303,16 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       );
     }
     function Uk(r, e) {
-      (r.prototype = Object.create(e.prototype)),
+      ((r.prototype = Object.create(e.prototype)),
         (r.prototype.constructor = r),
-        Ma(r, e);
+        Ma(r, e));
     }
     function Ma(r, e) {
       return (
         (Ma = Object.setPrototypeOf
           ? Object.setPrototypeOf.bind()
           : function (i, n) {
-              return (i.__proto__ = n), i;
+              return ((i.__proto__ = n), i);
             }),
         Ma(r, e)
       );
@@ -7371,16 +7373,16 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           };
     }
     function Qk(r, e) {
-      (r.prototype = Object.create(e.prototype)),
+      ((r.prototype = Object.create(e.prototype)),
         (r.prototype.constructor = r),
-        Ba(r, e);
+        Ba(r, e));
     }
     function Ba(r, e) {
       return (
         (Ba = Object.setPrototypeOf
           ? Object.setPrototypeOf.bind()
           : function (i, n) {
-              return (i.__proto__ = n), i;
+              return ((i.__proto__ = n), i);
             }),
         Ba(r, e)
       );
@@ -7389,7 +7391,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       Qk(e, r);
       function e(t) {
         var i;
-        return (i = r.call(this, t) || this), (i.type = Wk.COMMENT), i;
+        return ((i = r.call(this, t) || this), (i.type = Wk.COMMENT), i);
       }
       return e;
     })(Hk.default);
@@ -7411,16 +7413,16 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           };
     }
     function Jk(r, e) {
-      (r.prototype = Object.create(e.prototype)),
+      ((r.prototype = Object.create(e.prototype)),
         (r.prototype.constructor = r),
-        ja(r, e);
+        ja(r, e));
     }
     function ja(r, e) {
       return (
         (ja = Object.setPrototypeOf
           ? Object.setPrototypeOf.bind()
           : function (i, n) {
-              return (i.__proto__ = n), i;
+              return ((i.__proto__ = n), i);
             }),
         ja(r, e)
       );
@@ -7429,7 +7431,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       Jk(e, r);
       function e(i) {
         var n;
-        return (n = r.call(this, i) || this), (n.type = Xk.ID), n;
+        return ((n = r.call(this, i) || this), (n.type = Xk.ID), n);
       }
       var t = e.prototype;
       return (
@@ -7460,10 +7462,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     function Xp(r, e) {
       for (var t = 0; t < e.length; t++) {
         var i = e[t];
-        (i.enumerable = i.enumerable || !1),
+        ((i.enumerable = i.enumerable || !1),
           (i.configurable = !0),
           'value' in i && (i.writable = !0),
-          Object.defineProperty(r, i.key, i);
+          Object.defineProperty(r, i.key, i));
       }
     }
     function nS(r, e, t) {
@@ -7477,16 +7479,16 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       );
     }
     function sS(r, e) {
-      (r.prototype = Object.create(e.prototype)),
+      ((r.prototype = Object.create(e.prototype)),
         (r.prototype.constructor = r),
-        Ua(r, e);
+        Ua(r, e));
     }
     function Ua(r, e) {
       return (
         (Ua = Object.setPrototypeOf
           ? Object.setPrototypeOf.bind()
           : function (i, n) {
-              return (i.__proto__ = n), i;
+              return ((i.__proto__ = n), i);
             }),
         Ua(r, e)
       );
@@ -7512,17 +7514,18 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             },
             set: function (n) {
               if (n === !0 || n === '*' || n === '&') {
-                (this._namespace = n), this.raws && delete this.raws.namespace;
+                ((this._namespace = n),
+                  this.raws && delete this.raws.namespace);
                 return;
               }
               var s = (0, tS.default)(n, {
                 isIdentifier: !0,
               });
-              (this._namespace = n),
+              ((this._namespace = n),
                 s !== n
                   ? ((0, rS.ensureObject)(this, 'raws'),
                     (this.raws.namespace = s))
-                  : this.raws && delete this.raws.namespace;
+                  : this.raws && delete this.raws.namespace);
             },
           },
           {
@@ -7565,16 +7568,16 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           };
     }
     function fS(r, e) {
-      (r.prototype = Object.create(e.prototype)),
+      ((r.prototype = Object.create(e.prototype)),
         (r.prototype.constructor = r),
-        Va(r, e);
+        Va(r, e));
     }
     function Va(r, e) {
       return (
         (Va = Object.setPrototypeOf
           ? Object.setPrototypeOf.bind()
           : function (i, n) {
-              return (i.__proto__ = n), i;
+              return ((i.__proto__ = n), i);
             }),
         Va(r, e)
       );
@@ -7583,7 +7586,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       fS(e, r);
       function e(t) {
         var i;
-        return (i = r.call(this, t) || this), (i.type = lS.TAG), i;
+        return ((i = r.call(this, t) || this), (i.type = lS.TAG), i);
       }
       return e;
     })(oS.default);
@@ -7605,16 +7608,16 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           };
     }
     function mS(r, e) {
-      (r.prototype = Object.create(e.prototype)),
+      ((r.prototype = Object.create(e.prototype)),
         (r.prototype.constructor = r),
-        Wa(r, e);
+        Wa(r, e));
     }
     function Wa(r, e) {
       return (
         (Wa = Object.setPrototypeOf
           ? Object.setPrototypeOf.bind()
           : function (i, n) {
-              return (i.__proto__ = n), i;
+              return ((i.__proto__ = n), i);
             }),
         Wa(r, e)
       );
@@ -7623,7 +7626,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       mS(e, r);
       function e(t) {
         var i;
-        return (i = r.call(this, t) || this), (i.type = dS.STRING), i;
+        return ((i = r.call(this, t) || this), (i.type = dS.STRING), i);
       }
       return e;
     })(pS.default);
@@ -7645,16 +7648,16 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           };
     }
     function vS(r, e) {
-      (r.prototype = Object.create(e.prototype)),
+      ((r.prototype = Object.create(e.prototype)),
         (r.prototype.constructor = r),
-        Qa(r, e);
+        Qa(r, e));
     }
     function Qa(r, e) {
       return (
         (Qa = Object.setPrototypeOf
           ? Object.setPrototypeOf.bind()
           : function (i, n) {
-              return (i.__proto__ = n), i;
+              return ((i.__proto__ = n), i);
             }),
         Qa(r, e)
       );
@@ -7663,7 +7666,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       vS(e, r);
       function e(i) {
         var n;
-        return (n = r.call(this, i) || this), (n.type = bS.PSEUDO), n;
+        return ((n = r.call(this, i) || this), (n.type = bS.PSEUDO), n);
       }
       var t = e.prototype;
       return (
@@ -7717,10 +7720,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     function nd(r, e) {
       for (var t = 0; t < e.length; t++) {
         var i = e[t];
-        (i.enumerable = i.enumerable || !1),
+        ((i.enumerable = i.enumerable || !1),
           (i.configurable = !0),
           'value' in i && (i.writable = !0),
-          Object.defineProperty(r, i.key, i);
+          Object.defineProperty(r, i.key, i));
       }
     }
     function _S(r, e, t) {
@@ -7734,28 +7737,34 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       );
     }
     function ES(r, e) {
-      (r.prototype = Object.create(e.prototype)),
+      ((r.prototype = Object.create(e.prototype)),
         (r.prototype.constructor = r),
-        Za(r, e);
+        Za(r, e));
     }
     function Za(r, e) {
       return (
         (Za = Object.setPrototypeOf
           ? Object.setPrototypeOf.bind()
           : function (i, n) {
-              return (i.__proto__ = n), i;
+              return ((i.__proto__ = n), i);
             }),
         Za(r, e)
       );
     }
     var gi = id(),
       OS = /^('|")([^]*)\1$/,
-      TS = gi(function () {},
-      'Assigning an attribute a value containing characters that might need to be escaped is deprecated. Call attribute.setValue() instead.'),
-      RS = gi(function () {},
-      'Assigning attr.quoted is deprecated and has no effect. Assign to attr.quoteMark instead.'),
-      PS = gi(function () {},
-      'Constructing an Attribute selector with a value without specifying quoteMark is deprecated. Note: The value should be unescaped now.');
+      TS = gi(
+        function () {},
+        'Assigning an attribute a value containing characters that might need to be escaped is deprecated. Call attribute.setValue() instead.',
+      ),
+      RS = gi(
+        function () {},
+        'Assigning attr.quoted is deprecated and has no effect. Assign to attr.quoteMark instead.',
+      ),
+      PS = gi(
+        function () {},
+        'Constructing an Attribute selector with a value without specifying quoteMark is deprecated. Note: The value should be unescaped now.',
+      );
     function Ja(r) {
       var e = !1,
         t = null,
@@ -7820,10 +7829,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           return n.smart ? this.smartQuoteMark(n) : this.preferredQuoteMark(n);
         }),
         (t.setValue = function (n, s) {
-          s === void 0 && (s = {}),
+          (s === void 0 && (s = {}),
             (this._value = n),
             (this._quoteMark = this._determineQuoteMark(s)),
-            this._syncRawValue();
+            this._syncRawValue());
         }),
         (t.smartQuoteMark = function (n) {
           var s = this.value,
@@ -7846,8 +7855,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             return o === a
               ? this.preferredQuoteMark(n)
               : o < a
-              ? e.DOUBLE_QUOTE
-              : e.SINGLE_QUOTE;
+                ? e.DOUBLE_QUOTE
+                : e.SINGLE_QUOTE;
         }),
         (t.preferredQuoteMark = function (n) {
           var s = n.preferCurrentQuoteMark ? this.quoteMark : n.quoteMark;
@@ -7882,7 +7891,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           return Object.assign(s, a, o);
         }),
         (t._stringFor = function (n, s, a) {
-          s === void 0 && (s = n), a === void 0 && (a = sd);
+          (s === void 0 && (s = n), a === void 0 && (a = sd));
           var o = this._spacesFor(s);
           return a(this.stringifyProperty(n), o);
         }),
@@ -7898,18 +7907,18 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             n === 'attribute')
           )
             return s;
-          (s += this.stringifyProperty('attribute').length),
-            (s += a.after.length);
+          ((s += this.stringifyProperty('attribute').length),
+            (s += a.after.length));
           var o = this._spacesFor('operator');
           s += o.before.length;
           var l = this.stringifyProperty('operator');
           if (n === 'operator') return l ? s : -1;
-          (s += l.length), (s += o.after.length);
+          ((s += l.length), (s += o.after.length));
           var c = this._spacesFor('value');
           s += c.before.length;
           var f = this.stringifyProperty('value');
           if (n === 'value') return f ? s : -1;
-          (s += f.length), (s += c.after.length);
+          ((s += f.length), (s += c.after.length));
           var d = this._spacesFor('insensitive');
           return (
             (s += d.before.length),
@@ -7938,8 +7947,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                         (o.before = ' '),
                       sd(a, o)
                     );
-                  }
-                )
+                  },
+                ),
               )),
             s.push(']'),
             s.push(this.rawSpaceAfter),
@@ -7996,7 +8005,9 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   l = s.quoteMark;
                 if ((a && TS(), o === this._value && l === this._quoteMark))
                   return;
-                (this._value = o), (this._quoteMark = l), this._syncRawValue();
+                ((this._value = o),
+                  (this._quoteMark = l),
+                  this._syncRawValue());
               } else this._value = n;
             },
           },
@@ -8006,13 +8017,13 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               return this._insensitive;
             },
             set: function (n) {
-              n ||
+              (n ||
                 ((this._insensitive = !1),
                 this.raws &&
                   (this.raws.insensitiveFlag === 'I' ||
                     this.raws.insensitiveFlag === 'i') &&
                   (this.raws.insensitiveFlag = void 0)),
-                (this._insensitive = n);
+                (this._insensitive = n));
             },
           },
           {
@@ -8021,7 +8032,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               return this._attribute;
             },
             set: function (n) {
-              this._handleEscapes('attribute', n), (this._attribute = n);
+              (this._handleEscapes('attribute', n), (this._attribute = n));
             },
           },
         ]),
@@ -8066,16 +8077,16 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           };
     }
     function LS(r, e) {
-      (r.prototype = Object.create(e.prototype)),
+      ((r.prototype = Object.create(e.prototype)),
         (r.prototype.constructor = r),
-        ro(r, e);
+        ro(r, e));
     }
     function ro(r, e) {
       return (
         (ro = Object.setPrototypeOf
           ? Object.setPrototypeOf.bind()
           : function (i, n) {
-              return (i.__proto__ = n), i;
+              return ((i.__proto__ = n), i);
             }),
         ro(r, e)
       );
@@ -8111,16 +8122,16 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           };
     }
     function jS(r, e) {
-      (r.prototype = Object.create(e.prototype)),
+      ((r.prototype = Object.create(e.prototype)),
         (r.prototype.constructor = r),
-        no(r, e);
+        no(r, e));
     }
     function no(r, e) {
       return (
         (no = Object.setPrototypeOf
           ? Object.setPrototypeOf.bind()
           : function (i, n) {
-              return (i.__proto__ = n), i;
+              return ((i.__proto__ = n), i);
             }),
         no(r, e)
       );
@@ -8129,7 +8140,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       jS(e, r);
       function e(t) {
         var i;
-        return (i = r.call(this, t) || this), (i.type = BS.COMBINATOR), i;
+        return ((i = r.call(this, t) || this), (i.type = BS.COMBINATOR), i);
       }
       return e;
     })(NS.default);
@@ -8151,16 +8162,16 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           };
     }
     function WS(r, e) {
-      (r.prototype = Object.create(e.prototype)),
+      ((r.prototype = Object.create(e.prototype)),
         (r.prototype.constructor = r),
-        ao(r, e);
+        ao(r, e));
     }
     function ao(r, e) {
       return (
         (ao = Object.setPrototypeOf
           ? Object.setPrototypeOf.bind()
           : function (i, n) {
-              return (i.__proto__ = n), i;
+              return ((i.__proto__ = n), i);
             }),
         ao(r, e)
       );
@@ -8326,7 +8337,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             ? Object.defineProperty(i, s, a)
             : (i[s] = r[s]);
         }
-      return (i.default = r), t && t.set(r, i), i;
+      return ((i.default = r), t && t.set(r, i), i);
     }
     var _A =
         ((nr = {}),
@@ -8382,7 +8393,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       if (!_A[i])
         if (uo[i]) {
           var n = 0;
-          do t++, n++, (i = r.charCodeAt(t + 1));
+          do (t++, n++, (i = r.charCodeAt(t + 1)));
           while (uo[i] && n < 6);
           n < 6 && i === D.space && t++;
         } else t++;
@@ -8421,7 +8432,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         E,
         T;
       function B(N, R) {
-        if (r.safe) (t += R), (w = t.length - 1);
+        if (r.safe) ((t += R), (w = t.length - 1));
         else throw r.error('Unclosed ' + N, a, o - s, o);
       }
       for (; o < n; ) {
@@ -8435,9 +8446,9 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           case D.feed:
             w = o;
             do
-              (w += 1),
+              ((w += 1),
                 (c = t.charCodeAt(w)),
-                c === D.newline && ((s = w), (a += 1));
+                c === D.newline && ((s = w), (a += 1)));
             while (
               c === D.space ||
               c === D.newline ||
@@ -8445,21 +8456,21 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               c === D.cr ||
               c === D.feed
             );
-            (T = D.space), (p = a), (d = w - s - 1), (l = w);
+            ((T = D.space), (p = a), (d = w - s - 1), (l = w));
             break;
           case D.plus:
           case D.greaterThan:
           case D.tilde:
           case D.pipe:
             w = o;
-            do (w += 1), (c = t.charCodeAt(w));
+            do ((w += 1), (c = t.charCodeAt(w)));
             while (
               c === D.plus ||
               c === D.greaterThan ||
               c === D.tilde ||
               c === D.pipe
             );
-            (T = D.combinator), (p = a), (d = o - s), (l = w);
+            ((T = D.combinator), (p = a), (d = o - s), (l = w));
             break;
           case D.asterisk:
           case D.ampersand:
@@ -8474,11 +8485,11 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           case D.semicolon:
           case D.openParenthesis:
           case D.closeParenthesis:
-            (w = o), (T = c), (p = a), (d = o - s), (l = w + 1);
+            ((w = o), (T = c), (p = a), (d = o - s), (l = w + 1));
             break;
           case D.singleQuote:
           case D.doubleQuote:
-            (E = c === D.singleQuote ? "'" : '"'), (w = o);
+            ((E = c === D.singleQuote ? "'" : '"'), (w = o));
             do
               for (
                 h = !1,
@@ -8486,14 +8497,13 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   w === -1 && B('quote', E),
                   b = w;
                 t.charCodeAt(b - 1) === D.backslash;
-
               )
-                (b -= 1), (h = !h);
+                ((b -= 1), (h = !h));
             while (h);
-            (T = D.str), (p = a), (d = o - s), (l = w + 1);
+            ((T = D.str), (p = a), (d = o - s), (l = w + 1));
             break;
           default:
-            c === D.slash && t.charCodeAt(o + 1) === D.asterisk
+            (c === D.slash && t.charCodeAt(o + 1) === D.asterisk
               ? ((w = t.indexOf('*/', o + 2) + 1),
                 w === 0 && B('comment', '*/'),
                 (f = t.slice(o, w + 1)),
@@ -8508,12 +8518,14 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 (p = k),
                 (d = w - S))
               : c === D.slash
-              ? ((w = o), (T = c), (p = a), (d = o - s), (l = w + 1))
-              : ((w = OA(t, o)), (T = D.word), (p = a), (d = w - s)),
-              (l = w + 1);
+                ? ((w = o), (T = c), (p = a), (d = o - s), (l = w + 1))
+                : ((w = OA(t, o)), (T = D.word), (p = a), (d = w - s)),
+              (l = w + 1));
             break;
         }
-        e.push([T, a, o - s, p, d, o, l]), S && ((s = S), (S = null)), (o = l);
+        (e.push([T, a, o - s, p, d, o, l]),
+          S && ((s = S), (S = null)),
+          (o = l));
       }
       return e;
     }
@@ -8567,7 +8579,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             ? Object.defineProperty(i, s, a)
             : (i[s] = r[s]);
         }
-      return (i.default = r), t && t.set(r, i), i;
+      return ((i.default = r), t && t.set(r, i), i);
     }
     function je(r) {
       return r && r.__esModule
@@ -8579,10 +8591,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     function bd(r, e) {
       for (var t = 0; t < e.length; t++) {
         var i = e[t];
-        (i.enumerable = i.enumerable || !1),
+        ((i.enumerable = i.enumerable || !1),
           (i.configurable = !0),
           'value' in i && (i.writable = !0),
-          Object.defineProperty(r, i.key, i);
+          Object.defineProperty(r, i.key, i));
       }
     }
     function jA(r, e, t) {
@@ -8633,7 +8645,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         r[O.FIELDS.START_LINE],
         r[O.FIELDS.START_COL],
         r[O.FIELDS.END_LINE],
-        r[O.FIELDS.END_COL]
+        r[O.FIELDS.END_COL],
       );
     }
     function go(r, e) {
@@ -8642,7 +8654,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           r[O.FIELDS.START_LINE],
           r[O.FIELDS.START_COL],
           e[O.FIELDS.END_LINE],
-          e[O.FIELDS.END_COL]
+          e[O.FIELDS.END_COL],
         );
     }
     function ar(r, e) {
@@ -8668,14 +8680,14 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     }
     var VA = (function () {
       function r(t, i) {
-        i === void 0 && (i = {}),
+        (i === void 0 && (i = {}),
           (this.rule = t),
           (this.options = Object.assign(
             {
               lossy: !1,
               safe: !1,
             },
-            i
+            i,
           )),
           (this.position = 0),
           (this.css =
@@ -8684,12 +8696,12 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             css: this.css,
             error: this._errorGenerator(),
             safe: this.options.safe,
-          }));
+          })));
         var n = go(this.tokens[0], this.tokens[this.tokens.length - 1]);
-        (this.root = new IA.default({
+        ((this.root = new IA.default({
           source: n,
         })),
-          (this.root.errorGenerator = this._errorGenerator());
+          (this.root.errorGenerator = this._errorGenerator()));
         var s = new fo.default({
           source: {
             start: {
@@ -8699,7 +8711,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           },
           sourceIndex: 0,
         });
-        this.root.append(s), (this.current = s), this.loop();
+        (this.root.append(s), (this.current = s), this.loop());
       }
       var e = r.prototype;
       return (
@@ -8718,13 +8730,12 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             this.position++;
             this.position < this.tokens.length &&
             this.currToken[O.FIELDS.TYPE] !== q.closeSquare;
-
           )
-            i.push(this.currToken), this.position++;
+            (i.push(this.currToken), this.position++);
           if (this.currToken[O.FIELDS.TYPE] !== q.closeSquare)
             return this.expected(
               'closing square bracket',
-              this.currToken[O.FIELDS.START_POS]
+              this.currToken[O.FIELDS.START_POS],
             );
           var s = i.length,
             a = {
@@ -8747,13 +8758,13 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   var y =
                     (0, ue.getProp)(a, 'raws', 'spaces', f, 'after') || null;
                   y && (a.raws.spaces[f].after = y + h);
-                } else (l = l + h), (c = c + h);
+                } else ((l = l + h), (c = c + h));
                 break;
               case q.asterisk:
                 if (b[O.FIELDS.TYPE] === q.equals)
-                  (a.operator = h), (f = 'operator');
+                  ((a.operator = h), (f = 'operator'));
                 else if ((!a.namespace || (f === 'namespace' && !d)) && b) {
-                  l &&
+                  (l &&
                     ((0, ue.ensureObject)(a, 'spaces', 'attribute'),
                     (a.spaces.attribute.before = l),
                     (l = '')),
@@ -8761,22 +8772,22 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                       ((0, ue.ensureObject)(a, 'raws', 'spaces', 'attribute'),
                       (a.raws.spaces.attribute.before = l),
                       (c = '')),
-                    (a.namespace = (a.namespace || '') + h);
+                    (a.namespace = (a.namespace || '') + h));
                   var w = (0, ue.getProp)(a, 'raws', 'namespace') || null;
-                  w && (a.raws.namespace += h), (f = 'namespace');
+                  (w && (a.raws.namespace += h), (f = 'namespace'));
                 }
                 d = !1;
                 break;
               case q.dollar:
                 if (f === 'value') {
                   var k = (0, ue.getProp)(a, 'raws', 'value');
-                  (a.value += '$'), k && (a.raws.value = k + '$');
+                  ((a.value += '$'), k && (a.raws.value = k + '$'));
                   break;
                 }
               case q.caret:
-                b[O.FIELDS.TYPE] === q.equals &&
+                (b[O.FIELDS.TYPE] === q.equals &&
                   ((a.operator = h), (f = 'operator')),
-                  (d = !1);
+                  (d = !1));
                 break;
               case q.combinator:
                 if (
@@ -8788,10 +8799,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   d = !1;
                   break;
                 }
-                b[O.FIELDS.TYPE] === q.equals
+                (b[O.FIELDS.TYPE] === q.equals
                   ? ((a.operator = h), (f = 'operator'))
                   : !a.namespace && !a.attribute && (a.namespace = !0),
-                  (d = !1);
+                  (d = !1));
                 break;
               case q.word:
                 if (
@@ -8802,9 +8813,9 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   !a.operator &&
                   !a.namespace
                 )
-                  (a.namespace = h), (f = 'namespace');
+                  ((a.namespace = h), (f = 'namespace'));
                 else if (!a.attribute || (f === 'attribute' && !d)) {
-                  l &&
+                  (l &&
                     ((0, ue.ensureObject)(a, 'spaces', 'attribute'),
                     (a.spaces.attribute.before = l),
                     (l = '')),
@@ -8812,9 +8823,9 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                       ((0, ue.ensureObject)(a, 'raws', 'spaces', 'attribute'),
                       (a.raws.spaces.attribute.before = c),
                       (c = '')),
-                    (a.attribute = (a.attribute || '') + h);
+                    (a.attribute = (a.attribute || '') + h));
                   var S = (0, ue.getProp)(a, 'raws', 'attribute') || null;
-                  S && (a.raws.attribute += h), (f = 'attribute');
+                  (S && (a.raws.attribute += h), (f = 'attribute'));
                 } else if (
                   (!a.value && a.value !== '') ||
                   (f === 'value' && !(d || a.quoteMark))
@@ -8822,12 +8833,12 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   var E = (0, ue.unesc)(h),
                     T = (0, ue.getProp)(a, 'raws', 'value') || '',
                     B = a.value || '';
-                  (a.value = B + E),
+                  ((a.value = B + E),
                     (a.quoteMark = null),
                     (E !== h || T) &&
                       ((0, ue.ensureObject)(a, 'raws'),
                       (a.raws.value = (T || B) + h)),
-                    (f = 'value');
+                    (f = 'value'));
                 } else {
                   var N = h === 'i' || h === 'I';
                   (a.value || a.value === '') && (a.quoteMark || d)
@@ -8845,7 +8856,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                           a,
                           'raws',
                           'spaces',
-                          'insensitive'
+                          'insensitive',
                         ),
                         (a.raws.spaces.insensitive.before = c),
                         (c = '')))
@@ -8862,17 +8873,17 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                     'Expected an attribute followed by an operator preceding the string.',
                     {
                       index: p[O.FIELDS.START_POS],
-                    }
+                    },
                   );
                 var R = (0, gd.unescapeValue)(h),
                   F = R.unescaped,
                   Y = R.quoteMark;
-                (a.value = F),
+                ((a.value = F),
                   (a.quoteMark = Y),
                   (f = 'value'),
                   (0, ue.ensureObject)(a, 'raws'),
                   (a.raws.value = h),
-                  (d = !1);
+                  (d = !1));
                 break;
               case q.equals:
                 if (!a.attribute)
@@ -8882,11 +8893,11 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                     'Unexpected "=" found; an operator was already defined.',
                     {
                       index: p[O.FIELDS.START_POS],
-                    }
+                    },
                   );
-                (a.operator = a.operator ? a.operator + h : h),
+                ((a.operator = a.operator ? a.operator + h : h),
                   (f = 'operator'),
-                  (d = !1);
+                  (d = !1));
                 break;
               case q.comment:
                 if (f)
@@ -8897,12 +8908,12 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   ) {
                     var _ = (0, ue.getProp)(a, 'spaces', f, 'after') || '',
                       Q = (0, ue.getProp)(a, 'raws', 'spaces', f, 'after') || _;
-                    (0, ue.ensureObject)(a, 'raws', 'spaces', f),
-                      (a.raws.spaces[f].after = Q + h);
+                    ((0, ue.ensureObject)(a, 'raws', 'spaces', f),
+                      (a.raws.spaces[f].after = Q + h));
                   } else {
                     var U = a[f] || '',
                       le = (0, ue.getProp)(a, 'raws', f) || U;
-                    (0, ue.ensureObject)(a, 'raws'), (a.raws[f] = le + h);
+                    ((0, ue.ensureObject)(a, 'raws'), (a.raws[f] = le + h));
                   }
                 else c = c + h;
                 break;
@@ -8913,10 +8924,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             }
             o++;
           }
-          ar(a, 'attribute'),
+          (ar(a, 'attribute'),
             ar(a, 'namespace'),
             this.newNode(new gd.default(a)),
-            this.position++;
+            this.position++);
         }),
         (e.parseWhitespaceEquivalentTokens = function (i) {
           i < 0 && (i = this.tokens.length);
@@ -8929,14 +8940,14 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               this.options.lossy || (a += this.content());
             else if (this.currToken[O.FIELDS.TYPE] === q.comment) {
               var l = {};
-              a && ((l.before = a), (a = '')),
+              (a && ((l.before = a), (a = '')),
                 (o = new md.default({
                   value: this.content(),
                   source: sr(this.currToken),
                   sourceIndex: this.currToken[O.FIELDS.START_POS],
                   spaces: l,
                 })),
-                s.push(o);
+                s.push(o));
             }
           while (++this.position < i);
           if (a) {
@@ -8951,14 +8962,14 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                     c[O.FIELDS.START_LINE],
                     c[O.FIELDS.START_COL],
                     f[O.FIELDS.END_LINE],
-                    f[O.FIELDS.END_COL]
+                    f[O.FIELDS.END_COL],
                   ),
                   sourceIndex: c[O.FIELDS.START_POS],
                   spaces: {
                     before: a,
                     after: '',
                   },
-                })
+                }),
               );
             }
           }
@@ -8969,16 +8980,16 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           n === void 0 && (n = !1);
           var a = '',
             o = '';
-          i.forEach(function (c) {
+          (i.forEach(function (c) {
             var f = s.lossySpace(c.spaces.before, n),
               d = s.lossySpace(c.rawSpaceBefore, n);
-            (a += f + s.lossySpace(c.spaces.after, n && f.length === 0)),
+            ((a += f + s.lossySpace(c.spaces.after, n && f.length === 0)),
               (o +=
                 f +
                 c.value +
-                s.lossySpace(c.rawSpaceAfter, n && d.length === 0));
+                s.lossySpace(c.rawSpaceAfter, n && d.length === 0)));
           }),
-            o === a && (o = void 0);
+            o === a && (o = void 0));
           var l = {
             space: a,
             rawSpace: o,
@@ -9008,12 +9019,12 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 this.currToken[O.FIELDS.START_LINE],
                 this.currToken[O.FIELDS.START_COL],
                 this.tokens[this.position + 2][O.FIELDS.END_LINE],
-                this.tokens[this.position + 2][O.FIELDS.END_COL]
+                this.tokens[this.position + 2][O.FIELDS.END_COL],
               ),
               sourceIndex: this.currToken[O.FIELDS.START_POS],
               raws: s,
             });
-            return (this.position = this.position + 3), a;
+            return ((this.position = this.position + 3), a);
           } else this.unexpected();
         }),
         (e.combinator = function () {
@@ -9032,7 +9043,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 var o = this.convertWhitespaceNodesToSpace(s),
                   l = o.space,
                   c = o.rawSpace;
-                c !== void 0 && (a.rawSpaceAfter += c), (a.spaces.after += l);
+                (c !== void 0 && (a.rawSpaceAfter += c), (a.spaces.after += l));
               } else
                 s.forEach(function (T) {
                   return i.newNode(T);
@@ -9048,20 +9059,20 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             (this.isNamedCombinator()
               ? (p = this.namedCombinator())
               : this.currToken[O.FIELDS.TYPE] === q.combinator
-              ? ((p = new po.default({
-                  value: this.content(),
-                  source: sr(this.currToken),
-                  sourceIndex: this.currToken[O.FIELDS.START_POS],
-                })),
-                this.position++)
-              : mo[this.currToken[O.FIELDS.TYPE]] || d || this.unexpected(),
+                ? ((p = new po.default({
+                    value: this.content(),
+                    source: sr(this.currToken),
+                    sourceIndex: this.currToken[O.FIELDS.START_POS],
+                  })),
+                  this.position++)
+                : mo[this.currToken[O.FIELDS.TYPE]] || d || this.unexpected(),
             p)
           ) {
             if (d) {
               var h = this.convertWhitespaceNodesToSpace(d),
                 b = h.space,
                 v = h.rawSpace;
-              (p.spaces.before = b), (p.rawSpaceBefore = v);
+              ((p.spaces.before = b), (p.rawSpaceBefore = v));
             }
           } else {
             var y = this.convertWhitespaceNodesToSpace(d, !0),
@@ -9072,19 +9083,19 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               E = {
                 spaces: {},
               };
-            w.endsWith(' ') && k.endsWith(' ')
+            (w.endsWith(' ') && k.endsWith(' ')
               ? ((S.before = w.slice(0, w.length - 1)),
                 (E.spaces.before = k.slice(0, k.length - 1)))
               : w.startsWith(' ') && k.startsWith(' ')
-              ? ((S.after = w.slice(1)), (E.spaces.after = k.slice(1)))
-              : (E.value = k),
+                ? ((S.after = w.slice(1)), (E.spaces.after = k.slice(1)))
+                : (E.value = k),
               (p = new po.default({
                 value: ' ',
                 source: go(f, this.tokens[this.position - 1]),
                 sourceIndex: f[O.FIELDS.START_POS],
                 spaces: S,
                 raws: E,
-              }));
+              })));
           }
           return (
             this.currToken &&
@@ -9096,7 +9107,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         }),
         (e.comma = function () {
           if (this.position === this.tokens.length - 1) {
-            (this.root.trailingComma = !0), this.position++;
+            ((this.root.trailingComma = !0), this.position++);
             return;
           }
           this.current._inferEndPosition();
@@ -9106,18 +9117,18 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             },
             sourceIndex: this.tokens[this.position + 1][O.FIELDS.START_POS],
           });
-          this.current.parent.append(i), (this.current = i), this.position++;
+          (this.current.parent.append(i), (this.current = i), this.position++);
         }),
         (e.comment = function () {
           var i = this.currToken;
-          this.newNode(
+          (this.newNode(
             new md.default({
               value: this.content(),
               source: sr(i),
               sourceIndex: i[O.FIELDS.START_POS],
-            })
+            }),
           ),
-            this.position++;
+            this.position++);
         }),
         (e.error = function (i, n) {
           throw this.root.error(i, n);
@@ -9130,13 +9141,13 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         (e.missingParenthesis = function () {
           return this.expected(
             'opening parenthesis',
-            this.currToken[O.FIELDS.START_POS]
+            this.currToken[O.FIELDS.START_POS],
           );
         }),
         (e.missingSquareBracket = function () {
           return this.expected(
             'opening square bracket',
-            this.currToken[O.FIELDS.START_POS]
+            this.currToken[O.FIELDS.START_POS],
           );
         }),
         (e.unexpected = function () {
@@ -9144,21 +9155,21 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             "Unexpected '" +
               this.content() +
               "'. Escaping special characters with \\ may help.",
-            this.currToken[O.FIELDS.START_POS]
+            this.currToken[O.FIELDS.START_POS],
           );
         }),
         (e.unexpectedPipe = function () {
           return this.error(
             "Unexpected '|'.",
-            this.currToken[O.FIELDS.START_POS]
+            this.currToken[O.FIELDS.START_POS],
           );
         }),
         (e.namespace = function () {
           var i = (this.prevToken && this.content(this.prevToken)) || !0;
           if (this.nextToken[O.FIELDS.TYPE] === q.word)
-            return this.position++, this.word(i);
+            return (this.position++, this.word(i));
           if (this.nextToken[O.FIELDS.TYPE] === q.asterisk)
-            return this.position++, this.universal(i);
+            return (this.position++, this.universal(i));
           this.unexpectedPipe();
         }),
         (e.nesting = function () {
@@ -9170,14 +9181,14 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             }
           }
           var n = this.currToken;
-          this.newNode(
+          (this.newNode(
             new NA.default({
               value: this.content(),
               source: sr(n),
               sourceIndex: n[O.FIELDS.START_POS],
-            })
+            }),
           ),
-            this.position++;
+            this.position++);
         }),
         (e.parentheses = function () {
           var i = this.current.last,
@@ -9193,27 +9204,25 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             for (
               i.append(s), this.current = s;
               this.position < this.tokens.length && n;
-
             )
-              this.currToken[O.FIELDS.TYPE] === q.openParenthesis && n++,
+              (this.currToken[O.FIELDS.TYPE] === q.openParenthesis && n++,
                 this.currToken[O.FIELDS.TYPE] === q.closeParenthesis && n--,
                 n
                   ? this.parse()
                   : ((this.current.source.end = vd(this.currToken)),
                     (this.current.parent.source.end = vd(this.currToken)),
-                    this.position++);
+                    this.position++));
             this.current = a;
           } else {
             for (
               var o = this.currToken, l = '(', c;
               this.position < this.tokens.length && n;
-
             )
-              this.currToken[O.FIELDS.TYPE] === q.openParenthesis && n++,
+              (this.currToken[O.FIELDS.TYPE] === q.openParenthesis && n++,
                 this.currToken[O.FIELDS.TYPE] === q.closeParenthesis && n--,
                 (c = this.currToken),
                 (l += this.parseParenthesisToken(this.currToken)),
-                this.position++;
+                this.position++);
             i
               ? i.appendToPropertyAndEscape('value', l, l)
               : this.newNode(
@@ -9223,51 +9232,50 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                       o[O.FIELDS.START_LINE],
                       o[O.FIELDS.START_COL],
                       c[O.FIELDS.END_LINE],
-                      c[O.FIELDS.END_COL]
+                      c[O.FIELDS.END_COL],
                     ),
                     sourceIndex: o[O.FIELDS.START_POS],
-                  })
+                  }),
                 );
           }
           if (n)
             return this.expected(
               'closing parenthesis',
-              this.currToken[O.FIELDS.START_POS]
+              this.currToken[O.FIELDS.START_POS],
             );
         }),
         (e.pseudo = function () {
           for (
             var i = this, n = '', s = this.currToken;
             this.currToken && this.currToken[O.FIELDS.TYPE] === q.colon;
-
           )
-            (n += this.content()), this.position++;
+            ((n += this.content()), this.position++);
           if (!this.currToken)
             return this.expected(
               ['pseudo-class', 'pseudo-element'],
-              this.position - 1
+              this.position - 1,
             );
           if (this.currToken[O.FIELDS.TYPE] === q.word)
             this.splitWord(!1, function (a, o) {
-              (n += a),
+              ((n += a),
                 i.newNode(
                   new LA.default({
                     value: n,
                     source: go(s, i.currToken),
                     sourceIndex: s[O.FIELDS.START_POS],
-                  })
+                  }),
                 ),
                 o > 1 &&
                   i.nextToken &&
                   i.nextToken[O.FIELDS.TYPE] === q.openParenthesis &&
                   i.error('Misplaced parenthesis.', {
                     index: i.nextToken[O.FIELDS.START_POS],
-                  });
+                  }));
             });
           else
             return this.expected(
               ['pseudo-class', 'pseudo-element'],
-              this.currToken[O.FIELDS.START_POS]
+              this.currToken[O.FIELDS.START_POS],
             );
         }),
         (e.space = function () {
@@ -9280,44 +9288,43 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           })
             ? ((this.spaces = this.optionalSpace(i)), this.position++)
             : this.position === this.tokens.length - 1 ||
-              this.nextToken[O.FIELDS.TYPE] === q.comma ||
-              this.nextToken[O.FIELDS.TYPE] === q.closeParenthesis
-            ? ((this.current.last.spaces.after = this.optionalSpace(i)),
-              this.position++)
-            : this.combinator();
+                this.nextToken[O.FIELDS.TYPE] === q.comma ||
+                this.nextToken[O.FIELDS.TYPE] === q.closeParenthesis
+              ? ((this.current.last.spaces.after = this.optionalSpace(i)),
+                this.position++)
+              : this.combinator();
         }),
         (e.string = function () {
           var i = this.currToken;
-          this.newNode(
+          (this.newNode(
             new co.default({
               value: this.content(),
               source: sr(i),
               sourceIndex: i[O.FIELDS.START_POS],
-            })
+            }),
           ),
-            this.position++;
+            this.position++);
         }),
         (e.universal = function (i) {
           var n = this.nextToken;
           if (n && this.content(n) === '|')
-            return this.position++, this.namespace();
+            return (this.position++, this.namespace());
           var s = this.currToken;
-          this.newNode(
+          (this.newNode(
             new MA.default({
               value: this.content(),
               source: sr(s),
               sourceIndex: s[O.FIELDS.START_POS],
             }),
-            i
+            i,
           ),
-            this.position++;
+            this.position++);
         }),
         (e.splitWord = function (i, n) {
           for (
             var s = this, a = this.nextToken, o = this.content();
             a &&
             ~[q.dollar, q.caret, q.equals, q.word].indexOf(a[O.FIELDS.TYPE]);
-
           ) {
             this.position++;
             var l = this.content();
@@ -9343,7 +9350,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               return !~p.indexOf(b);
             }));
           var h = (0, BA.default)(UA([0].concat(f, d)));
-          h.forEach(function (b, v) {
+          (h.forEach(function (b, v) {
             var y = h[v + 1] || o.length,
               w = o.slice(b, y);
             if (v === 0 && n) return n.call(s, w, h.length);
@@ -9371,11 +9378,11 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 source: T,
                 sourceIndex: E,
               };
-              ar(R, 'value'), (k = new $A.default(R));
+              (ar(R, 'value'), (k = new $A.default(R)));
             }
-            s.newNode(k, i), (i = null);
+            (s.newNode(k, i), (i = null));
           }),
-            this.position++;
+            this.position++);
         }),
         (e.word = function (i) {
           var n = this.nextToken;
@@ -9385,7 +9392,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         }),
         (e.loop = function () {
           for (; this.position < this.tokens.length; ) this.parse(!0);
-          return this.current._inferEndPosition(), this.root;
+          return (this.current._inferEndPosition(), this.root);
         }),
         (e.parse = function (i) {
           switch (this.currToken[O.FIELDS.TYPE]) {
@@ -9448,7 +9455,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 'Expected ' + o + ' ' + i + ', found "' + s + '" instead.',
                 {
                   index: n,
-                }
+                },
               )
             : this.error('Expected ' + o + ' ' + i + '.', {
                 index: n,
@@ -9536,9 +9543,9 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     }
     var GA = (function () {
       function r(t, i) {
-        (this.func = t || function () {}),
+        ((this.func = t || function () {}),
           (this.funcRes = null),
-          (this.options = i);
+          (this.options = i));
       }
       var e = r.prototype;
       return (
@@ -9596,7 +9603,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             a = this.func(s);
           if (a && typeof a.then == 'function')
             throw new Error(
-              'Selector processor returned a promise to a synchronous call.'
+              'Selector processor returned a promise to a synchronous call.',
             );
           var o = void 0;
           return (
@@ -9866,7 +9873,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             ? Object.defineProperty(i, s, a)
             : (i[s] = r[s]);
         }
-      return (i.default = r), t && t.set(r, i), i;
+      return ((i.default = r), t && t.set(r, i), i);
     }
     function qC(r) {
       return r && r.__esModule
@@ -9892,37 +9899,39 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           e
         )
       : r === 'fontFamily'
-      ? (e) => {
-          typeof e == 'function' && (e = e({}));
-          let t = Array.isArray(e) && ke(e[1]) ? e[0] : e;
-          return Array.isArray(t) ? t.join(', ') : t;
-        }
-      : [
-          'boxShadow',
-          'transitionProperty',
-          'transitionDuration',
-          'transitionDelay',
-          'transitionTimingFunction',
-          'backgroundImage',
-          'backgroundSize',
-          'backgroundColor',
-          'cursor',
-          'animation',
-        ].includes(r)
-      ? (e) => (
-          typeof e == 'function' && (e = e({})),
-          Array.isArray(e) && (e = e.join(', ')),
-          e
-        )
-      : ['gridTemplateColumns', 'gridTemplateRows', 'objectPosition'].includes(
-          r
-        )
-      ? (e) => (
-          typeof e == 'function' && (e = e({})),
-          typeof e == 'string' && (e = ee.list.comma(e).join(' ')),
-          e
-        )
-      : (e, t = {}) => (typeof e == 'function' && (e = e(t)), e);
+        ? (e) => {
+            typeof e == 'function' && (e = e({}));
+            let t = Array.isArray(e) && ke(e[1]) ? e[0] : e;
+            return Array.isArray(t) ? t.join(', ') : t;
+          }
+        : [
+              'boxShadow',
+              'transitionProperty',
+              'transitionDuration',
+              'transitionDelay',
+              'transitionTimingFunction',
+              'backgroundImage',
+              'backgroundSize',
+              'backgroundColor',
+              'cursor',
+              'animation',
+            ].includes(r)
+          ? (e) => (
+              typeof e == 'function' && (e = e({})),
+              Array.isArray(e) && (e = e.join(', ')),
+              e
+            )
+          : [
+                'gridTemplateColumns',
+                'gridTemplateRows',
+                'objectPosition',
+              ].includes(r)
+            ? (e) => (
+                typeof e == 'function' && (e = e({})),
+                typeof e == 'string' && (e = ee.list.comma(e).join(' ')),
+                e
+              )
+            : (e, t = {}) => (typeof e == 'function' && (e = e(t)), e);
   }
   var Ci = P(() => {
     u();
@@ -9945,8 +9954,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             ? e.error('Missed semicolon')
             : i
           : e
-          ? e.error(i.message)
-          : i;
+            ? e.error(i.message)
+            : i;
       }
       return t.at(0);
     }
@@ -9956,10 +9965,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         r.each((i) => {
           if (i.type === 'nesting') {
             let n = e.clone({});
-            i.value !== '&'
+            (i.value !== '&'
               ? i.replaceWith(Ao(i.value.replace('&', n.toString())))
               : i.replaceWith(n),
-              (t = !0);
+              (t = !0));
           } else 'nodes' in i && i.nodes && $d(i, e) && (t = !0);
         }),
         t
@@ -9973,14 +9982,14 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           e.selectors.forEach((s) => {
             if (!s) return;
             let a = Ao(s, e);
-            $d(a, n) ||
+            ($d(a, n) ||
               (a.prepend(
                 qd.combinator({
                   value: ' ',
-                })
+                }),
               ),
               a.prepend(n.clone({}))),
-              t.push(a.toString());
+              t.push(a.toString()));
           });
         }),
         t
@@ -9990,7 +9999,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       let t = r.prev();
       for (e.after(r); t && t.type === 'comment'; ) {
         let i = t.prev();
-        e.after(t), (t = i);
+        (e.after(t), (t = i));
       }
       return r;
     }
@@ -10002,10 +10011,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             o.type === 'rule' && n
               ? s && (o.selectors = Ld(t, o))
               : o.type === 'atrule' && o.nodes
-              ? r[o.name]
-                ? e(t, o, s)
-                : i[_o] !== !1 && a.push(o)
-              : a.push(o);
+                ? r[o.name]
+                  ? e(t, o, s)
+                  : i[_o] !== !1 && a.push(o)
+                : a.push(o);
           }),
           n && a.length)
         ) {
@@ -10022,7 +10031,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         nodes: [],
         selector: r,
       });
-      return i.append(e), t.after(i), i;
+      return (i.append(e), t.after(i), i);
     }
     function Md(r, e) {
       let t = {};
@@ -10045,7 +10054,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             t[2]
               .trim()
               .split(/\s+/)
-              .map((a) => [a, !0])
+              .map((a) => [a, !0]),
           );
         if (i && n.all)
           return {
@@ -10067,7 +10076,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     function BC(r) {
       let e = [],
         t = r.parent;
-      for (; t && t instanceof LC; ) e.push(t), (t = t.parent);
+      for (; t && t instanceof LC; ) (e.push(t), (t = t.parent));
       return e;
     }
     function FC(r) {
@@ -10083,32 +10092,32 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           l = BC(r);
         if (
           (l.forEach((c, f) => {
-            if (e(c.name)) (i = c), (n = f), (a = o);
+            if (e(c.name)) ((i = c), (n = f), (a = o));
             else {
               let d = o;
-              (o = c.clone({
+              ((o = c.clone({
                 nodes: [],
               })),
                 d && o.append(d),
-                (s = s || o);
+                (s = s || o));
             }
           }),
           i ? (a ? (s.append(t), i.after(a)) : i.after(t)) : r.after(t),
           r.next() && i)
         ) {
           let c;
-          l.slice(0, n + 1).forEach((f, d, p) => {
+          (l.slice(0, n + 1).forEach((f, d, p) => {
             let h = c;
-            (c = f.clone({
+            ((c = f.clone({
               nodes: [],
             })),
-              h && c.append(h);
+              h && c.append(h));
             let b = [],
               y = (p[d - 1] || r).next();
-            for (; y; ) b.push(y), (y = y.next());
+            for (; y; ) (b.push(y), (y = y.next()));
             c.append(b);
           }),
-            c && (a || t[t.length - 1]).after(c);
+            c && (a || t[t.length - 1]).after(c));
         }
       }
       r.remove();
@@ -10125,15 +10134,15 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           nodes: r.nodes,
           selector: i,
         });
-        r.removeAll(), r.append(s);
+        (r.removeAll(), r.append(s));
       }
-      (r[Nd] = t), (r[_o] = t ? !t('all') : n === 'noop');
+      ((r[Nd] = t), (r[_o] = t ? !t('all') : n === 'noop'));
     }
     var Eo = Symbol('hasRootRule');
     Oo.exports = (r = {}) => {
       let e = Md(
           ['media', 'supports', 'layer', 'container', 'starting-style'],
-          r.bubble
+          r.bubble,
         ),
         t = MC(e),
         i = Md(
@@ -10144,14 +10153,14 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             '-webkit-keyframes',
             '-moz-keyframes',
           ],
-          r.unwrap
+          r.unwrap,
         ),
         n = (r.rootRuleName || 'at-root').replace(/^@/, ''),
         s = r.preserveEmpty;
       return {
         Once(a) {
           a.walkAtRules(n, (o) => {
-            jC(o), (a[Eo] = !0);
+            (jC(o), (a[Eo] = !0));
           });
         },
         postcssPlugin: 'postcss-nested',
@@ -10163,7 +10172,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             l = a,
             c = !1,
             f = [];
-          a.each((d) => {
+          (a.each((d) => {
             d.type === 'rule'
               ? (f.length && ((l = Co(a.selector, f, l)), (f = [])),
                 (c = !0),
@@ -10171,20 +10180,20 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 (d.selectors = Ld(a, d)),
                 (l = Hn(d, l)))
               : d.type === 'atrule'
-              ? (f.length && ((l = Co(a.selector, f, l)), (f = [])),
-                d.name === n
-                  ? ((o = !0), t(a, d, !0, d[_o]), (l = Hn(d, l)))
-                  : e[d.name]
-                  ? ((c = !0), (o = !0), t(a, d, !0), (l = Hn(d, l)))
-                  : i[d.name]
-                  ? ((c = !0), (o = !0), t(a, d, !1), (l = Hn(d, l)))
-                  : c && f.push(d))
-              : d.type === 'decl' && c && f.push(d);
+                ? (f.length && ((l = Co(a.selector, f, l)), (f = [])),
+                  d.name === n
+                    ? ((o = !0), t(a, d, !0, d[_o]), (l = Hn(d, l)))
+                    : e[d.name]
+                      ? ((c = !0), (o = !0), t(a, d, !0), (l = Hn(d, l)))
+                      : i[d.name]
+                        ? ((c = !0), (o = !0), t(a, d, !1), (l = Hn(d, l)))
+                        : c && f.push(d))
+                : d.type === 'decl' && c && f.push(d);
           }),
             f.length && (l = Co(a.selector, f, l)),
             o &&
               s !== !0 &&
-              ((a.raws.semicolon = !0), a.nodes.length === 0 && a.remove());
+              ((a.raws.semicolon = !0), a.nodes.length === 0 && a.remove()));
         },
       };
     };
@@ -10200,8 +10209,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         r === 'float'
           ? 'cssFloat'
           : r.startsWith('-ms-')
-          ? r.substr(1).replace(Fd, jd)
-          : r.replace(Fd, jd)
+            ? r.substr(1).replace(Fd, jd)
+            : r.replace(Fd, jd)
       );
     zd.exports = zC;
   });
@@ -10241,13 +10250,13 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       return (
         r.each((i) => {
           if (i.type === 'atrule')
-            (e = '@' + i.name),
+            ((e = '@' + i.name),
               i.params && (e += ' ' + i.params),
               typeof t[e] == 'undefined'
                 ? (t[e] = To(i))
                 : Array.isArray(t[e])
-                ? t[e].push(To(i))
-                : (t[e] = [t[e], To(i)]);
+                  ? t[e].push(To(i))
+                  : (t[e] = [t[e], To(i)]));
           else if (i.type === 'rule') {
             let n = Ro(i);
             if (t[i.selector]) for (let s in n) t[i.selector][s] = n[s];
@@ -10258,13 +10267,13 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               ? (e = i.prop)
               : (e = UC(i.prop));
             let n = i.value;
-            !isNaN(i.value) && VC[e] && (n = parseFloat(i.value)),
+            (!isNaN(i.value) && VC[e] && (n = parseFloat(i.value)),
               i.important && (n += ' !important'),
               typeof t[e] == 'undefined'
                 ? (t[e] = n)
                 : Array.isArray(t[e])
-                ? t[e].push(n)
-                : (t[e] = [t[e], n]);
+                  ? t[e].push(n)
+                  : (t[e] = [t[e], n]));
           }
         }),
         t
@@ -10320,13 +10329,13 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 prop: e,
                 value: t,
                 important: !0,
-              })
+              }),
             ))
           : r.push(
               _i.decl({
                 prop: e,
                 value: t,
-              })
+              }),
             ));
     }
     function Gd(r, e, t) {
@@ -10334,7 +10343,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         name: e[1],
         params: e[3] || '',
       });
-      typeof t == 'object' && ((i.nodes = []), Io(t, i)), r.push(i);
+      (typeof t == 'object' && ((i.nodes = []), Io(t, i)), r.push(i));
     }
     function Io(r, e) {
       let t, i, n;
@@ -10356,7 +10365,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     }
     Qd.exports = function (r) {
       let e = _i.root();
-      return Io(r, e), e;
+      return (Io(r, e), e);
     };
   });
   var Do = x((jI, Yd) => {
@@ -10427,12 +10436,12 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     QI,
     ih = P(() => {
       u();
-      (or = pe(th())),
+      ((or = pe(th())),
         (rh = or.default),
         (HI = or.default.objectify),
         (WI = or.default.parse),
         (GI = or.default.async),
-        (QI = or.default.sync);
+        (QI = or.default.sync));
     });
   function lr(r) {
     return Array.isArray(r)
@@ -10444,7 +10453,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               }),
             ]).process(e, {
               parser: rh,
-            }).root.nodes
+            }).root.nodes,
         )
       : lr([r]);
   }
@@ -10474,7 +10483,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     });
   function Te(r) {
     let e = ah.default.className();
-    return (e.value = r), jt(e?.raws?.value ?? e.value);
+    return ((e.value = r), jt(e?.raws?.value ?? e.value));
   }
   var ah,
     fr = P(() => {
@@ -10492,12 +10501,12 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     return e === 'DEFAULT'
       ? r
       : e === '-' || e === '-DEFAULT'
-      ? `-${r}`
-      : e.startsWith('-')
-      ? `-${r}${e}`
-      : e.startsWith('/')
-      ? `${r}${e}`
-      : `${r}-${e}`;
+        ? `-${r}`
+        : e.startsWith('-')
+          ? `-${r}${e}`
+          : e.startsWith('/')
+            ? `${r}${e}`
+            : `${r}-${e}`;
   }
   var Lo = P(() => {
     u();
@@ -10523,19 +10532,19 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                         : Object.assign(h, {
                             [b]: n(p),
                           }),
-                    {}
+                    {},
                   ),
               }),
-            {}
+            {},
           ),
           {
             ...i,
             values: t
               ? Object.fromEntries(
-                  Object.entries(a(r) ?? {}).filter(([c]) => c !== 'DEFAULT')
+                  Object.entries(a(r) ?? {}).filter(([c]) => c !== 'DEFAULT'),
                 )
               : a(r),
-          }
+          },
         );
       }
     };
@@ -10557,7 +10566,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   i.max && `(max-width: ${i.max})`,
                 ]
                   .filter(Boolean)
-                  .join(' and ')
+                  .join(' and '),
           );
           return e.not ? `not all and ${t}` : t;
         })
@@ -10579,21 +10588,22 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         !a.has('DIRECTIONS') && n_.has(o)
           ? ((n.direction = o), a.add('DIRECTIONS'))
           : !a.has('PLAY_STATES') && s_.has(o)
-          ? ((n.playState = o), a.add('PLAY_STATES'))
-          : !a.has('FILL_MODES') && a_.has(o)
-          ? ((n.fillMode = o), a.add('FILL_MODES'))
-          : !a.has('ITERATION_COUNTS') && (o_.has(o) || p_.test(o))
-          ? ((n.iterationCount = o), a.add('ITERATION_COUNTS'))
-          : (!a.has('TIMING_FUNCTION') && l_.has(o)) ||
-            (!a.has('TIMING_FUNCTION') && u_.some((l) => o.startsWith(`${l}(`)))
-          ? ((n.timingFunction = o), a.add('TIMING_FUNCTION'))
-          : !a.has('DURATION') && lh.test(o)
-          ? ((n.duration = o), a.add('DURATION'))
-          : !a.has('DELAY') && lh.test(o)
-          ? ((n.delay = o), a.add('DELAY'))
-          : a.has('NAME')
-          ? (n.unknown || (n.unknown = []), n.unknown.push(o))
-          : ((n.name = o), a.add('NAME'));
+            ? ((n.playState = o), a.add('PLAY_STATES'))
+            : !a.has('FILL_MODES') && a_.has(o)
+              ? ((n.fillMode = o), a.add('FILL_MODES'))
+              : !a.has('ITERATION_COUNTS') && (o_.has(o) || p_.test(o))
+                ? ((n.iterationCount = o), a.add('ITERATION_COUNTS'))
+                : (!a.has('TIMING_FUNCTION') && l_.has(o)) ||
+                    (!a.has('TIMING_FUNCTION') &&
+                      u_.some((l) => o.startsWith(`${l}(`)))
+                  ? ((n.timingFunction = o), a.add('TIMING_FUNCTION'))
+                  : !a.has('DURATION') && lh.test(o)
+                    ? ((n.duration = o), a.add('DURATION'))
+                    : !a.has('DELAY') && lh.test(o)
+                      ? ((n.delay = o), a.add('DELAY'))
+                      : a.has('NAME')
+                        ? (n.unknown || (n.unknown = []), n.unknown.push(o))
+                        : ((n.name = o), a.add('NAME'));
       return n;
     });
   }
@@ -10609,7 +10619,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     p_,
     uh = P(() => {
       u();
-      (n_ = new Set(['normal', 'reverse', 'alternate', 'alternate-reverse'])),
+      ((n_ = new Set(['normal', 'reverse', 'alternate', 'alternate-reverse'])),
         (s_ = new Set(['running', 'paused'])),
         (a_ = new Set(['none', 'forwards', 'backwards', 'both'])),
         (o_ = new Set(['infinite'])),
@@ -10626,13 +10636,13 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         (f_ = /\,(?![^(]*\))/g),
         (c_ = /\ +(?![^(]*\))/g),
         (lh = /^(-?[\d.]+m?s)$/),
-        (p_ = /^(\d+)$/);
+        (p_ = /^(\d+)$/));
     });
   var fh,
     xe,
     ch = P(() => {
       u();
-      (fh = (r) =>
+      ((fh = (r) =>
         Object.assign(
           {},
           ...Object.entries(r ?? {}).flatMap(([e, t]) =>
@@ -10644,10 +10654,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   {
                     [`${e}`]: t,
                   },
-                ]
-          )
+                ],
+          ),
         )),
-        (xe = fh);
+        (xe = fh));
     });
   var dh,
     ph = P(() => {
@@ -10684,16 +10694,16 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   ],
                 }
               : Array.isArray(n)
-              ? {
-                  name: i,
-                  not: !1,
-                  values: n.map((s) => mh(s)),
-                }
-              : {
-                  name: i,
-                  not: !1,
-                  values: [mh(n)],
-                }
+                ? {
+                    name: i,
+                    not: !1,
+                    values: n.map((s) => mh(s)),
+                  }
+                : {
+                    name: i,
+                    not: !1,
+                    values: [mh(n)],
+                  }
           );
         })
       : Rt(Object.entries(r ?? {}), !1);
@@ -10705,19 +10715,19 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           reason: 'multiple-values',
         }
       : r.values[0].raw !== void 0
-      ? {
-          result: !1,
-          reason: 'raw-values',
-        }
-      : r.values[0].min !== void 0 && r.values[0].max !== void 0
-      ? {
-          result: !1,
-          reason: 'min-and-max',
-        }
-      : {
-          result: !0,
-          reason: null,
-        };
+        ? {
+            result: !1,
+            reason: 'raw-values',
+          }
+        : r.values[0].min !== void 0 && r.values[0].max !== void 0
+          ? {
+              result: !1,
+              reason: 'min-and-max',
+            }
+          : {
+              result: !0,
+              reason: null,
+            };
   }
   function hh(r, e, t) {
     let i = Xn(e, r),
@@ -10726,24 +10736,24 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       a = Kn(n);
     if (s.reason === 'multiple-values' || a.reason === 'multiple-values')
       throw new Error(
-        'Attempted to sort a screen with multiple values. This should never happen. Please open a bug report.'
+        'Attempted to sort a screen with multiple values. This should never happen. Please open a bug report.',
       );
     if (s.reason === 'raw-values' || a.reason === 'raw-values')
       throw new Error(
-        'Attempted to sort a screen with raw values. This should never happen. Please open a bug report.'
+        'Attempted to sort a screen with raw values. This should never happen. Please open a bug report.',
       );
     if (s.reason === 'min-and-max' || a.reason === 'min-and-max')
       throw new Error(
-        'Attempted to sort a screen with both min and max values. This should never happen. Please open a bug report.'
+        'Attempted to sort a screen with both min and max values. This should never happen. Please open a bug report.',
       );
     let { min: o, max: l } = i.values[0],
       { min: c, max: f } = n.values[0];
-    e.not && ([o, l] = [l, o]),
+    (e.not && ([o, l] = [l, o]),
       t.not && ([c, f] = [f, c]),
       (o = o === void 0 ? o : parseFloat(o)),
       (l = l === void 0 ? l : parseFloat(l)),
       (c = c === void 0 ? c : parseFloat(c)),
-      (f = f === void 0 ? f : parseFloat(f));
+      (f = f === void 0 ? f : parseFloat(f)));
     let [d, p] = r === 'min' ? [o, c] : [f, l];
     return d - p;
   }
@@ -10812,16 +10822,17 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       ct();
       Br();
       Oi();
-      (se = {
+      ((se = {
         childVariant: ({ addVariant: r }) => {
           r('*', '& > *');
         },
         pseudoElementVariants: ({ addVariant: r }) => {
-          r('first-letter', '&::first-letter'),
+          (r('first-letter', '&::first-letter'),
             r('first-line', '&::first-line'),
             r('marker', [
               ({ container: e }) => (
-                Jn(e, ['--tw-text-opacity']), '& *::marker'
+                Jn(e, ['--tw-text-opacity']),
+                '& *::marker'
               ),
               ({ container: e }) => (Jn(e, ['--tw-text-opacity']), '&::marker'),
             ]),
@@ -10834,7 +10845,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               ({ container: e }) => (
                 e.walkRules((t) => {
                   let i = !1;
-                  t.walkDecls('content', () => {
+                  (t.walkDecls('content', () => {
                     i = !0;
                   }),
                     i ||
@@ -10842,18 +10853,18 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                         ee.decl({
                           prop: 'content',
                           value: 'var(--tw-content)',
-                        })
-                      );
+                        }),
+                      ));
                 }),
                 '&::before'
-              )
+              ),
             ),
             r(
               'after',
               ({ container: e }) => (
                 e.walkRules((t) => {
                   let i = !1;
-                  t.walkDecls('content', () => {
+                  (t.walkDecls('content', () => {
                     i = !0;
                   }),
                     i ||
@@ -10861,12 +10872,12 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                         ee.decl({
                           prop: 'content',
                           value: 'var(--tw-content)',
-                        })
-                      );
+                        }),
+                      ));
                 }),
                 '&::after'
-              )
-            );
+              ),
+            ));
         },
         pseudoClassVariants: ({
           addVariant: r,
@@ -10949,8 +10960,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   w === '&'
                     ? (h = y)
                     : w === "'" || w === '"'
-                    ? (v += 1)
-                    : h !== null && w === ' ' && !v && (b = y);
+                      ? (v += 1)
+                      : h !== null && w === ' ' && !v && (b = y);
                 }
                 return (
                   h !== null && b === null && (b = f.length),
@@ -10962,16 +10973,16 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 [Pt]: {
                   respectPrefix: !1,
                 },
-              }
+              },
             );
         },
         directionVariants: ({ addVariant: r }) => {
-          r('ltr', '&:where([dir="ltr"], [dir="ltr"] *)'),
-            r('rtl', '&:where([dir="rtl"], [dir="rtl"] *)');
+          (r('ltr', '&:where([dir="ltr"], [dir="ltr"] *)'),
+            r('rtl', '&:where([dir="rtl"], [dir="rtl"] *)'));
         },
         reducedMotionVariants: ({ addVariant: r }) => {
-          r('motion-safe', '@media (prefers-reduced-motion: no-preference)'),
-            r('motion-reduce', '@media (prefers-reduced-motion: reduce)');
+          (r('motion-safe', '@media (prefers-reduced-motion: no-preference)'),
+            r('motion-reduce', '@media (prefers-reduced-motion: reduce)'));
         },
         darkVariants: ({ config: r, addVariant: e }) => {
           let [t, i = '.dark'] = [].concat(r('darkMode', 'media'));
@@ -11010,10 +11021,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           t === 'selector'
             ? e('dark', `&:where(${i}, ${i} *)`)
             : t === 'media'
-            ? e('dark', '@media (prefers-color-scheme: dark)')
-            : t === 'variant'
-            ? e('dark', i)
-            : t === 'class' && e('dark', `&:is(${i} *)`);
+              ? e('dark', '@media (prefers-color-scheme: dark)')
+              : t === 'variant'
+                ? e('dark', i)
+                : t === 'class' && e('dark', `&:is(${i} *)`);
         },
         printVariant: ({ addVariant: r }) => {
           r('print', '@media print');
@@ -11030,9 +11041,9 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             w !== void 0 && a.add(o(w));
           }
           function c(w) {
-            return l(w), a.size === 1;
+            return (l(w), a.size === 1);
           }
-          for (let w of s) for (let k of w.values) l(k.min), l(k.max);
+          for (let w of s) for (let k of w.values) (l(k.min), l(k.max));
           let f = a.size <= 1;
           function d(w) {
             return Object.fromEntries(
@@ -11053,7 +11064,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                       not: !k.not,
                     };
                 })
-                .map((k) => [k.name, k])
+                .map((k) => [k.name, k]),
             );
           }
           function p(w) {
@@ -11122,11 +11133,11 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             },
             {
               values: e('supports') ?? {},
-            }
+            },
           );
         },
         hasVariants: ({ matchVariant: r, prefix: e }) => {
-          r('has', (t) => `&:has(${K(t)})`, {
+          (r('has', (t) => `&:has(${K(t)})`, {
             values: {},
             [Pt]: {
               respectPrefix: !1,
@@ -11143,7 +11154,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 [Pt]: {
                   respectPrefix: !1,
                 },
-              }
+              },
             ),
             r(
               'peer-has',
@@ -11156,11 +11167,11 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 [Pt]: {
                   respectPrefix: !1,
                 },
-              }
-            );
+              },
+            ));
         },
         ariaVariants: ({ matchVariant: r, theme: e }) => {
-          r('aria', (t) => `&[aria-${Ye(K(t))}]`, {
+          (r('aria', (t) => `&[aria-${Ye(K(t))}]`, {
             values: e('aria') ?? {},
           }),
             r(
@@ -11171,7 +11182,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   : `:merge(.group)[aria-${Ye(K(t))}] &`,
               {
                 values: e('aria') ?? {},
-              }
+              },
             ),
             r(
               'peer-aria',
@@ -11181,11 +11192,11 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   : `:merge(.peer)[aria-${Ye(K(t))}] ~ &`,
               {
                 values: e('aria') ?? {},
-              }
-            );
+              },
+            ));
         },
         dataVariants: ({ matchVariant: r, theme: e }) => {
-          r('data', (t) => `&[data-${Ye(K(t))}]`, {
+          (r('data', (t) => `&[data-${Ye(K(t))}]`, {
             values: e('data') ?? {},
           }),
             r(
@@ -11196,7 +11207,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   : `:merge(.group)[data-${Ye(K(t))}] &`,
               {
                 values: e('data') ?? {},
-              }
+              },
             ),
             r(
               'peer-data',
@@ -11206,16 +11217,16 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   : `:merge(.peer)[data-${Ye(K(t))}] ~ &`,
               {
                 values: e('data') ?? {},
-              }
-            );
+              },
+            ));
         },
         orientationVariants: ({ addVariant: r }) => {
-          r('portrait', '@media (orientation: portrait)'),
-            r('landscape', '@media (orientation: landscape)');
+          (r('portrait', '@media (orientation: portrait)'),
+            r('landscape', '@media (orientation: landscape)'));
         },
         prefersContrastVariants: ({ addVariant: r }) => {
-          r('contrast-more', '@media (prefers-contrast: more)'),
-            r('contrast-less', '@media (prefers-contrast: less)');
+          (r('contrast-more', '@media (prefers-contrast: more)'),
+            r('contrast-less', '@media (prefers-contrast: less)'));
         },
         forcedColorsVariants: ({ addVariant: r }) => {
           r('forced-colors', '@media (forced-colors: active)');
@@ -11254,7 +11265,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         (yh = {
           preflight: ({ addBase: r }) => {
             let e = ee.parse(
-              `*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:theme('borderColor.DEFAULT', currentColor)}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:theme('fontFamily.sans', ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji");font-feature-settings:theme('fontFamily.sans[1].fontFeatureSettings', normal);font-variation-settings:theme('fontFamily.sans[1].fontVariationSettings', normal);-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:theme('fontFamily.mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace);font-feature-settings:theme('fontFamily.mono[1].fontFeatureSettings', normal);font-variation-settings:theme('fontFamily.mono[1].fontVariationSettings', normal);font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:theme('colors.gray.4', #9ca3af)}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}`
+              `*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:theme('borderColor.DEFAULT', currentColor)}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:theme('fontFamily.sans', ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji");font-feature-settings:theme('fontFamily.sans[1].fontFeatureSettings', normal);font-variation-settings:theme('fontFamily.sans[1].fontVariationSettings', normal);-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:theme('fontFamily.mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace);font-feature-settings:theme('fontFamily.mono[1].fontFeatureSettings', normal);font-variation-settings:theme('fontFamily.mono[1].fontVariationSettings', normal);font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:theme('colors.gray.4', #9ca3af)}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}`,
             );
             r([
               ee.comment({
@@ -11310,7 +11321,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                     : {};
                 },
                 l = Array.from(
-                  new Set(s.slice().sort((c, f) => parseInt(c) - parseInt(f)))
+                  new Set(s.slice().sort((c, f) => parseInt(c) - parseInt(f))),
                 ).map((c) => ({
                   [`@media (min-width: ${c})`]: {
                     '.container': {
@@ -11331,7 +11342,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                           marginLeft: 'auto',
                         }
                       : {},
-                    o(0)
+                    o(0),
                   ),
                 },
                 ...l,
@@ -11424,7 +11435,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             ],
             {
               supportsNegativeValues: !0,
-            }
+            },
           ),
           isolation: ({ addUtilities: r }) => {
             r({
@@ -11448,7 +11459,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             [['col-start', ['gridColumnStart']]],
             {
               supportsNegativeValues: !0,
-            }
+            },
           ),
           gridColumnEnd: L('gridColumnEnd', [['col-end', ['gridColumnEnd']]], {
             supportsNegativeValues: !0,
@@ -11520,7 +11531,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             ],
             {
               supportsNegativeValues: !0,
-            }
+            },
           ),
           boxSizing: ({ addUtilities: r }) => {
             r({
@@ -11533,7 +11544,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             });
           },
           lineClamp: ({ matchUtilities: r, addUtilities: e, theme: t }) => {
-            r(
+            (r(
               {
                 'line-clamp': (i) => ({
                   overflow: 'hidden',
@@ -11544,7 +11555,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               },
               {
                 values: t('lineClamp'),
-              }
+              },
             ),
               e({
                 '.line-clamp-none': {
@@ -11553,7 +11564,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   '-webkit-box-orient': 'horizontal',
                   '-webkit-line-clamp': 'none',
                 },
-              });
+              }));
           },
           display: ({ addUtilities: r }) => {
             r({
@@ -11671,7 +11682,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             });
           },
           borderSpacing: ({ addDefaults: r, matchUtilities: e, theme: t }) => {
-            r('border-spacing', {
+            (r('border-spacing', {
               '--tw-border-spacing-x': 0,
               '--tw-border-spacing-y': 0,
             }),
@@ -11699,8 +11710,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 },
                 {
                   values: t('borderSpacing'),
-                }
-              );
+                },
+              ));
           },
           transformOrigin: L('transformOrigin', [
             ['origin', ['transformOrigin']],
@@ -11729,7 +11740,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             ],
             {
               supportsNegativeValues: !0,
-            }
+            },
           ),
           rotate: L(
             'rotate',
@@ -11741,7 +11752,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             ],
             {
               supportsNegativeValues: !0,
-            }
+            },
           ),
           skew: L(
             'skew',
@@ -11767,7 +11778,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             ],
             {
               supportsNegativeValues: !0,
-            }
+            },
           ),
           scale: L(
             'scale',
@@ -11802,10 +11813,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             ],
             {
               supportsNegativeValues: !0,
-            }
+            },
           ),
           transform: ({ addDefaults: r, addUtilities: e }) => {
-            r('transform', {
+            (r('transform', {
               '--tw-translate-x': '0',
               '--tw-translate-y': '0',
               '--tw-rotate': '0',
@@ -11825,13 +11836,13 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 '.transform-gpu': {
                   transform: Xe.replace(
                     'translate(var(--tw-translate-x), var(--tw-translate-y))',
-                    'translate3d(var(--tw-translate-x), var(--tw-translate-y), 0)'
+                    'translate3d(var(--tw-translate-x), var(--tw-translate-y), 0)',
                   ),
                 },
                 '.transform-none': {
                   transform: 'none',
                 },
-              });
+              }));
           },
           animation: ({ matchUtilities: r, theme: e, config: t }) => {
             let i = (s) => Te(t('prefix') + s),
@@ -11841,7 +11852,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   {
                     [`@keyframes ${i(s)}`]: a,
                   },
-                ])
+                ]),
               );
             r(
               {
@@ -11854,7 +11865,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                         .map(({ name: o, value: l }) =>
                           o === void 0 || n[o] === void 0
                             ? l
-                            : l.replace(o, i(o))
+                            : l.replace(o, i(o)),
                         )
                         .join(', '),
                     },
@@ -11863,7 +11874,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               },
               {
                 values: e('animation'),
-              }
+              },
             );
           },
           cursor: L('cursor'),
@@ -11954,7 +11965,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             });
           },
           scrollSnapType: ({ addDefaults: r, addUtilities: e }) => {
-            r('scroll-snap-type', {
+            (r('scroll-snap-type', {
               '--tw-scroll-snap-strictness': 'proximity',
             }),
               e({
@@ -11979,7 +11990,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 '.snap-proximity': {
                   '--tw-scroll-snap-strictness': 'proximity',
                 },
-              });
+              }));
           },
           scrollSnapAlign: ({ addUtilities: r }) => {
             r({
@@ -12026,7 +12037,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             ],
             {
               supportsNegativeValues: !0,
-            }
+            },
           ),
           scrollPadding: L('scrollPadding', [
             ['scroll-p', ['scroll-padding']],
@@ -12347,7 +12358,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             ],
           ]),
           space: ({ matchUtilities: r, addUtilities: e, theme: t }) => {
-            r(
+            (r(
               {
                 'space-x': (i) => (
                   (i = i === '0' ? '0px' : i),
@@ -12373,7 +12384,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               {
                 values: t('space'),
                 supportsNegativeValues: !0,
-              }
+              },
             ),
               e({
                 '.space-y-reverse > :not([hidden]) ~ :not([hidden])': {
@@ -12382,10 +12393,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 '.space-x-reverse > :not([hidden]) ~ :not([hidden])': {
                   '--tw-space-x-reverse': '1',
                 },
-              });
+              }));
           },
           divideWidth: ({ matchUtilities: r, addUtilities: e, theme: t }) => {
-            r(
+            (r(
               {
                 'divide-x': (i) => (
                   (i = i === '0' ? '0px' : i),
@@ -12413,7 +12424,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               {
                 values: t('divideWidth'),
                 type: ['line-width', 'length', 'any'],
-              }
+              },
             ),
               e({
                 '.divide-y-reverse > :not([hidden]) ~ :not([hidden])': {
@@ -12424,7 +12435,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   '@defaults border-width': {},
                   '--tw-divide-x-reverse': '1',
                 },
-              });
+              }));
           },
           divideStyle: ({ addUtilities: r }) => {
             r({
@@ -12466,7 +12477,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               {
                 values: (({ DEFAULT: i, ...n }) => n)(xe(e('divideColor'))),
                 type: ['color', 'any'],
-              }
+              },
             );
           },
           divideOpacity: ({ matchUtilities: r, theme: e }) => {
@@ -12480,7 +12491,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               },
               {
                 values: e('divideOpacity'),
-              }
+              },
             );
           },
           placeSelf: ({ addUtilities: r }) => {
@@ -12809,7 +12820,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             ],
             {
               type: ['line-width', 'length'],
-            }
+            },
           ),
           borderStyle: ({ addUtilities: r }) => {
             r({
@@ -12834,7 +12845,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             });
           },
           borderColor: ({ matchUtilities: r, theme: e, corePlugins: t }) => {
-            r(
+            (r(
               {
                 border: (i) =>
                   t('borderOpacity')
@@ -12850,7 +12861,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               {
                 values: (({ DEFAULT: i, ...n }) => n)(xe(e('borderColor'))),
                 type: ['color', 'any'],
-              }
+              },
             ),
               r(
                 {
@@ -12880,7 +12891,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 {
                   values: (({ DEFAULT: i, ...n }) => n)(xe(e('borderColor'))),
                   type: ['color', 'any'],
-                }
+                },
               ),
               r(
                 {
@@ -12948,8 +12959,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 {
                   values: (({ DEFAULT: i, ...n }) => n)(xe(e('borderColor'))),
                   type: ['color', 'any'],
-                }
-              );
+                },
+              ));
           },
           borderOpacity: L('borderOpacity', [
             ['border-opacity', ['--tw-border-opacity']],
@@ -12975,7 +12986,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               {
                 values: xe(e('backgroundColor')),
                 type: ['color', 'any'],
-              }
+              },
             );
           },
           backgroundOpacity: L('backgroundOpacity', [
@@ -12986,7 +12997,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             [['bg', ['background-image']]],
             {
               type: ['lookup', 'image', 'url'],
-            }
+            },
           ),
           gradientColorStops: (() => {
             function r(e) {
@@ -13006,14 +13017,14 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   values: t('gradientColorStopPositions'),
                   type: ['length', 'percentage'],
                 };
-              e(
+              (e(
                 {
                   from: (a) => {
                     let o = r(a);
                     return {
                       '@defaults gradient-color-stops': {},
                       '--tw-gradient-from': `${X(
-                        a
+                        a,
                       )} var(--tw-gradient-from-position)`,
                       '--tw-gradient-to': `${o} var(--tw-gradient-to-position)`,
                       '--tw-gradient-stops':
@@ -13021,7 +13032,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                     };
                   },
                 },
-                n
+                n,
               ),
                 e(
                   {
@@ -13029,7 +13040,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                       '--tw-gradient-from-position': a,
                     }),
                   },
-                  s
+                  s,
                 ),
                 e(
                   {
@@ -13039,12 +13050,12 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                         '@defaults gradient-color-stops': {},
                         '--tw-gradient-to': `${o}  var(--tw-gradient-to-position)`,
                         '--tw-gradient-stops': `var(--tw-gradient-from), ${X(
-                          a
+                          a,
                         )} var(--tw-gradient-via-position), var(--tw-gradient-to)`,
                       };
                     },
                   },
-                  n
+                  n,
                 ),
                 e(
                   {
@@ -13052,18 +13063,18 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                       '--tw-gradient-via-position': a,
                     }),
                   },
-                  s
+                  s,
                 ),
                 e(
                   {
                     to: (a) => ({
                       '@defaults gradient-color-stops': {},
                       '--tw-gradient-to': `${X(
-                        a
+                        a,
                       )} var(--tw-gradient-to-position)`,
                     }),
                   },
-                  n
+                  n,
                 ),
                 e(
                   {
@@ -13071,8 +13082,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                       '--tw-gradient-to-position': a,
                     }),
                   },
-                  s
-                );
+                  s,
+                ));
             };
           })(),
           boxDecorationBreak: ({ addUtilities: r }) => {
@@ -13136,7 +13147,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   },
                 ],
               ],
-            }
+            },
           ),
           backgroundRepeat: ({ addUtilities: r }) => {
             r({
@@ -13183,7 +13194,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               {
                 values: xe(e('fill')),
                 type: ['color', 'any'],
-              }
+              },
             );
           },
           stroke: ({ matchUtilities: r, theme: e }) => {
@@ -13196,7 +13207,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               {
                 values: xe(e('stroke')),
                 type: ['color', 'url', 'any'],
-              }
+              },
             );
           },
           strokeWidth: L('strokeWidth', [['stroke', ['stroke-width']]], {
@@ -13265,7 +13276,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             supportsNegativeValues: !0,
           }),
           verticalAlign: ({ addUtilities: r, matchUtilities: e }) => {
-            r({
+            (r({
               '.align-baseline': {
                 'vertical-align': 'baseline',
               },
@@ -13295,7 +13306,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 align: (t) => ({
                   'vertical-align': t,
                 }),
-              });
+              }));
           },
           fontFamily: ({ matchUtilities: r, theme: e }) => {
             r(
@@ -13321,7 +13332,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               {
                 values: e('fontFamily'),
                 type: ['lookup', 'generic-name', 'family-name'],
-              }
+              },
             );
           },
           fontSize: ({ matchUtilities: r, theme: e }) => {
@@ -13372,7 +13383,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   'length',
                   'percentage',
                 ],
-              }
+              },
             );
           },
           fontWeight: L('fontWeight', [['font', ['fontWeight']]], {
@@ -13407,7 +13418,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           fontVariantNumeric: ({ addDefaults: r, addUtilities: e }) => {
             let t =
               'var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)';
-            r('font-variant-numeric', {
+            (r('font-variant-numeric', {
               '--tw-ordinal': ' ',
               '--tw-slashed-zero': ' ',
               '--tw-numeric-figure': ' ',
@@ -13458,7 +13469,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   '--tw-numeric-fraction': 'stacked-fractions',
                   'font-variant-numeric': t,
                 },
-              });
+              }));
           },
           lineHeight: L('lineHeight', [['leading', ['lineHeight']]]),
           letterSpacing: L('letterSpacing', [['tracking', ['letterSpacing']]], {
@@ -13481,7 +13492,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               {
                 values: xe(e('textColor')),
                 type: ['color', 'any'],
-              }
+              },
             );
           },
           textOpacity: L('textOpacity', [
@@ -13513,7 +13524,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               {
                 values: xe(e('textDecorationColor')),
                 type: ['color', 'any'],
-              }
+              },
             );
           },
           textDecorationStyle: ({ addUtilities: r }) => {
@@ -13540,14 +13551,14 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             [['decoration', ['text-decoration-thickness']]],
             {
               type: ['length', 'percentage'],
-            }
+            },
           ),
           textUnderlineOffset: L(
             'textUnderlineOffset',
             [['underline-offset', ['text-underline-offset']]],
             {
               type: ['length', 'percentage', 'any'],
-            }
+            },
           ),
           fontSmoothing: ({ addUtilities: r }) => {
             r({
@@ -13586,7 +13597,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               {
                 values: xe(e('placeholderColor')),
                 type: ['color', 'any'],
-              }
+              },
             );
           },
           placeholderOpacity: ({ matchUtilities: r, theme: e }) => {
@@ -13600,7 +13611,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               },
               {
                 values: e('placeholderOpacity'),
-              }
+              },
             );
           },
           caretColor: ({ matchUtilities: r, theme: e }) => {
@@ -13613,7 +13624,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               {
                 values: xe(e('caretColor')),
                 type: ['color', 'any'],
-              }
+              },
             );
           },
           accentColor: ({ matchUtilities: r, theme: e }) => {
@@ -13626,7 +13637,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               {
                 values: xe(e('accentColor')),
                 type: ['color', 'any'],
-              }
+              },
             );
           },
           opacity: L('opacity', [['opacity', ['opacity']]]),
@@ -13748,7 +13759,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 'var(--tw-shadow)',
               ].join(', ');
             return function ({ matchUtilities: t, addDefaults: i, theme: n }) {
-              i('box-shadow', {
+              (i('box-shadow', {
                 '--tw-ring-offset-shadow': '0 0 #0000',
                 '--tw-ring-shadow': '0 0 #0000',
                 '--tw-shadow': '0 0 #0000',
@@ -13773,8 +13784,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   {
                     values: n('boxShadow'),
                     type: ['shadow'],
-                  }
-                );
+                  },
+                ));
             };
           })(),
           boxShadowColor: ({ matchUtilities: r, theme: e }) => {
@@ -13788,7 +13799,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               {
                 values: xe(e('boxShadowColor')),
                 type: ['color', 'any'],
-              }
+              },
             );
           },
           outlineStyle: ({ addUtilities: r }) => {
@@ -13820,7 +13831,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             {
               type: ['length', 'number', 'percentage', 'any'],
               supportsNegativeValues: !0,
-            }
+            },
           ),
           outlineColor: ({ matchUtilities: r, theme: e }) => {
             r(
@@ -13832,7 +13843,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               {
                 values: xe(e('outlineColor')),
                 type: ['color', 'any'],
-              }
+              },
             );
           },
           ringWidth: ({
@@ -13850,7 +13861,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 ? Je(i('ringColor')?.DEFAULT, a, `rgb(147 197 253 / ${a})`)
                 : `rgb(147 197 253 / ${a})`;
             })();
-            e('ring-width', {
+            (e('ring-width', {
               '--tw-ring-inset': ' ',
               '--tw-ring-offset-width': i('ringOffsetWidth.DEFAULT', '0px'),
               '--tw-ring-offset-color': i('ringOffsetColor.DEFAULT', '#fff'),
@@ -13877,14 +13888,14 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 {
                   values: i('ringWidth'),
                   type: 'length',
-                }
+                },
               ),
               t({
                 '.ring-inset': {
                   '@defaults ring-width': {},
                   '--tw-ring-inset': 'inset',
                 },
-              });
+              }));
           },
           ringColor: ({ matchUtilities: r, theme: e, corePlugins: t }) => {
             r(
@@ -13903,11 +13914,11 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               {
                 values: Object.fromEntries(
                   Object.entries(xe(e('ringColor'))).filter(
-                    ([i]) => i !== 'DEFAULT'
-                  )
+                    ([i]) => i !== 'DEFAULT',
+                  ),
                 ),
                 type: ['color', 'any'],
-              }
+              },
             );
           },
           ringOpacity: (r) => {
@@ -13921,7 +13932,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             [['ring-offset', ['--tw-ring-offset-width']]],
             {
               type: 'length',
-            }
+            },
           ),
           ringOffsetColor: ({ matchUtilities: r, theme: e }) => {
             r(
@@ -13933,7 +13944,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               {
                 values: xe(e('ringOffsetColor')),
                 type: ['color', 'any'],
-              }
+              },
             );
           },
           blur: ({ matchUtilities: r, theme: e }) => {
@@ -13947,7 +13958,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               },
               {
                 values: e('blur'),
-              }
+              },
             );
           },
           brightness: ({ matchUtilities: r, theme: e }) => {
@@ -13961,7 +13972,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               },
               {
                 values: e('brightness'),
-              }
+              },
             );
           },
           contrast: ({ matchUtilities: r, theme: e }) => {
@@ -13975,7 +13986,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               },
               {
                 values: e('contrast'),
-              }
+              },
             );
           },
           dropShadow: ({ matchUtilities: r, theme: e }) => {
@@ -13991,7 +14002,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               },
               {
                 values: e('dropShadow'),
-              }
+              },
             );
           },
           grayscale: ({ matchUtilities: r, theme: e }) => {
@@ -14005,7 +14016,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               },
               {
                 values: e('grayscale'),
-              }
+              },
             );
           },
           hueRotate: ({ matchUtilities: r, theme: e }) => {
@@ -14020,7 +14031,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               {
                 values: e('hueRotate'),
                 supportsNegativeValues: !0,
-              }
+              },
             );
           },
           invert: ({ matchUtilities: r, theme: e }) => {
@@ -14034,7 +14045,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               },
               {
                 values: e('invert'),
-              }
+              },
             );
           },
           saturate: ({ matchUtilities: r, theme: e }) => {
@@ -14048,7 +14059,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               },
               {
                 values: e('saturate'),
-              }
+              },
             );
           },
           sepia: ({ matchUtilities: r, theme: e }) => {
@@ -14062,11 +14073,11 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               },
               {
                 values: e('sepia'),
-              }
+              },
             );
           },
           filter: ({ addDefaults: r, addUtilities: e }) => {
-            r('filter', {
+            (r('filter', {
               '--tw-blur': ' ',
               '--tw-brightness': ' ',
               '--tw-contrast': ' ',
@@ -14085,7 +14096,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 '.filter-none': {
                   filter: 'none',
                 },
-              });
+              }));
           },
           backdropBlur: ({ matchUtilities: r, theme: e }) => {
             r(
@@ -14099,7 +14110,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               },
               {
                 values: e('backdropBlur'),
-              }
+              },
             );
           },
           backdropBrightness: ({ matchUtilities: r, theme: e }) => {
@@ -14114,7 +14125,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               },
               {
                 values: e('backdropBrightness'),
-              }
+              },
             );
           },
           backdropContrast: ({ matchUtilities: r, theme: e }) => {
@@ -14129,7 +14140,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               },
               {
                 values: e('backdropContrast'),
-              }
+              },
             );
           },
           backdropGrayscale: ({ matchUtilities: r, theme: e }) => {
@@ -14144,7 +14155,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               },
               {
                 values: e('backdropGrayscale'),
-              }
+              },
             );
           },
           backdropHueRotate: ({ matchUtilities: r, theme: e }) => {
@@ -14160,7 +14171,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               {
                 values: e('backdropHueRotate'),
                 supportsNegativeValues: !0,
-              }
+              },
             );
           },
           backdropInvert: ({ matchUtilities: r, theme: e }) => {
@@ -14175,7 +14186,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               },
               {
                 values: e('backdropInvert'),
-              }
+              },
             );
           },
           backdropOpacity: ({ matchUtilities: r, theme: e }) => {
@@ -14190,7 +14201,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               },
               {
                 values: e('backdropOpacity'),
-              }
+              },
             );
           },
           backdropSaturate: ({ matchUtilities: r, theme: e }) => {
@@ -14205,7 +14216,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               },
               {
                 values: e('backdropSaturate'),
-              }
+              },
             );
           },
           backdropSepia: ({ matchUtilities: r, theme: e }) => {
@@ -14220,11 +14231,11 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               },
               {
                 values: e('backdropSepia'),
-              }
+              },
             );
           },
           backdropFilter: ({ addDefaults: r, addUtilities: e }) => {
-            r('backdrop-filter', {
+            (r('backdrop-filter', {
               '--tw-backdrop-blur': ' ',
               '--tw-backdrop-brightness': ' ',
               '--tw-backdrop-contrast': ' ',
@@ -14245,7 +14256,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   '-webkit-backdrop-filter': 'none',
                   'backdrop-filter': 'none',
                 },
-              });
+              }));
           },
           transitionProperty: ({ matchUtilities: r, theme: e }) => {
             let t = e('transitionTimingFunction.DEFAULT'),
@@ -14264,7 +14275,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               },
               {
                 values: e('transitionProperty'),
-              }
+              },
             );
           },
           transitionDelay: L('transitionDelay', [
@@ -14275,20 +14286,20 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             [['duration', ['transitionDuration']]],
             {
               filterDefault: !0,
-            }
+            },
           ),
           transitionTimingFunction: L(
             'transitionTimingFunction',
             [['ease', ['transitionTimingFunction']]],
             {
               filterDefault: !0,
-            }
+            },
           ),
           willChange: L('willChange', [['will-change', ['will-change']]]),
           contain: ({ addDefaults: r, addUtilities: e }) => {
             let t =
               'var(--tw-contain-size) var(--tw-contain-layout) var(--tw-contain-paint) var(--tw-contain-style)';
-            r('contain', {
+            (r('contain', {
               '--tw-contain-size': ' ',
               '--tw-contain-layout': ' ',
               '--tw-contain-paint': ' ',
@@ -14329,7 +14340,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   '--tw-contain-style': 'style',
                   contain: t,
                 },
-              });
+              }));
           },
           content: L('content', [
             ['content', ['--tw-content', ['content', 'var(--tw-content)']]],
@@ -14344,7 +14355,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               },
             });
           },
-        });
+        }));
     });
   function h_(r) {
     if (r === void 0) return !1;
@@ -14363,7 +14374,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     Ti,
     It = P(() => {
       u();
-      (Ze =
+      ((Ze =
         typeof m != 'undefined'
           ? {
               NODE_ENV: 'production',
@@ -14378,7 +14389,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         (es = new Map()),
         (No = new Map()),
         (gt = new String('*')),
-        (Ti = Symbol('__NONE__'));
+        (Ti = Symbol('__NONE__')));
     });
   function cr(r) {
     let e = [],
@@ -14403,13 +14414,13 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     m_,
     Bo = P(() => {
       u();
-      (xh = new Map([
+      ((xh = new Map([
         ['{', '}'],
         ['[', ']'],
         ['(', ')'],
       ])),
         (kh = new Map(Array.from(xh.entries()).map(([r, e]) => [e, r]))),
-        (m_ = new Set(['"', "'", '`']));
+        (m_ = new Set(['"', "'", '`'])));
     });
   function pr(r) {
     let [e] = Sh(r);
@@ -14424,16 +14435,16 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       t = null;
     for (let i of r.nodes)
       if (i.type === 'combinator')
-        (e = e.filter(([, n]) => jo(n).includes('jumpable'))), (t = null);
+        ((e = e.filter(([, n]) => jo(n).includes('jumpable'))), (t = null));
       else if (i.type === 'pseudo') {
         g_(i)
           ? ((t = i), e.push([r, i, null]))
           : t && y_(i, t)
-          ? e.push([r, i, t])
-          : (t = null);
+            ? e.push([r, i, t])
+            : (t = null);
         for (let n of i.nodes ?? []) {
           let [s, a] = Sh(n);
-          (t = a || t), e.push(...s);
+          ((t = a || t), e.push(...s));
         }
       }
     return [e, t];
@@ -14504,15 +14515,15 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         ],
       });
     for (let { ast: a } of n)
-      ([s, a] = w_(s, a)),
+      (([s, a] = w_(s, a)),
         a.walkNesting((o) => o.replaceWith(...s.nodes[0].nodes)),
-        (s = a);
+        (s = a));
     return s;
   }
   function _h(r) {
     let e = [];
     for (; r.prev() && r.prev().type !== 'combinator'; ) r = r.prev();
-    for (; r && r.type !== 'combinator'; ) e.push(r), (r = r.next());
+    for (; r && r.type !== 'combinator'; ) (e.push(r), (r = r.next()));
     return e;
   }
   function b_(r) {
@@ -14521,26 +14532,26 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         e.type === 'tag' && t.type === 'class'
           ? -1
           : e.type === 'class' && t.type === 'tag'
-          ? 1
-          : e.type === 'class' &&
-            t.type === 'pseudo' &&
-            t.value.startsWith('::')
-          ? -1
-          : e.type === 'pseudo' &&
-            e.value.startsWith('::') &&
-            t.type === 'class'
-          ? 1
-          : r.index(e) - r.index(t)
+            ? 1
+            : e.type === 'class' &&
+                t.type === 'pseudo' &&
+                t.value.startsWith('::')
+              ? -1
+              : e.type === 'pseudo' &&
+                  e.value.startsWith('::') &&
+                  t.type === 'class'
+                ? 1
+                : r.index(e) - r.index(t),
       ),
       r
     );
   }
   function Uo(r, e) {
     let t = !1;
-    r.walk((i) => {
-      if (i.type === 'class' && i.value === e) return (t = !0), !1;
+    (r.walk((i) => {
+      if (i.type === 'class' && i.value === e) return ((t = !0), !1);
     }),
-      t || r.remove();
+      t || r.remove());
   }
   function rs(r, e, { context: t, candidate: i, base: n }) {
     let s = t?.tailwindConfig?.separator ?? ':';
@@ -14579,21 +14590,21 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           return;
         }
         let h = _h(f);
-        d.insertBefore(h[0], l), d.insertAfter(h[h.length - 1], c);
+        (d.insertBefore(h[0], l), d.insertAfter(h[h.length - 1], c));
         for (let v of p) d.insertBefore(h[0], v.clone());
-        f.remove(), (h = _h(l));
+        (f.remove(), (h = _h(l)));
         let b = d.index(l);
-        d.nodes.splice(
+        (d.nodes.splice(
           b,
           h.length,
           ...b_(
             st.default.selector({
               nodes: h,
-            })
-          ).nodes
+            }),
+          ).nodes,
         ),
           l.remove(),
-          c.remove();
+          c.remove());
       }),
       a.walkPseudos((f) => {
         f.value === zo && f.replaceWith(f.nodes);
@@ -14619,17 +14630,17 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         if (!s) return;
         let a = [],
           o = i.next();
-        for (; o && o.type !== 'combinator'; ) a.push(o), (o = o.next());
+        for (; o && o.type !== 'combinator'; ) (a.push(o), (o = o.next()));
         let l = o;
-        s.pseudo.parent.insertAfter(
+        (s.pseudo.parent.insertAfter(
           s.pseudo,
           st.default.selector({
             nodes: a.map((c) => c.clone()),
-          })
+          }),
         ),
           i.remove(),
           a.forEach((c) => c.remove()),
-          l && l.type === 'combinator' && l.remove();
+          l && l.type === 'combinator' && l.remove());
       }),
       [r, e]
     );
@@ -14639,7 +14650,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     zo,
     Vo = P(() => {
       u();
-      (st = pe(it())), (Ch = pe(Pn()));
+      ((st = pe(it())), (Ch = pe(Pn())));
       fr();
       Gn();
       ts();
@@ -14650,14 +14661,14 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     let t = (0, Ho.default)().astSync(r);
     return (
       t.each((i) => {
-        i.nodes.some((s) => s.type === 'combinator') &&
+        (i.nodes.some((s) => s.type === 'combinator') &&
           (i.nodes = [
             Ho.default.pseudo({
               value: ':is',
               nodes: [i.clone()],
             }),
           ]),
-          pr(i);
+          pr(i));
       }),
       `${e} ${t.toString()}`
     );
@@ -14681,8 +14692,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         r[a - 1] === '-'
           ? (t = a - 1)
           : r[a - 1] === '/'
-          ? ((t = a - 1), (i = !0))
-          : (t = -1);
+            ? ((t = a - 1), (i = !0))
+            : (t = -1);
       } else
         e === 1 / 0 && r.includes('/')
           ? ((t = r.lastIndexOf('/')), (i = !0))
@@ -14690,7 +14701,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       if (t < 0) break;
       let n = r.slice(0, t),
         s = r.slice(i ? t : t + 1);
-      (e = t - 1), !(n === '' || s === '/') && (yield [n, s]);
+      ((e = t - 1), !(n === '' || s === '/') && (yield [n, s]));
     }
   }
   function k_(r, e) {
@@ -14702,11 +14713,11 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             nodes: [t[1].clone()],
           }),
           s = t[1].raws.tailwind.classCandidate;
-        n.walkRules((a) => {
+        (n.walkRules((a) => {
           let o = s.startsWith('-');
           a.selector = ur(e.tailwindConfig.prefix, a.selector, o);
         }),
-          (t[1] = n.nodes[0]);
+          (t[1] = n.nodes[0]));
       }
     }
     return r;
@@ -14723,13 +14734,13 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       let a = ee.root({
         nodes: [s.clone()],
       });
-      a.walkRules((o) => {
+      (a.walkRules((o) => {
         if (i(o)) return;
         let l = (0, ns.default)().astSync(o.selector);
-        l.each((c) => Uo(c, e)),
+        (l.each((c) => Uo(c, e)),
           Qf(l, (c) => (c === e ? `!${c}` : c)),
           (o.selector = l.toString()),
-          o.walkDecls((c) => (c.important = !0));
+          o.walkDecls((c) => (c.important = !0)));
       }),
         t.push([
           {
@@ -14737,7 +14748,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             important: !0,
           },
           a.nodes[0],
-        ]);
+        ]));
     }
     return t;
   }
@@ -14766,7 +14777,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         let [, s, a, o] = n;
         if (s === '@' && a === '-') return [];
         if (s !== '@' && a === '') return [];
-        (r = r.replace(`${a}[${o}]`, '')), (i.value = o);
+        ((r = r.replace(`${a}[${o}]`, '')), (i.value = o));
       }
     }
     if (Ko(r) && !t.variantMap.has(r)) {
@@ -14809,7 +14820,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                           return Go(N);
                         },
                         selector: N,
-                      })
+                      }),
                     ));
                 }),
                 v
@@ -14819,13 +14830,13 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             y = [],
             S = h({
               get container() {
-                return w(), v;
+                return (w(), v);
               },
               separator: t.tailwindConfig.separator,
               modifySelectors: k,
               wrap(T) {
                 let B = v.nodes;
-                v.removeAll(), T.append(B), v.append(T);
+                (v.removeAll(), T.append(B), v.append(T));
               },
               format(T) {
                 y.push({
@@ -14849,7 +14860,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             S === null)
           )
             continue;
-          v.raws.neededBackup &&
+          (v.raws.neededBackup &&
             (delete v.raws.neededBackup,
             v.walkRules((T) => {
               let B = T.raws.originalSelector;
@@ -14861,23 +14872,23 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                     Y.value = `${r}${t.tailwindConfig.separator}${Y.value}`;
                   });
                 }).processSync(B);
-              y.push({
+              (y.push({
                 format: N.replace(R, '&'),
                 respectPrefix: l,
               }),
-                (T.selector = B);
+                (T.selector = B));
             })),
             (v.nodes[0].raws.tailwind = {
               ...v.nodes[0].raws.tailwind,
               parentLayer: c.layer,
-            });
+            }));
           let E = [
             {
               ...c,
               sort: t.offsets.applyVariantOffset(
                 c.sort,
                 p,
-                Object.assign(i, t.variantOptions.get(r))
+                Object.assign(i, t.variantOptions.get(r)),
               ),
               collectedFormats: (c.collectedFormats ?? []).concat(y),
             },
@@ -14894,8 +14905,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     return !ke(r) && !Array.isArray(r)
       ? [[r], t]
       : Array.isArray(r)
-      ? Qo(r[0], e, r[1])
-      : (e.has(r) || e.set(r, lr(r)), [e.get(r), t]);
+        ? Qo(r[0], e, r[1])
+        : (e.has(r) || e.set(r, lr(r)), [e.get(r), t]);
   }
   function __(r) {
     return C_.test(r);
@@ -14913,7 +14924,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     let e = !0;
     return (
       r.walkDecls((t) => {
-        if (!Oh(t.prop, t.value)) return (e = !1), !1;
+        if (!Oh(t.prop, t.value)) return ((e = !1), !1);
       }),
       e
     );
@@ -14921,7 +14932,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
   function Oh(r, e) {
     if (E_(`${r}:${e}`)) return !1;
     try {
-      return ee.parse(`a{${r}:${e}}`).toResult(), !0;
+      return (ee.parse(`a{${r}:${e}}`).toResult(), !0);
     } catch (t) {
       return !1;
     }
@@ -14952,19 +14963,20 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       : null;
   }
   function* T_(r, e) {
-    e.candidateRuleMap.has(r) && (yield [e.candidateRuleMap.get(r), 'DEFAULT']),
+    (e.candidateRuleMap.has(r) &&
+      (yield [e.candidateRuleMap.get(r), 'DEFAULT']),
       yield* (function* (o) {
         o !== null && (yield [o, 'DEFAULT']);
-      })(O_(r, e));
+      })(O_(r, e)));
     let t = r,
       i = !1,
       n = e.tailwindConfig.prefix,
       s = n.length,
       a = t.startsWith(n) || t.startsWith(`-${n}`);
-    t[s] === '-' && a && ((i = !0), (t = n + t.slice(s + 1))),
+    (t[s] === '-' && a && ((i = !0), (t = n + t.slice(s + 1))),
       i &&
         e.candidateRuleMap.has(t) &&
-        (yield [e.candidateRuleMap.get(t), '-DEFAULT']);
+        (yield [e.candidateRuleMap.get(t), '-DEFAULT']));
     for (let [o, l] of x_(t))
       e.candidateRuleMap.has(o) &&
         (yield [e.candidateRuleMap.get(o), i ? `-${l}` : l]);
@@ -14974,12 +14986,12 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
   }
   function* P_(r, e) {
     for (let t of r)
-      (t[1].raws.tailwind = {
+      ((t[1].raws.tailwind = {
         ...t[1].raws.tailwind,
         classCandidate: e,
         preserveSource: t[0].options?.preserveSource ?? !1,
       }),
-        yield t;
+        yield t);
   }
   function* Yo(r, e) {
     let t = e.tailwindConfig.separator,
@@ -14997,7 +15009,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           for (let v of [].concat(
             h(f, {
               isOnlyPlugin: d,
-            })
+            }),
           )) {
             let [y, w] = Qo(v, e.postCssNodeCache);
             for (let k of y)
@@ -15029,9 +15041,9 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         }
         if (b.length > 0) {
           let v = Array.from(
-            ta(p.options?.types ?? [], f, p.options ?? {}, e.tailwindConfig)
+            ta(p.options?.types ?? [], f, p.options ?? {}, e.tailwindConfig),
           ).map(([y, w]) => w);
-          v.length > 0 && l.set(b, v), o.push(b);
+          (v.length > 0 && l.set(b, v), o.push(b));
         }
       }
       if (Ko(f)) {
@@ -15045,22 +15057,22 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                       Eh(E)
                         ? S.types.some(
                             ({ type: T, preferOnConflict: B }) =>
-                              k.includes(T) && B
+                              k.includes(T) && B,
                           )
-                        : !1
+                        : !1,
                     );
                   });
             },
             [p, h] = o.reduce(
               (y, w) => (
                 w.some(([{ options: S }]) =>
-                  S.types.some(({ type: E }) => E === 'any')
+                  S.types.some(({ type: E }) => E === 'any'),
                 )
                   ? y[0].push(w)
                   : y[1].push(w),
                 y
               ),
-              [[], []]
+              [[], []],
             ),
             v = b(h) ?? b(p);
           if (v) o = [v];
@@ -15082,17 +15094,17 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                     B.toString()
                       .split(
                         `
-`
+`,
                       )
                       .slice(1, -1)
                       .map((N) => N.trim())
                       .map((N) => `      ${N}`).join(`
-`)
+`),
                   ).join(`
 
 `);
                 w.push(
-                  `  Use \`${r.replace('[', `[${E}:`)}\` for \`${T.trim()}\``
+                  `  Use \`${r.replace('[', `[${E}:`)}\` for \`${T.trim()}\``,
                 );
                 break;
               }
@@ -15108,13 +15120,13 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         }
         o = o.map((p) => p.filter((h) => Eh(h[1])));
       }
-      (o = o.flat()),
+      ((o = o.flat()),
         (o = Array.from(P_(o, i))),
         (o = k_(o, e)),
-        s && (o = S_(o, i));
+        s && (o = S_(o, i)));
       for (let p of n) o = A_(p, o, e);
       for (let p of o)
-        (p[1].raws.tailwind = {
+        ((p[1].raws.tailwind = {
           ...p[1].raws.tailwind,
           candidate: r,
         }),
@@ -15122,7 +15134,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             context: e,
             candidate: r,
           })),
-          p !== null && (yield p);
+          p !== null && (yield p));
     }
   }
   function I_(r, { context: e, candidate: t }) {
@@ -15154,7 +15166,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             }
             a.selector = o;
           } catch {
-            return (i = !1), !1;
+            return ((i = !1), !1);
           }
       }),
       !i || s.nodes.length === 0 ? null : ((r[1] = s.nodes[0]), r)
@@ -15201,10 +15213,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           let h = ee.root({
             nodes: [d.clone()],
           });
-          h.walkRules(n), (d = h.nodes[0]);
+          (h.walkRules(n), (d = h.nodes[0]));
         }
         let p = [c, t ? d.clone() : d];
-        o.add(p), e.ruleCache.add(p), i.push(p);
+        (o.add(p), e.ruleCache.add(p), i.push(p));
       }
     }
     return i;
@@ -15234,7 +15246,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       ct();
       Wo();
       v_ = (0, ns.default)(
-        (r) => r.first.filter(({ type: e }) => e === 'class').pop().value
+        (r) => r.first.filter(({ type: e }) => e === 'class').pop().value,
       );
       C_ = /^[a-z_-]/;
     });
@@ -15256,7 +15268,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     let i = No.get(r),
       n = q_(t),
       s = i !== n;
-    return No.set(r, n), s;
+    return (No.set(r, n), s);
   }
   var Ih = P(() => {
     u();
@@ -15280,7 +15292,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
   });
   function Lh(r) {
     let e = null;
-    for (let t of r) (e = e ?? t), (e = e > t ? e : t);
+    for (let t of r) ((e = e ?? t), (e = e > t ? e : t));
     return e;
   }
   function $_(r, e) {
@@ -15300,7 +15312,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       $h();
       Xo = class {
         constructor() {
-          (this.offsets = {
+          ((this.offsets = {
             defaults: 0n,
             base: 0n,
             components: 0n,
@@ -15317,7 +15329,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               variants: 5n,
             }),
             (this.reservedVariantBits = 0n),
-            (this.variantOffsets = new Map());
+            (this.variantOffsets = new Map()));
         }
         create(e) {
           return {
@@ -15404,19 +15416,19 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 {
                   value: n.value,
                   modifier: n.modifier,
-                }
+                },
               );
               if (c !== 0) return c;
             }
           return e.variants !== t.variants
             ? e.variants - t.variants
             : e.parallelIndex !== t.parallelIndex
-            ? e.parallelIndex - t.parallelIndex
-            : e.arbitrary !== t.arbitrary
-            ? e.arbitrary - t.arbitrary
-            : e.propertyOffset !== t.propertyOffset
-            ? e.propertyOffset - t.propertyOffset
-            : e.index - t.index;
+              ? e.parallelIndex - t.parallelIndex
+              : e.arbitrary !== t.arbitrary
+                ? e.arbitrary - t.arbitrary
+                : e.propertyOffset !== t.propertyOffset
+                  ? e.propertyOffset - t.propertyOffset
+                  : e.index - t.index;
         }
         recalculateVariantOffsets() {
           let e = Array.from(this.variantOffsets.entries())
@@ -15485,7 +15497,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           : {
               type: i,
               preferOnConflict: !1,
-            }
+            },
       ),
     };
   }
@@ -15496,13 +15508,17 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     for (let n = 0; n < r.length; n++) {
       let s = r[n];
       if (s === '\\') t += '\\' + r[++n];
-      else if (s === '{') ++i, e.push(t.trim()), (t = '');
+      else if (s === '{') (++i, e.push(t.trim()), (t = ''));
       else if (s === '}') {
         if (--i < 0) throw new Error('Your { and } are unbalanced.');
-        e.push(t.trim()), (t = '');
+        (e.push(t.trim()), (t = ''));
       } else t += s;
     }
-    return t.length > 0 && e.push(t.trim()), (e = e.filter((n) => n !== '')), e;
+    return (
+      t.length > 0 && e.push(t.trim()),
+      (e = e.filter((n) => n !== '')),
+      e
+    );
   }
   function M_(r, e, { before: t = [] } = {}) {
     if (((t = [].concat(t)), t.length <= 0)) {
@@ -15543,7 +15559,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     e = {
       containsNonOnDemandable: !1,
     },
-    t = 0
+    t = 0,
   ) {
     let i = [],
       n = [];
@@ -15584,7 +15600,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             ee.atRule({
               name: i,
               params: n?.trim() ?? '',
-            })
+            }),
           );
       })
       .reverse();
@@ -15595,7 +15611,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
   function j_(
     r,
     e,
-    { variantList: t, variantMap: i, offsets: n, classList: s }
+    { variantList: t, variantMap: i, offsets: n, classList: s },
   ) {
     function a(p, h) {
       return p ? (0, Nh.default)(r, p, h) : r;
@@ -15627,14 +15643,14 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           for (let [h, b] of fs(p)) {
             let v = l(h, {}),
               y = n.create('base');
-            e.candidateRuleMap.has(v) || e.candidateRuleMap.set(v, []),
+            (e.candidateRuleMap.has(v) || e.candidateRuleMap.set(v, []),
               e.candidateRuleMap.get(v).push([
                 {
                   sort: y,
                   layer: 'base',
                 },
                 b,
-              ]);
+              ]));
           }
         },
         addDefaults(p, h) {
@@ -15643,14 +15659,14 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           };
           for (let [v, y] of fs(b)) {
             let w = l(v, {});
-            e.candidateRuleMap.has(w) || e.candidateRuleMap.set(w, []),
+            (e.candidateRuleMap.has(w) || e.candidateRuleMap.set(w, []),
               e.candidateRuleMap.get(w).push([
                 {
                   sort: n.create('defaults'),
                   layer: 'defaults',
                 },
                 y,
-              ]);
+              ]));
           }
         },
         addComponents(p, h) {
@@ -15661,11 +15677,11 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               respectPrefix: !0,
               respectImportant: !1,
             },
-            Array.isArray(h) ? {} : h
+            Array.isArray(h) ? {} : h,
           );
           for (let [v, y] of fs(p)) {
             let w = l(v, h);
-            s.add(w),
+            (s.add(w),
               e.candidateRuleMap.has(w) || e.candidateRuleMap.set(w, []),
               e.candidateRuleMap.get(w).push([
                 {
@@ -15674,7 +15690,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   options: h,
                 },
                 y,
-              ]);
+              ]));
           }
         },
         addUtilities(p, h) {
@@ -15685,11 +15701,11 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               respectPrefix: !0,
               respectImportant: !0,
             },
-            Array.isArray(h) ? {} : h
+            Array.isArray(h) ? {} : h,
           );
           for (let [v, y] of fs(p)) {
             let w = l(v, h);
-            s.add(w),
+            (s.add(w),
               e.candidateRuleMap.has(w) || e.candidateRuleMap.set(w, []),
               e.candidateRuleMap.get(w).push([
                 {
@@ -15698,7 +15714,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   options: h,
                 },
                 y,
-              ]);
+              ]));
           }
         },
         matchUtilities: function (p, h) {
@@ -15721,7 +15737,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                       `Unnecessary typehint \`${R}\` in \`${y}-${T}\`.`,
                       `You can safely update it to \`${y}-${T.replace(
                         R + ':',
-                        ''
+                        '',
                       )}\`.`,
                     ]);
                   else return [];
@@ -15756,8 +15772,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               },
               S,
             ];
-            e.candidateRuleMap.has(w) || e.candidateRuleMap.set(w, []),
-              e.candidateRuleMap.get(w).push(E);
+            (e.candidateRuleMap.has(w) || e.candidateRuleMap.set(w, []),
+              e.candidateRuleMap.get(w).push(E));
           }
         },
         matchComponents: function (p, h) {
@@ -15780,7 +15796,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                       `Unnecessary typehint \`${R}\` in \`${y}-${T}\`.`,
                       `You can safely update it to \`${y}-${T.replace(
                         R + ':',
-                        ''
+                        '',
                       )}\`.`,
                     ]);
                   else return [];
@@ -15815,12 +15831,12 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               },
               S,
             ];
-            e.candidateRuleMap.has(w) || e.candidateRuleMap.set(w, []),
-              e.candidateRuleMap.get(w).push(E);
+            (e.candidateRuleMap.has(w) || e.candidateRuleMap.set(w, []),
+              e.candidateRuleMap.get(w).push(E));
           }
         },
         addVariant(p, h, b = {}) {
-          (h = [].concat(h).map((v) => {
+          ((h = [].concat(h).map((v) => {
             if (typeof v != 'string')
               return (y = {}) => {
                 let {
@@ -15842,12 +15858,12 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                         args: w,
                         wrap: T,
                         format: B,
-                      }
-                    )
+                      },
+                    ),
                   );
                 if (typeof N == 'string' && !ls(N))
                   throw new Error(
-                    `Your custom variant \`${p}\` has an invalid format string. Make sure it's an at-rule or contains a \`&\` placeholder.`
+                    `Your custom variant \`${p}\` has an invalid format string. Make sure it's an at-rule or contains a \`&\` placeholder.`,
                   );
                 return Array.isArray(N)
                   ? N.filter((R) => typeof R == 'string').map((R) => Ri(R))
@@ -15855,13 +15871,13 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               };
             if (!ls(v))
               throw new Error(
-                `Your custom variant \`${p}\` has an invalid format string. Make sure it's an at-rule or contains a \`&\` placeholder.`
+                `Your custom variant \`${p}\` has an invalid format string. Make sure it's an at-rule or contains a \`&\` placeholder.`,
               );
             return Ri(v);
           })),
             M_(t, p, b),
             i.set(p, h),
-            e.variantOptions.set(p, b);
+            e.variantOptions.set(p, b));
         },
         matchVariant(p, h, b) {
           let v = b?.id ?? ++f,
@@ -15881,7 +15897,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                         }
                       : {
                           container: B,
-                        }
+                        },
                   ),
                 {
                   ...b,
@@ -15889,7 +15905,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   id: v,
                   type: Jo.MatchVariant,
                   variantInfo: el.Base,
-                }
+                },
               );
           let k = 'DEFAULT' in (b?.values ?? {});
           d.addVariant(
@@ -15900,7 +15916,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 : h(
                     S?.value === Ti
                       ? b.values.DEFAULT
-                      : S?.value ?? (typeof S == 'string' ? S : ''),
+                      : (S?.value ?? (typeof S == 'string' ? S : '')),
                     w
                       ? {
                           modifier: S?.modifier,
@@ -15908,21 +15924,21 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                         }
                       : {
                           container: E,
-                        }
+                        },
                   ),
             {
               ...b,
               id: v,
               type: Jo.MatchVariant,
               variantInfo: el.Dynamic,
-            }
+            },
           );
         },
       };
     return d;
   }
   function cs(r) {
-    return rl.has(r) || rl.set(r, new Map()), rl.get(r);
+    return (rl.has(r) || rl.set(r, new Map()), rl.get(r));
   }
   function jh(r, e) {
     let t = !1,
@@ -15996,7 +16012,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         (l) => (
           l.__isOptionsFunction && (l = l()),
           typeof l == 'function' ? l : l.handler
-        )
+        ),
       ),
       n = z_(e),
       s = [
@@ -16056,7 +16072,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     for (let [f, d] of i.entries())
       e.variantMap.set(
         f,
-        d.map((p, h) => [n.forVariant(f, h), p])
+        d.map((p, h) => [n.forVariant(f, h), p]),
       );
     let o = (e.tailwindConfig.safelist ?? []).filter(Boolean);
     if (o.length > 0) {
@@ -16100,8 +16116,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                       ...S,
                       ...S.flatMap((E) =>
                         Object.keys(e.tailwindConfig.theme.opacity).map(
-                          (T) => `${E}/${T}`
-                        )
+                          (T) => `${E}/${T}`,
+                        ),
                       ),
                     ]),
                   h &&
@@ -16114,11 +16130,11 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           for (let y of v)
             for (let { pattern: w, variants: k = [] } of f)
               if (((w.lastIndex = 0), d.has(w) || d.set(w, 0), !!w.test(y))) {
-                d.set(w, d.get(w) + 1),
+                (d.set(w, d.get(w) + 1),
                   e.changedContent.push({
                     content: y,
                     extension: 'html',
-                  });
+                  }));
                 for (let S of k)
                   e.changedContent.push({
                     content: S + e.tailwindConfig.separator + y,
@@ -16137,7 +16153,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     }
     let l = [].concat(e.tailwindConfig.darkMode ?? 'media')[1] ?? 'dark',
       c = [tl(e, l), tl(e, 'group'), tl(e, 'peer')];
-    (e.getClassOrder = function (d) {
+    ((e.getClassOrder = function (d) {
       let p = [...d].sort((y, w) => (y === w ? 0 : y < w ? -1 : 1)),
         h = new Map(p.map((y) => [y, null])),
         b = as(new Set(p), e, !0);
@@ -16150,7 +16166,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       return d.map((y) => {
         let w = h.get(y) ?? null,
           k = c.indexOf(y);
-        return w === null && k !== -1 && (w = BigInt(k)), [y, w];
+        return (w === null && k !== -1 && (w = BigInt(k)), [y, w]);
       });
     }),
       (e.getClassList = function (d = {}) {
@@ -16219,7 +16235,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                                     return Go(Ie);
                                   },
                                   selector: Ie,
-                                })
+                                }),
                               ));
                           }),
                           S
@@ -16235,7 +16251,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                     },
                     he = le(C);
                   if ((A.length > 0 && B.push(A), Array.isArray(he)))
-                    for (let V of he) (A = []), V(C), B.push(A);
+                    for (let V of he) ((A = []), V(C), B.push(A));
                 }
                 let N = [],
                   R = S.toString();
@@ -16255,16 +16271,16 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 let F = !(y in (b.values ?? {})),
                   Y = b[Pt] ?? {},
                   _ = (() => !(F || Y.respectPrefix === !1))();
-                (B = B.map((le) =>
+                ((B = B.map((le) =>
                   le.map((A) => ({
                     format: A,
                     respectPrefix: _,
-                  }))
+                  })),
                 )),
                   (N = N.map((le) => ({
                     format: le,
                     respectPrefix: _,
-                  })));
+                  }))));
                 let Q = {
                     candidate: w,
                     context: e,
@@ -16273,7 +16289,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                     rs(`.${w}`, dr(le, Q), Q)
                       .replace(`.${w}`, '&')
                       .replace('{ & }', '')
-                      .trim()
+                      .trim(),
                   );
                 return (
                   N.length > 0 &&
@@ -16283,7 +16299,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               },
             });
         return p;
-      });
+      }));
   }
   function Uh(r, e) {
     !r.classCache.has(e) ||
@@ -16321,7 +16337,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         markInvalidUtilityNode: (s) => H_(i, s),
       },
       n = U_(i, t);
-    return V_(n, i), i;
+    return (V_(n, i), i);
   }
   function Vh(r, e, t, i, n, s) {
     let a = e.opts.from,
@@ -16331,7 +16347,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     if (o && hr.has(a)) l = hr.get(a);
     else if (Pi.has(n)) {
       let p = Pi.get(n);
-      Dt.get(p).add(a), hr.set(a, p), (l = p);
+      (Dt.get(p).add(a), hr.set(a, p), (l = p));
     }
     let c = Ph(a, r);
     if (l) {
@@ -16374,7 +16390,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       ft();
       la();
       Ot();
-      (Nh = pe(Ra())), (Zo = pe(it()));
+      ((Nh = pe(Ra())), (Zo = pe(it())));
       Ci();
       qo();
       Gn();
@@ -16394,7 +16410,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       Mh();
       ct();
       Vo();
-      (Pt = Symbol()),
+      ((Pt = Symbol()),
         (Jo = {
           AddVariant: Symbol.for('ADD_VARIANT'),
           MatchVariant: Symbol.for('MATCH_VARIANT'),
@@ -16402,34 +16418,34 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         (el = {
           Base: 1 << 0,
           Dynamic: 1 << 1,
-        });
+        }));
       rl = new WeakMap();
-      (hr = wh), (Pi = vh), (Dt = es);
+      ((hr = wh), (Pi = vh), (Dt = es));
     });
   function nl(r) {
     return r.ignore
       ? []
       : r.glob
-      ? m.env.ROLLUP_WATCH === 'true'
-        ? [
+        ? m.env.ROLLUP_WATCH === 'true'
+          ? [
+              {
+                type: 'dependency',
+                file: r.base,
+              },
+            ]
+          : [
+              {
+                type: 'dir-dependency',
+                dir: r.base,
+                glob: r.glob,
+              },
+            ]
+        : [
             {
               type: 'dependency',
               file: r.base,
             },
-          ]
-        : [
-            {
-              type: 'dir-dependency',
-              dir: r.base,
-              glob: r.glob,
-            },
-          ]
-      : [
-          {
-            type: 'dependency',
-            file: r.base,
-          },
-        ];
+          ];
   }
   var Hh = P(() => {
     u();
@@ -16486,7 +16502,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           variants: i,
         }) {
           let n = t('lineClamp');
-          r(
+          (r(
             {
               'line-clamp': (s) => ({
                 ...Q_,
@@ -16495,7 +16511,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             },
             {
               values: n,
-            }
+            },
           ),
             e(
               [
@@ -16505,8 +16521,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   },
                 },
               ],
-              i('lineClamp')
-            );
+              i('lineClamp'),
+            ));
         },
         {
           theme: {
@@ -16522,7 +16538,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           variants: {
             lineClamp: ['responsive'],
           },
-        }
+        },
       );
     Yh.exports = Y_;
   });
@@ -16606,8 +16622,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       typeof r == 'number'
         ? Number.isInteger(r)
         : typeof r == 'string' && r.trim() !== ''
-        ? Number.isInteger(Number(r))
-        : !1;
+          ? Number.isInteger(Number(r))
+          : !1;
     Ve.find = (r, e) => r.nodes.find((t) => t.type === e);
     Ve.exceedsLimit = (r, e, t = 1, i) =>
       i === !1 || !Ve.isInteger(r) || !Ve.isInteger(e)
@@ -16624,18 +16640,18 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       r.type !== 'brace'
         ? !1
         : (r.commas >> (0 + r.ranges)) >> 0 == 0
-        ? ((r.invalid = !0), !0)
-        : !1;
+          ? ((r.invalid = !0), !0)
+          : !1;
     Ve.isInvalidBrace = (r) =>
       r.type !== 'brace'
         ? !1
         : r.invalid === !0 || r.dollar
-        ? !0
-        : (r.commas >> (0 + r.ranges)) >> 0 == 0 ||
-          r.open !== !0 ||
-          r.close !== !0
-        ? ((r.invalid = !0), !0)
-        : !1;
+          ? !0
+          : (r.commas >> (0 + r.ranges)) >> 0 == 0 ||
+              r.open !== !0 ||
+              r.close !== !0
+            ? ((r.invalid = !0), !0)
+            : !1;
     Ve.isOpenOrClose = (r) =>
       r.type === 'open' || r.type === 'close'
         ? !0
@@ -16647,7 +16663,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           t.type === 'range' && (t.type = 'text'),
           e
         ),
-        []
+        [],
       );
     Ve.flatten = (...r) => {
       let e = [],
@@ -16662,7 +16678,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           }
           return e;
         };
-      return t(r), e;
+      return (t(r), e);
     };
   });
   var hs = x((Z4, om) => {
@@ -16690,10 +16706,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       return typeof r == 'number'
         ? r - r == 0
         : typeof r == 'string' && r.trim() !== ''
-        ? Number.isFinite
-          ? Number.isFinite(+r)
-          : isFinite(+r)
-        : !1;
+          ? Number.isFinite
+            ? Number.isFinite(+r)
+            : isFinite(+r)
+          : !1;
     };
   });
   var bm = x((e6, ym) => {
@@ -16703,12 +16719,12 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       Wt = (r, e, t) => {
         if (fm(r) === !1)
           throw new TypeError(
-            'toRegexRange: expected the first argument to be a number'
+            'toRegexRange: expected the first argument to be a number',
           );
         if (e === void 0 || r === e) return String(r);
         if (fm(e) === !1)
           throw new TypeError(
-            'toRegexRange: expected the second argument to be a number.'
+            'toRegexRange: expected the second argument to be a number.',
           );
         let i = {
           relaxZeros: !0,
@@ -16741,7 +16757,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           (d && ((p.isPadded = d), (p.maxLen = String(p.max).length)), c < 0)
         ) {
           let v = f < 0 ? Math.abs(f) : 1;
-          (b = cm(v, Math.abs(c), p, i)), (c = p.a = 0);
+          ((b = cm(v, Math.abs(c), p, i)), (c = p.a = 0));
         }
         return (
           f >= 0 && (h = cm(c, f, p, i)),
@@ -16768,10 +16784,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         i = 1,
         n = dm(r, t),
         s = new Set([e]);
-      for (; r <= n && n <= e; ) s.add(n), (t += 1), (n = dm(r, t));
+      for (; r <= n && n <= e; ) (s.add(n), (t += 1), (n = dm(r, t)));
       for (n = hm(e + 1, i) - 1; r < n && n <= e; )
-        s.add(n), (i += 1), (n = hm(e + 1, i) - 1);
-      return (s = [...s]), s.sort(eE), s;
+        (s.add(n), (i += 1), (n = hm(e + 1, i) - 1));
+      return ((s = [...s]), s.sort(eE), s);
     }
     function Z_(r, e, t) {
       if (r === e)
@@ -16807,17 +16823,17 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           f = Z_(String(a), String(c), i),
           d = '';
         if (!t.isPadded && o && o.pattern === f.pattern) {
-          o.count.length > 1 && o.count.pop(),
+          (o.count.length > 1 && o.count.pop(),
             o.count.push(f.count[0]),
             (o.string = o.pattern + mm(o.count)),
-            (a = c + 1);
+            (a = c + 1));
           continue;
         }
-        t.isPadded && (d = rE(c, t, i)),
+        (t.isPadded && (d = rE(c, t, i)),
           (f.string = d + f.pattern + mm(f.count)),
           s.push(f),
           (a = c + 1),
-          (o = f);
+          (o = f));
       }
       return s;
     }
@@ -16825,8 +16841,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       let s = [];
       for (let a of r) {
         let { string: o } = a;
-        !i && !pm(e, 'string', o) && s.push(t + o),
-          i && pm(e, 'string', o) && s.push(t + o);
+        (!i && !pm(e, 'string', o) && s.push(t + o),
+          i && pm(e, 'string', o) && s.push(t + o));
       }
       return s;
     }
@@ -16882,7 +16898,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     var iE = (Fn(), Bn),
       wm = bm(),
       vm = (r) => r !== null && typeof r == 'object' && !Array.isArray(r),
-      nE = (r) => (e) => r === !0 ? Number(e) : String(e),
+      nE = (r) => (e) => (r === !0 ? Number(e) : String(e)),
       fl = (r) => typeof r == 'number' || (typeof r == 'string' && r !== ''),
       Ii = (r) => Number.isInteger(+r),
       cl = (r) => {
@@ -16897,7 +16913,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       aE = (r, e, t) => {
         if (e > 0) {
           let i = r[0] === '-' ? '-' : '';
-          i && (r = r.slice(1)), (r = i + r.padStart(i ? e - 1 : e, '0'));
+          (i && (r = r.slice(1)), (r = i + r.padStart(i ? e - 1 : e, '0')));
         }
         return t === !1 ? String(r) : r;
       },
@@ -16907,8 +16923,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         return t ? '-' + r : r;
       },
       oE = (r, e, t) => {
-        r.negatives.sort((o, l) => (o < l ? -1 : o > l ? 1 : 0)),
-          r.positives.sort((o, l) => (o < l ? -1 : o > l ? 1 : 0));
+        (r.negatives.sort((o, l) => (o < l ? -1 : o > l ? 1 : 0)),
+          r.positives.sort((o, l) => (o < l ? -1 : o > l ? 1 : 0)));
         let i = e.capture ? '' : '?:',
           n = '',
           s = '',
@@ -16961,7 +16977,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           if (i.strictRanges === !0) throw Sm([r, e]);
           return [];
         }
-        n === 0 && (n = 0), s === 0 && (s = 0);
+        (n === 0 && (n = 0), s === 0 && (s = 0));
         let a = n > s,
           o = String(r),
           l = String(e),
@@ -16980,9 +16996,9 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           y = [],
           w = 0;
         for (; a ? n >= s : n <= s; )
-          i.toRegex === !0 && t > 1 ? v(n) : y.push(aE(h(n, w), d, p)),
+          (i.toRegex === !0 && t > 1 ? v(n) : y.push(aE(h(n, w), d, p)),
             (n = a ? n - t : n + t),
-            w++;
+            w++);
         return i.toRegex === !0
           ? t > 1
             ? oE(b, i, d)
@@ -17005,7 +17021,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         let f = [],
           d = 0;
         for (; o ? s >= a : s <= a; )
-          f.push(n(s, d)), (s = o ? s - t : s + t), d++;
+          (f.push(n(s, d)), (s = o ? s - t : s + t), d++);
         return i.toRegex === !0
           ? km(f, null, {
               wrap: !1,
@@ -17032,8 +17048,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               ? uE(r, e, t, n)
               : fE(r, e, Math.max(Math.abs(t), 1), n)
             : t != null && !vm(t)
-            ? lE(t, n)
-            : gs(r, e, 1, t)
+              ? lE(t, n)
+              : gs(r, e, 1, t)
         );
       };
     Cm.exports = gs;
@@ -17052,7 +17068,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             c = '';
           if (i.isOpen === !0) return l + i.value;
           if (i.isClose === !0)
-            return console.log('node.isClose', l, i.value), l + i.value;
+            return (console.log('node.isClose', l, i.value), l + i.value);
           if (i.type === 'open') return o ? l + i.value : '(';
           if (i.type === 'close') return o ? l + i.value : ')';
           if (i.type === 'comma')
@@ -17090,8 +17106,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           if (Array.isArray(n)) for (let s of n) i.push(Gt(s, e, t));
           else
             for (let s of e)
-              t === !0 && typeof s == 'string' && (s = `{${s}}`),
-                i.push(Array.isArray(s) ? Gt(n, s, t) : n + s);
+              (t === !0 && typeof s == 'string' && (s = `{${s}}`),
+                i.push(Array.isArray(s) ? Gt(n, s, t) : n + s));
         return mr.flatten(i);
       },
       hE = (r, e = {}) => {
@@ -17101,7 +17117,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             let a = s,
               o = s.queue;
             for (; a.type !== 'brace' && a.type !== 'root' && a.parent; )
-              (a = a.parent), (o = a.queue);
+              ((a = a.parent), (o = a.queue));
             if (n.invalid || n.dollar) {
               o.push(Gt(o.pop(), Tm(n, e)));
               return;
@@ -17118,23 +17134,23 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               let d = mr.reduce(n.nodes);
               if (mr.exceedsLimit(...d, e.step, t))
                 throw new RangeError(
-                  'expanded array length exceeds range limit. Use options.rangeLimit to increase or disable the limit.'
+                  'expanded array length exceeds range limit. Use options.rangeLimit to increase or disable the limit.',
                 );
               let p = dE(...d, e);
-              p.length === 0 && (p = Tm(n, e)),
+              (p.length === 0 && (p = Tm(n, e)),
                 o.push(Gt(o.pop(), p)),
-                (n.nodes = []);
+                (n.nodes = []));
               return;
             }
             let l = mr.encloseBrace(n),
               c = n.queue,
               f = n;
             for (; f.type !== 'brace' && f.type !== 'root' && f.parent; )
-              (f = f.parent), (c = f.queue);
+              ((f = f.parent), (c = f.queue));
             for (let d = 0; d < n.nodes.length; d++) {
               let p = n.nodes[d];
               if (p.type === 'comma' && n.type === 'brace') {
-                d === 1 && c.push(''), c.push('');
+                (d === 1 && c.push(''), c.push(''));
                 continue;
               }
               if (p.type === 'close') {
@@ -17232,7 +17248,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           i = typeof t.maxLength == 'number' ? Math.min(qm, t.maxLength) : qm;
         if (r.length > i)
           throw new SyntaxError(
-            `Input length (${r.length}), exceeds max characters (${i})`
+            `Input length (${r.length}), exceeds max characters (${i})`,
           );
         let n = {
             type: 'root',
@@ -17256,14 +17272,13 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               o.value += v.value;
               return;
             }
-            return a.nodes.push(v), (v.parent = a), (v.prev = o), (o = v), v;
+            return (a.nodes.push(v), (v.parent = a), (v.prev = o), (o = v), v);
           };
         for (
           b({
             type: 'bos',
           });
           f < c;
-
         )
           if (((a = s[s.length - 1]), (p = h()), !(p === _E || p === CE))) {
             if (p === dl) {
@@ -17301,7 +17316,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               continue;
             }
             if (p === wE) {
-              (a = b({
+              ((a = b({
                 type: 'paren',
                 nodes: [],
               })),
@@ -17309,7 +17324,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 b({
                   type: 'text',
                   value: p,
-                });
+                }));
               continue;
             }
             if (p === vE) {
@@ -17320,12 +17335,12 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 });
                 continue;
               }
-              (a = s.pop()),
+              ((a = s.pop()),
                 b({
                   type: 'text',
                   value: p,
                 }),
-                (a = s[s.length - 1]);
+                (a = s[s.length - 1]));
               continue;
             }
             if (p === SE || p === AE || p === gE) {
@@ -17351,7 +17366,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             if (p === xE) {
               d++;
               let v = (o.value && o.value.slice(-1) === '$') || a.dollar === !0;
-              (a = b({
+              ((a = b({
                 type: 'brace',
                 open: !0,
                 close: !1,
@@ -17365,7 +17380,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 b({
                   type: 'open',
                   value: p,
-                });
+                }));
               continue;
             }
             if (p === kE) {
@@ -17377,14 +17392,14 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 continue;
               }
               let v = 'close';
-              (a = s.pop()),
+              ((a = s.pop()),
                 (a.close = !0),
                 b({
                   type: v,
                   value: p,
                 }),
                 d--,
-                (a = s[s.length - 1]);
+                (a = s[s.length - 1]));
               continue;
             }
             if (p === yE && d > 0) {
@@ -17399,11 +17414,11 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   },
                 ];
               }
-              b({
+              (b({
                 type: 'comma',
                 value: p,
               }),
-                a.commas++;
+                a.commas++);
               continue;
             }
             if (p === bE && d > 0 && a.commas === 0) {
@@ -17422,16 +17437,16 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   (o.type = 'range'),
                   a.nodes.length !== 3 && a.nodes.length !== 5)
                 ) {
-                  (a.invalid = !0), (a.ranges = 0), (o.type = 'text');
+                  ((a.invalid = !0), (a.ranges = 0), (o.type = 'text'));
                   continue;
                 }
-                a.ranges++, (a.args = []);
+                (a.ranges++, (a.args = []));
                 continue;
               }
               if (o.type === 'range') {
                 v.pop();
                 let y = v[v.length - 1];
-                (y.value += o.value + p), (o = y), a.ranges--;
+                ((y.value += o.value + p), (o = y), a.ranges--);
                 continue;
               }
               b({
@@ -17484,14 +17499,16 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           }
         else t = [].concat(Le.create(r, e));
         return (
-          e && e.expand === !0 && e.nodupes === !0 && (t = [...new Set(t)]), t
+          e && e.expand === !0 && e.nodupes === !0 && (t = [...new Set(t)]),
+          t
         );
       };
     Le.parse = (r, e = {}) => RE(r, e);
     Le.stringify = (r, e = {}) =>
       typeof r == 'string' ? Bm(Le.parse(r, e), e) : Bm(r, e);
     Le.compile = (r, e = {}) => (
-      typeof r == 'string' && (r = Le.parse(r, e)), OE(r, e)
+      typeof r == 'string' && (r = Le.parse(r, e)),
+      OE(r, e)
     );
     Le.expand = (r, e = {}) => {
       typeof r == 'string' && (r = Le.parse(r, e));
@@ -17506,8 +17523,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       r === '' || r.length < 3
         ? [r]
         : e.expand !== !0
-        ? Le.compile(r, e)
-        : Le.expand(r, e);
+          ? Le.compile(r, e)
+          : Le.expand(r, e);
     Fm.exports = Le;
   });
   var Di = x((o6, Wm) => {
@@ -17701,18 +17718,18 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       return i === -1
         ? r
         : r[i - 1] === '\\'
-        ? Re.escapeLast(r, e, i - 1)
-        : `${r.slice(0, i)}\\${r.slice(i)}`;
+          ? Re.escapeLast(r, e, i - 1)
+          : `${r.slice(0, i)}\\${r.slice(i)}`;
     };
     Re.removePrefix = (r, e = {}) => {
       let t = r;
-      return t.startsWith('./') && ((t = t.slice(2)), (e.prefix = './')), t;
+      return (t.startsWith('./') && ((t = t.slice(2)), (e.prefix = './')), t);
     };
     Re.wrapOutput = (r, e = {}, t = {}) => {
       let i = t.contains ? '' : '^',
         n = t.contains ? '' : '$',
         s = `${i}(?:${r})${n}`;
-      return e.negated === !0 && (s = `(?:^(?!${s}).*$)`), s;
+      return (e.negated === !0 && (s = `(?:^(?!${s}).*$)`), s);
     };
   });
   var eg = x((u6, Jm) => {
@@ -17776,13 +17793,13 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           R = Q();
           let he;
           if (R === $i) {
-            (k = F.backslashes = !0), (R = Q()), R === wl && (w = !0);
+            ((k = F.backslashes = !0), (R = Q()), R === wl && (w = !0));
             continue;
           }
           if (w === !0 || R === wl) {
             for (B++; Y() !== !0 && (R = Q()); ) {
               if (R === $i) {
-                (k = F.backslashes = !0), Q();
+                ((k = F.backslashes = !0), Q());
                 continue;
               }
               if (R === wl) {
@@ -17810,7 +17827,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 break;
               }
               if (R === JE && (B--, B === 0)) {
-                (w = !1), (p = F.isBrace = !0), (T = !0);
+                ((w = !1), (p = F.isBrace = !0), (T = !0));
                 break;
               }
             }
@@ -17850,11 +17867,11 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             ) {
               for (; Y() !== !0 && (R = Q()); ) {
                 if (R === $i) {
-                  (k = F.backslashes = !0), (R = Q());
+                  ((k = F.backslashes = !0), (R = Q()));
                   continue;
                 }
                 if (R === Km) {
-                  (b = F.isGlob = !0), (T = !0);
+                  ((b = F.isGlob = !0), (T = !0));
                   break;
                 }
               }
@@ -17879,11 +17896,11 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           if (R === XE) {
             for (; Y() !== !0 && (he = Q()); ) {
               if (he === $i) {
-                (k = F.backslashes = !0), Q();
+                ((k = F.backslashes = !0), Q());
                 continue;
               }
               if (he === e2) {
-                (h = F.isBracket = !0), (b = F.isGlob = !0), (T = !0);
+                ((h = F.isBracket = !0), (b = F.isGlob = !0), (T = !0));
                 break;
               }
             }
@@ -17891,14 +17908,14 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             break;
           }
           if (t.nonegate !== !0 && R === bl && c === f) {
-            (S = F.negated = !0), f++;
+            ((S = F.negated = !0), f++);
             continue;
           }
           if (t.noparen !== !0 && R === vl) {
             if (((b = F.isGlob = !0), n === !0)) {
               for (; Y() !== !0 && (R = Q()); ) {
                 if (R === vl) {
-                  (k = F.backslashes = !0), (R = Q());
+                  ((k = F.backslashes = !0), (R = Q()));
                   continue;
                 }
                 if (R === Km) {
@@ -17919,12 +17936,12 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         let U = l,
           le = '',
           A = '';
-        f > 0 && ((le = l.slice(0, f)), (l = l.slice(f)), (d -= f)),
+        (f > 0 && ((le = l.slice(0, f)), (l = l.slice(f)), (d -= f)),
           U && b === !0 && d > 0
             ? ((U = l.slice(0, d)), (A = l.slice(d)))
             : b === !0
-            ? ((U = ''), (A = l))
-            : (U = l),
+              ? ((U = ''), (A = l))
+              : (U = l),
           U &&
             U !== '' &&
             U !== '/' &&
@@ -17933,7 +17950,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             (U = U.slice(0, -1)),
           t.unescape === !0 &&
             (A && (A = Gm.removeBackslashes(A)),
-            U && k === !0 && (U = Gm.removeBackslashes(U)));
+            U && k === !0 && (U = Gm.removeBackslashes(U))));
         let C = {
           prefix: le,
           input: r,
@@ -17958,24 +17975,24 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             let Ee = he ? he + 1 : f,
               Ie = s[V],
               De = r.slice(Ee, Ie);
-            t.tokens &&
+            (t.tokens &&
               (V === 0 && f !== 0
                 ? ((a[V].isPrefix = !0), (a[V].value = le))
                 : (a[V].value = De),
               Zm(a[V]),
               (C.maxDepth += a[V].depth)),
               (V !== 0 || De !== '') && o.push(De),
-              (he = Ie);
+              (he = Ie));
           }
           if (he && he + 1 < r.length) {
             let V = r.slice(he + 1);
-            o.push(V),
+            (o.push(V),
               t.tokens &&
                 ((a[a.length - 1].value = V),
                 Zm(a[a.length - 1]),
-                (C.maxDepth += a[a.length - 1].depth));
+                (C.maxDepth += a[a.length - 1].depth)));
           }
-          (C.slashes = s), (C.parts = o);
+          ((C.slashes = s), (C.parts = o));
         }
         return C;
       };
@@ -18016,7 +18033,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           n = r.length;
         if (n > i)
           throw new SyntaxError(
-            `Input length: ${n}, exceeds maximum allowed length: ${i}`
+            `Input length: ${n}, exceeds maximum allowed length: ${i}`,
           );
         let s = {
             type: 'bos',
@@ -18046,8 +18063,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           R = t.dot ? '' : y,
           F = t.dot ? S : E,
           Y = t.bash === !0 ? N(t) : T;
-        t.capture && (Y = `(${Y})`),
-          typeof t.noext == 'boolean' && (t.noextglob = t.noext);
+        (t.capture && (Y = `(${Y})`),
+          typeof t.noext == 'boolean' && (t.noextglob = t.noext));
         let _ = {
           input: r,
           index: -1,
@@ -18065,7 +18082,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           globstar: !1,
           tokens: a,
         };
-        (r = Me.removePrefix(r, _)), (n = r.length);
+        ((r = Me.removePrefix(r, _)), (n = r.length));
         let Q = [],
           U = [],
           le = [],
@@ -18076,22 +18093,22 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           Ee = (_.advance = () => r[++_.index] || ''),
           Ie = () => r.slice(_.index + 1),
           De = ($ = '', ae = 0) => {
-            (_.consumed += $), (_.index += ae);
+            ((_.consumed += $), (_.index += ae));
           },
           ji = ($) => {
-            (_.output += $.output != null ? $.output : $.value), De($.value);
+            ((_.output += $.output != null ? $.output : $.value), De($.value));
           },
           Iv = () => {
             let $ = 1;
             for (; V() === '!' && (V(2) !== '(' || V(3) === '?'); )
-              Ee(), _.start++, $++;
+              (Ee(), _.start++, $++);
             return $ % 2 == 0 ? !1 : ((_.negated = !0), _.start++, !0);
           },
           zi = ($) => {
-            _[$]++, le.push($);
+            (_[$]++, le.push($));
           },
           Ft = ($) => {
-            _[$]--, le.pop();
+            (_[$]--, le.pop());
           },
           W = ($) => {
             if (A.type === 'globstar') {
@@ -18117,10 +18134,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               ($.value || $.output) && ji($),
               A && A.type === 'text' && $.type === 'text')
             ) {
-              (A.value += $.value), (A.output = (A.output || '') + $.value);
+              ((A.value += $.value), (A.output = (A.output || '') + $.value));
               return;
             }
-            ($.prev = A), a.push($), (A = $);
+            (($.prev = A), a.push($), (A = $));
           },
           Ui = ($, ae) => {
             let I = {
@@ -18128,9 +18145,9 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               conditions: 1,
               inner: '',
             };
-            (I.prev = A), (I.parens = _.parens), (I.output = _.output);
+            ((I.prev = A), (I.parens = _.parens), (I.output = _.output));
             let H = (t.capture ? '(' : '') + I.open;
-            zi('parens'),
+            (zi('parens'),
               W({
                 type: $,
                 value: ae,
@@ -18142,7 +18159,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 value: Ee(),
                 output: H,
               }),
-              Q.push(I);
+              Q.push(I));
           },
           Dv = ($) => {
             let ae = $.close + (t.capture ? ')' : ''),
@@ -18166,13 +18183,13 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               }
               $.prev.type === 'bos' && (_.negatedExtglob = !0);
             }
-            W({
+            (W({
               type: 'paren',
               extglob: !0,
               value: C,
               output: ae,
             }),
-              Ft('parens');
+              Ft('parens'));
           };
         if (t.fastpaths !== !1 && !/(^[*!]|[/()[\]{}"])/.test(r)) {
           let $ = !1,
@@ -18180,27 +18197,27 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               Ce === '\\'
                 ? (($ = !0), I)
                 : Ce === '?'
-                ? H
-                  ? H + Ce + (ye ? S.repeat(ye.length) : '')
-                  : Bs === 0
-                  ? F + (ye ? S.repeat(ye.length) : '')
-                  : S.repeat(ce.length)
-                : Ce === '.'
-                ? d.repeat(ce.length)
-                : Ce === '*'
-                ? H
-                  ? H + Ce + (ye ? Y : '')
-                  : Y
-                : H
-                ? I
-                : `\\${I}`
+                  ? H
+                    ? H + Ce + (ye ? S.repeat(ye.length) : '')
+                    : Bs === 0
+                      ? F + (ye ? S.repeat(ye.length) : '')
+                      : S.repeat(ce.length)
+                  : Ce === '.'
+                    ? d.repeat(ce.length)
+                    : Ce === '*'
+                      ? H
+                        ? H + Ce + (ye ? Y : '')
+                        : Y
+                      : H
+                        ? I
+                        : `\\${I}`,
             );
           return (
             $ === !0 &&
               (t.unescape === !0
                 ? (ae = ae.replace(/\\/g, ''))
                 : (ae = ae.replace(/\\+/g, (I) =>
-                    I.length % 2 == 0 ? '\\\\' : I ? '\\' : ''
+                    I.length % 2 == 0 ? '\\\\' : I ? '\\' : '',
                   ))),
             ae === r && t.contains === !0
               ? ((_.output = r), _)
@@ -18214,11 +18231,11 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             if ((I === '/' && t.bash !== !0) || I === '.' || I === ';')
               continue;
             if (!I) {
-              (C += '\\'),
+              ((C += '\\'),
                 W({
                   type: 'text',
                   value: C,
-                });
+                }));
               continue;
             }
             let H = /^\\+/.exec(Ie()),
@@ -18251,15 +18268,15 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   Ce = A.value.slice(H + 2),
                   ye = r2[Ce];
                 if (ye) {
-                  (A.value = ce + ye),
+                  ((A.value = ce + ye),
                     (_.backtrack = !0),
                     Ee(),
-                    !s.output && a.indexOf(A) === 1 && (s.output = b);
+                    !s.output && a.indexOf(A) === 1 && (s.output = b));
                   continue;
                 }
               }
             }
-            ((C === '[' && V() !== ':') || (C === '-' && V() === ']')) &&
+            (((C === '[' && V() !== ':') || (C === '-' && V() === ']')) &&
               (C = `\\${C}`),
               C === ']' &&
                 (A.value === '[' || A.value === '[^') &&
@@ -18268,32 +18285,32 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               (A.value += C),
               ji({
                 value: C,
-              });
+              }));
             continue;
           }
           if (_.quotes === 1 && C !== '"') {
-            (C = Me.escapeRegex(C)),
+            ((C = Me.escapeRegex(C)),
               (A.value += C),
               ji({
                 value: C,
-              });
+              }));
             continue;
           }
           if (C === '"') {
-            (_.quotes = _.quotes === 1 ? 0 : 1),
+            ((_.quotes = _.quotes === 1 ? 0 : 1),
               t.keepQuotes === !0 &&
                 W({
                   type: 'text',
                   value: C,
-                });
+                }));
             continue;
           }
           if (C === '(') {
-            zi('parens'),
+            (zi('parens'),
               W({
                 type: 'paren',
                 value: C,
-              });
+              }));
             continue;
           }
           if (C === ')') {
@@ -18304,12 +18321,12 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               Dv(Q.pop());
               continue;
             }
-            W({
+            (W({
               type: 'paren',
               value: C,
               output: _.parens ? ')' : '\\)',
             }),
-              Ft('parens');
+              Ft('parens'));
             continue;
           }
           if (C === '[') {
@@ -18365,10 +18382,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               ((_.output = _.output.slice(0, -A.value.length)),
               t.literalBrackets === !0)
             ) {
-              (_.output += H), (A.value = H);
+              ((_.output += H), (A.value = H));
               continue;
             }
-            (A.value = `(${o}${H}|${A.value})`), (_.output += A.value);
+            ((A.value = `(${o}${H}|${A.value})`), (_.output += A.value));
             continue;
           }
           if (C === '{' && t.nobrace !== !0) {
@@ -18380,7 +18397,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               outputIndex: _.output.length,
               tokensIndex: _.tokens.length,
             };
-            U.push(I), W(I);
+            (U.push(I), W(I));
             continue;
           }
           if (C === '}') {
@@ -18403,49 +18420,49 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 ye--
               )
                 ce[ye].type !== 'dots' && Ce.unshift(ce[ye].value);
-              (H = s2(Ce, t)), (_.backtrack = !0);
+              ((H = s2(Ce, t)), (_.backtrack = !0));
             }
             if (I.comma !== !0 && I.dots !== !0) {
               let ce = _.output.slice(0, I.outputIndex),
                 Ce = _.tokens.slice(I.tokensIndex);
-              (I.value = I.output = '\\{'), (C = H = '\\}'), (_.output = ce);
+              ((I.value = I.output = '\\{'), (C = H = '\\}'), (_.output = ce));
               for (let ye of Ce) _.output += ye.output || ye.value;
             }
-            W({
+            (W({
               type: 'brace',
               value: C,
               output: H,
             }),
               Ft('braces'),
-              U.pop();
+              U.pop());
             continue;
           }
           if (C === '|') {
-            Q.length > 0 && Q[Q.length - 1].conditions++,
+            (Q.length > 0 && Q[Q.length - 1].conditions++,
               W({
                 type: 'text',
                 value: C,
-              });
+              }));
             continue;
           }
           if (C === ',') {
             let I = C,
               H = U[U.length - 1];
-            H && le[le.length - 1] === 'braces' && ((H.comma = !0), (I = '|')),
+            (H && le[le.length - 1] === 'braces' && ((H.comma = !0), (I = '|')),
               W({
                 type: 'comma',
                 value: C,
                 output: I,
-              });
+              }));
             continue;
           }
           if (C === '/') {
             if (A.type === 'dot' && _.index === _.start + 1) {
-              (_.start = _.index + 1),
+              ((_.start = _.index + 1),
                 (_.consumed = ''),
                 (_.output = ''),
                 a.pop(),
-                (A = s);
+                (A = s));
               continue;
             }
             W({
@@ -18459,7 +18476,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             if (_.braces > 0 && A.type === 'dot') {
               A.value === '.' && (A.output = d);
               let I = U[U.length - 1];
-              (A.type = 'dots'), (A.output += C), (A.value += C), (I.dots = !0);
+              ((A.type = 'dots'),
+                (A.output += C),
+                (A.value += C),
+                (I.dots = !0));
               continue;
             }
             if (
@@ -18496,16 +18516,16 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 ce = C;
               if (H === '<' && !Me.supportsLookbehinds())
                 throw new Error(
-                  'Node.js v10 or higher is required for regex lookbehinds'
+                  'Node.js v10 or higher is required for regex lookbehinds',
                 );
-              ((A.value === '(' && !/[!=<:]/.test(H)) ||
+              (((A.value === '(' && !/[!=<:]/.test(H)) ||
                 (H === '<' && !/<([!=]|\w+>)/.test(Ie()))) &&
                 (ce = `\\${C}`),
                 W({
                   type: 'text',
                   value: C,
                   output: ce,
-                });
+                }));
               continue;
             }
             if (t.dot !== !0 && (A.type === 'slash' || A.type === 'bos')) {
@@ -18588,21 +18608,21 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           if (C !== '*') {
             (C === '$' || C === '^') && (C = `\\${C}`);
             let I = i2.exec(Ie());
-            I && ((C += I[0]), (_.index += I[0].length)),
+            (I && ((C += I[0]), (_.index += I[0].length)),
               W({
                 type: 'text',
                 value: C,
-              });
+              }));
             continue;
           }
           if (A && (A.type === 'globstar' || A.star === !0)) {
-            (A.type = 'star'),
+            ((A.type = 'star'),
               (A.star = !0),
               (A.value += C),
               (A.output = Y),
               (_.backtrack = !0),
               (_.globstar = !0),
-              De(C);
+              De(C));
             continue;
           }
           let $ = Ie();
@@ -18640,31 +18660,31 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             for (; $.slice(0, 3) === '/**'; ) {
               let Vi = r[_.index + 4];
               if (Vi && Vi !== '/') break;
-              ($ = $.slice(3)), De('/**', 3);
+              (($ = $.slice(3)), De('/**', 3));
             }
             if (I.type === 'bos' && he()) {
-              (A.type = 'globstar'),
+              ((A.type = 'globstar'),
                 (A.value += C),
                 (A.output = N(t)),
                 (_.output = A.output),
                 (_.globstar = !0),
-                De(C);
+                De(C));
               continue;
             }
             if (I.type === 'slash' && I.prev.type !== 'bos' && !Ce && he()) {
-              (_.output = _.output.slice(0, -(I.output + A.output).length)),
+              ((_.output = _.output.slice(0, -(I.output + A.output).length)),
                 (I.output = `(?:${I.output}`),
                 (A.type = 'globstar'),
                 (A.output = N(t) + (t.strictSlashes ? ')' : '|$)')),
                 (A.value += C),
                 (_.globstar = !0),
                 (_.output += I.output + A.output),
-                De(C);
+                De(C));
               continue;
             }
             if (I.type === 'slash' && I.prev.type !== 'bos' && $[0] === '/') {
               let Vi = $[1] !== void 0 ? '|$' : '';
-              (_.output = _.output.slice(0, -(I.output + A.output).length)),
+              ((_.output = _.output.slice(0, -(I.output + A.output).length)),
                 (I.output = `(?:${I.output}`),
                 (A.type = 'globstar'),
                 (A.output = `${N(t)}${h}|${h}${Vi})`),
@@ -18676,11 +18696,11 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   type: 'slash',
                   value: '/',
                   output: '',
-                });
+                }));
               continue;
             }
             if (I.type === 'bos' && $[0] === '/') {
-              (A.type = 'globstar'),
+              ((A.type = 'globstar'),
                 (A.value += C),
                 (A.output = `(?:^|${h}|${N(t)}${h})`),
                 (_.output = A.output),
@@ -18690,16 +18710,16 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   type: 'slash',
                   value: '/',
                   output: '',
-                });
+                }));
               continue;
             }
-            (_.output = _.output.slice(0, -A.output.length)),
+            ((_.output = _.output.slice(0, -A.output.length)),
               (A.type = 'globstar'),
               (A.output = N(t)),
               (A.value += C),
               (_.output += A.output),
               (_.globstar = !0),
-              De(C);
+              De(C));
             continue;
           }
           let ae = {
@@ -18708,10 +18728,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             output: Y,
           };
           if (t.bash === !0) {
-            (ae.output = '.*?'),
+            ((ae.output = '.*?'),
               (A.type === 'bos' || A.type === 'slash') &&
                 (ae.output = R + ae.output),
-              W(ae);
+              W(ae));
             continue;
           }
           if (
@@ -18719,32 +18739,32 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             (A.type === 'bracket' || A.type === 'paren') &&
             t.regex === !0
           ) {
-            (ae.output = C), W(ae);
+            ((ae.output = C), W(ae));
             continue;
           }
-          (_.index === _.start || A.type === 'slash' || A.type === 'dot') &&
+          ((_.index === _.start || A.type === 'slash' || A.type === 'dot') &&
             (A.type === 'dot'
               ? ((_.output += w), (A.output += w))
               : t.dot === !0
-              ? ((_.output += k), (A.output += k))
-              : ((_.output += R), (A.output += R)),
+                ? ((_.output += k), (A.output += k))
+                : ((_.output += R), (A.output += R)),
             V() !== '*' && ((_.output += b), (A.output += b))),
-            W(ae);
+            W(ae));
         }
         for (; _.brackets > 0; ) {
           if (t.strictBrackets === !0)
             throw new SyntaxError(gr('closing', ']'));
-          (_.output = Me.escapeLast(_.output, '[')), Ft('brackets');
+          ((_.output = Me.escapeLast(_.output, '[')), Ft('brackets'));
         }
         for (; _.parens > 0; ) {
           if (t.strictBrackets === !0)
             throw new SyntaxError(gr('closing', ')'));
-          (_.output = Me.escapeLast(_.output, '(')), Ft('parens');
+          ((_.output = Me.escapeLast(_.output, '(')), Ft('parens'));
         }
         for (; _.braces > 0; ) {
           if (t.strictBrackets === !0)
             throw new SyntaxError(gr('closing', '}'));
-          (_.output = Me.escapeLast(_.output, '{')), Ft('braces');
+          ((_.output = Me.escapeLast(_.output, '{')), Ft('braces'));
         }
         if (
           (t.strictSlashes !== !0 &&
@@ -18758,8 +18778,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         ) {
           _.output = '';
           for (let $ of _.tokens)
-            (_.output += $.output != null ? $.output : $.value),
-              $.suffix && (_.output += $.suffix);
+            ((_.output += $.output != null ? $.output : $.value),
+              $.suffix && (_.output += $.suffix));
         }
         return _;
       };
@@ -18771,7 +18791,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         n = r.length;
       if (n > i)
         throw new SyntaxError(
-          `Input length: ${n}, exceeds maximum allowed length: ${i}`
+          `Input length: ${n}, exceeds maximum allowed length: ${i}`,
         );
       r = tg[r] || r;
       let s = Me.isWindows(e),
@@ -18825,7 +18845,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         },
         B = Me.removePrefix(r, k),
         N = T(B);
-      return N && t.strictSlashes !== !0 && (N += `${o}?`), N;
+      return (N && t.strictSlashes !== !0 && (N += `${o}?`), N);
     };
     rg.exports = xl;
   });
@@ -18891,13 +18911,13 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             p === !1
               ? ((v.isMatch = !1), d ? v : !1)
               : l(f)
-              ? (typeof n.onIgnore == 'function' && n.onIgnore(v),
-                (v.isMatch = !1),
-                d ? v : !1)
-              : (typeof n.onMatch == 'function' && n.onMatch(v), d ? v : !0)
+                ? (typeof n.onIgnore == 'function' && n.onIgnore(v),
+                  (v.isMatch = !1),
+                  d ? v : !1)
+                : (typeof n.onMatch == 'function' && n.onMatch(v), d ? v : !0)
           );
         };
-        return t && (c.state = o), c;
+        return (t && (c.state = o), c);
       };
     de.test = (r, e, t, { glob: i, posix: n } = {}) => {
       if (typeof r != 'string')
@@ -18943,7 +18963,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         o = `${s}(?:${r.output})${a}`;
       r && r.negated === !0 && (o = `^(?!${o}).*$`);
       let l = de.toRegex(o, e);
-      return i === !0 && (l.state = r), l;
+      return (i === !0 && (l.state = r), l);
     };
     de.makeRe = (r, e = {}, t = !1, i = !1) => {
       if (!r || typeof r != 'string')
@@ -18990,13 +19010,13 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         return e > -1 && r.indexOf('}', e) > -1;
       },
       oe = (r, e, t) => {
-        (e = [].concat(e)), (r = [].concat(r));
+        ((e = [].concat(e)), (r = [].concat(r)));
         let i = new Set(),
           n = new Set(),
           s = new Set(),
           a = 0,
           o = (f) => {
-            s.add(f.output), t && t.onResult && t.onResult(f);
+            (s.add(f.output), t && t.onResult && t.onResult(f));
           };
         for (let f = 0; f < e.length; f++) {
           let d = ot(
@@ -19005,7 +19025,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 ...t,
                 onResult: o,
               },
-              !0
+              !0,
             ),
             p = d.state.negated || d.state.negatedExtglob;
           p && a++;
@@ -19033,13 +19053,13 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       let i = new Set(),
         n = [],
         s = (o) => {
-          t.onResult && t.onResult(o), n.push(o.output);
+          (t.onResult && t.onResult(o), n.push(o.output));
         },
         a = new Set(
           oe(r, e, {
             ...t,
             onResult: s,
-          })
+          }),
         );
       for (let o of n) a.has(o) || i.add(o);
       return [...i];
@@ -19121,15 +19141,15 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
   });
   function mg(r, e) {
     let t = e.content.files;
-    (t = t.filter((o) => typeof o == 'string')), (t = t.map(ll));
+    ((t = t.filter((o) => typeof o == 'string')), (t = t.map(ll)));
     let i = ps.generateTasks(t),
       n = [],
       s = [];
     for (let o of i)
-      n.push(...o.positive.map((l) => gg(l, !1))),
-        s.push(...o.negative.map((l) => gg(l, !0)));
+      (n.push(...o.positive.map((l) => gg(l, !1))),
+        s.push(...o.negative.map((l) => gg(l, !0))));
     let a = [...n, ...s];
-    return (a = c2(r, a)), (a = a.flatMap(p2)), (a = a.map(f2)), a;
+    return ((a = c2(r, a)), (a = a.flatMap(p2)), (a = a.map(f2)), a);
   }
   function gg(r, e) {
     let t = {
@@ -19139,7 +19159,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       pattern: r,
       glob: null,
     };
-    return Zh(r) && Object.assign(t, nm(r)), t;
+    return (Zh(r) && Object.assign(t, nm(r)), t);
   }
   function f2(r) {
     let e = ll(r.base);
@@ -19194,7 +19214,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       i = [];
     for (let s of r) {
       let a = hg.default.matcher(s);
-      wg.test(s) && i.push(a), t.push(a);
+      (wg.test(s) && i.push(a), t.push(a));
     }
     let n = !1;
     return (s) => {
@@ -19230,7 +19250,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         c = be.statSync(o).mtimeMs;
       c > l && (s.add(o), i.set(o, c));
     }
-    return Ze.DEBUG && console.timeEnd('Finding changed files'), [s, i];
+    return (Ze.DEBUG && console.timeEnd('Finding changed files'), [s, i]);
   }
   var hg,
     bg,
@@ -19246,8 +19266,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       It();
       Be();
       hg = pe(dg());
-      (bg = ['node_modules']),
-        (wg = new RegExp(`(${bg.map((r) => String.raw`\b${r}\b`).join('|')})`));
+      ((bg = ['node_modules']),
+        (wg = new RegExp(
+          `(${bg.map((r) => String.raw`\b${r}\b`).join('|')})`,
+        )));
     });
   function xg() {}
   var kg = P(() => {
@@ -19267,7 +19289,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
   function* Sg(r, e, t, i = me.extname(r)) {
     let n = b2(me.resolve(e, r), m2.includes(i) ? g2 : y2);
     if (n === null || t.has(n)) return;
-    t.add(n), yield n, (e = me.dirname(n)), (i = me.extname(n));
+    (t.add(n), yield n, (e = me.dirname(n)), (i = me.extname(n)));
     let s = be.readFileSync(n, 'utf-8');
     for (let a of [
       ...s.matchAll(/import[\s\S]*?['"](.{3,}?)['"]/gi),
@@ -19286,7 +19308,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       u();
       ft();
       et();
-      (m2 = ['.js', '.cjs', '.mjs']),
+      ((m2 = ['.js', '.cjs', '.mjs']),
         (g2 = [
           '',
           '.js',
@@ -19308,7 +19330,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           '.cjs',
           '.mjs',
           '.jsx',
-        ]);
+        ]));
     });
   function w2(r, e) {
     if (_l.has(r)) return _l.get(r);
@@ -19324,16 +19346,16 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         c = new Map();
       for (let p of o) {
         let h = be.statSync(p).mtimeMs;
-        c.set(p, h), (!a || !a.has(p) || h > a.get(p)) && (l = !0);
+        (c.set(p, h), (!a || !a.has(p) || h > a.get(p)) && (l = !0));
       }
       if (!l) return [i, e, n, s];
       for (let p of o) delete hf.cache[p];
       let f = ol(zr(xg(e))),
         d = Wi(f);
-      return _g.set(e, [f, d, o, c]), [f, e, d, o];
+      return (_g.set(e, [f, d, o, c]), [f, e, d, o]);
     }
     let t = zr(r?.config ?? r ?? {});
-    return (t = ol(t)), [t, null, Wi(t), []];
+    return ((t = ol(t)), [t, null, Wi(t), []]);
   }
   function El(r) {
     return ({ tailwindDirectives: e, registerDependency: t }) =>
@@ -19378,10 +19400,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       vg();
       kg();
       Ag();
-      (_g = new Cg.default({
+      ((_g = new Cg.default({
         maxSize: 100,
       })),
-        (_l = new WeakMap());
+        (_l = new WeakMap()));
     });
   function Ol(r) {
     let e = new Set(),
@@ -19389,22 +19411,22 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       i = new Set();
     if (
       (r.walkAtRules((n) => {
-        n.name === 'apply' && i.add(n),
+        (n.name === 'apply' && i.add(n),
           n.name === 'import' &&
             (n.params === '"tailwindcss/base"' ||
             n.params === "'tailwindcss/base'"
               ? ((n.name = 'tailwind'), (n.params = 'base'))
               : n.params === '"tailwindcss/components"' ||
-                n.params === "'tailwindcss/components'"
-              ? ((n.name = 'tailwind'), (n.params = 'components'))
-              : n.params === '"tailwindcss/utilities"' ||
-                n.params === "'tailwindcss/utilities'"
-              ? ((n.name = 'tailwind'), (n.params = 'utilities'))
-              : (n.params === '"tailwindcss/screens"' ||
-                  n.params === "'tailwindcss/screens'" ||
-                  n.params === '"tailwindcss/variants"' ||
-                  n.params === "'tailwindcss/variants'") &&
-                ((n.name = 'tailwind'), (n.params = 'variants'))),
+                  n.params === "'tailwindcss/components'"
+                ? ((n.name = 'tailwind'), (n.params = 'components'))
+                : n.params === '"tailwindcss/utilities"' ||
+                    n.params === "'tailwindcss/utilities'"
+                  ? ((n.name = 'tailwind'), (n.params = 'utilities'))
+                  : (n.params === '"tailwindcss/screens"' ||
+                      n.params === "'tailwindcss/screens'" ||
+                      n.params === '"tailwindcss/variants"' ||
+                      n.params === "'tailwindcss/variants'") &&
+                    ((n.name = 'tailwind'), (n.params = 'variants'))),
           n.name === 'tailwind' &&
             (n.params === 'screens' && (n.params = 'variants'),
             e.add(n.params)),
@@ -19415,7 +19437,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 'Use `@layer utilities` or `@layer components` instead.',
                 'https://tailwindcss.com/docs/upgrade-guide#replace-variants-with-layer',
               ]),
-            t.add(n));
+            t.add(n)));
       }),
       !e.has('base') || !e.has('components') || !e.has('utilities'))
     ) {
@@ -19426,16 +19448,16 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         ) {
           if (!e.has(n.params))
             throw n.error(
-              `\`@layer ${n.params}\` is used but no matching \`@tailwind ${n.params}\` directive is present.`
+              `\`@layer ${n.params}\` is used but no matching \`@tailwind ${n.params}\` directive is present.`,
             );
         } else if (n.name === 'responsive') {
           if (!e.has('utilities'))
             throw n.error(
-              '`@responsive` is used but `@tailwind utilities` is missing.'
+              '`@responsive` is used but `@tailwind utilities` is missing.',
             );
         } else if (n.name === 'variants' && !e.has('utilities'))
           throw n.error(
-            '`@variants` is used but `@tailwind utilities` is missing.'
+            '`@variants` is used but `@tailwind utilities` is missing.',
           );
     }
     return {
@@ -19494,7 +19516,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     x2,
     Dg = P(() => {
       u();
-      (Pg = /[\\^$.*+?()[\]{}|]/g), (x2 = RegExp(Pg.source));
+      ((Pg = /[\\^$.*+?()[\]{}|]/g), (x2 = RegExp(Pg.source)));
     });
   function qg(r) {
     let e = Array.from(k2(r));
@@ -19550,7 +19572,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 /(?:\/[^\s'"`\\$]*)?/,
               ]),
               /[-\/][^\s'"`\\$={><]*/,
-            ])
+            ]),
           ),
         ]),
       ]),
@@ -19581,7 +19603,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         Object.assign([], n, {
           index: n.index + o,
           0: a,
-        })
+        }),
       );
     });
     for (let n of i) {
@@ -19610,7 +19632,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       u();
       Dg();
       zt();
-      (S2 = /([\[\]'"`])([^\[\]'"`])?/g), (A2 = /[^"'`\s<>\]]+/);
+      ((S2 = /([\[\]'"`])([^\[\]'"`])?/g), (A2 = /[^"'`\s<>\]]+/));
     });
   function _2(r, e) {
     let t = r.tailwindConfig.content.extract;
@@ -19626,7 +19648,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         e,
         new Lg.default({
           maxSize: 25e3,
-        })
+        }),
       );
     for (let n of r.split(`
 `))
@@ -19693,24 +19715,24 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               { file: k, content: S },
               { transformer: E, extractor: T },
             ]) => {
-              (S = k ? await be.promises.readFile(k, 'utf8') : S),
-                O2(E(S), T, i, n);
-            }
-          )
+              ((S = k ? await be.promises.readFile(k, 'utf8') : S),
+                O2(E(S), T, i, n));
+            },
+          ),
         );
       }
       bt.DEBUG && console.timeEnd('Reading changed files');
       let o = r.classCache.size;
-      bt.DEBUG && console.time('Generate rules'),
-        bt.DEBUG && console.time('Sorting candidates');
+      (bt.DEBUG && console.time('Generate rules'),
+        bt.DEBUG && console.time('Sorting candidates'));
       let l = new Set([...i].sort((y, w) => (y === w ? 0 : y < w ? -1 : 1)));
-      bt.DEBUG && console.timeEnd('Sorting candidates'),
+      (bt.DEBUG && console.timeEnd('Sorting candidates'),
         as(l, r),
         bt.DEBUG && console.timeEnd('Generate rules'),
         bt.DEBUG && console.time('Build stylesheet'),
         (r.stylesheetCache === null || r.classCache.size !== o) &&
           (r.stylesheetCache = T2([...r.ruleCache], r)),
-        bt.DEBUG && console.timeEnd('Build stylesheet');
+        bt.DEBUG && console.timeEnd('Build stylesheet'));
       let {
         defaults: c,
         base: f,
@@ -19718,51 +19740,51 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         utilities: p,
         variants: h,
       } = r.stylesheetCache;
-      t.base &&
+      (t.base &&
         (t.base.before(
           Qt([...c, ...f], t.base.source, {
             layer: 'base',
-          })
+          }),
         ),
         t.base.remove()),
         t.components &&
           (t.components.before(
             Qt([...d], t.components.source, {
               layer: 'components',
-            })
+            }),
           ),
           t.components.remove()),
         t.utilities &&
           (t.utilities.before(
             Qt([...p], t.utilities.source, {
               layer: 'utilities',
-            })
+            }),
           ),
-          t.utilities.remove());
+          t.utilities.remove()));
       let b = Array.from(h).filter((y) => {
         let w = y.raws.tailwind?.parentLayer;
         return w === 'components'
           ? t.components !== null
           : w === 'utilities'
-          ? t.utilities !== null
-          : !0;
+            ? t.utilities !== null
+            : !0;
       });
-      t.variants
+      (t.variants
         ? (t.variants.before(
             Qt(b, t.variants.source, {
               layer: 'variants',
-            })
+            }),
           ),
           t.variants.remove())
         : b.length > 0 &&
           e.append(
             Qt(b, e.source, {
               layer: 'variants',
-            })
+            }),
           ),
-        (e.source.end = e.source.end ?? e.source.start);
+        (e.source.end = e.source.end ?? e.source.start));
       let v = b.some((y) => y.raws.tailwind?.parentLayer === 'utilities');
-      t.utilities &&
+      (t.utilities &&
         p.size === 0 &&
         !v &&
         G.warn('content-problems', [
@@ -19775,7 +19797,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         (r.changedContent = []),
         e.walkAtRules('layer', (y) => {
           Object.keys(t).includes(y.params) && y.remove();
-        });
+        }));
     };
   }
   var Lg,
@@ -19792,14 +19814,14 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       Be();
       Rg();
       $g();
-      (bt = Ze),
+      ((bt = Ze),
         (Mg = {
           DEFAULT: qg,
         }),
         (Ng = {
           DEFAULT: (r) => r,
           svelte: (r) => r.replace(/(?:^|\s)class:/g, ' '),
-        });
+        }));
       Li = new WeakMap();
     });
   function xs(r) {
@@ -19811,7 +19833,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         a.walkClasses((o) => {
           let l = o.parent.toString(),
             c = e.get(l);
-          c || e.set(l, (c = new Set())), c.add(o.value);
+          (c || e.set(l, (c = new Set())), c.add(o.value));
         });
       }).processSync(s.selector);
     });
@@ -19834,13 +19856,13 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     return typeof t == 'function' ? t(e) : t + e;
   }
   function* zg(r) {
-    for (yield r; r.parent; ) yield r.parent, (r = r.parent);
+    for (yield r; r.parent; ) (yield r.parent, (r = r.parent));
   }
   function P2(r, e = {}) {
     let t = r.nodes;
     r.nodes = [];
     let i = r.clone(e);
-    return (r.nodes = t), i;
+    return ((r.nodes = t), i);
   }
   function I2(r) {
     for (let e of zg(r))
@@ -19861,7 +19883,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           s = e.offsets.create('user');
         for (let a of xs(i)) {
           let o = t.get(a) || [];
-          t.set(a, o),
+          (t.set(a, o),
             o.push([
               {
                 layer: 'user',
@@ -19869,7 +19891,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 important: !1,
               },
               n,
-            ]);
+            ]));
         }
       }),
       t
@@ -19881,7 +19903,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       if (e.classCache.has(t)) {
         e.applyClassCache.set(
           t,
-          e.classCache.get(t).map(([n, s]) => [n, s.clone()])
+          e.classCache.get(t).map(([n, s]) => [n, s.clone()]),
         );
         continue;
       }
@@ -19933,14 +19955,14 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           let y = new Set();
           p.each((w) => {
             let k = !1;
-            (w = w.clone()),
+            ((w = w.clone()),
               w.walkClasses((S) => {
                 S.value === b.value &&
                   (k ||
                     (S.replaceWith(...v.nodes.map((E) => E.clone())),
                     y.add(w),
                     (k = !0)));
-              });
+              }));
           });
           for (let w of y) {
             let k = [[]];
@@ -19950,23 +19972,23 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 : k[k.length - 1].push(S);
             w.nodes = [];
             for (let S of k)
-              Array.isArray(S) &&
+              (Array.isArray(S) &&
                 S.sort((E, T) =>
                   E.type === 'tag' && T.type === 'class'
                     ? -1
                     : E.type === 'class' && T.type === 'tag'
-                    ? 1
-                    : E.type === 'class' &&
-                      T.type === 'pseudo' &&
-                      T.value.startsWith('::')
-                    ? -1
-                    : E.type === 'pseudo' &&
-                      E.value.startsWith('::') &&
-                      T.type === 'class'
-                    ? 1
-                    : 0
+                      ? 1
+                      : E.type === 'class' &&
+                          T.type === 'pseudo' &&
+                          T.value.startsWith('::')
+                        ? -1
+                        : E.type === 'pseudo' &&
+                            E.value.startsWith('::') &&
+                            T.type === 'class'
+                          ? 1
+                          : 0,
                 ),
-                (w.nodes = w.nodes.concat(S));
+                (w.nodes = w.nodes.concat(S)));
           }
           v.replaceWith(...y);
         }),
@@ -19984,11 +20006,11 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           throw l.error(
             `@apply is not supported within nested at-rules like @screen. We suggest you write this as @apply ${f
               .map((h) => `${p}:${h}`)
-              .join(' ')} instead.`
+              .join(' ')} instead.`,
           );
         }
         throw l.error(
-          `@apply is not supported within nested at-rules like @${l.parent.name}. You can fix this by un-nesting @${l.parent.name}.`
+          `@apply is not supported within nested at-rules like @${l.parent.name}. You can fix this by un-nesting @${l.parent.name}.`,
         );
       }
       for (let p of f) {
@@ -19996,7 +20018,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           throw l.error(`@apply should not be used with the '${p}' utility`);
         if (!s.has(p))
           throw l.error(
-            `The \`${p}\` class does not exist. If \`${p}\` is a custom class, make sure it is defined within a \`@layer\` directive.`
+            `The \`${p}\` class does not exist. If \`${p}\` is a custom class, make sure it is defined within a \`@layer\` directive.`,
           );
         let h = s.get(p);
         for (let [, b] of h)
@@ -20008,7 +20030,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   'Rewrite the selector without nesting or configure the `tailwindcss/nesting` plugin:',
                   'https://tailwindcss.com/docs/using-with-preprocessors#nesting',
                 ].join(`
-`)
+`),
               );
             });
         c.push([p, d, h]);
@@ -20027,12 +20049,12 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             S.some((R) => E.includes(R)))
           )
             throw k.error(
-              `You cannot \`@apply\` the \`${h}\` utility here because it creates a circular dependency.`
+              `You cannot \`@apply\` the \`${h}\` utility here because it creates a circular dependency.`,
             );
           let B = ee.root({
             nodes: [k.clone()],
           });
-          B.walk((R) => {
+          (B.walk((R) => {
             R.source = f;
           }),
             (k.type !== 'atrule' ||
@@ -20052,16 +20074,16 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                     l.selector.indexOf(F) === 0
                       ? l.selector.slice(F.length)
                       : l.selector;
-                _ === '' && (_ = l.selector),
+                (_ === '' && (_ = l.selector),
                   (R.selector = a(_, R.selector, h)),
                   F && _ !== l.selector && (R.selector = is(R.selector, F)),
                   R.walkDecls((U) => {
                     U.important = w.important || b;
-                  });
+                  }));
                 let Q = (0, vs.default)().astSync(R.selector);
-                Q.each((U) => pr(U)), (R.selector = Q.toString());
+                (Q.each((U) => pr(U)), (R.selector = Q.toString()));
               }),
-            !!B.nodes[0] && d.push([w.sort, B.nodes[0]]);
+            !!B.nodes[0] && d.push([w.sort, B.nodes[0]]));
         }
       }
       let p = e.offsets.sort(d).map((h) => h[1]);
@@ -20101,10 +20123,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         a !== null && o !== null
           ? (l = Math.min(a, o))
           : a !== null
-          ? (l = a)
-          : o !== null
-          ? (l = o)
-          : (l = null);
+            ? (l = a)
+            : o !== null
+              ? (l = o)
+              : (l = null);
         var c,
           f,
           d,
@@ -20126,7 +20148,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             return c;
         return c || r.nullResultValue;
       }
-      (r.threshold = 0.4),
+      ((r.threshold = 0.4),
         (r.thresholdAbsolute = 20),
         (r.caseSensitive = !1),
         (r.nullResultValue = null),
@@ -20134,7 +20156,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         (r.returnFirstMatch = !1),
         typeof ks != 'undefined' && ks.exports
           ? (ks.exports = r)
-          : (window.didYouMean = r);
+          : (window.didYouMean = r));
       var e = Math.pow(2, 32) - 1;
       function t(i, n, s) {
         s = s || s === 0 ? s : e;
@@ -20162,15 +20184,15 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             f <= a;
             f++
           )
-            f < p || f > h
+            (f < p || f > h
               ? (l[c][f] = s + 1)
               : n.charAt(c - 1) === i.charAt(f - 1)
-              ? (l[c][f] = l[c - 1][f - 1])
-              : (l[c][f] = Math.min(
-                  l[c - 1][f - 1] + 1,
-                  Math.min(l[c][f - 1] + 1, l[c - 1][f] + 1)
-                )),
-              l[c][f] < d && (d = l[c][f]);
+                ? (l[c][f] = l[c - 1][f - 1])
+                : (l[c][f] = Math.min(
+                    l[c - 1][f - 1] + 1,
+                    Math.min(l[c][f - 1] + 1, l[c - 1][f] + 1),
+                  )),
+              l[c][f] < d && (d = l[c][f]));
           if (d > s) return s + 1;
         }
         return l[o][a];
@@ -20218,51 +20240,50 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           k = '',
           S = '';
         d < h;
-
       )
         if (p <= 32) {
           i = d;
-          do (i += 1), (p = t.charCodeAt(i));
+          do ((i += 1), (p = t.charCodeAt(i)));
           while (p <= 32);
-          (a = t.slice(d, i)),
+          ((a = t.slice(d, i)),
             (s = e[e.length - 1]),
             p === $l && v
               ? (S = a)
               : s && s.type === 'div'
-              ? ((s.after = a), (s.sourceEndIndex += a.length))
-              : p === Nl ||
-                p === Bl ||
-                (p === yr &&
-                  t.charCodeAt(i + 1) !== As &&
-                  (!y || (y && y.type === 'function' && !1)))
-              ? (k = a)
-              : e.push({
-                  type: 'space',
-                  sourceIndex: d,
-                  sourceEndIndex: i,
-                  value: a,
-                }),
-            (d = i);
+                ? ((s.after = a), (s.sourceEndIndex += a.length))
+                : p === Nl ||
+                    p === Bl ||
+                    (p === yr &&
+                      t.charCodeAt(i + 1) !== As &&
+                      (!y || (y && y.type === 'function' && !1)))
+                  ? (k = a)
+                  : e.push({
+                      type: 'space',
+                      sourceIndex: d,
+                      sourceEndIndex: i,
+                      value: a,
+                    }),
+            (d = i));
         } else if (p === Ss || p === Ll) {
-          (i = d),
+          ((i = d),
             (n = p === Ss ? "'" : '"'),
             (a = {
               type: 'string',
               sourceIndex: d,
               quote: n,
-            });
+            }));
           do
             if (((o = !1), (i = t.indexOf(n, i + 1)), ~i))
-              for (l = i; t.charCodeAt(l - 1) === Ml; ) (l -= 1), (o = !o);
-            else (t += n), (i = t.length - 1), (a.unclosed = !0);
+              for (l = i; t.charCodeAt(l - 1) === Ml; ) ((l -= 1), (o = !o));
+            else ((t += n), (i = t.length - 1), (a.unclosed = !0));
           while (o);
-          (a.value = t.slice(d + 1, i)),
+          ((a.value = t.slice(d + 1, i)),
             (a.sourceEndIndex = a.unclosed ? i : i + 1),
             e.push(a),
             (d = i + 1),
-            (p = t.charCodeAt(d));
+            (p = t.charCodeAt(d)));
         } else if (p === yr && t.charCodeAt(d + 1) === As)
-          (i = t.indexOf('*/', d)),
+          ((i = t.indexOf('*/', d)),
             (a = {
               type: 'comment',
               sourceIndex: d,
@@ -20273,9 +20294,9 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             (a.value = t.slice(d + 2, i)),
             e.push(a),
             (d = i + 2),
-            (p = t.charCodeAt(d));
+            (p = t.charCodeAt(d)));
         else if ((p === yr || p === As) && y && y.type === 'function')
-          (a = t[d]),
+          ((a = t[d]),
             e.push({
               type: 'word',
               sourceIndex: d - k.length,
@@ -20283,9 +20304,9 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               value: a,
             }),
             (d += 1),
-            (p = t.charCodeAt(d));
+            (p = t.charCodeAt(d)));
         else if (p === yr || p === Nl || p === Bl)
-          (a = t[d]),
+          ((a = t[d]),
             e.push({
               type: 'div',
               sourceIndex: d - k.length,
@@ -20296,10 +20317,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             }),
             (k = ''),
             (d += 1),
-            (p = t.charCodeAt(d));
+            (p = t.charCodeAt(d)));
         else if (ql === p) {
           i = d;
-          do (i += 1), (p = t.charCodeAt(i));
+          do ((i += 1), (p = t.charCodeAt(i)));
           while (p <= 32);
           if (
             ((f = d),
@@ -20315,13 +20336,13 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             i -= 1;
             do
               if (((o = !1), (i = t.indexOf(')', i + 1)), ~i))
-                for (l = i; t.charCodeAt(l - 1) === Ml; ) (l -= 1), (o = !o);
-              else (t += ')'), (i = t.length - 1), (a.unclosed = !0);
+                for (l = i; t.charCodeAt(l - 1) === Ml; ) ((l -= 1), (o = !o));
+              else ((t += ')'), (i = t.length - 1), (a.unclosed = !0));
             while (o);
             c = i;
-            do (c -= 1), (p = t.charCodeAt(c));
+            do ((c -= 1), (p = t.charCodeAt(c)));
             while (p <= 32);
-            f < c
+            (f < c
               ? (d !== c + 1
                   ? (a.nodes = [
                       {
@@ -20345,18 +20366,18 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               (d = i + 1),
               (a.sourceEndIndex = a.unclosed ? i : d),
               (p = t.charCodeAt(d)),
-              e.push(a);
+              e.push(a));
           } else
-            (v += 1),
+            ((v += 1),
               (a.after = ''),
               (a.sourceEndIndex = d + 1),
               e.push(a),
               b.push(a),
               (e = a.nodes = []),
-              (y = a);
+              (y = a));
           w = '';
         } else if ($l === p && v)
-          (d += 1),
+          ((d += 1),
             (p = t.charCodeAt(d)),
             (y.after = S),
             (y.sourceEndIndex += S.length),
@@ -20365,10 +20386,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             (b[b.length - 1].sourceEndIndex = d),
             b.pop(),
             (y = b[v]),
-            (e = y.nodes);
+            (e = y.nodes));
         else {
           i = d;
-          do p === Ml && (i += 1), (i += 1), (p = t.charCodeAt(i));
+          do (p === Ml && (i += 1), (i += 1), (p = t.charCodeAt(i)));
           while (
             i < h &&
             !(
@@ -20384,28 +20405,28 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               (p === $l && v)
             )
           );
-          (a = t.slice(d, i)),
+          ((a = t.slice(d, i)),
             ql === p
               ? (w = a)
               : (M2 === a.charCodeAt(0) || N2 === a.charCodeAt(0)) &&
-                B2 === a.charCodeAt(1) &&
-                F2.test(a.slice(2))
-              ? e.push({
-                  type: 'unicode-range',
-                  sourceIndex: d,
-                  sourceEndIndex: i,
-                  value: a,
-                })
-              : e.push({
-                  type: 'word',
-                  sourceIndex: d,
-                  sourceEndIndex: i,
-                  value: a,
-                }),
-            (d = i);
+                  B2 === a.charCodeAt(1) &&
+                  F2.test(a.slice(2))
+                ? e.push({
+                    type: 'unicode-range',
+                    sourceIndex: d,
+                    sourceEndIndex: i,
+                    value: a,
+                  })
+                : e.push({
+                    type: 'word',
+                    sourceIndex: d,
+                    sourceEndIndex: i,
+                    value: a,
+                  }),
+            (d = i));
         }
       for (d = b.length - 1; d; d -= 1)
-        (b[d].unclosed = !0), (b[d].sourceEndIndex = t.length);
+        ((b[d].unclosed = !0), (b[d].sourceEndIndex = t.length));
       return b[0].nodes;
     };
   });
@@ -20414,13 +20435,13 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     Yg.exports = function r(e, t, i) {
       var n, s, a, o;
       for (n = 0, s = e.length; n < s; n += 1)
-        (a = e[n]),
+        ((a = e[n]),
           i || (o = t(a, n, e)),
           o !== !1 &&
             a.type === 'function' &&
             Array.isArray(a.nodes) &&
             r(a.nodes, t, i),
-          i && t(a, n, e);
+          i && t(a, n, e));
     };
   });
   var ey = x((oq, Jg) => {
@@ -20433,24 +20454,24 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       return e && (s = e(r)) !== void 0
         ? s
         : t === 'word' || t === 'space'
-        ? i
-        : t === 'string'
-        ? ((n = r.quote || ''), n + i + (r.unclosed ? '' : n))
-        : t === 'comment'
-        ? '/*' + i + (r.unclosed ? '' : '*/')
-        : t === 'div'
-        ? (r.before || '') + i + (r.after || '')
-        : Array.isArray(r.nodes)
-        ? ((n = Zg(r.nodes, e)),
-          t !== 'function'
-            ? n
-            : i +
-              '(' +
-              (r.before || '') +
-              n +
-              (r.after || '') +
-              (r.unclosed ? '' : ')'))
-        : i;
+          ? i
+          : t === 'string'
+            ? ((n = r.quote || ''), n + i + (r.unclosed ? '' : n))
+            : t === 'comment'
+              ? '/*' + i + (r.unclosed ? '' : '*/')
+              : t === 'div'
+                ? (r.before || '') + i + (r.after || '')
+                : Array.isArray(r.nodes)
+                  ? ((n = Zg(r.nodes, e)),
+                    t !== 'function'
+                      ? n
+                      : i +
+                        '(' +
+                        (r.before || '') +
+                        n +
+                        (r.after || '') +
+                        (r.unclosed ? '' : ')'))
+                  : i;
     }
     function Zg(r, e) {
       var t, i;
@@ -20491,7 +20512,6 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       for (
         i = r.charCodeAt(e), (i === _s || i === Cs) && e++;
         e < t && ((i = r.charCodeAt(e)), !(i < 48 || i > 57));
-
       )
         e += 1;
       if (
@@ -20512,7 +20532,6 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         for (
           e += n === _s || n === Cs ? 3 : 2;
           e < t && ((i = r.charCodeAt(e)), !(i < 48 || i > 57));
-
         )
           e += 1;
       return {
@@ -20533,7 +20552,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       return Array.isArray(this.nodes) ? ny(this.nodes) : '';
     };
     $t.prototype.walk = function (r, e) {
-      return iy(this.nodes, r, e), this;
+      return (iy(this.nodes, r, e), this);
     };
     $t.unit = ry();
     $t.walk = iy;
@@ -20555,7 +20574,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       : r.reduce(
           (e, t, i) =>
             t.includes('.') ? `${e}[${t}]` : i === 0 ? t : `${e}.${t}`,
-          ''
+          '',
         );
   }
   function ly(r) {
@@ -20633,7 +20652,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
   function fy(r, e, t) {
     if (e.type === 'function' && t[e.value] !== void 0) {
       let i = W2(r, e.nodes, t);
-      (e.type = 'word'), (e.value = t[e.value](r, ...i));
+      ((e.type = 'word'), (e.value = t[e.value](r, ...i)));
     }
     return e;
   }
@@ -20650,7 +20669,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     r = r.replace(/^['"]+|['"]+$/g, '');
     let e = r.match(/^([^\s]+)(?![^\[]*\])(?:\s*\/\s*([^\/\s]+))$/),
       t;
-    yield [r, void 0], e && ((r = e[1]), (t = e[2]), yield [r, t]);
+    (yield [r, void 0], e && ((r = e[1]), (t = e[2]), yield [r, t]));
   }
   function K2(r, e, t) {
     let i = Array.from(Y2(e)).map(([n, s]) =>
@@ -20661,8 +20680,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         {
           resolvedPath: n,
           alpha: s,
-        }
-      )
+        },
+      ),
     );
     return i.find((n) => n.isValid) ?? i[0];
   }
@@ -20680,11 +20699,11 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             let p = i.parent,
               h = p?.raws.tailwind?.candidate;
             if (p && h !== void 0) {
-              r.markInvalidUtilityNode(p),
+              (r.markInvalidUtilityNode(p),
                 p.remove(),
                 G.warn('invalid-theme-key-in-class', [
                   `The utility \`${h}\` contains an invalid theme value and was not generated.`,
-                ]);
+                ]));
               return;
             }
             throw i.error(l);
@@ -20717,7 +20736,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     Q2,
     py = P(() => {
       u();
-      (Mi = pe(Ra())), (oy = pe(Wg()));
+      ((Mi = pe(Ra())), (oy = pe(Wg())));
       Ci();
       jl = pe(ay());
       Zn();
@@ -20737,7 +20756,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         let i = t.params,
           s = Rt(r.screens).find(({ name: a }) => a === i);
         if (!s) throw t.error(`No \`${i}\` screen found.`);
-        (t.name = 'media'), (t.params = Tt(s));
+        ((t.name = 'media'), (t.params = Tt(s)));
       });
     };
   }
@@ -20753,8 +20772,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             ? !0
             : o.value.startsWith('::') ||
               [':before', ':after', ':first-line', ':first-letter'].includes(
-                o.value
-              )
+                o.value,
+              ),
         )
         .reverse(),
       t = new Set(['tag', 'class', 'id', 'attribute']),
@@ -20770,7 +20789,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     );
   }
   function J2(r) {
-    return Vl.has(r) || Vl.set(r, Z2.transformSync(r)), Vl.get(r);
+    return (Vl.has(r) || Vl.set(r, Z2.transformSync(r)), Vl.get(r));
   }
   function Hl({ tailwindConfig: r }) {
     return (e) => {
@@ -20783,7 +20802,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             return;
           }
           let s = n.params;
-          t.has(s) || t.set(s, new Set()), t.get(s).add(n.parent), n.remove();
+          (t.has(s) || t.set(s, new Set()), t.get(s).add(n.parent), n.remove());
         }),
         we(r, 'optimizeUniversalDefaults'))
       )
@@ -20797,7 +20816,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                     ? l
                     : '__DEFAULT__',
                 f = s.get(c) ?? new Set();
-              s.set(c, f), f.add(l);
+              (s.set(c, f), f.add(l));
             }
           if (s.size === 0) {
             n.remove();
@@ -20807,9 +20826,9 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             let l = ee.rule({
               source: n.source,
             });
-            (l.selectors = [...o]),
+            ((l.selectors = [...o]),
               l.append(n.nodes.map((c) => c.clone())),
-              n.before(l);
+              n.before(l));
           }
           n.remove();
         }
@@ -20818,10 +20837,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           selectors: ['*', '::before', '::after'],
         });
         for (let a of i)
-          n.append(a.nodes),
+          (n.append(a.nodes),
             n.parent || a.before(n),
             n.source || (n.source = a.source),
-            a.remove();
+            a.remove());
         let s = n.clone({
           selectors: ['::backdrop'],
         });
@@ -20848,20 +20867,20 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           });
         },
       };
-      (Z2 = (0, Es.default)((r) =>
+      ((Z2 = (0, Es.default)((r) =>
         r.map((e) => {
           let t = e
             .split((i) => i.type === 'combinator' && i.value === ' ')
             .pop();
           return X2(t);
-        })
+        }),
       )),
-        (Vl = new Map());
+        (Vl = new Map()));
     });
   function Wl() {
     function r(e) {
       let t = null;
-      e.each((i) => {
+      (e.each((i) => {
         if (!eO.has(i.type)) {
           t = null;
           return;
@@ -20874,16 +20893,16 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         i.type === 'atrule' && i.name === 'font-face'
           ? (t = i)
           : n.every(
-              (s) =>
-                (i[s] ?? '').replace(/\s+/g, ' ') ===
-                (t[s] ?? '').replace(/\s+/g, ' ')
-            )
-          ? (i.nodes && t.append(i.nodes), i.remove())
-          : (t = i);
+                (s) =>
+                  (i[s] ?? '').replace(/\s+/g, ' ') ===
+                  (t[s] ?? '').replace(/\s+/g, ' '),
+              )
+            ? (i.nodes && t.append(i.nodes), i.remove())
+            : (t = i);
       }),
         e.each((i) => {
           i.type === 'atrule' && r(i);
-        });
+        }));
     }
     return (e) => {
       r(e);
@@ -20893,11 +20912,11 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     eO,
     by = P(() => {
       u();
-      (yy = {
+      ((yy = {
         atrule: ['name', 'params'],
         rule: ['selector'],
       }),
-        (eO = new Set(Object.keys(yy)));
+        (eO = new Set(Object.keys(yy))));
     });
   function Gl() {
     return (r) => {
@@ -20909,12 +20928,12 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           if (s.parent === e) {
             if (t.has(s.prop)) {
               if (t.get(s.prop).value === s.value) {
-                i.add(t.get(s.prop)), t.set(s.prop, s);
+                (i.add(t.get(s.prop)), t.set(s.prop, s));
                 return;
               }
-              n.has(s.prop) || n.set(s.prop, new Set()),
+              (n.has(s.prop) || n.set(s.prop, new Set()),
                 n.get(s.prop).add(t.get(s.prop)),
-                n.get(s.prop).add(s);
+                n.get(s.prop).add(s));
             }
             t.set(s.prop, s);
           }
@@ -20936,7 +20955,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
   }
   function rO(r) {
     let e = /^-?\d*.?\d+([\w%]+)?$/g.exec(r);
-    return e ? e[1] ?? tO : null;
+    return e ? (e[1] ?? tO) : null;
   }
   var tO,
     wy = P(() => {
@@ -20964,7 +20983,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             let a = t.clone({
               nodes: [],
             });
-            a.append(s), t.after(a);
+            (a.append(s), t.after(a));
           }
           t.remove();
         }
@@ -20998,9 +21017,9 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       })(e, t);
       if (s.tailwindConfig.separator === '-')
         throw new Error(
-          "The '-' character cannot be used as a custom separator in JIT mode due to parsing ambiguity. Please use another character like '_' instead."
+          "The '-' character cannot be used as a custom separator in JIT mode due to parsing ambiguity. Please use another character like '_' instead.",
         );
-      Rf(s.tailwindConfig),
+      (Rf(s.tailwindConfig),
         await Pl(s)(e, t),
         Os()(e, t),
         Dl(s)(e, t),
@@ -21008,7 +21027,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         dy(s)(e, t),
         Hl(s)(e, t),
         Wl(s)(e, t),
-        Gl(s)(e, t);
+        Gl(s)(e, t));
     };
   }
   var xy = P(() => {
@@ -21032,23 +21051,23 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       r.walkAtRules('config', (n) => {
         if (((i = n.source?.input.file ?? e.opts.from ?? null), i === null))
           throw n.error(
-            'The `@config` directive cannot be used without setting `from` in your PostCSS config.'
+            'The `@config` directive cannot be used without setting `from` in your PostCSS config.',
           );
         if (t)
           throw n.error('Only one `@config` directive is allowed per file.');
         let s = n.params.match(/(['"])(.*?)\1/);
         if (!s)
           throw n.error(
-            'A path is required when using the `@config` directive.'
+            'A path is required when using the `@config` directive.',
           );
         let a = s[2];
         if (me.isAbsolute(a))
           throw n.error(
-            'The `@config` directive cannot be used with an absolute path.'
+            'The `@config` directive cannot be used with an absolute path.',
           );
         if (((t = me.resolve(me.dirname(i), a)), !be.existsSync(t)))
           throw n.error(
-            `The config file at "${a}" does not exist. Make sure the path is correct and the file exists.`
+            `The config file at "${a}" does not exist. Make sure the path is correct and the file exists.`,
           );
         n.remove();
       }),
@@ -21792,11 +21811,11 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         i = e(t, []);
       if (t === i) return r;
       let n = r.match(/,\s*/);
-      return (n = n ? n[0] : ', '), i.join(n);
+      return ((n = n ? n[0] : ', '), i.join(n));
     };
     Lt.exports.splitSelector = function (r) {
       return Kl.comma(r).map((e) =>
-        Kl.space(e).map((t) => t.split(/(?=\.|#)/g))
+        Kl.space(e).map((t) => t.split(/(?=\.|#)/g)),
       );
     };
   });
@@ -21825,21 +21844,21 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           );
         }
         constructor(e, t, i, n) {
-          (this.data = e),
+          ((this.data = e),
             (this.options = i || {}),
             (this.browserslistOpts = n || {}),
-            (this.selected = this.parse(t));
+            (this.selected = this.parse(t)));
         }
         parse(e) {
           let t = {};
           for (let i in this.browserslistOpts) t[i] = this.browserslistOpts[i];
-          return (t.path = this.options.from), aO(e, t);
+          return ((t.path = this.options.from), aO(e, t));
         }
         prefix(e) {
           let [t, i] = e.split(' '),
             n = this.data[t],
             s = n.prefix_exceptions && n.prefix_exceptions[i];
-          return s || (s = n.prefix), `-${s}-`;
+          return (s || (s = n.prefix), `-${s}-`);
         }
         isSelected(e) {
           return this.selected.includes(e);
@@ -21871,13 +21890,14 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         i === 'parent' && typeof n == 'object'
           ? e && (t[i] = e)
           : i === 'source' || i === null
-          ? (t[i] = n)
-          : Array.isArray(n)
-          ? (t[i] = n.map((s) => Xl(s, t)))
-          : i !== '_autoprefixerPrefix' &&
-            i !== '_autoprefixerValues' &&
-            i !== 'proxyCache' &&
-            (typeof n == 'object' && n !== null && (n = Xl(n, t)), (t[i] = n));
+            ? (t[i] = n)
+            : Array.isArray(n)
+              ? (t[i] = n.map((s) => Xl(s, t)))
+              : i !== '_autoprefixerPrefix' &&
+                i !== '_autoprefixerValues' &&
+                i !== 'proxyCache' &&
+                (typeof n == 'object' && n !== null && (n = Xl(n, t)),
+                (t[i] = n));
       }
       return t;
     }
@@ -21898,7 +21918,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         return i;
       }
       constructor(e, t, i) {
-        (this.prefixes = t), (this.name = e), (this.all = i);
+        ((this.prefixes = t), (this.name = e), (this.all = i));
       }
       parentPrefix(e) {
         let t;
@@ -21906,16 +21926,16 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           typeof e._autoprefixerPrefix != 'undefined'
             ? (t = e._autoprefixerPrefix)
             : e.type === 'decl' && e.prop[0] === '-'
-            ? (t = Dy.prefix(e.prop))
-            : e.type === 'root'
-            ? (t = !1)
-            : e.type === 'rule' &&
-              e.selector.includes(':-') &&
-              /:(-\w+-)/.test(e.selector)
-            ? (t = e.selector.match(/:(-\w+-)/)[1])
-            : e.type === 'atrule' && e.name[0] === '-'
-            ? (t = Dy.prefix(e.name))
-            : (t = this.parentPrefix(e.parent)),
+              ? (t = Dy.prefix(e.prop))
+              : e.type === 'root'
+                ? (t = !1)
+                : e.type === 'rule' &&
+                    e.selector.includes(':-') &&
+                    /:(-\w+-)/.test(e.selector)
+                  ? (t = e.selector.match(/:(-\w+-)/)[1])
+                  : e.type === 'atrule' && e.name[0] === '-'
+                    ? (t = Dy.prefix(e.name))
+                    : (t = this.parentPrefix(e.parent)),
           lO.prefixes().includes(t) || (t = !1),
           (e._autoprefixerPrefix = t),
           e._autoprefixerPrefix
@@ -21955,7 +21975,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           return !1;
         }
         set(e, t) {
-          return (e.prop = this.prefixed(e.prop, t)), e;
+          return ((e.prop = this.prefixed(e.prop, t)), e);
         }
         needCascade(e) {
           return (
@@ -21971,19 +21991,19 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           if (t._autoprefixerMax) return t._autoprefixerMax;
           let i = 0;
           for (let n of e)
-            (n = $y.removeNote(n)), n.length > i && (i = n.length);
-          return (t._autoprefixerMax = i), t._autoprefixerMax;
+            ((n = $y.removeNote(n)), n.length > i && (i = n.length));
+          return ((t._autoprefixerMax = i), t._autoprefixerMax);
         }
         calcBefore(e, t, i = '') {
           let s = this.maxPrefixed(e, t) - $y.removeNote(i).length,
             a = t.raw('before');
-          return s > 0 && (a += Array(s).fill(' ').join('')), a;
+          return (s > 0 && (a += Array(s).fill(' ').join('')), a);
         }
         restoreBefore(e) {
           let t = e.raw('before').split(`
 `),
             i = t[t.length - 1];
-          this.all.group(e).up((n) => {
+          (this.all.group(e).up((n) => {
             let s = n.raw('before').split(`
 `),
               a = s[s.length - 1];
@@ -21991,7 +22011,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           }),
             (t[t.length - 1] = i),
             (e.raws.before = t.join(`
-`));
+`)));
         }
         insert(e, t, i) {
           let n = this.set(this.clone(e), t);
@@ -22008,7 +22028,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         }
         isAlready(e, t) {
           let i = this.all.group(e).up((n) => n.prop === t);
-          return i || (i = this.all.group(e).down((n) => n.prop === t)), i;
+          return (i || (i = this.all.group(e).down((n) => n.prop === t)), i);
         }
         add(e, t, i, n) {
           let s = this.prefixed(e.prop, t);
@@ -22070,11 +22090,11 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           if (!this.bad) {
             this.bad = [];
             for (let t of this.prefixes)
-              this.bad.push(this.prefixName(t, 'min')),
-                this.bad.push(this.prefixName(t, 'max'));
+              (this.bad.push(this.prefixName(t, 'min')),
+                this.bad.push(this.prefixName(t, 'max')));
           }
           e.params = Zl.editList(e.params, (t) =>
-            t.filter((i) => this.bad.every((n) => !i.includes(n)))
+            t.filter((i) => this.bad.every((n) => !i.includes(n))),
           );
         }
         process(e) {
@@ -22145,51 +22165,51 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           k = '',
           S = '';
         d < h;
-
       )
         if (p <= 32) {
           i = d;
-          do (i += 1), (p = t.charCodeAt(i));
+          do ((i += 1), (p = t.charCodeAt(i)));
           while (p <= 32);
-          (a = t.slice(d, i)),
+          ((a = t.slice(d, i)),
             (s = e[e.length - 1]),
             p === eu && v
               ? (S = a)
               : s && s.type === 'div'
-              ? ((s.after = a), (s.sourceEndIndex += a.length))
-              : p === iu ||
-                p === nu ||
-                (p === vr &&
-                  t.charCodeAt(i + 1) !== qs &&
-                  (!y || (y && y.type === 'function' && y.value !== 'calc')))
-              ? (k = a)
-              : e.push({
-                  type: 'space',
-                  sourceIndex: d,
-                  sourceEndIndex: i,
-                  value: a,
-                }),
-            (d = i);
+                ? ((s.after = a), (s.sourceEndIndex += a.length))
+                : p === iu ||
+                    p === nu ||
+                    (p === vr &&
+                      t.charCodeAt(i + 1) !== qs &&
+                      (!y ||
+                        (y && y.type === 'function' && y.value !== 'calc')))
+                  ? (k = a)
+                  : e.push({
+                      type: 'space',
+                      sourceIndex: d,
+                      sourceEndIndex: i,
+                      value: a,
+                    }),
+            (d = i));
         } else if (p === Ds || p === tu) {
-          (i = d),
+          ((i = d),
             (n = p === Ds ? "'" : '"'),
             (a = {
               type: 'string',
               sourceIndex: d,
               quote: n,
-            });
+            }));
           do
             if (((o = !1), (i = t.indexOf(n, i + 1)), ~i))
-              for (l = i; t.charCodeAt(l - 1) === ru; ) (l -= 1), (o = !o);
-            else (t += n), (i = t.length - 1), (a.unclosed = !0);
+              for (l = i; t.charCodeAt(l - 1) === ru; ) ((l -= 1), (o = !o));
+            else ((t += n), (i = t.length - 1), (a.unclosed = !0));
           while (o);
-          (a.value = t.slice(d + 1, i)),
+          ((a.value = t.slice(d + 1, i)),
             (a.sourceEndIndex = a.unclosed ? i : i + 1),
             e.push(a),
             (d = i + 1),
-            (p = t.charCodeAt(d));
+            (p = t.charCodeAt(d)));
         } else if (p === vr && t.charCodeAt(d + 1) === qs)
-          (i = t.indexOf('*/', d)),
+          ((i = t.indexOf('*/', d)),
             (a = {
               type: 'comment',
               sourceIndex: d,
@@ -22200,14 +22220,14 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             (a.value = t.slice(d + 2, i)),
             e.push(a),
             (d = i + 2),
-            (p = t.charCodeAt(d));
+            (p = t.charCodeAt(d)));
         else if (
           (p === vr || p === qs) &&
           y &&
           y.type === 'function' &&
           y.value === 'calc'
         )
-          (a = t[d]),
+          ((a = t[d]),
             e.push({
               type: 'word',
               sourceIndex: d - k.length,
@@ -22215,9 +22235,9 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               value: a,
             }),
             (d += 1),
-            (p = t.charCodeAt(d));
+            (p = t.charCodeAt(d)));
         else if (p === vr || p === iu || p === nu)
-          (a = t[d]),
+          ((a = t[d]),
             e.push({
               type: 'div',
               sourceIndex: d - k.length,
@@ -22228,10 +22248,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             }),
             (k = ''),
             (d += 1),
-            (p = t.charCodeAt(d));
+            (p = t.charCodeAt(d)));
         else if (Jl === p) {
           i = d;
-          do (i += 1), (p = t.charCodeAt(i));
+          do ((i += 1), (p = t.charCodeAt(i)));
           while (p <= 32);
           if (
             ((f = d),
@@ -22247,13 +22267,13 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             i -= 1;
             do
               if (((o = !1), (i = t.indexOf(')', i + 1)), ~i))
-                for (l = i; t.charCodeAt(l - 1) === ru; ) (l -= 1), (o = !o);
-              else (t += ')'), (i = t.length - 1), (a.unclosed = !0);
+                for (l = i; t.charCodeAt(l - 1) === ru; ) ((l -= 1), (o = !o));
+              else ((t += ')'), (i = t.length - 1), (a.unclosed = !0));
             while (o);
             c = i;
-            do (c -= 1), (p = t.charCodeAt(c));
+            do ((c -= 1), (p = t.charCodeAt(c)));
             while (p <= 32);
-            f < c
+            (f < c
               ? (d !== c + 1
                   ? (a.nodes = [
                       {
@@ -22277,18 +22297,18 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               (d = i + 1),
               (a.sourceEndIndex = a.unclosed ? i : d),
               (p = t.charCodeAt(d)),
-              e.push(a);
+              e.push(a));
           } else
-            (v += 1),
+            ((v += 1),
               (a.after = ''),
               (a.sourceEndIndex = d + 1),
               e.push(a),
               b.push(a),
               (e = a.nodes = []),
-              (y = a);
+              (y = a));
           w = '';
         } else if (eu === p && v)
-          (d += 1),
+          ((d += 1),
             (p = t.charCodeAt(d)),
             (y.after = S),
             (y.sourceEndIndex += S.length),
@@ -22297,10 +22317,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             (b[b.length - 1].sourceEndIndex = d),
             b.pop(),
             (y = b[v]),
-            (e = y.nodes);
+            (e = y.nodes));
         else {
           i = d;
-          do p === ru && (i += 1), (i += 1), (p = t.charCodeAt(i));
+          do (p === ru && (i += 1), (i += 1), (p = t.charCodeAt(i)));
           while (
             i < h &&
             !(
@@ -22316,28 +22336,28 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               (p === eu && v)
             )
           );
-          (a = t.slice(d, i)),
+          ((a = t.slice(d, i)),
             Jl === p
               ? (w = a)
               : (gO === a.charCodeAt(0) || yO === a.charCodeAt(0)) &&
-                bO === a.charCodeAt(1) &&
-                wO.test(a.slice(2))
-              ? e.push({
-                  type: 'unicode-range',
-                  sourceIndex: d,
-                  sourceEndIndex: i,
-                  value: a,
-                })
-              : e.push({
-                  type: 'word',
-                  sourceIndex: d,
-                  sourceEndIndex: i,
-                  value: a,
-                }),
-            (d = i);
+                  bO === a.charCodeAt(1) &&
+                  wO.test(a.slice(2))
+                ? e.push({
+                    type: 'unicode-range',
+                    sourceIndex: d,
+                    sourceEndIndex: i,
+                    value: a,
+                  })
+                : e.push({
+                    type: 'word',
+                    sourceIndex: d,
+                    sourceEndIndex: i,
+                    value: a,
+                  }),
+            (d = i));
         }
       for (d = b.length - 1; d; d -= 1)
-        (b[d].unclosed = !0), (b[d].sourceEndIndex = t.length);
+        ((b[d].unclosed = !0), (b[d].sourceEndIndex = t.length));
       return b[0].nodes;
     };
   });
@@ -22346,13 +22366,13 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     Hy.exports = function r(e, t, i) {
       var n, s, a, o;
       for (n = 0, s = e.length; n < s; n += 1)
-        (a = e[n]),
+        ((a = e[n]),
           i || (o = t(a, n, e)),
           o !== !1 &&
             a.type === 'function' &&
             Array.isArray(a.nodes) &&
             r(a.nodes, t, i),
-          i && t(a, n, e);
+          i && t(a, n, e));
     };
   });
   var Ky = x((a$, Yy) => {
@@ -22365,24 +22385,24 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       return e && (s = e(r)) !== void 0
         ? s
         : t === 'word' || t === 'space'
-        ? i
-        : t === 'string'
-        ? ((n = r.quote || ''), n + i + (r.unclosed ? '' : n))
-        : t === 'comment'
-        ? '/*' + i + (r.unclosed ? '' : '*/')
-        : t === 'div'
-        ? (r.before || '') + i + (r.after || '')
-        : Array.isArray(r.nodes)
-        ? ((n = Qy(r.nodes, e)),
-          t !== 'function'
-            ? n
-            : i +
-              '(' +
-              (r.before || '') +
-              n +
-              (r.after || '') +
-              (r.unclosed ? '' : ')'))
-        : i;
+          ? i
+          : t === 'string'
+            ? ((n = r.quote || ''), n + i + (r.unclosed ? '' : n))
+            : t === 'comment'
+              ? '/*' + i + (r.unclosed ? '' : '*/')
+              : t === 'div'
+                ? (r.before || '') + i + (r.after || '')
+                : Array.isArray(r.nodes)
+                  ? ((n = Qy(r.nodes, e)),
+                    t !== 'function'
+                      ? n
+                      : i +
+                        '(' +
+                        (r.before || '') +
+                        n +
+                        (r.after || '') +
+                        (r.unclosed ? '' : ')'))
+                  : i;
     }
     function Qy(r, e) {
       var t, i;
@@ -22423,7 +22443,6 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       for (
         i = r.charCodeAt(e), (i === Ls || i === $s) && e++;
         e < t && ((i = r.charCodeAt(e)), !(i < 48 || i > 57));
-
       )
         e += 1;
       if (
@@ -22444,7 +22463,6 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         for (
           e += n === Ls || n === $s ? 3 : 2;
           e < t && ((i = r.charCodeAt(e)), !(i < 48 || i > 57));
-
         )
           e += 1;
       return {
@@ -22465,7 +22483,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       return Array.isArray(this.nodes) ? eb(this.nodes) : '';
     };
     Nt.prototype.walk = function (r, e) {
-      return Jy(this.nodes, r, e), this;
+      return (Jy(this.nodes, r, e), this);
     };
     Nt.unit = Zy();
     Nt.walk = Jy;
@@ -22480,8 +22498,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       ib = Ni(),
       nb = class {
         constructor(e) {
-          (this.props = ['transition', 'transition-property']),
-            (this.prefixes = e);
+          ((this.props = ['transition', 'transition-property']),
+            (this.prefixes = e));
         }
         add(e, t) {
           let i,
@@ -22548,7 +22566,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           if (t.prop !== 'transition-property') return;
           let i = !1,
             n = !1;
-          t.parent.each((s) => {
+          (t.parent.each((s) => {
             if (s.type !== 'decl' || s.prop.indexOf('transition-') !== 0)
               return;
             let a = AO.comma(s.value);
@@ -22559,14 +22577,14 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               });
               return;
             }
-            return (n = n || a.length > 1), !1;
+            return ((n = n || a.length > 1), !1);
           }),
             i &&
               n &&
               t.warn(
                 e,
-                'Replace transition-property to transition, because Autoprefixer could not support any cases of transition-property and other transition-*'
-              );
+                'Replace transition-property to transition, because Autoprefixer could not support any cases of transition-property and other transition-*',
+              ));
         }
         remove(e) {
           let t = this.parse(e.value);
@@ -22582,7 +22600,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           }
           let n = e.parent.some((a) => a.prop === e.prop && a.value === i),
             s = e.parent.some(
-              (a) => a !== e && a.prop === e.prop && a.value.length > i.length
+              (a) => a !== e && a.prop === e.prop && a.value.length > i.length,
             );
           if (n || s) {
             e.remove();
@@ -22595,16 +22613,16 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             i = [],
             n = [];
           for (let s of t.nodes)
-            n.push(s),
-              s.type === 'div' && s.value === ',' && (i.push(n), (n = []));
-          return i.push(n), i.filter((s) => s.length > 0);
+            (n.push(s),
+              s.type === 'div' && s.value === ',' && (i.push(n), (n = [])));
+          return (i.push(n), i.filter((s) => s.length > 0));
         }
         stringify(e) {
           if (e.length === 0) return '';
           let t = [];
           for (let i of e)
-            i[i.length - 1].type !== 'div' && i.push(this.div(e)),
-              (t = t.concat(i));
+            (i[i.length - 1].type !== 'div' && i.push(this.div(e)),
+              (t = t.concat(i)));
           return (
             t[0].type === 'div' && (t = t.slice(1)),
             t[t.length - 1].type === 'div' &&
@@ -22678,10 +22696,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     var _O = _e(),
       ob = class {
         constructor(e, t, i, n) {
-          (this.unprefixed = e),
+          ((this.unprefixed = e),
             (this.prefixed = t),
             (this.string = i || t),
-            (this.regexp = n || _O.regexp(t));
+            (this.regexp = n || _O.regexp(t)));
         }
         check(e) {
           return e.includes(this.string) ? !!e.match(this.regexp) : !1;
@@ -22706,7 +22724,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               l = TO.prefix(i);
             if (l === '-pie-') continue;
             if (l === s) {
-              (o = t.value = a), n.push(o);
+              ((o = t.value = a), n.push(o));
               continue;
             }
             let c = e.prefixed(i, s),
@@ -22718,7 +22736,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             let d = a.replace(/\s+/, ' ');
             if (
               f.some(
-                (b) => b.prop === t.prop && b.value.replace(/\s+/, ' ') === d
+                (b) => b.prop === t.prop && b.value.replace(/\s+/, ' ') === d,
               )
             ) {
               n.push(o);
@@ -22727,7 +22745,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             let h = this.clone(t, {
               value: a,
             });
-            (o = t.parent.insertBefore(t, h)), n.push(o);
+            ((o = t.parent.insertBefore(t, h)), n.push(o));
           }
           return n;
         }
@@ -22789,7 +22807,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       ];
     function au(r) {
       return r.parent.some(
-        (e) => e.prop === 'grid-template' || e.prop === 'grid-template-areas'
+        (e) => e.prop === 'grid-template' || e.prop === 'grid-template-areas',
       );
     }
     function NO(r) {
@@ -22806,7 +22824,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           n = this.prefixes.add['@keyframes'],
           s = this.prefixes.add['@viewport'],
           a = this.prefixes.add['@supports'];
-        e.walkAtRules((f) => {
+        (e.walkAtRules((f) => {
           if (f.name === 'keyframes') {
             if (!this.disabled(f, t)) return n && n.process(f);
           } else if (f.name === 'viewport') {
@@ -22824,7 +22842,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           e.walkRules((f) => {
             if (!this.disabled(f, t))
               return this.prefixes.add.selectors.map((d) => d.process(f, t));
-          });
+          }));
         function o(f) {
           return f.parent.nodes.some((d) => {
             if (d.type !== 'decl') return !1;
@@ -22836,7 +22854,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         }
         function l(f) {
           return f.parent.some(
-            (d) => d.prop === 'display' && /(inline-)?flex/.test(d.value)
+            (d) => d.prop === 'display' && /(inline-)?flex/.test(d.value),
           );
         }
         let c =
@@ -22854,7 +22872,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 'grid-row-span is not part of final Grid Layout. Use grid-row.',
                 {
                   node: f,
-                }
+                },
               );
               return;
             } else if (p === 'grid-column-span') {
@@ -22862,7 +22880,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 'grid-column-span is not part of final Grid Layout. Use grid-column.',
                 {
                   node: f,
-                }
+                },
               );
               return;
             } else if (p === 'display' && h === 'box') {
@@ -22870,7 +22888,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 'You should write display: flex by final spec instead of display: box',
                 {
                   node: f,
-                }
+                },
               );
               return;
             } else if (p === 'text-emphasis-position')
@@ -22879,7 +22897,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   'You should use 2 values for text-emphasis-position For example, `under left` instead of just `under`.',
                   {
                     node: f,
-                  }
+                  },
                 );
             else if (/^(align|justify|place)-(items|content)$/.test(p) && l(f))
               (h === 'start' || h === 'end') &&
@@ -22887,14 +22905,14 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   `${h} value has mixed support, consider using flex-${h} instead`,
                   {
                     node: f,
-                  }
+                  },
                 );
             else if (p === 'text-decoration-skip' && h === 'ink')
               t.warn(
                 'Replace text-decoration-skip: ink to text-decoration-skip-ink: auto, because spec had been changed',
                 {
                   node: f,
-                }
+                },
               );
             else {
               if (c && this.gridStatus(f, t))
@@ -22910,7 +22928,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                     `IE does not support ${p} on grid containers. Try using ${v} on child elements instead: ${f.parent.selector} > * { ${v}: ${f.value} }`,
                     {
                       node: f,
-                    }
+                    },
                   );
                 } else if (/^(align|justify|place)-content$/.test(p) && o(f))
                   t.warn(`IE does not support ${f.prop} on grid containers`, {
@@ -22921,7 +22939,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                     'Please do not use display: contents; if you have grid setting enabled',
                     {
                       node: f,
-                    }
+                    },
                   );
                   return;
                 } else if (f.prop === 'grid-gap') {
@@ -22931,7 +22949,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                         'grid-gap only works if grid-template(-areas) is being used or both rows and columns have been declared and cells have not been manually placed inside the explicit grid',
                         {
                           node: f,
-                        }
+                        },
                       )
                     : (v === !0 || v === 'no-autoplace') &&
                       !au(f) &&
@@ -22939,7 +22957,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                         'grid-gap only works if grid-template(-areas) is being used',
                         {
                           node: f,
-                        }
+                        },
                       );
                 } else if (p === 'grid-auto-columns') {
                   t.warn('grid-auto-columns is not supported by IE', {
@@ -22959,17 +22977,17 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                         node: f,
                       })
                     : h.includes('dense')
-                    ? t.warn('grid-auto-flow: dense is not supported by IE', {
-                        node: f,
-                      })
-                    : !v &&
-                      !y &&
-                      t.warn(
-                        'grid-auto-flow works only if grid-template-rows and grid-template-columns are present in the same rule',
-                        {
+                      ? t.warn('grid-auto-flow: dense is not supported by IE', {
                           node: f,
-                        }
-                      );
+                        })
+                      : !v &&
+                        !y &&
+                        t.warn(
+                          'grid-auto-flow works only if grid-template-rows and grid-template-columns are present in the same rule',
+                          {
+                            node: f,
+                          },
+                        );
                   return;
                 } else if (h.includes('auto-fit')) {
                   t.warn('auto-fit value is not supported by IE', {
@@ -22991,7 +23009,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                       {
                         node: f,
                         word: '[',
-                      }
+                      },
                     );
               if (h.includes('radial-gradient'))
                 if (qO.test(f.value))
@@ -22999,7 +23017,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                     'Gradient has outdated direction syntax. New syntax is like `closest-side at 0 0` instead of `0 0, closest-side`.',
                     {
                       node: f,
-                    }
+                    },
                   );
                 else {
                   let v = pb(h);
@@ -23012,14 +23030,14 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                                 'Gradient has outdated direction syntax. Replace `cover` to `farthest-corner`.',
                                 {
                                   node: f,
-                                }
+                                },
                               )
                             : w.value === 'contain' &&
                               t.warn(
                                 'Gradient has outdated direction syntax. Replace `contain` to `closest-side`.',
                                 {
                                   node: f,
-                                }
+                                },
                               ));
                 }
               h.includes('linear-gradient') &&
@@ -23028,7 +23046,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   'Gradient has outdated direction syntax. New syntax is like `to left` instead of `right`.',
                   {
                     node: f,
-                  }
+                  },
                 );
             }
             MO.includes(f.prop) &&
@@ -23038,17 +23056,17 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                       'Replace fill-available to stretch, because spec had been changed',
                       {
                         node: f,
-                      }
+                      },
                     )
                   : f.value.includes('fill') &&
                     pb(h).nodes.some(
-                      (y) => y.type === 'word' && y.value === 'fill'
+                      (y) => y.type === 'word' && y.value === 'fill',
                     ) &&
                     t.warn(
                       'Replace fill to stretch, because spec had been changed',
                       {
                         node: f,
-                      }
+                      },
                     )));
             let b;
             if (f.prop === 'transition' || f.prop === 'transition-property')
@@ -23124,9 +23142,9 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               if (!n.parent.some((f) => c[f.prop])) return;
             }
             if (l && !this.withHackValue(n)) {
-              n.raw('before').includes(`
+              (n.raw('before').includes(`
 `) && this.reduceSpaces(n),
-                a.removeChild(s);
+                a.removeChild(s));
               return;
             }
           }
@@ -23186,7 +23204,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         let i = null;
         if (e.nodes) {
           let n;
-          e.each((s) => {
+          (e.each((s) => {
             s.type === 'comment' &&
               /(!\s*)?autoprefixer:\s*(off|on)/i.test(s.text) &&
               (typeof n != 'undefined'
@@ -23194,18 +23212,18 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                     'Second Autoprefixer control comment was ignored. Autoprefixer applies control comment to whole block, not to next rules.',
                     {
                       node: s,
-                    }
+                    },
                   )
                 : (n = /on/i.test(s.text)));
           }),
-            n !== void 0 && (i = !n);
+            n !== void 0 && (i = !n));
         }
         if (!e.nodes || i === null)
           if (e.parent) {
             let n = this.disabled(e.parent, t);
             e.parent._autoprefixerSelfDisabled === !0 ? (i = !1) : (i = n);
           } else i = !1;
-        return (e._autoprefixerDisabled = i), i;
+        return ((e._autoprefixerDisabled = i), i);
       }
       reduceSpaces(e) {
         let t = !1;
@@ -23240,7 +23258,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         let i = null;
         if (e.nodes) {
           let n;
-          e.each((s) => {
+          (e.each((s) => {
             if (s.type === 'comment' && LO.test(s.text)) {
               let a = /:\s*autoplace/i.test(s.text),
                 o = /no-autoplace/i.test(s.text);
@@ -23249,16 +23267,16 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                     'Second Autoprefixer grid control comment was ignored. Autoprefixer applies control comments to the whole block, not to the next rules.',
                     {
                       node: s,
-                    }
+                    },
                   )
                 : a
-                ? (n = 'autoplace')
-                : o
-                ? (n = !0)
-                : (n = /on/i.test(s.text));
+                  ? (n = 'autoplace')
+                  : o
+                    ? (n = !0)
+                    : (n = /on/i.test(s.text));
             }
           }),
-            n !== void 0 && (i = n);
+            n !== void 0 && (i = n));
         }
         if (e.type === 'atrule' && e.name === 'supports') {
           let n = e.params;
@@ -23272,11 +23290,11 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             typeof this.prefixes.options.grid != 'undefined'
               ? (i = this.prefixes.options.grid)
               : typeof m.env.AUTOPREFIXER_GRID != 'undefined'
-              ? m.env.AUTOPREFIXER_GRID === 'autoplace'
-                ? (i = 'autoplace')
-                : (i = !0)
-              : (i = !1);
-        return (e._autoprefixerGridStatus = i), i;
+                ? m.env.AUTOPREFIXER_GRID === 'autoplace'
+                  ? (i = 'autoplace')
+                  : (i = !0)
+                : (i = !1);
+        return ((e._autoprefixerGridStatus = i), i);
       }
     };
     hb.exports = db;
@@ -23365,11 +23383,11 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           t = [e];
         for (let i of r) {
           if (i === '(') {
-            (e = ['']), yb(t).push(e), t.push(e);
+            ((e = ['']), yb(t).push(e), t.push(e));
             continue;
           }
           if (i === ')') {
-            t.pop(), (e = yb(t)), e.push('');
+            (t.pop(), (e = yb(t)), e.push(''));
             continue;
           }
           e[e.length - 1] += i;
@@ -23410,7 +23428,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     }
     var Sb = class {
       constructor(e, t) {
-        (this.Prefixes = e), (this.all = t);
+        ((this.Prefixes = e), (this.all = t));
       }
       prefixer() {
         if (this.prefixerCache) return this.prefixerCache;
@@ -23420,7 +23438,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           (this.prefixerCache = new this.Prefixes(
             this.all.data,
             t,
-            this.all.options
+            this.all.options,
           )),
           this.prefixerCache
         );
@@ -23429,7 +23447,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         let t = e.split(':'),
           i = t[0],
           n = t[1];
-        return n || (n = ''), [i.trim(), n.trim()];
+        return (n || (n = ''), [i.trim(), n.trim()]);
       }
       virtual(e) {
         let [t, i] = this.parse(e),
@@ -23497,7 +23515,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             i += 2;
             continue;
           }
-          typeof e[i] == 'object' && (e[i] = this.remove(e[i], t)), (i += 1);
+          (typeof e[i] == 'object' && (e[i] = this.remove(e[i], t)), (i += 1));
         }
         return e;
       }
@@ -23506,14 +23524,14 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           typeof t != 'object'
             ? t
             : t.length === 1 && typeof t[0] == 'object'
-            ? this.cleanBrackets(t[0])
-            : this.cleanBrackets(t)
+              ? this.cleanBrackets(t[0])
+              : this.cleanBrackets(t),
         );
       }
       convert(e) {
         let t = [''];
-        for (let i of e) t.push([`${i.prop}: ${i.value}`]), t.push(' or ');
-        return (t[t.length - 1] = ''), t;
+        for (let i of e) (t.push([`${i.prop}: ${i.value}`]), t.push(' or '));
+        return ((t[t.length - 1] = ''), t);
       }
       normalize(e) {
         if (typeof e != 'object') return e;
@@ -23535,11 +23553,11 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       }
       process(e) {
         let t = lu.parse(e.params);
-        (t = this.normalize(t)),
+        ((t = this.normalize(t)),
           (t = this.remove(t, e.params)),
           (t = this.add(t, e.params)),
           (t = this.cleanBrackets(t)),
-          (e.params = lu.stringify(t));
+          (e.params = lu.stringify(t)));
       }
       disabled(e) {
         if (
@@ -23563,14 +23581,14 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     u();
     var _b = class {
       constructor(e, t) {
-        (this.prefix = t),
+        ((this.prefix = t),
           (this.prefixed = e.prefixed(this.prefix)),
           (this.regexp = e.regexp(this.prefix)),
           (this.prefixeds = e
             .possible()
             .map((i) => [e.prefixed(i), e.regexp(i)])),
           (this.unprefixed = e.name),
-          (this.nameRegexp = e.regexp());
+          (this.nameRegexp = e.regexp()));
       }
       isHack(e) {
         let t = e.parent.index(e) + 1,
@@ -23626,7 +23644,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             let t = e ? this.prefixed(e) : this.name;
             this.regexpCache.set(
               e,
-              new RegExp(`(^|[^:"'=])${YO.escapeRegexp(t)}`, 'gi')
+              new RegExp(`(^|[^:"'=])${YO.escapeRegexp(t)}`, 'gi'),
             );
           }
           return this.regexpCache.get(e);
@@ -23647,7 +23665,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           } else
             for (let i of this.possible()) t[i] = this.replace(e.selector, i);
           return (
-            (e._autoprefixerPrefixeds[this.name] = t), e._autoprefixerPrefixeds
+            (e._autoprefixerPrefixeds[this.name] = t),
+            e._autoprefixerPrefixeds
           );
         }
         already(e, t, i) {
@@ -23714,8 +23733,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           return e === '-webkit-'
             ? ':-webkit-full-screen'
             : e === '-moz-'
-            ? ':-moz-full-screen'
-            : `:${e}fullscreen`;
+              ? ':-moz-full-screen'
+              : `:${e}fullscreen`;
         }
       };
     uu.names = [':fullscreen'];
@@ -23732,12 +23751,12 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           return e === '-webkit-'
             ? '::-webkit-input-placeholder'
             : e === '-ms-'
-            ? '::-ms-input-placeholder'
-            : e === '-ms- old'
-            ? ':-ms-input-placeholder'
-            : e === '-moz- old'
-            ? ':-moz-placeholder'
-            : `::${e}placeholder`;
+              ? '::-ms-input-placeholder'
+              : e === '-ms- old'
+                ? ':-ms-input-placeholder'
+                : e === '-moz- old'
+                  ? ':-moz-placeholder'
+                  : `::${e}placeholder`;
         }
       };
     fu.names = ['::placeholder'];
@@ -23783,8 +23802,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         r === '-webkit- 2009' || r === '-moz-'
           ? (e = 2009)
           : r === '-ms-'
-          ? (e = 2012)
-          : r === '-webkit-' && (e = 'final'),
+            ? (e = 2012)
+            : r === '-webkit-' && (e = 'final'),
         r === '-webkit- 2009' && (r = '-webkit-'),
         [e, r]
       );
@@ -23799,7 +23818,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         prefixed(e, t) {
           let i;
           return (
-            ([i, t] = Vb(t)), i === 2009 ? t + 'box-flex' : super.prefixed(e, t)
+            ([i, t] = Vb(t)),
+            i === 2009 ? t + 'box-flex' : super.prefixed(e, t)
           );
         }
         normalize() {
@@ -23841,8 +23861,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             i === 2009
               ? t + 'box-ordinal-group'
               : i === 2012
-              ? t + 'flex-order'
-              : super.prefixed(e, t)
+                ? t + 'flex-order'
+                : super.prefixed(e, t)
           );
         }
         normalize() {
@@ -23933,7 +23953,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             s.length === 0 ||
             e.parent.some(
               (d) =>
-                d.prop === t + 'box-orient' || d.prop === t + 'box-direction'
+                d.prop === t + 'box-orient' || d.prop === t + 'box-direction',
             )
           )
             return;
@@ -23972,8 +23992,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             i === 2009
               ? t + 'box-flex'
               : i === 2012
-              ? t + 'flex-positive'
-              : super.prefixed(e, t)
+                ? t + 'flex-positive'
+                : super.prefixed(e, t)
           );
         }
       };
@@ -24002,7 +24022,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           let s = Ar.parse(e),
             [a, o] = Ar.translate(s, 0, 2),
             [l, c] = Ar.translate(s, 1, 3);
-          [
+          ([
             ['grid-row', a],
             ['grid-row-span', o],
             ['grid-column', l],
@@ -24011,7 +24031,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             Ar.insertDecl(e, f, d);
           }),
             Ar.warnTemplateSelectorNotFound(e, n),
-            Ar.warnIfGridRowColumnExists(e, n);
+            Ar.warnIfGridRowColumnExists(e, n));
         }
       };
     vu.names = ['grid-area'];
@@ -24049,7 +24069,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         }
         prefixed(e, t) {
           let i = super.prefixed(e, t);
-          return t === '-ms-' && (i = i.replace('-start', '')), i;
+          return (t === '-ms-' && (i = i.replace('-start', '')), i);
         }
       };
     ku.names = ['grid-row-start', 'grid-column-start'];
@@ -24080,7 +24100,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           let i = hw(t)[0];
           if (i === 2012)
             return (
-              (e.value = Cr.oldValues[e.value] || e.value), super.set(e, t)
+              (e.value = Cr.oldValues[e.value] || e.value),
+              super.set(e, t)
             );
           if (i === 'final') return super.set(e, t);
         }
@@ -24101,7 +24122,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           super(e, t, i);
           this.prefixes &&
             (this.prefixes = bT.uniq(
-              this.prefixes.map((n) => (n === '-ms-' ? '-webkit-' : n))
+              this.prefixes.map((n) => (n === '-ms-' ? '-webkit-' : n)),
             ));
         }
       };
@@ -24141,7 +24162,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         }
         prefixed(e, t) {
           let i = super.prefixed(e, t);
-          return t === '-webkit-' && (i = i.replace('border', 'box-image')), i;
+          return (
+            t === '-webkit-' && (i = i.replace('border', 'box-image')),
+            i
+          );
         }
       };
     Cu.names = [
@@ -24167,8 +24191,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         insert(e, t, i) {
           let n = e.prop === 'mask-composite',
             s;
-          n ? (s = e.value.split(',')) : (s = e.value.match(lt.regexp) || []),
-            (s = s.map((c) => c.trim()).filter((c) => c));
+          (n ? (s = e.value.split(',')) : (s = e.value.match(lt.regexp) || []),
+            (s = s.map((c) => c.trim()).filter((c) => c)));
           let a = s.length,
             o;
           if (
@@ -24207,7 +24231,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     };
     lt.regexp = new RegExp(
       `\\s+(${Object.keys(lt.oldValues).join('|')})\\b(?!\\))\\s*(?=[,])`,
-      'ig'
+      'ig',
     );
     Aw.exports = lt;
   });
@@ -24223,8 +24247,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             i === 2009
               ? t + 'box-align'
               : i === 2012
-              ? t + 'flex-align'
-              : super.prefixed(e, t)
+                ? t + 'flex-align'
+                : super.prefixed(e, t)
           );
         }
         normalize() {
@@ -24299,8 +24323,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           return e.includes('inside')
             ? 'break-inside'
             : e.includes('before')
-            ? 'break-before'
-            : 'break-after';
+              ? 'break-before'
+              : 'break-after';
         }
         set(e, t) {
           return (
@@ -24386,7 +24410,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       Ru = class extends OT {
         set(e, t) {
           return (
-            (e.value = e.value.replace(/\s+fill(\s)/, '$1')), super.set(e, t)
+            (e.value = e.value.replace(/\s+fill(\s)/, '$1')),
+            super.set(e, t)
           );
         }
       };
@@ -24412,7 +24437,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           let i = zw(t)[0];
           if (i === 2012)
             return (
-              (e.value = Or.oldValues[e.value] || e.value), super.set(e, t)
+              (e.value = Or.oldValues[e.value] || e.value),
+              super.set(e, t)
             );
           if (i === 'final') return super.set(e, t);
         }
@@ -24446,10 +24472,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       for (let e of ['left', 'right']) {
         let t = `border-${r}-${e}-radius`,
           i = `border-radius-${r}${e}`;
-        We.names.push(t),
+        (We.names.push(t),
           We.names.push(i),
           (We.toMozilla[t] = i),
-          (We.toNormal[i] = t);
+          (We.toNormal[i] = t));
       }
     Hw.exports = We;
   });
@@ -24548,7 +24574,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         normalize(e) {
           return e.replace(
             /(margin|padding|border)-(start|end)/,
-            '$1-inline-$2'
+            '$1-inline-$2',
           );
         }
       };
@@ -24647,7 +24673,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           if (
             e.parent.some(
               (f) =>
-                f.prop === t + 'box-orient' || f.prop === t + 'box-direction'
+                f.prop === t + 'box-orient' || f.prop === t + 'box-direction',
             )
           )
             return;
@@ -24720,7 +24746,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           super(e, t, i);
           this.prefixes &&
             (this.prefixes = VT.uniq(
-              this.prefixes.map((n) => (n === '-ms-' ? '-webkit-' : n))
+              this.prefixes.map((n) => (n === '-ms-' ? '-webkit-' : n)),
             ));
         }
       };
@@ -24736,7 +24762,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           super(e, t, i);
           this.prefixes &&
             (this.prefixes = WT.uniq(
-              this.prefixes.map((n) => (n === '-ms-' ? '-webkit-' : n))
+              this.prefixes.map((n) => (n === '-ms-' ? '-webkit-' : n)),
             ));
         }
         check(e) {
@@ -24779,8 +24805,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             i === 2009
               ? t + 'box-pack'
               : i === 2012
-              ? t + 'flex-pack'
-              : super.prefixed(e, t)
+                ? t + 'flex-pack'
+                : super.prefixed(e, t)
           );
         }
         normalize() {
@@ -24832,7 +24858,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           if (t !== '-ms-') return super.insert(e, t, i);
           let n = ju.parse(e),
             [s, a] = ju.translate(n, 0, 1);
-          n[0] &&
+          (n[0] &&
             n[0].includes('span') &&
             (a = n[0].join('').replace(/\D/g, '')),
             [
@@ -24840,7 +24866,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               [`${e.prop}-span`, a],
             ].forEach(([l, c]) => {
               ju.insertDecl(e, l, c);
-            });
+            }));
         }
       };
     zu.names = ['grid-row', 'grid-column'];
@@ -24876,7 +24902,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             c = a.includes('columns'),
             f = s.some(
               (k) =>
-                k.prop === 'grid-template' || k.prop === 'grid-template-areas'
+                k.prop === 'grid-template' || k.prop === 'grid-template-areas',
             );
           if (f && l) return !1;
           let d = new iR({
@@ -24908,17 +24934,17 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             if (!k && !f) {
               e.warn(
                 n,
-                'Autoplacement does not work without grid-template-rows property'
+                'Autoplacement does not work without grid-template-rows property',
               );
               return;
             }
-            !s.nodes.find((E) => E.prop === 'grid-template-columns') &&
+            (!s.nodes.find((E) => E.prop === 'grid-template-columns') &&
               !f &&
               e.warn(
                 n,
-                'Autoplacement does not work without grid-template-columns property'
+                'Autoplacement does not work without grid-template-columns property',
               ),
-              c && !f && eR(e, n, h, w);
+              c && !f && eR(e, n, h, w));
           }
         }
       };
@@ -24995,7 +25021,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           a = !1,
           o = e.parent,
           l = fR(e);
-        (l = pR(e, l) || l),
+        ((l = pR(e, l) || l),
           o.walkDecls(/-ms-grid-rows/, (d) => d.remove()),
           o.walkDecls(/grid-template-(rows|columns)/, (d) => {
             if (d.prop === 'grid-template-rows') {
@@ -25012,9 +25038,9 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 }),
               });
             } else s = !0;
-          });
+          }));
         let c = dR(e.value);
-        s &&
+        (s &&
           !a &&
           l.row &&
           c.length > 1 &&
@@ -25031,12 +25057,12 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             hasColumns: s,
             decl: e,
             result: n,
-          });
+          }));
         let f = oR({
           rows: c,
           gap: l,
         });
-        return lR(f, e, n), e;
+        return (lR(f, e, n), e);
       }
     };
     Wu.names = ['grid-template-areas'];
@@ -25135,8 +25161,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               ) {
                 if (!this.oldWebkit(n)) return !1;
               } else
-                (n.nodes = this.convertDirection(n.nodes)),
-                  (n.value = t + n.value);
+                ((n.nodes = this.convertDirection(n.nodes)),
+                  (n.value = t + n.value));
           return i.toString();
         }
         replaceFirst(e, ...t) {
@@ -25150,7 +25176,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 : {
                     type: 'word',
                     value: n,
-                  }
+                  },
             )
             .concat(e.slice(1));
         }
@@ -25167,17 +25193,17 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             e[0].value = this.normalizeUnit(e[0].value, 1);
           else if (e[0].value.includes('deg')) {
             let t = parseFloat(e[0].value);
-            (t = yR.wrap(0, 360, t)), (e[0].value = `${t}deg`);
+            ((t = yR.wrap(0, 360, t)), (e[0].value = `${t}deg`));
           }
           return (
             e[0].value === '0deg'
               ? (e = this.replaceFirst(e, 'to', ' ', 'top'))
               : e[0].value === '90deg'
-              ? (e = this.replaceFirst(e, 'to', ' ', 'right'))
-              : e[0].value === '180deg'
-              ? (e = this.replaceFirst(e, 'to', ' ', 'bottom'))
-              : e[0].value === '270deg' &&
-                (e = this.replaceFirst(e, 'to', ' ', 'left')),
+                ? (e = this.replaceFirst(e, 'to', ' ', 'right'))
+                : e[0].value === '180deg'
+                  ? (e = this.replaceFirst(e, 'to', ' ', 'bottom'))
+                  : e[0].value === '270deg' &&
+                    (e = this.replaceFirst(e, 'to', ' ', 'left')),
             e
           );
         }
@@ -25192,7 +25218,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             {
               type: 'space',
               value: ' ',
-            }
+            },
           );
           for (let t = 2; t < e.length && e[t].type !== 'div'; t++)
             e[t].type === 'word' &&
@@ -25217,8 +25243,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               (e[0].value === 'to'
                 ? this.fixDirection(e)
                 : e[0].value.includes('deg')
-                ? this.fixAngle(e)
-                : this.isRadial(e) && this.fixRadial(e)),
+                  ? this.fixAngle(e)
+                  : this.isRadial(e) && this.fixRadial(e)),
             e
           );
         }
@@ -25231,10 +25257,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         }
         fixAngle(e) {
           let t = e[0].value;
-          (t = parseFloat(t)),
+          ((t = parseFloat(t)),
             (t = Math.abs(450 - t) % 360),
             (t = this.roundFloat(t, 3)),
-            (e[0].value = `${t}deg`);
+            (e[0].value = `${t}deg`));
         }
         fixRadial(e) {
           let t = [],
@@ -25281,9 +25307,9 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             return !1;
           let n = [[]];
           for (let s of t)
-            n[n.length - 1].push(s),
-              s.type === 'div' && s.value === ',' && n.push([]);
-          this.oldDirection(n), this.colorStops(n), (e.nodes = []);
+            (n[n.length - 1].push(s),
+              s.type === 'div' && s.value === ',' && n.push([]));
+          (this.oldDirection(n), this.colorStops(n), (e.nodes = []));
           for (let s of n) e.nodes = e.nodes.concat(s);
           return (
             e.nodes.unshift(
@@ -25291,7 +25317,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 type: 'word',
                 value: 'linear',
               },
-              this.cloneDiv(e.nodes)
+              this.cloneDiv(e.nodes),
             ),
             (e.value = '-webkit-gradient'),
             !0
@@ -25348,19 +25374,19 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             i === 1 && (!n || n === '0%')
               ? (l = `from(${o})`)
               : i === e.length - 1 && (!n || n === '100%')
-              ? (l = `to(${o})`)
-              : n
-              ? (l = `color-stop(${n}, ${o})`)
-              : (l = `color-stop(${o})`);
+                ? (l = `to(${o})`)
+                : n
+                  ? (l = `color-stop(${n}, ${o})`)
+                  : (l = `color-stop(${o})`);
             let c = s[s.length - 1];
-            (e[i] = [
+            ((e[i] = [
               {
                 type: 'word',
                 value: l,
               },
             ]),
               c.type === 'div' && c.value === ',' && (a = e[i].push(c)),
-              t.push(a);
+              t.push(a));
           }
           return t;
         }
@@ -25440,8 +25466,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         return t === '-moz-' && this.isStretch()
           ? e.replace(this.regexp(), '$1-moz-available$3')
           : t === '-webkit-' && this.isStretch()
-          ? e.replace(this.regexp(), '$1-webkit-fill-available$3')
-          : super.replace(e, t);
+            ? e.replace(this.regexp(), '$1-webkit-fill-available$3')
+            : super.replace(e, t);
       }
       old(e) {
         let t = e + this.name;
@@ -25477,15 +25503,15 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           return t === '-webkit-'
             ? e.replace(this.regexp(), '$1-webkit-optimize-contrast')
             : t === '-moz-'
-            ? e.replace(this.regexp(), '$1-moz-crisp-edges')
-            : super.replace(e, t);
+              ? e.replace(this.regexp(), '$1-moz-crisp-edges')
+              : super.replace(e, t);
         }
         old(e) {
           return e === '-webkit-'
             ? new G0(this.name, '-webkit-optimize-contrast')
             : e === '-moz-'
-            ? new G0(this.name, '-moz-crisp-edges')
-            : super.old(e);
+              ? new G0(this.name, '-moz-crisp-edges')
+              : super.old(e);
         }
       };
     Zu.names = ['pixelated'];
@@ -25556,10 +25582,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 ? (i = 'box')
                 : (i = 'inline-box')
               : t === 2012
-              ? this.name === 'flex'
-                ? (i = 'flexbox')
-                : (i = 'inline-flexbox')
-              : t === 'final' && (i = this.name),
+                ? this.name === 'flex'
+                  ? (i = 'flexbox')
+                  : (i = 'inline-flexbox')
+                : t === 'final' && (i = this.name),
             e + i
           );
         }
@@ -25729,12 +25755,12 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     var af = new Map(),
       Fi = class {
         constructor(e, t, i = {}) {
-          (this.data = e),
+          ((this.data = e),
             (this.browsers = t),
             (this.options = i),
             ([this.add, this.remove] = this.preprocess(this.select(this.data))),
             (this.transition = new IR(this)),
-            (this.processor = new DR(this));
+            (this.processor = new DR(this)));
         }
         cleaner() {
           if (this.cleanerCache) return this.cleanerCache;
@@ -25761,7 +25787,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               a = s
                 .filter((l) => l.note)
                 .map((l) => `${this.browsers.prefix(l.browser)} ${l.note}`);
-            (a = Ir.uniq(a)),
+            ((a = Ir.uniq(a)),
               (s = s
                 .filter((l) => this.browsers.isSelected(l.browser))
                 .map((l) => {
@@ -25770,16 +25796,16 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 })),
               (s = this.sort(Ir.uniq(s))),
               this.options.flexbox === 'no-2009' &&
-                (s = s.filter((l) => !l.includes('2009')));
+                (s = s.filter((l) => !l.includes('2009'))));
             let o = n.browsers.map((l) => this.browsers.prefix(l));
-            n.mistakes && (o = o.concat(n.mistakes)),
+            (n.mistakes && (o = o.concat(n.mistakes)),
               (o = o.concat(a)),
               (o = Ir.uniq(o)),
               s.length
                 ? ((t.add[i] = s),
                   s.length < o.length &&
                     (t.remove[i] = o.filter((l) => !s.includes(l))))
-                : (t.remove[i] = o);
+                : (t.remove[i] = o));
           }
           return t;
         }
@@ -25807,14 +25833,14 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               if (a) {
                 let o = ut.load(n, s, this);
                 for (let l of a)
-                  t[l] ||
+                  (t[l] ||
                     (t[l] = {
                       values: [],
                     }),
-                    t[l].values.push(o);
+                    t[l].values.push(o));
               } else {
                 let o = (t[n] && t[n].values) || [];
-                (t[n] = z.load(n, s, this)), (t[n].values = o);
+                ((t[n] = z.load(n, s, this)), (t[n].values = o));
               }
             }
           }
@@ -25842,9 +25868,9 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   let c = o.old(l);
                   if (c)
                     for (let f of a)
-                      i[f] || (i[f] = {}),
+                      (i[f] || (i[f] = {}),
                         i[f].values || (i[f].values = []),
-                        i[f].values.push(c);
+                        i[f].values.push(c));
                 }
               } else
                 for (let o of s) {
@@ -25858,24 +25884,24 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                         continue;
                     }
                   }
-                  for (let c of l) i[c] || (i[c] = {}), (i[c].remove = !0);
+                  for (let c of l) (i[c] || (i[c] = {}), (i[c].remove = !0));
                 }
             }
           }
           return [t, i];
         }
         decl(e) {
-          return af.has(e) || af.set(e, z.load(e)), af.get(e);
+          return (af.has(e) || af.set(e, z.load(e)), af.get(e));
         }
         unprefixed(e) {
           let t = this.normalize(av.unprefixed(e));
-          return t === 'flex-direction' && (t = 'flex-flow'), t;
+          return (t === 'flex-direction' && (t = 'flex-flow'), t);
         }
         normalize(e) {
           return this.decl(e).normalize(e);
         }
         prefixed(e, t) {
-          return (e = av.unprefixed(e)), this.decl(e).prefixed(e, t);
+          return ((e = av.unprefixed(e)), this.decl(e).prefixed(e, t));
         }
         values(e, t) {
           let i = this[e],
@@ -26478,19 +26504,19 @@ Check your Browserslist config to be sure that your targets are set up correctly
         (r.length === 1 && V5(r[0])
           ? ((e = r[0]), (r = void 0))
           : r.length === 0 || (r.length === 1 && !r[0])
-          ? (r = void 0)
-          : r.length <= 2 && (Array.isArray(r[0]) || !r[0])
-          ? ((e = r[1]), (r = r[0]))
-          : typeof r[r.length - 1] == 'object' && (e = r.pop()),
+            ? (r = void 0)
+            : r.length <= 2 && (Array.isArray(r[0]) || !r[0])
+              ? ((e = r[1]), (r = r[0]))
+              : typeof r[r.length - 1] == 'object' && (e = r.pop()),
         e || (e = {}),
         e.browser)
       )
         throw new Error(
-          'Change `browser` option to `overrideBrowserslist` in Autoprefixer'
+          'Change `browser` option to `overrideBrowserslist` in Autoprefixer',
         );
       if (e.browserslist)
         throw new Error(
-          'Change `browserslist` option to `overrideBrowserslist` in Autoprefixer'
+          'Change `browserslist` option to `overrideBrowserslist` in Autoprefixer',
         );
       e.overrideBrowserslist
         ? (r = e.overrideBrowserslist)
@@ -26500,8 +26526,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
             (of.red
               ? console.warn(
                   of.red(
-                    mv.replace(/`[^`]+`/g, (n) => of.yellow(n.slice(1, -1)))
-                  )
+                    mv.replace(/`[^`]+`/g, (n) => of.yellow(n.slice(1, -1))),
+                  ),
                 )
               : console.warn(mv)),
           (r = e.browsers));
@@ -26514,7 +26540,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         let s = hv,
           a = new F5(s.browsers, r, n, t),
           o = a.selected.join(', ') + JSON.stringify(e);
-        return lf.has(o) || lf.set(o, new j5(s.prefixes, a, e)), lf.get(o);
+        return (lf.has(o) || lf.set(o, new j5(s.prefixes, a, e)), lf.get(o));
       }
       return {
         postcssPlugin: 'autoprefixer',
@@ -26525,14 +26551,14 @@ Check your Browserslist config to be sure that your targets are set up correctly
           });
           return {
             OnceExit(a) {
-              H5(n, s),
+              (H5(n, s),
                 e.remove !== !1 && s.processor.remove(a, n),
-                e.add !== !1 && s.processor.add(a, n);
+                e.add !== !1 && s.processor.add(a, n));
             },
           };
         },
         info(n) {
-          return (n = n || {}), (n.from = n.from || m.cwd()), U5(i(n));
+          return ((n = n || {}), (n.from = n.from || m.cwd()), U5(i(n)));
         },
         options: e,
         browsers: r,
@@ -26561,7 +26587,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
     kv = P(() => {
       u();
       Xi();
-      (vv = pe(rn())), (G5 = St(vv.default.theme));
+      ((vv = pe(rn())), (G5 = St(vv.default.theme)));
     });
   var Av = {};
   Ge(Av, {
@@ -26572,7 +26598,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
     Cv = P(() => {
       u();
       Xi();
-      (Sv = pe(rn())), (Q5 = St(Sv.default));
+      ((Sv = pe(rn())), (Q5 = St(Sv.default)));
     });
   u();
   ('use strict');
@@ -26593,7 +26619,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         };
   }
   console.warn(
-    'cdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation'
+    'cdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation',
   );
   var Ns = 'tailwind',
     uf = 'text/tailwindcss',
@@ -26613,7 +26639,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
           : e[t];
       },
       set(e, t, i) {
-        return (e[t] = i), (!r || t === 'config') && pf(!0), !0;
+        return ((e[t] = i), (!r || t === 'config') && pf(!0), !0);
       },
     });
   window[Ns] = new Proxy(
@@ -26625,7 +26651,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
       plugin: rP.default,
       resolveConfig: iP.default,
     },
-    Rv(!0)
+    Rv(!0),
   );
   function Pv(r) {
     cf.observe(r, {
@@ -26668,7 +26694,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
       (Ev || t.size > 0 || e !== Tv || !Yt || !Yt.isConnected)
     ) {
       for (let n of t) ff.add(n);
-      (Ev = !1), (Tv = e), (self[_v] = Array.from(t).join(' '));
+      ((Ev = !1), (Tv = e), (self[_v] = Array.from(t).join(' ')));
       let { css: i } = await (0, K5.default)([
         (0, Y5.default)({
           ...window[Ns].config,
@@ -26690,11 +26716,11 @@ Check your Browserslist config to be sure that your targets are set up correctly
           remove: !1,
         }),
       ]).process(
-        `@tailwind base;@tailwind components;@tailwind utilities;${e}`
+        `@tailwind base;@tailwind components;@tailwind utilities;${e}`,
       );
-      (!Yt || !Yt.isConnected) &&
+      ((!Yt || !Yt.isConnected) &&
         ((Yt = document.createElement('style')), document.head.append(Yt)),
-        (Yt.textContent = i);
+        (Yt.textContent = i));
     }
   }
 })();

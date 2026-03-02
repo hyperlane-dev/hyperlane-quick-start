@@ -15,7 +15,7 @@
         -moz-user-select: none;
         -ms-user-select: none;
         scrollbar-width: thin;
-        scrollbar-color: #424242 #1a1a1a;
+        scrollbar-color: #c1c1c1 #f1f1f1;
       }
 
       *::-webkit-scrollbar {
@@ -24,16 +24,16 @@
       }
 
       *::-webkit-scrollbar-track {
-        background: #1a1a1a;
+        background: #f1f1f1;
       }
 
       *::-webkit-scrollbar-thumb {
-        background: #424242;
+        background: #c1c1c1;
         border-radius: 4px;
       }
 
       *::-webkit-scrollbar-thumb:hover {
-        background: #555;
+        background: #a8a8a8;
       }
 
       input,
@@ -48,14 +48,14 @@
       body {
         font-family:
           -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-        background: #0d1117;
-        color: #c9d1d9;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #2c3e50;
         min-height: 100vh;
       }
 
       .header {
-        background: #161b22;
-        border-bottom: 1px solid #30363d;
+        background: #ffffff;
+        border-bottom: 1px solid #e0e0e0;
         padding: 16px 24px;
         display: flex;
         align-items: center;
@@ -74,7 +74,7 @@
       .header h1 {
         font-size: 1.25rem;
         font-weight: 600;
-        color: #f0f6fc;
+        color: #2c3e50;
         display: flex;
         align-items: center;
         gap: 8px;
@@ -88,62 +88,67 @@
         gap: 8px;
       }
 
-      .header h1 .icon {
-        font-size: 1.5rem;
+      .header h1 .nav-logo {
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        object-fit: contain;
       }
 
       .btn {
         padding: 6px 16px;
-        border: 1px solid #30363d;
+        border: 1px solid #e0e0e0;
         border-radius: 6px;
         font-size: 14px;
         font-weight: 500;
         cursor: pointer;
         transition: all 0.2s;
-        background: #21262d;
-        color: #c9d1d9;
+        background: #f5f7fb;
+        color: #2c3e50;
         display: inline-flex;
         align-items: center;
         gap: 6px;
       }
 
       .btn:hover {
-        background: #30363d;
-        border-color: #8b949e;
+        background: #e8ecf4;
+        border-color: #d0d0d0;
       }
 
       .btn-primary {
-        background: #238636;
-        border-color: #238636;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-color: transparent;
         color: #fff;
       }
 
       .btn-primary:hover {
-        background: #2ea043;
-        border-color: #2ea043;
+        background: linear-gradient(135deg, #5a6fd6 0%, #6a4190 100%);
       }
 
       .btn-danger {
-        background: #da3633;
-        border-color: #da3633;
+        background: #ef4444;
+        border-color: #ef4444;
         color: #fff;
       }
 
       .btn-danger:hover {
-        background: #f85149;
-        border-color: #f85149;
+        background: #dc2626;
+        border-color: #dc2626;
       }
 
       .container {
         max-width: 1400px;
-        margin: 0 auto;
+        margin: 24px 12px;
         padding: 24px;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
       }
 
       .tabs {
         display: flex;
         gap: 4px;
-        border-bottom: 1px solid #30363d;
+        border-bottom: 1px solid #e0e0e0;
         margin-bottom: 24px;
       }
 
@@ -151,9 +156,9 @@
         padding: 12px 16px;
         cursor: pointer;
         border-bottom: 2px solid transparent;
-        color: #8b949e;
+        color: #4a5568;
         font-size: 14px;
-        font-weight: 500;
+        font-weight: 700;
         transition: all 0.2s;
         display: flex;
         align-items: center;
@@ -161,42 +166,44 @@
       }
 
       .tab:hover {
-        color: #c9d1d9;
+        color: #2d3748;
       }
 
       .tab.active {
-        color: #f0f6fc;
-        border-bottom-color: #f78166;
+        color: #5a67d8;
+        border-bottom-color: #5a67d8;
       }
 
       .tab .count {
-        background: #30363d;
+        background: #e2e8f0;
         padding: 2px 8px;
         border-radius: 10px;
         font-size: 12px;
-        font-weight: 600;
+        font-weight: 700;
+        color: #2d3748;
       }
 
       .card {
-        background: #161b22;
-        border: 1px solid #30363d;
+        background: #ffffff;
+        border: 1px solid #e0e0e0;
         border-radius: 12px;
         overflow: hidden;
         margin-bottom: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
       }
 
       .card-header {
         padding: 16px 20px;
-        border-bottom: 1px solid #30363d;
+        border-bottom: 1px solid #e0e0e0;
         display: flex;
         justify-content: space-between;
         align-items: center;
       }
 
       .card-title {
-        font-size: 16px;
-        font-weight: 600;
-        color: #f0f6fc;
+        font-size: 18px;
+        font-weight: 700;
+        color: #1a202c;
       }
 
       .card-body {
@@ -210,8 +217,8 @@
       }
 
       .pipeline-item {
-        background: #0d1117;
-        border: 1px solid #30363d;
+        background: #f8f9fa;
+        border: 1px solid #e0e0e0;
         border-radius: 8px;
         padding: 16px;
         display: flex;
@@ -222,8 +229,8 @@
       }
 
       .pipeline-item:hover {
-        border-color: #58a6ff;
-        background: #161b22;
+        border-color: #667eea;
+        background: #f0f4ff;
       }
 
       .pipeline-status {
@@ -234,12 +241,12 @@
       }
 
       .pipeline-status.active {
-        background: #238636;
-        box-shadow: 0 0 8px #238636;
+        background: #22c55e;
+        box-shadow: 0 0 8px #22c55e;
       }
 
       .pipeline-status.inactive {
-        background: #8b949e;
+        background: #9ca3af;
       }
 
       .pipeline-info {
@@ -248,9 +255,9 @@
       }
 
       .pipeline-name {
-        font-size: 16px;
-        font-weight: 600;
-        color: #58a6ff;
+        font-size: 17px;
+        font-weight: 700;
+        color: #4c51bf;
         margin-bottom: 4px;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -258,11 +265,12 @@
       }
 
       .pipeline-meta {
-        font-size: 12px;
-        color: #8b949e;
+        font-size: 13px;
+        color: #4a5568;
         display: flex;
         gap: 12px;
         flex-wrap: wrap;
+        font-weight: 600;
       }
 
       .pipeline-actions {
@@ -278,8 +286,8 @@
       }
 
       .run-item {
-        background: #0d1117;
-        border: 1px solid #30363d;
+        background: #f8f9fa;
+        border: 1px solid #e0e0e0;
         border-radius: 8px;
         padding: 12px 16px;
         display: flex;
@@ -290,8 +298,8 @@
       }
 
       .run-item:hover {
-        background: #161b22;
-        border-color: #58a6ff;
+        background: #f0f4ff;
+        border-color: #667eea;
       }
 
       .run-status {
@@ -307,12 +315,12 @@
       }
 
       .run-status.success {
-        background: #238636;
+        background: #22c55e;
         color: #fff;
       }
 
       .run-status.failure {
-        background: #da3633;
+        background: #ef4444;
         color: #fff;
         padding-bottom: 3px;
       }
@@ -320,7 +328,7 @@
       .loading-more {
         text-align: center;
         padding: 20px;
-        color: #8b949e;
+        color: #666;
         font-size: 14px;
         display: flex;
         align-items: center;
@@ -335,8 +343,8 @@
       .loading-spinner {
         width: 16px;
         height: 16px;
-        border: 2px solid #30363d;
-        border-top-color: #58a6ff;
+        border: 2px solid #e0e0e0;
+        border-top-color: #667eea;
         border-radius: 50%;
         animation: spin 0.8s linear infinite;
       }
@@ -348,18 +356,18 @@
       }
 
       .run-status.pending {
-        background: #8b949e;
+        background: #9ca3af;
         color: #fff;
       }
 
       .run-status.running {
-        background: #1f6feb;
+        background: #667eea;
         color: #fff;
         animation: pulse 1.5s infinite;
       }
 
       .run-status.cancelled {
-        background: #6e7681;
+        background: #6b7280;
         color: #fff;
       }
 
@@ -379,22 +387,24 @@
       }
 
       .run-title {
-        font-size: 14px;
-        font-weight: 500;
-        color: #f0f6fc;
+        font-size: 15px;
+        font-weight: 700;
+        color: #2d3748;
         margin-bottom: 2px;
       }
 
       .run-meta {
-        font-size: 12px;
-        color: #8b949e;
+        font-size: 13px;
+        color: #4a5568;
+        font-weight: 600;
       }
 
       .run-time {
-        font-size: 12px;
-        color: #8b949e;
+        font-size: 13px;
+        color: #4a5568;
         text-align: right;
         flex-shrink: 0;
+        font-weight: 600;
       }
 
       .form-group {
@@ -404,8 +414,8 @@
       .form-label {
         display: block;
         font-size: 14px;
-        font-weight: 500;
-        color: #c9d1d9;
+        font-weight: 700;
+        color: #2d3748;
         margin-bottom: 8px;
       }
 
@@ -414,10 +424,10 @@
       .form-select {
         width: 100%;
         padding: 8px 12px;
-        background: #0d1117;
-        border: 1px solid #30363d;
+        background: #f8f9fa;
+        border: 1px solid #e0e0e0;
         border-radius: 6px;
-        color: #c9d1d9;
+        color: #2c3e50;
         font-size: 14px;
         transition: all 0.2s;
       }
@@ -426,8 +436,9 @@
       .form-textarea:focus,
       .form-select:focus {
         outline: none;
-        border-color: #58a6ff;
-        box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+        background: #fff;
       }
 
       .form-textarea {
@@ -446,7 +457,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.8);
+        background: rgba(0, 0, 0, 0.5);
         z-index: 1000;
         align-items: center;
         justify-content: center;
@@ -458,18 +469,19 @@
       }
 
       .modal-content {
-        background: #161b22;
-        border: 1px solid #30363d;
+        background: #ffffff;
+        border: 1px solid #e0e0e0;
         border-radius: 12px;
         max-width: 700px;
         width: 100%;
         max-height: 90vh;
         overflow-y: auto;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
       }
 
       .modal-header {
         padding: 20px;
-        border-bottom: 1px solid #30363d;
+        border-bottom: 1px solid #e0e0e0;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -478,13 +490,13 @@
       .modal-title {
         font-size: 18px;
         font-weight: 600;
-        color: #f0f6fc;
+        color: #2c3e50;
       }
 
       .modal-close {
         background: none;
         border: none;
-        color: #8b949e;
+        color: #666;
         font-size: 24px;
         cursor: pointer;
         padding: 0;
@@ -498,8 +510,8 @@
       }
 
       .modal-close:hover {
-        background: #30363d;
-        color: #f0f6fc;
+        background: #f5f7fb;
+        color: #2c3e50;
       }
 
       .modal-body {
@@ -508,7 +520,7 @@
 
       .modal-footer {
         padding: 16px 20px;
-        border-top: 1px solid #30363d;
+        border-top: 1px solid #e0e0e0;
         display: flex;
         justify-content: flex-end;
         gap: 12px;
@@ -517,7 +529,7 @@
       .empty-state {
         text-align: center;
         padding: 60px 20px;
-        color: #8b949e;
+        color: #666;
       }
 
       .empty-state-icon {
@@ -528,7 +540,7 @@
       .empty-state-title {
         font-size: 20px;
         font-weight: 600;
-        color: #f0f6fc;
+        color: #2c3e50;
         margin-bottom: 8px;
       }
 
@@ -540,16 +552,16 @@
       }
 
       .job-item {
-        background: #0d1117;
-        border: 1px solid #30363d;
+        background: #f8f9fa;
+        border: 1px solid #e0e0e0;
         border-radius: 8px;
         overflow: hidden;
       }
 
       .job-header {
         padding: 12px 16px;
-        background: #161b22;
-        border-bottom: 1px solid #30363d;
+        background: #ffffff;
+        border-bottom: 1px solid #e0e0e0;
         display: flex;
         align-items: center;
         gap: 12px;
@@ -557,7 +569,7 @@
 
       .job-name {
         font-weight: 600;
-        color: #f0f6fc;
+        color: #2c3e50;
         flex: 1;
       }
 
@@ -582,7 +594,7 @@
       }
 
       .step-header-row:hover {
-        background: #21262d;
+        background: #f0f4ff;
       }
 
       .step-status {
@@ -597,41 +609,43 @@
       }
 
       .step-status.success {
-        background: #238636;
+        background: #22c55e;
         color: #fff;
       }
       .step-status.failure {
-        background: #da3633;
+        background: #ef4444;
         color: #fff;
       }
       .step-status.pending {
-        background: #8b949e;
+        background: #9ca3af;
         color: #fff;
       }
       .step-status.running {
-        background: #1f6feb;
+        background: #667eea;
         color: #fff;
         animation: pulse 1.5s infinite;
       }
       .step-status.skipped {
-        background: #6e7681;
+        background: #6b7280;
         color: #fff;
       }
 
       .step-name {
         flex: 1;
-        font-size: 13px;
-        color: #c9d1d9;
+        font-size: 14px;
+        color: #2d3748;
+        font-weight: 600;
       }
 
       .step-time {
-        font-size: 12px;
-        color: #8b949e;
+        font-size: 13px;
+        color: #4a5568;
+        font-weight: 600;
       }
 
       .log-output {
-        background: #0d1117;
-        border: 1px solid #30363d;
+        background: #f8f9fa;
+        border: 1px solid #e0e0e0;
         border-radius: 6px;
         padding: 16px;
         font-family:
@@ -639,7 +653,7 @@
           'Courier New', monospace;
         font-size: 12px;
         line-height: 1.6;
-        color: #c9d1d9;
+        color: #2c3e50;
         max-height: 400px;
         overflow-y: auto;
         white-space: pre-wrap;
@@ -651,67 +665,67 @@
       }
 
       .log-timestamp {
-        color: #6e7681;
+        color: #999;
         margin-right: 8px;
         user-select: none;
       }
 
       .log-section {
-        color: #58a6ff;
+        color: #667eea;
         font-weight: 600;
         margin-top: 8px;
         margin-bottom: 4px;
       }
 
       .log-error {
-        color: #f85149;
-        background: rgba(248, 81, 73, 0.1);
+        color: #ef4444;
+        background: rgba(239, 68, 68, 0.1);
         padding: 0 4px;
         border-radius: 3px;
       }
 
       .log-warning {
-        color: #f0883e;
-        background: rgba(240, 136, 62, 0.1);
+        color: #f59e0b;
+        background: rgba(245, 158, 11, 0.1);
         padding: 0 4px;
         border-radius: 3px;
       }
 
       .log-success {
-        color: #3fb950;
-        background: rgba(63, 185, 80, 0.1);
+        color: #22c55e;
+        background: rgba(34, 197, 94, 0.1);
         padding: 0 4px;
         border-radius: 3px;
       }
 
       .log-info {
-        color: #58a6ff;
+        color: #667eea;
       }
 
       .log-command {
-        color: #d2a8ff;
+        color: #8b5cf6;
         font-weight: 500;
       }
 
       .log-hash {
-        color: #79c0ff;
+        color: #3b82f6;
       }
 
       .log-url {
-        color: #a5d6ff;
+        color: #667eea;
         text-decoration: underline;
         cursor: pointer;
       }
 
       .step-log-container {
-        background: #0d1117;
-        border-top: 1px solid #21262d;
+        background: #f8f9fa;
+        border-top: 1px solid #e0e0e0;
         overflow: hidden;
       }
 
       .step-log-header {
         padding: 8px 16px;
-        background: #161b22;
+        background: #ffffff;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -720,14 +734,14 @@
       }
 
       .step-log-header:hover {
-        background: #21262d;
+        background: #f0f4ff;
       }
 
       .step-log-toggle {
         display: flex;
         align-items: center;
         gap: 8px;
-        color: #8b949e;
+        color: #666;
         font-size: 12px;
       }
 
@@ -747,7 +761,7 @@
           'Courier New', monospace;
         font-size: 12px;
         line-height: 1.6;
-        color: #c9d1d9;
+        color: #2c3e50;
       }
 
       .step-log-content.collapsed {
@@ -839,14 +853,14 @@
       .detail-title {
         font-size: 24px;
         font-weight: 600;
-        color: #f0f6fc;
+        color: #2c3e50;
         margin-bottom: 8px;
       }
 
       .detail-meta {
         display: flex;
         gap: 16px;
-        color: #8b949e;
+        color: #666;
         font-size: 14px;
       }
 
@@ -1021,7 +1035,9 @@
         }
 
         .card-title {
-          font-size: 14px;
+          font-size: 15px;
+          font-weight: 700;
+          color: #1a202c;
         }
 
         .card-body {
@@ -1110,7 +1126,12 @@
       <div class="header-left">
         <h1>
           <a href="https://github.com/hyperlane-dev/hyperlane" target="_blank">
-            <span class="icon">🚀</span>
+            <img
+              src="https://docs.ltpp.vip/img/hyperlane.png"
+              alt=""
+              class="nav-logo"
+              onerror="this.style.display = 'none'"
+            />
             <span>Hyperlane CICD</span>
           </a>
         </h1>
@@ -1249,7 +1270,12 @@ jobs:
             <div
               class="form-input"
               id="run-config-pipeline-name"
-              style="background: #0d1117; cursor: default"
+              style="
+                background: #e2e8f0;
+                color: #2d3748;
+                cursor: default;
+                font-weight: 600;
+              "
             ></div>
           </div>
           <div class="form-group">
@@ -1258,7 +1284,9 @@ jobs:
               class="form-textarea"
               id="run-config-content"
               style="
-                background: #0d1117;
+                background: #f8f9fa;
+                color: #2d3748;
+                border: 1px solid #e2e8f0;
                 overflow: auto;
                 min-height: 300px;
                 cursor: default;

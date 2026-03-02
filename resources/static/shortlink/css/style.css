@@ -69,19 +69,19 @@ body {
 
 .header h1 a {
   position: relative;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   text-decoration: none;
 }
 
-.header h1 a .icon {
-  display: inline-block;
-  margin-right: 8px;
+.header h1 a .nav-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: contain;
+  vertical-align: middle;
+  margin-right: 12px;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-  background: none !important;
-  -webkit-background-clip: unset !important;
-  -webkit-text-fill-color: unset !important;
-  background-clip: unset !important;
-  color: inherit;
 }
 
 .header h1 a .text {
