@@ -64,11 +64,10 @@ impl OrderService {
         let active_model: OrderUserActiveModel = OrderUserActiveModel {
             username: ActiveValue::Set(request.get_username().clone()),
             password_hash: ActiveValue::Set(password_hash),
-            nickname: ActiveValue::Set(request.try_get_nickname().clone()),
             email: ActiveValue::Set(request.try_get_email().clone()),
             phone: ActiveValue::Set(request.try_get_phone().clone()),
-            role: ActiveValue::Set("user".to_string()),
-            status: ActiveValue::Set("pending".to_string()),
+            role: ActiveValue::Set(UserRole::User.to_i16()),
+            status: ActiveValue::Set(UserStatus::Pending.to_i16()),
             id: ActiveValue::NotSet,
             created_at: ActiveValue::NotSet,
             updated_at: ActiveValue::NotSet,
@@ -81,7 +80,7 @@ impl OrderService {
     }
 
     #[instrument_trace]
-    pub async fn login_user(request: LoginRequest) -> Result<(UserResponse, i32, String), String> {
+    pub async fn login_user(request: LoginRequest) -> Result<(UserResponse, i32, i16), String> {
         let db: DatabaseConnection =
             PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
         let user: Option<OrderUserModel> = OrderUserEntity::find()
@@ -91,7 +90,7 @@ impl OrderService {
             .map_err(|error: DbErr| error.to_string())?;
         match user {
             Some(model) => {
-                if model.get_status() != "approved" {
+                if model.get_status() != UserStatus::Approved.to_i16() {
                     return Err("User is not approved".to_string());
                 }
                 let valid: bool = PasswordUtil::verify_password(
@@ -103,7 +102,7 @@ impl OrderService {
                 }
                 let user_response: UserResponse = Self::model_to_user_response(&model);
                 let user_id: i32 = model.get_id();
-                let role: String = model.get_role().clone();
+                let role: i16 = model.get_role();
                 Ok((user_response, user_id, role))
             }
             None => Err("User not found".to_string()),
@@ -126,11 +125,10 @@ impl OrderService {
         let active_model: OrderUserActiveModel = OrderUserActiveModel {
             username: ActiveValue::Set(request.get_username().clone()),
             password_hash: ActiveValue::Set(password_hash),
-            nickname: ActiveValue::Set(request.try_get_nickname().clone()),
             email: ActiveValue::Set(request.try_get_email().clone()),
             phone: ActiveValue::Set(request.try_get_phone().clone()),
-            role: ActiveValue::Set(request.get_role().clone()),
-            status: ActiveValue::Set("approved".to_string()),
+            role: ActiveValue::Set(*request.get_role()),
+            status: ActiveValue::Set(UserStatus::Approved.to_i16()),
             id: ActiveValue::NotSet,
             created_at: ActiveValue::NotSet,
             updated_at: ActiveValue::NotSet,
@@ -156,9 +154,6 @@ impl OrderService {
         match user {
             Some(model) => {
                 let mut active_model: OrderUserActiveModel = model.into();
-                if let Some(nickname) = request.try_get_nickname() {
-                    active_model.nickname = ActiveValue::Set(Some(nickname.clone()));
-                }
                 if let Some(email) = request.try_get_email() {
                     active_model.email = ActiveValue::Set(Some(email.clone()));
                 }
@@ -222,10 +217,10 @@ impl OrderService {
         match user {
             Some(model) => {
                 let mut active_model: OrderUserActiveModel = model.into();
-                let status: String = if approved {
-                    "approved".to_string()
+                let status: i16 = if approved {
+                    UserStatus::Approved.to_i16()
                 } else {
-                    "rejected".to_string()
+                    UserStatus::Rejected.to_i16()
                 };
                 active_model.status = ActiveValue::Set(status);
                 active_model.updated_at = ActiveValue::Set(Some(Local::now().naive_local()));
@@ -248,7 +243,6 @@ impl OrderService {
             let keyword_pattern: String = format!("%{keyword}%");
             let mut condition: Condition = Condition::any()
                 .add(OrderUserColumn::Username.like(keyword_pattern.clone()))
-                .add(OrderUserColumn::Nickname.like(keyword_pattern.clone()))
                 .add(OrderUserColumn::Email.like(keyword_pattern.clone()))
                 .add(OrderUserColumn::Phone.like(keyword_pattern.clone()));
             if let Ok(user_id) = keyword.parse::<i32>() {
@@ -309,14 +303,15 @@ impl OrderService {
             .try_get_created_at()
             .as_ref()
             .map(|dt: &NaiveDateTime| dt.format("%Y-%m-%d %H:%M:%S").to_string());
+        let role: UserRole = UserRole::try_from(model.get_role()).unwrap_or_default();
+        let status: UserStatus = UserStatus::try_from(model.get_status()).unwrap_or_default();
         response
             .set_id(model.get_id())
             .set_username(model.get_username().clone())
-            .set_nickname(model.try_get_nickname().clone())
             .set_email(model.try_get_email().clone())
             .set_phone(model.try_get_phone().clone())
-            .set_role(model.get_role().clone())
-            .set_status(model.get_status().clone())
+            .set_role(role.as_str().to_string())
+            .set_status(status.as_str().to_string())
             .set_created_at(created_at);
         response
     }
@@ -469,7 +464,6 @@ impl OrderService {
                 if let Some(user) = user_map.get(&response.get_user_id()) {
                     response
                         .set_username(Some(user.get_username().clone()))
-                        .set_nickname(user.try_get_nickname().clone())
                         .set_email(user.try_get_email().clone())
                         .set_phone(user.try_get_phone().clone());
                 }
@@ -491,7 +485,6 @@ impl OrderService {
         if let Some(user) = user {
             response
                 .set_username(Some(user.get_username().clone()))
-                .set_nickname(user.try_get_nickname().clone())
                 .set_email(user.try_get_email().clone())
                 .set_phone(user.try_get_phone().clone());
         }

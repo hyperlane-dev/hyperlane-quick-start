@@ -7,7 +7,10 @@ use {
     super::*,
     mapper::order::{
         record::{OrderRecordActiveModel, OrderRecordColumn, OrderRecordEntity, OrderRecordModel},
-        user::{OrderUserActiveModel, OrderUserColumn, OrderUserEntity, OrderUserModel},
+        user::{
+            OrderUserActiveModel, OrderUserColumn, OrderUserEntity, OrderUserModel, UserRole,
+            UserStatus,
+        },
     },
     model::application::order::JwtConfigEnum,
     model::request::order::*,

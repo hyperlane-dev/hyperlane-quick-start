@@ -79,15 +79,6 @@
               />
             </div>
             <div class="form-group">
-              <label class="form-label">Nickname</label>
-              <input
-                type="text"
-                id="reg-nickname"
-                class="form-input"
-                placeholder="Your nickname"
-              />
-            </div>
-            <div class="form-group">
               <label class="form-label">Email</label>
               <input
                 type="email"
@@ -354,6 +345,20 @@
                     </select>
                   </div>
                 </div>
+                <div class="records-summary">
+                  <div class="summary-item income">
+                    <span class="summary-label">Total Income:</span>
+                    <span class="summary-value" id="records-total-income"
+                      >$0.00</span
+                    >
+                  </div>
+                  <div class="summary-item expense">
+                    <span class="summary-label">Total Expense:</span>
+                    <span class="summary-value" id="records-total-expense"
+                      >$0.00</span
+                    >
+                  </div>
+                </div>
                 <div id="all-records-list" class="record-list">
                   <div class="empty-state">
                     <div class="empty-state-icon">📝</div>
@@ -408,7 +413,7 @@
                       type="text"
                       id="user-search-keyword"
                       class="form-input"
-                      placeholder="Search by username, nickname, email, phone or ID..."
+                      placeholder="Search by username, email, phone or ID..."
                       onkeyup="handleUserSearch(event)"
                     />
                   </div>
@@ -554,20 +559,7 @@
                 <form id="profile-form" class="profile-form">
                   <div class="form-group">
                     <label class="form-label">Username</label>
-                    <input
-                      type="text"
-                      id="profile-username"
-                      class="form-input"
-                      readonly
-                    />
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label">Nickname</label>
-                    <input
-                      type="text"
-                      id="profile-nickname"
-                      class="form-input"
-                    />
+                    <span id="profile-username" class="form-display"></span>
                   </div>
                   <div class="form-group">
                     <label class="form-label">Email</label>
@@ -716,18 +708,9 @@
             <div class="form-group">
               <label class="form-label">Role *</label>
               <select id="user-role-select" class="form-select" required>
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
+                <option value="0">User</option>
+                <option value="1">Admin</option>
               </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Nickname</label>
-              <input
-                type="text"
-                id="user-nickname"
-                class="form-input"
-                placeholder="Enter nickname"
-              />
             </div>
             <div class="form-group">
               <label class="form-label">Email</label>

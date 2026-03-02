@@ -302,6 +302,10 @@ a {
   transition: all 0.2s;
 }
 
+.form-select {
+  padding-right: 28px;
+}
+
 .form-input:focus,
 .form-select:focus {
   outline: none;
@@ -309,10 +313,24 @@ a {
   box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
 }
 
+.form-display {
+  display: block;
+  padding: 10px 12px;
+  background: #161b22;
+  border: 1px solid #21262d;
+  border-radius: 6px;
+  color: #8b949e;
+  font-size: 14px;
+}
+
 .form-input-sm,
 .form-select-sm {
   padding: 6px 10px;
   font-size: 13px;
+}
+
+.form-select-sm {
+  padding-right: 24px;
 }
 
 input[type='date'].form-input {
@@ -543,6 +561,38 @@ input[type='number'].form-input {
   flex: 1;
   overflow-y: auto;
   min-height: 0;
+}
+
+.records-summary {
+  display: flex;
+  gap: 24px;
+  padding: 12px 16px;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.summary-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.summary-item.income .summary-value {
+  color: #3fb950;
+  font-weight: 600;
+}
+
+.summary-item.expense .summary-value {
+  color: #f85149;
+  font-weight: 600;
+}
+
+.summary-label {
+  color: #8b949e;
 }
 
 .record-item {
@@ -1186,6 +1236,16 @@ input[type='number'].form-input {
   .card-header > .btn {
     flex: 1;
     min-width: fit-content;
+  }
+
+  .records-summary {
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+
+  .summary-item {
+    font-size: 13px;
   }
 
   #dashboard-page,

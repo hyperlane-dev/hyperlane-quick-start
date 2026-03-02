@@ -4,7 +4,6 @@ use super::*;
 pub struct RegisterRequest {
     pub(super) username: String,
     pub(super) password: String,
-    pub(super) nickname: Option<String>,
     pub(super) email: Option<String>,
     pub(super) phone: Option<String>,
 }
@@ -19,15 +18,13 @@ pub struct LoginRequest {
 pub struct CreateUserRequest {
     pub(super) username: String,
     pub(super) password: String,
-    pub(super) nickname: Option<String>,
     pub(super) email: Option<String>,
     pub(super) phone: Option<String>,
-    pub(super) role: String,
+    pub(super) role: i16,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]
 pub struct UpdateUserRequest {
-    pub(super) nickname: Option<String>,
     pub(super) email: Option<String>,
     pub(super) phone: Option<String>,
 }

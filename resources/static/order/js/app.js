@@ -139,7 +139,16 @@ function showMainApp() {
   showPage('main-app');
   updateUserInfo();
   initDatePickers();
-  navigateTo('dashboard', true);
+  const routeState = parseRouteHash();
+  if (routeState.page) {
+    if (routeState.page === 'user-records' && routeState.userId) {
+      viewingUserId = parseInt(routeState.userId);
+      viewingUserName = routeState.userName || 'User';
+    }
+    navigateTo(routeState.page, false);
+  } else {
+    navigateTo('dashboard', true);
+  }
 }
 
 function initHashRouter() {
@@ -217,8 +226,7 @@ function switchToPage(page) {
 
 function updateUserInfo() {
   if (!currentUser) return;
-  document.getElementById('current-user').textContent =
-    currentUser.nickname || currentUser.username;
+  document.getElementById('current-user').textContent = currentUser.username;
   const roleBadge = document.getElementById('user-role');
   roleBadge.textContent = currentUser.role;
   roleBadge.className = `role-badge ${currentUser.role}`;
@@ -288,9 +296,9 @@ function updateOverviewStats(data) {
   document.getElementById('today-transactions').textContent =
     data.today.transactions;
   document.getElementById('today-income').textContent =
-    `$${formatAmount(data.today.income)}`;
+    `¥${formatAmount(data.today.income)}`;
   document.getElementById('today-expense').textContent =
-    `$${formatAmount(data.today.expense)}`;
+    `¥${formatAmount(data.today.expense)}`;
   document.getElementById('today-new-users').textContent = data.today.new_users;
   updateChangeIndicator(
     'today-transactions-change',
@@ -791,7 +799,6 @@ async function handleRegister(e) {
   const data = {
     username: document.getElementById('reg-username').value,
     password: document.getElementById('reg-password').value,
-    nickname: document.getElementById('reg-nickname').value || null,
     email: document.getElementById('reg-email').value || null,
     phone: document.getElementById('reg-phone').value || null,
   };
@@ -1005,7 +1012,7 @@ function renderRecordItem(record) {
         </div>
       </div>
       <div class="record-right">
-        <div class="record-amount ${amountClass}">${amountPrefix}$${formatAmount(record.amount)}</div>
+        <div class="record-amount ${amountClass}">${amountPrefix}¥${formatAmount(record.amount)}</div>
         <button class="btn-print" onclick="event.stopPropagation(); printRecordData(JSON.parse(this.dataset.record));" data-record="${recordJson}">🖨️ Print</button>
       </div>
     </div>`;
@@ -1017,11 +1024,26 @@ function updateStats(data) {
     const expense = parseFloat(data.total_expense) || 0;
     const balance = parseFloat(data.balance) || 0;
     document.getElementById('total-income').textContent =
-      `$${formatAmount(income)}`;
+      `¥${formatAmount(income)}`;
     document.getElementById('total-expense').textContent =
-      `$${formatAmount(expense)}`;
+      `¥${formatAmount(expense)}`;
     document.getElementById('total-balance').textContent =
-      `$${formatAmount(balance)}`;
+      `¥${formatAmount(balance)}`;
+  }
+}
+
+function updateRecordsSummary(data) {
+  if (data) {
+    const income = parseFloat(data.total_income) || 0;
+    const expense = parseFloat(data.total_expense) || 0;
+    const incomeEl = document.getElementById('records-total-income');
+    const expenseEl = document.getElementById('records-total-expense');
+    if (incomeEl) {
+      incomeEl.textContent = `¥${formatAmount(income)}`;
+    }
+    if (expenseEl) {
+      expenseEl.textContent = `¥${formatAmount(expense)}`;
+    }
   }
 }
 
@@ -1085,6 +1107,7 @@ async function applyFilters(pageDirection = null) {
       }
       renderAllRecords(allRecords);
       updateStats(data);
+      updateRecordsSummary(data);
       renderPagination();
     } else {
       showToast(result.message || 'Error loading records', 'error');
@@ -1166,7 +1189,7 @@ function renderAllRecords(records) {
         </div>
       </div>
       <div class="record-right">
-        <div class="record-amount ${r.transaction_type}">${r.transaction_type === 'income' ? '+' : '-'}$${formatAmount(r.amount)}</div>
+        <div class="record-amount ${r.transaction_type}">${r.transaction_type === 'income' ? '+' : '-'}¥${formatAmount(r.amount)}</div>
         <button class="btn-print" onclick="event.stopPropagation(); printRecordData(JSON.parse(this.dataset.record));" data-record="${rJson}">🖨️ Print</button>
       </div>
     </div>`;
@@ -1297,15 +1320,6 @@ function printRecordData(record) {
       <div class="field-row">
         <span class="field-label">Username</span>
         <span class="field-value">${escapeHtml(record.username)}</span>
-      </div>`
-          : ''
-      }
-      ${
-        record.nickname
-          ? `
-      <div class="field-row">
-        <span class="field-label">Nickname</span>
-        <span class="field-value">${escapeHtml(record.nickname)}</span>
       </div>`
           : ''
       }
@@ -1477,21 +1491,25 @@ function renderUsers(users) {
     return;
   }
   container.innerHTML = users
-    .map(
-      (u) => `
-    <div class="user-item" onclick="viewUserRecords(${u.id}, '${escapeHtml(u.nickname || u.username)}')" style="cursor: pointer;">
-      <div class="user-avatar">${(u.nickname || u.username).charAt(0).toUpperCase()}</div>
+    .map((u) => {
+      const roleText = u.role === 'admin' ? 'Admin' : 'User';
+      const statusClass = u.status;
+      const statusText = u.status;
+      const contactInfo = [u.email, u.phone].filter(Boolean).join(' • ');
+      return `
+    <div class="user-item" onclick="viewUserRecords(${u.id}, '${escapeHtml(u.username)}')" style="cursor: pointer;">
+      <div class="user-avatar">${u.username.charAt(0).toUpperCase()}</div>
       <div class="user-info-details">
-        <div class="user-name">${escapeHtml(u.nickname || u.username)}</div>
-        <div class="user-meta">${escapeHtml(u.username)} • ${u.role}</div>
+        <div class="user-name">${escapeHtml(u.username)} <span style="color: #8b949e; font-size: 12px;">(${roleText})</span></div>
+        <div class="user-meta">ID: ${u.id}${contactInfo ? ' • ' + escapeHtml(contactInfo) : ''}</div>
       </div>
-      <div class="user-status ${u.status}">${u.status}</div>
+      <div class="user-status ${statusClass}">${statusText}</div>
       <div class="user-actions" onclick="event.stopPropagation();">
         ${u.status !== 'approved' ? `<button class="btn btn-sm btn-primary" onclick="approveUser(${u.id}, true)">Approve</button>` : ''}
         ${u.status === 'pending' ? `<button class="btn btn-sm btn-danger" onclick="approveUser(${u.id}, false)">Reject</button>` : ''}
       </div>
-    </div>`,
-    )
+    </div>`;
+    })
     .join('');
 }
 
@@ -1630,7 +1648,7 @@ function renderUserRecords(records) {
         </div>
       </div>
       <div class="record-right">
-        <div class="record-amount ${r.transaction_type}">${r.transaction_type === 'income' ? '+' : '-'}$${formatAmount(r.amount)}</div>
+        <div class="record-amount ${r.transaction_type}">${r.transaction_type === 'income' ? '+' : '-'}¥${formatAmount(r.amount)}</div>
         <button class="btn-print" onclick="event.stopPropagation(); printRecordData(JSON.parse(this.dataset.record));" data-record="${rJson}">🖨️ Print</button>
       </div>
     </div>`;
@@ -1644,11 +1662,11 @@ function updateUserRecordStats(data) {
     const expense = parseFloat(data.total_expense) || 0;
     const balance = parseFloat(data.balance) || 0;
     document.getElementById('user-total-income').textContent =
-      `$${formatAmount(income)}`;
+      `¥${formatAmount(income)}`;
     document.getElementById('user-total-expense').textContent =
-      `$${formatAmount(expense)}`;
+      `¥${formatAmount(expense)}`;
     document.getElementById('user-total-balance').textContent =
-      `$${formatAmount(balance)}`;
+      `¥${formatAmount(balance)}`;
   }
 }
 
@@ -1703,8 +1721,7 @@ async function handleUserSubmit(e) {
   const data = {
     username: document.getElementById('user-username').value,
     password: document.getElementById('user-password').value,
-    role: document.getElementById('user-role-select').value,
-    nickname: document.getElementById('user-nickname').value || null,
+    role: parseInt(document.getElementById('user-role-select').value, 10),
     email: document.getElementById('user-email').value || null,
     phone: document.getElementById('user-phone').value || null,
   };
@@ -1760,9 +1777,8 @@ async function approveUser(userId, approved) {
 
 function loadProfile() {
   if (!currentUser) return;
-  document.getElementById('profile-username').value = currentUser.username;
-  document.getElementById('profile-nickname').value =
-    currentUser.nickname || '';
+  document.getElementById('profile-username').textContent =
+    currentUser.username;
   document.getElementById('profile-email').value = currentUser.email || '';
   document.getElementById('profile-phone').value = currentUser.phone || '';
 }
@@ -1776,7 +1792,6 @@ async function handleProfileSubmit(e) {
   }
   setRequestPending(requestKey, true);
   const data = {
-    nickname: document.getElementById('profile-nickname').value || null,
     email: document.getElementById('profile-email').value || null,
     phone: document.getElementById('profile-phone').value || null,
   };
@@ -2229,11 +2244,8 @@ async function handleScanResult(qrData) {
       const userData = result.data;
       closeScanModal();
       closeMobileSidebar();
-      viewUserRecords(userData.id, userData.nickname || userData.username);
-      showToast(
-        `Found user: ${userData.nickname || userData.username}`,
-        'success',
-      );
+      viewUserRecords(userData.id, userData.username);
+      showToast(`Found user: ${userData.username}`, 'success');
     } else if (result.code === 404) {
       showScanError('User not found. Please check the QR code.');
     } else {

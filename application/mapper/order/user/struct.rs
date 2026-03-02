@@ -21,15 +21,13 @@ pub struct Model {
     #[get(pub(crate))]
     pub(super) password_hash: String,
     #[get(pub(crate))]
-    pub(super) nickname: Option<String>,
-    #[get(pub(crate))]
     pub(super) email: Option<String>,
     #[get(pub(crate))]
     pub(super) phone: Option<String>,
-    #[get(pub(crate))]
-    pub(super) role: String,
-    #[get(pub(crate))]
-    pub(super) status: String,
+    #[get(type(copy), pub(crate))]
+    pub(super) role: i16,
+    #[get(type(copy), pub(crate))]
+    pub(super) status: i16,
     #[get(pub(crate))]
     pub(super) created_at: Option<NaiveDateTime>,
     #[get(pub(crate))]
