@@ -20,11 +20,10 @@ impl RssService {
                 let entry_path: std::path::PathBuf = entry.path();
                 if entry_path.is_dir() {
                     Self::scan_directory_recursive(&entry_path, files);
-                } else if entry_path.is_file() {
-                    if let Some(file_info) = Self::create_uploaded_file(&entry_path) {
+                } else if entry_path.is_file()
+                    && let Some(file_info) = Self::create_uploaded_file(&entry_path) {
                         files.push(file_info);
                     }
-                }
             }
         }
     }

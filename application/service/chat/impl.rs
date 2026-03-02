@@ -61,12 +61,11 @@ impl ServerHook for ChatSendedHook {
         let response: String = get_response_json(ctx).await;
         info!("{request}{BR}{response}");
         let response_body: ResponseBody = ctx.get_response().get_body().clone();
-        if let Ok(resp_data) = serde_json::from_slice::<WebSocketRespData>(&response_body) {
-            if *resp_data.get_type() == MessageType::OnlineCount {
+        if let Ok(resp_data) = serde_json::from_slice::<WebSocketRespData>(&response_body)
+            && *resp_data.get_type() == MessageType::OnlineCount {
                 ctx.set_aborted(true);
                 return;
             }
-        }
         let session_id: String = ChatService::get_name(ctx).await;
         ChatService::save_message_from_response(&session_id, &response_body).await;
     }

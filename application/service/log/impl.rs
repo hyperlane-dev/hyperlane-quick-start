@@ -61,11 +61,10 @@ impl LogService {
         let mut logs: Vec<String> = Vec::new();
         for log_file_name in log_files.iter().take(MAX_LOG_FILES_PER_DATE) {
             let full_path: PathBuf = date_path.join(log_file_name);
-            if let Ok(content) = Self::read_and_reverse_log_file(&full_path).await {
-                if !content.is_empty() {
+            if let Ok(content) = Self::read_and_reverse_log_file(&full_path).await
+                && !content.is_empty() {
                     logs.push(content);
                 }
-            }
         }
         logs
     }

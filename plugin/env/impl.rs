@@ -400,10 +400,11 @@ impl EnvConfig {
                 .get(DOCKER_YAML_PORTS)
                 .and_then(|ports_value| ports_value.as_sequence())
                 && let Some(port_mapping) = ports.first().and_then(|port| port.as_str())
-                    && let Some(host_port) = port_mapping.split(':').next()
-                        && let Ok(port) = host_port.parse() {
-                            config.set_mysql_port(Some(port));
-                        }
+                && let Some(host_port) = port_mapping.split(':').next()
+                && let Ok(port) = host_port.parse()
+            {
+                config.set_mysql_port(Some(port));
+            }
         }
         if let Some(postgresql) = yaml
             .get(DOCKER_YAML_SERVICES)
@@ -436,10 +437,11 @@ impl EnvConfig {
                 .get(DOCKER_YAML_PORTS)
                 .and_then(|ports_value| ports_value.as_sequence())
                 && let Some(port_mapping) = ports.first().and_then(|port| port.as_str())
-                    && let Some(host_port) = port_mapping.split(':').next()
-                        && let Ok(port) = host_port.parse() {
-                            config.set_postgresql_port(Some(port));
-                        }
+                && let Some(host_port) = port_mapping.split(':').next()
+                && let Ok(port) = host_port.parse()
+            {
+                config.set_postgresql_port(Some(port));
+            }
         }
         if let Some(redis) = yaml
             .get(DOCKER_YAML_SERVICES)
@@ -448,17 +450,19 @@ impl EnvConfig {
             if let Some(command) = redis
                 .get(DOCKER_YAML_COMMAND)
                 .and_then(|command_value| command_value.as_str())
-                && let Some(password_part) = command.split(DOCKER_REDIS_PASSWORD_FLAG).nth(1) {
-                    config.set_redis_password(Some(password_part.trim().to_string()));
-                }
+                && let Some(password_part) = command.split(DOCKER_REDIS_PASSWORD_FLAG).nth(1)
+            {
+                config.set_redis_password(Some(password_part.trim().to_string()));
+            }
             if let Some(ports) = redis
                 .get(DOCKER_YAML_PORTS)
                 .and_then(|ports_value| ports_value.as_sequence())
                 && let Some(port_mapping) = ports.first().and_then(|port| port.as_str())
-                    && let Some(host_port) = port_mapping.split(':').next()
-                        && let Ok(port) = host_port.parse() {
-                            config.set_redis_port(Some(port));
-                        }
+                && let Some(host_port) = port_mapping.split(':').next()
+                && let Ok(port) = host_port.parse()
+            {
+                config.set_redis_port(Some(port));
+            }
         }
         Ok(config)
     }

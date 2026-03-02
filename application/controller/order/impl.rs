@@ -572,41 +572,36 @@ impl ServerHook for RecordListRoute {
         let mut query: RecordQueryRequest = RecordQueryRequest::default();
         let user_role: UserRole = current_user.get_role().parse().unwrap_or_default();
         if user_role.is_admin() {
-            if let Some(user_id_str) = user_id_opt {
-                if let Ok(user_id) = user_id_str.parse::<i32>() {
+            if let Some(user_id_str) = user_id_opt
+                && let Ok(user_id) = user_id_str.parse::<i32>() {
                     query.set_user_id(Some(user_id));
                 }
-            }
         } else {
             query.set_user_id(Some(current_user_id));
         }
-        if let Some(start_date_str) = start_date_opt {
-            if let Ok(start_date) = NaiveDate::parse_from_str(&start_date_str, "%Y-%m-%d") {
+        if let Some(start_date_str) = start_date_opt
+            && let Ok(start_date) = NaiveDate::parse_from_str(&start_date_str, "%Y-%m-%d") {
                 query.set_start_date(Some(start_date));
             }
-        }
-        if let Some(end_date_str) = end_date_opt {
-            if let Ok(end_date) = NaiveDate::parse_from_str(&end_date_str, "%Y-%m-%d") {
+        if let Some(end_date_str) = end_date_opt
+            && let Ok(end_date) = NaiveDate::parse_from_str(&end_date_str, "%Y-%m-%d") {
                 query.set_end_date(Some(end_date));
             }
-        }
         if let Some(category) = category_opt {
             query.set_category(Some(category));
         }
         if let Some(transaction_type) = transaction_type_opt {
             query.set_transaction_type(Some(transaction_type));
         }
-        if let Some(last_id_str) = last_id_opt {
-            if let Ok(last_id) = last_id_str.parse::<i32>() {
+        if let Some(last_id_str) = last_id_opt
+            && let Ok(last_id) = last_id_str.parse::<i32>() {
                 query.set_last_id(Some(last_id));
             }
-        }
         const MAX_LIMIT: i32 = 100;
-        if let Some(limit_str) = limit_opt {
-            if let Ok(limit) = limit_str.parse::<i32>() {
+        if let Some(limit_str) = limit_opt
+            && let Ok(limit) = limit_str.parse::<i32>() {
                 query.set_limit(Some(limit.min(MAX_LIMIT)));
             }
-        }
         match OrderService::list_records(query).await {
             Ok(list_response) => {
                 let response: ApiResponse<RecordListResponse> =
