@@ -1062,6 +1062,10 @@ input[type='number'].form-input {
     padding: 12px;
   }
 
+  .record-item:active {
+    transform: none;
+  }
+
   .record-info {
     flex: 1;
     min-width: 0;
@@ -1116,13 +1120,18 @@ input[type='number'].form-input {
     padding: 12px;
   }
 
+  .user-item:active {
+    transform: none;
+  }
+
   .user-info-details {
     flex: 1;
     min-width: 0;
   }
 
   .user-status {
-    order: 3;
+    flex-shrink: 0;
+    margin-left: auto;
   }
 
   .record-actions,
@@ -1154,22 +1163,54 @@ input[type='number'].form-input {
     min-width: fit-content;
   }
 
-  #records-page .card,
-  #users-page .card {
-    height: calc(100vh - 120px);
-  }
-
-  #user-records-page .card {
-    height: calc(100vh - 240px);
-  }
-
-  #dashboard-page {
+  #dashboard-page,
+  #records-page,
+  #users-page,
+  #user-records-page {
     height: auto;
     min-height: calc(100vh - 80px);
   }
 
-  #dashboard-page .card {
+  #dashboard-page .card,
+  #records-page .card,
+  #users-page .card,
+  #user-records-page .card {
     flex: none;
+    height: auto;
+    min-height: calc(100vh - 140px);
+  }
+
+  #dashboard-page .card-body,
+  #records-page .card-body,
+  #users-page .card-body,
+  #user-records-page .card-body {
+    overflow: visible;
+    flex: none;
+  }
+
+  #dashboard-page .record-list {
+    max-height: none;
+    height: auto;
+    overflow-y: visible;
+  }
+
+  #records-page .record-list,
+  #users-page .user-list,
+  #user-records-page .record-list {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .record-meta-row {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .record-meta-item {
+    flex-shrink: 0;
   }
 }
 

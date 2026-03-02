@@ -22,6 +22,20 @@ let usersPageFirstIds = [null];
 
 const API_BASE = '/api/order';
 
+const pendingRequests = new Set();
+
+function isRequestPending(key) {
+  return pendingRequests.has(key);
+}
+
+function setRequestPending(key, pending) {
+  if (pending) {
+    pendingRequests.add(key);
+  } else {
+    pendingRequests.delete(key);
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   initEventListeners();
   initHashRouter();
@@ -248,6 +262,11 @@ let categoryAmountChart = null;
 let userActivityChart = null;
 
 async function loadOverview() {
+  const requestKey = 'load_overview';
+  if (isRequestPending(requestKey)) {
+    return;
+  }
+  setRequestPending(requestKey, true);
   try {
     const response = await fetch(`${API_BASE}/overview/statistics`, {
       credentials: 'include',
@@ -269,6 +288,8 @@ async function loadOverview() {
     }
   } catch (error) {
     showToast('Network error: ' + error.message, 'error');
+  } finally {
+    setRequestPending(requestKey, false);
   }
 }
 
@@ -735,6 +756,12 @@ window.addEventListener('resize', () => {
 
 async function handleLogin(e) {
   e.preventDefault();
+  const requestKey = 'login';
+  if (isRequestPending(requestKey)) {
+    showToast('Login in progress, please wait...', 'info');
+    return;
+  }
+  setRequestPending(requestKey, true);
   const username = document.getElementById('login-username').value;
   const password = document.getElementById('login-password').value;
   try {
@@ -757,11 +784,19 @@ async function handleLogin(e) {
     }
   } catch (error) {
     showToast('Network error: ' + error.message, 'error');
+  } finally {
+    setRequestPending(requestKey, false);
   }
 }
 
 async function handleRegister(e) {
   e.preventDefault();
+  const requestKey = 'register';
+  if (isRequestPending(requestKey)) {
+    showToast('Registration in progress, please wait...', 'info');
+    return;
+  }
+  setRequestPending(requestKey, true);
   const data = {
     username: document.getElementById('reg-username').value,
     password: document.getElementById('reg-password').value,
@@ -788,6 +823,8 @@ async function handleRegister(e) {
     }
   } catch (error) {
     showToast('Network error: ' + error.message, 'error');
+  } finally {
+    setRequestPending(requestKey, false);
   }
 }
 
@@ -799,6 +836,13 @@ function handleLogout() {
   localStorage.removeItem('order_user');
   localStorage.removeItem('order_token');
   window.location.hash = '';
+  document
+    .querySelectorAll('.admin-only')
+    .forEach((el) => el.classList.add('hidden'));
+  document.getElementById('current-user').textContent = 'User';
+  const roleBadge = document.getElementById('user-role');
+  roleBadge.textContent = 'user';
+  roleBadge.className = 'role-badge';
   showPage('login-page');
   showToast('Logged out successfully', 'info');
 }
@@ -830,6 +874,11 @@ async function loadRecentRecords(append = false) {
       recentRecordsHasMore = result.data.has_more;
       recentRecordsLastId = result.data.last_id;
       renderRecentRecords(result.data.records, append);
+      if (!recentRecordsHasMore) {
+        const container = document.getElementById('recent-records-list');
+        const sentinel = container?.querySelector('.load-more-sentinel');
+        if (sentinel) sentinel.style.display = 'none';
+      }
       if (!append) {
         updateStats(result.data);
       }
@@ -860,23 +909,62 @@ function renderRecentRecords(records, append = false) {
   if (append) {
     const loader = container.querySelector('.loading-more');
     if (loader) loader.remove();
-    container.insertAdjacentHTML('beforeend', html);
+    const sentinel = container.querySelector('.load-more-sentinel');
+    if (sentinel) {
+      sentinel.insertAdjacentHTML('beforebegin', html);
+    } else {
+      container.insertAdjacentHTML('beforeend', html);
+    }
   } else {
+    const sentinel = container.querySelector('.load-more-sentinel');
     container.innerHTML = html;
+    if (sentinel) {
+      container.appendChild(sentinel);
+      sentinel.style.display = '';
+    }
   }
 }
 
 function initRecentRecordsScroll() {
   const container = document.getElementById('recent-records-list');
   if (!container) return;
-  container.addEventListener('scroll', () => {
-    if (!recentRecordsHasMore || recentRecordsLoading) return;
-    const { scrollTop, scrollHeight, clientHeight } = container;
-    if (scrollTop + clientHeight >= scrollHeight - 50) {
-      showLoadingMore();
-      loadRecentRecords(true);
-    }
-  });
+
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+
+  if (isMobile) {
+    const sentinel = document.createElement('div');
+    sentinel.className = 'load-more-sentinel';
+    sentinel.style.cssText = 'height: 1px; margin-top: 20px;';
+    container.appendChild(sentinel);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (
+            entry.isIntersecting &&
+            recentRecordsHasMore &&
+            !recentRecordsLoading
+          ) {
+            showLoadingMore();
+            loadRecentRecords(true);
+          }
+        });
+      },
+      { rootMargin: '0px 0px 100px 0px' },
+    );
+
+    observer.observe(sentinel);
+  } else {
+    const handleScroll = () => {
+      if (!recentRecordsHasMore || recentRecordsLoading) return;
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      if (scrollTop + clientHeight >= scrollHeight - 50) {
+        showLoadingMore();
+        loadRecentRecords(true);
+      }
+    };
+    container.addEventListener('scroll', handleScroll, { passive: true });
+  }
 }
 
 function showLoadingMore() {
@@ -951,6 +1039,11 @@ async function loadRecords() {
 }
 
 async function applyFilters(pageDirection = null) {
+  const requestKey = 'apply_filters';
+  if (isRequestPending(requestKey)) {
+    return;
+  }
+  setRequestPending(requestKey, true);
   const startDate = document.getElementById('filter-start-date').value;
   const endDate = document.getElementById('filter-end-date').value;
   const category = document.getElementById('filter-category').value;
@@ -1005,6 +1098,8 @@ async function applyFilters(pageDirection = null) {
     }
   } catch (error) {
     showToast('Network error: ' + error.message, 'error');
+  } finally {
+    setRequestPending(requestKey, false);
   }
 }
 
@@ -1096,6 +1191,12 @@ function showCreateRecordModal(targetUserId = null, targetUserName = null) {
 
 async function handleRecordSubmit(e) {
   e.preventDefault();
+  const requestKey = 'record_submit';
+  if (isRequestPending(requestKey)) {
+    showToast('Saving record, please wait...', 'info');
+    return;
+  }
+  setRequestPending(requestKey, true);
   const data = {
     transaction_type: document.getElementById('record-type').value,
     amount: parseFloat(document.getElementById('record-amount').value),
@@ -1129,6 +1230,8 @@ async function handleRecordSubmit(e) {
     }
   } catch (error) {
     showToast('Network error', 'error');
+  } finally {
+    setRequestPending(requestKey, false);
   }
 }
 
@@ -1273,6 +1376,11 @@ function printRecordData(record) {
 }
 
 async function loadUsers(pageDirection = null) {
+  const requestKey = 'load_users';
+  if (isRequestPending(requestKey)) {
+    return;
+  }
+  setRequestPending(requestKey, true);
   try {
     const keyword = document
       .getElementById('user-search-keyword')
@@ -1328,6 +1436,8 @@ async function loadUsers(pageDirection = null) {
     }
   } catch (error) {
     showToast('Network error: ' + error.message, 'error');
+  } finally {
+    setRequestPending(requestKey, false);
   }
 }
 
@@ -1433,6 +1543,11 @@ async function loadUserRecords() {
 }
 
 async function applyUserRecordFilters(pageDirection = null) {
+  const requestKey = 'apply_user_filters';
+  if (isRequestPending(requestKey)) {
+    return;
+  }
+  setRequestPending(requestKey, true);
   const startDate = document.getElementById('user-filter-start-date').value;
   const endDate = document.getElementById('user-filter-end-date').value;
   const category = document.getElementById('user-filter-category').value;
@@ -1485,6 +1600,8 @@ async function applyUserRecordFilters(pageDirection = null) {
     }
   } catch (error) {
     showToast('Network error: ' + error.message, 'error');
+  } finally {
+    setRequestPending(requestKey, false);
   }
 }
 
@@ -1580,6 +1697,12 @@ function resetUserRecordFilters() {
 
 async function handleUserSubmit(e) {
   e.preventDefault();
+  const requestKey = 'user_submit';
+  if (isRequestPending(requestKey)) {
+    showToast('Creating user, please wait...', 'info');
+    return;
+  }
+  setRequestPending(requestKey, true);
   const data = {
     username: document.getElementById('user-username').value,
     password: document.getElementById('user-password').value,
@@ -1605,10 +1728,18 @@ async function handleUserSubmit(e) {
     }
   } catch (error) {
     showToast('Network error', 'error');
+  } finally {
+    setRequestPending(requestKey, false);
   }
 }
 
 async function approveUser(userId, approved) {
+  const requestKey = `approve_user_${userId}`;
+  if (isRequestPending(requestKey)) {
+    showToast('Processing, please wait...', 'info');
+    return;
+  }
+  setRequestPending(requestKey, true);
   try {
     const response = await fetch(`${API_BASE}/user/approve/${userId}`, {
       method: 'POST',
@@ -1625,6 +1756,8 @@ async function approveUser(userId, approved) {
     }
   } catch (error) {
     showToast('Network error', 'error');
+  } finally {
+    setRequestPending(requestKey, false);
   }
 }
 
@@ -1639,6 +1772,12 @@ function loadProfile() {
 
 async function handleProfileSubmit(e) {
   e.preventDefault();
+  const requestKey = 'profile_submit';
+  if (isRequestPending(requestKey)) {
+    showToast('Saving profile, please wait...', 'info');
+    return;
+  }
+  setRequestPending(requestKey, true);
   const data = {
     nickname: document.getElementById('profile-nickname').value || null,
     email: document.getElementById('profile-email').value || null,
@@ -1662,11 +1801,19 @@ async function handleProfileSubmit(e) {
     }
   } catch (error) {
     showToast('Network error', 'error');
+  } finally {
+    setRequestPending(requestKey, false);
   }
 }
 
 async function handlePasswordSubmit(e) {
   e.preventDefault();
+  const requestKey = 'password_submit';
+  if (isRequestPending(requestKey)) {
+    showToast('Changing password, please wait...', 'info');
+    return;
+  }
+  setRequestPending(requestKey, true);
   const data = {
     old_password: document.getElementById('old-password').value,
     new_password: document.getElementById('new-password').value,
@@ -1690,6 +1837,8 @@ async function handlePasswordSubmit(e) {
     }
   } catch (error) {
     showToast('Network error', 'error');
+  } finally {
+    setRequestPending(requestKey, false);
   }
 }
 
@@ -2082,6 +2231,7 @@ async function handleScanResult(qrData) {
     if (result.code === 200 && result.data) {
       const userData = result.data;
       closeScanModal();
+      closeMobileSidebar();
       viewUserRecords(userData.id, userData.nickname || userData.username);
       showToast(
         `Found user: ${userData.nickname || userData.username}`,
