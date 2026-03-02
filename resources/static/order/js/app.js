@@ -337,29 +337,45 @@ function initTrendChart(dailyTrend) {
   const option = {
     tooltip: {
       trigger: 'axis',
-      axisPointer: { type: 'cross' },
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      borderColor: '#e0e0e0',
+      borderWidth: 1,
+      textStyle: { color: '#2c3e50', fontSize: 13 },
+      axisPointer: {
+        type: 'line',
+        lineStyle: { color: '#667eea', width: 1, type: 'dashed' },
+      },
+      padding: [12, 16],
+      extraCssText:
+        'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
     },
     legend: {
       data: ['Income', 'Expense'],
-      textStyle: { color: '#c9d1d9' },
+      textStyle: { color: '#666', fontSize: 13 },
+      top: 8,
+      itemGap: 20,
+      itemWidth: 12,
+      itemHeight: 12,
     },
     grid: {
       left: '3%',
       right: '4%',
       bottom: '3%',
+      top: '15%',
       containLabel: true,
     },
     xAxis: {
       type: 'category',
       data: dailyTrend.dates,
-      axisLine: { lineStyle: { color: '#30363d' } },
-      axisLabel: { color: '#8b949e' },
+      axisLine: { lineStyle: { color: '#e0e0e0', width: 1 } },
+      axisLabel: { color: '#666', fontSize: 11 },
+      axisTick: { show: false },
     },
     yAxis: {
       type: 'value',
-      axisLine: { lineStyle: { color: '#30363d' } },
-      axisLabel: { color: '#8b949e' },
-      splitLine: { lineStyle: { color: '#21262d' } },
+      axisLine: { show: false },
+      axisLabel: { color: '#666', fontSize: 11 },
+      splitLine: { lineStyle: { color: '#f0f0f0', width: 1 } },
     },
     series: [
       {
@@ -367,11 +383,14 @@ function initTrendChart(dailyTrend) {
         type: 'line',
         data: dailyTrend.income,
         smooth: true,
-        itemStyle: { color: '#238636' },
+        symbol: 'circle',
+        symbolSize: 6,
+        itemStyle: { color: '#22c55e' },
+        lineStyle: { width: 2.5, color: '#22c55e' },
         areaStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(35, 134, 54, 0.3)' },
-            { offset: 1, color: 'rgba(35, 134, 54, 0.05)' },
+            { offset: 0, color: 'rgba(34, 197, 94, 0.2)' },
+            { offset: 1, color: 'rgba(34, 197, 94, 0.02)' },
           ]),
         },
       },
@@ -380,11 +399,14 @@ function initTrendChart(dailyTrend) {
         type: 'line',
         data: dailyTrend.expense,
         smooth: true,
-        itemStyle: { color: '#f85149' },
+        symbol: 'circle',
+        symbolSize: 6,
+        itemStyle: { color: '#ef4444' },
+        lineStyle: { width: 2.5, color: '#ef4444' },
         areaStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(248, 81, 73, 0.3)' },
-            { offset: 1, color: 'rgba(248, 81, 73, 0.05)' },
+            { offset: 0, color: 'rgba(239, 68, 68, 0.2)' },
+            { offset: 1, color: 'rgba(239, 68, 68, 0.02)' },
           ]),
         },
       },
@@ -401,42 +423,88 @@ function initCompareChart(monthlyComparison) {
   const option = {
     tooltip: {
       trigger: 'axis',
-      axisPointer: { type: 'shadow' },
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      borderColor: '#e0e0e0',
+      borderWidth: 1,
+      textStyle: { color: '#2c3e50', fontSize: 13 },
+      axisPointer: {
+        type: 'shadow',
+        shadowStyle: { color: 'rgba(0, 0, 0, 0.05)' },
+      },
+      padding: [12, 16],
+      extraCssText:
+        'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
     },
     legend: {
       data: ['Income', 'Expense'],
-      textStyle: { color: '#c9d1d9' },
+      textStyle: { color: '#666', fontSize: 13 },
+      top: 8,
+      itemGap: 20,
+      itemWidth: 12,
+      itemHeight: 12,
     },
     grid: {
       left: '3%',
       right: '4%',
       bottom: '3%',
+      top: '15%',
       containLabel: true,
     },
     xAxis: {
       type: 'category',
       data: monthlyComparison.months,
-      axisLine: { lineStyle: { color: '#30363d' } },
-      axisLabel: { color: '#8b949e' },
+      axisLine: { lineStyle: { color: '#e0e0e0', width: 1 } },
+      axisLabel: { color: '#666', fontSize: 11 },
+      axisTick: { show: false },
     },
     yAxis: {
       type: 'value',
-      axisLine: { lineStyle: { color: '#30363d' } },
-      axisLabel: { color: '#8b949e' },
-      splitLine: { lineStyle: { color: '#21262d' } },
+      axisLine: { show: false },
+      axisLabel: { color: '#666', fontSize: 11 },
+      splitLine: { lineStyle: { color: '#f0f0f0', width: 1 } },
     },
     series: [
       {
         name: 'Income',
         type: 'bar',
         data: monthlyComparison.income,
-        itemStyle: { color: '#238636' },
+        itemStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: '#22c55e' },
+            { offset: 1, color: '#16a34a' },
+          ]),
+          borderRadius: [4, 4, 0, 0],
+        },
+        barWidth: '35%',
+        emphasis: {
+          itemStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              { offset: 0, color: '#34d399' },
+              { offset: 1, color: '#22c55e' },
+            ]),
+          },
+        },
       },
       {
         name: 'Expense',
         type: 'bar',
         data: monthlyComparison.expense,
-        itemStyle: { color: '#f85149' },
+        itemStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: '#f87171' },
+            { offset: 1, color: '#ef4444' },
+          ]),
+          borderRadius: [4, 4, 0, 0],
+        },
+        barWidth: '35%',
+        emphasis: {
+          itemStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              { offset: 0, color: '#fca5a5' },
+              { offset: 1, color: '#f87171' },
+            ]),
+          },
+        },
       },
     ],
   };
@@ -448,25 +516,47 @@ function initCategoryChart(categoryDistribution) {
   if (!chartDom) return;
   if (categoryChart) categoryChart.dispose();
   categoryChart = echarts.init(chartDom);
+  const colorPalette = [
+    '#667eea',
+    '#764ba2',
+    '#f59e0b',
+    '#10b981',
+    '#ef4444',
+    '#06b6d4',
+    '#8b5cf6',
+    '#f97316',
+  ];
   const option = {
     tooltip: {
       trigger: 'item',
-      formatter: '{b}: {c} ({d}%)',
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      borderColor: '#e0e0e0',
+      borderWidth: 1,
+      textStyle: { color: '#2c3e50', fontSize: 13 },
+      formatter: '{b}: <b>{c}</b> ({d}%)',
+      padding: [12, 16],
+      extraCssText:
+        'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
     },
     legend: {
       orient: 'vertical',
-      left: 'left',
-      textStyle: { color: '#c9d1d9' },
+      left: 12,
+      top: 'center',
+      textStyle: { color: '#666', fontSize: 12 },
+      itemGap: 12,
+      itemWidth: 10,
+      itemHeight: 10,
     },
+    color: colorPalette,
     series: [
       {
         type: 'pie',
-        radius: ['40%', '70%'],
-        center: ['60%', '50%'],
+        radius: ['45%', '72%'],
+        center: ['58%', '50%'],
         avoidLabelOverlap: false,
         itemStyle: {
-          borderRadius: 5,
-          borderColor: '#161b22',
+          borderRadius: 6,
+          borderColor: '#ffffff',
           borderWidth: 2,
         },
         label: {
@@ -474,11 +564,19 @@ function initCategoryChart(categoryDistribution) {
           position: 'center',
         },
         emphasis: {
+          scale: true,
+          scaleSize: 8,
+          itemStyle: {
+            shadowBlur: 20,
+            shadowOffsetX: 0,
+            shadowColor: 'rgba(0, 0, 0, 0.2)',
+          },
           label: {
             show: true,
-            fontSize: 16,
-            fontWeight: 'bold',
-            color: '#c9d1d9',
+            fontSize: 14,
+            fontWeight: 600,
+            color: '#2c3e50',
+            formatter: '{b}\n{d}%',
           },
         },
         labelLine: { show: false },
@@ -497,36 +595,58 @@ function initUserGrowthChart(userGrowth) {
   const option = {
     tooltip: {
       trigger: 'axis',
-      axisPointer: { type: 'cross' },
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      borderColor: '#e0e0e0',
+      borderWidth: 1,
+      textStyle: { color: '#2c3e50', fontSize: 13 },
+      axisPointer: {
+        type: 'line',
+        lineStyle: { color: '#667eea', width: 1, type: 'dashed' },
+      },
+      padding: [12, 16],
+      extraCssText:
+        'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
     },
     grid: {
       left: '3%',
       right: '4%',
       bottom: '3%',
+      top: '12%',
       containLabel: true,
     },
     xAxis: {
       type: 'category',
       data: userGrowth.dates,
-      axisLine: { lineStyle: { color: '#30363d' } },
-      axisLabel: { color: '#8b949e' },
+      axisLine: { lineStyle: { color: '#e0e0e0', width: 1 } },
+      axisLabel: { color: '#666', fontSize: 11 },
+      axisTick: { show: false },
     },
     yAxis: {
       type: 'value',
-      axisLine: { lineStyle: { color: '#30363d' } },
-      axisLabel: { color: '#8b949e' },
-      splitLine: { lineStyle: { color: '#21262d' } },
+      axisLine: { show: false },
+      axisLabel: { color: '#666', fontSize: 11 },
+      splitLine: { lineStyle: { color: '#f0f0f0', width: 1 } },
     },
     series: [
       {
         name: 'New Users',
         type: 'bar',
         data: userGrowth.counts,
+        barWidth: '50%',
         itemStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: '#58a6ff' },
-            { offset: 1, color: '#1f6feb' },
+            { offset: 0, color: '#667eea' },
+            { offset: 1, color: '#764ba2' },
           ]),
+          borderRadius: [6, 6, 0, 0],
+        },
+        emphasis: {
+          itemStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              { offset: 0, color: '#7c8cf0' },
+              { offset: 1, color: '#8b5cf6' },
+            ]),
+          },
         },
       },
     ],
@@ -542,23 +662,35 @@ function initTypeDistributionChart(distribution) {
   const option = {
     tooltip: {
       trigger: 'item',
-      formatter: '{b}: {c} ({d}%)',
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      borderColor: '#e0e0e0',
+      borderWidth: 1,
+      textStyle: { color: '#2c3e50', fontSize: 13 },
+      formatter: '{b}: <b>{c}</b> ({d}%)',
+      padding: [12, 16],
+      extraCssText:
+        'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
     },
     legend: {
       orient: 'vertical',
-      left: 'left',
-      textStyle: { color: '#c9d1d9' },
+      left: 12,
+      top: 'center',
+      textStyle: { color: '#666', fontSize: 12 },
+      itemGap: 12,
+      itemWidth: 10,
+      itemHeight: 10,
       data: ['Income', 'Expense'],
     },
     series: [
       {
         name: 'Transaction Type',
         type: 'pie',
-        radius: ['40%', '70%'],
+        radius: ['45%', '72%'],
+        center: ['58%', '50%'],
         avoidLabelOverlap: false,
         itemStyle: {
-          borderRadius: 10,
-          borderColor: '#0d1117',
+          borderRadius: 8,
+          borderColor: '#ffffff',
           borderWidth: 2,
         },
         label: {
@@ -566,26 +698,42 @@ function initTypeDistributionChart(distribution) {
           position: 'center',
         },
         emphasis: {
+          scale: true,
+          scaleSize: 8,
+          itemStyle: {
+            shadowBlur: 20,
+            shadowOffsetX: 0,
+            shadowColor: 'rgba(0, 0, 0, 0.2)',
+          },
           label: {
             show: true,
-            fontSize: 20,
-            fontWeight: 'bold',
-            color: '#c9d1d9',
+            fontSize: 16,
+            fontWeight: 600,
+            color: '#2c3e50',
+            formatter: '{b}\n{d}%',
           },
         },
-        labelLine: {
-          show: false,
-        },
+        labelLine: { show: false },
         data: [
           {
             value: distribution.income_count,
             name: 'Income',
-            itemStyle: { color: '#10b981' },
+            itemStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                { offset: 0, color: '#34d399' },
+                { offset: 1, color: '#22c55e' },
+              ]),
+            },
           },
           {
             value: distribution.expense_count,
             name: 'Expense',
-            itemStyle: { color: '#ef4444' },
+            itemStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                { offset: 0, color: '#f87171' },
+                { offset: 1, color: '#ef4444' },
+              ]),
+            },
           },
         ],
       },
@@ -602,40 +750,54 @@ function initCountTrendChart(trend) {
   const option = {
     tooltip: {
       trigger: 'axis',
-      axisPointer: { type: 'cross' },
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      borderColor: '#e0e0e0',
+      borderWidth: 1,
+      textStyle: { color: '#2c3e50', fontSize: 13 },
+      axisPointer: {
+        type: 'line',
+        lineStyle: { color: '#f59e0b', width: 1, type: 'dashed' },
+      },
+      padding: [12, 16],
+      extraCssText:
+        'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
     },
     grid: {
       left: '3%',
       right: '4%',
       bottom: '3%',
+      top: '12%',
       containLabel: true,
     },
     xAxis: {
       type: 'category',
       data: trend.dates,
-      axisLine: { lineStyle: { color: '#30363d' } },
-      axisLabel: { color: '#8b949e' },
+      axisLine: { lineStyle: { color: '#e0e0e0', width: 1 } },
+      axisLabel: { color: '#666', fontSize: 11 },
+      axisTick: { show: false },
     },
     yAxis: {
       type: 'value',
-      axisLine: { lineStyle: { color: '#30363d' } },
-      axisLabel: { color: '#8b949e' },
-      splitLine: { lineStyle: { color: '#21262d' } },
+      axisLine: { show: false },
+      axisLabel: { color: '#666', fontSize: 11 },
+      splitLine: { lineStyle: { color: '#f0f0f0', width: 1 } },
     },
     series: [
       {
         name: 'Transaction Count',
         type: 'line',
         smooth: true,
+        symbol: 'circle',
+        symbolSize: 6,
         data: trend.counts,
         itemStyle: { color: '#f59e0b' },
+        lineStyle: { width: 2.5, color: '#f59e0b' },
         areaStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(245, 158, 11, 0.5)' },
-            { offset: 1, color: 'rgba(245, 158, 11, 0.1)' },
+            { offset: 0, color: 'rgba(245, 158, 11, 0.25)' },
+            { offset: 1, color: 'rgba(245, 158, 11, 0.02)' },
           ]),
         },
-        lineStyle: { width: 3 },
       },
     ],
   };
@@ -652,38 +814,59 @@ function initCategoryAmountChart(distribution) {
   const option = {
     tooltip: {
       trigger: 'axis',
-      axisPointer: { type: 'shadow' },
-      formatter: '{b}: ${c}',
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      borderColor: '#e0e0e0',
+      borderWidth: 1,
+      textStyle: { color: '#2c3e50', fontSize: 13 },
+      axisPointer: {
+        type: 'shadow',
+        shadowStyle: { color: 'rgba(0, 0, 0, 0.05)' },
+      },
+      formatter: '{b}: <b>¥{c}</b>',
+      padding: [12, 16],
+      extraCssText:
+        'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
     },
     grid: {
       left: '3%',
-      right: '4%',
+      right: '8%',
       bottom: '3%',
+      top: '5%',
       containLabel: true,
     },
     xAxis: {
       type: 'value',
-      axisLine: { lineStyle: { color: '#30363d' } },
-      axisLabel: { color: '#8b949e' },
-      splitLine: { lineStyle: { color: '#21262d' } },
+      axisLine: { show: false },
+      axisLabel: { color: '#666', fontSize: 11 },
+      splitLine: { lineStyle: { color: '#f0f0f0', width: 1 } },
     },
     yAxis: {
       type: 'category',
       data: names.slice(0, 10).reverse(),
-      axisLine: { lineStyle: { color: '#30363d' } },
-      axisLabel: { color: '#8b949e' },
+      axisLine: { show: false },
+      axisLabel: { color: '#666', fontSize: 12 },
+      axisTick: { show: false },
     },
     series: [
       {
         name: 'Amount',
         type: 'bar',
         data: amounts.slice(0, 10).reverse(),
+        barWidth: '55%',
         itemStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
             { offset: 0, color: '#8b5cf6' },
-            { offset: 1, color: '#6366f1' },
+            { offset: 1, color: '#667eea' },
           ]),
-          borderRadius: [0, 4, 4, 0],
+          borderRadius: [0, 6, 6, 0],
+        },
+        emphasis: {
+          itemStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+              { offset: 0, color: '#a78bfa' },
+              { offset: 1, color: '#8b5cf6' },
+            ]),
+          },
         },
       },
     ],
@@ -699,46 +882,78 @@ function initUserActivityChart(activity) {
   const option = {
     tooltip: {
       trigger: 'axis',
-      axisPointer: { type: 'cross' },
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      borderColor: '#e0e0e0',
+      borderWidth: 1,
+      textStyle: { color: '#2c3e50', fontSize: 13 },
+      axisPointer: {
+        type: 'line',
+        lineStyle: { color: '#667eea', width: 1, type: 'dashed' },
+      },
+      padding: [12, 16],
+      extraCssText:
+        'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
     },
     legend: {
       data: ['Active Users', 'New Records'],
-      textStyle: { color: '#c9d1d9' },
+      textStyle: { color: '#666', fontSize: 13 },
+      top: 8,
+      itemGap: 20,
+      itemWidth: 12,
+      itemHeight: 12,
     },
     grid: {
       left: '3%',
       right: '4%',
       bottom: '3%',
+      top: '15%',
       containLabel: true,
     },
     xAxis: {
       type: 'category',
       data: activity.dates,
-      axisLine: { lineStyle: { color: '#30363d' } },
-      axisLabel: { color: '#8b949e' },
+      axisLine: { lineStyle: { color: '#e0e0e0', width: 1 } },
+      axisLabel: { color: '#666', fontSize: 11 },
+      axisTick: { show: false },
     },
     yAxis: {
       type: 'value',
-      axisLine: { lineStyle: { color: '#30363d' } },
-      axisLabel: { color: '#8b949e' },
-      splitLine: { lineStyle: { color: '#21262d' } },
+      axisLine: { show: false },
+      axisLabel: { color: '#666', fontSize: 11 },
+      splitLine: { lineStyle: { color: '#f0f0f0', width: 1 } },
     },
     series: [
       {
         name: 'Active Users',
         type: 'line',
         smooth: true,
+        symbol: 'circle',
+        symbolSize: 6,
         data: activity.active_users,
         itemStyle: { color: '#06b6d4' },
-        lineStyle: { width: 3 },
+        lineStyle: { width: 2.5, color: '#06b6d4' },
+        areaStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: 'rgba(6, 182, 212, 0.2)' },
+            { offset: 1, color: 'rgba(6, 182, 212, 0.02)' },
+          ]),
+        },
       },
       {
         name: 'New Records',
         type: 'line',
         smooth: true,
+        symbol: 'circle',
+        symbolSize: 6,
         data: activity.new_records,
         itemStyle: { color: '#f97316' },
-        lineStyle: { width: 3 },
+        lineStyle: { width: 2.5, color: '#f97316' },
+        areaStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: 'rgba(249, 115, 22, 0.2)' },
+            { offset: 1, color: 'rgba(249, 115, 22, 0.02)' },
+          ]),
+        },
       },
     ],
   };
