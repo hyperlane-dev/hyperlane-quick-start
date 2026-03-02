@@ -37,9 +37,10 @@ impl TrackingService {
         let page_size: i64 = (*request.try_get_page_size()).unwrap_or(20).clamp(1, 100);
         if let Some(start) = *request.try_get_start_time()
             && let Some(end) = *request.try_get_end_time()
-                && start > end {
-                    return Err("start_time must be less than or equal to end_time".to_string());
-                }
+            && start > end
+        {
+            return Err("start_time must be less than or equal to end_time".to_string());
+        }
         let (models, total): (Vec<Model>, i64) = if request.try_get_header_key().clone().is_some() {
             let header_key: String = request.try_get_header_key().clone().unwrap();
             TrackingMapper::query_by_header(

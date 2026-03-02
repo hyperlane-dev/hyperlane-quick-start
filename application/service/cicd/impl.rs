@@ -334,10 +334,11 @@ impl CicdService {
                 output_builder.add_stdout(stdout);
                 output_builder.add_stderr(stderr);
                 if let Ok(status) = exit_status
-                    && !status.success() {
-                        let exit_code: i32 = status.code().unwrap_or(-1);
-                        return Err(format!("Command exited with code {exit_code}"));
-                    }
+                    && !status.success()
+                {
+                    let exit_code: i32 = status.code().unwrap_or(-1);
+                    return Err(format!("Command exited with code {exit_code}"));
+                }
             }
             Err(_) => {
                 output_builder.mark_timeout(TASK_TIMEOUT.as_secs());

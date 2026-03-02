@@ -515,10 +515,10 @@ impl ServerHook for RunLogsSseRoute {
             for step_id in &current_step_ids {
                 if !step_ids.contains(step_id)
                     && let Some(receiver) = log_manager.create_step_receiver(run_id, *step_id).await
-                    {
-                        receivers.push((*step_id, receiver));
-                        step_ids.push(*step_id);
-                    }
+                {
+                    receivers.push((*step_id, receiver));
+                    step_ids.push(*step_id);
+                }
             }
             if !has_activity {
                 sleep(Duration::from_millis(10)).await;
