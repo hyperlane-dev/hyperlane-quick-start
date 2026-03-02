@@ -997,13 +997,15 @@ function renderRecordItem(record) {
         <div class="record-meta-row">
           <span class="record-meta-item"><span class="record-meta-label">ID:</span> <span class="record-meta-value">${record.id}</span></span>
           <span class="record-meta-item"><span class="record-meta-label">Bill No:</span> <span class="record-meta-value">${escapeHtml(record.bill_no)}</span></span>
-          <span class="record-meta-item" onclick="event.stopPropagation(); viewUserRecords(${record.user_id}, 'User ${record.user_id}');" style="cursor: pointer;"><span class="record-meta-label">User ID:</span> <span class="record-meta-value" style="color: #58a6ff; text-decoration: underline;">${record.user_id}</span></span>
+          <span class="record-meta-item" onclick="event.stopPropagation(); viewUserRecords(${record.user_id}, 'User ${record.user_id}');" style="cursor: pointer;"><span class="record-meta-label">User ID:</span> <span class="record-meta-value" style="color: #58a6ff;">${record.user_id}</span></span>
+        </div>
+        <div class="record-date-row">
+          <span class="record-date-item"><span class="record-date-label">Date:</span> <span class="record-date-value">${formatDate(record.bill_date)}</span></span>
+          ${record.created_at ? `<span class="record-date-item"><span class="record-date-label">Created:</span> <span class="record-date-value">${formatDate(record.created_at)}</span></span>` : ''}
         </div>
       </div>
       <div class="record-right">
         <div class="record-amount ${amountClass}">${amountPrefix}$${formatAmount(record.amount)}</div>
-        <div class="record-date">${formatDate(record.bill_date)}</div>
-        ${record.created_at ? `<div class="record-date">Created: ${formatDate(record.created_at)}</div>` : ''}
         <button class="btn-print" onclick="event.stopPropagation(); printRecordData(JSON.parse(this.dataset.record));" data-record="${recordJson}">🖨️ Print</button>
       </div>
     </div>`;
@@ -1156,13 +1158,15 @@ function renderAllRecords(records) {
         <div class="record-meta-row">
           <span class="record-meta-item"><span class="record-meta-label">ID:</span> <span class="record-meta-value">${r.id}</span></span>
           <span class="record-meta-item"><span class="record-meta-label">Bill No:</span> <span class="record-meta-value">${escapeHtml(r.bill_no)}</span></span>
-          <span class="record-meta-item" onclick="event.stopPropagation(); viewUserRecords(${r.user_id}, 'User ${r.user_id}');" style="cursor: pointer;"><span class="record-meta-label">User ID:</span> <span class="record-meta-value" style="color: #58a6ff; text-decoration: underline;">${r.user_id}</span></span>
+          <span class="record-meta-item" onclick="event.stopPropagation(); viewUserRecords(${r.user_id}, 'User ${r.user_id}');" style="cursor: pointer;"><span class="record-meta-label">User ID:</span> <span class="record-meta-value" style="color: #58a6ff;">${r.user_id}</span></span>
+        </div>
+        <div class="record-date-row">
+          <span class="record-date-item"><span class="record-date-label">Date:</span> <span class="record-date-value">${formatDate(r.bill_date)}</span></span>
+          ${r.created_at ? `<span class="record-date-item"><span class="record-date-label">Created:</span> <span class="record-date-value">${formatDate(r.created_at)}</span></span>` : ''}
         </div>
       </div>
       <div class="record-right">
         <div class="record-amount ${r.transaction_type}">${r.transaction_type === 'income' ? '+' : '-'}$${formatAmount(r.amount)}</div>
-        <div class="record-date">${formatDate(r.bill_date)}</div>
-        ${r.created_at ? `<div class="record-date">Created: ${formatDate(r.created_at)}</div>` : ''}
         <button class="btn-print" onclick="event.stopPropagation(); printRecordData(JSON.parse(this.dataset.record));" data-record="${rJson}">🖨️ Print</button>
       </div>
     </div>`;
@@ -1620,11 +1624,13 @@ function renderUserRecords(records) {
           <span class="record-meta-item"><span class="record-meta-label">ID:</span> <span class="record-meta-value">${r.id}</span></span>
           <span class="record-meta-item"><span class="record-meta-label">Bill No:</span> <span class="record-meta-value">${escapeHtml(r.bill_no)}</span></span>
         </div>
+        <div class="record-date-row">
+          <span class="record-date-item"><span class="record-date-label">Date:</span> <span class="record-date-value">${formatDate(r.bill_date)}</span></span>
+          ${r.created_at ? `<span class="record-date-item"><span class="record-date-label">Created:</span> <span class="record-date-value">${formatDate(r.created_at)}</span></span>` : ''}
+        </div>
       </div>
       <div class="record-right">
         <div class="record-amount ${r.transaction_type}">${r.transaction_type === 'income' ? '+' : '-'}$${formatAmount(r.amount)}</div>
-        <div class="record-date">${formatDate(r.bill_date)}</div>
-        ${r.created_at ? `<div class="record-date">Created: ${formatDate(r.created_at)}</div>` : ''}
         <button class="btn-print" onclick="event.stopPropagation(); printRecordData(JSON.parse(this.dataset.record));" data-record="${rJson}">🖨️ Print</button>
       </div>
     </div>`;

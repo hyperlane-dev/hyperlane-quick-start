@@ -46,6 +46,10 @@ body {
   line-height: 1.6;
 }
 
+a {
+  text-decoration: none;
+}
+
 .hidden {
   display: none !important;
 }
@@ -653,9 +657,6 @@ input[type='number'].form-input {
 .record-meta-value {
   position: relative;
   display: inline-block;
-  max-width: 100px;
-  overflow: hidden;
-  text-overflow: ellipsis;
   vertical-align: bottom;
   transition: all 0.2s;
 }
@@ -665,6 +666,27 @@ input[type='number'].form-input {
 }
 
 .record-meta-value {
+  color: #c9d1d9;
+}
+
+.record-date-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.record-date-item {
+  font-size: 11px;
+  color: #6e7681;
+  font-family: monospace;
+}
+
+.record-date-label {
+  color: #8b949e;
+}
+
+.record-date-value {
   color: #c9d1d9;
 }
 
@@ -1041,8 +1063,21 @@ input[type='number'].form-input {
   }
 
   .filter-group {
-    flex-direction: column;
-    align-items: stretch;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .filter-group .date-picker-wrapper {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .filter-group .form-input-sm {
+    width: 100%;
+    min-width: 90px;
   }
 
   .record-item {
@@ -1193,13 +1228,22 @@ input[type='number'].form-input {
 
   .record-meta-row {
     display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    gap: 8px;
-    -webkit-overflow-scrolling: touch;
+    flex-direction: column;
+    gap: 4px;
   }
 
   .record-meta-item {
+    flex-shrink: 0;
+  }
+
+  .record-date-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 4px;
+  }
+
+  .record-date-item {
     flex-shrink: 0;
   }
 
