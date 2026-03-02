@@ -45,8 +45,12 @@ impl ServerHook for StaticResourceRoute {
                     .set_body(&content)
                     .set_status_code(200)
                     .set_header(CONTENT_TYPE, content_type)
-                    .set_header(CACHE_CONTROL, CACHE_CONTROL_STATIC_ASSETS)
-                    .set_header(EXPIRES, EXPIRES_FAR_FUTURE);
+                    .set_header(
+                        CACHE_CONTROL,
+                        format!("{NO_CACHE}, {NO_STORE}, {MUST_REVALIDATE}"),
+                    )
+                    .set_header(PRAGMA, NO_CACHE)
+                    .set_header(EXPIRES, "0");
             }
             Err(_) => {
                 ctx.get_mut_response().set_status_code(404);
