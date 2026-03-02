@@ -247,7 +247,6 @@
         color: #6c757d;
       }
 
-      /* Custom DateTime Picker Styles */
       .datetime-picker-wrapper {
         position: relative;
         display: inline-block;
@@ -1123,9 +1122,6 @@
       </div>
     </div>
     <script>
-      /**
-       * Custom DateTime Picker Component for Tracking
-       */
       class DateTimePicker {
         constructor(inputId, options = {}) {
           this.inputId = inputId;
@@ -1371,9 +1367,6 @@
         }
       }
 
-      /**
-       * Initialize custom datetime pickers
-       */
       function initDateTimePickers() {
         const startPicker = new DateTimePicker('startTime', {
           onChange: () => {},

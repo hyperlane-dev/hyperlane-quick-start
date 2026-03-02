@@ -26,6 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initEventListeners();
   initHashRouter();
   checkAuth();
+  initScanFeature();
+  initMyQRFeature();
 });
 
 function initEventListeners() {
@@ -1938,4 +1940,238 @@ function initDatePickers() {
   const userEndDatePicker = new DatePicker('user-filter-end-date', {
     onChange: () => applyUserRecordFilters(),
   });
+}
+
+let scanStream = null;
+let scanAnimationId = null;
+let scanVideoElement = null;
+let scanCanvasElement = null;
+let scanCanvasContext = null;
+let scanCurrentFacingMode = 'environment';
+let isScanning = false;
+
+function initScanFeature() {
+  const scanBtn = document.getElementById('scan-btn');
+  if (scanBtn) {
+    scanBtn.addEventListener('click', openScanModal);
+  }
+}
+
+function openScanModal() {
+  const modal = document.getElementById('scan-modal');
+  if (modal) {
+    modal.classList.add('active');
+    startScanning();
+  }
+}
+
+function closeScanModal() {
+  const modal = document.getElementById('scan-modal');
+  if (modal) {
+    modal.classList.remove('active');
+  }
+  stopScanning();
+}
+
+async function startScanning() {
+  scanVideoElement = document.getElementById('scan-video');
+  scanCanvasElement = document.getElementById('scan-canvas');
+  if (!scanVideoElement || !scanCanvasElement) {
+    return;
+  }
+  scanCanvasContext = scanCanvasElement.getContext('2d');
+  if (!scanCanvasContext) {
+    return;
+  }
+  const errorDiv = document.getElementById('scan-error');
+  if (errorDiv) {
+    errorDiv.classList.add('hidden');
+  }
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    showScanError(
+      'Camera access is not supported. Please use HTTPS or localhost.',
+    );
+    return;
+  }
+  try {
+    const constraints = {
+      video: {
+        facingMode: scanCurrentFacingMode,
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+      },
+    };
+    scanStream = await navigator.mediaDevices.getUserMedia(constraints);
+    scanVideoElement.srcObject = scanStream;
+    scanVideoElement.onloadedmetadata = () => {
+      if (scanVideoElement) {
+        scanVideoElement.play();
+      }
+      isScanning = true;
+      tickScan();
+    };
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    showScanError(`Camera access failed: ${errorMessage}`);
+  }
+}
+
+function stopScanning() {
+  isScanning = false;
+  if (scanAnimationId) {
+    cancelAnimationFrame(scanAnimationId);
+    scanAnimationId = null;
+  }
+  if (scanStream) {
+    scanStream.getTracks().forEach((track) => track.stop());
+    scanStream = null;
+  }
+  if (scanVideoElement) {
+    scanVideoElement.srcObject = null;
+  }
+}
+
+function tickScan() {
+  if (
+    !isScanning ||
+    !scanVideoElement ||
+    !scanCanvasElement ||
+    !scanCanvasContext
+  ) {
+    return;
+  }
+  if (scanVideoElement.readyState === scanVideoElement.HAVE_ENOUGH_DATA) {
+    scanCanvasElement.width = scanVideoElement.videoWidth;
+    scanCanvasElement.height = scanVideoElement.videoHeight;
+    scanCanvasContext.drawImage(
+      scanVideoElement,
+      0,
+      0,
+      scanCanvasElement.width,
+      scanCanvasElement.height,
+    );
+    const imageData = scanCanvasContext.getImageData(
+      0,
+      0,
+      scanCanvasElement.width,
+      scanCanvasElement.height,
+    );
+    const code = jsQR(imageData.data, imageData.width, imageData.height, {
+      inversionAttempts: 'attemptBoth',
+    });
+    if (code && code.data) {
+      handleScanResult(code.data);
+      return;
+    }
+  }
+  scanAnimationId = requestAnimationFrame(tickScan);
+}
+
+async function handleScanResult(qrData) {
+  stopScanning();
+  const userId = parseInt(qrData, 10);
+  if (isNaN(userId)) {
+    showScanError('Invalid QR code. Expected user ID.');
+    return;
+  }
+  try {
+    const response = await fetch(`${API_BASE}/user/get/${userId}`, {
+      credentials: 'include',
+    });
+    const result = await response.json();
+    if (result.code === 200 && result.data) {
+      const userData = result.data;
+      closeScanModal();
+      viewUserRecords(userData.id, userData.nickname || userData.username);
+      showToast(
+        `Found user: ${userData.nickname || userData.username}`,
+        'success',
+      );
+    } else if (result.code === 404) {
+      showScanError('User not found. Please check the QR code.');
+    } else {
+      showScanError(result.message || 'Failed to find user');
+    }
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    showScanError(`Network error: ${errorMessage}`);
+  }
+}
+
+function showScanError(message) {
+  const errorDiv = document.getElementById('scan-error');
+  if (errorDiv) {
+    errorDiv.textContent = message;
+    errorDiv.classList.remove('hidden');
+  }
+}
+
+async function switchCamera() {
+  stopScanning();
+  scanCurrentFacingMode =
+    scanCurrentFacingMode === 'environment' ? 'user' : 'environment';
+  await startScanning();
+}
+
+function initMyQRFeature() {
+  const myQRBtn = document.getElementById('my-qr-btn');
+  if (myQRBtn) {
+    myQRBtn.addEventListener('click', openMyQRModal);
+  }
+}
+
+function openMyQRModal() {
+  const modal = document.getElementById('my-qr-modal');
+  if (!modal) {
+    return;
+  }
+  if (!currentUser || !currentUser.id) {
+    showToast('User information not available', 'error');
+    return;
+  }
+  const userIdSpan = document.getElementById('my-qr-user-id');
+  if (userIdSpan) {
+    userIdSpan.textContent = String(currentUser.id);
+  }
+  generateMyQRCode(String(currentUser.id));
+  modal.classList.add('active');
+}
+
+function closeMyQRModal() {
+  const modal = document.getElementById('my-qr-modal');
+  if (modal) {
+    modal.classList.remove('active');
+  }
+}
+
+function generateMyQRCode(userId) {
+  const container = document.getElementById('my-qr-canvas');
+  if (!container) {
+    return;
+  }
+  container.innerHTML = '';
+  new QRCode(container, {
+    text: userId,
+    width: 200,
+    height: 200,
+    colorDark: '#000000',
+    colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.M,
+  });
+}
+
+function downloadMyQRCode() {
+  const container = document.getElementById('my-qr-canvas');
+  if (!container) {
+    return;
+  }
+  const img = container.querySelector('img');
+  if (img && img.src) {
+    const link = document.createElement('a');
+    link.download = `user-${currentUser ? currentUser.id : 'qr'}-qrcode.png`;
+    link.href = img.src;
+    link.click();
+  } else {
+    showToast('QR code not ready', 'error');
+  }
 }

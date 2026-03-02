@@ -1230,7 +1230,6 @@ input[type='number'].form-input {
   }
 }
 
-/* Overview Dashboard Styles */
 .stat-change {
   font-size: 12px;
   margin-top: 4px;
@@ -1267,7 +1266,6 @@ input[type='number'].form-input {
   }
 }
 
-/* Custom Date Picker Styles */
 .date-picker-wrapper {
   position: relative;
   display: inline-block;
@@ -1465,4 +1463,163 @@ input[type='number'].form-input {
 .date-picker-btn.primary:hover {
   background: #2ea043;
   border-color: #2ea043;
+}
+
+.scan-modal-content {
+  max-width: 500px;
+}
+
+.scan-modal-body {
+  padding: 20px;
+}
+
+.scan-container {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto 20px;
+  aspect-ratio: 1;
+  background: #0d1117;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.scan-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.scan-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+
+.scan-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.scan-frame {
+  width: 200px;
+  height: 200px;
+  border: 2px solid rgba(88, 166, 255, 0.5);
+  border-radius: 12px;
+  position: relative;
+}
+
+.scan-frame::before,
+.scan-frame::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-color: #58a6ff;
+  border-style: solid;
+}
+
+.scan-frame::before {
+  top: -2px;
+  left: -2px;
+  border-width: 4px 0 0 4px;
+}
+
+.scan-frame::after {
+  bottom: -2px;
+  right: -2px;
+  border-width: 0 4px 4px 0;
+}
+
+.scan-line {
+  position: absolute;
+  width: 180px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #58a6ff, transparent);
+  animation: scanMove 2s linear infinite;
+}
+
+@keyframes scanMove {
+  0% {
+    transform: translateY(-100px);
+  }
+  50% {
+    transform: translateY(100px);
+  }
+  100% {
+    transform: translateY(-100px);
+  }
+}
+
+.scan-error {
+  text-align: center;
+  color: #f85149;
+  padding: 12px;
+  background: rgba(248, 81, 73, 0.1);
+  border: 1px solid rgba(248, 81, 73, 0.3);
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.scan-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.my-qr-modal-content {
+  max-width: 400px;
+}
+
+.my-qr-modal-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.qr-code-container {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.qr-code-container canvas {
+  display: block;
+}
+
+.qr-code-info {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.qr-code-info p {
+  color: #c9d1d9;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.qr-code-info .qr-code-hint {
+  color: #8b949e;
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+.qr-code-actions {
+  display: flex;
+  gap: 12px;
 }

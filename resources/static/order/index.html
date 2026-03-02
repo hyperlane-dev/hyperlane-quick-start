@@ -7,6 +7,7 @@
     <link rel="icon" href="https://docs.ltpp.vip/img/hyperlane.png" />
     <link href="./css/style.css" rel="stylesheet" />
     <script src="./js/echarts.js"></script>
+    <script src="./js/qrcode.js"></script>
     <script src="./js/app.js" defer></script>
   </head>
   <body>
@@ -141,6 +142,14 @@
             <div class="nav-item" data-page="profile">
               <span class="nav-icon">⚙️</span>
               <span>Profile</span>
+            </div>
+            <div class="nav-item" id="scan-btn">
+              <span class="nav-icon">📷</span>
+              <span>Scan QR</span>
+            </div>
+            <div class="nav-item" id="my-qr-btn">
+              <span class="nav-icon">🔳</span>
+              <span>My QR Code</span>
             </div>
           </nav>
           <div class="sidebar-footer">
@@ -757,5 +766,78 @@
     </div>
 
     <div class="toast-container" id="toast-container"></div>
+
+    <div class="modal" id="scan-modal">
+      <div class="modal-content scan-modal-content">
+        <div class="modal-header">
+          <span class="modal-title">Scan QR Code</span>
+          <button class="modal-close" onclick="closeScanModal()">
+            &times;
+          </button>
+        </div>
+        <div class="modal-body scan-modal-body">
+          <div id="scan-container" class="scan-container">
+            <video
+              id="scan-video"
+              class="scan-video"
+              autoplay
+              playsinline
+            ></video>
+            <canvas id="scan-canvas" class="scan-canvas"></canvas>
+            <div class="scan-overlay">
+              <div class="scan-frame"></div>
+              <div class="scan-line"></div>
+            </div>
+          </div>
+          <div id="scan-error" class="scan-error hidden"></div>
+          <div class="scan-actions">
+            <button type="button" class="btn" onclick="closeScanModal()">
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              onclick="switchCamera()"
+            >
+              Switch Camera
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="my-qr-modal">
+      <div class="modal-content my-qr-modal-content">
+        <div class="modal-header">
+          <span class="modal-title">My QR Code</span>
+          <button class="modal-close" onclick="closeMyQRModal()">
+            &times;
+          </button>
+        </div>
+        <div class="modal-body my-qr-modal-body">
+          <div class="qr-code-container">
+            <div id="my-qr-canvas"></div>
+          </div>
+          <div class="qr-code-info">
+            <p>User ID: <span id="my-qr-user-id"></span></p>
+            <p class="qr-code-hint">Scan this code to view my records</p>
+          </div>
+          <div class="qr-code-actions">
+            <button type="button" class="btn" onclick="closeMyQRModal()">
+              Close
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              onclick="downloadMyQRCode()"
+            >
+              Download
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
   </body>
 </html>
