@@ -299,13 +299,14 @@
               </div>
               <div class="card-body">
                 <div class="filter-bar">
-                  <div class="filter-group">
+                  <div class="filter-group" style="width: 100%">
                     <label class="filter-label">Date Range</label>
                     <input
                       type="text"
                       id="filter-start-date"
                       class="form-input form-input-sm"
                       placeholder="YYYY-MM-DD"
+                      style="flex: 1"
                     />
                     <span>to</span>
                     <input
@@ -313,36 +314,41 @@
                       id="filter-end-date"
                       class="form-input form-input-sm"
                       placeholder="YYYY-MM-DD"
+                      style="flex: 1"
                     />
                   </div>
-                  <div class="filter-group">
-                    <label class="filter-label">Type</label>
-                    <select
-                      id="filter-type"
-                      class="form-select form-select-sm"
-                      onchange="applyFilters()"
-                    >
-                      <option value="">All</option>
-                      <option value="income">Income</option>
-                      <option value="expense">Expense</option>
-                    </select>
-                  </div>
-                  <div class="filter-group">
-                    <label class="filter-label">Category</label>
-                    <select
-                      id="filter-category"
-                      class="form-select form-select-sm"
-                      onchange="applyFilters()"
-                    >
-                      <option value="">All</option>
-                      <option value="food">Food</option>
-                      <option value="transport">Transport</option>
-                      <option value="shopping">Shopping</option>
-                      <option value="entertainment">Entertainment</option>
-                      <option value="salary">Salary</option>
-                      <option value="investment">Investment</option>
-                      <option value="other">Other</option>
-                    </select>
+                  <div class="filter-row">
+                    <div class="filter-group" style="flex: 1">
+                      <label class="filter-label">Type</label>
+                      <select
+                        id="filter-type"
+                        class="form-select form-select-sm"
+                        onchange="applyFilters()"
+                        style="width: 100%"
+                      >
+                        <option value="">All</option>
+                        <option value="income">Income</option>
+                        <option value="expense">Expense</option>
+                      </select>
+                    </div>
+                    <div class="filter-group" style="flex: 1">
+                      <label class="filter-label">Category</label>
+                      <select
+                        id="filter-category"
+                        class="form-select form-select-sm"
+                        onchange="applyFilters()"
+                        style="width: 100%"
+                      >
+                        <option value="">All</option>
+                        <option value="food">Food</option>
+                        <option value="transport">Transport</option>
+                        <option value="shopping">Shopping</option>
+                        <option value="entertainment">Entertainment</option>
+                        <option value="salary">Salary</option>
+                        <option value="investment">Investment</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
                 <div class="records-summary">
@@ -399,27 +405,17 @@
             <div class="card">
               <div class="card-header">
                 <span class="card-title">User Management</span>
-                <button
-                  class="btn btn-primary btn-sm"
-                  onclick="showCreateUserModal()"
-                >
-                  + New User
-                </button>
               </div>
               <div class="card-body">
                 <div class="filter-bar" style="margin-bottom: 16px">
-                  <div class="filter-group" style="flex: 1">
+                  <div class="filter-group" style="width: 100%">
                     <input
                       type="text"
                       id="user-search-keyword"
                       class="form-input"
                       placeholder="Search by username, email, phone or ID..."
-                      onkeyup="handleUserSearch(event)"
                     />
                   </div>
-                  <button class="btn btn-primary btn-sm" onclick="loadUsers()">
-                    Search
-                  </button>
                 </div>
                 <div id="users-list" class="user-list">
                   <div class="empty-state">
@@ -465,13 +461,14 @@
               </div>
               <div class="card-body">
                 <div class="filter-bar">
-                  <div class="filter-group">
+                  <div class="filter-group" style="width: 100%">
                     <label class="filter-label">Date Range</label>
                     <input
                       type="text"
                       id="user-filter-start-date"
                       class="form-input form-input-sm"
                       placeholder="YYYY-MM-DD"
+                      style="flex: 1"
                     />
                     <span>to</span>
                     <input
@@ -479,36 +476,41 @@
                       id="user-filter-end-date"
                       class="form-input form-input-sm"
                       placeholder="YYYY-MM-DD"
+                      style="flex: 1"
                     />
                   </div>
-                  <div class="filter-group">
-                    <label class="filter-label">Category</label>
-                    <select
-                      id="user-filter-category"
-                      class="form-select form-select-sm"
-                      onchange="applyUserRecordFilters()"
-                    >
-                      <option value="">All</option>
-                      <option value="food">Food</option>
-                      <option value="transport">Transport</option>
-                      <option value="shopping">Shopping</option>
-                      <option value="entertainment">Entertainment</option>
-                      <option value="salary">Salary</option>
-                      <option value="investment">Investment</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
-                  <div class="filter-group">
-                    <label class="filter-label">Type</label>
-                    <select
-                      id="user-filter-type"
-                      class="form-select form-select-sm"
-                      onchange="applyUserRecordFilters()"
-                    >
-                      <option value="">All</option>
-                      <option value="income">Income</option>
-                      <option value="expense">Expense</option>
-                    </select>
+                  <div class="filter-row">
+                    <div class="filter-group" style="flex: 1">
+                      <label class="filter-label">Category</label>
+                      <select
+                        id="user-filter-category"
+                        class="form-select form-select-sm"
+                        onchange="applyUserRecordFilters()"
+                        style="width: 100%"
+                      >
+                        <option value="">All</option>
+                        <option value="food">Food</option>
+                        <option value="transport">Transport</option>
+                        <option value="shopping">Shopping</option>
+                        <option value="entertainment">Entertainment</option>
+                        <option value="salary">Salary</option>
+                        <option value="investment">Investment</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
+                    <div class="filter-group" style="flex: 1">
+                      <label class="filter-label">Type</label>
+                      <select
+                        id="user-filter-type"
+                        class="form-select form-select-sm"
+                        onchange="applyUserRecordFilters()"
+                        style="width: 100%"
+                      >
+                        <option value="">All</option>
+                        <option value="income">Income</option>
+                        <option value="expense">Expense</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
                 <div id="user-records-list" class="record-list">

@@ -64,13 +64,13 @@ a {
 }
 
 .login-container {
-  background: #161b22;
-  border: 1px solid #30363d;
+  background: #1e1e2e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   padding: 40px;
   width: 100%;
   max-width: 400px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
 }
 
 .login-header {
@@ -290,27 +290,53 @@ a {
   margin-bottom: 8px;
 }
 
-.form-input,
-.form-select {
+.form-input {
   width: 100%;
   padding: 10px 12px;
-  background: #0d1117;
+  background: #252836;
   border: 1px solid #30363d;
   border-radius: 6px;
-  color: #c9d1d9;
+  color: #f0f6fc;
   font-size: 14px;
   transition: all 0.2s;
 }
 
 .form-select {
-  padding-right: 28px;
+  width: 100%;
+  padding: 10px 36px 10px 12px;
+  background: #252836;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #f0f6fc;
+  font-size: 14px;
+  transition: all 0.2s;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238b949e' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.form-input:focus,
+.form-input:focus {
+  outline: none;
+  border-color: #58a6ff;
+  box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
+  background: #2a2d3e;
+}
+
 .form-select:focus {
   outline: none;
   border-color: #58a6ff;
   box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
+}
+
+.form-input::placeholder {
+  color: #6e7681;
 }
 
 .form-display {
@@ -323,14 +349,21 @@ a {
   font-size: 14px;
 }
 
-.form-input-sm,
-.form-select-sm {
+.form-input-sm {
   padding: 6px 10px;
   font-size: 13px;
 }
 
 .form-select-sm {
-  padding-right: 24px;
+  padding: 6px 32px 6px 10px;
+  font-size: 13px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238b949e' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 12px;
 }
 
 input[type='date'].form-input {
@@ -521,12 +554,17 @@ input[type='number'].form-input {
 
 .filter-bar {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 12px;
-  align-items: center;
   margin-bottom: 20px;
   padding-bottom: 20px;
   border-bottom: 1px solid #30363d;
+}
+
+.filter-row {
+  display: flex;
+  gap: 12px;
+  width: 100%;
 }
 
 .filter-group {
@@ -535,6 +573,26 @@ input[type='number'].form-input {
   gap: 8px;
   flex-wrap: nowrap;
   white-space: nowrap;
+  width: 100%;
+}
+
+.filter-group .form-input-sm {
+  width: 100%;
+  min-width: 0;
+}
+
+.filter-group .date-picker-wrapper {
+  flex: 1;
+  min-width: 0;
+}
+
+.filter-group .filter-label {
+  flex-shrink: 0;
+}
+
+.filter-group span {
+  flex-shrink: 0;
+  color: #8b949e;
 }
 
 .filter-actions {
@@ -819,7 +877,6 @@ input[type='number'].form-input {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: #238636;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -827,6 +884,14 @@ input[type='number'].form-input {
   font-weight: 600;
   color: #fff;
   flex-shrink: 0;
+}
+
+.user-avatar-admin {
+  background: #8957e5;
+}
+
+.user-avatar-user {
+  background: #1f6feb;
 }
 
 .user-info-details {

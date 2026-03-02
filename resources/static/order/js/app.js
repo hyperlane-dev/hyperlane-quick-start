@@ -80,6 +80,9 @@ function initEventListeners() {
   document
     .getElementById('sidebar-overlay')
     ?.addEventListener('click', closeMobileSidebar);
+  document
+    .getElementById('user-search-keyword')
+    ?.addEventListener('input', handleUserSearchInput);
 
   document.querySelectorAll('.nav-item').forEach((item) => {
     item.addEventListener('click', () => {
@@ -1450,12 +1453,17 @@ async function loadUsers(pageDirection = null) {
   }
 }
 
-function handleUserSearch(event) {
-  if (event.key === 'Enter') {
+let userSearchDebounceTimer = null;
+
+function handleUserSearchInput() {
+  if (userSearchDebounceTimer) {
+    clearTimeout(userSearchDebounceTimer);
+  }
+  userSearchDebounceTimer = setTimeout(() => {
     usersCurrentPage = 1;
     usersPageFirstIds = [null];
     loadUsers();
-  }
+  }, 300);
 }
 
 function resetUserSearch() {
@@ -1493,12 +1501,14 @@ function renderUsers(users) {
   container.innerHTML = users
     .map((u) => {
       const roleText = u.role === 'admin' ? 'Admin' : 'User';
+      const avatarClass =
+        u.role === 'admin' ? 'user-avatar-admin' : 'user-avatar-user';
       const statusClass = u.status;
       const statusText = u.status;
       const contactInfo = [u.email, u.phone].filter(Boolean).join(' • ');
       return `
     <div class="user-item" onclick="viewUserRecords(${u.id}, '${escapeHtml(u.username)}')" style="cursor: pointer;">
-      <div class="user-avatar">${u.username.charAt(0).toUpperCase()}</div>
+      <div class="user-avatar ${avatarClass}">${u.username.charAt(0).toUpperCase()}</div>
       <div class="user-info-details">
         <div class="user-name">${escapeHtml(u.username)} <span style="color: #8b949e; font-size: 12px;">(${roleText})</span></div>
         <div class="user-meta">ID: ${u.id}${contactInfo ? ' • ' + escapeHtml(contactInfo) : ''}</div>
