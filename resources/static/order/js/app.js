@@ -139,16 +139,7 @@ function showMainApp() {
   showPage('main-app');
   updateUserInfo();
   initDatePickers();
-  const routeState = parseRouteHash();
-  if (routeState.page) {
-    if (routeState.page === 'user-records' && routeState.userId) {
-      viewingUserId = parseInt(routeState.userId);
-      viewingUserName = routeState.userName || 'User';
-    }
-    navigateTo(routeState.page, false);
-  } else {
-    navigateTo('dashboard', false);
-  }
+  navigateTo('dashboard', true);
 }
 
 function initHashRouter() {

@@ -660,18 +660,6 @@ input[type='number'].form-input {
   transition: all 0.2s;
 }
 
-.record-meta-value:hover {
-  position: absolute;
-  max-width: none;
-  overflow: visible;
-  background: #21262d;
-  border: 1px solid #30363d;
-  border-radius: 4px;
-  padding: 2px 6px;
-  z-index: 100;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-}
-
 .record-meta-label {
   color: #8b949e;
 }
