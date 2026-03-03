@@ -557,6 +557,18 @@ impl OrderService {
         let yesterday_new_users: i64 = Self::get_new_users_count(&db, yesterday).await?;
         let new_users_change: Option<f64> =
             Self::calculate_change_percentage(today_new_users as f64, yesterday_new_users as f64);
+        let (today_avg_income, today_avg_expense): (Decimal, Decimal) =
+            Self::get_date_avg_stats(&db, today).await?;
+        let (yesterday_avg_income, yesterday_avg_expense): (Decimal, Decimal) =
+            Self::get_date_avg_stats(&db, yesterday).await?;
+        let avg_income_change: Option<f64> = Self::calculate_change_percentage(
+            today_avg_income.to_f64().unwrap_or(0.0),
+            yesterday_avg_income.to_f64().unwrap_or(0.0),
+        );
+        let avg_expense_change: Option<f64> = Self::calculate_change_percentage(
+            today_avg_expense.to_f64().unwrap_or(0.0),
+            yesterday_avg_expense.to_f64().unwrap_or(0.0),
+        );
         let mut today_statistics: TodayStatistics = TodayStatistics::default();
         today_statistics.set_transactions(today_stats.0);
         today_statistics.set_income(today_stats.1.to_string());
@@ -567,6 +579,8 @@ impl OrderService {
         changes_statistics.set_income_change(income_change);
         changes_statistics.set_expense_change(expense_change);
         changes_statistics.set_new_users_change(new_users_change);
+        changes_statistics.set_avg_income_change(avg_income_change);
+        changes_statistics.set_avg_expense_change(avg_expense_change);
         let mut response: OverviewStatisticsResponse = OverviewStatisticsResponse::default();
         response.set_today(today_statistics);
         response.set_changes(changes_statistics);
@@ -1339,5 +1353,42 @@ impl OrderService {
         stats.set_max_single_income(max_income.to_string());
         stats.set_max_single_expense(max_expense.to_string());
         Ok(stats)
+    }
+
+    #[instrument_trace]
+    async fn get_date_avg_stats(
+        db: &DatabaseConnection,
+        date: NaiveDate,
+    ) -> Result<(Decimal, Decimal), String> {
+        let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
+            .filter(OrderRecordColumn::BillDate.eq(date))
+            .all(db)
+            .await
+            .map_err(|error: DbErr| error.to_string())?;
+        let mut income_count: i64 = 0;
+        let mut expense_count: i64 = 0;
+        let mut total_income: Decimal = Decimal::ZERO;
+        let mut total_expense: Decimal = Decimal::ZERO;
+        for record in &records {
+            let amount: Decimal = *record.get_amount();
+            if record.get_transaction_type() == TransactionType::Income.as_str() {
+                income_count += 1;
+                total_income += amount;
+            } else {
+                expense_count += 1;
+                total_expense += amount;
+            }
+        }
+        let avg_income: Decimal = if income_count > 0 {
+            total_income / Decimal::from(income_count)
+        } else {
+            Decimal::ZERO
+        };
+        let avg_expense: Decimal = if expense_count > 0 {
+            total_expense / Decimal::from(expense_count)
+        } else {
+            Decimal::ZERO
+        };
+        Ok((avg_income, avg_expense))
     }
 }

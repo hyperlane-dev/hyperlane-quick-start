@@ -81,6 +81,10 @@ pub struct ChangesStatistics {
     pub(super) expense_change: Option<f64>,
     #[get(type(copy), pub)]
     pub(super) new_users_change: Option<f64>,
+    #[get(type(copy), pub)]
+    pub(super) avg_income_change: Option<f64>,
+    #[get(type(copy), pub)]
+    pub(super) avg_expense_change: Option<f64>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]

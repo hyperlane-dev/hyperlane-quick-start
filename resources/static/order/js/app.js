@@ -332,6 +332,8 @@ function updateOverviewStats(data) {
     'today-new-users-change',
     data.changes.new_users_change,
   );
+  updateChangeIndicator('avg-income-change', data.changes.avg_income_change);
+  updateChangeIndicator('avg-expense-change', data.changes.avg_expense_change);
 }
 
 function updateChangeIndicator(elementId, change) {
