@@ -3,7 +3,7 @@ mod r#struct;
 
 pub use r#struct::*;
 
-use {super::*, mapper::log::*};
+use {super::*, model::application::log::*};
 
 use hyperlane_config::framework::*;
 

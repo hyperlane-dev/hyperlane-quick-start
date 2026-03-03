@@ -240,6 +240,9 @@
                 <div class="stat-change" id="today-new-users-change">--</div>
               </div>
             </div>
+            <div class="stats-grid">
+              <div id="avg-transaction-stats" class="stats-row"></div>
+            </div>
             <div class="charts-grid">
               <div class="card chart-card">
                 <div class="card-header">
@@ -311,78 +314,79 @@
                 </div>
               </div>
             </div>
-          </div>
-
-          <div class="dashboard-section">
-            <h2 class="section-title">Advanced Analytics</h2>
-            <div class="stats-grid">
-              <div id="avg-transaction-stats" class="stats-row"></div>
-            </div>
-            <div class="charts-grid">
-              <div class="card chart-card">
-                <div class="card-header">
-                  <span class="card-title">Income/Expense Ratio Trend</span>
+            <div class="dashboard-section">
+              <div class="charts-grid">
+                <div class="card chart-card">
+                  <div class="card-header">
+                    <span class="card-title">Income/Expense Ratio Trend</span>
+                  </div>
+                  <div class="card-body">
+                    <div id="ratio-trend-chart" class="chart-container"></div>
+                  </div>
                 </div>
-                <div class="card-body">
-                  <div id="ratio-trend-chart" class="chart-container"></div>
+                <div class="card chart-card">
+                  <div class="card-header">
+                    <span class="card-title"
+                      >Hourly Transaction Distribution</span
+                    >
+                  </div>
+                  <div class="card-body">
+                    <div
+                      id="hourly-distribution-chart"
+                      class="chart-container"
+                    ></div>
+                  </div>
                 </div>
-              </div>
-              <div class="card chart-card">
-                <div class="card-header">
-                  <span class="card-title"
-                    >Hourly Transaction Distribution</span
-                  >
+                <div class="card chart-card">
+                  <div class="card-header">
+                    <span class="card-title">Weekly Trend Analysis</span>
+                  </div>
+                  <div class="card-body">
+                    <div id="weekly-trend-chart" class="chart-container"></div>
+                  </div>
                 </div>
-                <div class="card-body">
-                  <div
-                    id="hourly-distribution-chart"
-                    class="chart-container"
-                  ></div>
+                <div class="card chart-card">
+                  <div class="card-header">
+                    <span class="card-title">Period-over-Period Analysis</span>
+                  </div>
+                  <div class="card-body">
+                    <div
+                      id="period-over-period-chart"
+                      class="chart-container"
+                    ></div>
+                  </div>
                 </div>
-              </div>
-              <div class="card chart-card">
-                <div class="card-header">
-                  <span class="card-title">Weekly Trend Analysis</span>
+                <div class="card chart-card wide">
+                  <div class="card-header">
+                    <span class="card-title">Category Trends Over Time</span>
+                  </div>
+                  <div class="card-body">
+                    <div
+                      id="category-trend-chart"
+                      class="chart-container"
+                    ></div>
+                  </div>
                 </div>
-                <div class="card-body">
-                  <div id="weekly-trend-chart" class="chart-container"></div>
+                <div class="card chart-card">
+                  <div class="card-header">
+                    <span class="card-title">User Retention Rate</span>
+                  </div>
+                  <div class="card-body">
+                    <div
+                      id="user-retention-chart"
+                      class="chart-container"
+                    ></div>
+                  </div>
                 </div>
-              </div>
-              <div class="card chart-card">
-                <div class="card-header">
-                  <span class="card-title">Period-over-Period Analysis</span>
-                </div>
-                <div class="card-body">
-                  <div
-                    id="period-over-period-chart"
-                    class="chart-container"
-                  ></div>
-                </div>
-              </div>
-              <div class="card chart-card wide">
-                <div class="card-header">
-                  <span class="card-title">Category Trends Over Time</span>
-                </div>
-                <div class="card-body">
-                  <div id="category-trend-chart" class="chart-container"></div>
-                </div>
-              </div>
-              <div class="card chart-card">
-                <div class="card-header">
-                  <span class="card-title">User Retention Rate</span>
-                </div>
-                <div class="card-body">
-                  <div id="user-retention-chart" class="chart-container"></div>
-                </div>
-              </div>
-              <div class="card chart-card">
-                <div class="card-header">
-                  <span class="card-title"
-                    >Top Users by Transaction Amount</span
-                  >
-                </div>
-                <div class="card-body">
-                  <div id="top-users-chart" class="chart-container"></div>
+                <div class="card chart-card">
+                  <div class="card-header">
+                    <span class="card-title"
+                      >Top Users by Transaction Amount</span
+                    >
+                  </div>
+                  <div class="card-body">
+                    <div id="top-users-chart" class="chart-container"></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -392,12 +396,6 @@
             <div class="card">
               <div class="card-header">
                 <span class="card-title">All Records</span>
-                <button
-                  class="btn btn-primary btn-sm admin-only hidden"
-                  onclick="showCreateRecordModal()"
-                >
-                  + New Record
-                </button>
               </div>
               <div class="card-body">
                 <div class="filter-bar">

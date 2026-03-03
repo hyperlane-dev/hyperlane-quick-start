@@ -1491,25 +1491,25 @@ function initAvgTransactionStats(stats) {
   const container = document.getElementById('avg-transaction-stats');
   if (!container) return;
   container.innerHTML = `
-    <div class="stat-card">
+    <div class="stat-card income">
       <div class="stat-label">Avg Income/Transaction</div>
-      <div class="stat-value" style="color: #22c55e;">¥${parseFloat(stats.avg_income_per_transaction).toFixed(2)}</div>
+      <div class="stat-value">¥${parseFloat(stats.avg_income_per_transaction).toFixed(2)}</div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card expense">
       <div class="stat-label">Avg Expense/Transaction</div>
-      <div class="stat-value" style="color: #ef4444;">¥${parseFloat(stats.avg_expense_per_transaction).toFixed(2)}</div>
+      <div class="stat-value">¥${parseFloat(stats.avg_expense_per_transaction).toFixed(2)}</div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card balance">
       <div class="stat-label">Overall Avg Amount</div>
-      <div class="stat-value" style="color: #3b82f6;">¥${parseFloat(stats.overall_avg_amount).toFixed(2)}</div>
+      <div class="stat-value">¥${parseFloat(stats.overall_avg_amount).toFixed(2)}</div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card income">
       <div class="stat-label">Max Single Income</div>
-      <div class="stat-value" style="color: #22c55e;">¥${parseFloat(stats.max_single_income).toFixed(2)}</div>
+      <div class="stat-value">¥${parseFloat(stats.max_single_income).toFixed(2)}</div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card expense">
       <div class="stat-label">Max Single Expense</div>
-      <div class="stat-value" style="color: #ef4444;">¥${parseFloat(stats.max_single_expense).toFixed(2)}</div>
+      <div class="stat-value">¥${parseFloat(stats.max_single_expense).toFixed(2)}</div>
     </div>
   `;
 }
