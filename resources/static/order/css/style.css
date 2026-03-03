@@ -6,26 +6,12 @@
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
-  scrollbar-width: thin;
-  scrollbar-color: #c1c1c1 #f1f1f1;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 *::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-*::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-*::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
-}
-
-*::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  display: none;
 }
 
 input,
@@ -528,6 +514,13 @@ input[type='number'].form-input {
   flex-direction: column;
   flex: 1;
   overflow: hidden;
+}
+
+#overview-page .stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
 .stats-grid {

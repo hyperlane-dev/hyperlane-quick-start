@@ -1488,25 +1488,37 @@ function initTopUsersChart(topUsers) {
 }
 
 function initAvgTransactionStats(stats) {
-  const container = document.getElementById('avg-transaction-stats');
-  if (!container) return;
-  container.innerHTML = `
+  const slot21 = document.getElementById('avg-transaction-stats-row-2-slot-1');
+  const slot22 = document.getElementById('avg-transaction-stats-row-2-slot-2');
+  const slot31 = document.getElementById('avg-transaction-stats-row-3-slot-1');
+  const slot32 = document.getElementById('avg-transaction-stats-row-3-slot-2');
+  const slot33 = document.getElementById('avg-transaction-stats-row-3-slot-3');
+  if (!slot21 || !slot22 || !slot31 || !slot32 || !slot33) return;
+  slot21.outerHTML = `
     <div class="stat-card income">
       <div class="stat-label">Avg Income/Transaction</div>
       <div class="stat-value">¥${parseFloat(stats.avg_income_per_transaction).toFixed(2)}</div>
     </div>
+  `;
+  slot22.outerHTML = `
     <div class="stat-card expense">
       <div class="stat-label">Avg Expense/Transaction</div>
       <div class="stat-value">¥${parseFloat(stats.avg_expense_per_transaction).toFixed(2)}</div>
     </div>
+  `;
+  slot31.outerHTML = `
     <div class="stat-card balance">
       <div class="stat-label">Overall Avg Amount</div>
       <div class="stat-value">¥${parseFloat(stats.overall_avg_amount).toFixed(2)}</div>
     </div>
+  `;
+  slot32.outerHTML = `
     <div class="stat-card income">
       <div class="stat-label">Max Single Income</div>
       <div class="stat-value">¥${parseFloat(stats.max_single_income).toFixed(2)}</div>
     </div>
+  `;
+  slot33.outerHTML = `
     <div class="stat-card expense">
       <div class="stat-label">Max Single Expense</div>
       <div class="stat-value">¥${parseFloat(stats.max_single_expense).toFixed(2)}</div>
