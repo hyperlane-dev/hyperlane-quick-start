@@ -262,6 +262,13 @@ let typeDistributionChart = null;
 let countTrendChart = null;
 let categoryAmountChart = null;
 let userActivityChart = null;
+let ratioTrendChart = null;
+let hourlyDistributionChart = null;
+let weeklyTrendChart = null;
+let periodOverPeriodChart = null;
+let categoryTrendChart = null;
+let userRetentionChart = null;
+let topUsersChart = null;
 
 async function loadOverview() {
   const requestKey = 'load_overview';
@@ -285,6 +292,14 @@ async function loadOverview() {
       initCountTrendChart(data.transaction_count_trend);
       initCategoryAmountChart(data.category_amount_distribution);
       initUserActivityChart(data.user_activity);
+      initRatioTrendChart(data.income_expense_ratio_trend);
+      initHourlyDistributionChart(data.hourly_distribution);
+      initWeeklyTrendChart(data.weekly_trend);
+      initPeriodOverPeriodChart(data.period_over_period);
+      initCategoryTrendChart(data.category_trends);
+      initUserRetentionChart(data.user_retention);
+      initTopUsersChart(data.top_users);
+      initAvgTransactionStats(data.avg_transaction_stats);
     } else {
       showToast(result.message || 'Error loading overview data', 'error');
     }
@@ -960,6 +975,545 @@ function initUserActivityChart(activity) {
   userActivityChart.setOption(option);
 }
 
+function initRatioTrendChart(ratioTrend) {
+  const chartDom = document.getElementById('ratio-trend-chart');
+  if (!chartDom) return;
+  if (ratioTrendChart) ratioTrendChart.dispose();
+  ratioTrendChart = echarts.init(chartDom);
+  const dates = ratioTrend.map((item) => item.date);
+  const ratios = ratioTrend.map((item) => item.ratio.toFixed(2));
+  const option = {
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      borderColor: '#e0e0e0',
+      borderWidth: 1,
+      textStyle: { color: '#2c3e50', fontSize: 13 },
+      axisPointer: {
+        type: 'line',
+        lineStyle: { color: '#667eea', width: 1, type: 'dashed' },
+      },
+      padding: [12, 16],
+      extraCssText:
+        'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
+      formatter: function (params) {
+        const idx = params[0].dataIndex;
+        const item = ratioTrend[idx];
+        return `<div style="font-weight:600;margin-bottom:5px">${item.date}</div>
+                <div>收支比: <span style="color:#667eea;font-weight:600">${item.ratio.toFixed(2)}</span></div>
+                <div>收入: <span style="color:#22c55e">¥${item.income}</span></div>
+                <div>支出: <span style="color:#ef4444">¥${item.expense}</span></div>`;
+      },
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      top: '10%',
+      containLabel: true,
+    },
+    xAxis: {
+      type: 'category',
+      data: dates,
+      axisLine: { lineStyle: { color: '#e0e0e0', width: 1 } },
+      axisLabel: { color: '#666', fontSize: 11 },
+      axisTick: { show: false },
+    },
+    yAxis: {
+      type: 'value',
+      name: 'Ratio',
+      axisLine: { show: false },
+      axisLabel: { color: '#666', fontSize: 11 },
+      splitLine: { lineStyle: { color: '#f0f0f0', width: 1 } },
+    },
+    series: [
+      {
+        type: 'line',
+        smooth: true,
+        symbol: 'circle',
+        symbolSize: 6,
+        data: ratios,
+        itemStyle: { color: '#667eea' },
+        lineStyle: { width: 2.5, color: '#667eea' },
+        areaStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: 'rgba(102, 126, 234, 0.3)' },
+            { offset: 1, color: 'rgba(102, 126, 234, 0.02)' },
+          ]),
+        },
+        markLine: {
+          silent: true,
+          data: [
+            {
+              yAxis: 1,
+              lineStyle: { color: '#22c55e', type: 'dashed', width: 2 },
+              label: { formatter: '收支平衡', color: '#22c55e' },
+            },
+          ],
+        },
+      },
+    ],
+  };
+  ratioTrendChart.setOption(option);
+}
+
+function initHourlyDistributionChart(hourlyData) {
+  const chartDom = document.getElementById('hourly-distribution-chart');
+  if (!chartDom) return;
+  if (hourlyDistributionChart) hourlyDistributionChart.dispose();
+  hourlyDistributionChart = echarts.init(chartDom);
+  const hours = hourlyData.map((item) => `${item.hour}:00`);
+  const counts = hourlyData.map((item) => item.count);
+  const option = {
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      borderColor: '#e0e0e0',
+      borderWidth: 1,
+      textStyle: { color: '#2c3e50', fontSize: 13 },
+      padding: [12, 16],
+      extraCssText:
+        'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      top: '10%',
+      containLabel: true,
+    },
+    xAxis: {
+      type: 'category',
+      data: hours,
+      axisLine: { lineStyle: { color: '#e0e0e0', width: 1 } },
+      axisLabel: { color: '#666', fontSize: 10, interval: 2 },
+      axisTick: { show: false },
+    },
+    yAxis: {
+      type: 'value',
+      axisLine: { show: false },
+      axisLabel: { color: '#666', fontSize: 11 },
+      splitLine: { lineStyle: { color: '#f0f0f0', width: 1 } },
+    },
+    series: [
+      {
+        type: 'bar',
+        data: counts,
+        itemStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: '#f093fb' },
+            { offset: 1, color: '#f5576c' },
+          ]),
+          borderRadius: [4, 4, 0, 0],
+        },
+        emphasis: {
+          itemStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              { offset: 0, color: '#e84393' },
+              { offset: 1, color: '#fd79a8' },
+            ]),
+          },
+        },
+      },
+    ],
+  };
+  hourlyDistributionChart.setOption(option);
+}
+
+function initWeeklyTrendChart(weeklyTrend) {
+  const chartDom = document.getElementById('weekly-trend-chart');
+  if (!chartDom) return;
+  if (weeklyTrendChart) weeklyTrendChart.dispose();
+  weeklyTrendChart = echarts.init(chartDom);
+  const days = weeklyTrend.map((item) => item.day_of_week);
+  const income = weeklyTrend.map((item) => parseFloat(item.income));
+  const expense = weeklyTrend.map((item) => parseFloat(item.expense));
+  const option = {
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      borderColor: '#e0e0e0',
+      borderWidth: 1,
+      textStyle: { color: '#2c3e50', fontSize: 13 },
+      padding: [12, 16],
+      extraCssText:
+        'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
+    },
+    legend: {
+      data: ['Income', 'Expense'],
+      textStyle: { color: '#666', fontSize: 13 },
+      top: 8,
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      top: '15%',
+      containLabel: true,
+    },
+    xAxis: {
+      type: 'category',
+      data: days,
+      axisLine: { lineStyle: { color: '#e0e0e0', width: 1 } },
+      axisLabel: { color: '#666', fontSize: 12 },
+      axisTick: { show: false },
+    },
+    yAxis: {
+      type: 'value',
+      axisLine: { show: false },
+      axisLabel: { color: '#666', fontSize: 11 },
+      splitLine: { lineStyle: { color: '#f0f0f0', width: 1 } },
+    },
+    series: [
+      {
+        name: 'Income',
+        type: 'bar',
+        data: income,
+        itemStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: '#4ade80' },
+            { offset: 1, color: '#22c55e' },
+          ]),
+          borderRadius: [4, 4, 0, 0],
+        },
+      },
+      {
+        name: 'Expense',
+        type: 'bar',
+        data: expense,
+        itemStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: '#f87171' },
+            { offset: 1, color: '#ef4444' },
+          ]),
+          borderRadius: [4, 4, 0, 0],
+        },
+      },
+    ],
+  };
+  weeklyTrendChart.setOption(option);
+}
+
+function initPeriodOverPeriodChart(popData) {
+  const chartDom = document.getElementById('period-over-period-chart');
+  if (!chartDom) return;
+  if (periodOverPeriodChart) periodOverPeriodChart.dispose();
+  periodOverPeriodChart = echarts.init(chartDom);
+  const periods = popData.map((item) => item.period);
+  const incomeChanges = popData.map((item) => item.income_change.toFixed(1));
+  const expenseChanges = popData.map((item) => item.expense_change.toFixed(1));
+  const transactionChanges = popData.map((item) =>
+    item.transaction_change.toFixed(1),
+  );
+  const option = {
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      borderColor: '#e0e0e0',
+      borderWidth: 1,
+      textStyle: { color: '#2c3e50', fontSize: 13 },
+      padding: [12, 16],
+      extraCssText:
+        'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
+      formatter: function (params) {
+        let result = `<div style="font-weight:600;margin-bottom:5px">${params[0].axisValue}</div>`;
+        params.forEach((param) => {
+          const color = param.value >= 0 ? '#22c55e' : '#ef4444';
+          const icon = param.value >= 0 ? '↑' : '↓';
+          result += `<div>${param.marker} ${param.seriesName}: <span style="color:${color};font-weight:600">${icon} ${Math.abs(param.value)}%</span></div>`;
+        });
+        return result;
+      },
+    },
+    legend: {
+      data: ['Income Change', 'Expense Change', 'Transaction Change'],
+      textStyle: { color: '#666', fontSize: 12 },
+      top: 8,
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      top: '15%',
+      containLabel: true,
+    },
+    xAxis: {
+      type: 'category',
+      data: periods,
+      axisLine: { lineStyle: { color: '#e0e0e0', width: 1 } },
+      axisLabel: { color: '#666', fontSize: 12 },
+      axisTick: { show: false },
+    },
+    yAxis: {
+      type: 'value',
+      name: 'Change %',
+      axisLine: { show: false },
+      axisLabel: {
+        color: '#666',
+        fontSize: 11,
+        formatter: '{value}%',
+      },
+      splitLine: { lineStyle: { color: '#f0f0f0', width: 1 } },
+    },
+    series: [
+      {
+        name: 'Income Change',
+        type: 'bar',
+        data: incomeChanges,
+        itemStyle: { color: '#22c55e' },
+      },
+      {
+        name: 'Expense Change',
+        type: 'bar',
+        data: expenseChanges,
+        itemStyle: { color: '#ef4444' },
+      },
+      {
+        name: 'Transaction Change',
+        type: 'line',
+        data: transactionChanges,
+        itemStyle: { color: '#667eea' },
+        lineStyle: { width: 2.5 },
+        symbol: 'circle',
+        symbolSize: 8,
+      },
+    ],
+  };
+  periodOverPeriodChart.setOption(option);
+}
+
+function initCategoryTrendChart(categoryTrends) {
+  const chartDom = document.getElementById('category-trend-chart');
+  if (!chartDom || categoryTrends.length === 0) return;
+  if (categoryTrendChart) categoryTrendChart.dispose();
+  categoryTrendChart = echarts.init(chartDom);
+  const colors = [
+    '#22c55e',
+    '#3b82f6',
+    '#f59e0b',
+    '#ef4444',
+    '#8b5cf6',
+    '#06b6d4',
+    '#f97316',
+    '#ec4899',
+  ];
+  const series = categoryTrends.slice(0, 6).map((item, idx) => ({
+    name: item.category,
+    type: 'line',
+    smooth: true,
+    symbol: 'none',
+    data: item.amounts.map((a) => parseFloat(a)),
+    lineStyle: { width: 2 },
+    itemStyle: { color: colors[idx % colors.length] },
+    emphasis: { focus: 'series' },
+  }));
+  const option = {
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      borderColor: '#e0e0e0',
+      borderWidth: 1,
+      textStyle: { color: '#2c3e50', fontSize: 13 },
+      padding: [12, 16],
+      extraCssText:
+        'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
+    },
+    legend: {
+      data: categoryTrends.slice(0, 6).map((item) => item.category),
+      textStyle: { color: '#666', fontSize: 11 },
+      top: 8,
+      type: 'scroll',
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      top: '15%',
+      containLabel: true,
+    },
+    xAxis: {
+      type: 'category',
+      data: categoryTrends[0]?.dates || [],
+      axisLine: { lineStyle: { color: '#e0e0e0', width: 1 } },
+      axisLabel: { color: '#666', fontSize: 10 },
+      axisTick: { show: false },
+    },
+    yAxis: {
+      type: 'value',
+      axisLine: { show: false },
+      axisLabel: { color: '#666', fontSize: 11 },
+      splitLine: { lineStyle: { color: '#f0f0f0', width: 1 } },
+    },
+    series: series,
+  };
+  categoryTrendChart.setOption(option);
+}
+
+function initUserRetentionChart(retentionData) {
+  const chartDom = document.getElementById('user-retention-chart');
+  if (!chartDom) return;
+  if (userRetentionChart) userRetentionChart.dispose();
+  userRetentionChart = echarts.init(chartDom);
+  const dates = retentionData.map((item) => item.date);
+  const retentionRates = retentionData.map((item) =>
+    item.retention_rate.toFixed(1),
+  );
+  const option = {
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      borderColor: '#e0e0e0',
+      borderWidth: 1,
+      textStyle: { color: '#2c3e50', fontSize: 13 },
+      padding: [12, 16],
+      extraCssText:
+        'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
+      formatter: function (params) {
+        const idx = params[0].dataIndex;
+        const item = retentionData[idx];
+        return `<div style="font-weight:600;margin-bottom:5px">${item.date}</div>
+                <div>新用户: <span style="color:#3b82f6;font-weight:600">${item.new_users}</span></div>
+                <div>留存用户: <span style="color:#22c55e;font-weight:600">${item.retained_users}</span></div>
+                <div>留存率: <span style="color:#f59e0b;font-weight:600">${item.retention_rate.toFixed(1)}%</span></div>`;
+      },
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      top: '10%',
+      containLabel: true,
+    },
+    xAxis: {
+      type: 'category',
+      data: dates,
+      axisLine: { lineStyle: { color: '#e0e0e0', width: 1 } },
+      axisLabel: { color: '#666', fontSize: 10 },
+      axisTick: { show: false },
+    },
+    yAxis: {
+      type: 'value',
+      name: 'Retention %',
+      max: 100,
+      axisLine: { show: false },
+      axisLabel: {
+        color: '#666',
+        fontSize: 11,
+        formatter: '{value}%',
+      },
+      splitLine: { lineStyle: { color: '#f0f0f0', width: 1 } },
+    },
+    series: [
+      {
+        type: 'line',
+        smooth: true,
+        symbol: 'circle',
+        symbolSize: 6,
+        data: retentionRates,
+        itemStyle: { color: '#f59e0b' },
+        lineStyle: { width: 2.5, color: '#f59e0b' },
+        areaStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: 'rgba(245, 158, 11, 0.3)' },
+            { offset: 1, color: 'rgba(245, 158, 11, 0.02)' },
+          ]),
+        },
+      },
+    ],
+  };
+  userRetentionChart.setOption(option);
+}
+
+function initTopUsersChart(topUsers) {
+  const chartDom = document.getElementById('top-users-chart');
+  if (!chartDom || topUsers.length === 0) return;
+  if (topUsersChart) topUsersChart.dispose();
+  topUsersChart = echarts.init(chartDom);
+  const usernames = topUsers.map((item) => item.username);
+  const amounts = topUsers.map((item) => parseFloat(item.total_amount));
+  const counts = topUsers.map((item) => item.transaction_count);
+  const option = {
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      borderColor: '#e0e0e0',
+      borderWidth: 1,
+      textStyle: { color: '#2c3e50', fontSize: 13 },
+      padding: [12, 16],
+      extraCssText:
+        'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
+      formatter: function (params) {
+        const idx = params[0].dataIndex;
+        const item = topUsers[idx];
+        return `<div style="font-weight:600;margin-bottom:5px">${item.username}</div>
+                <div>交易金额: <span style="color:#667eea;font-weight:600">¥${item.total_amount}</span></div>
+                <div>交易次数: <span style="color:#3b82f6;font-weight:600">${item.transaction_count}</span></div>`;
+      },
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      top: '10%',
+      containLabel: true,
+    },
+    xAxis: {
+      type: 'category',
+      data: usernames,
+      axisLine: { lineStyle: { color: '#e0e0e0', width: 1 } },
+      axisLabel: { color: '#666', fontSize: 11 },
+      axisTick: { show: false },
+    },
+    yAxis: {
+      type: 'value',
+      axisLine: { show: false },
+      axisLabel: { color: '#666', fontSize: 11 },
+      splitLine: { lineStyle: { color: '#f0f0f0', width: 1 } },
+    },
+    series: [
+      {
+        type: 'bar',
+        data: amounts,
+        itemStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: '#667eea' },
+            { offset: 1, color: '#764ba2' },
+          ]),
+          borderRadius: [4, 4, 0, 0],
+        },
+      },
+    ],
+  };
+  topUsersChart.setOption(option);
+}
+
+function initAvgTransactionStats(stats) {
+  const container = document.getElementById('avg-transaction-stats');
+  if (!container) return;
+  container.innerHTML = `
+    <div class="stat-card">
+      <div class="stat-label">Avg Income/Transaction</div>
+      <div class="stat-value" style="color: #22c55e;">¥${parseFloat(stats.avg_income_per_transaction).toFixed(2)}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Avg Expense/Transaction</div>
+      <div class="stat-value" style="color: #ef4444;">¥${parseFloat(stats.avg_expense_per_transaction).toFixed(2)}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Overall Avg Amount</div>
+      <div class="stat-value" style="color: #3b82f6;">¥${parseFloat(stats.overall_avg_amount).toFixed(2)}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Max Single Income</div>
+      <div class="stat-value" style="color: #22c55e;">¥${parseFloat(stats.max_single_income).toFixed(2)}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Max Single Expense</div>
+      <div class="stat-value" style="color: #ef4444;">¥${parseFloat(stats.max_single_expense).toFixed(2)}</div>
+    </div>
+  `;
+}
+
 window.addEventListener('resize', () => {
   trendChart?.resize();
   compareChart?.resize();
@@ -969,6 +1523,13 @@ window.addEventListener('resize', () => {
   countTrendChart?.resize();
   categoryAmountChart?.resize();
   userActivityChart?.resize();
+  ratioTrendChart?.resize();
+  hourlyDistributionChart?.resize();
+  weeklyTrendChart?.resize();
+  periodOverPeriodChart?.resize();
+  categoryTrendChart?.resize();
+  userRetentionChart?.resize();
+  topUsersChart?.resize();
 });
 
 async function handleLogin(e) {

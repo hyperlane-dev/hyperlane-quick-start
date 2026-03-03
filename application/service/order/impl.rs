@@ -382,7 +382,7 @@ impl OrderService {
         let mut total_expense: Decimal = Decimal::ZERO;
         for record in &all_records {
             let amount: Decimal = *record.get_amount();
-            if record.get_transaction_type() == "income" {
+            if record.get_transaction_type() == TransactionType::Income.as_str() {
                 total_income += amount;
             } else {
                 total_expense += amount;
@@ -445,7 +445,7 @@ impl OrderService {
         let user_ids: Vec<i32> = records
             .iter()
             .map(|r: &OrderRecordModel| r.get_user_id())
-            .collect::<std::collections::HashSet<i32>>()
+            .collect::<HashSet<i32>>()
             .into_iter()
             .collect();
         let users: Vec<OrderUserModel> = OrderUserEntity::find()
@@ -453,7 +453,7 @@ impl OrderService {
             .all(db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
-        let user_map: std::collections::HashMap<i32, OrderUserModel> = users
+        let user_map: HashMap<i32, OrderUserModel> = users
             .into_iter()
             .map(|u: OrderUserModel| (u.get_id(), u))
             .collect();
@@ -531,6 +531,18 @@ impl OrderService {
         let category_amount_distribution: Vec<CategoryAmountItem> =
             Self::get_category_amount_distribution(&db).await?;
         let user_activity: UserActivity = Self::get_user_activity(&db, 30).await?;
+        let income_expense_ratio_trend: Vec<IncomeExpenseRatioItem> =
+            Self::get_income_expense_ratio_trend(&db, 30).await?;
+        let hourly_distribution: Vec<HourlyDistributionItem> =
+            Self::get_hourly_distribution(&db).await?;
+        let weekly_trend: Vec<WeeklyTrendItem> = Self::get_weekly_trend(&db).await?;
+        let period_over_period: Vec<PeriodOverPeriodItem> =
+            Self::get_period_over_period_analysis(&db).await?;
+        let category_trends: Vec<CategoryTrendItem> = Self::get_category_trends(&db, 30).await?;
+        let user_retention: Vec<UserRetentionItem> = Self::get_user_retention(&db, 30).await?;
+        let top_users: Vec<TopUserItem> = Self::get_top_users(&db, 10).await?;
+        let avg_transaction_stats: AverageTransactionStats =
+            Self::get_average_transaction_stats(&db).await?;
         let transactions_change: Option<f64> =
             Self::calculate_change_percentage(today_stats.0 as f64, yesterday_stats.0 as f64);
         let income_change: Option<f64> = Self::calculate_change_percentage(
@@ -566,6 +578,14 @@ impl OrderService {
         response.set_transaction_count_trend(transaction_count_trend);
         response.set_category_amount_distribution(category_amount_distribution);
         response.set_user_activity(user_activity);
+        response.set_income_expense_ratio_trend(income_expense_ratio_trend);
+        response.set_hourly_distribution(hourly_distribution);
+        response.set_weekly_trend(weekly_trend);
+        response.set_period_over_period(period_over_period);
+        response.set_category_trends(category_trends);
+        response.set_user_retention(user_retention);
+        response.set_top_users(top_users);
+        response.set_avg_transaction_stats(avg_transaction_stats);
         Ok(response)
     }
 
@@ -584,7 +604,7 @@ impl OrderService {
         let mut total_expense: Decimal = Decimal::ZERO;
         for record in &records {
             let amount: Decimal = *record.get_amount();
-            if record.get_transaction_type() == "income" {
+            if record.get_transaction_type() == TransactionType::Income.as_str() {
                 total_income += amount;
             } else {
                 total_expense += amount;
@@ -631,7 +651,7 @@ impl OrderService {
             let mut day_expense: Decimal = Decimal::ZERO;
             for record in day_records {
                 let amount: Decimal = *record.get_amount();
-                if record.get_transaction_type() == "income" {
+                if record.get_transaction_type() == TransactionType::Income.as_str() {
                     day_income += amount;
                 } else {
                     day_expense += amount;
@@ -681,7 +701,7 @@ impl OrderService {
             let mut total_expense: Decimal = Decimal::ZERO;
             for record in &records {
                 let amount: Decimal = *record.get_amount();
-                if record.get_transaction_type() == "income" {
+                if record.get_transaction_type() == TransactionType::Income.as_str() {
                     total_income += amount;
                 } else {
                     total_expense += amount;
@@ -702,12 +722,11 @@ impl OrderService {
         db: &DatabaseConnection,
     ) -> Result<Vec<CategoryItem>, String> {
         let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
-            .filter(OrderRecordColumn::TransactionType.eq("expense"))
+            .filter(OrderRecordColumn::TransactionType.eq(TransactionType::Expense.as_str()))
             .all(db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
-        let mut category_map: std::collections::HashMap<String, i64> =
-            std::collections::HashMap::new();
+        let mut category_map: HashMap<String, i64> = HashMap::new();
         for record in &records {
             let category: String = record.get_category().clone();
             *category_map.entry(category).or_insert(0) += 1;
@@ -769,7 +788,7 @@ impl OrderService {
         let mut expense_amount: Decimal = Decimal::ZERO;
         for record in &records {
             let amount: Decimal = *record.get_amount();
-            if record.get_transaction_type() == "income" {
+            if record.get_transaction_type() == TransactionType::Income.as_str() {
                 income_count += 1;
                 income_amount += amount;
             } else {
@@ -822,12 +841,11 @@ impl OrderService {
         db: &DatabaseConnection,
     ) -> Result<Vec<CategoryAmountItem>, String> {
         let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
-            .filter(OrderRecordColumn::TransactionType.eq("expense"))
+            .filter(OrderRecordColumn::TransactionType.eq(TransactionType::Expense.as_str()))
             .all(db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
-        let mut category_map: std::collections::HashMap<String, Decimal> =
-            std::collections::HashMap::new();
+        let mut category_map: HashMap<String, Decimal> = HashMap::new();
         for record in &records {
             let category: String = record.get_category().clone();
             let amount: Decimal = *record.get_amount();
@@ -870,8 +888,7 @@ impl OrderService {
                 .iter()
                 .filter(|r| *r.get_bill_date() == current_date)
                 .collect();
-            let unique_users: std::collections::HashSet<i32> =
-                day_records.iter().map(|r| r.get_user_id()).collect();
+            let unique_users: HashSet<i32> = day_records.iter().map(|r| r.get_user_id()).collect();
             active_users.push(unique_users.len() as i64);
             new_records.push(day_records.len() as i64);
             current_date += chrono::Duration::days(1);
@@ -882,7 +899,9 @@ impl OrderService {
         activity.set_new_records(new_records);
         Ok(activity)
     }
+}
 
+impl OrderService {
     #[instrument_trace]
     fn calculate_change_percentage(current: f64, previous: f64) -> Option<f64> {
         if previous == 0.0 {
@@ -892,5 +911,433 @@ impl OrderService {
             return None;
         }
         Some(((current - previous) / previous) * 100.0)
+    }
+
+    #[instrument_trace]
+    async fn get_income_expense_ratio_trend(
+        db: &DatabaseConnection,
+        days: i64,
+    ) -> Result<Vec<IncomeExpenseRatioItem>, String> {
+        let end_date: NaiveDate = Local::now().naive_local().date();
+        let start_date: NaiveDate = end_date - chrono::Duration::days(days);
+        let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
+            .filter(OrderRecordColumn::BillDate.gte(start_date))
+            .filter(OrderRecordColumn::BillDate.lte(end_date))
+            .order_by_asc(OrderRecordColumn::BillDate)
+            .all(db)
+            .await
+            .map_err(|error: DbErr| error.to_string())?;
+        let mut result: Vec<IncomeExpenseRatioItem> = Vec::new();
+        let mut current_date: NaiveDate = start_date;
+        while current_date <= end_date {
+            let day_records: Vec<&OrderRecordModel> = records
+                .iter()
+                .filter(|r| *r.get_bill_date() == current_date)
+                .collect();
+            let mut day_income: Decimal = Decimal::ZERO;
+            let mut day_expense: Decimal = Decimal::ZERO;
+            for record in &day_records {
+                let amount: Decimal = *record.get_amount();
+                if record.get_transaction_type() == TransactionType::Income.as_str() {
+                    day_income += amount;
+                } else {
+                    day_expense += amount;
+                }
+            }
+            let ratio: f64 = if day_expense > Decimal::ZERO {
+                (day_income / day_expense).to_f64().unwrap_or(0.0)
+            } else {
+                0.0
+            };
+            let mut item: IncomeExpenseRatioItem = IncomeExpenseRatioItem::default();
+            item.set_date(current_date.to_string());
+            item.set_ratio(ratio);
+            item.set_income(day_income.to_string());
+            item.set_expense(day_expense.to_string());
+            result.push(item);
+            current_date += chrono::Duration::days(1);
+        }
+        Ok(result)
+    }
+
+    #[instrument_trace]
+    async fn get_hourly_distribution(
+        db: &DatabaseConnection,
+    ) -> Result<Vec<HourlyDistributionItem>, String> {
+        let today: NaiveDate = Local::now().naive_local().date();
+        let start_date: NaiveDate = today - chrono::Duration::days(30);
+        let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
+            .filter(OrderRecordColumn::BillDate.gte(start_date))
+            .filter(OrderRecordColumn::BillDate.lte(today))
+            .all(db)
+            .await
+            .map_err(|error: DbErr| error.to_string())?;
+        let mut hourly_data: HashMap<i32, (i64, Decimal, Decimal)> = HashMap::new();
+        for record in &records {
+            let hour: i32 = record
+                .try_get_created_at()
+                .map(|dt| dt.hour() as i32)
+                .unwrap_or(0);
+            let entry: &mut (i64, Decimal, Decimal) =
+                hourly_data
+                    .entry(hour)
+                    .or_insert((0, Decimal::ZERO, Decimal::ZERO));
+            entry.0 += 1;
+            let amount: Decimal = *record.get_amount();
+            if record.get_transaction_type() == TransactionType::Income.as_str() {
+                entry.1 += amount;
+            } else {
+                entry.2 += amount;
+            }
+        }
+        let result: Vec<HourlyDistributionItem> = (0..24)
+            .map(|hour| {
+                let (count, income, expense) =
+                    hourly_data
+                        .get(&hour)
+                        .copied()
+                        .unwrap_or((0, Decimal::ZERO, Decimal::ZERO));
+                let mut item: HourlyDistributionItem = HourlyDistributionItem::default();
+                item.set_hour(hour);
+                item.set_count(count);
+                item.set_income(income.to_string());
+                item.set_expense(expense.to_string());
+                item
+            })
+            .collect();
+        Ok(result)
+    }
+
+    #[instrument_trace]
+    async fn get_weekly_trend(db: &DatabaseConnection) -> Result<Vec<WeeklyTrendItem>, String> {
+        let today: NaiveDate = Local::now().naive_local().date();
+        let start_date: NaiveDate = today - chrono::Duration::days(90);
+        let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
+            .filter(OrderRecordColumn::BillDate.gte(start_date))
+            .filter(OrderRecordColumn::BillDate.lte(today))
+            .all(db)
+            .await
+            .map_err(|error: DbErr| error.to_string())?;
+        let days: Vec<&str> = WEEK_DAYS.to_vec();
+        let mut weekly_data: Vec<(Decimal, Decimal, i64)> =
+            vec![(Decimal::ZERO, Decimal::ZERO, 0); 7];
+        for record in &records {
+            let weekday: usize = record.get_bill_date().weekday().num_days_from_monday() as usize;
+            let amount: Decimal = *record.get_amount();
+            if record.get_transaction_type() == TransactionType::Income.as_str() {
+                weekly_data[weekday].0 += amount;
+            } else {
+                weekly_data[weekday].1 += amount;
+            }
+            weekly_data[weekday].2 += 1;
+        }
+        let result: Vec<WeeklyTrendItem> = days
+            .into_iter()
+            .enumerate()
+            .map(|(idx, day)| {
+                let (income, expense, count) = weekly_data[idx];
+                let mut item: WeeklyTrendItem = WeeklyTrendItem::default();
+                item.set_day_of_week(day.to_string());
+                item.set_income(income.to_string());
+                item.set_expense(expense.to_string());
+                item.set_transaction_count(count);
+                item
+            })
+            .collect();
+        Ok(result)
+    }
+
+    #[instrument_trace]
+    async fn get_period_over_period_analysis(
+        db: &DatabaseConnection,
+    ) -> Result<Vec<PeriodOverPeriodItem>, String> {
+        let today: NaiveDate = Local::now().naive_local().date();
+        let mut result: Vec<PeriodOverPeriodItem> = Vec::new();
+        let periods: Vec<(String, NaiveDate, NaiveDate, NaiveDate, NaiveDate)> = vec![
+            (
+                "WoW".to_string(),
+                today - chrono::Duration::days(6),
+                today,
+                today - chrono::Duration::days(13),
+                today - chrono::Duration::days(7),
+            ),
+            (
+                "MoM".to_string(),
+                today - chrono::Duration::days(29),
+                today,
+                today - chrono::Duration::days(59),
+                today - chrono::Duration::days(30),
+            ),
+            (
+                "QoQ".to_string(),
+                today - chrono::Duration::days(89),
+                today,
+                today - chrono::Duration::days(179),
+                today - chrono::Duration::days(90),
+            ),
+        ];
+        for (period_name, curr_start, curr_end, prev_start, prev_end) in periods {
+            let curr_stats: (Decimal, Decimal, i64) =
+                Self::get_period_stats(db, curr_start, curr_end).await?;
+            let prev_stats: (Decimal, Decimal, i64) =
+                Self::get_period_stats(db, prev_start, prev_end).await?;
+            let income_change: f64 = Self::calculate_change_percentage(
+                curr_stats.0.to_f64().unwrap_or(0.0),
+                prev_stats.0.to_f64().unwrap_or(0.0),
+            )
+            .unwrap_or(0.0);
+            let expense_change: f64 = Self::calculate_change_percentage(
+                curr_stats.1.to_f64().unwrap_or(0.0),
+                prev_stats.1.to_f64().unwrap_or(0.0),
+            )
+            .unwrap_or(0.0);
+            let transaction_change: f64 =
+                Self::calculate_change_percentage(curr_stats.2 as f64, prev_stats.2 as f64)
+                    .unwrap_or(0.0);
+            let mut item: PeriodOverPeriodItem = PeriodOverPeriodItem::default();
+            item.set_period(period_name);
+            item.set_income_change(income_change);
+            item.set_expense_change(expense_change);
+            item.set_transaction_change(transaction_change);
+            result.push(item);
+        }
+        Ok(result)
+    }
+
+    #[instrument_trace]
+    async fn get_period_stats(
+        db: &DatabaseConnection,
+        start: NaiveDate,
+        end: NaiveDate,
+    ) -> Result<(Decimal, Decimal, i64), String> {
+        let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
+            .filter(OrderRecordColumn::BillDate.gte(start))
+            .filter(OrderRecordColumn::BillDate.lte(end))
+            .all(db)
+            .await
+            .map_err(|error: DbErr| error.to_string())?;
+        let mut income: Decimal = Decimal::ZERO;
+        let mut expense: Decimal = Decimal::ZERO;
+        for record in &records {
+            let amount: Decimal = *record.get_amount();
+            if record.get_transaction_type() == TransactionType::Income.as_str() {
+                income += amount;
+            } else {
+                expense += amount;
+            }
+        }
+        Ok((income, expense, records.len() as i64))
+    }
+
+    #[instrument_trace]
+    async fn get_category_trends(
+        db: &DatabaseConnection,
+        days: i64,
+    ) -> Result<Vec<CategoryTrendItem>, String> {
+        let end_date: NaiveDate = Local::now().naive_local().date();
+        let start_date: NaiveDate = end_date - chrono::Duration::days(days);
+        let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
+            .filter(OrderRecordColumn::BillDate.gte(start_date))
+            .filter(OrderRecordColumn::BillDate.lte(end_date))
+            .filter(OrderRecordColumn::TransactionType.eq(TransactionType::Expense.as_str()))
+            .all(db)
+            .await
+            .map_err(|error: DbErr| error.to_string())?;
+        let mut category_data: HashMap<String, Vec<(String, Decimal)>> = HashMap::new();
+        for record in &records {
+            let category: String = record.get_category().clone();
+            let date: String = record.get_bill_date().to_string();
+            let amount: Decimal = *record.get_amount();
+            category_data
+                .entry(category)
+                .or_default()
+                .push((date, amount));
+        }
+        let dates: Vec<String> = (0..=days)
+            .map(|i| (start_date + chrono::Duration::days(i)).to_string())
+            .collect();
+        let result: Vec<CategoryTrendItem> = category_data
+            .into_iter()
+            .map(|(category, data)| {
+                let amounts: Vec<String> = dates
+                    .iter()
+                    .map(|date| {
+                        let total: Decimal = data
+                            .iter()
+                            .filter(|(d, _)| d == date)
+                            .map(|(_, amt)| amt)
+                            .sum();
+                        total.to_string()
+                    })
+                    .collect();
+                let mut item: CategoryTrendItem = CategoryTrendItem::default();
+                item.set_category(category);
+                item.set_dates(dates.clone());
+                item.set_amounts(amounts);
+                item
+            })
+            .collect();
+        Ok(result)
+    }
+
+    #[instrument_trace]
+    async fn get_user_retention(
+        db: &DatabaseConnection,
+        days: i64,
+    ) -> Result<Vec<UserRetentionItem>, String> {
+        let end_date: NaiveDate = Local::now().naive_local().date();
+        let start_date: NaiveDate = end_date - chrono::Duration::days(days);
+        let users: Vec<OrderUserModel> = OrderUserEntity::find()
+            .filter(OrderUserColumn::CreatedAt.gte(start_date.and_hms_opt(0, 0, 0).unwrap()))
+            .filter(OrderUserColumn::CreatedAt.lte(end_date.and_hms_opt(23, 59, 59).unwrap()))
+            .all(db)
+            .await
+            .map_err(|error: DbErr| error.to_string())?;
+        let mut result: Vec<UserRetentionItem> = Vec::new();
+        let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
+            .filter(OrderRecordColumn::BillDate.gte(start_date))
+            .filter(OrderRecordColumn::BillDate.lte(end_date))
+            .all(db)
+            .await
+            .map_err(|error: DbErr| error.to_string())?;
+        for day_offset in 0..=days {
+            let date: NaiveDate = start_date + chrono::Duration::days(day_offset);
+            let new_users: Vec<i32> = users
+                .iter()
+                .filter(|u| u.get_created_at().date() == date)
+                .map(|u| u.get_id())
+                .collect();
+            let new_users_count: i64 = new_users.len() as i64;
+            let retained: i64 = if new_users_count > 0 {
+                let next_day: NaiveDate = date + chrono::Duration::days(1);
+                let retained_users: HashSet<i32> = records
+                    .iter()
+                    .filter(|r| {
+                        *r.get_bill_date() == next_day && new_users.contains(&r.get_user_id())
+                    })
+                    .map(|r| r.get_user_id())
+                    .collect();
+                retained_users.len() as i64
+            } else {
+                0
+            };
+            let retention_rate: f64 = if new_users_count > 0 {
+                (retained as f64 / new_users_count as f64) * 100.0
+            } else {
+                0.0
+            };
+            let mut item: UserRetentionItem = UserRetentionItem::default();
+            item.set_date(date.to_string());
+            item.set_new_users(new_users_count);
+            item.set_retained_users(retained);
+            item.set_retention_rate(retention_rate);
+            result.push(item);
+        }
+        Ok(result)
+    }
+
+    #[instrument_trace]
+    async fn get_top_users(
+        db: &DatabaseConnection,
+        limit: i64,
+    ) -> Result<Vec<TopUserItem>, String> {
+        let today: NaiveDate = Local::now().naive_local().date();
+        let start_date: NaiveDate = today - chrono::Duration::days(30);
+        let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
+            .filter(OrderRecordColumn::BillDate.gte(start_date))
+            .filter(OrderRecordColumn::BillDate.lte(today))
+            .all(db)
+            .await
+            .map_err(|error: DbErr| error.to_string())?;
+        let mut user_stats: HashMap<i32, (String, i64, Decimal)> = HashMap::new();
+        for record in &records {
+            let user_id: i32 = record.get_user_id();
+            let entry: &mut (String, i64, Decimal) = user_stats
+                .entry(user_id)
+                .or_insert_with(|| (String::new(), 0, Decimal::ZERO));
+            entry.1 += 1;
+            entry.2 += record.get_amount();
+        }
+        for (user_id, entry) in &mut user_stats {
+            if let Ok(Some(user)) = OrderUserEntity::find_by_id(*user_id).one(db).await {
+                entry.0 = user.get_username().clone();
+            }
+        }
+        let mut result: Vec<TopUserItem> = user_stats
+            .into_iter()
+            .map(|(user_id, (username, count, total))| {
+                let mut item: TopUserItem = TopUserItem::default();
+                item.set_user_id(user_id);
+                item.set_username(username);
+                item.set_transaction_count(count);
+                item.set_total_amount(total.to_string());
+                item
+            })
+            .collect();
+        result.sort_by(|a, b| {
+            let a_amt: Decimal = a.get_total_amount().parse().unwrap_or(Decimal::ZERO);
+            let b_amt: Decimal = b.get_total_amount().parse().unwrap_or(Decimal::ZERO);
+            b_amt.cmp(&a_amt)
+        });
+        result.truncate(limit as usize);
+        Ok(result)
+    }
+
+    #[instrument_trace]
+    async fn get_average_transaction_stats(
+        db: &DatabaseConnection,
+    ) -> Result<AverageTransactionStats, String> {
+        let today: NaiveDate = Local::now().naive_local().date();
+        let start_date: NaiveDate = today - chrono::Duration::days(30);
+        let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
+            .filter(OrderRecordColumn::BillDate.gte(start_date))
+            .filter(OrderRecordColumn::BillDate.lte(today))
+            .all(db)
+            .await
+            .map_err(|error: DbErr| error.to_string())?;
+        let mut income_count: i64 = 0;
+        let mut expense_count: i64 = 0;
+        let mut total_income: Decimal = Decimal::ZERO;
+        let mut total_expense: Decimal = Decimal::ZERO;
+        let mut max_income: Decimal = Decimal::ZERO;
+        let mut max_expense: Decimal = Decimal::ZERO;
+        for record in &records {
+            let amount: Decimal = *record.get_amount();
+            if record.get_transaction_type() == TransactionType::Income.as_str() {
+                income_count += 1;
+                total_income += amount;
+                if amount > max_income {
+                    max_income = amount;
+                }
+            } else {
+                expense_count += 1;
+                total_expense += amount;
+                if amount > max_expense {
+                    max_expense = amount;
+                }
+            }
+        }
+        let avg_income: Decimal = if income_count > 0 {
+            total_income / Decimal::from(income_count)
+        } else {
+            Decimal::ZERO
+        };
+        let avg_expense: Decimal = if expense_count > 0 {
+            total_expense / Decimal::from(expense_count)
+        } else {
+            Decimal::ZERO
+        };
+        let overall_avg: Decimal = if !records.is_empty() {
+            (total_income + total_expense) / Decimal::from(records.len() as i64)
+        } else {
+            Decimal::ZERO
+        };
+        let mut stats: AverageTransactionStats = AverageTransactionStats::default();
+        stats.set_avg_income_per_transaction(avg_income.to_string());
+        stats.set_avg_expense_per_transaction(avg_expense.to_string());
+        stats.set_overall_avg_amount(overall_avg.to_string());
+        stats.set_max_single_income(max_income.to_string());
+        stats.set_max_single_expense(max_expense.to_string());
+        Ok(stats)
     }
 }

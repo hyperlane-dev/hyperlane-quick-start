@@ -6,6 +6,7 @@ pub use r#fn::*;
 
 use {
     super::*,
+    mapper::order::user::*,
     model::{
         application::order::*,
         request::order::*,

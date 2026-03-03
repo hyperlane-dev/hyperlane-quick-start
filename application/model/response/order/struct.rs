@@ -140,6 +140,70 @@ pub struct UserActivity {
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]
+pub struct IncomeExpenseRatioItem {
+    pub(super) date: String,
+    pub(super) ratio: f64,
+    pub(super) income: String,
+    pub(super) expense: String,
+}
+
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]
+pub struct HourlyDistributionItem {
+    pub(super) hour: i32,
+    pub(super) count: i64,
+    pub(super) income: String,
+    pub(super) expense: String,
+}
+
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]
+pub struct WeeklyTrendItem {
+    pub(super) day_of_week: String,
+    pub(super) income: String,
+    pub(super) expense: String,
+    pub(super) transaction_count: i64,
+}
+
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]
+pub struct PeriodOverPeriodItem {
+    pub(super) period: String,
+    pub(super) income_change: f64,
+    pub(super) expense_change: f64,
+    pub(super) transaction_change: f64,
+}
+
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]
+pub struct CategoryTrendItem {
+    pub(super) category: String,
+    pub(super) dates: Vec<String>,
+    pub(super) amounts: Vec<String>,
+}
+
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]
+pub struct UserRetentionItem {
+    pub(super) date: String,
+    pub(super) new_users: i64,
+    pub(super) retained_users: i64,
+    pub(super) retention_rate: f64,
+}
+
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]
+pub struct TopUserItem {
+    pub(super) user_id: i32,
+    pub(super) username: String,
+    pub(super) transaction_count: i64,
+    pub(super) total_amount: String,
+}
+
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]
+pub struct AverageTransactionStats {
+    pub(super) avg_income_per_transaction: String,
+    pub(super) avg_expense_per_transaction: String,
+    pub(super) overall_avg_amount: String,
+    pub(super) max_single_income: String,
+    pub(super) max_single_expense: String,
+}
+
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]
 pub struct OverviewStatisticsResponse {
     pub(super) today: TodayStatistics,
     pub(super) changes: ChangesStatistics,
@@ -151,4 +215,12 @@ pub struct OverviewStatisticsResponse {
     pub(super) transaction_count_trend: TransactionCountTrend,
     pub(super) category_amount_distribution: Vec<CategoryAmountItem>,
     pub(super) user_activity: UserActivity,
+    pub(super) income_expense_ratio_trend: Vec<IncomeExpenseRatioItem>,
+    pub(super) hourly_distribution: Vec<HourlyDistributionItem>,
+    pub(super) weekly_trend: Vec<WeeklyTrendItem>,
+    pub(super) period_over_period: Vec<PeriodOverPeriodItem>,
+    pub(super) category_trends: Vec<CategoryTrendItem>,
+    pub(super) user_retention: Vec<UserRetentionItem>,
+    pub(super) top_users: Vec<TopUserItem>,
+    pub(super) avg_transaction_stats: AverageTransactionStats,
 }
