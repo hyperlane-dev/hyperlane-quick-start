@@ -301,7 +301,11 @@ async function loadOverview() {
       initTopUsersChart(data.top_users);
       initAvgTransactionStats(data.avg_transaction_stats);
     } else {
-      showToast(result.message || 'Error loading overview data', 'error');
+      if (result.code === 401) {
+        handleAuthError(result.message);
+      } else {
+        showToast(result.message || 'Error loading overview data', 'error');
+      }
     }
   } catch (error) {
     showToast('Network error: ' + error.message, 'error');
@@ -1488,42 +1492,26 @@ function initTopUsersChart(topUsers) {
 }
 
 function initAvgTransactionStats(stats) {
-  const slot21 = document.getElementById('avg-transaction-stats-row-2-slot-1');
-  const slot22 = document.getElementById('avg-transaction-stats-row-2-slot-2');
-  const slot31 = document.getElementById('avg-transaction-stats-row-3-slot-1');
-  const slot32 = document.getElementById('avg-transaction-stats-row-3-slot-2');
-  const slot33 = document.getElementById('avg-transaction-stats-row-3-slot-3');
-  if (!slot21 || !slot22 || !slot31 || !slot32 || !slot33) return;
-  slot21.outerHTML = `
-    <div class="stat-card income">
-      <div class="stat-label">Avg Income/Transaction</div>
-      <div class="stat-value">¥${parseFloat(stats.avg_income_per_transaction).toFixed(2)}</div>
-    </div>
-  `;
-  slot22.outerHTML = `
-    <div class="stat-card expense">
-      <div class="stat-label">Avg Expense/Transaction</div>
-      <div class="stat-value">¥${parseFloat(stats.avg_expense_per_transaction).toFixed(2)}</div>
-    </div>
-  `;
-  slot31.outerHTML = `
-    <div class="stat-card balance">
-      <div class="stat-label">Overall Avg Amount</div>
-      <div class="stat-value">¥${parseFloat(stats.overall_avg_amount).toFixed(2)}</div>
-    </div>
-  `;
-  slot32.outerHTML = `
-    <div class="stat-card income">
-      <div class="stat-label">Max Single Income</div>
-      <div class="stat-value">¥${parseFloat(stats.max_single_income).toFixed(2)}</div>
-    </div>
-  `;
-  slot33.outerHTML = `
-    <div class="stat-card expense">
-      <div class="stat-label">Max Single Expense</div>
-      <div class="stat-value">¥${parseFloat(stats.max_single_expense).toFixed(2)}</div>
-    </div>
-  `;
+  const avgIncomeEl = document.getElementById('avg-income-per-transaction');
+  const avgExpenseEl = document.getElementById('avg-expense-per-transaction');
+  const overallAvgEl = document.getElementById('overall-avg-amount');
+  const maxIncomeEl = document.getElementById('max-single-income');
+  const maxExpenseEl = document.getElementById('max-single-expense');
+  if (avgIncomeEl) {
+    avgIncomeEl.textContent = `$${parseFloat(stats.avg_income_per_transaction).toFixed(2)}`;
+  }
+  if (avgExpenseEl) {
+    avgExpenseEl.textContent = `$${parseFloat(stats.avg_expense_per_transaction).toFixed(2)}`;
+  }
+  if (overallAvgEl) {
+    overallAvgEl.textContent = `$${parseFloat(stats.overall_avg_amount).toFixed(2)}`;
+  }
+  if (maxIncomeEl) {
+    maxIncomeEl.textContent = `$${parseFloat(stats.max_single_income).toFixed(2)}`;
+  }
+  if (maxExpenseEl) {
+    maxExpenseEl.textContent = `$${parseFloat(stats.max_single_expense).toFixed(2)}`;
+  }
 }
 
 window.addEventListener('resize', () => {
@@ -1636,6 +1624,25 @@ function handleLogout() {
   showToast('Logged out successfully', 'info');
 }
 
+function handleAuthError(message) {
+  currentUser = null;
+  currentToken = null;
+  viewingUserId = null;
+  viewingUserName = null;
+  localStorage.removeItem('order_user');
+  localStorage.removeItem('order_token');
+  window.location.hash = '';
+  document
+    .querySelectorAll('.admin-only')
+    .forEach((el) => el.classList.add('hidden'));
+  document.getElementById('current-user').textContent = 'User';
+  const roleBadge = document.getElementById('user-role');
+  roleBadge.textContent = 'user';
+  roleBadge.className = 'role-badge';
+  showPage('login-page');
+  showToast(message || 'Authentication failed, please login again', 'error');
+}
+
 async function loadDashboard() {
   recentRecordsLastId = null;
   recentRecordsHasMore = false;
@@ -1672,7 +1679,11 @@ async function loadRecentRecords(append = false) {
         updateStats(result.data);
       }
     } else {
-      showToast(result.message || 'Error loading records', 'error');
+      if (result.code === 401) {
+        handleAuthError(result.message);
+      } else {
+        showToast(result.message || 'Error loading records', 'error');
+      }
     }
   } catch (error) {
     showToast('Network error: ' + error.message, 'error');
@@ -1901,7 +1912,11 @@ async function applyFilters(pageDirection = null) {
       updateRecordsSummary(data);
       renderPagination();
     } else {
-      showToast(result.message || 'Error loading records', 'error');
+      if (result.code === 401) {
+        handleAuthError(result.message);
+      } else {
+        showToast(result.message || 'Error loading records', 'error');
+      }
     }
   } catch (error) {
     showToast('Network error: ' + error.message, 'error');
@@ -2035,7 +2050,11 @@ async function handleRecordSubmit(e) {
       else if (currentPage === 'records') loadRecords();
       else if (currentPage === 'user-records') loadUserRecords();
     } else {
-      showToast(result.message || 'Operation failed', 'error');
+      if (result.code === 401) {
+        handleAuthError(result.message);
+      } else {
+        showToast(result.message || 'Operation failed', 'error');
+      }
     }
   } catch (error) {
     showToast('Network error', 'error');
@@ -2232,7 +2251,11 @@ async function loadUsers(pageDirection = null) {
       renderUsers(allUsers);
       renderUsersPagination();
     } else {
-      showToast(result.message || 'Error loading users', 'error');
+      if (result.code === 401) {
+        handleAuthError(result.message);
+      } else {
+        showToast(result.message || 'Error loading users', 'error');
+      }
     }
   } catch (error) {
     showToast('Network error: ' + error.message, 'error');
@@ -2407,7 +2430,11 @@ async function applyUserRecordFilters(pageDirection = null) {
       updateUserRecordStats(data);
       renderUserRecordPagination();
     } else {
-      showToast(result.message || 'Error loading records', 'error');
+      if (result.code === 401) {
+        handleAuthError(result.message);
+      } else {
+        showToast(result.message || 'Error loading records', 'error');
+      }
     }
   } catch (error) {
     showToast('Network error: ' + error.message, 'error');
@@ -2536,7 +2563,11 @@ async function handleUserSubmit(e) {
       showToast('User created!', 'success');
       loadUsers();
     } else {
-      showToast(result.message || 'Operation failed', 'error');
+      if (result.code === 401) {
+        handleAuthError(result.message);
+      } else {
+        showToast(result.message || 'Operation failed', 'error');
+      }
     }
   } catch (error) {
     showToast('Network error', 'error');
@@ -2564,7 +2595,11 @@ async function approveUser(userId, approved) {
       showToast(approved ? 'User approved!' : 'User rejected!', 'success');
       loadUsers();
     } else {
-      showToast(result.message || 'Operation failed', 'error');
+      if (result.code === 401) {
+        handleAuthError(result.message);
+      } else {
+        showToast(result.message || 'Operation failed', 'error');
+      }
     }
   } catch (error) {
     showToast('Network error', 'error');
@@ -2607,7 +2642,11 @@ async function handleProfileSubmit(e) {
       updateUserInfo();
       showToast('Profile updated!', 'success');
     } else {
-      showToast(result.message || 'Update failed', 'error');
+      if (result.code === 401) {
+        handleAuthError(result.message);
+      } else {
+        showToast(result.message || 'Update failed', 'error');
+      }
     }
   } catch (error) {
     showToast('Network error', 'error');
@@ -2643,7 +2682,11 @@ async function handlePasswordSubmit(e) {
       document.getElementById('password-form').reset();
       showToast('Password changed!', 'success');
     } else {
-      showToast(result.message || 'Change failed', 'error');
+      if (result.code === 401) {
+        handleAuthError(result.message);
+      } else {
+        showToast(result.message || 'Change failed', 'error');
+      }
     }
   } catch (error) {
     showToast('Network error', 'error');
