@@ -974,6 +974,10 @@ input[type='number'].form-input {
   max-width: 500px;
 }
 
+.profile-form .btn {
+  width: 100%;
+}
+
 .modal {
   display: none;
   position: fixed;
