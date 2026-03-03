@@ -1570,12 +1570,12 @@ input[type='number'].form-input {
 .date-picker-wrapper {
   position: relative;
   display: inline-block;
+  flex: 1;
+  min-width: 0;
 }
 
 .date-picker-input {
-  flex: 1;
   width: 100%;
-  min-width: 0;
   padding: 6px 8px;
   padding-right: 30px;
   background: #ffffff;
@@ -1586,6 +1586,7 @@ input[type='number'].form-input {
   font-family: inherit;
   cursor: pointer;
   transition: all 0.2s;
+  box-sizing: border-box;
 }
 
 .date-picker-input:hover {
@@ -1609,15 +1610,13 @@ input[type='number'].form-input {
 }
 
 .date-picker-calendar {
-  position: absolute;
-  top: 100%;
-  left: 0;
+  position: fixed;
   margin-top: 4px;
   background: #ffffff;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   padding: 12px;
-  z-index: 1000;
+  z-index: 99999;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
   min-width: 280px;
   display: none;

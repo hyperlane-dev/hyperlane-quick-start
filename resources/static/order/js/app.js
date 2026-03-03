@@ -2832,6 +2832,8 @@ class DatePicker {
         this.close();
       }
     });
+    window.addEventListener('scroll', () => this.close(), true);
+    window.addEventListener('resize', () => this.close());
   }
 
   setInitialValue() {
@@ -2848,7 +2850,36 @@ class DatePicker {
   open() {
     this.isOpen = true;
     this.calendar.classList.add('active');
+    this.positionCalendar();
     this.renderCalendar();
+  }
+
+  positionCalendar() {
+    const rect = this.wrapper.getBoundingClientRect();
+    const calendarWidth = 280;
+    const calendarHeight = 320;
+    const padding = 8;
+    let left = rect.left;
+    let top = rect.bottom + 4;
+    if (left + calendarWidth > window.innerWidth - padding) {
+      left = window.innerWidth - calendarWidth - padding;
+    }
+    if (left < padding) {
+      left = padding;
+    }
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    if (spaceBelow < calendarHeight && spaceAbove > calendarHeight) {
+      top = rect.top - calendarHeight - 4;
+    }
+    if (top < padding) {
+      top = padding;
+    }
+    if (top + calendarHeight > window.innerHeight - padding) {
+      top = window.innerHeight - calendarHeight - padding;
+    }
+    this.calendar.style.left = `${left}px`;
+    this.calendar.style.top = `${top}px`;
   }
 
   close() {
