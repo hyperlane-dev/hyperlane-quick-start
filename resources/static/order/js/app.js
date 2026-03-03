@@ -1498,19 +1498,19 @@ function initAvgTransactionStats(stats) {
   const maxIncomeEl = document.getElementById('max-single-income');
   const maxExpenseEl = document.getElementById('max-single-expense');
   if (avgIncomeEl) {
-    avgIncomeEl.textContent = `$${parseFloat(stats.avg_income_per_transaction).toFixed(2)}`;
+    avgIncomeEl.textContent = `¥${parseFloat(stats.avg_income_per_transaction).toFixed(2)}`;
   }
   if (avgExpenseEl) {
-    avgExpenseEl.textContent = `$${parseFloat(stats.avg_expense_per_transaction).toFixed(2)}`;
+    avgExpenseEl.textContent = `¥${parseFloat(stats.avg_expense_per_transaction).toFixed(2)}`;
   }
   if (overallAvgEl) {
-    overallAvgEl.textContent = `$${parseFloat(stats.overall_avg_amount).toFixed(2)}`;
+    overallAvgEl.textContent = `¥${parseFloat(stats.overall_avg_amount).toFixed(2)}`;
   }
   if (maxIncomeEl) {
-    maxIncomeEl.textContent = `$${parseFloat(stats.max_single_income).toFixed(2)}`;
+    maxIncomeEl.textContent = `¥${parseFloat(stats.max_single_income).toFixed(2)}`;
   }
   if (maxExpenseEl) {
-    maxExpenseEl.textContent = `$${parseFloat(stats.max_single_expense).toFixed(2)}`;
+    maxExpenseEl.textContent = `¥${parseFloat(stats.max_single_expense).toFixed(2)}`;
   }
 }
 
