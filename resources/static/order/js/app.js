@@ -96,7 +96,9 @@ function initEventListeners() {
 
   document.querySelectorAll('.modal').forEach((modal) => {
     modal.addEventListener('click', (e) => {
-      if (e.target === modal) closeModal(modal.id);
+      if (e.target === modal && !modal.classList.contains('loading')) {
+        closeModal(modal.id);
+      }
     });
   });
 }
@@ -2035,6 +2037,7 @@ async function handleRecordSubmit(e) {
     return;
   }
   setRequestPending(requestKey, true);
+  setRecordModalLoading(true);
   const transaction_type = document.getElementById('record-type').value;
   const amount = parseFloat(document.getElementById('record-amount').value);
   const category = document.getElementById('record-category').value;
@@ -2049,6 +2052,7 @@ async function handleRecordSubmit(e) {
       : null;
   try {
     if (selectedImages.length > 0) {
+      let recordId = null;
       for (let i = 0; i < selectedImages.length; i++) {
         const img = selectedImages[i];
         const base64Data = img.file_data;
@@ -2058,17 +2062,21 @@ async function handleRecordSubmit(e) {
           bytes[j] = binaryString.charCodeAt(j);
         }
         const headers = {
-          'X-Amount': amount.toString(),
-          'X-Category': category,
-          'X-Transaction-Type': transaction_type,
           'X-File-Name': img.file_name,
           'X-Mime-Type': img.mime_type,
         };
-        if (description) {
-          headers['X-Description'] = description;
-        }
-        if (target_user_id) {
-          headers['X-Target-User-Id'] = target_user_id.toString();
+        if (recordId) {
+          headers['X-Record-Id'] = recordId.toString();
+        } else {
+          headers['X-Amount'] = amount.toString();
+          headers['X-Category'] = category;
+          headers['X-Transaction-Type'] = transaction_type;
+          if (description) {
+            headers['X-Description'] = description;
+          }
+          if (target_user_id) {
+            headers['X-Target-User-Id'] = target_user_id.toString();
+          }
         }
         if (img.original_name) {
           headers['X-Original-Name'] = img.original_name;
@@ -2087,7 +2095,16 @@ async function handleRecordSubmit(e) {
             showToast(result.message || 'Operation failed', 'error');
           }
           setRequestPending(requestKey, false);
+          setRecordModalLoading(false);
           return;
+        }
+        if (
+          !recordId &&
+          result.data &&
+          result.data.record &&
+          result.data.record.id
+        ) {
+          recordId = result.data.record.id;
         }
       }
       closeModal('record-modal');
@@ -2130,6 +2147,37 @@ async function handleRecordSubmit(e) {
     showToast('Network error', 'error');
   } finally {
     setRequestPending(requestKey, false);
+    setRecordModalLoading(false);
+  }
+}
+
+function setRecordModalLoading(isLoading) {
+  const modal = document.getElementById('record-modal');
+  const submitBtn = modal?.querySelector('button[type="submit"]');
+  const closeBtn = modal?.querySelector('.modal-close');
+  if (isLoading) {
+    modal?.classList.add('loading');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.dataset.originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<span class="loading-spinner"></span> Saving...';
+    }
+    if (closeBtn) {
+      closeBtn.disabled = true;
+      closeBtn.style.pointerEvents = 'none';
+    }
+  } else {
+    modal?.classList.remove('loading');
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      if (submitBtn.dataset.originalText) {
+        submitBtn.innerHTML = submitBtn.dataset.originalText;
+      }
+    }
+    if (closeBtn) {
+      closeBtn.disabled = false;
+      closeBtn.style.pointerEvents = '';
+    }
   }
 }
 
@@ -2496,7 +2544,7 @@ async function applyUserRecordFilters(pageDirection = null) {
           pageFirstIds.push(data.records[0].id);
         }
       }
-      renderUserRecords(allRecords);
+      await renderUserRecords(allRecords);
       updateUserRecordStats(data);
       renderUserRecordPagination();
     } else {
@@ -2513,7 +2561,7 @@ async function applyUserRecordFilters(pageDirection = null) {
   }
 }
 
-function renderUserRecords(records) {
+async function renderUserRecords(records) {
   const container = document.getElementById('user-records-list');
   if (!records || !Array.isArray(records) || records.length === 0) {
     container.innerHTML = `
@@ -2524,11 +2572,13 @@ function renderUserRecords(records) {
       </div>`;
     return;
   }
-  container.innerHTML = records
-    .map((r) => {
+  const recordHtmls = await Promise.all(
+    records.map(async (r) => {
       const rJson = JSON.stringify(r).replace(/"/g, '&quot;');
+      const images = await loadRecordImages(r.id);
+      const imagesHtml = renderRecordImages(r.id, images);
       return `
-    <div class="record-item" data-bill-no="${escapeHtml(r.bill_no)}" ondblclick="copyBillNo('${escapeHtml(r.bill_no)}')">
+    <div class="record-item" data-record-id="${r.id}" data-bill-no="${escapeHtml(r.bill_no)}" ondblclick="copyBillNo('${escapeHtml(r.bill_no)}')">
       <div class="record-type ${r.transaction_type}">${r.transaction_type === 'income' ? '💰' : '💸'}</div>
       <div class="record-info">
         <div class="record-category">${escapeHtml(r.category)}</div>
@@ -2541,14 +2591,16 @@ function renderUserRecords(records) {
           <span class="record-date-item"><span class="record-date-label">Date:</span> <span class="record-date-value">${formatDate(r.bill_date)}</span></span>
           ${r.created_at ? `<span class="record-date-item"><span class="record-date-label">Created:</span> <span class="record-date-value">${formatDate(r.created_at)}</span></span>` : ''}
         </div>
+        ${imagesHtml}
       </div>
       <div class="record-right">
         <div class="record-amount ${r.transaction_type}">${r.transaction_type === 'income' ? '+' : '-'}¥${formatAmount(r.amount)}</div>
         <button class="btn-print" onclick="event.stopPropagation(); printRecordData(JSON.parse(this.dataset.record));" data-record="${rJson}">🖨️ Print</button>
       </div>
     </div>`;
-    })
-    .join('');
+    }),
+  );
+  container.innerHTML = recordHtmls.join('');
 }
 
 function updateUserRecordStats(data) {
@@ -3295,6 +3347,9 @@ let currentPreviewImage = null;
 let currentZoom = 1;
 let currentImageData = null;
 let currentRecordImages = {};
+let imagePosition = { x: 0, y: 0 };
+let isDragging = false;
+let dragStart = { x: 0, y: 0 };
 
 function handleImageSelect(event) {
   const files = event.target.files;
@@ -3415,10 +3470,73 @@ function resetZoom() {
 }
 
 function updateZoom() {
+  updateImagePosition();
+}
+
+function updateImagePosition() {
   const img = document.getElementById('preview-image');
   if (img) {
-    img.style.transform = `scale(${currentZoom})`;
+    img.style.transform = `translate(${imagePosition.x}px, ${imagePosition.y}px) scale(${currentZoom})`;
   }
+}
+
+function setupImagePreviewInteractions() {
+  const container = document.getElementById('image-preview-container');
+  const img = document.getElementById('preview-image');
+  if (!container || !img) return;
+  container.onwheel = handleImageWheel;
+  container.onmousedown = handleImageMouseDown;
+  container.onmousemove = handleImageMouseMove;
+  container.onmouseup = handleImageMouseUp;
+  container.onmouseleave = handleImageMouseUp;
+  container.ondblclick = handleImageDoubleClick;
+  img.ondragstart = () => false;
+}
+
+function handleImageWheel(event) {
+  event.preventDefault();
+  const delta = event.deltaY > 0 ? -0.1 : 0.1;
+  const newZoom = Math.max(0.5, Math.min(5, currentZoom + delta));
+  if (newZoom !== currentZoom) {
+    currentZoom = newZoom;
+    updateZoom();
+  }
+}
+
+function handleImageMouseDown(event) {
+  if (event.button !== 0) return;
+  event.preventDefault();
+  isDragging = true;
+  dragStart = {
+    x: event.clientX - imagePosition.x,
+    y: event.clientY - imagePosition.y,
+  };
+  const container = document.getElementById('image-preview-container');
+  if (container) {
+    container.style.cursor = 'grabbing';
+  }
+}
+
+function handleImageMouseMove(event) {
+  if (!isDragging) return;
+  event.preventDefault();
+  imagePosition.x = event.clientX - dragStart.x;
+  imagePosition.y = event.clientY - dragStart.y;
+  updateImagePosition();
+}
+
+function handleImageMouseUp() {
+  isDragging = false;
+  const container = document.getElementById('image-preview-container');
+  if (container) {
+    container.style.cursor = 'grab';
+  }
+}
+
+function handleImageDoubleClick() {
+  currentZoom = 1;
+  imagePosition = { x: 0, y: 0 };
+  updateZoom();
 }
 
 async function downloadCurrentImage() {
@@ -3484,43 +3602,15 @@ async function openRecordImagePreview(recordId, imageId) {
   );
   if (!image) return;
   currentPreviewImage = { ...image, recordId: recordId };
-  document.getElementById('preview-image').src = API_BASE + image.download_url;
+  document.getElementById('preview-image').src = image.download_url;
+  const uploaderText = image.username
+    ? `Uploaded by: ${escapeHtml(image.username)}`
+    : '';
+  document.getElementById('image-preview-uploader').textContent = uploaderText;
   currentZoom = 1;
+  imagePosition = { x: 0, y: 0 };
   updateZoom();
+  updateImagePosition();
   openModal('image-preview-modal');
-}
-
-async function deleteRecordImage(imageId, recordId) {
-  if (!confirm('Are you sure you want to delete this image?')) return;
-  try {
-    const response = await fetch(`${API_BASE}/image/delete/${imageId}`, {
-      method: 'POST',
-      credentials: 'include',
-    });
-    const result = await response.json();
-    if (result.code === 200) {
-      showToast('Image deleted successfully', 'success');
-      if (recordId) {
-        await loadRecordImages(recordId);
-        const recordEl = document.querySelector(
-          `[data-record-id="${recordId}"]`,
-        );
-        if (recordEl) {
-          const imagesContainer = recordEl.querySelector(
-            '.record-images-container',
-          );
-          if (imagesContainer) {
-            imagesContainer.innerHTML = renderRecordImages(
-              recordId,
-              currentRecordImages[recordId],
-            );
-          }
-        }
-      }
-    } else {
-      showToast(result.message || 'Failed to delete image', 'error');
-    }
-  } catch (error) {
-    showToast('Network error', 'error');
-  }
+  setupImagePreviewInteractions();
 }

@@ -29,7 +29,6 @@ use super::*;
         controller::monitor::openapi_monitor_system_info,
         controller::online::openapi_online_docs,
         controller::openapi::openapi_openapi_json,
-        controller::order::openapi_image_delete,
         controller::order::openapi_image_download,
         controller::order::openapi_image_list,
         controller::order::openapi_overview_statistics,

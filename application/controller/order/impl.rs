@@ -731,6 +731,7 @@ impl ServerHook for RecordCreateWithImagesRoute {
 
     #[prologue_macros(
         post_method,
+        request_header_option("x-record-id" => record_id_opt),
         request_header_option("x-amount" => amount_opt),
         request_header_option("x-category" => category_opt),
         request_header_option("x-transaction-type" => transaction_type_opt),
@@ -778,56 +779,10 @@ impl ServerHook for RecordCreateWithImagesRoute {
             ctx.get_mut_response().set_body(response.to_json_bytes());
             return;
         }
-        let amount: Decimal = match amount_opt {
-            Some(s) => match s.parse() {
-                Ok(v) => v,
-                Err(_) => {
-                    let response = ApiResponse::<()>::error_with_code(
-                        ResponseCode::BadRequest,
-                        "Invalid amount format",
-                    );
-                    ctx.get_mut_response().set_body(response.to_json_bytes());
-                    return;
-                }
-            },
-            None => {
-                let response = ApiResponse::<()>::error_with_code(
-                    ResponseCode::BadRequest,
-                    "Missing X-Amount header",
-                );
-                ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
-            }
-        };
-        let category = match category_opt {
+        let file_name: String = match file_name_opt {
             Some(s) => s,
             None => {
-                let response = ApiResponse::<()>::error_with_code(
-                    ResponseCode::BadRequest,
-                    "Missing X-Category header",
-                );
-                ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
-            }
-        };
-        let transaction_type = match transaction_type_opt {
-            Some(s) => s,
-            None => {
-                let response = ApiResponse::<()>::error_with_code(
-                    ResponseCode::BadRequest,
-                    "Missing X-Transaction-Type header",
-                );
-                ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
-            }
-        };
-        let target_user_id: i32 = target_user_id_opt
-            .and_then(|s| s.parse().ok())
-            .unwrap_or(current_user_id);
-        let file_name = match file_name_opt {
-            Some(s) => s,
-            None => {
-                let response = ApiResponse::<()>::error_with_code(
+                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
                     ResponseCode::BadRequest,
                     "Missing X-File-Name header",
                 );
@@ -835,10 +790,10 @@ impl ServerHook for RecordCreateWithImagesRoute {
                 return;
             }
         };
-        let mime_type = match mime_type_opt {
+        let mime_type: String = match mime_type_opt {
             Some(s) => s,
             None => {
-                let response = ApiResponse::<()>::error_with_code(
+                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
                     ResponseCode::BadRequest,
                     "Missing X-Mime-Type header",
                 );
@@ -846,41 +801,114 @@ impl ServerHook for RecordCreateWithImagesRoute {
                 return;
             }
         };
-        let body_bytes = ctx.get_request().get_body().clone();
-        let file_data = body_bytes;
-        let file_size = file_data.len() as i32;
-        let mut record_request = CreateRecordRequest::default();
-        record_request
-            .set_amount(amount)
-            .set_category(category)
-            .set_transaction_type(transaction_type)
-            .set_description(description_opt)
-            .set_target_user_id(Some(target_user_id));
-        let mut image_request = ImageUploadRequest::default();
+        let file_data: Vec<u8> = ctx.get_request().get_body().clone();
+        let file_size: i32 = file_data.len() as i32;
+        let mut image_request: ImageUploadRequest = ImageUploadRequest::default();
         image_request
             .set_file_name(file_name)
             .set_original_name(original_name_opt)
             .set_mime_type(mime_type)
             .set_file_data(file_data)
             .set_file_size(file_size);
-        match OrderService::create_record_with_single_image(
-            target_user_id,
-            record_request,
-            image_request,
-        )
-        .await
-        {
-            Ok(result) => {
-                let response: ApiResponse<CreateRecordWithImagesResponse> =
-                    ApiResponse::<CreateRecordWithImagesResponse>::success(result);
-                ctx.get_mut_response().set_body(response.to_json_bytes());
+        let result: CreateRecordWithImagesResponse = match record_id_opt {
+            Some(record_id_str) => {
+                let record_id: i32 = match record_id_str.parse() {
+                    Ok(id) => id,
+                    Err(_) => {
+                        let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
+                            ResponseCode::BadRequest,
+                            "Invalid X-Record-Id header",
+                        );
+                        ctx.get_mut_response().set_body(response.to_json_bytes());
+                        return;
+                    }
+                };
+                match OrderService::add_image_to_record(record_id, current_user_id, image_request)
+                    .await
+                {
+                    Ok(result) => result,
+                    Err(error) => {
+                        let response: ApiResponse<()> =
+                            ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                        ctx.get_mut_response().set_body(response.to_json_bytes());
+                        return;
+                    }
+                }
             }
-            Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
-                ctx.get_mut_response().set_body(response.to_json_bytes());
+            None => {
+                let amount: Decimal = match amount_opt {
+                    Some(s) => match s.parse() {
+                        Ok(v) => v,
+                        Err(_) => {
+                            let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
+                                ResponseCode::BadRequest,
+                                "Invalid amount format",
+                            );
+                            ctx.get_mut_response().set_body(response.to_json_bytes());
+                            return;
+                        }
+                    },
+                    None => {
+                        let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
+                            ResponseCode::BadRequest,
+                            "Missing X-Amount header",
+                        );
+                        ctx.get_mut_response().set_body(response.to_json_bytes());
+                        return;
+                    }
+                };
+                let category: String = match category_opt {
+                    Some(s) => s,
+                    None => {
+                        let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
+                            ResponseCode::BadRequest,
+                            "Missing X-Category header",
+                        );
+                        ctx.get_mut_response().set_body(response.to_json_bytes());
+                        return;
+                    }
+                };
+                let transaction_type: String = match transaction_type_opt {
+                    Some(s) => s,
+                    None => {
+                        let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
+                            ResponseCode::BadRequest,
+                            "Missing X-Transaction-Type header",
+                        );
+                        ctx.get_mut_response().set_body(response.to_json_bytes());
+                        return;
+                    }
+                };
+                let target_user_id: i32 = target_user_id_opt
+                    .and_then(|s: String| s.parse().ok())
+                    .unwrap_or(current_user_id);
+                let mut record_request: CreateRecordRequest = CreateRecordRequest::default();
+                record_request
+                    .set_amount(amount)
+                    .set_category(category)
+                    .set_transaction_type(transaction_type)
+                    .set_description(description_opt)
+                    .set_target_user_id(Some(target_user_id));
+                match OrderService::create_record_with_single_image(
+                    target_user_id,
+                    record_request,
+                    image_request,
+                )
+                .await
+                {
+                    Ok(result) => result,
+                    Err(error) => {
+                        let response: ApiResponse<()> =
+                            ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                        ctx.get_mut_response().set_body(response.to_json_bytes());
+                        return;
+                    }
+                }
             }
-        }
+        };
+        let response: ApiResponse<CreateRecordWithImagesResponse> =
+            ApiResponse::<CreateRecordWithImagesResponse>::success(result);
+        ctx.get_mut_response().set_body(response.to_json_bytes());
     }
 }
 
@@ -975,15 +1003,14 @@ impl ServerHook for ImageDownloadRoute {
                     .clone()
                     .unwrap_or_else(|| image.get_file_name().clone());
                 let content_disposition: String =
-                    format!("{ATTACHMENT}; filename=\"{}\"", file_name);
+                    format!("{ATTACHMENT}; {FILENAME}=\"{}\"", file_name);
                 let mime_type: String = image.get_mime_type().clone();
                 let file_data: Vec<u8> = image.get_file_data().clone();
                 ctx.get_mut_response()
                     .set_header(CONTENT_TYPE, &mime_type)
                     .set_header(CONTENT_DISPOSITION, &content_disposition)
-                    .set_header(CONTENT_LENGTH, &file_data.len().to_string())
+                    .set_header(CONTENT_LENGTH, file_data.len().to_string())
                     .set_body(file_data);
-                ctx.set_closed(true);
             }
             Ok(None) => {
                 let response: ApiResponse<()> =

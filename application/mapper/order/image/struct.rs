@@ -33,12 +33,3 @@ pub struct Model {
     #[get(pub(crate))]
     pub(super) created_at: Option<NaiveDateTime>,
 }
-
-#[derive(Clone, Copy, Debug, EnumIter)]
-pub enum Relation {}
-
-impl RelationTrait for Relation {
-    fn def(&self) -> RelationDef {
-        panic!("No relations defined")
-    }
-}

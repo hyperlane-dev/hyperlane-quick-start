@@ -206,20 +206,3 @@ pub fn openapi_image_list() {}
 )]
 #[instrument_trace]
 pub fn openapi_image_download() {}
-
-#[utoipa::path(
-    post,
-    path = "/api/order/image/delete/{id}",
-    params(
-        ("id" = i32, Path, description = "Image ID")
-    ),
-    responses(
-        (status = 200, description = "Image deleted successfully"),
-        (status = 400, description = "Bad request"),
-        (status = 401, description = "Unauthorized"),
-        (status = 404, description = "Image not found"),
-        (status = 500, description = "Internal server error")
-    )
-)]
-#[instrument_trace]
-pub fn openapi_image_delete() {}

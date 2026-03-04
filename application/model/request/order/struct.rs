@@ -79,7 +79,6 @@ pub struct ApproveUserRequest {
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct UserListQueryRequest {
-    #[get(pub)]
     #[set(pub)]
     pub(super) keyword: Option<String>,
     #[get(type(copy), pub)]
@@ -102,7 +101,6 @@ pub struct CreateRecordWithImagesRequest {
     pub(super) bill_date: Option<NaiveDate>,
     #[get(type(copy), pub)]
     pub(super) target_user_id: Option<i32>,
-    #[get(pub)]
     pub(super) images: Vec<ImageUploadRequest>,
 }
 

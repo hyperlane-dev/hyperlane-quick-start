@@ -222,6 +222,7 @@ pub struct RecordImageResponse {
     pub(super) file_size: i32,
     pub(super) created_at: String,
     pub(super) download_url: String,
+    pub(super) username: String,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
@@ -244,7 +245,6 @@ pub struct RecordImageDetailResponse {
     pub(super) mime_type: String,
     #[get(type(copy), pub)]
     pub(super) file_size: i32,
-    #[get(pub)]
     pub(super) file_data_base64: String,
     pub(super) created_at: String,
 }
@@ -258,7 +258,6 @@ pub struct ImageDataResponse {
     pub(super) file_name: String,
     pub(super) original_name: Option<String>,
     pub(super) mime_type: String,
-    #[get(pub)]
     pub(super) file_data: Vec<u8>,
 }
 

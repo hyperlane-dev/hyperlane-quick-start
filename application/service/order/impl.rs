@@ -1520,6 +1520,53 @@ impl OrderService {
     }
 
     #[instrument_trace]
+    pub async fn add_image_to_record(
+        record_id: i32,
+        user_id: i32,
+        image_request: ImageUploadRequest,
+    ) -> Result<CreateRecordWithImagesResponse, String> {
+        let db: DatabaseConnection =
+            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+        let record: Option<OrderRecordModel> = OrderRecordEntity::find_by_id(record_id)
+            .one(&db)
+            .await
+            .map_err(|error: DbErr| error.to_string())?;
+        let record_model: OrderRecordModel = match record {
+            Some(model) => model,
+            None => return Err("Record not found".to_string()),
+        };
+        let txn: DatabaseTransaction = db.begin().await.map_err(|e: DbErr| e.to_string())?;
+        let image_active_model: OrderRecordImageActiveModel = OrderRecordImageActiveModel {
+            record_id: ActiveValue::Set(record_id),
+            user_id: ActiveValue::Set(user_id),
+            file_name: ActiveValue::Set(image_request.get_file_name().clone()),
+            original_name: ActiveValue::Set(image_request.try_get_original_name().clone()),
+            mime_type: ActiveValue::Set(image_request.get_mime_type().clone()),
+            file_size: ActiveValue::Set(image_request.get_file_size()),
+            file_data: ActiveValue::Set(image_request.get_file_data().clone()),
+            id: ActiveValue::NotSet,
+            created_at: ActiveValue::NotSet,
+        };
+        let image_result: OrderRecordImageModel = match image_active_model.insert(&txn).await {
+            Ok(result) => result,
+            Err(error) => {
+                let _: Result<(), DbErr> = txn.rollback().await;
+                return Err(error.to_string());
+            }
+        };
+        txn.commit().await.map_err(|e: DbErr| e.to_string())?;
+        let record_response: RecordResponse = Self::model_to_record_response(&record_model);
+        let image_response: RecordImageResponse =
+            Self::model_to_image_response(&image_result, record_id);
+        let mut response: CreateRecordWithImagesResponse =
+            CreateRecordWithImagesResponse::default();
+        response
+            .set_record(record_response)
+            .set_images(vec![image_response]);
+        Ok(response)
+    }
+
+    #[instrument_trace]
     pub async fn get_record_images(record_id: i32) -> Result<RecordImageListResponse, String> {
         let db: DatabaseConnection =
             PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
@@ -1530,10 +1577,31 @@ impl OrderService {
             .await
             .map_err(|error: DbErr| error.to_string())?;
         let total_count: i32 = images.len() as i32;
-        let image_responses: Vec<RecordImageResponse> = images
+        let user_ids: Vec<i32> = images
             .iter()
-            .map(|img: &OrderRecordImageModel| Self::model_to_image_response(img, record_id))
+            .map(|img: &OrderRecordImageModel| img.get_user_id())
+            .collect::<std::collections::HashSet<_>>()
+            .into_iter()
             .collect();
+        let users: Vec<OrderUserModel> = OrderUserEntity::find()
+            .filter(OrderUserColumn::Id.is_in(user_ids))
+            .all(&db)
+            .await
+            .map_err(|error: DbErr| error.to_string())?;
+        let user_map: std::collections::HashMap<i32, String> = users
+            .into_iter()
+            .map(|user: OrderUserModel| (user.get_id(), user.get_username().clone()))
+            .collect();
+        let mut image_responses: Vec<RecordImageResponse> = Vec::new();
+        for img in &images {
+            let mut response: RecordImageResponse = Self::model_to_image_response(img, record_id);
+            let username: String = user_map
+                .get(&img.get_user_id())
+                .cloned()
+                .unwrap_or_default();
+            response.set_username(username);
+            image_responses.push(response);
+        }
         let mut response: RecordImageListResponse = RecordImageListResponse::default();
         response
             .set_images(image_responses)
@@ -1548,15 +1616,23 @@ impl OrderService {
     ) -> Result<Option<ImageDataResponse>, String> {
         let db: DatabaseConnection =
             PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+        let user: Option<OrderUserModel> = OrderUserEntity::find_by_id(user_id)
+            .one(&db)
+            .await
+            .map_err(|error: DbErr| error.to_string())?;
+        let user_role: UserRole = match user {
+            Some(ref model) => UserRole::try_from(model.get_role()).unwrap_or_default(),
+            None => return Err("User not found".to_string()),
+        };
+        if !user_role.is_admin() {
+            return Err("Only admin can access image data".to_string());
+        }
         let image: Option<OrderRecordImageModel> = OrderRecordImageEntity::find_by_id(image_id)
             .one(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
         match image {
             Some(model) => {
-                if model.get_user_id() != user_id {
-                    return Err("Unauthorized to access this image".to_string());
-                }
                 let mut response: ImageDataResponse = ImageDataResponse::default();
                 response
                     .set_id(model.get_id())

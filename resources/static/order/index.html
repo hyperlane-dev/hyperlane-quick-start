@@ -830,11 +830,12 @@
     </div>
 
     <div class="modal" id="image-preview-modal">
-      <div class="modal-content modal-content-fullscreen">
+      <div class="modal-content modal-content-fullscreen theme-adaptive">
         <div class="modal-header">
-          <span class="modal-title" id="image-preview-title"
-            >Image Preview</span
-          >
+          <span
+            class="image-preview-uploader"
+            id="image-preview-uploader"
+          ></span>
           <button class="modal-close" onclick="closeImagePreviewModal()">
             &times;
           </button>
@@ -850,20 +851,16 @@
           </div>
           <div class="image-preview-controls">
             <button type="button" class="btn" onclick="zoomOut()">
-              <span>🔍-</span> Zoom Out
+              <span>➖</span>
             </button>
             <button type="button" class="btn" onclick="zoomIn()">
-              <span>🔍+</span> Zoom In
+              <span>➕</span>
             </button>
             <button type="button" class="btn" onclick="resetZoom()">
-              <span>↺</span> Reset
+              <span>🔄️</span>
             </button>
-            <button
-              type="button"
-              class="btn btn-primary"
-              onclick="downloadCurrentImage()"
-            >
-              <span>⬇️</span> Download
+            <button type="button" class="btn" onclick="downloadCurrentImage()">
+              <span>⬇️</span>
             </button>
           </div>
         </div>
