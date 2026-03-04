@@ -163,3 +163,63 @@ pub fn openapi_record_get() {}
 )]
 #[instrument_trace]
 pub fn openapi_overview_statistics() {}
+
+#[utoipa::path(
+    post,
+    path = "/api/order/record/create_with_images",
+    responses(
+        (status = 200, description = "Record with images created successfully"),
+        (status = 400, description = "Bad request"),
+        (status = 401, description = "Unauthorized"),
+        (status = 500, description = "Internal server error")
+    )
+)]
+#[instrument_trace]
+pub fn openapi_record_create_with_images() {}
+
+#[utoipa::path(
+    get,
+    path = "/api/order/image/list/{record_id}",
+    params(
+        ("record_id" = i32, Path, description = "Record ID")
+    ),
+    responses(
+        (status = 200, description = "Image list retrieved successfully"),
+        (status = 400, description = "Bad request"),
+        (status = 500, description = "Internal server error")
+    )
+)]
+#[instrument_trace]
+pub fn openapi_image_list() {}
+
+#[utoipa::path(
+    get,
+    path = "/api/order/image/download/{id}",
+    params(
+        ("id" = i32, Path, description = "Image ID")
+    ),
+    responses(
+        (status = 200, description = "Image downloaded successfully"),
+        (status = 404, description = "Image not found"),
+        (status = 500, description = "Internal server error")
+    )
+)]
+#[instrument_trace]
+pub fn openapi_image_download() {}
+
+#[utoipa::path(
+    post,
+    path = "/api/order/image/delete/{id}",
+    params(
+        ("id" = i32, Path, description = "Image ID")
+    ),
+    responses(
+        (status = 200, description = "Image deleted successfully"),
+        (status = 400, description = "Bad request"),
+        (status = 401, description = "Unauthorized"),
+        (status = 404, description = "Image not found"),
+        (status = 500, description = "Internal server error")
+    )
+)]
+#[instrument_trace]
+pub fn openapi_image_delete() {}

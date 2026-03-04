@@ -373,11 +373,11 @@ impl ChatService {
     #[instrument_trace]
     pub async fn get_chat_history(
         before_id: Option<i64>,
-        limit: i64,
+        limit: u64,
     ) -> Result<ChatHistoryResponse, String> {
         let messages: Vec<ChatHistory> = ChatHistoryMapper::get_history(before_id, limit).await?;
         let total: i64 = ChatHistoryMapper::count_messages().await?;
-        let has_more: bool = messages.len() as i64 == limit;
+        let has_more: bool = messages.len() as u64 == limit;
         let mut response = ChatHistoryResponse::default();
         response
             .set_messages(messages)

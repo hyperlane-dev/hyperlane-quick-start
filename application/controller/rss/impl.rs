@@ -21,7 +21,6 @@ impl ServerHook for RssFeedRoute {
     )]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
-        const MAX_LIMIT: usize = 100;
         let limit: Option<usize> = limit_opt
             .and_then(|l| l.parse().ok())
             .map(|l: usize| l.min(MAX_LIMIT));

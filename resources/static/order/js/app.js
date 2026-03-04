@@ -1671,7 +1671,7 @@ async function loadRecentRecords(append = false) {
     if (result.code === 200) {
       recentRecordsHasMore = result.data.has_more;
       recentRecordsLastId = result.data.last_id;
-      renderRecentRecords(result.data.records, append);
+      await renderRecentRecords(result.data.records, append);
       if (!recentRecordsHasMore) {
         const container = document.getElementById('recent-records-list');
         const sentinel = container?.querySelector('.load-more-sentinel');
@@ -1694,7 +1694,7 @@ async function loadRecentRecords(append = false) {
   }
 }
 
-function renderRecentRecords(records, append = false) {
+async function renderRecentRecords(records, append = false) {
   const container = document.getElementById('recent-records-list');
   if (!records || records.length === 0) {
     if (!append) {
@@ -1707,7 +1707,10 @@ function renderRecentRecords(records, append = false) {
     }
     return;
   }
-  const html = records.map((r) => renderRecordItem(r)).join('');
+  const recordHtmls = await Promise.all(
+    records.map((r) => renderRecordItem(r)),
+  );
+  const html = recordHtmls.join('');
   if (append) {
     const loader = container.querySelector('.loading-more');
     if (loader) loader.remove();
@@ -1793,14 +1796,16 @@ function copyBillNo(billNo) {
     });
 }
 
-function renderRecordItem(record) {
+async function renderRecordItem(record) {
   const typeIcon = record.transaction_type === 'income' ? '💰' : '💸';
   const amountClass =
     record.transaction_type === 'income' ? 'income' : 'expense';
   const amountPrefix = record.transaction_type === 'income' ? '+' : '-';
   const recordJson = JSON.stringify(record).replace(/"/g, '&quot;');
+  const images = await loadRecordImages(record.id);
+  const imagesHtml = renderRecordImages(record.id, images);
   return `
-    <div class="record-item" data-bill-no="${escapeHtml(record.bill_no)}" ondblclick="copyBillNo('${escapeHtml(record.bill_no)}')">
+    <div class="record-item" data-record-id="${record.id}" data-bill-no="${escapeHtml(record.bill_no)}" ondblclick="copyBillNo('${escapeHtml(record.bill_no)}')">
       <div class="record-type ${record.transaction_type}">${typeIcon}</div>
       <div class="record-info">
         <div class="record-category">${escapeHtml(record.category)}</div>
@@ -1814,6 +1819,7 @@ function renderRecordItem(record) {
           <span class="record-date-item"><span class="record-date-label">Date:</span> <span class="record-date-value">${formatDate(record.bill_date)}</span></span>
           ${record.created_at ? `<span class="record-date-item"><span class="record-date-label">Created:</span> <span class="record-date-value">${formatDate(record.created_at)}</span></span>` : ''}
         </div>
+        ${imagesHtml}
       </div>
       <div class="record-right">
         <div class="record-amount ${amountClass}">${amountPrefix}¥${formatAmount(record.amount)}</div>
@@ -1909,7 +1915,7 @@ async function applyFilters(pageDirection = null) {
           pageFirstIds.push(data.records[0].id);
         }
       }
-      renderAllRecords(allRecords);
+      await renderAllRecords(allRecords);
       updateStats(data);
       updateRecordsSummary(data);
       renderPagination();
@@ -1966,7 +1972,7 @@ function resetFilters() {
   applyFilters();
 }
 
-function renderAllRecords(records) {
+async function renderAllRecords(records) {
   const container = document.getElementById('all-records-list');
   if (!records || !Array.isArray(records) || records.length === 0) {
     container.innerHTML = `
@@ -1977,11 +1983,13 @@ function renderAllRecords(records) {
       </div>`;
     return;
   }
-  container.innerHTML = records
-    .map((r) => {
+  const recordHtmls = await Promise.all(
+    records.map(async (r) => {
       const rJson = JSON.stringify(r).replace(/"/g, '&quot;');
+      const images = await loadRecordImages(r.id);
+      const imagesHtml = renderRecordImages(r.id, images);
       return `
-    <div class="record-item" data-bill-no="${escapeHtml(r.bill_no)}" ondblclick="copyBillNo('${escapeHtml(r.bill_no)}')">
+    <div class="record-item" data-record-id="${r.id}" data-bill-no="${escapeHtml(r.bill_no)}" ondblclick="copyBillNo('${escapeHtml(r.bill_no)}')">
       <div class="record-type ${r.transaction_type}">${r.transaction_type === 'income' ? '💰' : '💸'}</div>
       <div class="record-info">
         <div class="record-category">${escapeHtml(r.category)}</div>
@@ -1995,19 +2003,23 @@ function renderAllRecords(records) {
           <span class="record-date-item"><span class="record-date-label">Date:</span> <span class="record-date-value">${formatDate(r.bill_date)}</span></span>
           ${r.created_at ? `<span class="record-date-item"><span class="record-date-label">Created:</span> <span class="record-date-value">${formatDate(r.created_at)}</span></span>` : ''}
         </div>
+        ${imagesHtml}
       </div>
       <div class="record-right">
         <div class="record-amount ${r.transaction_type}">${r.transaction_type === 'income' ? '+' : '-'}¥${formatAmount(r.amount)}</div>
         <button class="btn-print" onclick="event.stopPropagation(); printRecordData(JSON.parse(this.dataset.record));" data-record="${rJson}">🖨️ Print</button>
       </div>
     </div>`;
-    })
-    .join('');
+    }),
+  );
+  container.innerHTML = recordHtmls.join('');
 }
 
 function showCreateRecordModal(targetUserId = null, targetUserName = null) {
   document.getElementById('record-modal-title').textContent = 'New Record';
   document.getElementById('record-form').reset();
+  selectedImages = [];
+  renderImagePreviewList();
   if (targetUserId && targetUserName) {
     document.getElementById('record-modal-title').textContent =
       `New Record for ${targetUserName}`;
@@ -2023,39 +2035,95 @@ async function handleRecordSubmit(e) {
     return;
   }
   setRequestPending(requestKey, true);
-  const data = {
-    transaction_type: document.getElementById('record-type').value,
-    amount: parseFloat(document.getElementById('record-amount').value),
-    category: document.getElementById('record-category').value,
-    description: document.getElementById('record-description').value || null,
-  };
-  if (
+  const transaction_type = document.getElementById('record-type').value;
+  const amount = parseFloat(document.getElementById('record-amount').value);
+  const category = document.getElementById('record-category').value;
+  const description =
+    document.getElementById('record-description').value || null;
+  const target_user_id =
     currentUser &&
     currentUser.role === 'admin' &&
     viewingUserId &&
     currentPage === 'user-records'
-  ) {
-    data.target_user_id = viewingUserId;
-  }
+      ? viewingUserId
+      : null;
   try {
-    const response = await fetch(`${API_BASE}/record/create`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-      credentials: 'include',
-    });
-    const result = await response.json();
-    if (result.code === 200) {
+    if (selectedImages.length > 0) {
+      for (let i = 0; i < selectedImages.length; i++) {
+        const img = selectedImages[i];
+        const base64Data = img.file_data;
+        const binaryString = atob(base64Data);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let j = 0; j < binaryString.length; j++) {
+          bytes[j] = binaryString.charCodeAt(j);
+        }
+        const headers = {
+          'X-Amount': amount.toString(),
+          'X-Category': category,
+          'X-Transaction-Type': transaction_type,
+          'X-File-Name': img.file_name,
+          'X-Mime-Type': img.mime_type,
+        };
+        if (description) {
+          headers['X-Description'] = description;
+        }
+        if (target_user_id) {
+          headers['X-Target-User-Id'] = target_user_id.toString();
+        }
+        if (img.original_name) {
+          headers['X-Original-Name'] = img.original_name;
+        }
+        const response = await fetch(`${API_BASE}/record/create_with_images`, {
+          method: 'POST',
+          headers: headers,
+          body: bytes,
+          credentials: 'include',
+        });
+        const result = await response.json();
+        if (result.code !== 200) {
+          if (result.code === 401) {
+            handleAuthError(result.message);
+          } else {
+            showToast(result.message || 'Operation failed', 'error');
+          }
+          setRequestPending(requestKey, false);
+          return;
+        }
+      }
       closeModal('record-modal');
+      selectedImages = [];
+      renderImagePreviewList();
       showToast('Record created!', 'success');
       if (currentPage === 'dashboard') loadDashboard();
       else if (currentPage === 'records') loadRecords();
       else if (currentPage === 'user-records') loadUserRecords();
     } else {
-      if (result.code === 401) {
-        handleAuthError(result.message);
+      const data = {
+        transaction_type: transaction_type,
+        amount: amount,
+        category: category,
+        description: description,
+        target_user_id: target_user_id,
+      };
+      const response = await fetch(`${API_BASE}/record/create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+        credentials: 'include',
+      });
+      const result = await response.json();
+      if (result.code === 200) {
+        closeModal('record-modal');
+        showToast('Record created!', 'success');
+        if (currentPage === 'dashboard') loadDashboard();
+        else if (currentPage === 'records') loadRecords();
+        else if (currentPage === 'user-records') loadUserRecords();
       } else {
-        showToast(result.message || 'Operation failed', 'error');
+        if (result.code === 401) {
+          handleAuthError(result.message);
+        } else {
+          showToast(result.message || 'Operation failed', 'error');
+        }
       }
     }
   } catch (error) {
@@ -3219,5 +3287,240 @@ function downloadMyQRCode() {
     link.click();
   } else {
     showToast('QR code not ready', 'error');
+  }
+}
+
+let selectedImages = [];
+let currentPreviewImage = null;
+let currentZoom = 1;
+let currentImageData = null;
+let currentRecordImages = {};
+
+function handleImageSelect(event) {
+  const files = event.target.files;
+  if (!files || files.length === 0) return;
+  Array.from(files).forEach((file) => {
+    if (!file.type.startsWith('image/')) {
+      showToast(`Skipping ${file.name}: Not an image file`, 'warning');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      showToast(`Skipping ${file.name}: File too large (max 10MB)`, 'warning');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const imageData = {
+        id: Date.now() + Math.random(),
+        file_name: file.name,
+        original_name: file.name,
+        mime_type: file.type,
+        file_data: e.target.result.split(',')[1],
+        preview: e.target.result,
+      };
+      selectedImages.push(imageData);
+      renderImagePreviewList();
+    };
+    reader.readAsDataURL(file);
+  });
+  event.target.value = '';
+}
+
+function renderImagePreviewList() {
+  const container = document.getElementById('image-preview-list');
+  if (!container) return;
+  if (selectedImages.length === 0) {
+    container.innerHTML = '';
+    return;
+  }
+  container.innerHTML = selectedImages
+    .map(
+      (img, index) => `
+    <div class="image-preview-item">
+      <img src="${img.preview}" alt="${escapeHtml(img.file_name)}" onclick="openImagePreview(${index}, true)" />
+      <button type="button" class="image-remove-btn" onclick="removeSelectedImage(${index})">&times;</button>
+    </div>
+  `,
+    )
+    .join('');
+}
+
+function removeSelectedImage(index) {
+  selectedImages.splice(index, 1);
+  renderImagePreviewList();
+}
+
+function openImagePreview(indexOrId, isSelected = false) {
+  let imageData;
+  if (isSelected) {
+    imageData = selectedImages[indexOrId];
+    if (!imageData) return;
+    currentPreviewImage = { ...imageData, isSelected: true };
+    document.getElementById('preview-image').src = imageData.preview;
+  } else {
+    const recordId = indexOrId;
+    const images = currentRecordImages[recordId];
+    if (!images || images.length === 0) return;
+    imageData = images[0];
+    currentPreviewImage = { ...imageData, recordId: recordId, imageIndex: 0 };
+    loadAndPreviewImage(imageData);
+  }
+  currentImageData = imageData;
+  currentZoom = 1;
+  updateZoom();
+  openModal('image-preview-modal');
+}
+
+async function loadAndPreviewImage(imageData) {
+  try {
+    const response = await fetch(`${API_BASE}/image/download/${imageData.id}`, {
+      credentials: 'include',
+    });
+    if (response.ok) {
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      document.getElementById('preview-image').src = url;
+      currentPreviewImage.blobUrl = url;
+    } else {
+      showToast('Failed to load image', 'error');
+    }
+  } catch (error) {
+    showToast('Network error loading image', 'error');
+  }
+}
+
+function closeImagePreviewModal() {
+  closeModal('image-preview-modal');
+  if (currentPreviewImage && currentPreviewImage.blobUrl) {
+    URL.revokeObjectURL(currentPreviewImage.blobUrl);
+  }
+  currentPreviewImage = null;
+  currentImageData = null;
+  currentZoom = 1;
+}
+
+function zoomIn() {
+  currentZoom = Math.min(currentZoom + 0.25, 3);
+  updateZoom();
+}
+
+function zoomOut() {
+  currentZoom = Math.max(currentZoom - 0.25, 0.5);
+  updateZoom();
+}
+
+function resetZoom() {
+  currentZoom = 1;
+  updateZoom();
+}
+
+function updateZoom() {
+  const img = document.getElementById('preview-image');
+  if (img) {
+    img.style.transform = `scale(${currentZoom})`;
+  }
+}
+
+async function downloadCurrentImage() {
+  if (!currentPreviewImage) return;
+  const img = document.getElementById('preview-image');
+  if (!img || !img.src) return;
+  let username = currentUser ? currentUser.username : 'user';
+  const date = new Date().toISOString().split('T')[0];
+  const recordId = currentPreviewImage.recordId || 'new';
+  const fileName = `${username}_${date}_${recordId}.jpg`;
+  try {
+    const response = await fetch(img.src);
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.download = fileName;
+    link.href = url;
+    link.click();
+    URL.revokeObjectURL(url);
+    showToast('Image downloaded successfully', 'success');
+  } catch (error) {
+    showToast('Failed to download image', 'error');
+  }
+}
+
+async function loadRecordImages(recordId) {
+  try {
+    const response = await fetch(`${API_BASE}/image/list/${recordId}`, {
+      credentials: 'include',
+    });
+    const result = await response.json();
+    if (result.code === 200) {
+      currentRecordImages[recordId] = result.data.images;
+      return result.data.images;
+    }
+    return [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function renderRecordImages(recordId, images) {
+  if (!images || images.length === 0) return '';
+  const imageHtml = images
+    .map(
+      (img) => `
+    <div class="record-image-thumbnail" onclick="event.stopPropagation(); openRecordImagePreview(${recordId}, ${img.id})">
+      <img src="${img.download_url}" alt="" loading="lazy" />
+    </div>
+  `,
+    )
+    .join('');
+  return `<div class="record-images-container">${imageHtml}</div>`;
+}
+
+async function openRecordImagePreview(recordId, imageId) {
+  const images = currentRecordImages[recordId];
+  if (!images) {
+    await loadRecordImages(recordId);
+  }
+  const image = currentRecordImages[recordId]?.find(
+    (img) => img.id === imageId,
+  );
+  if (!image) return;
+  currentPreviewImage = { ...image, recordId: recordId };
+  document.getElementById('preview-image').src = API_BASE + image.download_url;
+  currentZoom = 1;
+  updateZoom();
+  openModal('image-preview-modal');
+}
+
+async function deleteRecordImage(imageId, recordId) {
+  if (!confirm('Are you sure you want to delete this image?')) return;
+  try {
+    const response = await fetch(`${API_BASE}/image/delete/${imageId}`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+    const result = await response.json();
+    if (result.code === 200) {
+      showToast('Image deleted successfully', 'success');
+      if (recordId) {
+        await loadRecordImages(recordId);
+        const recordEl = document.querySelector(
+          `[data-record-id="${recordId}"]`,
+        );
+        if (recordEl) {
+          const imagesContainer = recordEl.querySelector(
+            '.record-images-container',
+          );
+          if (imagesContainer) {
+            imagesContainer.innerHTML = renderRecordImages(
+              recordId,
+              currentRecordImages[recordId],
+            );
+          }
+        }
+      }
+    } else {
+      showToast(result.message || 'Failed to delete image', 'error');
+    }
+  } catch (error) {
+    showToast('Network error', 'error');
   }
 }

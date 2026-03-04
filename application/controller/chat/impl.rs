@@ -60,14 +60,13 @@ impl ServerHook for ChatHistoryRoute {
         async fn get_limit(_tx: &mut Context) -> Option<String> {
             limit_opt
         }
-        const MAX_LIMIT: i64 = 100;
         let before_id: Option<i64> = get_before_id(ctx)
             .await
             .and_then(|id| id.parse::<i64>().ok());
-        let limit: i64 = get_limit(ctx)
+        let limit: u64 = get_limit(ctx)
             .await
-            .and_then(|s| s.parse::<i64>().ok())
-            .map(|l: i64| l.min(MAX_LIMIT))
+            .and_then(|s| s.parse::<u64>().ok())
+            .map(|l: u64| l.min(MAX_LIMIT))
             .unwrap_or(20);
         match ChatService::get_chat_history(before_id, limit).await {
             Ok(history) => {

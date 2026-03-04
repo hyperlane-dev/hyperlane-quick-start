@@ -70,14 +70,19 @@ impl DbBootstrap {
             ))
             .add_index(POSTGRESQL_SHORTLINK_INDEX_SQL.to_string())
             .add_table(TableSchema::new(
+                Vec::new(),
+                "order_user".to_string(),
+                POSTGRESQL_ORDER_USER_TABLE_SQL.to_string(),
+            ))
+            .add_table(TableSchema::new(
                 vec!["order_user".to_string()],
                 "order_record".to_string(),
                 POSTGRESQL_ORDER_RECORD_TABLE_SQL.to_string(),
             ))
             .add_table(TableSchema::new(
-                Vec::new(),
-                "order_user".to_string(),
-                POSTGRESQL_ORDER_USER_TABLE_SQL.to_string(),
+                vec!["order_record".to_string()],
+                "order_record_image".to_string(),
+                POSTGRESQL_ORDER_RECORD_IMAGE_TABLE_SQL.to_string(),
             ))
             .add_index(POSTGRESQL_ORDER_INDEX_SQL.to_string())
             .add_init_data(POSTGRESQL_ORDER_DATA_SQL.to_string())

@@ -7,3 +7,7 @@ CREATE INDEX IF NOT EXISTS idx_order_record_user_id ON order_record (user_id);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_order_record_bill_no ON order_record (bill_no);
 
 CREATE INDEX IF NOT EXISTS idx_order_record_bill_date ON order_record (bill_date);
+
+CREATE INDEX idx_order_record_image_record_id ON order_record_image (record_id);
+
+CREATE INDEX idx_order_record_image_user_id ON order_record_image (user_id);

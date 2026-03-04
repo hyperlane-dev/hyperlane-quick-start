@@ -52,7 +52,7 @@ impl ChatHistoryMapper {
     #[instrument_trace]
     pub async fn get_history(
         before_id: Option<i64>,
-        limit: i64,
+        limit: u64,
     ) -> Result<Vec<ChatHistory>, String> {
         Self::get_history_from_postgresql(before_id, limit).await
     }
@@ -60,7 +60,7 @@ impl ChatHistoryMapper {
     #[instrument_trace]
     async fn get_history_from_postgresql(
         before_id: Option<i64>,
-        limit: i64,
+        limit: u64,
     ) -> Result<Vec<ChatHistory>, String> {
         let db: DatabaseConnection =
             PostgreSqlPlugin::connection_db(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
@@ -70,7 +70,7 @@ impl ChatHistoryMapper {
         }
         let mut records: Vec<Model> = query
             .order_by_desc(Column::Id)
-            .limit(limit as u64)
+            .limit(limit)
             .all(&db)
             .await
             .map_err(|error: DbErr| format!("Failed to query from PostgreSQL {error}"))?;

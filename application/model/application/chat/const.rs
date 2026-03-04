@@ -1,3 +1,4 @@
+pub const MAX_LIMIT: u64 = 100;
 pub const GPT: &str = "gpt";
 pub const HEADER_X_CLIENT_ADDR: &str = "X-Client-Addr";
 pub const MENTION_PREFIX: char = '@';

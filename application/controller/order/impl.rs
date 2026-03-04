@@ -357,28 +357,21 @@ impl ServerHook for UserListRoute {
                 return;
             }
         };
-        let user_role: UserRole = current_user.get_role().parse().unwrap_or_default();
-        if !user_role.is_admin() {
-            let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                ResponseCode::Forbidden,
-                "Only admin can access user list",
-            );
-            ctx.get_mut_response().set_body(response.to_json_bytes());
-            return;
-        }
-        const MAX_LIMIT: i32 = 100;
-        let querys: &RequestQuerys = ctx.get_request().get_querys();
-        let keyword: Option<String> = querys.get("keyword").cloned();
-        let last_id: Option<i32> = querys.get("last_id").and_then(|s: &String| s.parse().ok());
-        let limit: Option<i32> = querys
-            .get("limit")
-            .and_then(|s: &String| s.parse().ok())
-            .map(|l: i32| l.min(MAX_LIMIT));
         let mut query: UserListQueryRequest = UserListQueryRequest::default();
-        query
-            .set_keyword(keyword)
-            .set_last_id(last_id)
-            .set_limit(limit);
+        let user_role: UserRole = current_user.get_role().parse().unwrap_or_default();
+        if user_role.is_admin() {
+            let querys: &RequestQuerys = ctx.get_request().get_querys();
+            let keyword: Option<String> = querys.get("keyword").cloned();
+            let last_id: Option<i32> = querys.get("last_id").and_then(|s: &String| s.parse().ok());
+            let limit: Option<u64> = querys
+                .get("limit")
+                .and_then(|s: &String| s.parse().ok())
+                .map(|l: u64| l.min(MAX_LIMIT));
+            query
+                .set_keyword(keyword)
+                .set_last_id(last_id)
+                .set_limit(limit);
+        }
         match OrderService::list_users(query).await {
             Ok(data) => {
                 let response: ApiResponse<UserListResponse> =
@@ -601,9 +594,8 @@ impl ServerHook for RecordListRoute {
         {
             query.set_last_id(Some(last_id));
         }
-        const MAX_LIMIT: i32 = 100;
         if let Some(limit_str) = limit_opt
-            && let Ok(limit) = limit_str.parse::<i32>()
+            && let Ok(limit) = limit_str.parse::<u64>()
         {
             query.set_limit(Some(limit.min(MAX_LIMIT)));
         }
@@ -726,6 +718,282 @@ impl ServerHook for OverviewStatisticsRoute {
                 let response: ApiResponse<()> =
                     ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
+            }
+        };
+    }
+}
+
+impl ServerHook for RecordCreateWithImagesRoute {
+    #[instrument_trace]
+    async fn new(_ctx: &mut Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(
+        post_method,
+        request_header_option("x-amount" => amount_opt),
+        request_header_option("x-category" => category_opt),
+        request_header_option("x-transaction-type" => transaction_type_opt),
+        request_header_option("x-description" => description_opt),
+        request_header_option("x-target-user-id" => target_user_id_opt),
+        request_header_option("x-file-name" => file_name_opt),
+        request_header_option("x-original-name" => original_name_opt),
+        request_header_option("x-mime-type" => mime_type_opt),
+        response_header(CONTENT_TYPE => APPLICATION_JSON)
+    )]
+    #[instrument_trace]
+    async fn handle(self, ctx: &mut Context) {
+        let current_user_id: i32 = match OrderService::extract_user_from_cookie(ctx) {
+            Ok(id) => id,
+            Err(error) => {
+                let response: ApiResponse<()> =
+                    ApiResponse::<()>::error_with_code(ResponseCode::Unauthorized, error);
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+                return;
+            }
+        };
+        let current_user: UserResponse = match OrderService::get_user(current_user_id).await {
+            Ok(Some(user_info)) => user_info,
+            Ok(None) => {
+                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
+                    ResponseCode::Unauthorized,
+                    "User not found",
+                );
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+                return;
+            }
+            Err(error) => {
+                let response: ApiResponse<()> =
+                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+                return;
+            }
+        };
+        let user_role: UserRole = current_user.get_role().parse().unwrap_or_default();
+        if !user_role.is_admin() {
+            let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
+                ResponseCode::Forbidden,
+                "Only admin can create records",
+            );
+            ctx.get_mut_response().set_body(response.to_json_bytes());
+            return;
+        }
+        let amount: Decimal = match amount_opt {
+            Some(s) => match s.parse() {
+                Ok(v) => v,
+                Err(_) => {
+                    let response = ApiResponse::<()>::error_with_code(
+                        ResponseCode::BadRequest,
+                        "Invalid amount format",
+                    );
+                    ctx.get_mut_response().set_body(response.to_json_bytes());
+                    return;
+                }
+            },
+            None => {
+                let response = ApiResponse::<()>::error_with_code(
+                    ResponseCode::BadRequest,
+                    "Missing X-Amount header",
+                );
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+                return;
+            }
+        };
+        let category = match category_opt {
+            Some(s) => s,
+            None => {
+                let response = ApiResponse::<()>::error_with_code(
+                    ResponseCode::BadRequest,
+                    "Missing X-Category header",
+                );
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+                return;
+            }
+        };
+        let transaction_type = match transaction_type_opt {
+            Some(s) => s,
+            None => {
+                let response = ApiResponse::<()>::error_with_code(
+                    ResponseCode::BadRequest,
+                    "Missing X-Transaction-Type header",
+                );
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+                return;
+            }
+        };
+        let target_user_id: i32 = target_user_id_opt
+            .and_then(|s| s.parse().ok())
+            .unwrap_or(current_user_id);
+        let file_name = match file_name_opt {
+            Some(s) => s,
+            None => {
+                let response = ApiResponse::<()>::error_with_code(
+                    ResponseCode::BadRequest,
+                    "Missing X-File-Name header",
+                );
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+                return;
+            }
+        };
+        let mime_type = match mime_type_opt {
+            Some(s) => s,
+            None => {
+                let response = ApiResponse::<()>::error_with_code(
+                    ResponseCode::BadRequest,
+                    "Missing X-Mime-Type header",
+                );
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+                return;
+            }
+        };
+        let body_bytes = ctx.get_request().get_body().clone();
+        let file_data = body_bytes;
+        let file_size = file_data.len() as i32;
+        let mut record_request = CreateRecordRequest::default();
+        record_request
+            .set_amount(amount)
+            .set_category(category)
+            .set_transaction_type(transaction_type)
+            .set_description(description_opt)
+            .set_target_user_id(Some(target_user_id));
+        let mut image_request = ImageUploadRequest::default();
+        image_request
+            .set_file_name(file_name)
+            .set_original_name(original_name_opt)
+            .set_mime_type(mime_type)
+            .set_file_data(file_data)
+            .set_file_size(file_size);
+        match OrderService::create_record_with_single_image(
+            target_user_id,
+            record_request,
+            image_request,
+        )
+        .await
+        {
+            Ok(result) => {
+                let response: ApiResponse<CreateRecordWithImagesResponse> =
+                    ApiResponse::<CreateRecordWithImagesResponse>::success(result);
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+            }
+            Err(error) => {
+                let response: ApiResponse<()> =
+                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+            }
+        }
+    }
+}
+
+impl ServerHook for ImageListRoute {
+    #[instrument_trace]
+    async fn new(_ctx: &mut Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(get_method, route_param_option(RECORD_ID_KEY => record_id_opt), response_header(CONTENT_TYPE => APPLICATION_JSON))]
+    #[instrument_trace]
+    async fn handle(self, ctx: &mut Context) {
+        let record_id: i32 = match record_id_opt {
+            Some(id_str) => match id_str.parse::<i32>() {
+                Ok(id) => id,
+                Err(_) => {
+                    let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
+                        ResponseCode::BadRequest,
+                        "Invalid record ID",
+                    );
+                    ctx.get_mut_response().set_body(response.to_json_bytes());
+                    return;
+                }
+            },
+            None => {
+                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
+                    ResponseCode::BadRequest,
+                    "Record ID is required",
+                );
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+                return;
+            }
+        };
+        match OrderService::get_record_images(record_id).await {
+            Ok(images) => {
+                let response: ApiResponse<RecordImageListResponse> =
+                    ApiResponse::<RecordImageListResponse>::success(images);
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+            }
+            Err(error) => {
+                let response: ApiResponse<()> =
+                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+            }
+        };
+    }
+}
+
+impl ServerHook for ImageDownloadRoute {
+    #[instrument_trace]
+    async fn new(_ctx: &mut Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(get_method, route_param_option(ID_KEY => id_opt))]
+    #[instrument_trace]
+    async fn handle(self, ctx: &mut Context) {
+        let current_user_id: i32 = match OrderService::extract_user_from_cookie(ctx) {
+            Ok(user_id) => user_id,
+            Err(error) => {
+                let response: ApiResponse<()> =
+                    ApiResponse::<()>::error_with_code(ResponseCode::Unauthorized, error);
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+                return;
+            }
+        };
+        let image_id: i32 = match id_opt {
+            Some(id_str) => match id_str.parse::<i32>() {
+                Ok(id) => id,
+                Err(_) => {
+                    let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
+                        ResponseCode::BadRequest,
+                        "Invalid image ID",
+                    );
+                    ctx.get_mut_response().set_body(response.to_json_bytes());
+                    return;
+                }
+            },
+            None => {
+                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
+                    ResponseCode::BadRequest,
+                    "Image ID is required",
+                );
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+                return;
+            }
+        };
+        match OrderService::get_image_data(image_id, current_user_id).await {
+            Ok(Some(image)) => {
+                let file_name: String = image
+                    .try_get_original_name()
+                    .clone()
+                    .unwrap_or_else(|| image.get_file_name().clone());
+                let content_disposition: String =
+                    format!("{ATTACHMENT}; filename=\"{}\"", file_name);
+                let mime_type: String = image.get_mime_type().clone();
+                let file_data: Vec<u8> = image.get_file_data().clone();
+                ctx.get_mut_response()
+                    .set_header(CONTENT_TYPE, &mime_type)
+                    .set_header(CONTENT_DISPOSITION, &content_disposition)
+                    .set_header(CONTENT_LENGTH, &file_data.len().to_string())
+                    .set_body(file_data);
+                ctx.set_closed(true);
+            }
+            Ok(None) => {
+                let response: ApiResponse<()> =
+                    ApiResponse::<()>::error_with_code(ResponseCode::NotFound, "Image not found");
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+            }
+            Err(error) => {
+                let response: ApiResponse<()> =
+                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                ctx.get_mut_response().set_body(response.to_json_bytes());
             }
         };
     }

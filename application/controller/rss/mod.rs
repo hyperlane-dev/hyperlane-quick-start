@@ -4,4 +4,4 @@ mod r#struct;
 
 pub use r#fn::*;
 
-use {super::*, service::rss::*, r#struct::*};
+use {super::*, model::application::rss::*, service::rss::*, r#struct::*};

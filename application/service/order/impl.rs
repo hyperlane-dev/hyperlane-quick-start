@@ -261,9 +261,9 @@ impl OrderService {
             paged_select = paged_select.filter(OrderUserColumn::Id.lt(last_id));
         }
         paged_select = paged_select.order_by_desc(OrderUserColumn::Id);
-        let limit: i32 = query.try_get_limit().unwrap_or(20);
-        let limit_with_extra: i32 = limit + 1;
-        paged_select = paged_select.limit(limit_with_extra as u64);
+        let limit: u64 = query.try_get_limit().unwrap_or(20);
+        let limit_with_extra: u64 = limit + 1;
+        paged_select = paged_select.limit(limit_with_extra);
         let paged_users: Vec<OrderUserModel> = paged_select
             .all(&db)
             .await
@@ -394,14 +394,14 @@ impl OrderService {
             paged_select = paged_select.filter(OrderRecordColumn::Id.lt(last_id));
         }
         paged_select = paged_select.order_by_desc(OrderRecordColumn::Id);
-        let limit: i32 = query.try_get_limit().unwrap_or(20);
-        let limit_with_extra: i32 = limit + 1;
-        paged_select = paged_select.limit(limit_with_extra as u64);
+        let limit: u64 = query.try_get_limit().unwrap_or(20);
+        let limit_with_extra: u64 = limit + 1;
+        paged_select = paged_select.limit(limit_with_extra);
         let paged_records: Vec<OrderRecordModel> = paged_select
             .all(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
-        let has_more: bool = paged_records.len() > limit as usize;
+        let has_more: bool = paged_records.len() as u64 > limit;
         let paged_records: Vec<OrderRecordModel> =
             paged_records.into_iter().take(limit as usize).collect();
         let last_id: Option<i32> = paged_records.last().map(|r: &OrderRecordModel| r.get_id());
@@ -1390,5 +1390,208 @@ impl OrderService {
             Decimal::ZERO
         };
         Ok((avg_income, avg_expense))
+    }
+}
+
+impl OrderService {
+    #[instrument_trace]
+    pub async fn create_record_with_images(
+        user_id: i32,
+        request: CreateRecordWithImagesRequest,
+    ) -> Result<CreateRecordWithImagesResponse, String> {
+        let db: DatabaseConnection =
+            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+        let bill_no: String = Self::generate_bill_no();
+        let bill_date: NaiveDate = request
+            .try_get_bill_date()
+            .unwrap_or_else(|| Local::now().naive_local().date());
+        let txn: DatabaseTransaction = db.begin().await.map_err(|e: DbErr| e.to_string())?;
+        let record_active_model: OrderRecordActiveModel = OrderRecordActiveModel {
+            bill_no: ActiveValue::Set(bill_no.clone()),
+            user_id: ActiveValue::Set(user_id),
+            amount: ActiveValue::Set(request.get_amount()),
+            category: ActiveValue::Set(request.get_category().clone()),
+            transaction_type: ActiveValue::Set(request.get_transaction_type().clone()),
+            description: ActiveValue::Set(request.try_get_description().clone()),
+            bill_date: ActiveValue::Set(bill_date),
+            id: ActiveValue::NotSet,
+            created_at: ActiveValue::NotSet,
+            updated_at: ActiveValue::NotSet,
+        };
+        let record_result: OrderRecordModel = record_active_model
+            .insert(&txn)
+            .await
+            .map_err(|error: DbErr| error.to_string())?;
+        let record_id: i32 = record_result.get_id();
+        let mut saved_images: Vec<RecordImageResponse> = Vec::new();
+        for image_req in request.get_images() {
+            let file_data: Vec<u8> = image_req.get_file_data().clone();
+            let file_size: i32 = image_req.get_file_size();
+            let image_active_model: OrderRecordImageActiveModel = OrderRecordImageActiveModel {
+                record_id: ActiveValue::Set(record_id),
+                user_id: ActiveValue::Set(user_id),
+                file_name: ActiveValue::Set(image_req.get_file_name().clone()),
+                original_name: ActiveValue::Set(image_req.try_get_original_name().clone()),
+                mime_type: ActiveValue::Set(image_req.get_mime_type().clone()),
+                file_size: ActiveValue::Set(file_size),
+                file_data: ActiveValue::Set(file_data),
+                id: ActiveValue::NotSet,
+                created_at: ActiveValue::NotSet,
+            };
+            let image_result: OrderRecordImageModel = match image_active_model.insert(&txn).await {
+                Ok(result) => result,
+                Err(error) => {
+                    let _: Result<(), DbErr> = txn.rollback().await;
+                    return Err(error.to_string());
+                }
+            };
+            let image_response: RecordImageResponse =
+                Self::model_to_image_response(&image_result, record_id);
+            saved_images.push(image_response);
+        }
+        txn.commit().await.map_err(|e: DbErr| e.to_string())?;
+        let record_response: RecordResponse = Self::model_to_record_response(&record_result);
+        let mut response: CreateRecordWithImagesResponse =
+            CreateRecordWithImagesResponse::default();
+        response
+            .set_record(record_response)
+            .set_images(saved_images);
+        Ok(response)
+    }
+
+    #[instrument_trace]
+    pub async fn create_record_with_single_image(
+        user_id: i32,
+        record_request: CreateRecordRequest,
+        image_request: ImageUploadRequest,
+    ) -> Result<CreateRecordWithImagesResponse, String> {
+        let db: DatabaseConnection =
+            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+        let bill_no: String = Self::generate_bill_no();
+        let bill_date: NaiveDate = record_request
+            .try_get_bill_date()
+            .unwrap_or_else(|| Local::now().naive_local().date());
+        let txn: DatabaseTransaction = db.begin().await.map_err(|e: DbErr| e.to_string())?;
+        let record_active_model: OrderRecordActiveModel = OrderRecordActiveModel {
+            bill_no: ActiveValue::Set(bill_no.clone()),
+            user_id: ActiveValue::Set(user_id),
+            amount: ActiveValue::Set(record_request.get_amount()),
+            category: ActiveValue::Set(record_request.get_category().clone()),
+            transaction_type: ActiveValue::Set(record_request.get_transaction_type().clone()),
+            description: ActiveValue::Set(record_request.try_get_description().clone()),
+            bill_date: ActiveValue::Set(bill_date),
+            id: ActiveValue::NotSet,
+            created_at: ActiveValue::NotSet,
+            updated_at: ActiveValue::NotSet,
+        };
+        let record_result: OrderRecordModel = record_active_model
+            .insert(&txn)
+            .await
+            .map_err(|error: DbErr| error.to_string())?;
+        let record_id: i32 = record_result.get_id();
+        let image_active_model: OrderRecordImageActiveModel = OrderRecordImageActiveModel {
+            record_id: ActiveValue::Set(record_id),
+            user_id: ActiveValue::Set(user_id),
+            file_name: ActiveValue::Set(image_request.get_file_name().clone()),
+            original_name: ActiveValue::Set(image_request.try_get_original_name().clone()),
+            mime_type: ActiveValue::Set(image_request.get_mime_type().clone()),
+            file_size: ActiveValue::Set(image_request.get_file_size()),
+            file_data: ActiveValue::Set(image_request.get_file_data().clone()),
+            id: ActiveValue::NotSet,
+            created_at: ActiveValue::NotSet,
+        };
+        let image_result: OrderRecordImageModel = match image_active_model.insert(&txn).await {
+            Ok(result) => result,
+            Err(error) => {
+                let _: Result<(), DbErr> = txn.rollback().await;
+                return Err(error.to_string());
+            }
+        };
+        txn.commit().await.map_err(|e: DbErr| e.to_string())?;
+        let record_response: RecordResponse = Self::model_to_record_response(&record_result);
+        let image_response: RecordImageResponse =
+            Self::model_to_image_response(&image_result, record_id);
+        let mut response: CreateRecordWithImagesResponse =
+            CreateRecordWithImagesResponse::default();
+        response
+            .set_record(record_response)
+            .set_images(vec![image_response]);
+        Ok(response)
+    }
+
+    #[instrument_trace]
+    pub async fn get_record_images(record_id: i32) -> Result<RecordImageListResponse, String> {
+        let db: DatabaseConnection =
+            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+        let images: Vec<OrderRecordImageModel> = OrderRecordImageEntity::find()
+            .filter(OrderRecordImageColumn::RecordId.eq(record_id))
+            .order_by_desc(OrderRecordImageColumn::Id)
+            .all(&db)
+            .await
+            .map_err(|error: DbErr| error.to_string())?;
+        let total_count: i32 = images.len() as i32;
+        let image_responses: Vec<RecordImageResponse> = images
+            .iter()
+            .map(|img: &OrderRecordImageModel| Self::model_to_image_response(img, record_id))
+            .collect();
+        let mut response: RecordImageListResponse = RecordImageListResponse::default();
+        response
+            .set_images(image_responses)
+            .set_total_count(total_count);
+        Ok(response)
+    }
+
+    #[instrument_trace]
+    pub async fn get_image_data(
+        image_id: i32,
+        user_id: i32,
+    ) -> Result<Option<ImageDataResponse>, String> {
+        let db: DatabaseConnection =
+            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+        let image: Option<OrderRecordImageModel> = OrderRecordImageEntity::find_by_id(image_id)
+            .one(&db)
+            .await
+            .map_err(|error: DbErr| error.to_string())?;
+        match image {
+            Some(model) => {
+                if model.get_user_id() != user_id {
+                    return Err("Unauthorized to access this image".to_string());
+                }
+                let mut response: ImageDataResponse = ImageDataResponse::default();
+                response
+                    .set_id(model.get_id())
+                    .set_record_id(model.get_record_id())
+                    .set_file_name(model.get_file_name().clone())
+                    .set_original_name(model.try_get_original_name().clone())
+                    .set_mime_type(model.get_mime_type().clone())
+                    .set_file_data(model.get_file_data().clone());
+                Ok(Some(response))
+            }
+            None => Ok(None),
+        }
+    }
+
+    #[instrument_trace]
+    fn model_to_image_response(
+        model: &OrderRecordImageModel,
+        record_id: i32,
+    ) -> RecordImageResponse {
+        let mut response: RecordImageResponse = RecordImageResponse::default();
+        let created_at: String = model
+            .try_get_created_at()
+            .map(|dt: NaiveDateTime| dt.format("%Y-%m-%d %H:%M:%S").to_string())
+            .unwrap_or_default();
+        let download_url: String = format!("/api/order/image/download/{}", model.get_id());
+        response
+            .set_id(model.get_id())
+            .set_record_id(record_id)
+            .set_user_id(model.get_user_id())
+            .set_file_name(model.get_file_name().clone())
+            .set_original_name(model.try_get_original_name().clone())
+            .set_mime_type(model.get_mime_type().clone())
+            .set_file_size(model.get_file_size())
+            .set_created_at(created_at)
+            .set_download_url(download_url);
+        response
     }
 }

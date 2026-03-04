@@ -9,6 +9,9 @@ use {super::*, r#struct::*};
 use {
     domain::chat::*,
     mapper::chat::*,
-    model::response::{chat::*, common::*},
+    model::{
+        application::chat::*,
+        response::{chat::*, common::*},
+    },
     service::chat::*,
 };

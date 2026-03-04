@@ -740,7 +740,7 @@
     </div>
 
     <div class="modal" id="record-modal">
-      <div class="modal-content">
+      <div class="modal-content modal-content-large">
         <div class="modal-header">
           <span class="modal-title" id="record-modal-title">New Record</span>
           <button class="modal-close" onclick="closeModal('record-modal')">
@@ -789,6 +789,31 @@
                 placeholder="Enter description..."
               />
             </div>
+            <div class="form-group">
+              <label class="form-label">Images</label>
+              <div class="image-upload-area" id="image-upload-area">
+                <div
+                  class="image-upload-placeholder"
+                  onclick="document.getElementById('image-input').click()"
+                >
+                  <span class="upload-icon">📷</span>
+                  <span class="upload-text"
+                    >Click to take photo or select images</span
+                  >
+                  <span class="upload-hint">Supports: JPG, PNG, WEBP</span>
+                </div>
+                <input
+                  type="file"
+                  id="image-input"
+                  class="image-input"
+                  accept="image/*"
+                  multiple
+                  capture="environment"
+                  onchange="handleImageSelect(event)"
+                />
+              </div>
+              <div class="image-preview-list" id="image-preview-list"></div>
+            </div>
           </div>
           <div class="modal-footer">
             <button
@@ -801,6 +826,47 @@
             <button type="submit" class="btn btn-primary">Save</button>
           </div>
         </form>
+      </div>
+    </div>
+
+    <div class="modal" id="image-preview-modal">
+      <div class="modal-content modal-content-fullscreen">
+        <div class="modal-header">
+          <span class="modal-title" id="image-preview-title"
+            >Image Preview</span
+          >
+          <button class="modal-close" onclick="closeImagePreviewModal()">
+            &times;
+          </button>
+        </div>
+        <div class="modal-body image-preview-body">
+          <div class="image-preview-container" id="image-preview-container">
+            <img
+              id="preview-image"
+              class="preview-image"
+              src=""
+              alt="Preview"
+            />
+          </div>
+          <div class="image-preview-controls">
+            <button type="button" class="btn" onclick="zoomOut()">
+              <span>🔍-</span> Zoom Out
+            </button>
+            <button type="button" class="btn" onclick="zoomIn()">
+              <span>🔍+</span> Zoom In
+            </button>
+            <button type="button" class="btn" onclick="resetZoom()">
+              <span>↺</span> Reset
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              onclick="downloadCurrentImage()"
+            >
+              <span>⬇️</span> Download
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
