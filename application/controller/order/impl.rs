@@ -533,8 +533,8 @@ impl ServerHook for RecordListRoute {
     #[request_query_option("end_date" => end_date_opt)]
     #[request_query_option("category" => category_opt)]
     #[request_query_option("transaction_type" => transaction_type_opt)]
-    #[request_query_option("last_id" => last_id_opt)]
-    #[request_query_option("direction" => direction_opt)]
+    #[request_query_option("cache_id" => cache_id_opt)]
+    #[request_query_option("page" => page_opt)]
     #[request_query_option("limit" => limit_opt)]
     async fn handle(self, ctx: &mut Context) {
         let current_user_id: i32 = match OrderService::extract_user_from_cookie(ctx) {
@@ -590,18 +590,20 @@ impl ServerHook for RecordListRoute {
         if let Some(transaction_type) = transaction_type_opt {
             query.set_transaction_type(Some(transaction_type));
         }
-        if let Some(last_id_str) = last_id_opt
-            && let Ok(last_id) = last_id_str.parse::<i32>()
+        if let Some(cache_id_str) = cache_id_opt
+            && let Ok(cache_id) = cache_id_str.parse::<i32>()
         {
-            query.set_last_id(Some(last_id));
+            query.set_cache_id(Some(cache_id));
+        }
+        if let Some(page_str) = page_opt
+            && let Ok(page) = page_str.parse::<i32>()
+        {
+            query.set_page(Some(page));
         }
         if let Some(limit_str) = limit_opt
             && let Ok(limit) = limit_str.parse::<u64>()
         {
             query.set_limit(Some(limit.min(MAX_LIMIT)));
-        }
-        if let Some(direction) = direction_opt {
-            query.set_direction(direction.parse::<Direction>().ok());
         }
         match OrderService::list_records(query).await {
             Ok(list_response) => {

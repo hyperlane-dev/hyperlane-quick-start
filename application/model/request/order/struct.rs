@@ -66,11 +66,11 @@ pub struct RecordQueryRequest {
     pub(super) category: Option<String>,
     pub(super) transaction_type: Option<String>,
     #[get(type(copy), pub)]
-    pub(super) last_id: Option<i32>,
+    pub(super) cache_id: Option<i32>,
+    #[get(type(copy), pub)]
+    pub(super) page: Option<i32>,
     #[get(type(copy), pub)]
     pub(super) limit: Option<u64>,
-    #[get(type(copy), pub)]
-    pub(super) direction: Option<Direction>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]

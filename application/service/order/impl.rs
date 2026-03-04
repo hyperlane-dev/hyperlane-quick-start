@@ -367,48 +367,29 @@ impl OrderService {
             base_select =
                 base_select.filter(OrderRecordColumn::TransactionType.eq(transaction_type.clone()));
         }
-        if let Some(last_id) = query.try_get_last_id() {
-            if query.try_get_direction().is_some_and(|d: Direction| d.is_prev()) {
-                base_select = base_select.filter(OrderRecordColumn::Id.gt(last_id));
-            } else {
-                base_select = base_select.filter(OrderRecordColumn::Id.lt(last_id));
-            }
+        if let Some(cache_id) = query.try_get_cache_id() {
+            base_select = base_select.filter(OrderRecordColumn::Id.lte(cache_id));
         }
-        let total_count_u64: u64 = base_select
+        let total_count: i64 = base_select
             .clone()
             .count(&db)
             .await
-            .map_err(|error: DbErr| error.to_string())?;
-        let total_count: i64 = total_count_u64 as i64;
-        let all_records: Vec<OrderRecordModel> = base_select
-            .clone()
-            .all(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
-        let mut total_income: Decimal = Decimal::ZERO;
-        let mut total_expense: Decimal = Decimal::ZERO;
-        for record in &all_records {
-            let amount: Decimal = *record.get_amount();
-            if record.get_transaction_type() == TransactionType::Income.as_str() {
-                total_income += amount;
-            } else {
-                total_expense += amount;
-            }
-        }
+            .map_err(|error: DbErr| error.to_string())? as i64;
+        let total_income: Decimal =
+            Self::sum_by_transaction_type(&db, &base_select, TransactionType::Income).await?;
+        let total_expense: Decimal =
+            Self::sum_by_transaction_type(&db, &base_select, TransactionType::Expense).await?;
         let balance: Decimal = total_income - total_expense;
-        let mut paged_select: Select<OrderRecordEntity> = base_select;
-        paged_select = paged_select.order_by_desc(OrderRecordColumn::Id);
+        let page: i32 = query.try_get_page().unwrap_or(1);
         let limit: u64 = query.try_get_limit().unwrap_or(20);
-        let limit_with_extra: u64 = limit + 1;
-        paged_select = paged_select.limit(limit_with_extra);
-        let paged_records: Vec<OrderRecordModel> = paged_select
+        let offset: u64 = ((page - 1) as u64) * limit;
+        let paged_records: Vec<OrderRecordModel> = base_select
+            .order_by_desc(OrderRecordColumn::Id)
+            .limit(limit)
+            .offset(offset)
             .all(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
-        let has_more: bool = paged_records.len() as u64 > limit;
-        let paged_records: Vec<OrderRecordModel> =
-            paged_records.into_iter().take(limit as usize).collect();
-        let last_id: Option<i32> = paged_records.last().map(|r: &OrderRecordModel| r.get_id());
         let record_responses: Vec<RecordResponse> =
             Self::enrich_records_with_users(&db, paged_records).await?;
         let mut response: RecordListResponse = RecordListResponse::default();
@@ -417,10 +398,30 @@ impl OrderService {
             .set_total_income(total_income.to_string())
             .set_total_expense(total_expense.to_string())
             .set_balance(balance.to_string())
-            .set_has_more(has_more)
-            .set_last_id(last_id)
             .set_total_count(total_count);
         Ok(response)
+    }
+
+    #[instrument_trace]
+    async fn sum_by_transaction_type(
+        db: &DatabaseConnection,
+        base_select: &Select<OrderRecordEntity>,
+        transaction_type: TransactionType,
+    ) -> Result<Decimal, String> {
+        let result: Option<(Option<Decimal>,)> = base_select
+            .clone()
+            .filter(OrderRecordColumn::TransactionType.eq(transaction_type.as_str()))
+            .select_only()
+            .column_as(OrderRecordColumn::Amount.sum(), "sum")
+            .into_tuple()
+            .one(db)
+            .await
+            .map_err(|error: DbErr| error.to_string())?;
+        let sum = match result {
+            Some((Some(decimal),)) => decimal,
+            _ => Decimal::ZERO,
+        };
+        Ok(sum)
     }
 
     #[instrument_trace]

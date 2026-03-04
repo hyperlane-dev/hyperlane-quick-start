@@ -54,10 +54,6 @@ pub struct RecordListResponse {
     pub(super) total_expense: String,
     pub(super) balance: String,
     #[get(type(copy), pub)]
-    pub(super) has_more: bool,
-    #[get(type(copy), pub)]
-    pub(super) last_id: Option<i32>,
-    #[get(type(copy), pub)]
     pub(super) total_count: i64,
 }
 

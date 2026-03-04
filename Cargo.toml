@@ -56,7 +56,7 @@ hyperlane_plugin = { path = "plugin" }
 
 [profile.dev]
 incremental = true
-opt-level = 1
+opt-level = 0
 lto = false
 panic = "unwind"
 debug = false

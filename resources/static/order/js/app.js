@@ -9,6 +9,7 @@ let recordsHasMore = false;
 let allRecords = [];
 let totalRecords = 0;
 let currentPageNum = 1;
+let cacheId = null;
 
 let recentRecordsLastId = null;
 let recentRecordsHasMore = false;
@@ -18,6 +19,7 @@ let usersLimit = 20;
 let usersHasMore = false;
 let allUsers = [];
 let usersCurrentPage = 1;
+let usersTotalCount = 0;
 
 const API_BASE = '/api/order';
 
@@ -1688,9 +1690,12 @@ async function loadRecentRecords(append = false) {
     });
     const result = await response.json();
     if (result.code === 200) {
-      recentRecordsHasMore = result.data.has_more;
-      recentRecordsLastId = result.data.last_id;
-      await renderRecentRecords(result.data.records, append);
+      const records = result.data.records;
+      recentRecordsHasMore = records.length === 20;
+      if (records.length > 0) {
+        recentRecordsLastId = records[records.length - 1].id;
+      }
+      await renderRecentRecords(records, append);
       if (!recentRecordsHasMore) {
         const container = document.getElementById('recent-records-list');
         const sentinel = container?.querySelector('.load-more-sentinel');
@@ -1900,16 +1905,18 @@ async function applyFilters(pageDirection = null) {
   if (currentUser && currentUser.role !== 'admin') {
     params.append('user_id', currentUser.id);
   }
-  let cursor = null;
-  if (pageDirection === 'next' && allRecords.length > 0) {
-    cursor = allRecords[allRecords.length - 1].id;
-    params.append('last_id', cursor);
-    params.append('direction', 'next');
-  } else if (pageDirection === 'prev' && allRecords.length > 0) {
-    cursor = allRecords[0].id;
-    params.append('last_id', cursor);
-    params.append('direction', 'prev');
+  if (cacheId) {
+    params.append('cache_id', cacheId);
   }
+  if (pageDirection === 'next') {
+    currentPageNum++;
+  } else if (pageDirection === 'prev') {
+    currentPageNum--;
+  } else if (pageDirection === 'reset') {
+    currentPageNum = 1;
+    cacheId = null;
+  }
+  params.append('page', currentPageNum);
   params.append('limit', recordsLimit);
   try {
     const response = await fetch(`${API_BASE}/record/list?${params}`, {
@@ -1919,13 +1926,9 @@ async function applyFilters(pageDirection = null) {
     if (result.code === 200) {
       const data = result.data;
       allRecords = data.records;
-      recordsHasMore = data.has_more;
-      if (pageDirection === 'next') {
-        currentPageNum++;
-      } else if (pageDirection === 'prev') {
-        currentPageNum--;
-      } else {
-        currentPageNum = 1;
+      recordsHasMore = allRecords.length === recordsLimit;
+      if (currentPageNum === 1 && allRecords.length > 0 && !cacheId) {
+        cacheId = allRecords[0].id;
       }
       totalRecords = data.total_count || allRecords.length;
       await renderAllRecords(allRecords);
@@ -1958,15 +1961,17 @@ async function applyFilters(pageDirection = null) {
 }
 
 function goToNextPage() {
-  if (recordsHasMore) {
-    applyFilters('next');
-  }
+  applyFilters('next');
 }
 
 function goToPrevPage() {
-  if (currentPageNum > 1) {
-    applyFilters('prev');
-  }
+  applyFilters('prev');
+}
+
+function goToPage(pageNum) {
+  if (pageNum === currentPageNum) return;
+  currentPageNum = pageNum;
+  applyFilters();
 }
 
 function renderPagination() {
@@ -1978,12 +1983,50 @@ function renderPagination() {
     allRecords.length > 0
       ? `Showing ${startRecord} - ${endRecord}`
       : 'Showing 0 - 0';
+  const totalPages = Math.ceil(totalRecords / recordsLimit) || 1;
+
+  let pageButtonsHtml = '';
+  if (totalPages > 1) {
+    const maxVisiblePages = 5;
+    let startPage = Math.max(
+      1,
+      currentPageNum - Math.floor(maxVisiblePages / 2),
+    );
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage < maxVisiblePages - 1) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    if (startPage > 1) {
+      pageButtonsHtml += `<button class="page-btn" onclick="goToPage(1)">1</button>`;
+      if (startPage > 2) {
+        pageButtonsHtml += `<span class="page-ellipsis">...</span>`;
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageButtonsHtml += `<button class="page-btn ${i === currentPageNum ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+    }
+
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        pageButtonsHtml += `<span class="page-ellipsis">...</span>`;
+      }
+      pageButtonsHtml += `<button class="page-btn" onclick="goToPage(${totalPages})">${totalPages}</button>`;
+    }
+  }
+
+  const paginationControlsHtml = `
+    <button id="pagination-prev" class="btn btn-sm" onclick="goToPrevPage()" ${currentPageNum <= 1 ? 'disabled' : ''}>← Previous</button>
+    <div class="page-numbers">${pageButtonsHtml}</div>
+    <button id="pagination-next" class="btn btn-sm" onclick="goToNextPage()" ${currentPageNum >= totalPages ? 'disabled' : ''}>Next →</button>
+  `;
+
   document.getElementById('pagination-total').textContent = totalText;
   document.getElementById('pagination-range').textContent = rangeText;
-  document.getElementById('pagination-page').textContent =
-    `Page ${currentPageNum}`;
-  document.getElementById('pagination-prev').disabled = currentPageNum <= 1;
-  document.getElementById('pagination-next').disabled = !recordsHasMore;
+  document.getElementById('pagination-controls').innerHTML =
+    paginationControlsHtml;
 }
 
 function resetFilters() {
@@ -1991,10 +2034,7 @@ function resetFilters() {
   document.getElementById('filter-end-date').value = '';
   document.getElementById('filter-category').value = '';
   document.getElementById('filter-type').value = '';
-  currentPageNum = 1;
-  recordsLastId = null;
-  recordsFirstId = null;
-  applyFilters();
+  applyFilters('reset');
 }
 
 async function renderAllRecords(records) {
@@ -2369,7 +2409,7 @@ async function loadUsers(pageDirection = null) {
     if (result.code === 200) {
       const data = result.data;
       allUsers = data.users;
-      usersHasMore = data.has_more;
+      usersTotalCount = data.total_count || allUsers.length;
       if (pageDirection === 'next') {
         usersCurrentPage++;
       } else if (pageDirection === 'prev') {
@@ -2415,7 +2455,8 @@ function resetUserSearch() {
 }
 
 function goToUsersNextPage() {
-  if (usersHasMore) {
+  const totalPages = Math.ceil(usersTotalCount / usersLimit);
+  if (usersCurrentPage < totalPages) {
     loadUsers('next');
   }
 }
@@ -2467,9 +2508,43 @@ function renderUsersPagination() {
   const startUser = (usersCurrentPage - 1) * usersLimit + 1;
   const endUser = startUser + allUsers.length - 1;
   const totalText =
-    usersHasMore || usersCurrentPage > 1 ? `Page ${usersCurrentPage}` : '';
+    usersTotalCount > 0 ? `Total: ${usersTotalCount} users` : 'Total: 0 users';
   const rangeText =
     allUsers.length > 0 ? `Showing ${startUser} - ${endUser}` : 'Showing 0 - 0';
+  const totalPages = Math.ceil(usersTotalCount / usersLimit) || 1;
+
+  let pageButtonsHtml = '';
+  if (totalPages > 1) {
+    const maxVisiblePages = 5;
+    let startPage = Math.max(
+      1,
+      usersCurrentPage - Math.floor(maxVisiblePages / 2),
+    );
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage < maxVisiblePages - 1) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    if (startPage > 1) {
+      pageButtonsHtml += `<button class="page-btn" onclick="goToUsersPage(1)">1</button>`;
+      if (startPage > 2) {
+        pageButtonsHtml += `<span class="page-ellipsis">...</span>`;
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageButtonsHtml += `<button class="page-btn ${i === usersCurrentPage ? 'active' : ''}" onclick="goToUsersPage(${i})">${i}</button>`;
+    }
+
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        pageButtonsHtml += `<span class="page-ellipsis">...</span>`;
+      }
+      pageButtonsHtml += `<button class="page-btn" onclick="goToUsersPage(${totalPages})">${totalPages}</button>`;
+    }
+  }
+
   paginationContainer.innerHTML = `
     <div class="pagination-info">
       <span class="pagination-total">${totalText}</span>
@@ -2477,9 +2552,17 @@ function renderUsersPagination() {
     </div>
     <div class="pagination-controls">
       <button id="users-pagination-prev" class="btn btn-secondary btn-sm" onclick="goToUsersPrevPage()" ${usersCurrentPage <= 1 ? 'disabled' : ''}>← Prev</button>
-      <button id="users-pagination-next" class="btn btn-secondary btn-sm" onclick="goToUsersNextPage()" ${!usersHasMore ? 'disabled' : ''}>Next →</button>
+      <div class="page-numbers">${pageButtonsHtml}</div>
+      <button id="users-pagination-next" class="btn btn-secondary btn-sm" onclick="goToUsersNextPage()" ${usersCurrentPage >= totalPages ? 'disabled' : ''}>Next →</button>
     </div>
   `;
+}
+
+function goToUsersPage(pageNum) {
+  if (pageNum === usersCurrentPage) return;
+  const direction = pageNum > usersCurrentPage ? 'next' : 'prev';
+  usersCurrentPage = pageNum;
+  loadUsers(direction);
 }
 
 function showCreateUserModal() {
@@ -2537,7 +2620,7 @@ async function applyUserRecordFilters(pageDirection = null) {
     if (result.code === 200) {
       const data = result.data;
       allRecords = data.records;
-      recordsHasMore = data.has_more;
+      recordsHasMore = allRecords.length === recordsLimit;
       if (pageDirection === 'next') {
         currentPageNum++;
       } else if (pageDirection === 'prev') {
@@ -2628,17 +2711,61 @@ function renderUserRecordPagination() {
     allRecords.length > 0
       ? `Showing ${startRecord} - ${endRecord}`
       : 'Showing 0 - 0';
+  const totalPages = Math.ceil(totalRecords / recordsLimit) || 1;
+
+  let pageButtonsHtml = '';
+  if (totalPages > 1) {
+    const maxVisiblePages = 5;
+    let startPage = Math.max(
+      1,
+      currentPageNum - Math.floor(maxVisiblePages / 2),
+    );
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage < maxVisiblePages - 1) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    if (startPage > 1) {
+      pageButtonsHtml += `<button class="page-btn" onclick="goToUserRecordPage(1)">1</button>`;
+      if (startPage > 2) {
+        pageButtonsHtml += `<span class="page-ellipsis">...</span>`;
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageButtonsHtml += `<button class="page-btn ${i === currentPageNum ? 'active' : ''}" onclick="goToUserRecordPage(${i})">${i}</button>`;
+    }
+
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        pageButtonsHtml += `<span class="page-ellipsis">...</span>`;
+      }
+      pageButtonsHtml += `<button class="page-btn" onclick="goToUserRecordPage(${totalPages})">${totalPages}</button>`;
+    }
+  }
+
+  const paginationControlsHtml = `
+    <button id="user-pagination-prev" class="btn btn-sm" onclick="goToUserRecordPrevPage()" ${currentPageNum <= 1 ? 'disabled' : ''}>← Previous</button>
+    <div class="page-numbers">${pageButtonsHtml}</div>
+    <button id="user-pagination-next" class="btn btn-sm" onclick="goToUserRecordNextPage()" ${currentPageNum >= totalPages ? 'disabled' : ''}>Next →</button>
+  `;
+
   document.getElementById('user-pagination-total').textContent = totalText;
   document.getElementById('user-pagination-range').textContent = rangeText;
-  document.getElementById('user-pagination-page').textContent =
-    `Page ${currentPageNum}`;
-  document.getElementById('user-pagination-prev').disabled =
-    currentPageNum <= 1;
-  document.getElementById('user-pagination-next').disabled = !recordsHasMore;
+  document.getElementById('user-pagination-controls').innerHTML =
+    paginationControlsHtml;
+}
+
+function goToUserRecordPage(pageNum) {
+  if (pageNum === currentPageNum) return;
+  const direction = pageNum > currentPageNum ? 'next' : 'prev';
+  currentPageNum = pageNum;
+  applyUserRecordFilters(direction);
 }
 
 function goToUserRecordNextPage() {
-  if (recordsHasMore) {
+  if (currentPageNum < Math.ceil(totalRecords / recordsLimit)) {
     applyUserRecordFilters('next');
   }
 }
