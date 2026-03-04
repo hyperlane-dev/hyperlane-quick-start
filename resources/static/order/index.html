@@ -2,7 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+      name="viewport"
+    />
     <title>Order - Hyperlane</title>
     <link rel="icon" href="https://docs.ltpp.vip/img/hyperlane.png" />
     <link href="./css/style.css" rel="stylesheet" />
@@ -175,7 +178,9 @@
               <span id="current-user">User</span>
               <span id="user-role" class="role-badge">user</span>
             </div>
-            <button id="logout-btn" class="btn btn-sm">Logout</button>
+            <button id="logout-btn" class="btn btn-sm btn-primary">
+              Logout
+            </button>
           </div>
         </aside>
 
@@ -847,6 +852,7 @@
               class="preview-image"
               src=""
               alt="Preview"
+              onerror="this.style.display = 'none'"
             />
           </div>
           <div class="image-preview-controls">
@@ -859,7 +865,11 @@
             <button type="button" class="btn" onclick="resetZoom()">
               <span>🔄️</span>
             </button>
-            <button type="button" class="btn" onclick="downloadCurrentImage()">
+            <button
+              type="button"
+              class="btn btn-primary"
+              onclick="downloadCurrentImage()"
+            >
               <span>⬇️</span>
             </button>
           </div>
@@ -963,15 +973,12 @@
           </div>
           <div id="scan-error" class="scan-error hidden"></div>
           <div class="scan-actions">
-            <button type="button" class="btn" onclick="closeScanModal()">
-              Cancel
-            </button>
             <button
               type="button"
-              class="btn btn-primary"
+              class="btn btn-primary scan-switch-btn"
               onclick="switchCamera()"
             >
-              Switch Camera
+              🔃 Switch Camera
             </button>
           </div>
         </div>
@@ -990,19 +997,14 @@
           <div class="qr-code-container">
             <div id="my-qr-canvas"></div>
           </div>
-          <div class="qr-code-info">
-            <p>User ID: <span id="my-qr-user-id"></span></p>
-          </div>
           <div class="qr-code-actions">
-            <button type="button" class="btn" onclick="closeMyQRModal()">
-              Close
-            </button>
             <button
               type="button"
-              class="btn btn-primary"
+              class="btn btn-primary qr-download-btn"
+              id="qr-download-btn"
               onclick="downloadMyQRCode()"
             >
-              Download
+              ⬇️ User ID
             </button>
           </div>
         </div>

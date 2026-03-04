@@ -367,6 +367,17 @@ impl OrderService {
             base_select =
                 base_select.filter(OrderRecordColumn::TransactionType.eq(transaction_type.clone()));
         }
+        if let Some(last_id) = query.try_get_last_id() {
+            if let Some(direction) = query.try_get_direction() {
+                if direction.is_prev() {
+                    base_select = base_select.filter(OrderRecordColumn::Id.gt(last_id));
+                } else {
+                    base_select = base_select.filter(OrderRecordColumn::Id.lt(last_id));
+                }
+            } else {
+                base_select = base_select.filter(OrderRecordColumn::Id.lt(last_id));
+            }
+        }
         let total_count_u64: u64 = base_select
             .clone()
             .count(&db)
@@ -390,9 +401,6 @@ impl OrderService {
         }
         let balance: Decimal = total_income - total_expense;
         let mut paged_select: Select<OrderRecordEntity> = base_select;
-        if let Some(last_id) = query.try_get_last_id() {
-            paged_select = paged_select.filter(OrderRecordColumn::Id.lt(last_id));
-        }
         paged_select = paged_select.order_by_desc(OrderRecordColumn::Id);
         let limit: u64 = query.try_get_limit().unwrap_or(20);
         let limit_with_extra: u64 = limit + 1;

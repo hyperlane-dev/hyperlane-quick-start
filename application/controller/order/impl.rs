@@ -534,6 +534,7 @@ impl ServerHook for RecordListRoute {
     #[request_query_option("category" => category_opt)]
     #[request_query_option("transaction_type" => transaction_type_opt)]
     #[request_query_option("last_id" => last_id_opt)]
+    #[request_query_option("direction" => direction_opt)]
     #[request_query_option("limit" => limit_opt)]
     async fn handle(self, ctx: &mut Context) {
         let current_user_id: i32 = match OrderService::extract_user_from_cookie(ctx) {
@@ -598,6 +599,9 @@ impl ServerHook for RecordListRoute {
             && let Ok(limit) = limit_str.parse::<u64>()
         {
             query.set_limit(Some(limit.min(MAX_LIMIT)));
+        }
+        if let Some(direction) = direction_opt {
+            query.set_direction(direction.parse::<Direction>().ok());
         }
         match OrderService::list_records(query).await {
             Ok(list_response) => {

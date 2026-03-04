@@ -69,6 +69,8 @@ pub struct RecordQueryRequest {
     pub(super) last_id: Option<i32>,
     #[get(type(copy), pub)]
     pub(super) limit: Option<u64>,
+    #[get(type(copy), pub)]
+    pub(super) direction: Option<Direction>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]

@@ -972,8 +972,9 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   gap: 8px;
 }
 
-.profile-form {
-  max-width: 500px;
+.profile-form,
+#password-form {
+  width: 100%;
 }
 
 .profile-form .btn {
@@ -991,7 +992,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   z-index: 1000;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding: 0;
 }
 
 .modal.active {
@@ -1035,11 +1036,14 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 .modal-content {
   background: #ffffff;
   border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  max-width: 500px;
+  border-radius: 0;
+  max-width: 100%;
   width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
 }
 
@@ -1049,6 +1053,12 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
 }
 
 .modal-title {
@@ -1084,16 +1094,13 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   pointer-events: none;
 }
 
-.modal-body {
-  padding: 20px;
-}
-
 .modal-footer {
-  padding: 16px 20px;
+  padding: 20px;
   border-top: 1px solid #e0e0e0;
   display: flex;
   justify-content: flex-end;
   gap: 12px;
+  margin-top: auto;
 }
 
 .empty-state {
@@ -1212,7 +1219,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 
 @media (max-width: 768px) {
   .sidebar {
-    width: 260px;
+    width: 100%;
     transform: translateX(-100%);
     transition: transform 0.3s;
   }
@@ -1265,6 +1272,33 @@ input[type='number'].form-input::-webkit-inner-spin-button {
     align-items: center;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+  }
+
+  .scan-modal-body,
+  .my-qr-modal-body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .scan-container,
+  .qr-code-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .scan-actions,
+  .qr-code-actions {
+    margin-top: auto;
+    padding-top: 20px;
+    flex-shrink: 0;
+    width: 100%;
+  }
+
+  .scan-switch-btn,
+  .qr-download-btn {
+    width: 100%;
   }
 
   .filter-group .date-picker-wrapper {
@@ -1813,22 +1847,28 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .scan-modal-content {
-  max-width: 500px;
+  max-width: 100%;
+  width: 100%;
+  height: 100%;
 }
 
 .scan-modal-body {
   padding: 20px;
+  display: flex;
+  flex-direction: column;
 }
 
 .scan-container {
+  flex: 1;
   position: relative;
   width: 100%;
-  max-width: 400px;
   margin: 0 auto 20px;
-  aspect-ratio: 1;
   background: #f8f9fa;
   border-radius: 12px;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .scan-video {
@@ -1921,14 +1961,23 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   margin-bottom: 16px;
 }
 
-.scan-actions {
+.scan-actions,
+.qr-code-actions {
   display: flex;
   justify-content: center;
   gap: 12px;
+  margin-top: auto;
+  width: 100%;
+}
+
+.scan-switch-btn {
+  width: 100%;
 }
 
 .my-qr-modal-content {
-  max-width: 400px;
+  max-width: 100%;
+  width: 100%;
+  height: 100%;
 }
 
 .my-qr-modal-body {
@@ -1939,14 +1988,31 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .qr-code-container {
+  flex: 1;
   background: #fff;
   padding: 20px;
   border-radius: 12px;
   margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.qr-code-container canvas {
-  display: block;
+#my-qr-canvas {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+#my-qr-canvas img,
+#my-qr-canvas canvas {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: 100%;
+  object-fit: contain;
 }
 
 .qr-code-info {
@@ -1966,9 +2032,9 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   margin-top: 8px;
 }
 
-.qr-code-actions {
-  display: flex;
-  gap: 12px;
+.qr-download-btn {
+  width: 100%;
+  justify-content: center;
 }
 
 .image-upload-area {
@@ -2063,18 +2129,12 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   background: rgba(220, 38, 38, 1);
 }
 
-.modal-content-large {
-  max-width: 600px;
-  width: 90%;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
+.modal-content-large,
 .modal-content-fullscreen {
-  max-width: 95vw;
-  width: 95%;
-  max-height: 95vh;
-  height: 95%;
+  max-width: 100%;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
   display: flex;
   flex-direction: column;
 }

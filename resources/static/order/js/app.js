@@ -3,22 +3,21 @@ let currentToken = null;
 let currentPage = 'dashboard';
 let viewingUserId = null;
 let viewingUserName = null;
-let recordsLastId = null;
+
 let recordsLimit = 20;
 let recordsHasMore = false;
 let allRecords = [];
 let totalRecords = 0;
 let currentPageNum = 1;
-let pageFirstIds = [null];
+
 let recentRecordsLastId = null;
 let recentRecordsHasMore = false;
 let recentRecordsLoading = false;
-let usersLastId = null;
-let usersHasMore = false;
+
 let usersLimit = 20;
+let usersHasMore = false;
 let allUsers = [];
 let usersCurrentPage = 1;
-let usersPageFirstIds = [null];
 
 const API_BASE = '/api/order';
 
@@ -100,6 +99,24 @@ function initEventListeners() {
         closeModal(modal.id);
       }
     });
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const activeModal = document.querySelector('.modal.active');
+      if (activeModal && !activeModal.classList.contains('loading')) {
+        const modalId = activeModal.id;
+        if (modalId === 'scan-modal') {
+          closeScanModal();
+        } else if (modalId === 'my-qr-modal') {
+          closeMyQRModal();
+        } else if (modalId === 'image-preview-modal') {
+          closeImagePreviewModal();
+        } else {
+          closeModal(modalId);
+        }
+      }
+    }
   });
 }
 
@@ -1806,6 +1823,7 @@ async function renderRecordItem(record) {
   const recordJson = JSON.stringify(record).replace(/"/g, '&quot;');
   const images = await loadRecordImages(record.id);
   const imagesHtml = renderRecordImages(record.id, images);
+  const displayName = record.username || `User ${record.user_id}`;
   return `
     <div class="record-item" data-record-id="${record.id}" data-bill-no="${escapeHtml(record.bill_no)}" ondblclick="copyBillNo('${escapeHtml(record.bill_no)}')">
       <div class="record-type ${record.transaction_type}">${typeIcon}</div>
@@ -1815,7 +1833,7 @@ async function renderRecordItem(record) {
         <div class="record-meta-row">
           <span class="record-meta-item"><span class="record-meta-label">ID:</span> <span class="record-meta-value">${record.id}</span></span>
           <span class="record-meta-item"><span class="record-meta-label">Bill No:</span> <span class="record-meta-value">${escapeHtml(record.bill_no)}</span></span>
-          <span class="record-meta-item" onclick="event.stopPropagation(); viewUserRecords(${record.user_id}, 'User ${record.user_id}');" style="cursor: pointer;"><span class="record-meta-label">User ID:</span> <span class="record-meta-value" style="color: #58a6ff;">${record.user_id}</span></span>
+          <span class="record-meta-item" onclick="event.stopPropagation(); viewUserRecords(${record.user_id}, '${escapeHtml(displayName)}');" style="cursor: pointer;"><span class="record-meta-label">User:</span> <span class="record-meta-value" style="color: #58a6ff;">${escapeHtml(displayName)}</span></span>
         </div>
         <div class="record-date-row">
           <span class="record-date-item"><span class="record-date-label">Date:</span> <span class="record-date-value">${formatDate(record.bill_date)}</span></span>
@@ -1861,7 +1879,6 @@ function updateRecordsSummary(data) {
 
 async function loadRecords() {
   currentPageNum = 1;
-  pageFirstIds = [null];
   await applyFilters();
 }
 
@@ -1883,14 +1900,15 @@ async function applyFilters(pageDirection = null) {
   if (currentUser && currentUser.role !== 'admin') {
     params.append('user_id', currentUser.id);
   }
-  let lastId = null;
-  if (pageDirection === 'next' && pageFirstIds.length > currentPageNum) {
-    lastId = pageFirstIds[currentPageNum];
-  } else if (pageDirection === 'prev' && currentPageNum > 1) {
-    lastId = pageFirstIds[currentPageNum - 2];
-  }
-  if (lastId !== undefined && lastId !== null) {
-    params.append('last_id', lastId);
+  let cursor = null;
+  if (pageDirection === 'next' && allRecords.length > 0) {
+    cursor = allRecords[allRecords.length - 1].id;
+    params.append('last_id', cursor);
+    params.append('direction', 'next');
+  } else if (pageDirection === 'prev' && allRecords.length > 0) {
+    cursor = allRecords[0].id;
+    params.append('last_id', cursor);
+    params.append('direction', 'prev');
   }
   params.append('limit', recordsLimit);
   try {
@@ -1902,25 +1920,29 @@ async function applyFilters(pageDirection = null) {
       const data = result.data;
       allRecords = data.records;
       recordsHasMore = data.has_more;
-      recordsLastId = data.last_id;
-      totalRecords = data.total_count || allRecords.length;
       if (pageDirection === 'next') {
         currentPageNum++;
-        if (data.last_id && !pageFirstIds.includes(data.records[0]?.id)) {
-          pageFirstIds.push(data.records[0]?.id);
-        }
       } else if (pageDirection === 'prev') {
         currentPageNum--;
       } else {
-        pageFirstIds = [null];
-        if (data.records.length > 0) {
-          pageFirstIds.push(data.records[0].id);
-        }
+        currentPageNum = 1;
       }
+      totalRecords = data.total_count || allRecords.length;
       await renderAllRecords(allRecords);
       updateStats(data);
       updateRecordsSummary(data);
       renderPagination();
+      requestAnimationFrame(() => {
+        const firstRecord = document.querySelector(
+          '#all-records-list .record-item',
+        );
+        if (firstRecord) {
+          firstRecord.scrollIntoView({
+            behavior: 'instant',
+            block: 'start',
+          });
+        }
+      });
     } else {
       if (result.code === 401) {
         handleAuthError(result.message);
@@ -1970,7 +1992,8 @@ function resetFilters() {
   document.getElementById('filter-category').value = '';
   document.getElementById('filter-type').value = '';
   currentPageNum = 1;
-  pageFirstIds = [null];
+  recordsLastId = null;
+  recordsFirstId = null;
   applyFilters();
 }
 
@@ -1990,6 +2013,7 @@ async function renderAllRecords(records) {
       const rJson = JSON.stringify(r).replace(/"/g, '&quot;');
       const images = await loadRecordImages(r.id);
       const imagesHtml = renderRecordImages(r.id, images);
+      const displayName = r.username || `User ${r.user_id}`;
       return `
     <div class="record-item" data-record-id="${r.id}" data-bill-no="${escapeHtml(r.bill_no)}" ondblclick="copyBillNo('${escapeHtml(r.bill_no)}')">
       <div class="record-type ${r.transaction_type}">${r.transaction_type === 'income' ? '💰' : '💸'}</div>
@@ -1999,7 +2023,7 @@ async function renderAllRecords(records) {
         <div class="record-meta-row">
           <span class="record-meta-item"><span class="record-meta-label">ID:</span> <span class="record-meta-value">${r.id}</span></span>
           <span class="record-meta-item"><span class="record-meta-label">Bill No:</span> <span class="record-meta-value">${escapeHtml(r.bill_no)}</span></span>
-          <span class="record-meta-item" onclick="event.stopPropagation(); viewUserRecords(${r.user_id}, 'User ${r.user_id}');" style="cursor: pointer;"><span class="record-meta-label">User ID:</span> <span class="record-meta-value" style="color: #58a6ff;">${r.user_id}</span></span>
+          <span class="record-meta-item" onclick="event.stopPropagation(); viewUserRecords(${r.user_id}, '${escapeHtml(displayName)}');" style="cursor: pointer;"><span class="record-meta-label">User:</span> <span class="record-meta-value" style="color: #58a6ff;">${escapeHtml(displayName)}</span></span>
         </div>
         <div class="record-date-row">
           <span class="record-date-item"><span class="record-date-label">Date:</span> <span class="record-date-value">${formatDate(r.bill_date)}</span></span>
@@ -2327,17 +2351,15 @@ async function loadUsers(pageDirection = null) {
     if (keyword) {
       params.append('keyword', keyword);
     }
-    let lastId = null;
-    if (
-      pageDirection === 'next' &&
-      usersPageFirstIds.length > usersCurrentPage
-    ) {
-      lastId = usersPageFirstIds[usersCurrentPage];
-    } else if (pageDirection === 'prev' && usersCurrentPage > 1) {
-      lastId = usersPageFirstIds[usersCurrentPage - 2];
-    }
-    if (lastId !== undefined && lastId !== null) {
-      params.append('last_id', lastId);
+    let cursor = null;
+    if (pageDirection === 'next' && allUsers.length > 0) {
+      cursor = allUsers[allUsers.length - 1].id;
+      params.append('last_id', cursor);
+      params.append('direction', 'next');
+    } else if (pageDirection === 'prev' && allUsers.length > 0) {
+      cursor = allUsers[0].id;
+      params.append('last_id', cursor);
+      params.append('direction', 'prev');
     }
     const url = `${API_BASE}/user/list?${params.toString()}`;
     const response = await fetch(url, {
@@ -2348,23 +2370,12 @@ async function loadUsers(pageDirection = null) {
       const data = result.data;
       allUsers = data.users;
       usersHasMore = data.has_more;
-      usersLastId = data.last_id;
       if (pageDirection === 'next') {
         usersCurrentPage++;
-        if (
-          data.users.length > 0 &&
-          !usersPageFirstIds.includes(data.users[0]?.id)
-        ) {
-          usersPageFirstIds.push(data.users[0]?.id);
-        }
       } else if (pageDirection === 'prev') {
         usersCurrentPage--;
       } else {
         usersCurrentPage = 1;
-        usersPageFirstIds = [null];
-        if (data.users.length > 0) {
-          usersPageFirstIds.push(data.users[0]?.id);
-        }
       }
       renderUsers(allUsers);
       renderUsersPagination();
@@ -2390,7 +2401,6 @@ function handleUserSearchInput() {
   }
   userSearchDebounceTimer = setTimeout(() => {
     usersCurrentPage = 1;
-    usersPageFirstIds = [null];
     loadUsers();
   }, 300);
 }
@@ -2401,7 +2411,6 @@ function resetUserSearch() {
     searchInput.value = '';
   }
   usersCurrentPage = 1;
-  usersPageFirstIds = [null];
   loadUsers();
 }
 
@@ -2490,7 +2499,6 @@ async function loadUserRecords() {
   document.getElementById('user-records-title').textContent =
     `Records for ${viewingUserName || 'User'}`;
   currentPageNum = 1;
-  pageFirstIds = [null];
   await applyUserRecordFilters();
 }
 
@@ -2510,14 +2518,15 @@ async function applyUserRecordFilters(pageDirection = null) {
   if (endDate) params.append('end_date', endDate);
   if (category) params.append('category', category);
   if (type) params.append('transaction_type', type);
-  let lastId = null;
-  if (pageDirection === 'next' && pageFirstIds.length > currentPageNum) {
-    lastId = pageFirstIds[currentPageNum];
-  } else if (pageDirection === 'prev' && currentPageNum > 1) {
-    lastId = pageFirstIds[currentPageNum - 2];
-  }
-  if (lastId !== undefined && lastId !== null) {
-    params.append('last_id', lastId);
+  let cursor = null;
+  if (pageDirection === 'next' && allRecords.length > 0) {
+    cursor = allRecords[allRecords.length - 1].id;
+    params.append('last_id', cursor);
+    params.append('direction', 'next');
+  } else if (pageDirection === 'prev' && allRecords.length > 0) {
+    cursor = allRecords[0].id;
+    params.append('last_id', cursor);
+    params.append('direction', 'prev');
   }
   params.append('limit', recordsLimit);
   try {
@@ -2529,21 +2538,14 @@ async function applyUserRecordFilters(pageDirection = null) {
       const data = result.data;
       allRecords = data.records;
       recordsHasMore = data.has_more;
-      recordsLastId = data.last_id;
-      totalRecords = data.total_count || allRecords.length;
       if (pageDirection === 'next') {
         currentPageNum++;
-        if (data.last_id && !pageFirstIds.includes(data.records[0]?.id)) {
-          pageFirstIds.push(data.records[0]?.id);
-        }
       } else if (pageDirection === 'prev') {
         currentPageNum--;
       } else {
-        pageFirstIds = [null];
-        if (data.records.length > 0) {
-          pageFirstIds.push(data.records[0].id);
-        }
+        currentPageNum = 1;
       }
+      totalRecords = data.total_count || allRecords.length;
       await renderUserRecords(allRecords);
       updateUserRecordStats(data);
       renderUserRecordPagination();
@@ -2653,7 +2655,8 @@ function resetUserRecordFilters() {
   document.getElementById('user-filter-category').value = '';
   document.getElementById('user-filter-type').value = '';
   currentPageNum = 1;
-  pageFirstIds = [null];
+  recordsLastId = null;
+  recordsFirstId = null;
   applyUserRecordFilters();
 }
 
@@ -3116,6 +3119,7 @@ function initScanFeature() {
 }
 
 function openScanModal() {
+  closeMobileSidebar();
   const modal = document.getElementById('scan-modal');
   if (modal) {
     modal.classList.add('active');
@@ -3287,6 +3291,7 @@ function initMyQRFeature() {
 }
 
 function openMyQRModal() {
+  closeMobileSidebar();
   const modal = document.getElementById('my-qr-modal');
   if (!modal) {
     return;
@@ -3295,9 +3300,9 @@ function openMyQRModal() {
     showToast('User information not available', 'error');
     return;
   }
-  const userIdSpan = document.getElementById('my-qr-user-id');
-  if (userIdSpan) {
-    userIdSpan.textContent = String(currentUser.id);
+  const downloadBtn = document.getElementById('qr-download-btn');
+  if (downloadBtn) {
+    downloadBtn.textContent = `⬇️ User ID ${currentUser.id}`;
   }
   generateMyQRCode(String(currentUser.id));
   modal.classList.add('active');
@@ -3318,8 +3323,8 @@ function generateMyQRCode(userId) {
   container.innerHTML = '';
   new QRCode(container, {
     text: userId,
-    width: 200,
-    height: 200,
+    width: 512,
+    height: 512,
     colorDark: '#000000',
     colorLight: '#ffffff',
     correctLevel: QRCode.CorrectLevel.M,
@@ -3350,6 +3355,8 @@ let currentRecordImages = {};
 let imagePosition = { x: 0, y: 0 };
 let isDragging = false;
 let dragStart = { x: 0, y: 0 };
+let rafId = null;
+let pendingPosition = null;
 
 function handleImageSelect(event) {
   const files = event.target.files;
@@ -3392,7 +3399,7 @@ function renderImagePreviewList() {
     .map(
       (img, index) => `
     <div class="image-preview-item">
-      <img src="${img.preview}" alt="${escapeHtml(img.file_name)}" onclick="openImagePreview(${index}, true)" />
+      <img src="${img.preview}" alt="${escapeHtml(img.file_name)}" onclick="openImagePreview(${index}, true)" onerror="this.style.display='none'" />
       <button type="button" class="image-remove-btn" onclick="removeSelectedImage(${index})">&times;</button>
     </div>
   `,
@@ -3407,11 +3414,13 @@ function removeSelectedImage(index) {
 
 function openImagePreview(indexOrId, isSelected = false) {
   let imageData;
+  const img = document.getElementById('preview-image');
+  img.style.display = 'block';
   if (isSelected) {
     imageData = selectedImages[indexOrId];
     if (!imageData) return;
     currentPreviewImage = { ...imageData, isSelected: true };
-    document.getElementById('preview-image').src = imageData.preview;
+    img.src = imageData.preview;
   } else {
     const recordId = indexOrId;
     const images = currentRecordImages[recordId];
@@ -3427,6 +3436,8 @@ function openImagePreview(indexOrId, isSelected = false) {
 }
 
 async function loadAndPreviewImage(imageData) {
+  const img = document.getElementById('preview-image');
+  img.style.display = 'block';
   try {
     const response = await fetch(`${API_BASE}/image/download/${imageData.id}`, {
       credentials: 'include',
@@ -3434,12 +3445,14 @@ async function loadAndPreviewImage(imageData) {
     if (response.ok) {
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
-      document.getElementById('preview-image').src = url;
+      img.src = url;
       currentPreviewImage.blobUrl = url;
     } else {
+      img.style.display = 'none';
       showToast('Failed to load image', 'error');
     }
   } catch (error) {
+    img.style.display = 'none';
     showToast('Network error loading image', 'error');
   }
 }
@@ -3452,6 +3465,17 @@ function closeImagePreviewModal() {
   currentPreviewImage = null;
   currentImageData = null;
   currentZoom = 1;
+  imagePosition = { x: 0, y: 0 };
+  pendingPosition = null;
+  if (rafId) {
+    cancelAnimationFrame(rafId);
+    rafId = null;
+  }
+  const img = document.getElementById('preview-image');
+  if (img) {
+    img.style.display = 'block';
+    img.style.transition = 'transform 0.2s ease';
+  }
 }
 
 function zoomIn() {
@@ -3466,6 +3490,7 @@ function zoomOut() {
 
 function resetZoom() {
   currentZoom = 1;
+  imagePosition = { x: 0, y: 0 };
   updateZoom();
 }
 
@@ -3512,24 +3537,48 @@ function handleImageMouseDown(event) {
     y: event.clientY - imagePosition.y,
   };
   const container = document.getElementById('image-preview-container');
+  const img = document.getElementById('preview-image');
   if (container) {
     container.style.cursor = 'grabbing';
+  }
+  if (img) {
+    img.style.transition = 'none';
   }
 }
 
 function handleImageMouseMove(event) {
   if (!isDragging) return;
   event.preventDefault();
-  imagePosition.x = event.clientX - dragStart.x;
-  imagePosition.y = event.clientY - dragStart.y;
-  updateImagePosition();
+  pendingPosition = {
+    x: event.clientX - dragStart.x,
+    y: event.clientY - dragStart.y,
+  };
+  if (!rafId) {
+    rafId = requestAnimationFrame(() => {
+      if (pendingPosition) {
+        imagePosition.x = pendingPosition.x;
+        imagePosition.y = pendingPosition.y;
+        updateImagePosition();
+      }
+      rafId = null;
+    });
+  }
 }
 
 function handleImageMouseUp() {
   isDragging = false;
+  pendingPosition = null;
+  if (rafId) {
+    cancelAnimationFrame(rafId);
+    rafId = null;
+  }
   const container = document.getElementById('image-preview-container');
+  const img = document.getElementById('preview-image');
   if (container) {
     container.style.cursor = 'grab';
+  }
+  if (img) {
+    img.style.transition = 'transform 0.2s ease';
   }
 }
 
@@ -3584,7 +3633,7 @@ function renderRecordImages(recordId, images) {
     .map(
       (img) => `
     <div class="record-image-thumbnail" onclick="event.stopPropagation(); openRecordImagePreview(${recordId}, ${img.id})">
-      <img src="${img.download_url}" alt="" loading="lazy" />
+      <img src="${img.download_url}" alt="" loading="lazy" onerror="this.style.display='none'; this.parentElement.style.display='none'" />
     </div>
   `,
     )
@@ -3602,9 +3651,11 @@ async function openRecordImagePreview(recordId, imageId) {
   );
   if (!image) return;
   currentPreviewImage = { ...image, recordId: recordId };
-  document.getElementById('preview-image').src = image.download_url;
+  const img = document.getElementById('preview-image');
+  img.style.display = 'block';
+  img.src = image.download_url;
   const uploaderText = image.username
-    ? `Uploaded by: ${escapeHtml(image.username)}`
+    ? `Uploaded by ${escapeHtml(image.username)}`
     : '';
   document.getElementById('image-preview-uploader').textContent = uploaderText;
   currentZoom = 1;
