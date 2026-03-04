@@ -368,12 +368,8 @@ impl OrderService {
                 base_select.filter(OrderRecordColumn::TransactionType.eq(transaction_type.clone()));
         }
         if let Some(last_id) = query.try_get_last_id() {
-            if let Some(direction) = query.try_get_direction() {
-                if direction.is_prev() {
-                    base_select = base_select.filter(OrderRecordColumn::Id.gt(last_id));
-                } else {
-                    base_select = base_select.filter(OrderRecordColumn::Id.lt(last_id));
-                }
+            if query.try_get_direction().is_some_and(|d: Direction| d.is_prev()) {
+                base_select = base_select.filter(OrderRecordColumn::Id.gt(last_id));
             } else {
                 base_select = base_select.filter(OrderRecordColumn::Id.lt(last_id));
             }
