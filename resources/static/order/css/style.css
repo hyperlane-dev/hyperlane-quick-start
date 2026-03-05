@@ -1329,17 +1329,17 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   }
 
   .stats-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr;
     gap: 8px;
     margin-bottom: 12px;
   }
 
   #dashboard-page .stats-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr;
   }
 
   #user-records-page .stats-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr;
   }
 
   .stat-card {
@@ -1565,8 +1565,16 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   #users-page .card {
     flex: none;
     height: auto;
-    min-height: calc(100vh - 140px);
+    min-height: auto;
     width: 100%;
+  }
+
+  #dashboard-page .chart-card {
+    min-height: auto;
+  }
+
+  #dashboard-page .chart-container {
+    height: 220px;
   }
 
   #profile-page .card {
@@ -1859,13 +1867,13 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 
 @media (max-width: 480px) {
   .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: 6px;
   }
 
   #dashboard-page .stats-grid,
   #user-records-page .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
   }
 
   .stat-card {
