@@ -10,12 +10,6 @@ use {super::*, database::*, env::*, r#static::*};
 
 use hyperlane_utils::redis::*;
 
-use std::{
-    collections::HashMap,
-    sync::OnceLock,
-    time::{Duration, Instant},
-};
-
 use tokio::{
     spawn,
     sync::{RwLock, RwLockWriteGuard},
