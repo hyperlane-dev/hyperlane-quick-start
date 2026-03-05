@@ -50,13 +50,8 @@ impl OrderService {
 
     #[instrument_trace]
     pub async fn register_user(request: RegisterRequest) -> Result<UserResponse, String> {
-        let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
-        let existing_user: Option<OrderUserModel> = OrderUserEntity::find()
-            .filter(OrderUserColumn::Username.eq(request.get_username().clone()))
-            .one(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let existing_user: Option<OrderUserModel> =
+            UserRepository::find_by_username(request.get_username().clone()).await?;
         if existing_user.is_some() {
             return Err("Username already exists".to_string());
         }
@@ -72,22 +67,14 @@ impl OrderService {
             created_at: ActiveValue::NotSet,
             updated_at: ActiveValue::NotSet,
         };
-        let result: OrderUserModel = active_model
-            .insert(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let result: OrderUserModel = UserRepository::insert(active_model).await?;
         Ok(Self::model_to_user_response(&result))
     }
 
     #[instrument_trace]
     pub async fn login_user(request: LoginRequest) -> Result<(UserResponse, i32, i16), String> {
-        let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
-        let user: Option<OrderUserModel> = OrderUserEntity::find()
-            .filter(OrderUserColumn::Username.eq(request.get_username().clone()))
-            .one(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let user: Option<OrderUserModel> =
+            UserRepository::find_by_username(request.get_username().clone()).await?;
         match user {
             Some(model) => {
                 if model.get_status() != UserStatus::Approved.to_i16() {
@@ -111,13 +98,8 @@ impl OrderService {
 
     #[instrument_trace]
     pub async fn create_user(request: CreateUserRequest) -> Result<UserResponse, String> {
-        let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
-        let existing_user: Option<OrderUserModel> = OrderUserEntity::find()
-            .filter(OrderUserColumn::Username.eq(request.get_username().clone()))
-            .one(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let existing_user: Option<OrderUserModel> =
+            UserRepository::find_by_username(request.get_username().clone()).await?;
         if existing_user.is_some() {
             return Err("Username already exists".to_string());
         }
@@ -133,10 +115,7 @@ impl OrderService {
             created_at: ActiveValue::NotSet,
             updated_at: ActiveValue::NotSet,
         };
-        let result: OrderUserModel = active_model
-            .insert(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let result: OrderUserModel = UserRepository::insert(active_model).await?;
         Ok(Self::model_to_user_response(&result))
     }
 
@@ -145,12 +124,7 @@ impl OrderService {
         user_id: i32,
         request: UpdateUserRequest,
     ) -> Result<UserResponse, String> {
-        let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
-        let user: Option<OrderUserModel> = OrderUserEntity::find_by_id(user_id)
-            .one(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let user: Option<OrderUserModel> = UserRepository::find_by_id(user_id).await?;
         match user {
             Some(model) => {
                 let mut active_model: OrderUserActiveModel = model.into();
@@ -161,10 +135,7 @@ impl OrderService {
                     active_model.phone = ActiveValue::Set(Some(phone.clone()));
                 }
                 active_model.updated_at = ActiveValue::Set(Some(Local::now().naive_local()));
-                let result: OrderUserModel = active_model
-                    .update(&db)
-                    .await
-                    .map_err(|error: DbErr| error.to_string())?;
+                let result: OrderUserModel = UserRepository::update(active_model).await?;
                 Ok(Self::model_to_user_response(&result))
             }
             None => Err("User not found".to_string()),
@@ -176,12 +147,7 @@ impl OrderService {
         user_id: i32,
         request: ChangePasswordRequest,
     ) -> Result<(), String> {
-        let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
-        let user: Option<OrderUserModel> = OrderUserEntity::find_by_id(user_id)
-            .one(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let user: Option<OrderUserModel> = UserRepository::find_by_id(user_id).await?;
         match user {
             Some(model) => {
                 let valid: bool = PasswordUtil::verify_password(
@@ -196,10 +162,7 @@ impl OrderService {
                 let mut active_model: OrderUserActiveModel = model.into();
                 active_model.password_hash = ActiveValue::Set(new_password_hash);
                 active_model.updated_at = ActiveValue::Set(Some(Local::now().naive_local()));
-                active_model
-                    .update(&db)
-                    .await
-                    .map_err(|error: DbErr| error.to_string())?;
+                UserRepository::update(active_model).await?;
                 Ok(())
             }
             None => Err("User not found".to_string()),
@@ -208,12 +171,7 @@ impl OrderService {
 
     #[instrument_trace]
     pub async fn approve_user(user_id: i32, approved: bool) -> Result<UserResponse, String> {
-        let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
-        let user: Option<OrderUserModel> = OrderUserEntity::find_by_id(user_id)
-            .one(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let user: Option<OrderUserModel> = UserRepository::find_by_id(user_id).await?;
         match user {
             Some(model) => {
                 let mut active_model: OrderUserActiveModel = model.into();
@@ -224,10 +182,7 @@ impl OrderService {
                 };
                 active_model.status = ActiveValue::Set(status);
                 active_model.updated_at = ActiveValue::Set(Some(Local::now().naive_local()));
-                let result: OrderUserModel = active_model
-                    .update(&db)
-                    .await
-                    .map_err(|error: DbErr| error.to_string())?;
+                let result: OrderUserModel = UserRepository::update(active_model).await?;
                 Ok(Self::model_to_user_response(&result))
             }
             None => Err("User not found".to_string()),
@@ -236,41 +191,11 @@ impl OrderService {
 
     #[instrument_trace]
     pub async fn list_users(query: UserListQueryRequest) -> Result<UserListResponse, String> {
-        let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
-        let mut base_select: Select<OrderUserEntity> = OrderUserEntity::find();
-        if let Some(keyword) = query.try_get_keyword() {
-            let keyword_pattern: String = format!("%{keyword}%");
-            let mut condition: Condition = Condition::any()
-                .add(OrderUserColumn::Username.like(keyword_pattern.clone()))
-                .add(OrderUserColumn::Email.like(keyword_pattern.clone()))
-                .add(OrderUserColumn::Phone.like(keyword_pattern.clone()));
-            if let Ok(user_id) = keyword.parse::<i32>() {
-                condition = condition.add(OrderUserColumn::Id.eq(user_id));
-            }
-            base_select = base_select.filter(condition);
-        }
-        let total_count_u64: u64 = base_select
-            .clone()
-            .count(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
-        let total_count: i64 = total_count_u64 as i64;
-        let mut paged_select: Select<OrderUserEntity> = base_select;
-        if let Some(last_id) = query.try_get_last_id() {
-            paged_select = paged_select.filter(OrderUserColumn::Id.lt(last_id));
-        }
-        paged_select = paged_select.order_by_desc(OrderUserColumn::Id);
-        let limit: u64 = query.try_get_limit().unwrap_or(20);
-        let limit_with_extra: u64 = limit + 1;
-        paged_select = paged_select.limit(limit_with_extra);
-        let paged_users: Vec<OrderUserModel> = paged_select
-            .all(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
-        let has_more: bool = paged_users.len() > limit as usize;
-        let paged_users: Vec<OrderUserModel> =
-            paged_users.into_iter().take(limit as usize).collect();
+        let limit: u64 = query.get_limit().unwrap_or(20);
+        let keyword: Option<String> = query.try_get_keyword().clone();
+        let last_id: Option<i32> = query.get_last_id();
+        let (paged_users, total_count, has_more) =
+            UserRepository::query_with_pagination(keyword, last_id, limit).await?;
         let last_id: Option<i32> = paged_users.last().map(|u: &OrderUserModel| u.get_id());
         let user_responses: Vec<UserResponse> = paged_users
             .iter()
@@ -287,12 +212,7 @@ impl OrderService {
 
     #[instrument_trace]
     pub async fn get_user(user_id: i32) -> Result<Option<UserResponse>, String> {
-        let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
-        let user: Option<OrderUserModel> = OrderUserEntity::find_by_id(user_id)
-            .one(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let user: Option<OrderUserModel> = UserRepository::find_by_id(user_id).await?;
         Ok(user.map(|model: OrderUserModel| Self::model_to_user_response(&model)))
     }
 
@@ -321,8 +241,6 @@ impl OrderService {
         user_id: i32,
         request: CreateRecordRequest,
     ) -> Result<RecordResponse, String> {
-        let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
         let bill_no: String = Self::generate_bill_no();
         let bill_date: NaiveDate = request
             .try_get_bill_date()
@@ -339,59 +257,53 @@ impl OrderService {
             created_at: ActiveValue::NotSet,
             updated_at: ActiveValue::NotSet,
         };
-        let result: OrderRecordModel = active_model
-            .insert(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let result: OrderRecordModel = RecordRepository::insert(active_model).await?;
         Ok(Self::model_to_record_response(&result))
     }
 
     #[instrument_trace]
     pub async fn list_records(query: RecordQueryRequest) -> Result<RecordListResponse, String> {
-        let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
-        let mut base_select: Select<OrderRecordEntity> = OrderRecordEntity::find();
-        if let Some(user_id) = query.try_get_user_id() {
-            base_select = base_select.filter(OrderRecordColumn::UserId.eq(user_id));
-        }
-        if let Some(start_date) = query.try_get_start_date() {
-            base_select = base_select.filter(OrderRecordColumn::BillDate.gte(*start_date));
-        }
-        if let Some(end_date) = query.try_get_end_date() {
-            base_select = base_select.filter(OrderRecordColumn::BillDate.lte(*end_date));
-        }
-        if let Some(category) = query.try_get_category() {
-            base_select = base_select.filter(OrderRecordColumn::Category.eq(category.clone()));
-        }
-        if let Some(transaction_type) = query.try_get_transaction_type() {
-            base_select =
-                base_select.filter(OrderRecordColumn::TransactionType.eq(transaction_type.clone()));
-        }
-        if let Some(cache_id) = query.try_get_cache_id() {
-            base_select = base_select.filter(OrderRecordColumn::Id.lte(cache_id));
-        }
-        let total_count: i64 = base_select
-            .clone()
-            .count(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())? as i64;
-        let total_income: Decimal =
-            Self::sum_by_transaction_type(&db, &base_select, TransactionType::Income).await?;
-        let total_expense: Decimal =
-            Self::sum_by_transaction_type(&db, &base_select, TransactionType::Expense).await?;
+        let page: i32 = query.get_page().unwrap_or(1);
+        let limit: u64 = query.get_limit().unwrap_or(20);
+        let user_id: Option<i32> = query.get_user_id();
+        let start_date: Option<NaiveDate> = *query.try_get_start_date();
+        let end_date: Option<NaiveDate> = *query.try_get_end_date();
+        let category: Option<String> = query.try_get_category().clone();
+        let transaction_type: Option<String> = query.try_get_transaction_type().clone();
+        let cache_id: Option<i32> = query.get_cache_id();
+        let mut pagination_query: RecordPaginationQuery = RecordPaginationQuery::default();
+        pagination_query
+            .set_user_id(user_id)
+            .set_start_date(start_date)
+            .set_end_date(end_date)
+            .set_category(category.clone())
+            .set_transaction_type(transaction_type.clone())
+            .set_cache_id(cache_id)
+            .set_page(page)
+            .set_limit(limit);
+        let (paged_records, total_count) =
+            RecordRepository::query_with_pagination(pagination_query).await?;
+        let total_income: Decimal = RecordRepository::sum_amount_by_transaction_type(
+            user_id,
+            start_date,
+            end_date,
+            category.clone(),
+            cache_id,
+            TransactionType::Income.as_str().to_string(),
+        )
+        .await?;
+        let total_expense: Decimal = RecordRepository::sum_amount_by_transaction_type(
+            user_id,
+            start_date,
+            end_date,
+            category,
+            cache_id,
+            TransactionType::Expense.as_str().to_string(),
+        )
+        .await?;
         let balance: Decimal = total_income - total_expense;
-        let page: i32 = query.try_get_page().unwrap_or(1);
-        let limit: u64 = query.try_get_limit().unwrap_or(20);
-        let offset: u64 = ((page - 1) as u64) * limit;
-        let paged_records: Vec<OrderRecordModel> = base_select
-            .order_by_desc(OrderRecordColumn::Id)
-            .limit(limit)
-            .offset(offset)
-            .all(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
         let record_responses: Vec<RecordResponse> =
-            Self::enrich_records_with_users(&db, paged_records).await?;
+            Self::enrich_records_with_users(paged_records).await?;
         let mut response: RecordListResponse = RecordListResponse::default();
         response
             .set_records(record_responses)
@@ -403,39 +315,12 @@ impl OrderService {
     }
 
     #[instrument_trace]
-    async fn sum_by_transaction_type(
-        db: &DatabaseConnection,
-        base_select: &Select<OrderRecordEntity>,
-        transaction_type: TransactionType,
-    ) -> Result<Decimal, String> {
-        let result: Option<(Option<Decimal>,)> = base_select
-            .clone()
-            .filter(OrderRecordColumn::TransactionType.eq(transaction_type.as_str()))
-            .select_only()
-            .column_as(OrderRecordColumn::Amount.sum(), "sum")
-            .into_tuple()
-            .one(db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
-        let sum = match result {
-            Some((Some(decimal),)) => decimal,
-            _ => Decimal::ZERO,
-        };
-        Ok(sum)
-    }
-
-    #[instrument_trace]
     pub async fn get_record(record_id: i32) -> Result<Option<RecordResponse>, String> {
-        let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
-        let record: Option<OrderRecordModel> = OrderRecordEntity::find_by_id(record_id)
-            .one(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let record: Option<OrderRecordModel> = RecordRepository::find_by_id(record_id).await?;
         match record {
             Some(model) => {
                 let mut response: RecordResponse = Self::model_to_record_response(&model);
-                Self::enrich_record_with_user(&db, &mut response).await?;
+                Self::enrich_record_with_user(&mut response).await?;
                 Ok(Some(response))
             }
             None => Ok(None),
@@ -444,7 +329,6 @@ impl OrderService {
 
     #[instrument_trace]
     async fn enrich_records_with_users(
-        db: &DatabaseConnection,
         records: Vec<OrderRecordModel>,
     ) -> Result<Vec<RecordResponse>, String> {
         let user_ids: Vec<i32> = records
@@ -453,11 +337,7 @@ impl OrderService {
             .collect::<HashSet<i32>>()
             .into_iter()
             .collect();
-        let users: Vec<OrderUserModel> = OrderUserEntity::find()
-            .filter(OrderUserColumn::Id.is_in(user_ids))
-            .all(db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let users: Vec<OrderUserModel> = UserRepository::find_by_ids(user_ids).await?;
         let user_map: HashMap<i32, OrderUserModel> = users
             .into_iter()
             .map(|u: OrderUserModel| (u.get_id(), u))
@@ -479,14 +359,9 @@ impl OrderService {
     }
 
     #[instrument_trace]
-    async fn enrich_record_with_user(
-        db: &DatabaseConnection,
-        response: &mut RecordResponse,
-    ) -> Result<(), String> {
-        let user: Option<OrderUserModel> = OrderUserEntity::find_by_id(response.get_user_id())
-            .one(db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+    async fn enrich_record_with_user(response: &mut RecordResponse) -> Result<(), String> {
+        let user: Option<OrderUserModel> =
+            UserRepository::find_by_id(response.get_user_id()).await?;
         if let Some(user) = user {
             response
                 .set_username(Some(user.get_username().clone()))
@@ -518,36 +393,33 @@ impl OrderService {
 
     #[instrument_trace]
     pub async fn get_overview_statistics() -> Result<OverviewStatisticsResponse, String> {
-        let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
         let today: NaiveDate = Local::now().naive_local().date();
         let yesterday: NaiveDate = today - chrono::Duration::days(1);
-        let today_stats: (i64, Decimal, Decimal) = Self::get_date_statistics(&db, today).await?;
-        let yesterday_stats: (i64, Decimal, Decimal) =
-            Self::get_date_statistics(&db, yesterday).await?;
-        let daily_trend: DailyTrend = Self::get_daily_trend(&db, 30).await?;
-        let monthly_comparison: MonthlyComparison = Self::get_monthly_comparison(&db, 6).await?;
-        let category_distribution: Vec<CategoryItem> = Self::get_category_distribution(&db).await?;
-        let user_growth: UserGrowth = Self::get_user_growth(&db, 30).await?;
+        let today_stats: (i64, Decimal, Decimal) = Self::get_date_statistics(today).await?;
+        let yesterday_stats: (i64, Decimal, Decimal) = Self::get_date_statistics(yesterday).await?;
+        let daily_trend: DailyTrend = Self::get_daily_trend(30).await?;
+        let monthly_comparison: MonthlyComparison = Self::get_monthly_comparison(6).await?;
+        let category_distribution: Vec<CategoryItem> = Self::get_category_distribution().await?;
+        let user_growth: UserGrowth = Self::get_user_growth(30).await?;
         let transaction_type_distribution: TransactionTypeDistribution =
-            Self::get_transaction_type_distribution(&db).await?;
+            Self::get_transaction_type_distribution().await?;
         let transaction_count_trend: TransactionCountTrend =
-            Self::get_transaction_count_trend(&db, 30).await?;
+            Self::get_transaction_count_trend(30).await?;
         let category_amount_distribution: Vec<CategoryAmountItem> =
-            Self::get_category_amount_distribution(&db).await?;
-        let user_activity: UserActivity = Self::get_user_activity(&db, 30).await?;
+            Self::get_category_amount_distribution().await?;
+        let user_activity: UserActivity = Self::get_user_activity(30).await?;
         let income_expense_ratio_trend: Vec<IncomeExpenseRatioItem> =
-            Self::get_income_expense_ratio_trend(&db, 30).await?;
+            Self::get_income_expense_ratio_trend(30).await?;
         let hourly_distribution: Vec<HourlyDistributionItem> =
-            Self::get_hourly_distribution(&db).await?;
-        let weekly_trend: Vec<WeeklyTrendItem> = Self::get_weekly_trend(&db).await?;
+            Self::get_hourly_distribution().await?;
+        let weekly_trend: Vec<WeeklyTrendItem> = Self::get_weekly_trend().await?;
         let period_over_period: Vec<PeriodOverPeriodItem> =
-            Self::get_period_over_period_analysis(&db).await?;
-        let category_trends: Vec<CategoryTrendItem> = Self::get_category_trends(&db, 30).await?;
-        let user_retention: Vec<UserRetentionItem> = Self::get_user_retention(&db, 30).await?;
-        let top_users: Vec<TopUserItem> = Self::get_top_users(&db, 10).await?;
+            Self::get_period_over_period_analysis().await?;
+        let category_trends: Vec<CategoryTrendItem> = Self::get_category_trends(30).await?;
+        let user_retention: Vec<UserRetentionItem> = Self::get_user_retention(30).await?;
+        let top_users: Vec<TopUserItem> = Self::get_top_users(10).await?;
         let avg_transaction_stats: AverageTransactionStats =
-            Self::get_average_transaction_stats(&db).await?;
+            Self::get_average_transaction_stats().await?;
         let transactions_change: Option<f64> =
             Self::calculate_change_percentage(today_stats.0 as f64, yesterday_stats.0 as f64);
         let income_change: Option<f64> = Self::calculate_change_percentage(
@@ -558,14 +430,14 @@ impl OrderService {
             today_stats.2.to_f64().unwrap_or(0.0),
             yesterday_stats.2.to_f64().unwrap_or(0.0),
         );
-        let today_new_users: i64 = Self::get_new_users_count(&db, today).await?;
-        let yesterday_new_users: i64 = Self::get_new_users_count(&db, yesterday).await?;
+        let today_new_users: i64 = Self::get_new_users_count(today).await?;
+        let yesterday_new_users: i64 = Self::get_new_users_count(yesterday).await?;
         let new_users_change: Option<f64> =
             Self::calculate_change_percentage(today_new_users as f64, yesterday_new_users as f64);
         let (today_avg_income, today_avg_expense): (Decimal, Decimal) =
-            Self::get_date_avg_stats(&db, today).await?;
+            Self::get_date_avg_stats(today).await?;
         let (yesterday_avg_income, yesterday_avg_expense): (Decimal, Decimal) =
-            Self::get_date_avg_stats(&db, yesterday).await?;
+            Self::get_date_avg_stats(yesterday).await?;
         let avg_income_change: Option<f64> = Self::calculate_change_percentage(
             today_avg_income.to_f64().unwrap_or(0.0),
             yesterday_avg_income.to_f64().unwrap_or(0.0),
@@ -575,49 +447,45 @@ impl OrderService {
             yesterday_avg_expense.to_f64().unwrap_or(0.0),
         );
         let mut today_statistics: TodayStatistics = TodayStatistics::default();
-        today_statistics.set_transactions(today_stats.0);
-        today_statistics.set_income(today_stats.1.to_string());
-        today_statistics.set_expense(today_stats.2.to_string());
-        today_statistics.set_new_users(today_new_users);
+        today_statistics
+            .set_transactions(today_stats.0)
+            .set_income(today_stats.1.to_string())
+            .set_expense(today_stats.2.to_string())
+            .set_new_users(today_new_users);
         let mut changes_statistics: ChangesStatistics = ChangesStatistics::default();
-        changes_statistics.set_transactions_change(transactions_change);
-        changes_statistics.set_income_change(income_change);
-        changes_statistics.set_expense_change(expense_change);
-        changes_statistics.set_new_users_change(new_users_change);
-        changes_statistics.set_avg_income_change(avg_income_change);
-        changes_statistics.set_avg_expense_change(avg_expense_change);
+        changes_statistics
+            .set_transactions_change(transactions_change)
+            .set_income_change(income_change)
+            .set_expense_change(expense_change)
+            .set_new_users_change(new_users_change)
+            .set_avg_income_change(avg_income_change)
+            .set_avg_expense_change(avg_expense_change);
         let mut response: OverviewStatisticsResponse = OverviewStatisticsResponse::default();
-        response.set_today(today_statistics);
-        response.set_changes(changes_statistics);
-        response.set_daily_trend(daily_trend);
-        response.set_monthly_comparison(monthly_comparison);
-        response.set_category_distribution(category_distribution);
-        response.set_user_growth(user_growth);
-        response.set_transaction_type_distribution(transaction_type_distribution);
-        response.set_transaction_count_trend(transaction_count_trend);
-        response.set_category_amount_distribution(category_amount_distribution);
-        response.set_user_activity(user_activity);
-        response.set_income_expense_ratio_trend(income_expense_ratio_trend);
-        response.set_hourly_distribution(hourly_distribution);
-        response.set_weekly_trend(weekly_trend);
-        response.set_period_over_period(period_over_period);
-        response.set_category_trends(category_trends);
-        response.set_user_retention(user_retention);
-        response.set_top_users(top_users);
-        response.set_avg_transaction_stats(avg_transaction_stats);
+        response
+            .set_today(today_statistics)
+            .set_changes(changes_statistics)
+            .set_daily_trend(daily_trend)
+            .set_monthly_comparison(monthly_comparison)
+            .set_category_distribution(category_distribution)
+            .set_user_growth(user_growth)
+            .set_transaction_type_distribution(transaction_type_distribution)
+            .set_transaction_count_trend(transaction_count_trend)
+            .set_category_amount_distribution(category_amount_distribution)
+            .set_user_activity(user_activity)
+            .set_income_expense_ratio_trend(income_expense_ratio_trend)
+            .set_hourly_distribution(hourly_distribution)
+            .set_weekly_trend(weekly_trend)
+            .set_period_over_period(period_over_period)
+            .set_category_trends(category_trends)
+            .set_user_retention(user_retention)
+            .set_top_users(top_users)
+            .set_avg_transaction_stats(avg_transaction_stats);
         Ok(response)
     }
 
     #[instrument_trace]
-    async fn get_date_statistics(
-        db: &DatabaseConnection,
-        date: NaiveDate,
-    ) -> Result<(i64, Decimal, Decimal), String> {
-        let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
-            .filter(OrderRecordColumn::BillDate.eq(date))
-            .all(db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+    async fn get_date_statistics(date: NaiveDate) -> Result<(i64, Decimal, Decimal), String> {
+        let records: Vec<OrderRecordModel> = RecordRepository::find_by_bill_date(date).await?;
         let transaction_count: i64 = records.len() as i64;
         let mut total_income: Decimal = Decimal::ZERO;
         let mut total_expense: Decimal = Decimal::ZERO;
@@ -633,29 +501,18 @@ impl OrderService {
     }
 
     #[instrument_trace]
-    async fn get_new_users_count(db: &DatabaseConnection, date: NaiveDate) -> Result<i64, String> {
+    async fn get_new_users_count(date: NaiveDate) -> Result<i64, String> {
         let start_of_day: NaiveDateTime = date.and_hms_opt(0, 0, 0).unwrap();
         let end_of_day: NaiveDateTime = date.and_hms_opt(23, 59, 59).unwrap();
-        let count_u64: u64 = OrderUserEntity::find()
-            .filter(OrderUserColumn::CreatedAt.gte(start_of_day))
-            .filter(OrderUserColumn::CreatedAt.lte(end_of_day))
-            .count(db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
-        Ok(count_u64 as i64)
+        UserRepository::count_by_created_at_range(start_of_day, end_of_day).await
     }
 
     #[instrument_trace]
-    async fn get_daily_trend(db: &DatabaseConnection, days: i64) -> Result<DailyTrend, String> {
+    async fn get_daily_trend(days: i64) -> Result<DailyTrend, String> {
         let end_date: NaiveDate = Local::now().naive_local().date();
         let start_date: NaiveDate = end_date - chrono::Duration::days(days);
-        let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
-            .filter(OrderRecordColumn::BillDate.gte(start_date))
-            .filter(OrderRecordColumn::BillDate.lte(end_date))
-            .order_by_asc(OrderRecordColumn::BillDate)
-            .all(db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let records: Vec<OrderRecordModel> =
+            RecordRepository::find_by_bill_date_range(start_date, end_date).await?;
         let mut dates: Vec<String> = Vec::new();
         let mut income: Vec<String> = Vec::new();
         let mut expense: Vec<String> = Vec::new();
@@ -688,10 +545,7 @@ impl OrderService {
     }
 
     #[instrument_trace]
-    async fn get_monthly_comparison(
-        db: &DatabaseConnection,
-        months: i64,
-    ) -> Result<MonthlyComparison, String> {
+    async fn get_monthly_comparison(months: i64) -> Result<MonthlyComparison, String> {
         let now: chrono::DateTime<Local> = Local::now();
         let mut months_list: Vec<String> = Vec::new();
         let mut income_list: Vec<String> = Vec::new();
@@ -710,12 +564,8 @@ impl OrderService {
                 NaiveDate::from_ymd_opt(year, month + 1, 1).unwrap_or_default()
                     - chrono::Duration::days(1)
             };
-            let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
-                .filter(OrderRecordColumn::BillDate.gte(start_date))
-                .filter(OrderRecordColumn::BillDate.lte(end_date))
-                .all(db)
-                .await
-                .map_err(|error: DbErr| error.to_string())?;
+            let records: Vec<OrderRecordModel> =
+                RecordRepository::find_by_bill_date_range(start_date, end_date).await?;
             let mut total_income: Decimal = Decimal::ZERO;
             let mut total_expense: Decimal = Decimal::ZERO;
             for record in &records {
@@ -737,18 +587,14 @@ impl OrderService {
     }
 
     #[instrument_trace]
-    async fn get_category_distribution(
-        db: &DatabaseConnection,
-    ) -> Result<Vec<CategoryItem>, String> {
-        let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
-            .filter(OrderRecordColumn::TransactionType.eq(TransactionType::Expense.as_str()))
-            .all(db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+    async fn get_category_distribution() -> Result<Vec<CategoryItem>, String> {
+        let records: Vec<OrderRecordModel> = RecordRepository::find_all().await?;
         let mut category_map: HashMap<String, i64> = HashMap::new();
         for record in &records {
-            let category: String = record.get_category().clone();
-            *category_map.entry(category).or_insert(0) += 1;
+            if record.get_transaction_type() == TransactionType::Expense.as_str() {
+                let category: String = record.get_category().clone();
+                *category_map.entry(category).or_insert(0) += 1;
+            }
         }
         let mut result: Vec<CategoryItem> = category_map
             .into_iter()
@@ -768,7 +614,7 @@ impl OrderService {
     }
 
     #[instrument_trace]
-    async fn get_user_growth(db: &DatabaseConnection, days: i64) -> Result<UserGrowth, String> {
+    async fn get_user_growth(days: i64) -> Result<UserGrowth, String> {
         let end_date: NaiveDate = Local::now().naive_local().date();
         let start_date: NaiveDate = end_date - chrono::Duration::days(days);
         let mut dates: Vec<String> = Vec::new();
@@ -778,13 +624,9 @@ impl OrderService {
             dates.push(current_date.to_string());
             let start_of_day: NaiveDateTime = current_date.and_hms_opt(0, 0, 0).unwrap();
             let end_of_day: NaiveDateTime = current_date.and_hms_opt(23, 59, 59).unwrap();
-            let count_u64: u64 = OrderUserEntity::find()
-                .filter(OrderUserColumn::CreatedAt.gte(start_of_day))
-                .filter(OrderUserColumn::CreatedAt.lte(end_of_day))
-                .count(db)
-                .await
-                .map_err(|error: DbErr| error.to_string())?;
-            counts.push(count_u64 as i64);
+            let count: i64 =
+                UserRepository::count_by_created_at_range(start_of_day, end_of_day).await?;
+            counts.push(count);
             current_date += chrono::Duration::days(1);
         }
         let mut growth: UserGrowth = UserGrowth::default();
@@ -794,13 +636,8 @@ impl OrderService {
     }
 
     #[instrument_trace]
-    async fn get_transaction_type_distribution(
-        db: &DatabaseConnection,
-    ) -> Result<TransactionTypeDistribution, String> {
-        let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
-            .all(db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+    async fn get_transaction_type_distribution() -> Result<TransactionTypeDistribution, String> {
+        let records: Vec<OrderRecordModel> = RecordRepository::find_all().await?;
         let mut income_count: i64 = 0;
         let mut expense_count: i64 = 0;
         let mut income_amount: Decimal = Decimal::ZERO;
@@ -824,19 +661,11 @@ impl OrderService {
     }
 
     #[instrument_trace]
-    async fn get_transaction_count_trend(
-        db: &DatabaseConnection,
-        days: i64,
-    ) -> Result<TransactionCountTrend, String> {
+    async fn get_transaction_count_trend(days: i64) -> Result<TransactionCountTrend, String> {
         let end_date: NaiveDate = Local::now().naive_local().date();
         let start_date: NaiveDate = end_date - chrono::Duration::days(days);
-        let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
-            .filter(OrderRecordColumn::BillDate.gte(start_date))
-            .filter(OrderRecordColumn::BillDate.lte(end_date))
-            .order_by_asc(OrderRecordColumn::BillDate)
-            .all(db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let records: Vec<OrderRecordModel> =
+            RecordRepository::find_by_bill_date_range(start_date, end_date).await?;
         let mut dates: Vec<String> = Vec::new();
         let mut counts: Vec<i64> = Vec::new();
         let mut current_date: NaiveDate = start_date;
@@ -856,19 +685,15 @@ impl OrderService {
     }
 
     #[instrument_trace]
-    async fn get_category_amount_distribution(
-        db: &DatabaseConnection,
-    ) -> Result<Vec<CategoryAmountItem>, String> {
-        let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
-            .filter(OrderRecordColumn::TransactionType.eq(TransactionType::Expense.as_str()))
-            .all(db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+    async fn get_category_amount_distribution() -> Result<Vec<CategoryAmountItem>, String> {
+        let records: Vec<OrderRecordModel> = RecordRepository::find_all().await?;
         let mut category_map: HashMap<String, Decimal> = HashMap::new();
         for record in &records {
-            let category: String = record.get_category().clone();
-            let amount: Decimal = *record.get_amount();
-            *category_map.entry(category).or_insert(Decimal::ZERO) += amount;
+            if record.get_transaction_type() == TransactionType::Expense.as_str() {
+                let category: String = record.get_category().clone();
+                let amount: Decimal = *record.get_amount();
+                *category_map.entry(category).or_insert(Decimal::ZERO) += amount;
+            }
         }
         let mut result: Vec<CategoryAmountItem> = category_map
             .into_iter()
@@ -888,18 +713,14 @@ impl OrderService {
     }
 
     #[instrument_trace]
-    async fn get_user_activity(db: &DatabaseConnection, days: i64) -> Result<UserActivity, String> {
+    async fn get_user_activity(days: i64) -> Result<UserActivity, String> {
         let end_date: NaiveDate = Local::now().naive_local().date();
         let start_date: NaiveDate = end_date - chrono::Duration::days(days);
         let mut dates: Vec<String> = Vec::new();
         let mut active_users: Vec<i64> = Vec::new();
         let mut new_records: Vec<i64> = Vec::new();
-        let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
-            .filter(OrderRecordColumn::BillDate.gte(start_date))
-            .filter(OrderRecordColumn::BillDate.lte(end_date))
-            .all(db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let records: Vec<OrderRecordModel> =
+            RecordRepository::find_by_bill_date_range(start_date, end_date).await?;
         let mut current_date: NaiveDate = start_date;
         while current_date <= end_date {
             dates.push(current_date.to_string());
@@ -934,18 +755,12 @@ impl OrderService {
 
     #[instrument_trace]
     async fn get_income_expense_ratio_trend(
-        db: &DatabaseConnection,
         days: i64,
     ) -> Result<Vec<IncomeExpenseRatioItem>, String> {
         let end_date: NaiveDate = Local::now().naive_local().date();
         let start_date: NaiveDate = end_date - chrono::Duration::days(days);
-        let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
-            .filter(OrderRecordColumn::BillDate.gte(start_date))
-            .filter(OrderRecordColumn::BillDate.lte(end_date))
-            .order_by_asc(OrderRecordColumn::BillDate)
-            .all(db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let records: Vec<OrderRecordModel> =
+            RecordRepository::find_by_bill_date_range(start_date, end_date).await?;
         let mut result: Vec<IncomeExpenseRatioItem> = Vec::new();
         let mut current_date: NaiveDate = start_date;
         while current_date <= end_date {
@@ -980,17 +795,11 @@ impl OrderService {
     }
 
     #[instrument_trace]
-    async fn get_hourly_distribution(
-        db: &DatabaseConnection,
-    ) -> Result<Vec<HourlyDistributionItem>, String> {
+    async fn get_hourly_distribution() -> Result<Vec<HourlyDistributionItem>, String> {
         let today: NaiveDate = Local::now().naive_local().date();
         let start_date: NaiveDate = today - chrono::Duration::days(30);
-        let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
-            .filter(OrderRecordColumn::BillDate.gte(start_date))
-            .filter(OrderRecordColumn::BillDate.lte(today))
-            .all(db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let records: Vec<OrderRecordModel> =
+            RecordRepository::find_by_bill_date_range(start_date, today).await?;
         let mut hourly_data: HashMap<i32, (i64, Decimal, Decimal)> = HashMap::new();
         for record in &records {
             let hour: i32 = record
@@ -1028,15 +837,11 @@ impl OrderService {
     }
 
     #[instrument_trace]
-    async fn get_weekly_trend(db: &DatabaseConnection) -> Result<Vec<WeeklyTrendItem>, String> {
+    async fn get_weekly_trend() -> Result<Vec<WeeklyTrendItem>, String> {
         let today: NaiveDate = Local::now().naive_local().date();
         let start_date: NaiveDate = today - chrono::Duration::days(90);
-        let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
-            .filter(OrderRecordColumn::BillDate.gte(start_date))
-            .filter(OrderRecordColumn::BillDate.lte(today))
-            .all(db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let records: Vec<OrderRecordModel> =
+            RecordRepository::find_by_bill_date_range(start_date, today).await?;
         let days: Vec<&str> = WEEK_DAYS.to_vec();
         let mut weekly_data: Vec<(Decimal, Decimal, i64)> =
             vec![(Decimal::ZERO, Decimal::ZERO, 0); 7];
@@ -1067,9 +872,7 @@ impl OrderService {
     }
 
     #[instrument_trace]
-    async fn get_period_over_period_analysis(
-        db: &DatabaseConnection,
-    ) -> Result<Vec<PeriodOverPeriodItem>, String> {
+    async fn get_period_over_period_analysis() -> Result<Vec<PeriodOverPeriodItem>, String> {
         let today: NaiveDate = Local::now().naive_local().date();
         let mut result: Vec<PeriodOverPeriodItem> = Vec::new();
         let periods: Vec<(String, NaiveDate, NaiveDate, NaiveDate, NaiveDate)> = vec![
@@ -1097,9 +900,9 @@ impl OrderService {
         ];
         for (period_name, curr_start, curr_end, prev_start, prev_end) in periods {
             let curr_stats: (Decimal, Decimal, i64) =
-                Self::get_period_stats(db, curr_start, curr_end).await?;
+                Self::get_period_stats(curr_start, curr_end).await?;
             let prev_stats: (Decimal, Decimal, i64) =
-                Self::get_period_stats(db, prev_start, prev_end).await?;
+                Self::get_period_stats(prev_start, prev_end).await?;
             let income_change: f64 = Self::calculate_change_percentage(
                 curr_stats.0.to_f64().unwrap_or(0.0),
                 prev_stats.0.to_f64().unwrap_or(0.0),
@@ -1125,16 +928,11 @@ impl OrderService {
 
     #[instrument_trace]
     async fn get_period_stats(
-        db: &DatabaseConnection,
         start: NaiveDate,
         end: NaiveDate,
     ) -> Result<(Decimal, Decimal, i64), String> {
-        let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
-            .filter(OrderRecordColumn::BillDate.gte(start))
-            .filter(OrderRecordColumn::BillDate.lte(end))
-            .all(db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let records: Vec<OrderRecordModel> =
+            RecordRepository::find_by_bill_date_range(start, end).await?;
         let mut income: Decimal = Decimal::ZERO;
         let mut expense: Decimal = Decimal::ZERO;
         for record in &records {
@@ -1149,19 +947,16 @@ impl OrderService {
     }
 
     #[instrument_trace]
-    async fn get_category_trends(
-        db: &DatabaseConnection,
-        days: i64,
-    ) -> Result<Vec<CategoryTrendItem>, String> {
+    async fn get_category_trends(days: i64) -> Result<Vec<CategoryTrendItem>, String> {
         let end_date: NaiveDate = Local::now().naive_local().date();
         let start_date: NaiveDate = end_date - chrono::Duration::days(days);
-        let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
-            .filter(OrderRecordColumn::BillDate.gte(start_date))
-            .filter(OrderRecordColumn::BillDate.lte(end_date))
-            .filter(OrderRecordColumn::TransactionType.eq(TransactionType::Expense.as_str()))
-            .all(db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let records: Vec<OrderRecordModel> =
+            RecordRepository::find_by_bill_date_range_and_transaction_type(
+                start_date,
+                end_date,
+                TransactionType::Expense.as_str().to_string(),
+            )
+            .await?;
         let mut category_data: HashMap<String, Vec<(String, Decimal)>> = HashMap::new();
         for record in &records {
             let category: String = record.get_category().clone();
@@ -1200,25 +995,17 @@ impl OrderService {
     }
 
     #[instrument_trace]
-    async fn get_user_retention(
-        db: &DatabaseConnection,
-        days: i64,
-    ) -> Result<Vec<UserRetentionItem>, String> {
+    async fn get_user_retention(days: i64) -> Result<Vec<UserRetentionItem>, String> {
         let end_date: NaiveDate = Local::now().naive_local().date();
         let start_date: NaiveDate = end_date - chrono::Duration::days(days);
-        let users: Vec<OrderUserModel> = OrderUserEntity::find()
-            .filter(OrderUserColumn::CreatedAt.gte(start_date.and_hms_opt(0, 0, 0).unwrap()))
-            .filter(OrderUserColumn::CreatedAt.lte(end_date.and_hms_opt(23, 59, 59).unwrap()))
-            .all(db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let users: Vec<OrderUserModel> = UserRepository::find_by_created_at_range(
+            start_date.and_hms_opt(0, 0, 0).unwrap(),
+            end_date.and_hms_opt(23, 59, 59).unwrap(),
+        )
+        .await?;
         let mut result: Vec<UserRetentionItem> = Vec::new();
-        let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
-            .filter(OrderRecordColumn::BillDate.gte(start_date))
-            .filter(OrderRecordColumn::BillDate.lte(end_date))
-            .all(db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let records: Vec<OrderRecordModel> =
+            RecordRepository::find_by_bill_date_range(start_date, end_date).await?;
         for day_offset in 0..=days {
             let date: NaiveDate = start_date + chrono::Duration::days(day_offset);
             let new_users: Vec<i32> = users
@@ -1256,18 +1043,11 @@ impl OrderService {
     }
 
     #[instrument_trace]
-    async fn get_top_users(
-        db: &DatabaseConnection,
-        limit: i64,
-    ) -> Result<Vec<TopUserItem>, String> {
+    async fn get_top_users(limit: i64) -> Result<Vec<TopUserItem>, String> {
         let today: NaiveDate = Local::now().naive_local().date();
         let start_date: NaiveDate = today - chrono::Duration::days(30);
-        let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
-            .filter(OrderRecordColumn::BillDate.gte(start_date))
-            .filter(OrderRecordColumn::BillDate.lte(today))
-            .all(db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let records: Vec<OrderRecordModel> =
+            RecordRepository::find_by_bill_date_range(start_date, today).await?;
         let mut user_stats: HashMap<i32, (String, i64, Decimal)> = HashMap::new();
         for record in &records {
             let user_id: i32 = record.get_user_id();
@@ -1278,7 +1058,7 @@ impl OrderService {
             entry.2 += record.get_amount();
         }
         for (user_id, entry) in &mut user_stats {
-            if let Ok(Some(user)) = OrderUserEntity::find_by_id(*user_id).one(db).await {
+            if let Ok(Some(user)) = UserRepository::find_by_id(*user_id).await {
                 entry.0 = user.get_username().clone();
             }
         }
@@ -1303,17 +1083,11 @@ impl OrderService {
     }
 
     #[instrument_trace]
-    async fn get_average_transaction_stats(
-        db: &DatabaseConnection,
-    ) -> Result<AverageTransactionStats, String> {
+    async fn get_average_transaction_stats() -> Result<AverageTransactionStats, String> {
         let today: NaiveDate = Local::now().naive_local().date();
         let start_date: NaiveDate = today - chrono::Duration::days(30);
-        let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
-            .filter(OrderRecordColumn::BillDate.gte(start_date))
-            .filter(OrderRecordColumn::BillDate.lte(today))
-            .all(db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let records: Vec<OrderRecordModel> =
+            RecordRepository::find_by_bill_date_range(start_date, today).await?;
         let mut income_count: i64 = 0;
         let mut expense_count: i64 = 0;
         let mut total_income: Decimal = Decimal::ZERO;
@@ -1361,15 +1135,8 @@ impl OrderService {
     }
 
     #[instrument_trace]
-    async fn get_date_avg_stats(
-        db: &DatabaseConnection,
-        date: NaiveDate,
-    ) -> Result<(Decimal, Decimal), String> {
-        let records: Vec<OrderRecordModel> = OrderRecordEntity::find()
-            .filter(OrderRecordColumn::BillDate.eq(date))
-            .all(db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+    async fn get_date_avg_stats(date: NaiveDate) -> Result<(Decimal, Decimal), String> {
+        let records: Vec<OrderRecordModel> = RecordRepository::find_by_bill_date(date).await?;
         let mut income_count: i64 = 0;
         let mut expense_count: i64 = 0;
         let mut total_income: Decimal = Decimal::ZERO;
@@ -1423,10 +1190,8 @@ impl OrderService {
             created_at: ActiveValue::NotSet,
             updated_at: ActiveValue::NotSet,
         };
-        let record_result: OrderRecordModel = record_active_model
-            .insert(&txn)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let record_result: OrderRecordModel =
+            RecordRepository::insert_with_transaction(&txn, record_active_model).await?;
         let record_id: i32 = record_result.get_id();
         let mut saved_images: Vec<RecordImageResponse> = Vec::new();
         for image_req in request.get_images() {
@@ -1443,13 +1208,15 @@ impl OrderService {
                 id: ActiveValue::NotSet,
                 created_at: ActiveValue::NotSet,
             };
-            let image_result: OrderRecordImageModel = match image_active_model.insert(&txn).await {
-                Ok(result) => result,
-                Err(error) => {
-                    let _: Result<(), DbErr> = txn.rollback().await;
-                    return Err(error.to_string());
-                }
-            };
+            let image_result: OrderRecordImageModel =
+                match RecordImageRepository::insert_with_transaction(&txn, image_active_model).await
+                {
+                    Ok(result) => result,
+                    Err(error) => {
+                        let _: Result<(), DbErr> = txn.rollback().await;
+                        return Err(error);
+                    }
+                };
             let image_response: RecordImageResponse =
                 Self::model_to_image_response(&image_result, record_id);
             saved_images.push(image_response);
@@ -1489,10 +1256,8 @@ impl OrderService {
             created_at: ActiveValue::NotSet,
             updated_at: ActiveValue::NotSet,
         };
-        let record_result: OrderRecordModel = record_active_model
-            .insert(&txn)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let record_result: OrderRecordModel =
+            RecordRepository::insert_with_transaction(&txn, record_active_model).await?;
         let record_id: i32 = record_result.get_id();
         let image_active_model: OrderRecordImageActiveModel = OrderRecordImageActiveModel {
             record_id: ActiveValue::Set(record_id),
@@ -1505,13 +1270,14 @@ impl OrderService {
             id: ActiveValue::NotSet,
             created_at: ActiveValue::NotSet,
         };
-        let image_result: OrderRecordImageModel = match image_active_model.insert(&txn).await {
-            Ok(result) => result,
-            Err(error) => {
-                let _: Result<(), DbErr> = txn.rollback().await;
-                return Err(error.to_string());
-            }
-        };
+        let image_result: OrderRecordImageModel =
+            match RecordImageRepository::insert_with_transaction(&txn, image_active_model).await {
+                Ok(result) => result,
+                Err(error) => {
+                    let _: Result<(), DbErr> = txn.rollback().await;
+                    return Err(error);
+                }
+            };
         txn.commit().await.map_err(|e: DbErr| e.to_string())?;
         let record_response: RecordResponse = Self::model_to_record_response(&record_result);
         let image_response: RecordImageResponse =
@@ -1532,10 +1298,7 @@ impl OrderService {
     ) -> Result<CreateRecordWithImagesResponse, String> {
         let db: DatabaseConnection =
             PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
-        let record: Option<OrderRecordModel> = OrderRecordEntity::find_by_id(record_id)
-            .one(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let record: Option<OrderRecordModel> = RecordRepository::find_by_id(record_id).await?;
         let record_model: OrderRecordModel = match record {
             Some(model) => model,
             None => return Err("Record not found".to_string()),
@@ -1552,13 +1315,14 @@ impl OrderService {
             id: ActiveValue::NotSet,
             created_at: ActiveValue::NotSet,
         };
-        let image_result: OrderRecordImageModel = match image_active_model.insert(&txn).await {
-            Ok(result) => result,
-            Err(error) => {
-                let _: Result<(), DbErr> = txn.rollback().await;
-                return Err(error.to_string());
-            }
-        };
+        let image_result: OrderRecordImageModel =
+            match RecordImageRepository::insert_with_transaction(&txn, image_active_model).await {
+                Ok(result) => result,
+                Err(error) => {
+                    let _: Result<(), DbErr> = txn.rollback().await;
+                    return Err(error);
+                }
+            };
         txn.commit().await.map_err(|e: DbErr| e.to_string())?;
         let record_response: RecordResponse = Self::model_to_record_response(&record_model);
         let image_response: RecordImageResponse =
@@ -1573,14 +1337,8 @@ impl OrderService {
 
     #[instrument_trace]
     pub async fn get_record_images(record_id: i32) -> Result<RecordImageListResponse, String> {
-        let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
-        let images: Vec<OrderRecordImageModel> = OrderRecordImageEntity::find()
-            .filter(OrderRecordImageColumn::RecordId.eq(record_id))
-            .order_by_desc(OrderRecordImageColumn::Id)
-            .all(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let images: Vec<OrderRecordImageModel> =
+            RecordImageRepository::find_by_record_id(record_id).await?;
         let total_count: i32 = images.len() as i32;
         let user_ids: Vec<i32> = images
             .iter()
@@ -1588,11 +1346,7 @@ impl OrderService {
             .collect::<HashSet<_>>()
             .into_iter()
             .collect();
-        let users: Vec<OrderUserModel> = OrderUserEntity::find()
-            .filter(OrderUserColumn::Id.is_in(user_ids))
-            .all(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let users: Vec<OrderUserModel> = UserRepository::find_by_ids(user_ids).await?;
         let user_map: HashMap<i32, String> = users
             .into_iter()
             .map(|user: OrderUserModel| (user.get_id(), user.get_username().clone()))
@@ -1619,12 +1373,7 @@ impl OrderService {
         image_id: i32,
         user_id: i32,
     ) -> Result<Option<ImageDataResponse>, String> {
-        let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
-        let user: Option<OrderUserModel> = OrderUserEntity::find_by_id(user_id)
-            .one(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let user: Option<OrderUserModel> = UserRepository::find_by_id(user_id).await?;
         let user_role: UserRole = match user {
             Some(ref model) => UserRole::try_from(model.get_role()).unwrap_or_default(),
             None => return Err("User not found".to_string()),
@@ -1632,10 +1381,8 @@ impl OrderService {
         if !user_role.is_admin() {
             return Err("Only admin can access image data".to_string());
         }
-        let image: Option<OrderRecordImageModel> = OrderRecordImageEntity::find_by_id(image_id)
-            .one(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let image: Option<OrderRecordImageModel> =
+            RecordImageRepository::find_by_id(image_id).await?;
         match image {
             Some(model) => {
                 let mut response: ImageDataResponse = ImageDataResponse::default();

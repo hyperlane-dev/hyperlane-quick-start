@@ -127,3 +127,23 @@ pub struct RecordImageQueryRequest {
     #[get(type(copy), pub)]
     pub(super) record_id: i32,
 }
+
+#[derive(Clone, Data, Debug, Default)]
+pub struct RecordPaginationQuery {
+    #[get(type(copy), pub)]
+    pub(super) user_id: Option<i32>,
+    #[get(type(copy), pub)]
+    pub(super) start_date: Option<NaiveDate>,
+    #[get(type(copy), pub)]
+    pub(super) end_date: Option<NaiveDate>,
+    #[get(type(option), pub)]
+    pub(super) category: Option<String>,
+    #[get(type(option), pub)]
+    pub(super) transaction_type: Option<String>,
+    #[get(type(copy), pub)]
+    pub(super) cache_id: Option<i32>,
+    #[get(type(copy), pub)]
+    pub(super) page: i32,
+    #[get(type(copy), pub)]
+    pub(super) limit: u64,
+}
