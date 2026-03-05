@@ -18,9 +18,8 @@ use {
         request::cicd::*,
         response::cicd::*,
     },
+    repository::cicd::*,
 };
-
-use hyperlane_plugin::{common::*, mysql::*};
 
 use hyperlane_utils::*;
 

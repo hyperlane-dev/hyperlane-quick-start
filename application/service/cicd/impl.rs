@@ -69,67 +69,45 @@ impl From<CicdStepModel> for StepDto {
 impl CicdService {
     #[instrument_trace]
     pub async fn create_pipeline(param: CreatePipelineParam) -> Result<i32, String> {
-        let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let active_model: CicdPipelineActiveModel = CicdPipelineActiveModel::new(
+        PipelineRepository::create(
             param.get_name().clone(),
             param.try_get_description().clone(),
             param.try_get_config_content().clone(),
-        );
-        let result: CicdPipelineModel = active_model
-            .insert(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
-        Ok(result.get_id())
+        )
+        .await
     }
 
     #[instrument_trace]
     pub async fn get_pipeline_by_id(id: i32) -> Result<Option<PipelineDto>, String> {
-        let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let result: Option<CicdPipelineModel> = CicdPipelineEntity::find_by_id(id)
-            .one(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let result: Option<CicdPipelineModel> = PipelineRepository::find_by_id(id).await?;
         Ok(result.map(Into::into))
     }
 
     #[instrument_trace]
     pub async fn get_all_pipelines() -> Result<Vec<PipelineDto>, String> {
-        let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let models: Vec<CicdPipelineModel> = CicdPipelineEntity::find()
-            .order_by_desc(CicdPipelineColumn::CreatedAt)
-            .all(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let models: Vec<CicdPipelineModel> = PipelineRepository::find_all().await?;
         Ok(models.into_iter().map(Into::into).collect())
     }
 
     #[instrument_trace]
     pub async fn trigger_run(param: TriggerRunParam) -> Result<i32, String> {
-        let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
         let pipeline_id: i32 = param.get_pipeline_id();
         let pipeline: Option<CicdPipelineModel> =
-            Self::get_pipeline_by_id_with_config(pipeline_id).await?;
+            PipelineRepository::find_by_id(pipeline_id).await?;
         let config_content: String = pipeline
             .and_then(|p| p.try_get_config_content().clone())
             .ok_or_else(|| "Pipeline config content is required".to_string())?;
-        let run_number: i32 = Self::get_next_run_number(pipeline_id).await?;
-        let active_model: CicdRunActiveModel = CicdRunActiveModel::new(
+        let run_number: i32 = RunRepository::get_next_run_number(pipeline_id).await?;
+        let run_result: CicdRunModel = RunRepository::create(
             pipeline_id,
             run_number,
             param.try_get_triggered_by().clone(),
             param.try_get_commit_hash().clone(),
             param.try_get_commit_message().clone(),
-        );
-        let run_result: CicdRunModel = active_model
-            .insert(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        )
+        .await?;
         let run_id: i32 = run_result.get_id();
-        Self::parse_config_and_create_jobs(&db, run_id, &config_content).await?;
+        Self::parse_config_and_create_jobs(run_id, &config_content).await?;
         let run_id_clone: i32 = run_id;
         spawn(async move {
             if let Err(error) = Self::execute_run(run_id_clone).await {
@@ -140,42 +118,19 @@ impl CicdService {
     }
 
     #[instrument_trace]
-    async fn get_pipeline_by_id_with_config(id: i32) -> Result<Option<CicdPipelineModel>, String> {
-        let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let result: Option<CicdPipelineModel> = CicdPipelineEntity::find_by_id(id)
-            .one(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
-        Ok(result)
-    }
-
-    #[instrument_trace]
-    async fn parse_config_and_create_jobs(
-        db: &DatabaseConnection,
-        run_id: i32,
-        config_content: &str,
-    ) -> Result<(), String> {
+    async fn parse_config_and_create_jobs(run_id: i32, config_content: &str) -> Result<(), String> {
         let config: PipelineConfig = serde_yaml::from_str(config_content)
             .map_err(|error| format!("Failed to parse config: {error}"))?;
         for (job_name, job_config) in config.get_jobs() {
-            let job_active_model: mapper::cicd::job::ActiveModel =
-                CicdJobActiveModel::new(run_id, job_name.clone());
-            let job_result: CicdJobModel = job_active_model
-                .insert(db)
-                .await
-                .map_err(|error: DbErr| error.to_string())?;
+            let job_result: CicdJobModel = JobRepository::create(run_id, job_name.clone()).await?;
             let job_id: i32 = job_result.get_id();
             for step_config in job_config.get_steps() {
-                let step_active_model: mapper::cicd::step::ActiveModel = CicdStepActiveModel::new(
+                StepRepository::create(
                     job_id,
                     step_config.get_name().clone(),
                     step_config.try_get_run().clone(),
-                );
-                step_active_model
-                    .insert(db)
-                    .await
-                    .map_err(|error: DbErr| error.to_string())?;
+                )
+                .await?;
             }
         }
         Ok(())
@@ -183,7 +138,7 @@ impl CicdService {
 
     #[instrument_trace]
     pub async fn execute_run(run_id: i32) -> Result<(), String> {
-        Self::start_run(run_id).await?;
+        RunRepository::start(run_id).await?;
         let jobs: Vec<JobDto> = Self::get_jobs_by_run(run_id).await?;
         let mut has_error: bool = false;
         for job in jobs {
@@ -251,7 +206,7 @@ impl CicdService {
         };
         let log_manager: &LogStreamManager = get_log_stream_manager();
         log_manager.end_run_streams(run_id).await;
-        Self::complete_run(run_id, run_status).await?;
+        RunRepository::complete(run_id, run_status).await?;
         Ok(())
     }
 
@@ -393,209 +348,75 @@ impl CicdService {
 
     #[instrument_trace]
     pub async fn get_next_run_number(pipeline_id: i32) -> Result<i32, String> {
-        let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let result: Option<(Option<i32>,)> = CicdRunEntity::find()
-            .filter(CicdRunColumn::PipelineId.eq(pipeline_id))
-            .select_only()
-            .column_as(CicdRunColumn::RunNumber.max(), "max_number")
-            .into_tuple()
-            .one(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
-        let max_number: i32 = result.and_then(|(inner,)| inner).unwrap_or(0);
-        Ok(max_number + 1)
+        RunRepository::get_next_run_number(pipeline_id).await
     }
 
     #[instrument_trace]
     pub async fn get_run_by_id(id: i32) -> Result<Option<RunDto>, String> {
-        let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let result: Option<CicdRunModel> = CicdRunEntity::find_by_id(id)
-            .one(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let result: Option<CicdRunModel> = RunRepository::find_by_id(id).await?;
         Ok(result.map(Into::into))
     }
 
     #[instrument_trace]
     pub async fn get_runs_by_pipeline(pipeline_id: i32) -> Result<Vec<RunDto>, String> {
-        let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let models: Vec<CicdRunModel> = CicdRunEntity::find()
-            .filter(CicdRunColumn::PipelineId.eq(pipeline_id))
-            .order_by_desc(CicdRunColumn::CreatedAt)
-            .all(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let models: Vec<CicdRunModel> = RunRepository::find_by_pipeline(pipeline_id).await?;
         Ok(models.into_iter().map(Into::into).collect())
     }
 
     #[instrument_trace]
     pub async fn query_runs(param: QueryRunsParam) -> Result<PaginatedRunsDto, String> {
-        let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let page_size: i32 = param.try_get_page_size().unwrap_or(50);
-        let mut query = CicdRunEntity::find();
-        if let Some(pipeline_id) = param.try_get_pipeline_id() {
-            query = query.filter(CicdRunColumn::PipelineId.eq(pipeline_id));
-        }
-        if let Some(status) = param.try_get_status() {
-            query = query.filter(CicdRunColumn::Status.eq(status.to_string()));
-        }
-        if let Some(last_id) = param.try_get_last_id() {
-            query = query.filter(CicdRunColumn::Id.lt(last_id));
-        }
-        let total: i32 = CicdRunEntity::find()
-            .count(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())? as i32;
-        let models: Vec<CicdRunModel> = query
-            .order_by_desc(CicdRunColumn::Id)
-            .limit((page_size + 1) as u64)
-            .all(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
-        let has_more: bool = models.len() > page_size as usize;
-        let runs: Vec<CicdRunModel> = if has_more {
-            models.into_iter().take(page_size as usize).collect()
-        } else {
-            models
-        };
+        let page_size: u64 = param.try_get_page_size().unwrap_or(50) as u64;
+        let status_str: Option<String> = param.try_get_status().map(|s| s.to_string());
+        let (models, total, has_more): (Vec<CicdRunModel>, i32, bool) =
+            RunRepository::query_with_pagination(
+                param.try_get_pipeline_id(),
+                status_str,
+                param.try_get_last_id(),
+                page_size + 1,
+            )
+            .await?;
         let mut dto = PaginatedRunsDto::default();
         dto.set_total(total)
-            .set_runs(runs.into_iter().map(Into::into).collect())
+            .set_runs(models.into_iter().map(Into::into).collect())
             .set_has_more(has_more);
         Ok(dto)
     }
 
     #[instrument_trace]
     pub async fn update_run_status(id: i32, status: CicdStatus) -> Result<(), String> {
-        let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        CicdRunEntity::update_many()
-            .filter(CicdRunColumn::Id.eq(id))
-            .col_expr(CicdRunColumn::Status, Expr::value(status.to_string()))
-            .exec(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
-        Ok(())
+        RunRepository::update_status(id, status).await
     }
 
     #[instrument_trace]
     pub async fn start_run(id: i32) -> Result<(), String> {
-        let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let now: NaiveDateTime = Utc::now().naive_utc();
-        CicdRunEntity::update_many()
-            .filter(CicdRunColumn::Id.eq(id))
-            .col_expr(
-                CicdRunColumn::Status,
-                Expr::value(CicdStatus::Running.to_string()),
-            )
-            .col_expr(CicdRunColumn::StartedAt, Expr::value(now))
-            .exec(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
-        Ok(())
+        RunRepository::start(id).await
     }
 
     #[instrument_trace]
     pub async fn complete_run(id: i32, status: CicdStatus) -> Result<(), String> {
-        let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let run: Option<CicdRunModel> = CicdRunEntity::find_by_id(id)
-            .one(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
-        if let Some(run_model) = run {
-            let now: NaiveDateTime = Utc::now().naive_utc();
-            let started_at: NaiveDateTime = run_model.try_get_started_at().unwrap_or(now);
-            let duration_ms: i32 =
-                (now.and_utc().timestamp_millis() - started_at.and_utc().timestamp_millis()) as i32;
-            CicdRunEntity::update_many()
-                .filter(CicdRunColumn::Id.eq(id))
-                .col_expr(CicdRunColumn::Status, Expr::value(status.to_string()))
-                .col_expr(CicdRunColumn::CompletedAt, Expr::value(now))
-                .col_expr(CicdRunColumn::DurationMs, Expr::value(duration_ms))
-                .exec(&db)
-                .await
-                .map_err(|error: DbErr| error.to_string())?;
-        }
-        Ok(())
+        RunRepository::complete(id, status).await
     }
 
     #[instrument_trace]
     pub async fn create_job(run_id: i32, name: String) -> Result<i32, String> {
-        let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let active_model: CicdJobActiveModel = CicdJobActiveModel::new(run_id, name);
-        let result: CicdJobModel = active_model
-            .insert(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let result: CicdJobModel = JobRepository::create(run_id, name).await?;
         Ok(result.get_id())
     }
 
     #[instrument_trace]
     pub async fn get_jobs_by_run(run_id: i32) -> Result<Vec<JobDto>, String> {
-        let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let models: Vec<CicdJobModel> = CicdJobEntity::find()
-            .filter(CicdJobColumn::RunId.eq(run_id))
-            .order_by_asc(CicdJobColumn::CreatedAt)
-            .all(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let models: Vec<CicdJobModel> = JobRepository::find_by_run(run_id).await?;
         Ok(models.into_iter().map(Into::into).collect())
     }
 
     #[instrument_trace]
     pub async fn update_job_status(param: UpdateJobStatusParam) -> Result<(), String> {
-        let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let now: NaiveDateTime = Utc::now().naive_utc();
-        let param_status: CicdStatus = *param.get_status();
-        let param_job_id: i32 = param.get_job_id();
-        let param_runner: Option<String> = param.try_get_runner().clone();
-        if param_status == CicdStatus::Running {
-            CicdJobEntity::update_many()
-                .filter(CicdJobColumn::Id.eq(param_job_id))
-                .col_expr(CicdJobColumn::Status, Expr::value(param_status.to_string()))
-                .col_expr(CicdJobColumn::Runner, Expr::value(param_runner))
-                .col_expr(CicdJobColumn::StartedAt, Expr::value(now))
-                .exec(&db)
-                .await
-                .map_err(|error: DbErr| error.to_string())?;
-        } else if param_status.is_terminal() {
-            let job: Option<CicdJobModel> = CicdJobEntity::find_by_id(param_job_id)
-                .one(&db)
-                .await
-                .map_err(|error: DbErr| error.to_string())?;
-            if let Some(job_model) = job {
-                let started_at: NaiveDateTime =
-                    job_model.try_get_started_at().map(|s| s).unwrap_or(now);
-                let duration_ms: i32 = (now.and_utc().timestamp_millis()
-                    - started_at.and_utc().timestamp_millis())
-                    as i32;
-                CicdJobEntity::update_many()
-                    .filter(CicdJobColumn::Id.eq(param_job_id))
-                    .col_expr(CicdJobColumn::Status, Expr::value(param_status.to_string()))
-                    .col_expr(CicdJobColumn::CompletedAt, Expr::value(now))
-                    .col_expr(CicdJobColumn::DurationMs, Expr::value(duration_ms))
-                    .exec(&db)
-                    .await
-                    .map_err(|error: DbErr| error.to_string())?;
-            }
-        } else {
-            CicdJobEntity::update_many()
-                .filter(CicdJobColumn::Id.eq(param_job_id))
-                .col_expr(CicdJobColumn::Status, Expr::value(param_status.to_string()))
-                .exec(&db)
-                .await
-                .map_err(|error: DbErr| error.to_string())?;
-        }
-        Ok(())
+        JobRepository::update_status(
+            param.get_job_id(),
+            *param.get_status(),
+            param.try_get_runner().clone(),
+        )
+        .await
     }
 
     #[instrument_trace]
@@ -604,84 +425,24 @@ impl CicdService {
         name: String,
         command: Option<String>,
     ) -> Result<i32, String> {
-        let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let active_model: CicdStepActiveModel = CicdStepActiveModel::new(job_id, name, command);
-        let result: CicdStepModel = active_model
-            .insert(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let result: CicdStepModel = StepRepository::create(job_id, name, command).await?;
         Ok(result.get_id())
     }
 
     #[instrument_trace]
     pub async fn get_steps_by_job(job_id: i32) -> Result<Vec<StepDto>, String> {
-        let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let models: Vec<CicdStepModel> = CicdStepEntity::find()
-            .filter(CicdStepColumn::JobId.eq(job_id))
-            .order_by_asc(CicdStepColumn::CreatedAt)
-            .all(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let models: Vec<CicdStepModel> = StepRepository::find_by_job(job_id).await?;
         Ok(models.into_iter().map(Into::into).collect())
     }
 
     #[instrument_trace]
     pub async fn update_step_status(param: UpdateStepStatusParam) -> Result<(), String> {
-        let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let now: NaiveDateTime = Utc::now().naive_utc();
-        let param_status: CicdStatus = *param.get_status();
-        let param_step_id: i32 = param.get_step_id();
-        let param_output: Option<String> = param.try_get_output().clone();
-        if param_status == CicdStatus::Running {
-            CicdStepEntity::update_many()
-                .filter(CicdStepColumn::Id.eq(param_step_id))
-                .col_expr(
-                    CicdStepColumn::Status,
-                    Expr::value(param_status.to_string()),
-                )
-                .col_expr(CicdStepColumn::StartedAt, Expr::value(now))
-                .exec(&db)
-                .await
-                .map_err(|error: DbErr| error.to_string())?;
-        } else if param_status.is_terminal() {
-            let step: Option<CicdStepModel> = CicdStepEntity::find_by_id(param_step_id)
-                .one(&db)
-                .await
-                .map_err(|error: DbErr| error.to_string())?;
-            if let Some(step_model) = step {
-                let started_at: NaiveDateTime = (*step_model.try_get_started_at()).unwrap_or(now);
-                let duration_ms: i32 = (now.and_utc().timestamp_millis()
-                    - started_at.and_utc().timestamp_millis())
-                    as i32;
-                CicdStepEntity::update_many()
-                    .filter(CicdStepColumn::Id.eq(param_step_id))
-                    .col_expr(
-                        CicdStepColumn::Status,
-                        Expr::value(param_status.to_string()),
-                    )
-                    .col_expr(CicdStepColumn::Output, Expr::value(param_output.clone()))
-                    .col_expr(CicdStepColumn::CompletedAt, Expr::value(now))
-                    .col_expr(CicdStepColumn::DurationMs, Expr::value(duration_ms))
-                    .exec(&db)
-                    .await
-                    .map_err(|error: DbErr| error.to_string())?;
-            }
-        } else {
-            CicdStepEntity::update_many()
-                .filter(CicdStepColumn::Id.eq(param_step_id))
-                .col_expr(
-                    CicdStepColumn::Status,
-                    Expr::value(param_status.to_string()),
-                )
-                .col_expr(CicdStepColumn::Output, Expr::value(param_output.clone()))
-                .exec(&db)
-                .await
-                .map_err(|error: DbErr| error.to_string())?;
-        }
-        Ok(())
+        StepRepository::update_status(
+            param.get_step_id(),
+            *param.get_status(),
+            param.try_get_output().clone(),
+        )
+        .await
     }
 
     #[instrument_trace]
@@ -706,90 +467,39 @@ impl CicdService {
 
     #[instrument_trace]
     pub async fn recover_interrupted_runs() -> Result<u32, String> {
-        let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let running_runs: Vec<CicdRunModel> = CicdRunEntity::find()
-            .filter(CicdRunColumn::Status.eq(CicdStatus::Running.to_string()))
-            .all(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let running_runs: Vec<CicdRunModel> =
+            RunRepository::find_by_status(CicdStatus::Running).await?;
         let count: u32 = running_runs.len() as u32;
         if count == 0 {
             return Ok(0);
         }
-        let now: NaiveDateTime = Utc::now().naive_utc();
         let error_message: &str = "[System] Task was interrupted due to server restart";
         for run in running_runs {
             let run_id: i32 = run.get_id();
-            let jobs: Vec<CicdJobModel> = CicdJobEntity::find()
-                .filter(CicdJobColumn::RunId.eq(run_id))
-                .filter(CicdJobColumn::Status.eq(CicdStatus::Running.to_string()))
-                .all(&db)
-                .await
-                .map_err(|error: DbErr| error.to_string())?;
+            let jobs: Vec<CicdJobModel> =
+                JobRepository::find_by_run_and_status(run_id, CicdStatus::Running).await?;
             for job in jobs {
                 let job_id: i32 = job.get_id();
-                let job_started_at: NaiveDateTime = job.try_get_started_at().unwrap_or(now);
-                let job_duration_ms: i32 = (now.and_utc().timestamp_millis()
-                    - job_started_at.and_utc().timestamp_millis())
-                    as i32;
-                CicdJobEntity::update_many()
-                    .filter(CicdJobColumn::Id.eq(job_id))
-                    .col_expr(
-                        CicdJobColumn::Status,
-                        Expr::value(CicdStatus::Failure.to_string()),
-                    )
-                    .col_expr(CicdJobColumn::CompletedAt, Expr::value(now))
-                    .col_expr(CicdJobColumn::DurationMs, Expr::value(job_duration_ms))
-                    .exec(&db)
-                    .await
-                    .map_err(|error: DbErr| error.to_string())?;
-                let steps: Vec<CicdStepModel> = CicdStepEntity::find()
-                    .filter(CicdStepColumn::JobId.eq(job_id))
-                    .filter(CicdStepColumn::Status.eq(CicdStatus::Running.to_string()))
-                    .all(&db)
-                    .await
-                    .map_err(|error: DbErr| error.to_string())?;
+                JobRepository::update_status(
+                    job_id,
+                    CicdStatus::Failure,
+                    job.try_get_runner().clone(),
+                )
+                .await?;
+                let steps: Vec<CicdStepModel> =
+                    StepRepository::find_by_job_and_status(job_id, CicdStatus::Running).await?;
                 for step in steps {
                     let step_id: i32 = step.get_id();
-                    let step_started_at: NaiveDateTime =
-                        step.try_get_started_at().map(|s| s).unwrap_or(now);
-                    let step_duration_ms: i32 = (now.and_utc().timestamp_millis()
-                        - step_started_at.and_utc().timestamp_millis())
-                        as i32;
                     let step_output: String = step
                         .try_get_output()
                         .clone()
                         .map(|o| format!("{o}\n\n{error_message}"))
                         .unwrap_or_else(|| error_message.to_string());
-                    CicdStepEntity::update_many()
-                        .filter(CicdStepColumn::Id.eq(step_id))
-                        .col_expr(
-                            CicdStepColumn::Status,
-                            Expr::value(CicdStatus::Failure.to_string()),
-                        )
-                        .col_expr(CicdStepColumn::Output, Expr::value(step_output))
-                        .col_expr(CicdStepColumn::CompletedAt, Expr::value(now))
-                        .col_expr(CicdStepColumn::DurationMs, Expr::value(step_duration_ms))
-                        .exec(&db)
-                        .await
-                        .map_err(|error: DbErr| error.to_string())?;
+                    StepRepository::update_status(step_id, CicdStatus::Failure, Some(step_output))
+                        .await?;
                 }
             }
-            let started_at: NaiveDateTime = run.try_get_started_at().unwrap_or(now);
-            let duration_ms: i32 =
-                (now.and_utc().timestamp_millis() - started_at.and_utc().timestamp_millis()) as i32;
-            CicdRunEntity::update_many()
-                .filter(CicdRunColumn::Id.eq(run_id))
-                .col_expr(
-                    CicdRunColumn::Status,
-                    Expr::value(CicdStatus::Failure.to_string()),
-                )
-                .col_expr(CicdRunColumn::CompletedAt, Expr::value(now))
-                .col_expr(CicdRunColumn::DurationMs, Expr::value(duration_ms))
-                .exec(&db)
-                .await
-                .map_err(|error: DbErr| error.to_string())?;
+            RunRepository::complete(run_id, CicdStatus::Failure).await?;
             tracing::warn!(
                 "Run {} was interrupted by server restart and marked as failed",
                 run_id
