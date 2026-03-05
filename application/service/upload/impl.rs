@@ -115,7 +115,7 @@ impl UploadService {
     #[request_header_option(CHUNKIFY_FILE_NAME_HEADER => file_name_opt)]
     #[request_header_option(CHUNKIFY_DIRECTORY_HEADER => base_file_dir_opt)]
     #[instrument_trace]
-    pub async fn get_register_file_chunk_data<'a>(ctx: &mut Context) -> OptionFileChunkData {
+    pub async fn get_register_file_chunk_data<'a>(ctx: &mut Context) -> Option<FileChunkData> {
         let file_id: String = Self::validate_file_id(file_id_opt, ctx).ok()?;
         let total_chunks: usize = Self::validate_total_chunks(total_chunks_opt, ctx).ok()?;
         let file_name: String = Self::validate_file_name(file_name_opt, ctx).ok()?;
@@ -134,7 +134,7 @@ impl UploadService {
         ctx: &mut Context,
         file_id_opt: Option<String>,
         chunk_index_opt: Option<String>,
-    ) -> OptionFileChunkData {
+    ) -> Option<FileChunkData> {
         let mut data: FileChunkData = Self::get_merge_file_chunk_data(ctx, file_id_opt).await?;
         let chunk_index: usize = match chunk_index_opt {
             Some(idx) => match idx.parse::<usize>() {
@@ -163,21 +163,19 @@ impl UploadService {
 
     #[instrument_trace]
     pub async fn add_file_id_map(data: &FileChunkData) {
-        write_file_id_map()
-            .await
-            .insert(data.get_file_id().to_owned(), data.clone());
+        let _: () = FileChunkRepository::add_file_id_map(data).await;
     }
 
     #[instrument_trace]
     pub async fn remove_file_id_map(file_id: &str) {
-        write_file_id_map().await.remove(file_id);
+        let _: () = FileChunkRepository::remove_file_id_map(file_id).await;
     }
 
     #[instrument_trace]
     pub async fn get_merge_file_chunk_data(
         ctx: &mut Context,
         file_id_opt: Option<String>,
-    ) -> OptionFileChunkData {
+    ) -> Option<FileChunkData> {
         let file_id: String = match file_id_opt {
             Some(id) => id,
             None => {
@@ -189,7 +187,9 @@ impl UploadService {
                 return None;
             }
         };
-        read_file_id_map().await.get(&file_id).cloned()
+        let result: Option<FileChunkData> =
+            FileChunkRepository::get_merge_file_chunk_data(&file_id).await;
+        result
     }
 
     #[response_status_code(200)]

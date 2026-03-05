@@ -8,6 +8,5 @@ pub mod order;
 pub mod redis;
 pub mod shortlink;
 pub mod tracking;
-pub mod upload;
 
 use super::*;

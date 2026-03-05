@@ -16,8 +16,6 @@ use {
     r#struct::*,
 };
 
-use hyperlane_config::application::shortlink::ID_KEY;
-
-use std::collections::HashMap;
+use hyperlane_config::application::shortlink::*;
 
 use serde_json::json;

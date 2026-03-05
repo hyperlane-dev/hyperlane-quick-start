@@ -1,15 +1,5 @@
 use super::*;
 
-#[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]
-pub struct ShortlinkDao {
-    #[get(type(copy), pub(crate))]
-    pub(super) id: i32,
-    #[get(pub(crate))]
-    pub(super) url: String,
-    #[get(pub(crate))]
-    pub(super) created_at: String,
-}
-
 #[derive(
     Clone,
     Data,

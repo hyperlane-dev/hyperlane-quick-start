@@ -24,9 +24,8 @@ impl TrackingService {
             .set_headers(headers)
             .set_body(body_str)
             .set_timestamp(timestamp);
-        TrackingMapper::insert(record)
-            .await
-            .map_err(|error| format!("Failed to insert tracking record {error}"))
+        let result: Result<(), DbErr> = TrackingRepository::insert(record).await;
+        result.map_err(|error| format!("Failed to insert tracking record {error}"))
     }
 
     #[instrument_trace]
@@ -43,7 +42,7 @@ impl TrackingService {
         }
         let (models, total): (Vec<Model>, i64) = if request.try_get_header_key().clone().is_some() {
             let header_key: String = request.try_get_header_key().clone().unwrap();
-            TrackingMapper::query_by_header(
+            let result: Result<(Vec<Model>, i64), DbErr> = TrackingRepository::query_by_header(
                 header_key,
                 request.try_get_header_value().clone(),
                 *request.try_get_start_time(),
@@ -52,30 +51,31 @@ impl TrackingService {
                 page,
                 page_size,
             )
-            .await
-            .map_err(|error| format!("Failed to query by header {error}"))?
+            .await;
+            result.map_err(|error| format!("Failed to query by header {error}"))?
         } else if request.try_get_body_content().clone().is_some() {
             let content: String = request.try_get_body_content().clone().unwrap();
-            TrackingMapper::query_by_body_content(
-                content,
-                *request.try_get_start_time(),
-                *request.try_get_end_time(),
-                request.try_get_socket_addr().clone(),
-                page,
-                page_size,
-            )
-            .await
-            .map_err(|error| format!("Failed to query by body content {error}"))?
+            let result: Result<(Vec<Model>, i64), DbErr> =
+                TrackingRepository::query_by_body_content(
+                    content,
+                    *request.try_get_start_time(),
+                    *request.try_get_end_time(),
+                    request.try_get_socket_addr().clone(),
+                    page,
+                    page_size,
+                )
+                .await;
+            result.map_err(|error| format!("Failed to query by body content {error}"))?
         } else {
-            TrackingMapper::query(
+            let result: Result<(Vec<Model>, i64), DbErr> = TrackingRepository::query(
                 *request.try_get_start_time(),
                 *request.try_get_end_time(),
                 request.try_get_socket_addr().clone(),
                 page,
                 page_size,
             )
-            .await
-            .map_err(|error| format!("Failed to query tracking records {error}"))?
+            .await;
+            result.map_err(|error| format!("Failed to query tracking records {error}"))?
         };
         let records: Vec<TrackingRecordDTO> = models
             .into_iter()

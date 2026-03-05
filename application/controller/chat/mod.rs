@@ -8,7 +8,6 @@ use {super::*, r#struct::*};
 
 use {
     domain::chat::*,
-    mapper::chat::*,
     model::{
         application::chat::*,
         response::{chat::*, common::*},

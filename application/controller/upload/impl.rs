@@ -9,7 +9,7 @@ impl ServerHook for RegisterRoute {
     #[post_method]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
-        let file_chunk_data_opt: OptionFileChunkData =
+        let file_chunk_data_opt: Option<FileChunkData> =
             UploadService::get_register_file_chunk_data(ctx).await;
         if file_chunk_data_opt.is_none() {
             return;
@@ -33,7 +33,7 @@ impl ServerHook for SaveRoute {
     )]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
-        let file_chunk_data_opt: OptionFileChunkData =
+        let file_chunk_data_opt: Option<FileChunkData> =
             UploadService::get_save_file_chunk_data(ctx, file_id_opt, chunk_index_opt).await;
         if file_chunk_data_opt.is_none() {
             return;
@@ -65,7 +65,7 @@ impl ServerHook for MergeRoute {
     )]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
-        let file_chunk_data_opt: OptionFileChunkData =
+        let file_chunk_data_opt: Option<FileChunkData> =
             UploadService::get_merge_file_chunk_data(ctx, file_id_opt).await;
         if file_chunk_data_opt.is_none() {
             return;

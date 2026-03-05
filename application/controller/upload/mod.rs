@@ -4,4 +4,4 @@ mod r#struct;
 
 pub use r#fn::*;
 
-use {super::*, mapper::upload::*, model::application::upload::*, service::upload::*, r#struct::*};
+use {super::*, model::application::upload::*, service::upload::*, r#struct::*};

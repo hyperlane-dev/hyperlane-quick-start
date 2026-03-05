@@ -66,8 +66,6 @@ pub struct CicdStep {
     pub(super) updated_at: Option<String>,
 }
 
-use std::collections::HashMap;
-
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]
 pub struct PipelineConfig {
     pub(super) name: Option<String>,

@@ -1,6 +1,6 @@
 use super::*;
 
-#[derive(Clone, Data, Debug, Default)]
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct ShortlinkRecord {
     #[get(type(copy), pub)]
     pub(super) id: i32,

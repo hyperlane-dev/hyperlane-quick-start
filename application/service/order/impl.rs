@@ -1585,7 +1585,7 @@ impl OrderService {
         let user_ids: Vec<i32> = images
             .iter()
             .map(|img: &OrderRecordImageModel| img.get_user_id())
-            .collect::<std::collections::HashSet<_>>()
+            .collect::<HashSet<_>>()
             .into_iter()
             .collect();
         let users: Vec<OrderUserModel> = OrderUserEntity::find()
@@ -1593,7 +1593,7 @@ impl OrderService {
             .all(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?;
-        let user_map: std::collections::HashMap<i32, String> = users
+        let user_map: HashMap<i32, String> = users
             .into_iter()
             .map(|user: OrderUserModel| (user.get_id(), user.get_username().clone()))
             .collect();

@@ -5,5 +5,3 @@ mod r#struct;
 pub use {r#const::*, r#enum::*, r#struct::*};
 
 use super::*;
-
-use std::collections::HashMap;

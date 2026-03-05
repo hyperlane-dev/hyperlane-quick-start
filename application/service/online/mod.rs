@@ -3,6 +3,6 @@ mod r#struct;
 
 pub use r#struct::*;
 
-use {super::*, mapper::chat::*};
+use {super::*, service::chat::*};
 
 use tokio::sync::broadcast::error::SendError;

@@ -16,3 +16,4 @@ pub const JSON_FIELD_MESSAGE: &str = "message";
 pub const JSON_FIELD_MESSAGES: &str = "messages";
 pub const JSON_FIELD_ERRORS: &str = "errors";
 pub const GPT_MODEL: &str = "model";
+pub const ONLINE_CONNECTIONS: &str = "Current number of online connections";

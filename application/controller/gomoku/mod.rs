@@ -6,4 +6,4 @@ pub use r#fn::*;
 
 use {super::*, r#struct::*};
 
-use {mapper::chat::*, service::gomoku::*};
+use {service::chat::*, service::gomoku::*};

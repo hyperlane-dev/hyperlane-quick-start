@@ -21,25 +21,12 @@ impl ShortlinkService {
         if request.get_url().is_empty() {
             return Err("URL cannot be empty".to_string());
         }
-        let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
-        let existing_record: Option<Model> = Entity::find()
-            .filter(Column::Url.eq(request.get_url()))
-            .one(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let existing_record: Option<ShortlinkModel> =
+            ShortlinkRepository::find_by_url(request.get_url()).await?;
         let record_id: i32 = if let Some(record) = existing_record {
             record.get_id()
         } else {
-            let active_model: ActiveModel = ActiveModel {
-                url: ActiveValue::Set(request.get_url().clone()),
-                id: ActiveValue::NotSet,
-                created_at: ActiveValue::NotSet,
-            };
-            let result: ShortlinkModel = active_model
-                .insert(&db)
-                .await
-                .map_err(|error: DbErr| error.to_string())?;
+            let result: ShortlinkModel = ShortlinkRepository::insert(request.get_url()).await?;
             result.get_id()
         };
         Self::encrypt_id(record_id)
@@ -48,12 +35,7 @@ impl ShortlinkService {
     #[instrument_trace]
     pub async fn query_shortlink(encrypted_id: String) -> Result<Option<ShortlinkRecord>, String> {
         let id: i32 = Self::decrypt_id(&encrypted_id)?;
-        let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
-        let record: Option<Model> = Entity::find_by_id(id)
-            .one(&db)
-            .await
-            .map_err(|error: DbErr| error.to_string())?;
+        let record: Option<ShortlinkModel> = ShortlinkRepository::find_by_id(id).await?;
         match record {
             Some(model) => {
                 let mut record = ShortlinkRecord::default();
@@ -63,7 +45,7 @@ impl ShortlinkService {
                     .set_created_at(
                         model
                             .try_get_created_at()
-                            .map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string())
+                            .map(|dt: NaiveDateTime| dt.format("%Y-%m-%d %H:%M:%S").to_string())
                             .unwrap_or_default(),
                     );
                 Ok(Some(record))

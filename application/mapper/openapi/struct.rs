@@ -113,7 +113,7 @@ use super::*;
         model::request::order::RecordImageQueryRequest,
         model::request::redis::RedisRecord,
         model::request::shortlink::ShortlinkInsertRequest,
-        model::request::shortlink::ShortlinkRecord,
+        model::application::shortlink::ShortlinkRecord,
         model::response::chat::ChatHistoryResponse,
         model::response::chat::UserListResponse,
         model::response::chat::WebSocketRespData,
