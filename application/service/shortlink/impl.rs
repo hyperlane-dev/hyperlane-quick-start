@@ -38,7 +38,7 @@ impl ShortlinkService {
         let record: Option<ShortlinkModel> = ShortlinkRepository::find_by_id(id).await?;
         match record {
             Some(model) => {
-                let mut record = ShortlinkRecord::default();
+                let mut record: ShortlinkRecord = ShortlinkRecord::default();
                 record
                     .set_id(model.get_id())
                     .set_url(model.get_url().clone())

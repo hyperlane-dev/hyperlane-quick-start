@@ -100,7 +100,7 @@ impl RunRepository {
     ) -> Result<(Vec<CicdRunModel>, i32, bool), String> {
         let db: DatabaseConnection =
             MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let mut query = CicdRunEntity::find();
+        let mut query: Select<CicdRunEntity> = CicdRunEntity::find();
         if let Some(pid) = pipeline_id {
             query = query.filter(CicdRunColumn::PipelineId.eq(pid));
         }

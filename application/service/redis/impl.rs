@@ -33,7 +33,7 @@ impl RedisService {
             .into_iter()
             .zip(values)
             .map(|(k, v): (String, String)| {
-                let mut record = RedisRecord::default();
+                let mut record: RedisRecord = RedisRecord::default();
                 record.set_key(k).set_value(v);
                 record
             })

@@ -75,7 +75,8 @@ impl ChatDomain {
     #[instrument_trace]
     pub async fn get_or_create_session(session_id: &str) -> ChatSession {
         let sessions: &ArcRwLock<HashMap<String, ChatSession>> = Self::get_global_chat_sessions();
-        let mut sessions_guard = sessions.write().await;
+        let mut sessions_guard: RwLockWriteGuard<'_, HashMap<String, ChatSession>> =
+            sessions.write().await;
         sessions_guard.retain(|_, session| !session.is_expired(30));
         sessions_guard
             .entry(session_id.to_string())

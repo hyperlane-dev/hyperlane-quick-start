@@ -169,7 +169,7 @@ impl ServerHook for ListRunsRoute {
         let pipeline_id: Option<i32> = querys
             .get("pipeline_id")
             .and_then(|s: &String| s.parse().ok());
-        let mut param = QueryRunsParam::default();
+        let mut param: QueryRunsParam = QueryRunsParam::default();
         param
             .set_pipeline_id(pipeline_id)
             .set_status(None)

@@ -105,7 +105,7 @@ impl RssService {
         for file in limited_files {
             let full_url: String = format!("{base_url}{}", file.get_file_url());
             let enclosure: Option<RssEnclosure> = if !file.get_content_type().is_empty() {
-                let mut enclosure_obj = RssEnclosure::default();
+                let mut enclosure_obj: RssEnclosure = RssEnclosure::default();
                 enclosure_obj
                     .set_url(full_url.clone())
                     .set_length(file.get_file_size())
@@ -114,7 +114,7 @@ impl RssService {
             } else {
                 None
             };
-            let mut item = RssItem::default();
+            let mut item: RssItem = RssItem::default();
             item.set_title(file.get_file_name().to_string())
                 .set_link(full_url.clone())
                 .set_description(format!(

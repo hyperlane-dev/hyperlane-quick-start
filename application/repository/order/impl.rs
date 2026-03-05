@@ -66,7 +66,7 @@ impl UserRepository {
     ) -> Result<(Vec<OrderUserModel>, i64, bool), String> {
         let db: DatabaseConnection =
             PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
-        let mut base_select = OrderUserEntity::find();
+        let mut base_select: Select<OrderUserEntity> = OrderUserEntity::find();
         if let Some(keyword) = keyword {
             let keyword_pattern: String = format!("%{keyword}%");
             let mut condition: Condition = Condition::any()
@@ -84,7 +84,7 @@ impl UserRepository {
             .await
             .map_err(|error: DbErr| error.to_string())?;
         let total_count: i64 = total_count_u64 as i64;
-        let mut paged_select = base_select;
+        let mut paged_select: Select<OrderUserEntity> = base_select;
         if let Some(last_id) = last_id {
             paged_select = paged_select.filter(OrderUserColumn::Id.lt(last_id));
         }

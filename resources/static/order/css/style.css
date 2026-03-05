@@ -97,7 +97,8 @@ a {
 
 .main-app {
   display: flex;
-  min-height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
 }
 
 .sidebar {
@@ -221,14 +222,19 @@ a {
 }
 
 .main-content {
-  flex: 1;
   margin-left: 260px;
   padding: 24px;
-  min-height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .content-header {
   margin-bottom: 24px;
+  flex-shrink: 0;
 }
 
 .content-header h1 {
@@ -459,21 +465,72 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   padding: 20px;
 }
 
+#records-page,
+#users-page {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 #records-page .card,
 #users-page .card {
   display: flex;
   flex-direction: column;
   height: calc(100vh - 140px);
+  width: 100%;
+}
+
+#user-records-page {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+#user-records-page .stats-grid {
+  flex-shrink: 0;
+  margin-bottom: 16px;
 }
 
 #user-records-page .card {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 260px);
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+#user-records-page .card-header {
+  flex-shrink: 0;
+}
+
+#user-records-page .card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+#user-records-page .filter-bar {
+  flex-shrink: 0;
+}
+
+#user-records-page .record-list {
+  flex: 1;
+  min-height: 150px;
+  overflow-y: auto;
+}
+
+#user-records-page .pagination-container {
+  flex-shrink: 0;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e0e0e0;
 }
 
 #records-page .card-body,
-#user-records-page .card-body,
 #users-page .card-body {
   display: flex;
   flex-direction: column;
@@ -481,14 +538,25 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   overflow: hidden;
 }
 
+#profile-page {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+#profile-page .card {
+  width: 100%;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 #records-page .filter-bar,
-#user-records-page .filter-bar,
 #users-page .filter-bar {
   flex-shrink: 0;
 }
 
 #records-page .pagination-container,
-#user-records-page .pagination-container,
 #users-page .pagination-container {
   flex-shrink: 0;
   margin-top: 16px;
@@ -497,7 +565,9 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 #dashboard-page {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 120px);
+  flex: 1;
+  width: 100%;
+  overflow-y: auto;
 }
 
 #dashboard-page .stats-grid {
@@ -527,7 +597,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
   margin-bottom: 24px;
 }
@@ -1231,6 +1301,11 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   .main-content {
     margin-left: 0;
     padding: 16px;
+    height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
   }
 
   .mobile-menu-btn {
@@ -1254,11 +1329,33 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   }
 
   .stats-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
   }
 
-  #overview-page .stats-grid {
-    grid-template-columns: 1fr;
+  #dashboard-page .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  #user-records-page .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .stat-card {
+    padding: 12px 8px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+  }
+
+  .stat-value {
+    font-size: 16px;
+  }
+
+  .stat-change {
+    font-size: 11px;
   }
 
   .filter-bar {
@@ -1429,29 +1526,82 @@ input[type='number'].form-input::-webkit-inner-spin-button {
     font-size: 13px;
   }
 
-  #dashboard-page,
+  #dashboard-page {
+    width: 100%;
+    flex: 1;
+    overflow-y: auto;
+  }
+
   #records-page,
-  #users-page,
-  #user-records-page {
+  #users-page {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
     height: auto;
     min-height: calc(100vh - 80px);
   }
 
+  #profile-page {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  #user-records-page {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  #user-records-page .stats-grid {
+    flex-shrink: 0;
+    margin-bottom: 12px;
+  }
+
   #dashboard-page .card,
   #records-page .card,
-  #users-page .card,
-  #user-records-page .card {
+  #users-page .card {
     flex: none;
     height: auto;
     min-height: calc(100vh - 140px);
+    width: 100%;
+  }
+
+  #profile-page .card {
+    width: 100%;
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  #user-records-page .card {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
   }
 
   #dashboard-page .card-body,
   #records-page .card-body,
-  #users-page .card-body,
-  #user-records-page .card-body {
+  #users-page .card-body {
     overflow: visible;
     flex: none;
+  }
+
+  #user-records-page .card-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  #user-records-page .card-header,
+  #user-records-page .filter-bar {
+    flex-shrink: 0;
   }
 
   #dashboard-page .record-list {
@@ -1461,10 +1611,22 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   }
 
   #records-page .record-list,
-  #users-page .user-list,
-  #user-records-page .record-list {
+  #users-page .user-list {
     max-height: none;
     overflow: visible;
+  }
+
+  #user-records-page .record-list {
+    flex: 1;
+    min-height: 150px;
+    overflow-y: auto;
+  }
+
+  #user-records-page .pagination-container {
+    flex-shrink: 0;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #e0e0e0;
   }
 
   .record-meta-row {
@@ -1692,6 +1854,34 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 @media (max-width: 1200px) {
   .charts-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+
+  #dashboard-page .stats-grid,
+  #user-records-page .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stat-card {
+    padding: 10px 6px;
+  }
+
+  .stat-label {
+    font-size: 10px;
+  }
+
+  .stat-value {
+    font-size: 14px;
+  }
+
+  .stat-change {
+    font-size: 10px;
   }
 }
 

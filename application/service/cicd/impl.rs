@@ -375,7 +375,7 @@ impl CicdService {
                 page_size + 1,
             )
             .await?;
-        let mut dto = PaginatedRunsDto::default();
+        let mut dto: PaginatedRunsDto = PaginatedRunsDto::default();
         dto.set_total(total)
             .set_runs(models.into_iter().map(Into::into).collect())
             .set_has_more(has_more);
@@ -453,11 +453,11 @@ impl CicdService {
             let mut jobs_with_steps: Vec<JobWithStepsDto> = Vec::new();
             for job in jobs {
                 let steps: Vec<StepDto> = Self::get_steps_by_job(job.get_id()).await?;
-                let mut dto = JobWithStepsDto::default();
+                let mut dto: JobWithStepsDto = JobWithStepsDto::default();
                 dto.set_job(job).set_steps(steps);
                 jobs_with_steps.push(dto);
             }
-            let mut model = RunDetailDto::default();
+            let mut model: RunDetailDto = RunDetailDto::default();
             model.set_run(run_dto).set_jobs(jobs_with_steps);
             Ok(Some(model))
         } else {
@@ -565,7 +565,7 @@ impl CicdService {
                         } else {
                             (None, stderr_length)
                         };
-                    let mut log_dto = StepLogDto::default();
+                    let mut log_dto: StepLogDto = StepLogDto::default();
                     log_dto
                         .set_step_id(step_id)
                         .set_step_name(step.get_name().clone())
@@ -580,11 +580,11 @@ impl CicdService {
                         .set_stderr_offset(stderr_offset);
                     step_logs.push(log_dto);
                 }
-                let mut job_dto = JobWithIncrementalStepsDto::default();
+                let mut job_dto: JobWithIncrementalStepsDto = JobWithIncrementalStepsDto::default();
                 job_dto.set_job(job).set_steps(step_logs);
                 jobs_with_steps.push(job_dto);
             }
-            let mut detail_dto = IncrementalRunDetailDto::default();
+            let mut detail_dto: IncrementalRunDetailDto = IncrementalRunDetailDto::default();
             detail_dto.set_run(run_dto).set_jobs(jobs_with_steps);
             Ok(Some(detail_dto))
         } else {
@@ -670,7 +670,8 @@ impl LogStreamManager {
         let _receiver: BroadcastMapReceiver<String> = self
             .broadcast_map
             .subscribe_or_insert(key, DEFAULT_BROADCAST_SENDER_CAPACITY);
-        let mut outputs = self.get_step_outputs().write().await;
+        let mut outputs: RwLockWriteGuard<'_, HashMap<i32, StepOutput>> =
+            self.get_step_outputs().write().await;
         outputs.insert(
             step_id,
             StepOutput {

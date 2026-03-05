@@ -4,7 +4,7 @@ impl ActiveModelBehavior for ActiveModel {}
 
 impl From<Model> for ChatHistory {
     fn from(model: Model) -> Self {
-        let mut history = ChatHistory::default();
+        let mut history: ChatHistory = ChatHistory::default();
         history
             .set_id(model.id)
             .set_session_id(model.session_id)

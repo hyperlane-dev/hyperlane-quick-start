@@ -18,7 +18,7 @@ impl ServerHook for ListRecordsRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response =
+                let response: ApiResponse<()> =
                     ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
@@ -50,12 +50,12 @@ impl ServerHook for CreateRecordRoute {
         };
         match RedisService::create_redis_record(record).await {
             Ok(_) => {
-                let response =
+                let response: ApiResponse<()> =
                     ApiResponse::<()>::success_without_data("Record created successfully");
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response =
+                let response: ApiResponse<()> =
                     ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
@@ -87,12 +87,12 @@ impl ServerHook for UpdateRecordRoute {
         };
         match RedisService::update_redis_record(record).await {
             Ok(_) => {
-                let response =
+                let response: ApiResponse<()> =
                     ApiResponse::<()>::success_without_data("Record updated successfully");
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response =
+                let response: ApiResponse<()> =
                     ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
@@ -126,12 +126,12 @@ impl ServerHook for DeleteRecordRoute {
         };
         match RedisService::delete_redis_record(key).await {
             Ok(_) => {
-                let response =
+                let response: ApiResponse<()> =
                     ApiResponse::<()>::success_without_data("Record deleted successfully");
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response =
+                let response: ApiResponse<()> =
                     ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }

@@ -80,7 +80,7 @@ impl TrackingService {
         let records: Vec<TrackingRecordDTO> = models
             .into_iter()
             .map(|model| {
-                let mut dto = TrackingRecordDTO::default();
+                let mut dto: TrackingRecordDTO = TrackingRecordDTO::default();
                 dto.set_id(model.get_id())
                     .set_socket_addr(model.get_socket_addr().clone())
                     .set_headers(serde_json::from_str(model.get_headers()).unwrap_or_default())
@@ -95,7 +95,7 @@ impl TrackingService {
                 dto
             })
             .collect();
-        let mut response = TrackingQueryResponse::default();
+        let mut response: TrackingQueryResponse = TrackingQueryResponse::default();
         response
             .set_total(total)
             .set_page(page)

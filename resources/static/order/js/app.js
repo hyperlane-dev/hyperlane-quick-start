@@ -10,10 +10,7 @@ let allRecords = [];
 let totalRecords = 0;
 let currentPageNum = 1;
 let cacheId = null;
-
-let recentRecordsLastId = null;
-let recentRecordsHasMore = false;
-let recentRecordsLoading = false;
+let userRecordsCacheId = null;
 
 let usersLimit = 20;
 let usersHasMore = false;
@@ -233,7 +230,6 @@ function switchToPage(page) {
   const pageTitleMap = {
     dashboard: 'Dashboard',
     records: 'Records',
-    overview: 'Overview',
     users: 'Users',
     profile: 'Profile',
     'user-records': 'User Records',
@@ -242,7 +238,6 @@ function switchToPage(page) {
     pageTitleMap[page] || page;
   if (page === 'dashboard') loadDashboard();
   if (page === 'records') loadRecords();
-  if (page === 'overview') loadOverview();
   if (page === 'users') loadUsers();
   if (page === 'profile') loadProfile();
   if (page === 'user-records') loadUserRecords();
@@ -1667,145 +1662,7 @@ function handleAuthError(message) {
 }
 
 async function loadDashboard() {
-  recentRecordsLastId = null;
-  recentRecordsHasMore = false;
-  await loadRecentRecords();
-  initRecentRecordsScroll();
-}
-
-async function loadRecentRecords(append = false) {
-  if (recentRecordsLoading) return;
-  recentRecordsLoading = true;
-  try {
-    const params = new URLSearchParams();
-    params.append('limit', 20);
-    if (recentRecordsLastId) {
-      params.append('last_id', recentRecordsLastId);
-    }
-    if (currentUser && currentUser.role !== 'admin') {
-      params.append('user_id', currentUser.id);
-    }
-    const response = await fetch(`${API_BASE}/record/list?${params}`, {
-      credentials: 'include',
-    });
-    const result = await response.json();
-    if (result.code === 200) {
-      const records = result.data.records;
-      recentRecordsHasMore = records.length === 20;
-      if (records.length > 0) {
-        recentRecordsLastId = records[records.length - 1].id;
-      }
-      await renderRecentRecords(records, append);
-      if (!recentRecordsHasMore) {
-        const container = document.getElementById('recent-records-list');
-        const sentinel = container?.querySelector('.load-more-sentinel');
-        if (sentinel) sentinel.style.display = 'none';
-      }
-      if (!append) {
-        updateStats(result.data);
-      }
-    } else {
-      if (result.code === 401) {
-        handleAuthError(result.message);
-      } else {
-        showToast(result.message || 'Error loading records', 'error');
-      }
-    }
-  } catch (error) {
-    showToast('Network error: ' + error.message, 'error');
-  } finally {
-    recentRecordsLoading = false;
-  }
-}
-
-async function renderRecentRecords(records, append = false) {
-  const container = document.getElementById('recent-records-list');
-  if (!records || records.length === 0) {
-    if (!append) {
-      container.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-state-icon">📝</div>
-          <div class="empty-state-title">No records yet</div>
-          <p>Create your first record to get started</p>
-        </div>`;
-    }
-    return;
-  }
-  const recordHtmls = await Promise.all(
-    records.map((r) => renderRecordItem(r)),
-  );
-  const html = recordHtmls.join('');
-  if (append) {
-    const loader = container.querySelector('.loading-more');
-    if (loader) loader.remove();
-    const sentinel = container.querySelector('.load-more-sentinel');
-    if (sentinel) {
-      sentinel.insertAdjacentHTML('beforebegin', html);
-    } else {
-      container.insertAdjacentHTML('beforeend', html);
-    }
-  } else {
-    const sentinel = container.querySelector('.load-more-sentinel');
-    container.innerHTML = html;
-    if (sentinel) {
-      container.appendChild(sentinel);
-      sentinel.style.display = '';
-    }
-  }
-}
-
-function initRecentRecordsScroll() {
-  const container = document.getElementById('recent-records-list');
-  if (!container) return;
-
-  const isMobile = window.matchMedia('(max-width: 768px)').matches;
-
-  if (isMobile) {
-    const sentinel = document.createElement('div');
-    sentinel.className = 'load-more-sentinel';
-    sentinel.style.cssText = 'height: 1px; margin-top: 20px;';
-    container.appendChild(sentinel);
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (
-            entry.isIntersecting &&
-            recentRecordsHasMore &&
-            !recentRecordsLoading
-          ) {
-            showLoadingMore();
-            loadRecentRecords(true);
-          }
-        });
-      },
-      { rootMargin: '0px 0px 100px 0px' },
-    );
-
-    observer.observe(sentinel);
-  } else {
-    const handleScroll = () => {
-      if (!recentRecordsHasMore || recentRecordsLoading) return;
-      const { scrollTop, scrollHeight, clientHeight } = container;
-      if (scrollTop + clientHeight >= scrollHeight - 50) {
-        showLoadingMore();
-        loadRecentRecords(true);
-      }
-    };
-    container.addEventListener('scroll', handleScroll, { passive: true });
-  }
-}
-
-function showLoadingMore() {
-  const container = document.getElementById('recent-records-list');
-  if (!container) return;
-  const existing = container.querySelector('.loading-more');
-  if (existing) return;
-  const loader = document.createElement('div');
-  loader.className = 'loading-more';
-  loader.innerHTML =
-    '<div class="loading-spinner"></div><span>Loading more...</span>';
-  container.appendChild(loader);
+  await loadOverview();
 }
 
 function copyBillNo(billNo) {
@@ -1818,53 +1675,6 @@ function copyBillNo(billNo) {
     .catch(() => {
       showToast('Failed to copy Bill No', 'error', 2000);
     });
-}
-
-async function renderRecordItem(record) {
-  const typeIcon = record.transaction_type === 'income' ? '💰' : '💸';
-  const amountClass =
-    record.transaction_type === 'income' ? 'income' : 'expense';
-  const amountPrefix = record.transaction_type === 'income' ? '+' : '-';
-  const recordJson = JSON.stringify(record).replace(/"/g, '&quot;');
-  const images = await loadRecordImages(record.id);
-  const imagesHtml = renderRecordImages(record.id, images);
-  const displayName = record.username || `User ${record.user_id}`;
-  return `
-    <div class="record-item" data-record-id="${record.id}" data-bill-no="${escapeHtml(record.bill_no)}" ondblclick="copyBillNo('${escapeHtml(record.bill_no)}')">
-      <div class="record-type ${record.transaction_type}">${typeIcon}</div>
-      <div class="record-info">
-        <div class="record-category">${escapeHtml(record.category)}</div>
-        <div class="record-description">${escapeHtml(record.description || '')}</div>
-        <div class="record-meta-row">
-          <span class="record-meta-item"><span class="record-meta-label">ID:</span> <span class="record-meta-value">${record.id}</span></span>
-          <span class="record-meta-item"><span class="record-meta-label">Bill No:</span> <span class="record-meta-value">${escapeHtml(record.bill_no)}</span></span>
-          <span class="record-meta-item" onclick="event.stopPropagation(); viewUserRecords(${record.user_id}, '${escapeHtml(displayName)}');" style="cursor: pointer;"><span class="record-meta-label">User:</span> <span class="record-meta-value" style="color: #58a6ff;">${escapeHtml(displayName)}</span></span>
-        </div>
-        <div class="record-date-row">
-          <span class="record-date-item"><span class="record-date-label">Date:</span> <span class="record-date-value">${formatDate(record.bill_date)}</span></span>
-          ${record.created_at ? `<span class="record-date-item"><span class="record-date-label">Created:</span> <span class="record-date-value">${formatDate(record.created_at)}</span></span>` : ''}
-        </div>
-        ${imagesHtml}
-      </div>
-      <div class="record-right">
-        <div class="record-amount ${amountClass}">${amountPrefix}¥${formatAmount(record.amount)}</div>
-        <button class="btn-print" onclick="event.stopPropagation(); printRecordData(JSON.parse(this.dataset.record));" data-record="${recordJson}">🖨️ Print</button>
-      </div>
-    </div>`;
-}
-
-function updateStats(data) {
-  if (data) {
-    const income = parseFloat(data.total_income) || 0;
-    const expense = parseFloat(data.total_expense) || 0;
-    const balance = parseFloat(data.balance) || 0;
-    document.getElementById('total-income').textContent =
-      `¥${formatAmount(income)}`;
-    document.getElementById('total-expense').textContent =
-      `¥${formatAmount(expense)}`;
-    document.getElementById('total-balance').textContent =
-      `¥${formatAmount(balance)}`;
-  }
 }
 
 function updateRecordsSummary(data) {
@@ -1932,7 +1742,6 @@ async function applyFilters(pageDirection = null) {
       }
       totalRecords = data.total_count || allRecords.length;
       await renderAllRecords(allRecords);
-      updateStats(data);
       updateRecordsSummary(data);
       renderPagination();
       requestAnimationFrame(() => {
@@ -2581,8 +2390,7 @@ async function loadUserRecords() {
   if (!viewingUserId) return;
   document.getElementById('user-records-title').textContent =
     `Records for ${viewingUserName || 'User'}`;
-  currentPageNum = 1;
-  await applyUserRecordFilters();
+  await applyUserRecordFilters('reset');
 }
 
 async function applyUserRecordFilters(pageDirection = null) {
@@ -2601,17 +2409,19 @@ async function applyUserRecordFilters(pageDirection = null) {
   if (endDate) params.append('end_date', endDate);
   if (category) params.append('category', category);
   if (type) params.append('transaction_type', type);
-  let cursor = null;
-  if (pageDirection === 'next' && allRecords.length > 0) {
-    cursor = allRecords[allRecords.length - 1].id;
-    params.append('last_id', cursor);
-    params.append('direction', 'next');
-  } else if (pageDirection === 'prev' && allRecords.length > 0) {
-    cursor = allRecords[0].id;
-    params.append('last_id', cursor);
-    params.append('direction', 'prev');
+  if (pageDirection === 'next') {
+    currentPageNum++;
+  } else if (pageDirection === 'prev') {
+    currentPageNum--;
+  } else if (pageDirection === 'reset') {
+    currentPageNum = 1;
+    userRecordsCacheId = null;
   }
+  params.append('page', currentPageNum);
   params.append('limit', recordsLimit);
+  if (userRecordsCacheId) {
+    params.append('cache_id', userRecordsCacheId);
+  }
   try {
     const response = await fetch(`${API_BASE}/record/list?${params}`, {
       credentials: 'include',
@@ -2621,17 +2431,24 @@ async function applyUserRecordFilters(pageDirection = null) {
       const data = result.data;
       allRecords = data.records;
       recordsHasMore = allRecords.length === recordsLimit;
-      if (pageDirection === 'next') {
-        currentPageNum++;
-      } else if (pageDirection === 'prev') {
-        currentPageNum--;
-      } else {
-        currentPageNum = 1;
+      if (currentPageNum === 1 && allRecords.length > 0 && !userRecordsCacheId) {
+        userRecordsCacheId = allRecords[0].id;
       }
       totalRecords = data.total_count || allRecords.length;
       await renderUserRecords(allRecords);
       updateUserRecordStats(data);
       renderUserRecordPagination();
+      requestAnimationFrame(() => {
+        const firstRecord = document.querySelector(
+          '#user-records-list .record-item',
+        );
+        if (firstRecord) {
+          firstRecord.scrollIntoView({
+            behavior: 'instant',
+            block: 'start',
+          });
+        }
+      });
     } else {
       if (result.code === 401) {
         handleAuthError(result.message);
@@ -2759,9 +2576,8 @@ function renderUserRecordPagination() {
 
 function goToUserRecordPage(pageNum) {
   if (pageNum === currentPageNum) return;
-  const direction = pageNum > currentPageNum ? 'next' : 'prev';
   currentPageNum = pageNum;
-  applyUserRecordFilters(direction);
+  applyUserRecordFilters();
 }
 
 function goToUserRecordNextPage() {
@@ -2781,10 +2597,7 @@ function resetUserRecordFilters() {
   document.getElementById('user-filter-end-date').value = '';
   document.getElementById('user-filter-category').value = '';
   document.getElementById('user-filter-type').value = '';
-  currentPageNum = 1;
-  recordsLastId = null;
-  recordsFirstId = null;
-  applyUserRecordFilters();
+  applyUserRecordFilters('reset');
 }
 
 async function handleUserSubmit(e) {

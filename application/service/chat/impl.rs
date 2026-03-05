@@ -379,7 +379,7 @@ impl ChatService {
             ChatHistoryRepository::get_history(before_id, limit).await?;
         let total: i64 = ChatHistoryRepository::count_messages().await?;
         let has_more: bool = messages.len() as u64 == limit;
-        let mut response = ChatHistoryResponse::default();
+        let mut response: ChatHistoryResponse = ChatHistoryResponse::default();
         response
             .set_messages(messages)
             .set_total(total as usize)
