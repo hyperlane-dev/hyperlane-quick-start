@@ -79,9 +79,7 @@ impl CicdService {
 
     #[instrument_trace]
     pub async fn get_pipeline_by_id(id: i32) -> Result<Option<PipelineDto>, String> {
-        Ok(PipelineRepository::find_by_id(id)
-            .await?
-            .map(Into::into))
+        Ok(PipelineRepository::find_by_id(id).await?.map(Into::into))
     }
 
     #[instrument_trace]
