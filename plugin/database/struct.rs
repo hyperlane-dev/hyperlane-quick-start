@@ -33,7 +33,7 @@ pub struct ErrorContext {
     #[get(type(copy), pub(crate))]
     pub(super) should_continue: bool,
     #[get(pub(crate))]
-    pub(super) timestamp: std::time::SystemTime,
+    pub(super) timestamp: SystemTime,
 }
 
 #[derive(Clone, Data, Debug, Default)]
