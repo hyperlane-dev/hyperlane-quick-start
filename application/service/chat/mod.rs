@@ -19,6 +19,4 @@ use {
     hyperlane_plugin::{common::*, env::*},
 };
 
-use std::sync::OnceLock;
-
 use tokio::sync::broadcast::error::SendError;

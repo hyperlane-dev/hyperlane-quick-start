@@ -1081,18 +1081,14 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   bottom: 0;
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(2px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   z-index: 100;
 }
 
 .modal.loading .modal-content::before {
   content: '';
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  top: calc(50% - 20px);
+  left: calc(50% - 20px);
   width: 40px;
   height: 40px;
   border: 3px solid #e0e0e0;
