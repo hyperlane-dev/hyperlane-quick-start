@@ -146,8 +146,7 @@ impl OrderService {
         user_id: i32,
         request: ChangePasswordRequest,
     ) -> Result<(), String> {
-        let user: Option<OrderUserModel> = UserRepository::find_by_id(user_id).await?;
-        match user {
+        match UserRepository::find_by_id(user_id).await? {
             Some(model) => {
                 let valid: bool = PasswordUtil::verify_password(
                     request.get_old_password(),
@@ -170,8 +169,7 @@ impl OrderService {
 
     #[instrument_trace]
     pub async fn approve_user(user_id: i32, approved: bool) -> Result<UserResponse, String> {
-        let user: Option<OrderUserModel> = UserRepository::find_by_id(user_id).await?;
-        match user {
+        match UserRepository::find_by_id(user_id).await? {
             Some(model) => {
                 let mut active_model: OrderUserActiveModel = model.into();
                 let status: i16 = if approved {
@@ -211,8 +209,9 @@ impl OrderService {
 
     #[instrument_trace]
     pub async fn get_user(user_id: i32) -> Result<Option<UserResponse>, String> {
-        let user: Option<OrderUserModel> = UserRepository::find_by_id(user_id).await?;
-        Ok(user.map(|model: OrderUserModel| Self::model_to_user_response(&model)))
+        Ok(UserRepository::find_by_id(user_id)
+            .await?
+            .map(|model: OrderUserModel| Self::model_to_user_response(&model)))
     }
 
     #[instrument_trace]
@@ -315,8 +314,7 @@ impl OrderService {
 
     #[instrument_trace]
     pub async fn get_record(record_id: i32) -> Result<Option<RecordResponse>, String> {
-        let record: Option<OrderRecordModel> = RecordRepository::find_by_id(record_id).await?;
-        match record {
+        match RecordRepository::find_by_id(record_id).await? {
             Some(model) => {
                 let mut response: RecordResponse = Self::model_to_record_response(&model);
                 Self::enrich_record_with_user(&mut response).await?;
@@ -1297,8 +1295,7 @@ impl OrderService {
     ) -> Result<CreateRecordWithImagesResponse, String> {
         let db: DatabaseConnection =
             PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
-        let record: Option<OrderRecordModel> = RecordRepository::find_by_id(record_id).await?;
-        let record_model: OrderRecordModel = match record {
+        let record_model: OrderRecordModel = match RecordRepository::find_by_id(record_id).await? {
             Some(model) => model,
             None => return Err("Record not found".to_string()),
         };

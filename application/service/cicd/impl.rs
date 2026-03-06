@@ -79,8 +79,9 @@ impl CicdService {
 
     #[instrument_trace]
     pub async fn get_pipeline_by_id(id: i32) -> Result<Option<PipelineDto>, String> {
-        let result: Option<CicdPipelineModel> = PipelineRepository::find_by_id(id).await?;
-        Ok(result.map(Into::into))
+        Ok(PipelineRepository::find_by_id(id)
+            .await?
+            .map(Into::into))
     }
 
     #[instrument_trace]
@@ -353,8 +354,7 @@ impl CicdService {
 
     #[instrument_trace]
     pub async fn get_run_by_id(id: i32) -> Result<Option<RunDto>, String> {
-        let result: Option<CicdRunModel> = RunRepository::find_by_id(id).await?;
-        Ok(result.map(Into::into))
+        Ok(RunRepository::find_by_id(id).await?.map(Into::into))
     }
 
     #[instrument_trace]

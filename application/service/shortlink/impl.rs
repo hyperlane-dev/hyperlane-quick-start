@@ -35,8 +35,7 @@ impl ShortlinkService {
     #[instrument_trace]
     pub async fn query_shortlink(encrypted_id: String) -> Result<Option<ShortlinkRecord>, String> {
         let id: i32 = Self::decrypt_id(&encrypted_id)?;
-        let record: Option<ShortlinkModel> = ShortlinkRepository::find_by_id(id).await?;
-        match record {
+        match ShortlinkRepository::find_by_id(id).await? {
             Some(model) => {
                 let mut record: ShortlinkRecord = ShortlinkRecord::default();
                 record
