@@ -1022,9 +1022,9 @@ function initRatioTrendChart(ratioTrend) {
         const idx = params[0].dataIndex;
         const item = ratioTrend[idx];
         return `<div style="font-weight:600;margin-bottom:5px">${item.date}</div>
-                <div>收支比: <span style="color:#667eea;font-weight:600">${item.ratio.toFixed(2)}</span></div>
-                <div>收入: <span style="color:#22c55e">¥${item.income}</span></div>
-                <div>支出: <span style="color:#ef4444">¥${item.expense}</span></div>`;
+                <div>Income/Expense Ratio: <span style="color:#667eea;font-weight:600">${item.ratio.toFixed(2)}</span></div>
+                <div>Income: <span style="color:#22c55e">¥${item.income}</span></div>
+                <div>Expense: <span style="color:#ef4444">¥${item.expense}</span></div>`;
       },
     },
     grid: {
@@ -1069,7 +1069,7 @@ function initRatioTrendChart(ratioTrend) {
             {
               yAxis: 1,
               lineStyle: { color: '#22c55e', type: 'dashed', width: 2 },
-              label: { formatter: '收支平衡', color: '#22c55e' },
+              label: { formatter: 'Balance', color: '#22c55e' },
             },
           ],
         },
@@ -1394,9 +1394,9 @@ function initUserRetentionChart(retentionData) {
         const idx = params[0].dataIndex;
         const item = retentionData[idx];
         return `<div style="font-weight:600;margin-bottom:5px">${item.date}</div>
-                <div>新用户: <span style="color:#3b82f6;font-weight:600">${item.new_users}</span></div>
-                <div>留存用户: <span style="color:#22c55e;font-weight:600">${item.retained_users}</span></div>
-                <div>留存率: <span style="color:#f59e0b;font-weight:600">${item.retention_rate.toFixed(1)}%</span></div>`;
+                <div>New Users: <span style="color:#3b82f6;font-weight:600">${item.new_users}</span></div>
+                <div>Retained Users: <span style="color:#22c55e;font-weight:600">${item.retained_users}</span></div>
+                <div>Retention Rate: <span style="color:#f59e0b;font-weight:600">${item.retention_rate.toFixed(1)}%</span></div>`;
       },
     },
     grid: {
@@ -1468,8 +1468,8 @@ function initTopUsersChart(topUsers) {
         const idx = params[0].dataIndex;
         const item = topUsers[idx];
         return `<div style="font-weight:600;margin-bottom:5px">${item.username}</div>
-                <div>交易金额: <span style="color:#667eea;font-weight:600">¥${item.total_amount}</span></div>
-                <div>交易次数: <span style="color:#3b82f6;font-weight:600">${item.transaction_count}</span></div>`;
+                <div>Transaction Amount: <span style="color:#667eea;font-weight:600">¥${item.total_amount}</span></div>
+                <div>Transaction Count: <span style="color:#3b82f6;font-weight:600">${item.transaction_count}</span></div>`;
       },
     },
     grid: {
@@ -2431,7 +2431,11 @@ async function applyUserRecordFilters(pageDirection = null) {
       const data = result.data;
       allRecords = data.records;
       recordsHasMore = allRecords.length === recordsLimit;
-      if (currentPageNum === 1 && allRecords.length > 0 && !userRecordsCacheId) {
+      if (
+        currentPageNum === 1 &&
+        allRecords.length > 0 &&
+        !userRecordsCacheId
+      ) {
         userRecordsCacheId = allRecords[0].id;
       }
       totalRecords = data.total_count || allRecords.length;
@@ -2802,7 +2806,44 @@ function formatAmount(amount) {
 
 function formatDate(dateStr) {
   if (!dateStr) return '';
-  const date = new Date(dateStr);
+  if (dateStr.includes('T')) {
+    const date = new Date(dateStr);
+    return date.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    });
+  }
+  if (dateStr.includes(' ') && dateStr.includes(':')) {
+    const parts = dateStr.split(' ');
+    const dateParts = parts[0].split('-');
+    const timeParts = parts[1].split(':');
+    const year = parseInt(dateParts[0], 10);
+    const month = parseInt(dateParts[1], 10) - 1;
+    const day = parseInt(dateParts[2], 10);
+    const hour = parseInt(timeParts[0], 10);
+    const minute = parseInt(timeParts[1], 10);
+    const second = parseInt(timeParts[2], 10);
+    const date = new Date(year, month, day, hour, minute, second);
+    return date.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    });
+  }
+  const dateParts = dateStr.split('-');
+  const year = parseInt(dateParts[0], 10);
+  const month = parseInt(dateParts[1], 10) - 1;
+  const day = parseInt(dateParts[2], 10);
+  const date = new Date(year, month, day);
   return date.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',

@@ -23,9 +23,9 @@ pub struct Model {
     #[get(pub(crate))]
     pub(super) config_content: Option<String>,
     #[get(pub(crate))]
-    pub(super) created_at: Option<NaiveDateTime>,
+    pub(super) created_at: Option<DateTime<FixedOffset>>,
     #[get(pub(crate))]
-    pub(super) updated_at: Option<NaiveDateTime>,
+    pub(super) updated_at: Option<DateTime<FixedOffset>>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]

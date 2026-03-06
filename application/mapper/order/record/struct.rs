@@ -31,7 +31,7 @@ pub struct Model {
     #[get(pub(crate))]
     pub(super) bill_date: NaiveDate,
     #[get(pub(crate))]
-    pub(super) created_at: Option<NaiveDateTime>,
+    pub(super) created_at: Option<DateTime<FixedOffset>>,
     #[get(pub(crate))]
-    pub(super) updated_at: Option<NaiveDateTime>,
+    pub(super) updated_at: Option<DateTime<FixedOffset>>,
 }

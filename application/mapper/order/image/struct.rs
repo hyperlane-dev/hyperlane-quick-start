@@ -31,5 +31,5 @@ pub struct Model {
     #[get(pub(crate))]
     pub(super) file_data: Vec<u8>,
     #[get(pub(crate))]
-    pub(super) created_at: Option<NaiveDateTime>,
+    pub(super) created_at: Option<DateTime<FixedOffset>>,
 }

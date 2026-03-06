@@ -40,16 +40,7 @@ impl RssService {
             .replace('\\', ROOT_PATH)
             .trim_start_matches(ROOT_PATH)
             .to_string();
-        let upload_time: String = if let Ok(modified) = metadata.modified() {
-            if let Ok(duration) = modified.duration_since(std::time::UNIX_EPOCH) {
-                let secs: u64 = duration.as_secs();
-                Self::format_timestamp(secs)
-            } else {
-                String::new()
-            }
-        } else {
-            String::new()
-        };
+        let upload_time: String = time_millis();
         let file_url: String = if let Some(parent_path) = path.parent() {
             let parent_str: String = parent_path.to_string_lossy().to_string();
             let dir_path: String = parent_str
@@ -143,7 +134,15 @@ impl RssService {
         if timestamp.is_empty() {
             return String::new();
         }
-        timestamp.to_string()
+        match NaiveDateTime::parse_from_str(timestamp, "%Y-%m-%d %H:%M:%S%.3f") {
+            Ok(naive_dt) => {
+                let local_offset: FixedOffset = Local::now().offset().to_owned();
+                let datetime: DateTime<FixedOffset> =
+                    DateTime::from_naive_utc_and_offset(naive_dt, local_offset);
+                datetime.to_rfc2822()
+            }
+            Err(_) => timestamp.to_string(),
+        }
     }
 
     #[instrument_trace]
@@ -213,24 +212,5 @@ impl RssService {
             .replace('>', "&gt;")
             .replace('"', "&quot;")
             .replace('\'', "&apos;")
-    }
-
-    #[instrument_trace]
-    fn format_timestamp(secs: u64) -> String {
-        let system_time: SystemTime = SystemTime::UNIX_EPOCH + Duration::from_secs(secs);
-        if let Ok(datetime) = system_time.duration_since(SystemTime::UNIX_EPOCH) {
-            let total_secs: u64 = datetime.as_secs();
-            let days: u64 = total_secs / 86400;
-            let hours: u64 = (total_secs % 86400) / 3600;
-            let minutes: u64 = (total_secs % 3600) / 60;
-            let seconds: u64 = total_secs % 60;
-            let year: i32 = 1970 + (days / 365) as i32;
-            let day_of_year: u64 = days % 365;
-            let month: u32 = ((day_of_year / 30) + 1) as u32;
-            let day: u32 = ((day_of_year % 30) + 1) as u32;
-            format!("{year:04}-{month:02}-{day:02} {hours:02}:{minutes:02}:{seconds:02}",)
-        } else {
-            String::new()
-        }
     }
 }

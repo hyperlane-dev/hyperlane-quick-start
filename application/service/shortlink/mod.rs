@@ -10,4 +10,4 @@ use {
     repository::shortlink::*,
 };
 
-use {chrono::NaiveDateTime, hyperlane_config::application::charset::*};
+use hyperlane_config::application::charset::*;

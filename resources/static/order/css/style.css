@@ -546,7 +546,6 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 
 #profile-page .card {
   width: 100%;
-  max-width: 600px;
   margin-left: auto;
   margin-right: auto;
 }

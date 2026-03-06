@@ -42,10 +42,8 @@ impl OrderService {
 
     #[instrument_trace]
     fn generate_bill_no() -> String {
-        let now: chrono::DateTime<Local> = Local::now();
-        let timestamp: i64 = now.timestamp();
-        let nanos: u32 = now.timestamp_subsec_nanos() % 10000;
-        format!("BILL{}{:04}", timestamp, nanos)
+        let timestamp: u64 = timestamp_millis();
+        format!("BILL{}{:04}", timestamp, timestamp % 10000)
     }
 
     #[instrument_trace]
@@ -133,7 +131,7 @@ impl OrderService {
                 if let Some(phone) = request.try_get_phone() {
                     active_model.phone = ActiveValue::Set(Some(phone.clone()));
                 }
-                active_model.updated_at = ActiveValue::Set(Some(Local::now().naive_local()));
+                active_model.updated_at = ActiveValue::NotSet;
                 let result: OrderUserModel = UserRepository::update(active_model).await?;
                 Ok(Self::model_to_user_response(&result))
             }
@@ -159,7 +157,7 @@ impl OrderService {
                     PasswordUtil::hash_password(request.get_new_password());
                 let mut active_model: OrderUserActiveModel = model.into();
                 active_model.password_hash = ActiveValue::Set(new_password_hash);
-                active_model.updated_at = ActiveValue::Set(Some(Local::now().naive_local()));
+                active_model.updated_at = ActiveValue::NotSet;
                 UserRepository::update(active_model).await?;
                 Ok(())
             }
@@ -178,7 +176,7 @@ impl OrderService {
                     UserStatus::Rejected.to_i16()
                 };
                 active_model.status = ActiveValue::Set(status);
-                active_model.updated_at = ActiveValue::Set(Some(Local::now().naive_local()));
+                active_model.updated_at = ActiveValue::NotSet;
                 let result: OrderUserModel = UserRepository::update(active_model).await?;
                 Ok(Self::model_to_user_response(&result))
             }
@@ -220,7 +218,7 @@ impl OrderService {
         let created_at: Option<String> = model
             .try_get_created_at()
             .as_ref()
-            .map(|dt: &NaiveDateTime| dt.format("%Y-%m-%d %H:%M:%S").to_string());
+            .map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string());
         let role: UserRole = UserRole::try_from(model.get_role()).unwrap_or_default();
         let status: UserStatus = UserStatus::try_from(model.get_status()).unwrap_or_default();
         response
@@ -374,7 +372,7 @@ impl OrderService {
         let created_at: Option<String> = model
             .try_get_created_at()
             .as_ref()
-            .map(|dt: &NaiveDateTime| dt.format("%Y-%m-%d %H:%M:%S").to_string());
+            .map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string());
         response
             .set_id(model.get_id())
             .set_bill_no(model.get_bill_no().clone())
@@ -1007,7 +1005,7 @@ impl OrderService {
             let date: NaiveDate = start_date + chrono::Duration::days(day_offset);
             let new_users: Vec<i32> = users
                 .iter()
-                .filter(|u| u.get_created_at().date() == date)
+                .filter(|u| u.get_created_at().date_naive() == date)
                 .map(|u| u.get_id())
                 .collect();
             let new_users_count: i64 = new_users.len() as i64;
@@ -1399,7 +1397,7 @@ impl OrderService {
     ) -> RecordImageResponse {
         let created_at: String = model
             .try_get_created_at()
-            .map(|dt: NaiveDateTime| dt.format("%Y-%m-%d %H:%M:%S").to_string())
+            .map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string())
             .unwrap_or_default();
         let mut response: RecordImageResponse = RecordImageResponse::default();
         let download_url: String = format!("/api/order/image/download/{}", model.get_id());

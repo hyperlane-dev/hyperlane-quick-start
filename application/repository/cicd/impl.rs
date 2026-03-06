@@ -149,7 +149,7 @@ impl RunRepository {
     pub async fn start(id: i32) -> Result<(), String> {
         let db: DatabaseConnection =
             MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let now: NaiveDateTime = Utc::now().naive_utc();
+        let now: DateTime<FixedOffset> = Utc::now().into();
         CicdRunEntity::update_many()
             .filter(CicdRunColumn::Id.eq(id))
             .col_expr(
@@ -172,10 +172,9 @@ impl RunRepository {
             .await
             .map_err(|error: DbErr| error.to_string())?;
         if let Some(run_model) = run {
-            let now: NaiveDateTime = Utc::now().naive_utc();
-            let started_at: NaiveDateTime = run_model.try_get_started_at().unwrap_or(now);
-            let duration_ms: i32 =
-                (now.and_utc().timestamp_millis() - started_at.and_utc().timestamp_millis()) as i32;
+            let now: DateTime<FixedOffset> = Utc::now().into();
+            let started_at: DateTime<FixedOffset> = run_model.try_get_started_at().unwrap_or(now);
+            let duration_ms: i32 = (now.timestamp_millis() - started_at.timestamp_millis()) as i32;
             CicdRunEntity::update_many()
                 .filter(CicdRunColumn::Id.eq(id))
                 .col_expr(CicdRunColumn::Status, Expr::value(status.to_string()))
@@ -259,7 +258,7 @@ impl JobRepository {
     ) -> Result<(), String> {
         let db: DatabaseConnection =
             MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let now: NaiveDateTime = Utc::now().naive_utc();
+        let now: DateTime<FixedOffset> = Utc::now().into();
         if status == CicdStatus::Running {
             CicdJobEntity::update_many()
                 .filter(CicdJobColumn::Id.eq(id))
@@ -275,11 +274,10 @@ impl JobRepository {
                 .await
                 .map_err(|error: DbErr| error.to_string())?;
             if let Some(job_model) = job {
-                let started_at: NaiveDateTime =
-                    job_model.try_get_started_at().map(|s| s).unwrap_or(now);
-                let duration_ms: i32 = (now.and_utc().timestamp_millis()
-                    - started_at.and_utc().timestamp_millis())
-                    as i32;
+                let started_at: DateTime<FixedOffset> =
+                    job_model.try_get_started_at().unwrap_or(now);
+                let duration_ms: i32 =
+                    (now.timestamp_millis() - started_at.timestamp_millis()) as i32;
                 CicdJobEntity::update_many()
                     .filter(CicdJobColumn::Id.eq(id))
                     .col_expr(CicdJobColumn::Status, Expr::value(status.to_string()))
@@ -366,7 +364,7 @@ impl StepRepository {
     ) -> Result<(), String> {
         let db: DatabaseConnection =
             MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
-        let now: NaiveDateTime = Utc::now().naive_utc();
+        let now: DateTime<FixedOffset> = Utc::now().into();
         if status == CicdStatus::Running {
             CicdStepEntity::update_many()
                 .filter(CicdStepColumn::Id.eq(id))
@@ -381,10 +379,10 @@ impl StepRepository {
                 .await
                 .map_err(|error: DbErr| error.to_string())?;
             if let Some(step_model) = step {
-                let started_at: NaiveDateTime = (*step_model.try_get_started_at()).unwrap_or(now);
-                let duration_ms: i32 = (now.and_utc().timestamp_millis()
-                    - started_at.and_utc().timestamp_millis())
-                    as i32;
+                let started_at: DateTime<FixedOffset> =
+                    (*step_model.try_get_started_at()).unwrap_or(now);
+                let duration_ms: i32 =
+                    (now.timestamp_millis() - started_at.timestamp_millis()) as i32;
                 CicdStepEntity::update_many()
                     .filter(CicdStepColumn::Id.eq(id))
                     .col_expr(CicdStepColumn::Status, Expr::value(status.to_string()))
