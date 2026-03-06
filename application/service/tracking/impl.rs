@@ -32,50 +32,54 @@ impl TrackingService {
     pub async fn query_tracking_records(
         request: TrackingQueryRequest,
     ) -> Result<TrackingQueryResponse, String> {
-        let page: i64 = (*request.try_get_page()).unwrap_or(1).max(1);
-        let page_size: i64 = (*request.try_get_page_size()).unwrap_or(20).clamp(1, 100);
-        if let Some(start) = *request.try_get_start_time()
-            && let Some(end) = *request.try_get_end_time()
+        if let Some(start) = request.try_get_start_time()
+            && let Some(end) = request.try_get_end_time()
             && start > end
         {
             return Err("start_time must be less than or equal to end_time".to_string());
         }
+        let page: i64 = (request.try_get_page()).unwrap_or(1).max(1);
+        let page_size: i64 = (request.try_get_page_size()).unwrap_or(20).clamp(1, 100);
+        let cache_id: Option<i64> = request.try_get_cache_id();
         let (models, total): (Vec<Model>, i64) = if request.try_get_header_key().clone().is_some() {
-            let header_key: String = request.try_get_header_key().clone().unwrap();
-            let result: Result<(Vec<Model>, i64), DbErr> = TrackingRepository::query_by_header(
-                header_key,
-                request.try_get_header_value().clone(),
-                *request.try_get_start_time(),
-                *request.try_get_end_time(),
-                request.try_get_socket_addr().clone(),
-                page,
-                page_size,
-            )
-            .await;
-            result.map_err(|error| format!("Failed to query by header {error}"))?
+            let mut header_query: TrackingHeaderQuery = TrackingHeaderQuery::default();
+            header_query
+                .set_header_key(request.try_get_header_key().clone())
+                .set_header_value(request.try_get_header_value().clone())
+                .set_start_time(request.try_get_start_time())
+                .set_end_time(request.try_get_end_time())
+                .set_socket_addr(request.try_get_socket_addr().clone())
+                .set_page(page)
+                .set_page_size(page_size)
+                .set_cache_id(cache_id);
+            TrackingRepository::query_by_header(&header_query)
+                .await
+                .map_err(|error| format!("Failed to query by header {error}"))?
         } else if request.try_get_body_content().clone().is_some() {
-            let content: String = request.try_get_body_content().clone().unwrap();
-            let result: Result<(Vec<Model>, i64), DbErr> =
-                TrackingRepository::query_by_body_content(
-                    content,
-                    *request.try_get_start_time(),
-                    *request.try_get_end_time(),
-                    request.try_get_socket_addr().clone(),
-                    page,
-                    page_size,
-                )
-                .await;
-            result.map_err(|error| format!("Failed to query by body content {error}"))?
+            let mut body_query: TrackingBodyQuery = TrackingBodyQuery::default();
+            body_query
+                .set_body_content(request.try_get_body_content().clone())
+                .set_start_time(request.try_get_start_time())
+                .set_end_time(request.try_get_end_time())
+                .set_socket_addr(request.try_get_socket_addr().clone())
+                .set_page(page)
+                .set_page_size(page_size)
+                .set_cache_id(cache_id);
+            TrackingRepository::query_by_body_content(&body_query)
+                .await
+                .map_err(|error| format!("Failed to query by body content {error}"))?
         } else {
-            let result: Result<(Vec<Model>, i64), DbErr> = TrackingRepository::query(
-                *request.try_get_start_time(),
-                *request.try_get_end_time(),
-                request.try_get_socket_addr().clone(),
-                page,
-                page_size,
-            )
-            .await;
-            result.map_err(|error| format!("Failed to query tracking records {error}"))?
+            let mut query: TrackingQuery = TrackingQuery::default();
+            query
+                .set_start_time(request.try_get_start_time())
+                .set_end_time(request.try_get_end_time())
+                .set_socket_addr(request.try_get_socket_addr().clone())
+                .set_page(page)
+                .set_page_size(page_size)
+                .set_cache_id(cache_id);
+            TrackingRepository::query(&query)
+                .await
+                .map_err(|error| format!("Failed to query tracking records {error}"))?
         };
         let records: Vec<TrackingRecordDTO> = models
             .into_iter()

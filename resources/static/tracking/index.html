@@ -1386,15 +1386,29 @@
           this.pageSize = 50;
           this.totalRecords = 0;
           this.apiBase = '/api/tracking';
+          this.cacheId = null;
         }
 
-        async search(page = 1) {
-          this.currentPage = page;
+        async search(page = 1, pageDirection = null) {
+          if (pageDirection === 'next') {
+            this.currentPage++;
+          } else if (pageDirection === 'prev') {
+            this.currentPage--;
+          } else if (pageDirection === 'reset') {
+            this.currentPage = 1;
+            this.cacheId = null;
+          } else {
+            this.currentPage = page;
+          }
 
           const requestBody = {
-            page: page,
+            page: this.currentPage,
             page_size: this.pageSize,
           };
+
+          if (this.cacheId) {
+            requestBody.cache_id = this.cacheId;
+          }
 
           const startTime = document.getElementById('startTime').value;
           const endTime = document.getElementById('endTime').value;
@@ -1459,6 +1473,10 @@
           document.getElementById('totalRecords').textContent = data.total;
           document.getElementById('currentPage').textContent = data.page;
           document.getElementById('totalPages').textContent = totalPages;
+
+          if (data.page === 1 && data.records.length > 0 && !this.cacheId) {
+            this.cacheId = data.records[0].id;
+          }
 
           const container = document.getElementById('resultsContainer');
 
@@ -1528,8 +1546,8 @@
           let html = '<div class="pagination" style="display: none;">';
 
           html += `
-            <button class="page-btn" ${currentPage === 1 ? 'disabled' : ''} 
-                    onclick="app.search(${currentPage - 1})">
+            <button class="page-btn" ${currentPage === 1 ? 'disabled' : ''}
+                    onclick="app.goToPrevPage()">
               Previous
             </button>
           `;
@@ -1543,7 +1561,7 @@
           }
 
           if (startPage > 1) {
-            html += `<button class="page-btn" onclick="app.search(1)">1</button>`;
+            html += `<button class="page-btn" onclick="app.goToPage(1)">1</button>`;
             if (startPage > 2) {
               html += `<span class="page-info">...</span>`;
             }
@@ -1551,8 +1569,8 @@
 
           for (let i = startPage; i <= endPage; i++) {
             html += `
-              <button class="page-btn ${i === currentPage ? 'active' : ''}" 
-                      onclick="app.search(${i})">
+              <button class="page-btn ${i === currentPage ? 'active' : ''}"
+                      onclick="app.goToPage(${i})">
                 ${i}
               </button>
             `;
@@ -1562,20 +1580,33 @@
             if (endPage < totalPages - 1) {
               html += `<span class="page-info">...</span>`;
             }
-            html += `<button class="page-btn" onclick="app.search(${totalPages})">${totalPages}</button>`;
+            html += `<button class="page-btn" onclick="app.goToPage(${totalPages})">${totalPages}</button>`;
           }
 
           html += `
             <button class="page-btn" ${
               currentPage === totalPages ? 'disabled' : ''
-            } 
-                    onclick="app.search(${currentPage + 1})">
+            }
+                    onclick="app.goToNextPage()">
               Next
             </button>
           `;
 
           html += '</div>';
           return html;
+        }
+
+        goToNextPage() {
+          this.search(1, 'next');
+        }
+
+        goToPrevPage() {
+          this.search(1, 'prev');
+        }
+
+        goToPage(pageNum) {
+          if (pageNum === this.currentPage) return;
+          this.search(pageNum);
         }
 
         showDetail(recordId) {
@@ -1661,7 +1692,7 @@
           document.getElementById('headerValue').value = '';
           document.getElementById('bodyContent').value = '';
 
-          this.search();
+          this.search(1, 'reset');
         }
       }
 

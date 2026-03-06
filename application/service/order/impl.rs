@@ -124,8 +124,7 @@ impl OrderService {
         user_id: i32,
         request: UpdateUserRequest,
     ) -> Result<UserResponse, String> {
-        let user: Option<OrderUserModel> = UserRepository::find_by_id(user_id).await?;
-        match user {
+        match UserRepository::find_by_id(user_id).await? {
             Some(model) => {
                 let mut active_model: OrderUserActiveModel = model.into();
                 if let Some(email) = request.try_get_email() {
@@ -1373,17 +1372,14 @@ impl OrderService {
         image_id: i32,
         user_id: i32,
     ) -> Result<Option<ImageDataResponse>, String> {
-        let user: Option<OrderUserModel> = UserRepository::find_by_id(user_id).await?;
-        let user_role: UserRole = match user {
+        let user_role: UserRole = match UserRepository::find_by_id(user_id).await? {
             Some(ref model) => UserRole::try_from(model.get_role()).unwrap_or_default(),
             None => return Err("User not found".to_string()),
         };
         if !user_role.is_admin() {
             return Err("Only admin can access image data".to_string());
         }
-        let image: Option<OrderRecordImageModel> =
-            RecordImageRepository::find_by_id(image_id).await?;
-        match image {
+        match RecordImageRepository::find_by_id(image_id).await? {
             Some(model) => {
                 let mut response: ImageDataResponse = ImageDataResponse::default();
                 response
@@ -1404,11 +1400,11 @@ impl OrderService {
         model: &OrderRecordImageModel,
         record_id: i32,
     ) -> RecordImageResponse {
-        let mut response: RecordImageResponse = RecordImageResponse::default();
         let created_at: String = model
             .try_get_created_at()
             .map(|dt: NaiveDateTime| dt.format("%Y-%m-%d %H:%M:%S").to_string())
             .unwrap_or_default();
+        let mut response: RecordImageResponse = RecordImageResponse::default();
         let download_url: String = format!("/api/order/image/download/{}", model.get_id());
         response
             .set_id(model.get_id())
