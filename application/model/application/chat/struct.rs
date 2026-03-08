@@ -16,7 +16,7 @@ pub struct ChatSession {
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct OnlineUser {
     pub(super) username: String,
-    pub(super) join_time: String,
+    pub(super) join_time: i64,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
@@ -28,5 +28,5 @@ pub struct ChatHistory {
     pub(super) sender_type: String,
     pub(super) message_type: String,
     pub(super) content: String,
-    pub(super) created_at: String,
+    pub(super) created_at: i64,
 }

@@ -27,7 +27,7 @@ impl WebSocketReqData {
         resp.set_type(*self.get_type())
             .set_name(name)
             .set_data(self.get_data().clone())
-            .set_time(time());
+            .set_time(timestamp_millis() as i64);
         resp
     }
 }
@@ -40,7 +40,7 @@ impl WebSocketRespData {
         resp_data
             .set_type(msg_type)
             .set_data(data.to_string())
-            .set_time(time());
+            .set_time(timestamp_millis() as i64);
         if msg_type == MessageType::OnlineCount {
             resp_data.set_name("System".to_string());
         } else {
@@ -109,7 +109,7 @@ impl ChatDomain {
         let mut online_user: OnlineUser = OnlineUser::default();
         online_user
             .set_username(username.to_string())
-            .set_join_time(time());
+            .set_join_time(timestamp_millis() as i64);
         Self::get_global_online_users()
             .write()
             .await
@@ -133,7 +133,9 @@ impl ChatDomain {
             .cloned()
             .collect();
         let mut gpt_user: OnlineUser = OnlineUser::default();
-        gpt_user.set_username(GPT.to_string()).set_join_time(time());
+        gpt_user
+            .set_username(GPT.to_string())
+            .set_join_time(timestamp_millis() as i64);
         users_vec.insert(0, gpt_user);
         let total_count: usize = users_vec.len();
         let mut response: UserListResponse = UserListResponse::default();

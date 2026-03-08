@@ -25,15 +25,15 @@ pub struct Model {
     #[get(pub(crate))]
     pub(super) runner: Option<String>,
     #[get(pub(crate))]
-    pub(super) started_at: Option<DateTime<FixedOffset>>,
+    pub(super) started_at: Option<NaiveDateTime>,
     #[get(pub(crate))]
-    pub(super) completed_at: Option<DateTime<FixedOffset>>,
+    pub(super) completed_at: Option<NaiveDateTime>,
     #[get(type(copy), pub(crate))]
     pub(super) duration_ms: i32,
     #[get(pub(crate))]
-    pub(super) created_at: Option<DateTime<FixedOffset>>,
+    pub(super) created_at: Option<NaiveDateTime>,
     #[get(pub(crate))]
-    pub(super) updated_at: Option<DateTime<FixedOffset>>,
+    pub(super) updated_at: Option<NaiveDateTime>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]

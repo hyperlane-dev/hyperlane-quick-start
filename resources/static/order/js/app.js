@@ -2804,50 +2804,21 @@ function formatAmount(amount) {
   return parseFloat(amount).toFixed(2);
 }
 
-function formatDate(dateStr) {
-  if (!dateStr) return '';
-  if (dateStr.includes('T')) {
-    const date = new Date(dateStr);
-    return date.toLocaleString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false,
-    });
-  }
-  if (dateStr.includes(' ') && dateStr.includes(':')) {
-    const parts = dateStr.split(' ');
-    const dateParts = parts[0].split('-');
-    const timeParts = parts[1].split(':');
-    const year = parseInt(dateParts[0], 10);
-    const month = parseInt(dateParts[1], 10) - 1;
-    const day = parseInt(dateParts[2], 10);
-    const hour = parseInt(timeParts[0], 10);
-    const minute = parseInt(timeParts[1], 10);
-    const second = parseInt(timeParts[2], 10);
-    const date = new Date(year, month, day, hour, minute, second);
-    return date.toLocaleString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false,
-    });
-  }
-  const dateParts = dateStr.split('-');
-  const year = parseInt(dateParts[0], 10);
-  const month = parseInt(dateParts[1], 10) - 1;
-  const day = parseInt(dateParts[2], 10);
-  const date = new Date(year, month, day);
-  return date.toLocaleDateString('en-US', {
+function formatDate(timestamp) {
+  if (timestamp === null || timestamp === undefined || timestamp === '')
+    return '';
+  const date = new Date(
+    typeof timestamp === 'string' ? parseInt(timestamp, 10) : timestamp,
+  );
+  if (isNaN(date.getTime())) return '';
+  return date.toLocaleString('en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
   });
 }
 

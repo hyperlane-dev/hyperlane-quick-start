@@ -9,7 +9,7 @@ pub struct UserResponse {
     pub(super) phone: Option<String>,
     pub(super) role: String,
     pub(super) status: String,
-    pub(super) created_at: Option<String>,
+    pub(super) created_at: Option<i64>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
@@ -40,8 +40,8 @@ pub struct RecordResponse {
     pub(super) category: String,
     pub(super) transaction_type: String,
     pub(super) description: Option<String>,
-    pub(super) bill_date: String,
-    pub(super) created_at: Option<String>,
+    pub(super) bill_date: i64,
+    pub(super) created_at: Option<i64>,
     pub(super) username: Option<String>,
     pub(super) email: Option<String>,
     pub(super) phone: Option<String>,
@@ -216,7 +216,7 @@ pub struct RecordImageResponse {
     pub(super) mime_type: String,
     #[get(type(copy), pub)]
     pub(super) file_size: i32,
-    pub(super) created_at: String,
+    pub(super) created_at: i64,
     pub(super) download_url: String,
     pub(super) username: String,
 }
@@ -242,7 +242,7 @@ pub struct RecordImageDetailResponse {
     #[get(type(copy), pub)]
     pub(super) file_size: i32,
     pub(super) file_data_base64: String,
-    pub(super) created_at: String,
+    pub(super) created_at: i64,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]

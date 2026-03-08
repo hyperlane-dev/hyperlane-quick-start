@@ -15,8 +15,8 @@ impl From<Model> for ChatHistory {
             .set_created_at(
                 model
                     .created_at
-                    .map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string())
-                    .unwrap_or_default(),
+                    .map(|dt| dt.and_utc().timestamp_millis())
+                    .unwrap_or(0),
             );
         history
     }

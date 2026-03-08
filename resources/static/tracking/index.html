@@ -1389,6 +1389,12 @@
           this.cacheId = null;
         }
 
+        localDateTimeToTimestamp(dateTimeStr) {
+          if (!dateTimeStr) return null;
+          const date = new Date(dateTimeStr.replace(' ', 'T'));
+          return date.getTime() - date.getTimezoneOffset() * 60000;
+        }
+
         async search(page = 1, pageDirection = null) {
           if (pageDirection === 'next') {
             this.currentPage++;
@@ -1414,10 +1420,10 @@
           const endTime = document.getElementById('endTime').value;
 
           if (startTime) {
-            requestBody.start_time = new Date(startTime).getTime();
+            requestBody.start_time = this.localDateTimeToTimestamp(startTime);
           }
           if (endTime) {
-            requestBody.end_time = new Date(endTime).getTime();
+            requestBody.end_time = this.localDateTimeToTimestamp(endTime);
           }
 
           const socketAddr = document.getElementById('socketAddr').value.trim();
@@ -1507,7 +1513,7 @@
                 <td>${record.id}</td>
                 <td>${this.escapeHtml(record.socket_addr)}</td>
                 <td>${new Date(record.timestamp).toLocaleString()}</td>
-                <td>${record.created_at}</td>
+                <td>${new Date(record.created_at).toLocaleString()}</td>
                 <td>
                   <button class="detail-btn" onclick="app.showDetail(${
                     record.id
@@ -1634,7 +1640,7 @@
             </div>
             <div class="detail-section">
               <div class="detail-label">Created At</div>
-              <div class="detail-value">${record.created_at}</div>
+              <div class="detail-value">${this.utcToLocalDateTimeStr(record.created_at)}</div>
             </div>
             <div class="detail-section">
               <div class="detail-label">Headers</div>

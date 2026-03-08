@@ -90,6 +90,21 @@ const ChatHistory = {
     });
   },
 
+  formatLocalTime: function (timestamp) {
+    if (!timestamp) return '';
+    const date = new Date(
+      typeof timestamp === 'string' ? parseInt(timestamp, 10) : timestamp,
+    );
+    if (isNaN(date.getTime())) return '';
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  },
+
   createMessageElement: function (msg) {
     const messageDiv = document.createElement('div');
     const currentUuid =
@@ -121,6 +136,8 @@ const ChatHistory = {
       msg.message_type,
     );
 
+    const localTime = this.formatLocalTime(msg.created_at);
+
     messageDiv.innerHTML = `
             ${
               !isSelf
@@ -136,7 +153,7 @@ const ChatHistory = {
                 <div class="${contentClass}">
                     <div class="message-text">${processedContent}</div>
                 </div>
-                <div class="message-time">${msg.created_at}</div>
+                <div class="message-time">${localTime}</div>
             </div>
             ${
               isSelf

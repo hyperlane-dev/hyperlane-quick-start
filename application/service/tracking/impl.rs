@@ -93,8 +93,8 @@ impl TrackingService {
                     .set_created_at(
                         model
                             .try_get_created_at()
-                            .map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string())
-                            .unwrap_or_default(),
+                            .map(|dt| dt.timestamp_millis())
+                            .unwrap_or(0),
                     );
                 dto
             })

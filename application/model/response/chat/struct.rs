@@ -5,7 +5,7 @@ pub struct WebSocketRespData {
     pub(super) r#type: MessageType,
     pub(super) name: String,
     pub(super) data: String,
-    pub(super) time: String,
+    pub(super) time: i64,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]

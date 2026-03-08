@@ -44,9 +44,7 @@ impl ShortlinkService {
                     .set_created_at(
                         model
                             .try_get_created_at()
-                            .map(|dt: DateTime<FixedOffset>| {
-                                dt.format("%Y-%m-%d %H:%M:%S").to_string()
-                            })
+                            .map(|dt: NaiveDateTime| dt.format("%Y-%m-%d %H:%M:%S").to_string())
                             .unwrap_or_default(),
                     );
                 Ok(Some(record))

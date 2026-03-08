@@ -7,8 +7,16 @@ impl From<CicdPipelineModel> for PipelineDto {
             .set_name(model.get_name().clone())
             .set_description(model.try_get_description().clone())
             .set_config_content(model.try_get_config_content().clone())
-            .set_created_at(model.try_get_created_at().map(|dt| dt.to_rfc3339()))
-            .set_updated_at(model.try_get_updated_at().map(|dt| dt.to_rfc3339()));
+            .set_created_at(
+                model
+                    .try_get_created_at()
+                    .map(|dt| dt.and_utc().timestamp_millis()),
+            )
+            .set_updated_at(
+                model
+                    .try_get_updated_at()
+                    .map(|dt| dt.and_utc().timestamp_millis()),
+            );
         dto
     }
 }
@@ -25,10 +33,22 @@ impl From<CicdRunModel> for RunDto {
             .set_triggered_by(model.try_get_triggered_by().clone())
             .set_commit_hash(model.try_get_commit_hash().clone())
             .set_commit_message(model.try_get_commit_message().clone())
-            .set_started_at(model.try_get_started_at().map(|dt| dt.to_rfc3339()))
-            .set_completed_at(model.try_get_completed_at().map(|dt| dt.to_rfc3339()))
+            .set_started_at(
+                model
+                    .try_get_started_at()
+                    .map(|dt| dt.and_utc().timestamp_millis()),
+            )
+            .set_completed_at(
+                model
+                    .try_get_completed_at()
+                    .map(|dt| dt.and_utc().timestamp_millis()),
+            )
             .set_duration_ms(model.get_duration_ms())
-            .set_created_at(model.try_get_created_at().map(|dt| dt.to_rfc3339()));
+            .set_created_at(
+                model
+                    .try_get_created_at()
+                    .map(|dt| dt.and_utc().timestamp_millis()),
+            );
         dto
     }
 }
@@ -42,8 +62,16 @@ impl From<CicdJobModel> for JobDto {
             .set_name(model.get_name().clone())
             .set_status(status)
             .set_runner(model.try_get_runner().clone())
-            .set_started_at(model.try_get_started_at().map(|dt| dt.to_rfc3339()))
-            .set_completed_at(model.try_get_completed_at().map(|dt| dt.to_rfc3339()))
+            .set_started_at(
+                model
+                    .try_get_started_at()
+                    .map(|dt| dt.and_utc().timestamp_millis()),
+            )
+            .set_completed_at(
+                model
+                    .try_get_completed_at()
+                    .map(|dt| dt.and_utc().timestamp_millis()),
+            )
             .set_duration_ms(model.get_duration_ms());
         dto
     }
@@ -59,8 +87,16 @@ impl From<CicdStepModel> for StepDto {
             .set_command(model.try_get_command().clone())
             .set_status(status)
             .set_output(model.try_get_output().clone())
-            .set_started_at(model.try_get_started_at().map(|dt| dt.to_rfc3339()))
-            .set_completed_at(model.try_get_completed_at().map(|dt| dt.to_rfc3339()))
+            .set_started_at(
+                model
+                    .try_get_started_at()
+                    .map(|dt| dt.and_utc().timestamp_millis()),
+            )
+            .set_completed_at(
+                model
+                    .try_get_completed_at()
+                    .map(|dt| dt.and_utc().timestamp_millis()),
+            )
             .set_duration_ms(model.get_duration_ms());
         dto
     }

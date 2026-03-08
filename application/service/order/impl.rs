@@ -215,10 +215,9 @@ impl OrderService {
     #[instrument_trace]
     fn model_to_user_response(model: &OrderUserModel) -> UserResponse {
         let mut response: UserResponse = UserResponse::default();
-        let created_at: Option<String> = model
+        let created_at: Option<i64> = model
             .try_get_created_at()
-            .as_ref()
-            .map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string());
+            .map(|dt| dt.and_utc().timestamp_millis());
         let role: UserRole = UserRole::try_from(model.get_role()).unwrap_or_default();
         let status: UserStatus = UserStatus::try_from(model.get_status()).unwrap_or_default();
         response
@@ -369,10 +368,14 @@ impl OrderService {
     #[instrument_trace]
     fn model_to_record_response(model: &OrderRecordModel) -> RecordResponse {
         let mut response: RecordResponse = RecordResponse::default();
-        let created_at: Option<String> = model
+        let created_at: Option<i64> = model
             .try_get_created_at()
-            .as_ref()
-            .map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string());
+            .map(|dt| dt.and_utc().timestamp_millis());
+        let bill_date: i64 = model
+            .get_bill_date()
+            .and_time(chrono::NaiveTime::from_hms_opt(0, 0, 0).unwrap())
+            .and_utc()
+            .timestamp_millis();
         response
             .set_id(model.get_id())
             .set_bill_no(model.get_bill_no().clone())
@@ -381,7 +384,7 @@ impl OrderService {
             .set_category(model.get_category().clone())
             .set_transaction_type(model.get_transaction_type().clone())
             .set_description(model.try_get_description().clone())
-            .set_bill_date(model.get_bill_date().to_string())
+            .set_bill_date(bill_date)
             .set_created_at(created_at);
         response
     }
@@ -1005,7 +1008,7 @@ impl OrderService {
             let date: NaiveDate = start_date + chrono::Duration::days(day_offset);
             let new_users: Vec<i32> = users
                 .iter()
-                .filter(|u| u.get_created_at().date_naive() == date)
+                .filter(|u| u.get_created_at().date() == date)
                 .map(|u| u.get_id())
                 .collect();
             let new_users_count: i64 = new_users.len() as i64;
@@ -1395,10 +1398,10 @@ impl OrderService {
         model: &OrderRecordImageModel,
         record_id: i32,
     ) -> RecordImageResponse {
-        let created_at: String = model
+        let created_at: i64 = model
             .try_get_created_at()
-            .map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string())
-            .unwrap_or_default();
+            .map(|dt| dt.and_utc().timestamp_millis())
+            .unwrap_or(0);
         let mut response: RecordImageResponse = RecordImageResponse::default();
         let download_url: String = format!("/api/order/image/download/{}", model.get_id());
         response

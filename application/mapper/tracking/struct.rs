@@ -17,5 +17,5 @@ pub struct Model {
     #[get(type(copy), pub(crate))]
     pub(super) timestamp: i64,
     #[get(pub(crate))]
-    pub(super) created_at: Option<DateTime<FixedOffset>>,
+    pub(super) created_at: Option<DateTime<Local>>,
 }

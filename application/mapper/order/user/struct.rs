@@ -29,7 +29,7 @@ pub struct Model {
     #[get(type(copy), pub(crate))]
     pub(super) status: i16,
     #[get(pub(crate))]
-    pub(super) created_at: Option<DateTime<FixedOffset>>,
+    pub(super) created_at: Option<NaiveDateTime>,
     #[get(pub(crate))]
-    pub(super) updated_at: Option<DateTime<FixedOffset>>,
+    pub(super) updated_at: Option<NaiveDateTime>,
 }

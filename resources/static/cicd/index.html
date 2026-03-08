@@ -2143,7 +2143,7 @@ jobs:
           return '<div class="log-line"><span class="log-timestamp">--:--:--</span>No output available</div>';
 
         const lines = output.split('\n');
-        const baseTime = startedAt ? new Date(startedAt) : null;
+        const baseTime = startedAt ? parseServerTime(startedAt) : null;
         const totalLines = lines.length;
 
         return lines
@@ -2272,9 +2272,18 @@ jobs:
         return p ? p.name : `Pipeline ${id}`;
       }
 
-      function formatTime(isoString) {
-        if (!isoString) return 'unknown';
-        const date = new Date(isoString);
+      function parseServerTime(timestamp) {
+        if (!timestamp) return null;
+        const date = new Date(
+          typeof timestamp === 'string' ? parseInt(timestamp, 10) : timestamp,
+        );
+        return isNaN(date.getTime()) ? null : date;
+      }
+
+      function formatTime(timestamp) {
+        if (!timestamp) return 'unknown';
+        const date = parseServerTime(timestamp);
+        if (!date) return 'unknown';
         const now = new Date();
         const diff = Math.floor((now - date) / 1000);
 
@@ -2282,6 +2291,13 @@ jobs:
         if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
         if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
         return `${Math.floor(diff / 86400)}d ago`;
+      }
+
+      function formatDateTime(timestamp) {
+        if (!timestamp) return '-';
+        const date = parseServerTime(timestamp);
+        if (!date) return '-';
+        return date.toLocaleString();
       }
 
       function formatDuration(ms) {

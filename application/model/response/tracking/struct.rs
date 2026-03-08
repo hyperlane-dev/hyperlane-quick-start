@@ -39,5 +39,5 @@ pub struct TrackingRecordDTO {
     pub(super) body: String,
     #[get(type(copy), pub)]
     pub(super) timestamp: i64,
-    pub(super) created_at: String,
+    pub(super) created_at: i64,
 }

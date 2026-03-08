@@ -7,8 +7,8 @@ pub struct PipelineDto {
     pub(super) name: String,
     pub(super) description: Option<String>,
     pub(super) config_content: Option<String>,
-    pub(super) created_at: Option<String>,
-    pub(super) updated_at: Option<String>,
+    pub(super) created_at: Option<i64>,
+    pub(super) updated_at: Option<i64>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
@@ -24,11 +24,11 @@ pub struct RunDto {
     pub(super) triggered_by: Option<String>,
     pub(super) commit_hash: Option<String>,
     pub(super) commit_message: Option<String>,
-    pub(super) started_at: Option<String>,
-    pub(super) completed_at: Option<String>,
+    pub(super) started_at: Option<i64>,
+    pub(super) completed_at: Option<i64>,
     #[get(type(copy), pub)]
     pub(super) duration_ms: i32,
-    pub(super) created_at: Option<String>,
+    pub(super) created_at: Option<i64>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
@@ -40,8 +40,8 @@ pub struct JobDto {
     pub(super) name: String,
     pub(super) status: CicdStatus,
     pub(super) runner: Option<String>,
-    pub(super) started_at: Option<String>,
-    pub(super) completed_at: Option<String>,
+    pub(super) started_at: Option<i64>,
+    pub(super) completed_at: Option<i64>,
     #[get(type(copy), pub)]
     pub(super) duration_ms: i32,
 }
@@ -56,8 +56,8 @@ pub struct StepDto {
     pub(super) command: Option<String>,
     pub(super) status: CicdStatus,
     pub(super) output: Option<String>,
-    pub(super) started_at: Option<String>,
-    pub(super) completed_at: Option<String>,
+    pub(super) started_at: Option<i64>,
+    pub(super) completed_at: Option<i64>,
     #[get(type(copy), pub)]
     pub(super) duration_ms: i32,
 }

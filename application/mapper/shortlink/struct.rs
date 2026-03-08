@@ -19,5 +19,5 @@ pub struct Model {
     #[get(pub(crate))]
     pub(super) url: String,
     #[get(pub(crate))]
-    pub(super) created_at: Option<DateTime<FixedOffset>>,
+    pub(super) created_at: Option<NaiveDateTime>,
 }

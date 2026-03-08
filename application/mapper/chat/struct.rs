@@ -19,5 +19,5 @@ pub struct Model {
     #[get(pub(crate))]
     pub(super) content: String,
     #[get(pub(crate))]
-    pub(super) created_at: Option<DateTime<FixedOffset>>,
+    pub(super) created_at: Option<NaiveDateTime>,
 }
