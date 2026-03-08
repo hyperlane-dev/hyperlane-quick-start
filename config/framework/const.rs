@@ -1,7 +1,7 @@
 use super::*;
 
 #[cfg(debug_assertions)]
-pub const SERVER_PORT: u16 = DEFAULT_WEB_PORT;
+pub const SERVER_PORT: u16 = 60000;
 #[cfg(not(debug_assertions))]
 pub const SERVER_PORT: u16 = 65002;
 pub const SERVER_HOST: &str = DEFAULT_HOST;
