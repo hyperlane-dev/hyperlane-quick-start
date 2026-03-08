@@ -14,6 +14,11 @@
     <script src="./js/highlight.min.js"></script>
     <link href="./css/github.min.css" rel="stylesheet" />
     <style>
+      html,
+      body {
+        height: 100%;
+      }
+
       * {
         margin: 0;
         padding: 0;
@@ -31,7 +36,7 @@
       .btn-upload {
         padding: 8px 16px;
         height: 40px;
-        background: linear-gradient(135deg, #007bff, #0056b3);
+        background: #007bff;
         color: white;
         border: none;
         border-radius: 50%;
@@ -51,7 +56,7 @@
       }
 
       .btn-upload.disabled {
-        background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+        background: #6c757d;
         cursor: not-allowed;
         opacity: 0.6;
         box-shadow: none;
@@ -76,12 +81,7 @@
         left: -100%;
         width: 100%;
         height: 100%;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          rgba(255, 255, 255, 0.2),
-          transparent
-        );
+        background: rgba(255, 255, 255, 0.2);
         transition: left 0.5s ease;
       }
 
@@ -96,7 +96,7 @@
       }
 
       .btn-upload:active:not(:disabled) {
-        background: linear-gradient(135deg, #004085, #003366);
+        background: #004085;
         transform: translateY(0);
         box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
       }
@@ -125,16 +125,16 @@
           -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
         margin: 0;
         padding: 0;
-        height: 100vh;
+        height: 100%;
         overflow: hidden;
       }
 
       .chat-view {
         display: flex;
         flex-direction: column;
-        height: 100vh;
+        height: 100%;
         width: 100%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #667eea;
         color: #2c3e50;
       }
 
@@ -177,12 +177,7 @@
       }
 
       .nav-title a .text {
-        background: linear-gradient(90deg, #2c3e50, #667eea, #2c3e50, #667eea);
-        background-size: 200% auto;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        animation: shimmer 3s linear infinite;
+        color: #667eea;
       }
 
       .nav-title a::after {
@@ -192,7 +187,7 @@
         bottom: -2px;
         width: 0;
         height: 2px;
-        background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+        background: #667eea;
         transition: width 0.4s ease;
       }
 
@@ -338,11 +333,7 @@
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         transition: all 0.3s ease;
         position: relative;
-        background: linear-gradient(
-          135deg,
-          var(--avatar-color-1),
-          var(--avatar-color-2)
-        );
+        background: var(--avatar-color-1);
       }
 
       .message-avatar:hover {
@@ -360,11 +351,7 @@
         right: -1px;
         bottom: -1px;
         border-radius: 50%;
-        background: linear-gradient(
-          135deg,
-          rgba(255, 255, 255, 0.3),
-          transparent
-        );
+        background: rgba(255, 255, 255, 0.3);
         pointer-events: none;
       }
 
@@ -522,7 +509,7 @@
       .chat-input button {
         padding: 8px 16px;
         height: 40px;
-        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        background: #007bff;
         color: white;
         border: none;
         border-radius: 8px;
@@ -550,17 +537,12 @@
         left: -100%;
         width: 100%;
         height: 100%;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          rgba(255, 255, 255, 0.2),
-          transparent
-        );
+        background: rgba(255, 255, 255, 0.2);
         transition: left 0.5s ease;
       }
 
       .chat-input button:hover:not(:disabled) {
-        background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+        background: #0056b3;
         box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
         transform: translateY(-1px);
       }
@@ -570,13 +552,13 @@
       }
 
       .chat-input button:active:not(:disabled) {
-        background: linear-gradient(135deg, #004085 0%, #003366 100%);
+        background: #004085;
         transform: translateY(0);
         box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
       }
 
       .chat-input button:disabled {
-        background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+        background: #6c757d;
         cursor: not-allowed;
         opacity: 0.6;
         box-shadow: none;
@@ -1135,7 +1117,7 @@
         width: 36px;
         height: 36px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%);
+        background: #5b21b6;
         color: white;
         display: flex;
         align-items: center;
@@ -1185,14 +1167,14 @@
       }
 
       .user-avatar.gpt-avatar {
-        background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%);
+        background: #5b21b6;
         font-size: 1.125rem;
         box-shadow: 0 3px 12px rgba(91, 33, 182, 0.5);
         border: 1px solid rgba(255, 255, 255, 0.6);
       }
 
       .user-avatar.other-user-avatar {
-        background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%);
+        background: #5b21b6;
         box-shadow: 0 2px 10px rgba(91, 33, 182, 0.4);
         border: 1px solid rgba(255, 255, 255, 0.5);
       }

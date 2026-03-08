@@ -7,7 +7,7 @@
     <link rel="icon" href="https://docs.ltpp.vip/img/hyperlane.png" />
     <style>
       :root {
-        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --primary-gradient: #667eea;
         --primary-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         --hover-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
         --border-radius: 12px;
@@ -44,12 +44,17 @@
         -ms-user-select: text !important;
       }
 
+      html,
+      body {
+        height: 100%;
+      }
+
       body {
         font-family:
           -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
-        height: 100vh;
+        background: #667eea;
+        min-height: 100%;
+        height: 100%;
         margin: 0;
         display: flex;
         flex-direction: column;
@@ -101,12 +106,7 @@
       }
 
       .header h1 a .text {
-        background: linear-gradient(90deg, #fff, #ffd700, #fff, #ffd700);
-        background-size: 200% auto;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        animation: shimmer 3s linear infinite;
+        color: #ffd700;
       }
 
       .header h1 a::after {
@@ -116,7 +116,7 @@
         bottom: -2px;
         width: 0;
         height: 2px;
-        background: linear-gradient(90deg, #ffd700, #fff, #ffd700);
+        background: #ffd700;
         transition: width 0.4s ease;
       }
 
@@ -372,7 +372,7 @@
         }
 
         body {
-          height: 100vh;
+          height: 100%;
           overflow: hidden;
           padding: 10px;
         }

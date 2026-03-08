@@ -9,6 +9,11 @@
     <style>
       @import url('./css/css2');
 
+      html,
+      body {
+        height: 100%;
+      }
+
       * {
         margin: 0;
         padding: 0;
@@ -28,9 +33,9 @@
       body {
         font-family:
           -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #667eea;
         color: #2c3e50;
-        min-height: 100vh;
+        min-height: 100%;
         padding: 20px;
       }
 
@@ -75,12 +80,7 @@
       }
 
       .header h1 a .text {
-        background: linear-gradient(90deg, #fff, #ffd700, #fff, #ffd700);
-        background-size: 200% auto;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        animation: shimmer 3s linear infinite;
+        color: #ffd700;
       }
 
       .header h1 a::after {
@@ -90,7 +90,7 @@
         bottom: -2px;
         width: 0;
         height: 2px;
-        background: linear-gradient(90deg, #ffd700, #fff, #ffd700);
+        background: #ffd700;
         transition: width 0.4s ease;
       }
 
@@ -116,11 +116,7 @@
       }
 
       .search-panel {
-        background: linear-gradient(
-          135deg,
-          rgba(255, 255, 255, 0.98) 0%,
-          rgba(240, 244, 255, 0.98) 100%
-        );
+        background: rgba(255, 255, 255, 0.98);
         border-radius: 12px;
         padding: 30px;
         margin-bottom: 30px;
@@ -147,9 +143,7 @@
         left: 0;
         right: 0;
         height: 3px;
-        background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
-        background-size: 200% 100%;
-        animation: gradientMove 3s ease infinite;
+        background: #667eea;
         border-radius: 12px 12px 0 0;
       }
 
@@ -315,7 +309,7 @@
       }
 
       .datetime-picker-nav {
-        background: linear-gradient(135deg, #667eea, #764ba2);
+        background: #667eea;
         border: none;
         border-radius: 6px;
         color: white;
@@ -378,12 +372,12 @@
       }
 
       .datetime-picker-day:hover:not(.disabled):not(.selected) {
-        background: linear-gradient(135deg, #f0f4ff 0%, #faf8ff 100%);
+        background: #f0f4ff;
         border-color: #667eea;
       }
 
       .datetime-picker-day.selected {
-        background: linear-gradient(135deg, #667eea, #764ba2);
+        background: #667eea;
         border-color: #667eea;
         color: white;
       }
@@ -451,7 +445,7 @@
       }
 
       .datetime-picker-btn.primary {
-        background: linear-gradient(135deg, #667eea, #764ba2);
+        background: #667eea;
         color: white;
       }
 
@@ -480,7 +474,7 @@
       }
 
       .btn-primary {
-        background: linear-gradient(135deg, #667eea, #764ba2);
+        background: #667eea;
         color: white;
       }
 
@@ -507,7 +501,7 @@
       }
 
       .stat-card {
-        background: linear-gradient(135deg, #ffffff 0%, #faf8ff 100%);
+        background: #ffffff;
         border: 2px solid rgba(118, 75, 162, 0.2);
         border-radius: 12px;
         padding: 20px;
@@ -525,7 +519,7 @@
         left: 0;
         right: 0;
         height: 3px;
-        background: linear-gradient(90deg, #667eea, #764ba2);
+        background: #667eea;
         transform: scaleX(0);
         transition: transform 0.3s ease;
       }
@@ -534,7 +528,7 @@
         transform: translateY(-4px);
         border-color: #764ba2;
         box-shadow: 0 8px 24px rgba(118, 75, 162, 0.25);
-        background: linear-gradient(135deg, #ffffff 0%, #f5f0ff 100%);
+        background: #ffffff;
       }
 
       .stat-card:hover::after {
@@ -555,11 +549,7 @@
       }
 
       .results-panel {
-        background: linear-gradient(
-          135deg,
-          rgba(255, 255, 255, 0.98) 0%,
-          rgba(248, 250, 255, 0.98) 100%
-        );
+        background: rgba(255, 255, 255, 0.98);
         border-radius: 12px;
         padding: 30px;
         box-shadow: 0 4px 20px rgba(102, 126, 234, 0.15);
@@ -585,7 +575,7 @@
         left: 0;
         width: 4px;
         height: 100%;
-        background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        background: #667eea;
         border-radius: 12px 0 0 12px;
       }
 
@@ -609,7 +599,7 @@
       }
 
       thead {
-        background: linear-gradient(135deg, #f0f4ff 0%, #faf8ff 100%);
+        background: #f0f4ff;
         border-bottom: 3px solid rgba(102, 126, 234, 0.3);
       }
 
@@ -650,7 +640,7 @@
         left: 0;
         right: 0;
         height: 2px;
-        background: linear-gradient(90deg, transparent, #667eea, transparent);
+        background: #667eea;
         opacity: 0;
         transition: opacity 0.3s ease;
       }
@@ -686,18 +676,14 @@
       }
 
       tbody tr:hover {
-        background: linear-gradient(
-          90deg,
-          rgba(102, 126, 234, 0.08) 0%,
-          rgba(118, 75, 162, 0.08) 100%
-        );
+        background: rgba(102, 126, 234, 0.08);
         transform: scale(1.01);
         box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
       }
 
       .detail-btn {
         padding: 6px 12px;
-        background: linear-gradient(135deg, #667eea, #764ba2);
+        background: #667eea;
         border: none;
         border-radius: 6px;
         color: white;
@@ -770,7 +756,7 @@
       }
 
       .modal-content {
-        background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%);
+        background: #ffffff;
         border-radius: 12px;
         padding: 30px;
         max-width: 1200px;
@@ -804,7 +790,7 @@
         left: 0;
         right: 0;
         height: 4px;
-        background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+        background: #667eea;
         border-radius: 12px 12px 0 0;
       }
 

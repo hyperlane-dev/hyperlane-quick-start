@@ -6,6 +6,11 @@
     <title>Redis Management</title>
     <link rel="icon" href="https://docs.ltpp.vip/img/hyperlane.png" />
     <style>
+      html,
+      body {
+        height: 100%;
+      }
+
       * {
         margin: 0;
         padding: 0;
@@ -33,8 +38,8 @@
       body {
         font-family:
           -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
+        background: #667eea;
+        min-height: 100%;
         padding: 20px;
       }
 
@@ -76,12 +81,7 @@
       }
 
       .header h1 a .text {
-        background: linear-gradient(90deg, #fff, #ffd700, #fff, #ffd700);
-        background-size: 200% auto;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        animation: shimmer 3s linear infinite;
+        color: #ffd700;
       }
 
       .header h1 a::after {
@@ -91,7 +91,7 @@
         bottom: -2px;
         width: 0;
         height: 2px;
-        background: linear-gradient(90deg, #ffd700, #fff, #ffd700);
+        background: #ffd700;
         transition: width 0.4s ease;
       }
 
@@ -182,7 +182,7 @@
       }
 
       .btn-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #667eea;
         color: white;
       }
 
@@ -326,15 +326,15 @@
       }
 
       .toast.success {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        background: #28a745;
       }
 
       .toast.error {
-        background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+        background: #dc3545;
       }
 
       .toast.warning {
-        background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+        background: #ffc107;
         color: #000;
       }
 

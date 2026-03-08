@@ -6,6 +6,11 @@
     <title>Hyperlane - 404 Not Found</title>
     <link rel="icon" href="https://docs.ltpp.vip/img/hyperlane.png" />
     <style>
+      html,
+      body {
+        height: 100%;
+      }
+
       * {
         margin: 0;
         padding: 0;
@@ -25,8 +30,8 @@
       body {
         font-family:
           -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
+        background: #667eea;
+        min-height: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -71,12 +76,7 @@
       }
 
       h1 a .text {
-        background: linear-gradient(90deg, #2c3e50, #667eea, #2c3e50, #667eea);
-        background-size: 200% auto;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        animation: shimmer 3s linear infinite;
+        color: #667eea;
       }
 
       h1 a::after {
@@ -86,7 +86,7 @@
         bottom: -2px;
         width: 0;
         height: 2px;
-        background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+        background: #667eea;
         transition: width 0.4s ease;
       }
 
@@ -113,11 +113,7 @@
 
       .server-info {
         padding: 16px;
-        background: linear-gradient(
-          135deg,
-          rgba(102, 126, 234, 0.1) 0%,
-          rgba(118, 75, 162, 0.1) 100%
-        );
+        background: rgba(102, 126, 234, 0.1);
         border-radius: 8px;
         margin-bottom: 24px;
       }
@@ -131,12 +127,7 @@
       }
 
       .server-info a .text {
-        background: linear-gradient(90deg, #667eea, #764ba2, #667eea, #764ba2);
-        background-size: 200% auto;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        animation: shimmer 3s linear infinite;
+        color: #667eea;
       }
 
       .server-info a::after {
@@ -146,7 +137,7 @@
         bottom: -2px;
         width: 0;
         height: 2px;
-        background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+        background: #667eea;
         transition: width 0.4s ease;
       }
 
@@ -157,7 +148,7 @@
       .btn-home {
         display: inline-block;
         padding: 12px 32px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #667eea;
         color: white;
         text-decoration: none;
         transition:

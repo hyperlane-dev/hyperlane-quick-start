@@ -161,6 +161,7 @@ function showMainApp() {
   updateUserInfo();
   initDatePickers();
   const routeState = parseRouteHash();
+  const isAdmin = currentUser && currentUser.role === 'admin';
   if (routeState.page) {
     if (routeState.page === 'user-records' && routeState.userId) {
       viewingUserId = parseInt(routeState.userId);
@@ -168,7 +169,8 @@ function showMainApp() {
     }
     navigateTo(routeState.page, false);
   } else {
-    navigateTo('dashboard', true);
+    const defaultPage = isAdmin ? 'dashboard' : 'records';
+    navigateTo(defaultPage, true);
   }
 }
 
@@ -214,6 +216,11 @@ function updateRouteHash(page, extraParams = {}) {
 }
 
 function switchToPage(page) {
+  const isAdmin = currentUser && currentUser.role === 'admin';
+  if (page === 'dashboard' && !isAdmin) {
+    navigateTo('records', true);
+    return;
+  }
   currentPage = page;
   document
     .querySelectorAll('.page-content')
@@ -1574,6 +1581,7 @@ async function handleLogin(e) {
       localStorage.setItem('order_user', JSON.stringify(currentUser));
       localStorage.setItem('order_token', currentToken);
       showToast('Login successful!', 'success');
+      document.getElementById('login-form')?.reset();
       showMainApp();
     } else {
       showToast(result.message || 'Login failed', 'error');
@@ -1612,6 +1620,7 @@ async function handleRegister(e) {
         'Registration successful! Please wait for approval.',
         'success',
       );
+      document.getElementById('register-form')?.reset();
       showPage('login-page');
     } else {
       showToast(result.message || 'Registration failed', 'error');

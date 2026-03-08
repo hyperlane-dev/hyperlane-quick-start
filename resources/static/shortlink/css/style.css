@@ -13,6 +13,11 @@
   display: none;
 }
 
+html,
+body {
+  height: 100%;
+}
+
 input,
 textarea,
 .url-input {
@@ -26,16 +31,16 @@ body {
     -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
   margin: 0;
   padding: 0;
-  min-height: 100vh;
+  min-height: 100%;
   color: #2c3e50;
   line-height: 1.6;
 }
 
 .container {
-  min-height: 100vh;
+  min-height: 100%;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #667eea;
 }
 
 @keyframes fadeInDown {
@@ -85,12 +90,7 @@ body {
 }
 
 .header h1 a .text {
-  background: linear-gradient(90deg, #fff, #ffd700, #fff, #ffd700);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: shimmer 3s linear infinite;
+  color: #ffd700;
 }
 
 .header h1 a::after {
@@ -100,7 +100,7 @@ body {
   bottom: -2px;
   width: 0;
   height: 2px;
-  background: linear-gradient(90deg, #ffd700, #fff, #ffd700);
+  background: #ffd700;
   transition: width 0.4s ease;
 }
 
@@ -243,7 +243,7 @@ body {
   position: relative;
   overflow: hidden;
   padding: 16px 32px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #667eea;
   color: white;
   border: none;
   border-radius: 12px;
@@ -265,12 +265,7 @@ body {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.2),
-    transparent
-  );
+  background: rgba(255, 255, 255, 0.2);
   transition: left 0.5s ease;
 }
 
@@ -414,7 +409,7 @@ body {
 }
 
 .open-btn {
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  background: #28a745;
   color: white;
   box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
 }
@@ -425,7 +420,7 @@ body {
 }
 
 .new-link-btn {
-  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  background: #007bff;
   color: white;
   box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
 }
@@ -498,7 +493,7 @@ body {
   position: relative;
   overflow: hidden;
   padding: 14px 28px;
-  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  background: #dc3545;
   color: white;
   border: none;
   border-radius: 10px;

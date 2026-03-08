@@ -1,3 +1,10 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -26,9 +33,9 @@ select {
 body {
   font-family:
     -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #667eea;
   color: #2c3e50;
-  min-height: 100vh;
+  min-height: 100%;
   line-height: 1.6;
 }
 
@@ -41,11 +48,15 @@ a {
 }
 
 .login-page {
-  min-height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #667eea;
   padding: 20px;
 }
 
@@ -110,7 +121,7 @@ a {
   position: fixed;
   top: 0;
   left: 0;
-  height: 100vh;
+  height: 100%;
   z-index: 100;
 }
 
@@ -271,13 +282,13 @@ a {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #667eea;
   border-color: transparent;
   color: #fff;
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #5a6fd6 0%, #6a4190 100%);
+  background: #5a6fd6;
   border-color: transparent;
 }
 
@@ -470,13 +481,15 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   width: 100%;
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 #records-page .card,
 #users-page .card {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 140px);
+  height: calc(100% - 140px);
   width: 100%;
 }
 
@@ -1533,8 +1546,10 @@ input[type='number'].form-input::-webkit-inner-spin-button {
     width: 100%;
     display: flex;
     flex-direction: column;
-    height: auto;
-    min-height: calc(100vh - 80px);
+    flex: 1;
+    min-height: 0;
+    max-height: calc(100dvh - 80px);
+    overflow: hidden;
   }
 
   #profile-page {
@@ -1548,6 +1563,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
     flex-direction: column;
     flex: 1;
     min-height: 0;
+    max-height: calc(100dvh - 80px);
     overflow: hidden;
   }
 
@@ -1559,10 +1575,12 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   #dashboard-page .card,
   #records-page .card,
   #users-page .card {
-    flex: none;
-    height: auto;
-    min-height: auto;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
     width: 100%;
+    overflow: hidden;
   }
 
   #dashboard-page .chart-card {
@@ -1591,8 +1609,11 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   #dashboard-page .card-body,
   #records-page .card-body,
   #users-page .card-body {
-    overflow: visible;
-    flex: none;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
   }
 
   #user-records-page .card-body {
@@ -1616,13 +1637,14 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 
   #records-page .record-list,
   #users-page .user-list {
-    max-height: none;
-    overflow: visible;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
   }
 
   #user-records-page .record-list {
     flex: 1;
-    min-height: 150px;
+    min-height: 0;
     overflow-y: auto;
   }
 
@@ -1744,7 +1766,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .page-btn.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #667eea;
   border-color: transparent;
   color: #ffffff;
   font-weight: 600;
@@ -1760,14 +1782,44 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   .pagination-container {
     flex-direction: column;
     align-items: stretch;
+    position: fixed;
+    bottom: 0;
+    left: 16px;
+    right: 16px;
+    margin: 0;
+    border-radius: 8px 8px 0 0;
+    z-index: 50;
+    max-height: 120px;
+    padding: 8px 16px;
+    gap: 8px;
   }
 
   .pagination-info {
     justify-content: center;
+    font-size: 12px;
   }
 
   .pagination-controls {
     justify-content: center;
+    gap: 8px;
+  }
+
+  .pagination-controls > button {
+    min-width: 60px;
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+
+  .page-btn {
+    padding: 4px 8px;
+    font-size: 12px;
+    min-width: 28px;
+  }
+
+  #records-page .card-body,
+  #users-page .card-body,
+  #user-records-page .card-body {
+    padding-bottom: 80px;
   }
 }
 
@@ -2079,13 +2131,13 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .date-picker-btn.primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #667eea;
   border-color: transparent;
   color: #fff;
 }
 
 .date-picker-btn.primary:hover {
-  background: linear-gradient(135deg, #5a6fd6 0%, #6a4190 100%);
+  background: #5a6fd6;
 }
 
 .scan-modal-content {
@@ -2177,7 +2229,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   position: absolute;
   width: 180px;
   height: 2px;
-  background: linear-gradient(90deg, transparent, #667eea, transparent);
+  background: #667eea;
   animation: scanMove 2s linear infinite;
 }
 
@@ -2483,31 +2535,18 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .theme-adaptive {
-  background:
-    linear-gradient(
-      135deg,
-      rgba(102, 126, 234, 0.15) 0%,
-      rgba(118, 75, 162, 0.15) 100%
-    ),
-    rgba(255, 255, 255, 0.98);
+  background: rgba(102, 126, 234, 0.15);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
 
 .theme-adaptive .modal-header {
-  background: linear-gradient(
-    135deg,
-    rgba(102, 126, 234, 0.1) 0%,
-    rgba(118, 75, 162, 0.1) 100%
-  );
+  background: rgba(102, 126, 234, 0.1);
   border-bottom: 1px solid rgba(102, 126, 234, 0.2);
 }
 
 .theme-adaptive .modal-title {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #667eea;
   font-weight: 600;
 }
 
@@ -2519,7 +2558,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .image-preview-container {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #667eea;
   cursor: grab;
 }
 
@@ -2528,11 +2567,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .image-preview-controls {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.95) 0%,
-    rgba(249, 250, 251, 0.95) 100%
-  );
+  background: rgba(255, 255, 255, 0.95);
   border-top: 1px solid rgba(102, 126, 234, 0.15);
 }
 
