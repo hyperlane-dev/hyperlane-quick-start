@@ -1131,6 +1131,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: #f8f9fa;
 }
 
 .modal-body {
@@ -2540,7 +2541,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   -webkit-backdrop-filter: blur(10px);
 }
 
-.theme-adaptive .modal-header {
+.theme-adaptive {
   background: rgba(102, 126, 234, 0.1);
   border-bottom: 1px solid rgba(102, 126, 234, 0.2);
 }
