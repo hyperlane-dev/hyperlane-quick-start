@@ -1124,6 +1124,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   flex: 1;
   overflow-y: auto;
   padding: 20px;
+  min-height: 0;
 }
 
 .modal-title {
@@ -1165,7 +1166,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  margin-top: auto;
+  flex-shrink: 0;
 }
 
 .empty-state {
@@ -2378,6 +2379,15 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   max-height: 100%;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+}
+
+#record-form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .image-preview-body {
