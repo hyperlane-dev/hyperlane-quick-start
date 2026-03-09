@@ -12,6 +12,7 @@
     <script src="./js/echarts.js"></script>
     <script src="./js/qrcode.js"></script>
     <script src="./js/qr.js"></script>
+    <script src="../js/request-manager.js"></script>
     <script src="./js/app.js" defer></script>
   </head>
   <body>
@@ -192,7 +193,7 @@
 
           <div id="dashboard-page" class="page-content">
             <div class="stats-grid">
-              <div class="stat-card">
+              <div class="stat-card balance">
                 <div class="stat-label">Today's Transactions</div>
                 <div class="stat-value" id="today-transactions">0</div>
                 <div class="stat-change" id="today-transactions-change">--</div>
@@ -209,7 +210,7 @@
               </div>
             </div>
             <div class="stats-grid">
-              <div class="stat-card">
+              <div class="stat-card balance">
                 <div class="stat-label">New Users (Today)</div>
                 <div class="stat-value" id="today-new-users">0</div>
                 <div class="stat-change" id="today-new-users-change">--</div>
@@ -251,7 +252,9 @@
                   >
                 </div>
                 <div class="card-body">
-                  <div id="trend-chart" class="chart-container"></div>
+                  <div id="trend-chart" class="chart-container">
+                    <div class="chart-loading"></div>
+                  </div>
                 </div>
               </div>
               <div class="card chart-card">
@@ -259,7 +262,9 @@
                   <span class="card-title">Income vs Expense Comparison</span>
                 </div>
                 <div class="card-body">
-                  <div id="compare-chart" class="chart-container"></div>
+                  <div id="compare-chart" class="chart-container">
+                    <div class="chart-loading"></div>
+                  </div>
                 </div>
               </div>
               <div class="card chart-card">
@@ -267,7 +272,9 @@
                   <span class="card-title">Category Distribution</span>
                 </div>
                 <div class="card-body">
-                  <div id="category-chart" class="chart-container"></div>
+                  <div id="category-chart" class="chart-container">
+                    <div class="chart-loading"></div>
+                  </div>
                 </div>
               </div>
               <div class="card chart-card">
@@ -275,7 +282,9 @@
                   <span class="card-title">User Growth Trend</span>
                 </div>
                 <div class="card-body">
-                  <div id="user-growth-chart" class="chart-container"></div>
+                  <div id="user-growth-chart" class="chart-container">
+                    <div class="chart-loading"></div>
+                  </div>
                 </div>
               </div>
               <div class="card chart-card">
@@ -283,10 +292,9 @@
                   <span class="card-title">Transaction Type Distribution</span>
                 </div>
                 <div class="card-body">
-                  <div
-                    id="type-distribution-chart"
-                    class="chart-container"
-                  ></div>
+                  <div id="type-distribution-chart" class="chart-container">
+                    <div class="chart-loading"></div>
+                  </div>
                 </div>
               </div>
               <div class="card chart-card">
@@ -294,7 +302,9 @@
                   <span class="card-title">Daily Transaction Count</span>
                 </div>
                 <div class="card-body">
-                  <div id="count-trend-chart" class="chart-container"></div>
+                  <div id="count-trend-chart" class="chart-container">
+                    <div class="chart-loading"></div>
+                  </div>
                 </div>
               </div>
               <div class="card chart-card">
@@ -302,7 +312,9 @@
                   <span class="card-title">Category Amount Distribution</span>
                 </div>
                 <div class="card-body">
-                  <div id="category-amount-chart" class="chart-container"></div>
+                  <div id="category-amount-chart" class="chart-container">
+                    <div class="chart-loading"></div>
+                  </div>
                 </div>
               </div>
               <div class="card chart-card">
@@ -310,7 +322,9 @@
                   <span class="card-title">User Activity Trend</span>
                 </div>
                 <div class="card-body">
-                  <div id="user-activity-chart" class="chart-container"></div>
+                  <div id="user-activity-chart" class="chart-container">
+                    <div class="chart-loading"></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -321,7 +335,9 @@
                     <span class="card-title">Income/Expense Ratio Trend</span>
                   </div>
                   <div class="card-body">
-                    <div id="ratio-trend-chart" class="chart-container"></div>
+                    <div id="ratio-trend-chart" class="chart-container">
+                      <div class="chart-loading"></div>
+                    </div>
                   </div>
                 </div>
                 <div class="card chart-card">
@@ -331,10 +347,9 @@
                     >
                   </div>
                   <div class="card-body">
-                    <div
-                      id="hourly-distribution-chart"
-                      class="chart-container"
-                    ></div>
+                    <div id="hourly-distribution-chart" class="chart-container">
+                      <div class="chart-loading"></div>
+                    </div>
                   </div>
                 </div>
                 <div class="card chart-card">
@@ -342,7 +357,9 @@
                     <span class="card-title">Weekly Trend Analysis</span>
                   </div>
                   <div class="card-body">
-                    <div id="weekly-trend-chart" class="chart-container"></div>
+                    <div id="weekly-trend-chart" class="chart-container">
+                      <div class="chart-loading"></div>
+                    </div>
                   </div>
                 </div>
                 <div class="card chart-card">
@@ -350,10 +367,9 @@
                     <span class="card-title">Period-over-Period Analysis</span>
                   </div>
                   <div class="card-body">
-                    <div
-                      id="period-over-period-chart"
-                      class="chart-container"
-                    ></div>
+                    <div id="period-over-period-chart" class="chart-container">
+                      <div class="chart-loading"></div>
+                    </div>
                   </div>
                 </div>
                 <div class="card chart-card wide">
@@ -361,10 +377,9 @@
                     <span class="card-title">Category Trends Over Time</span>
                   </div>
                   <div class="card-body">
-                    <div
-                      id="category-trend-chart"
-                      class="chart-container"
-                    ></div>
+                    <div id="category-trend-chart" class="chart-container">
+                      <div class="chart-loading"></div>
+                    </div>
                   </div>
                 </div>
                 <div class="card chart-card">
@@ -372,10 +387,9 @@
                     <span class="card-title">User Retention Rate</span>
                   </div>
                   <div class="card-body">
-                    <div
-                      id="user-retention-chart"
-                      class="chart-container"
-                    ></div>
+                    <div id="user-retention-chart" class="chart-container">
+                      <div class="chart-loading"></div>
+                    </div>
                   </div>
                 </div>
                 <div class="card chart-card">
@@ -385,7 +399,9 @@
                     >
                   </div>
                   <div class="card-body">
-                    <div id="top-users-chart" class="chart-container"></div>
+                    <div id="top-users-chart" class="chart-container">
+                      <div class="chart-loading"></div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -466,10 +482,9 @@
                   </div>
                 </div>
                 <div id="all-records-list" class="record-list">
-                  <div class="empty-state">
-                    <div class="empty-state-icon">📝</div>
-                    <div class="empty-state-title">No records found</div>
-                    <p>Create a new record or adjust filters</p>
+                  <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">Loading...</div>
                   </div>
                 </div>
                 <div id="pagination-container" class="pagination-container">
@@ -503,9 +518,9 @@
                   </div>
                 </div>
                 <div id="users-list" class="user-list">
-                  <div class="empty-state">
-                    <div class="empty-state-icon">👥</div>
-                    <div class="empty-state-title">No users found</div>
+                  <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">Loading...</div>
                   </div>
                 </div>
                 <div id="users-pagination" class="pagination-container"></div>
@@ -515,6 +530,10 @@
 
           <div id="user-records-page" class="page-content hidden">
             <div class="stats-grid">
+              <div class="stat-card balance">
+                <div class="stat-label">Balance</div>
+                <div class="stat-value" id="user-total-balance">¥0.00</div>
+              </div>
               <div class="stat-card income">
                 <div class="stat-label">Total Income</div>
                 <div class="stat-value" id="user-total-income">¥0.00</div>
@@ -522,10 +541,6 @@
               <div class="stat-card expense">
                 <div class="stat-label">Total Expense</div>
                 <div class="stat-value" id="user-total-expense">¥0.00</div>
-              </div>
-              <div class="stat-card balance">
-                <div class="stat-label">Balance</div>
-                <div class="stat-value" id="user-total-balance">¥0.00</div>
               </div>
             </div>
             <div class="card">
@@ -535,12 +550,20 @@
                 >
                 <div>
                   <button
-                    class="btn btn-primary btn-sm"
+                    class="btn btn-primary btn-sm desktop-add-btn"
                     onclick="
                       showCreateRecordModal(viewingUserId, viewingUserName)
                     "
                   >
                     + New Record
+                  </button>
+                  <button
+                    class="mobile-add-btn"
+                    onclick="
+                      showCreateRecordModal(viewingUserId, viewingUserName)
+                    "
+                  >
+                    ➕
                   </button>
                 </div>
               </div>
@@ -599,10 +622,9 @@
                   </div>
                 </div>
                 <div id="user-records-list" class="record-list">
-                  <div class="empty-state">
-                    <div class="empty-state-icon">📝</div>
-                    <div class="empty-state-title">No records found</div>
-                    <p>No records for this user yet</p>
+                  <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">Loading...</div>
                   </div>
                 </div>
                 <div

@@ -45,7 +45,7 @@
       .container {
         position: relative;
         z-index: 2;
-        padding: 0 20px;
+        padding: 0 20px 20px;
       }
 
       .section {
@@ -269,13 +269,13 @@
       .metric-card::after {
         content: '';
         position: absolute;
-        top: 0;
+        bottom: 0;
         right: 0;
-        width: 80px;
-        height: 80px;
-        background: rgba(102, 126, 234, 0.1);
+        width: 60px;
+        height: 60px;
+        background: rgba(102, 126, 234, 0.08);
         border-radius: 50%;
-        transform: translate(30%, -30%);
+        transform: translate(30%, 30%);
         transition: all 0.3s ease;
       }
 
@@ -287,9 +287,9 @@
       }
 
       .metric-card:hover::after {
-        width: 100px;
-        height: 100px;
-        background: rgba(102, 126, 234, 0.15);
+        width: 80px;
+        height: 80px;
+        background: rgba(102, 126, 234, 0.12);
       }
 
       .metric-title {
@@ -832,10 +832,9 @@
           this.dataHistory.networkTx = [];
 
           dataPoints.forEach((point) => {
-            const pointTimestamp = point.timestamp * 1000;
+            const pointTimestamp = point.timestamp;
             const date = new Date(pointTimestamp);
             const timeLabel = date.toLocaleTimeString();
-
             this.dataHistory.timestamps.push(timeLabel);
             this.dataHistory.cpu.push(point.cpu_usage);
             this.dataHistory.memory.push(point.memory_usage);
@@ -1168,7 +1167,7 @@
         }
 
         updateChartData(data) {
-          const date = new Date(data.timestamp * 1000);
+          const date = new Date(data.timestamp);
           const timeLabel = date.toLocaleTimeString();
           this.dataHistory.timestamps.push(timeLabel);
           this.dataHistory.cpu.push(data.cpu_usage);

@@ -40,7 +40,18 @@ impl RssService {
             .replace('\\', ROOT_PATH)
             .trim_start_matches(ROOT_PATH)
             .to_string();
-        let upload_time: String = time_millis();
+        let upload_time: String = metadata
+            .modified()
+            .ok()
+            .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
+            .map(|d| {
+                let secs = d.as_secs() as i64;
+                let millis = d.subsec_millis() as i64;
+                let dt = chrono::DateTime::from_timestamp(secs, millis as u32 * 1_000_000)
+                    .unwrap_or_default();
+                dt.format("%Y-%m-%d %H:%M:%S%.3f").to_string()
+            })
+            .unwrap_or_else(time_millis);
         let file_url: String = if let Some(parent_path) = path.parent() {
             let parent_str: String = parent_path.to_string_lossy().to_string();
             let dir_path: String = parent_str
@@ -136,9 +147,7 @@ impl RssService {
         }
         match NaiveDateTime::parse_from_str(timestamp, "%Y-%m-%d %H:%M:%S%.3f") {
             Ok(naive_dt) => {
-                let local_offset: FixedOffset = Local::now().offset().to_owned();
-                let datetime: DateTime<FixedOffset> =
-                    DateTime::from_naive_utc_and_offset(naive_dt, local_offset);
+                let datetime: DateTime<Utc> = DateTime::from_naive_utc_and_offset(naive_dt, Utc);
                 datetime.to_rfc2822()
             }
             Err(_) => timestamp.to_string(),

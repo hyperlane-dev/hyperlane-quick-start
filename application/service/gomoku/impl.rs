@@ -390,7 +390,7 @@ impl GomokuWebSocketService {
             .set_room_id(room_id.to_string())
             .set_sender_id(sender_id.to_string())
             .set_payload(payload)
-            .set_time(time());
+            .set_time(Utc::now().timestamp_millis());
         serde_json::to_vec(&resp).map_err(|error| error.to_string())
     }
 

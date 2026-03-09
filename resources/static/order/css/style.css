@@ -54,10 +54,17 @@ a {
   width: 100%;
   height: 100%;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   background: #667eea;
   padding: 20px;
+  overflow-y: auto;
+  scrollbar-width: auto;
+  -ms-overflow-style: auto;
+}
+
+.login-page::-webkit-scrollbar {
+  display: block;
 }
 
 .login-container {
@@ -68,6 +75,7 @@ a {
   width: 100%;
   max-width: 400px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  margin: auto 0;
 }
 
 .login-header {
@@ -151,6 +159,7 @@ a {
   display: inline-flex;
   align-items: center;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .login-header h1 .nav-logo {
@@ -244,12 +253,12 @@ a {
 }
 
 .content-header {
-  margin-bottom: 24px;
+  margin-bottom: 12px;
   flex-shrink: 0;
 }
 
 .content-header h1 {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 600;
   color: #2c3e50;
 }
@@ -621,6 +630,8 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   padding: 20px;
   text-align: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  min-width: 0;
+  overflow: hidden;
 }
 
 .stat-card.income {
@@ -632,7 +643,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .stat-card.balance {
-  border-left: 4px solid #667eea;
+  border-left: 4px solid #f59e0b;
 }
 
 .stat-label {
@@ -641,12 +652,18 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .stat-value {
   font-size: 24px;
   font-weight: 600;
   color: #2c3e50;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .stat-card.income .stat-value {
@@ -1189,6 +1206,29 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   color: #666;
 }
 
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  gap: 16px;
+}
+
+.loading-state .loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e0e0e0;
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.loading-text {
+  color: #666;
+  font-size: 14px;
+}
+
 .empty-state-icon {
   font-size: 48px;
   margin-bottom: 16px;
@@ -1279,6 +1319,21 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   display: none;
 }
 
+.mobile-add-btn {
+  background: none;
+  border: none;
+  display: none;
+  padding: 0;
+  font-size: 20px;
+  font-weight: 600;
+  align-items: center;
+  justify-content: center;
+}
+
+.desktop-add-btn {
+  display: inline-flex;
+}
+
 .sidebar-overlay {
   display: none;
   position: fixed;
@@ -1310,7 +1365,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 
   .main-content {
     margin-left: 0;
-    padding: 16px;
+    padding: 8px 16px;
     height: 100dvh;
     overflow: hidden;
     display: flex;
@@ -1322,20 +1377,21 @@ input[type='number'].form-input::-webkit-inner-spin-button {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
     background: #f5f7fb;
     border: 1px solid #e0e0e0;
-    border-radius: 8px;
+    border-radius: 6px;
     color: #2c3e50;
-    font-size: 20px;
+    font-size: 16px;
     cursor: pointer;
-    margin-right: 12px;
+    margin-right: 8px;
   }
 
   .content-header {
     display: flex;
     align-items: center;
+    margin-bottom: 8px;
   }
 
   .stats-grid {
@@ -1505,25 +1561,39 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   }
 
   .card-header {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 12px;
+    align-items: center;
   }
 
   .card-header .card-title {
-    flex: 1 1 100%;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
   }
 
   .card-header > div {
     display: flex;
     gap: 8px;
-    flex-wrap: wrap;
-    width: 100%;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
   }
 
   .card-header > div .btn,
   .card-header > .btn {
     flex: 1;
     min-width: fit-content;
+  }
+
+  .mobile-add-btn {
+    display: inline-flex;
+    margin-left: auto;
+  }
+
+  .desktop-add-btn {
+    display: none;
   }
 
   .records-summary {
@@ -1697,7 +1767,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   margin-top: 16px;
   background: #ffffff;
   border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  border-radius: 12px;
   flex-wrap: wrap;
   gap: 12px;
 }
@@ -1714,6 +1784,24 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   align-items: center;
   justify-content: center;
   gap: 12px;
+}
+
+@media (max-width: 1200px) {
+  .pagination-container {
+    justify-content: center;
+    align-items: center;
+  }
+
+  .pagination-info {
+    display: block;
+    text-align: center;
+    width: 100%;
+  }
+
+  .pagination-controls {
+    justify-content: center;
+    width: 100%;
+  }
 }
 
 .pagination-controls > button {
@@ -1782,13 +1870,14 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 @media (max-width: 768px) {
   .pagination-container {
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
     position: fixed;
     bottom: 0;
     left: 16px;
     right: 16px;
     margin: 0;
-    border-radius: 8px 8px 0 0;
+    border-radius: 0;
+    border-top: none;
     z-index: 50;
     max-height: 120px;
     padding: 8px 16px;
@@ -1796,13 +1885,16 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   }
 
   .pagination-info {
-    justify-content: center;
+    display: block;
+    text-align: center;
     font-size: 12px;
+    width: 100%;
   }
 
   .pagination-controls {
     justify-content: center;
     gap: 8px;
+    width: 100%;
   }
 
   .pagination-controls > button {
@@ -1906,6 +1998,34 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 .chart-container {
   width: 100%;
   height: 280px;
+  position: relative;
+}
+
+.chart-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: #666;
+  font-size: 14px;
+  background: #f8f9fa;
+  z-index: 1;
+}
+
+.chart-loading::before {
+  content: '';
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e0e0e0;
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
 }
 
 @media (max-width: 1200px) {

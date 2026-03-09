@@ -41,6 +41,7 @@ body {
   display: flex;
   flex-direction: column;
   background: #667eea;
+  margin-bottom: 20px;
 }
 
 @keyframes fadeInDown {

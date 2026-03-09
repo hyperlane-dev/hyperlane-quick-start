@@ -60,7 +60,7 @@ impl MonitorService {
     async fn collect_performance_data_point() -> PerformanceDataPoint {
         Self::refresh_system().await;
         Self::refresh_networks().await;
-        let timestamp: u64 = timestamp();
+        let timestamp: u64 = Utc::now().timestamp_millis() as u64;
         let cpu_usage: f64 = Self::get_cpu_usage().await;
         let (memory_used, _memory_total, memory_usage) = Self::get_memory_info().await;
         let (disk_used, _disk_total, disk_usage) = Self::get_disk_info();

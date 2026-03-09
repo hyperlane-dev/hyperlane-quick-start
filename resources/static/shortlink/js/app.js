@@ -1,5 +1,6 @@
 const ShortlinkApp = {
   currentShortlinkId: null,
+  requestManager: new RequestManager(),
 
   api: {
     insert: '/api/shortlink/insert',
@@ -120,18 +121,27 @@ const ShortlinkApp = {
   },
 
   generateShortlink: async function (url) {
+    const requestKey = 'generate_shortlink';
+    if (this.requestManager.isPending(requestKey)) {
+      this.showToast('Generating shortlink, please wait...', 'warning');
+      return;
+    }
     this.showLoading(true);
 
     try {
-      const response = await fetch(this.api.insert, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await this.requestManager.fetch(
+        requestKey,
+        this.api.insert,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            url: url,
+          }),
         },
-        body: JSON.stringify({
-          url: url,
-        }),
-      });
+      );
 
       const result = await response.json();
 
@@ -143,6 +153,9 @@ const ShortlinkApp = {
         throw new Error(result.message || 'Failed to generate shortlink');
       }
     } catch (error) {
+      if (error.message === 'Request aborted') {
+        return;
+      }
       console.error('Error generating shortlink:', error);
       this.showError(
         error.message ||
@@ -195,27 +208,37 @@ const ShortlinkApp = {
     }
   },
 
-  openShortlink: function () {
+  openShortlink: async function () {
     if (!this.currentShortlinkId) {
       this.showToast('No shortlink to open', 'error');
       return;
     }
 
+    const requestKey = 'open_shortlink';
+    if (this.requestManager.isPending(requestKey)) {
+      return;
+    }
+
     const shortlinkUrl = this.api.query(this.currentShortlinkId);
 
-    fetch(shortlinkUrl)
-      .then((response) => response.json())
-      .then((result) => {
-        if (result.code === 200 && result.data && result.data.url) {
-          window.open(result.data.url, '_blank');
-        } else {
-          throw new Error('Failed to retrieve original URL');
-        }
-      })
-      .catch((error) => {
-        console.error('Error opening shortlink:', error);
-        this.showToast('Failed to open shortlink', 'error');
-      });
+    try {
+      const response = await this.requestManager.fetch(
+        requestKey,
+        shortlinkUrl,
+      );
+      const result = await response.json();
+      if (result.code === 200 && result.data && result.data.url) {
+        window.open(result.data.url, '_blank');
+      } else {
+        throw new Error('Failed to retrieve original URL');
+      }
+    } catch (error) {
+      if (error.message === 'Request aborted') {
+        return;
+      }
+      console.error('Error opening shortlink:', error);
+      this.showToast('Failed to open shortlink', 'error');
+    }
   },
 
   resetForm: function () {

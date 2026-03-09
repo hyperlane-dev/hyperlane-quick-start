@@ -10,6 +10,6 @@ pub struct GomokuWsResponse {
     pub(super) sender_id: String,
     #[get(pub(crate))]
     pub(super) payload: serde_json::Value,
-    #[get(pub(crate))]
-    pub(super) time: String,
+    #[get(type(copy), pub(crate))]
+    pub(super) time: i64,
 }

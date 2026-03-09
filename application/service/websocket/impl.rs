@@ -9,7 +9,7 @@ impl WebSocketService {
         let mut response: MessageResponse = MessageResponse::default();
         response
             .set_message(body.get_message().clone())
-            .set_time(date());
+            .set_time(Utc::now().timestamp_millis());
         serde_json::to_string(&response).map_err(|error| error.to_string())
     }
 }

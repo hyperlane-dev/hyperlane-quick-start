@@ -27,7 +27,7 @@ impl WebSocketReqData {
         resp.set_type(*self.get_type())
             .set_name(name)
             .set_data(self.get_data().clone())
-            .set_time(timestamp_millis() as i64);
+            .set_time(Utc::now().timestamp_millis());
         resp
     }
 }
@@ -40,7 +40,7 @@ impl WebSocketRespData {
         resp_data
             .set_type(msg_type)
             .set_data(data.to_string())
-            .set_time(timestamp_millis() as i64);
+            .set_time(Utc::now().timestamp_millis());
         if msg_type == MessageType::OnlineCount {
             resp_data.set_name("System".to_string());
         } else {

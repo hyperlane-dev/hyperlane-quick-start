@@ -20,19 +20,7 @@ let usersTotalCount = 0;
 
 const API_BASE = '/api/order';
 
-const pendingRequests = new Set();
-
-function isRequestPending(key) {
-  return pendingRequests.has(key);
-}
-
-function setRequestPending(key, pending) {
-  if (pending) {
-    pendingRequests.add(key);
-  } else {
-    pendingRequests.delete(key);
-  }
-}
+const orderRequestManager = window.requestManager;
 
 document.addEventListener('DOMContentLoaded', () => {
   initEventListeners();
@@ -293,16 +281,116 @@ let categoryTrendChart = null;
 let userRetentionChart = null;
 let topUsersChart = null;
 
+function disposeAllCharts() {
+  const charts = [
+    trendChart,
+    compareChart,
+    categoryChart,
+    userGrowthChart,
+    typeDistributionChart,
+    countTrendChart,
+    categoryAmountChart,
+    userActivityChart,
+    ratioTrendChart,
+    hourlyDistributionChart,
+    weeklyTrendChart,
+    periodOverPeriodChart,
+    categoryTrendChart,
+    userRetentionChart,
+    topUsersChart,
+  ];
+  charts.forEach((chart) => {
+    if (chart && typeof chart.dispose === 'function') {
+      try {
+        chart.dispose();
+      } catch (e) {}
+    }
+  });
+  trendChart = null;
+  compareChart = null;
+  categoryChart = null;
+  userGrowthChart = null;
+  typeDistributionChart = null;
+  countTrendChart = null;
+  categoryAmountChart = null;
+  userActivityChart = null;
+  ratioTrendChart = null;
+  hourlyDistributionChart = null;
+  weeklyTrendChart = null;
+  periodOverPeriodChart = null;
+  categoryTrendChart = null;
+  userRetentionChart = null;
+  topUsersChart = null;
+}
+
+function showDashboardLoading() {
+  disposeAllCharts();
+  const chartIds = [
+    'trend-chart',
+    'compare-chart',
+    'category-chart',
+    'user-growth-chart',
+    'type-distribution-chart',
+    'count-trend-chart',
+    'category-amount-chart',
+    'user-activity-chart',
+    'ratio-trend-chart',
+    'hourly-distribution-chart',
+    'weekly-trend-chart',
+    'period-over-period-chart',
+    'category-trend-chart',
+    'user-retention-chart',
+    'top-users-chart',
+  ];
+  chartIds.forEach((id) => {
+    const chartDom = document.getElementById(id);
+    if (chartDom) {
+      chartDom.innerHTML = '<div class="chart-loading"></div>';
+    }
+  });
+  const statIds = [
+    'today-transactions',
+    'today-income',
+    'today-expense',
+    'today-new-users',
+    'avg-income-per-transaction',
+    'avg-expense-per-transaction',
+    'overall-avg-amount',
+    'max-single-income',
+    'max-single-expense',
+  ];
+  statIds.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.textContent = '-';
+    }
+  });
+  const changeIds = [
+    'today-transactions-change',
+    'today-income-change',
+    'today-expense-change',
+    'today-new-users-change',
+    'avg-income-change',
+    'avg-expense-change',
+  ];
+  changeIds.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.textContent = '--';
+      el.className = 'stat-change';
+    }
+  });
+}
+
 async function loadOverview() {
   const requestKey = 'load_overview';
-  if (isRequestPending(requestKey)) {
-    return;
-  }
-  setRequestPending(requestKey, true);
+  showDashboardLoading();
   try {
-    const response = await fetch(`${API_BASE}/overview/statistics`, {
-      credentials: 'include',
-    });
+    const response = await orderRequestManager.fetch(
+      requestKey,
+      `${API_BASE}/overview/statistics`,
+      { credentials: 'include' },
+    );
     const result = await response.json();
     if (result.code === 200) {
       const data = result.data;
@@ -331,9 +419,9 @@ async function loadOverview() {
       }
     }
   } catch (error) {
-    showToast('Network error: ' + error.message, 'error');
-  } finally {
-    setRequestPending(requestKey, false);
+    if (error.message !== 'Request aborted') {
+      showToast('Network error: ' + error.message, 'error');
+    }
   }
 }
 
@@ -376,6 +464,10 @@ function updateChangeIndicator(elementId, change) {
 function initTrendChart(dailyTrend) {
   const chartDom = document.getElementById('trend-chart');
   if (!chartDom) return;
+  const loadingEl = chartDom.querySelector('.chart-loading');
+  if (loadingEl && loadingEl.parentNode) {
+    loadingEl.parentNode.removeChild(loadingEl);
+  }
   if (trendChart) trendChart.dispose();
   trendChart = echarts.init(chartDom);
   const option = {
@@ -462,6 +554,10 @@ function initTrendChart(dailyTrend) {
 function initCompareChart(monthlyComparison) {
   const chartDom = document.getElementById('compare-chart');
   if (!chartDom) return;
+  const loadingEl = chartDom.querySelector('.chart-loading');
+  if (loadingEl && loadingEl.parentNode) {
+    loadingEl.parentNode.removeChild(loadingEl);
+  }
   if (compareChart) compareChart.dispose();
   compareChart = echarts.init(chartDom);
   const option = {
@@ -558,6 +654,10 @@ function initCompareChart(monthlyComparison) {
 function initCategoryChart(categoryDistribution) {
   const chartDom = document.getElementById('category-chart');
   if (!chartDom) return;
+  const loadingEl = chartDom.querySelector('.chart-loading');
+  if (loadingEl && loadingEl.parentNode) {
+    loadingEl.parentNode.removeChild(loadingEl);
+  }
   if (categoryChart) categoryChart.dispose();
   categoryChart = echarts.init(chartDom);
   const colorPalette = [
@@ -634,6 +734,10 @@ function initCategoryChart(categoryDistribution) {
 function initUserGrowthChart(userGrowth) {
   const chartDom = document.getElementById('user-growth-chart');
   if (!chartDom) return;
+  const loadingEl = chartDom.querySelector('.chart-loading');
+  if (loadingEl && loadingEl.parentNode) {
+    loadingEl.parentNode.removeChild(loadingEl);
+  }
   if (userGrowthChart) userGrowthChart.dispose();
   userGrowthChart = echarts.init(chartDom);
   const option = {
@@ -701,6 +805,10 @@ function initUserGrowthChart(userGrowth) {
 function initTypeDistributionChart(distribution) {
   const chartDom = document.getElementById('type-distribution-chart');
   if (!chartDom) return;
+  const loadingEl = chartDom.querySelector('.chart-loading');
+  if (loadingEl && loadingEl.parentNode) {
+    loadingEl.parentNode.removeChild(loadingEl);
+  }
   if (typeDistributionChart) typeDistributionChart.dispose();
   typeDistributionChart = echarts.init(chartDom);
   const option = {
@@ -789,6 +897,10 @@ function initTypeDistributionChart(distribution) {
 function initCountTrendChart(trend) {
   const chartDom = document.getElementById('count-trend-chart');
   if (!chartDom) return;
+  const loadingEl = chartDom.querySelector('.chart-loading');
+  if (loadingEl && loadingEl.parentNode) {
+    loadingEl.parentNode.removeChild(loadingEl);
+  }
   if (countTrendChart) countTrendChart.dispose();
   countTrendChart = echarts.init(chartDom);
   const option = {
@@ -851,6 +963,10 @@ function initCountTrendChart(trend) {
 function initCategoryAmountChart(distribution) {
   const chartDom = document.getElementById('category-amount-chart');
   if (!chartDom) return;
+  const loadingEl = chartDom.querySelector('.chart-loading');
+  if (loadingEl && loadingEl.parentNode) {
+    loadingEl.parentNode.removeChild(loadingEl);
+  }
   if (categoryAmountChart) categoryAmountChart.dispose();
   categoryAmountChart = echarts.init(chartDom);
   const names = distribution.map((item) => item.name);
@@ -921,6 +1037,10 @@ function initCategoryAmountChart(distribution) {
 function initUserActivityChart(activity) {
   const chartDom = document.getElementById('user-activity-chart');
   if (!chartDom) return;
+  const loadingEl = chartDom.querySelector('.chart-loading');
+  if (loadingEl && loadingEl.parentNode) {
+    loadingEl.parentNode.removeChild(loadingEl);
+  }
   if (userActivityChart) userActivityChart.dispose();
   userActivityChart = echarts.init(chartDom);
   const option = {
@@ -1007,6 +1127,10 @@ function initUserActivityChart(activity) {
 function initRatioTrendChart(ratioTrend) {
   const chartDom = document.getElementById('ratio-trend-chart');
   if (!chartDom) return;
+  const loadingEl = chartDom.querySelector('.chart-loading');
+  if (loadingEl && loadingEl.parentNode) {
+    loadingEl.parentNode.removeChild(loadingEl);
+  }
   if (ratioTrendChart) ratioTrendChart.dispose();
   ratioTrendChart = echarts.init(chartDom);
   const dates = ratioTrend.map((item) => item.date);
@@ -1089,6 +1213,10 @@ function initRatioTrendChart(ratioTrend) {
 function initHourlyDistributionChart(hourlyData) {
   const chartDom = document.getElementById('hourly-distribution-chart');
   if (!chartDom) return;
+  const loadingEl = chartDom.querySelector('.chart-loading');
+  if (loadingEl && loadingEl.parentNode) {
+    loadingEl.parentNode.removeChild(loadingEl);
+  }
   if (hourlyDistributionChart) hourlyDistributionChart.dispose();
   hourlyDistributionChart = echarts.init(chartDom);
   const hours = hourlyData.map((item) => `${item.hour}:00`);
@@ -1152,6 +1280,10 @@ function initHourlyDistributionChart(hourlyData) {
 function initWeeklyTrendChart(weeklyTrend) {
   const chartDom = document.getElementById('weekly-trend-chart');
   if (!chartDom) return;
+  const loadingEl = chartDom.querySelector('.chart-loading');
+  if (loadingEl && loadingEl.parentNode) {
+    loadingEl.parentNode.removeChild(loadingEl);
+  }
   if (weeklyTrendChart) weeklyTrendChart.dispose();
   weeklyTrendChart = echarts.init(chartDom);
   const days = weeklyTrend.map((item) => item.day_of_week);
@@ -1226,6 +1358,10 @@ function initWeeklyTrendChart(weeklyTrend) {
 function initPeriodOverPeriodChart(popData) {
   const chartDom = document.getElementById('period-over-period-chart');
   if (!chartDom) return;
+  const loadingEl = chartDom.querySelector('.chart-loading');
+  if (loadingEl && loadingEl.parentNode) {
+    loadingEl.parentNode.removeChild(loadingEl);
+  }
   if (periodOverPeriodChart) periodOverPeriodChart.dispose();
   periodOverPeriodChart = echarts.init(chartDom);
   const periods = popData.map((item) => item.period);
@@ -1314,6 +1450,10 @@ function initPeriodOverPeriodChart(popData) {
 function initCategoryTrendChart(categoryTrends) {
   const chartDom = document.getElementById('category-trend-chart');
   if (!chartDom || categoryTrends.length === 0) return;
+  const loadingEl = chartDom.querySelector('.chart-loading');
+  if (loadingEl && loadingEl.parentNode) {
+    loadingEl.parentNode.removeChild(loadingEl);
+  }
   if (categoryTrendChart) categoryTrendChart.dispose();
   categoryTrendChart = echarts.init(chartDom);
   const colors = [
@@ -1381,6 +1521,10 @@ function initCategoryTrendChart(categoryTrends) {
 function initUserRetentionChart(retentionData) {
   const chartDom = document.getElementById('user-retention-chart');
   if (!chartDom) return;
+  const loadingEl = chartDom.querySelector('.chart-loading');
+  if (loadingEl && loadingEl.parentNode) {
+    loadingEl.parentNode.removeChild(loadingEl);
+  }
   if (userRetentionChart) userRetentionChart.dispose();
   userRetentionChart = echarts.init(chartDom);
   const dates = retentionData.map((item) => item.date);
@@ -1456,6 +1600,10 @@ function initUserRetentionChart(retentionData) {
 function initTopUsersChart(topUsers) {
   const chartDom = document.getElementById('top-users-chart');
   if (!chartDom || topUsers.length === 0) return;
+  const loadingEl = chartDom.querySelector('.chart-loading');
+  if (loadingEl && loadingEl.parentNode) {
+    loadingEl.parentNode.removeChild(loadingEl);
+  }
   if (topUsersChart) topUsersChart.dispose();
   topUsersChart = echarts.init(chartDom);
   const usernames = topUsers.map((item) => item.username);
@@ -1560,20 +1708,23 @@ window.addEventListener('resize', () => {
 async function handleLogin(e) {
   e.preventDefault();
   const requestKey = 'login';
-  if (isRequestPending(requestKey)) {
+  if (orderRequestManager.isPending(requestKey)) {
     showToast('Login in progress, please wait...', 'info');
     return;
   }
-  setRequestPending(requestKey, true);
   const username = document.getElementById('login-username').value;
   const password = document.getElementById('login-password').value;
   try {
-    const response = await fetch(`${API_BASE}/user/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password }),
-      credentials: 'include',
-    });
+    const response = await orderRequestManager.fetch(
+      requestKey,
+      `${API_BASE}/user/login`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+        credentials: 'include',
+      },
+    );
     const result = await response.json();
     if (result.code === 200) {
       currentUser = result.data.user;
@@ -1587,20 +1738,19 @@ async function handleLogin(e) {
       showToast(result.message || 'Login failed', 'error');
     }
   } catch (error) {
-    showToast('Network error: ' + error.message, 'error');
-  } finally {
-    setRequestPending(requestKey, false);
+    if (error.message !== 'Request aborted') {
+      showToast('Network error: ' + error.message, 'error');
+    }
   }
 }
 
 async function handleRegister(e) {
   e.preventDefault();
   const requestKey = 'register';
-  if (isRequestPending(requestKey)) {
+  if (orderRequestManager.isPending(requestKey)) {
     showToast('Registration in progress, please wait...', 'info');
     return;
   }
-  setRequestPending(requestKey, true);
   const data = {
     username: document.getElementById('reg-username').value,
     password: document.getElementById('reg-password').value,
@@ -1608,12 +1758,16 @@ async function handleRegister(e) {
     phone: document.getElementById('reg-phone').value || null,
   };
   try {
-    const response = await fetch(`${API_BASE}/user/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-      credentials: 'include',
-    });
+    const response = await orderRequestManager.fetch(
+      requestKey,
+      `${API_BASE}/user/register`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+        credentials: 'include',
+      },
+    );
     const result = await response.json();
     if (result.code === 200) {
       showToast(
@@ -1626,9 +1780,9 @@ async function handleRegister(e) {
       showToast(result.message || 'Registration failed', 'error');
     }
   } catch (error) {
-    showToast('Network error: ' + error.message, 'error');
-  } finally {
-    setRequestPending(requestKey, false);
+    if (error.message !== 'Request aborted') {
+      showToast('Network error: ' + error.message, 'error');
+    }
   }
 }
 
@@ -1706,12 +1860,17 @@ async function loadRecords() {
   await applyFilters();
 }
 
+function showListLoading(listId) {
+  const listEl = document.getElementById(listId);
+  if (listEl) {
+    listEl.innerHTML =
+      '<div class="loading-state"><div class="loading-spinner"></div><div class="loading-text">Loading...</div></div>';
+  }
+}
+
 async function applyFilters(pageDirection = null) {
   const requestKey = 'apply_filters';
-  if (isRequestPending(requestKey)) {
-    return;
-  }
-  setRequestPending(requestKey, true);
+  showListLoading('all-records-list');
   const startDate = document.getElementById('filter-start-date').value;
   const endDate = document.getElementById('filter-end-date').value;
   const category = document.getElementById('filter-category').value;
@@ -1738,9 +1897,11 @@ async function applyFilters(pageDirection = null) {
   params.append('page', currentPageNum);
   params.append('limit', recordsLimit);
   try {
-    const response = await fetch(`${API_BASE}/record/list?${params}`, {
-      credentials: 'include',
-    });
+    const response = await orderRequestManager.fetch(
+      requestKey,
+      `${API_BASE}/record/list?${params}`,
+      { credentials: 'include' },
+    );
     const result = await response.json();
     if (result.code === 200) {
       const data = result.data;
@@ -1772,9 +1933,9 @@ async function applyFilters(pageDirection = null) {
       }
     }
   } catch (error) {
-    showToast('Network error: ' + error.message, 'error');
-  } finally {
-    setRequestPending(requestKey, false);
+    if (error.message !== 'Request aborted') {
+      showToast('Network error: ' + error.message, 'error');
+    }
   }
 }
 
@@ -1914,11 +2075,10 @@ function showCreateRecordModal(targetUserId = null, targetUserName = null) {
 async function handleRecordSubmit(e) {
   e.preventDefault();
   const requestKey = 'record_submit';
-  if (isRequestPending(requestKey)) {
+  if (orderRequestManager.isPending(requestKey)) {
     showToast('Saving record, please wait...', 'info');
     return;
   }
-  setRequestPending(requestKey, true);
   setRecordModalLoading(true);
   const transaction_type = document.getElementById('record-type').value;
   const amount = parseFloat(document.getElementById('record-amount').value);
@@ -1976,7 +2136,6 @@ async function handleRecordSubmit(e) {
           } else {
             showToast(result.message || 'Operation failed', 'error');
           }
-          setRequestPending(requestKey, false);
           setRecordModalLoading(false);
           return;
         }
@@ -2026,9 +2185,10 @@ async function handleRecordSubmit(e) {
       }
     }
   } catch (error) {
-    showToast('Network error', 'error');
+    if (error.message !== 'Request aborted') {
+      showToast('Network error', 'error');
+    }
   } finally {
-    setRequestPending(requestKey, false);
     setRecordModalLoading(false);
   }
 }
@@ -2196,10 +2356,7 @@ function printRecordData(record) {
 
 async function loadUsers(pageDirection = null) {
   const requestKey = 'load_users';
-  if (isRequestPending(requestKey)) {
-    return;
-  }
-  setRequestPending(requestKey, true);
+  showListLoading('users-list');
   try {
     const keyword = document
       .getElementById('user-search-keyword')
@@ -2220,7 +2377,7 @@ async function loadUsers(pageDirection = null) {
       params.append('direction', 'prev');
     }
     const url = `${API_BASE}/user/list?${params.toString()}`;
-    const response = await fetch(url, {
+    const response = await orderRequestManager.fetch(requestKey, url, {
       credentials: 'include',
     });
     const result = await response.json();
@@ -2245,9 +2402,9 @@ async function loadUsers(pageDirection = null) {
       }
     }
   } catch (error) {
-    showToast('Network error: ' + error.message, 'error');
-  } finally {
-    setRequestPending(requestKey, false);
+    if (error.message !== 'Request aborted') {
+      showToast('Network error: ' + error.message, 'error');
+    }
   }
 }
 
@@ -2404,10 +2561,7 @@ async function loadUserRecords() {
 
 async function applyUserRecordFilters(pageDirection = null) {
   const requestKey = 'apply_user_filters';
-  if (isRequestPending(requestKey)) {
-    return;
-  }
-  setRequestPending(requestKey, true);
+  showListLoading('user-records-list');
   const startDate = document.getElementById('user-filter-start-date').value;
   const endDate = document.getElementById('user-filter-end-date').value;
   const category = document.getElementById('user-filter-category').value;
@@ -2432,9 +2586,11 @@ async function applyUserRecordFilters(pageDirection = null) {
     params.append('cache_id', userRecordsCacheId);
   }
   try {
-    const response = await fetch(`${API_BASE}/record/list?${params}`, {
-      credentials: 'include',
-    });
+    const response = await orderRequestManager.fetch(
+      requestKey,
+      `${API_BASE}/record/list?${params}`,
+      { credentials: 'include' },
+    );
     const result = await response.json();
     if (result.code === 200) {
       const data = result.data;
@@ -2470,9 +2626,9 @@ async function applyUserRecordFilters(pageDirection = null) {
       }
     }
   } catch (error) {
-    showToast('Network error: ' + error.message, 'error');
-  } finally {
-    setRequestPending(requestKey, false);
+    if (error.message !== 'Request aborted') {
+      showToast('Network error: ' + error.message, 'error');
+    }
   }
 }
 
@@ -2616,11 +2772,10 @@ function resetUserRecordFilters() {
 async function handleUserSubmit(e) {
   e.preventDefault();
   const requestKey = 'user_submit';
-  if (isRequestPending(requestKey)) {
+  if (orderRequestManager.isPending(requestKey)) {
     showToast('Creating user, please wait...', 'info');
     return;
   }
-  setRequestPending(requestKey, true);
   const data = {
     username: document.getElementById('user-username').value,
     password: document.getElementById('user-password').value,
@@ -2629,12 +2784,16 @@ async function handleUserSubmit(e) {
     phone: document.getElementById('user-phone').value || null,
   };
   try {
-    const response = await fetch(`${API_BASE}/user/create`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-      credentials: 'include',
-    });
+    const response = await orderRequestManager.fetch(
+      requestKey,
+      `${API_BASE}/user/create`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+        credentials: 'include',
+      },
+    );
     const result = await response.json();
     if (result.code === 200) {
       closeModal('user-modal');
@@ -2648,26 +2807,29 @@ async function handleUserSubmit(e) {
       }
     }
   } catch (error) {
-    showToast('Network error', 'error');
-  } finally {
-    setRequestPending(requestKey, false);
+    if (error.message !== 'Request aborted') {
+      showToast('Network error', 'error');
+    }
   }
 }
 
 async function approveUser(userId, approved) {
   const requestKey = `approve_user_${userId}`;
-  if (isRequestPending(requestKey)) {
+  if (orderRequestManager.isPending(requestKey)) {
     showToast('Processing, please wait...', 'info');
     return;
   }
-  setRequestPending(requestKey, true);
   try {
-    const response = await fetch(`${API_BASE}/user/approve/${userId}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ approved }),
-      credentials: 'include',
-    });
+    const response = await orderRequestManager.fetch(
+      requestKey,
+      `${API_BASE}/user/approve/${userId}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ approved }),
+        credentials: 'include',
+      },
+    );
     const result = await response.json();
     if (result.code === 200) {
       showToast(approved ? 'User approved!' : 'User rejected!', 'success');
@@ -2680,9 +2842,9 @@ async function approveUser(userId, approved) {
       }
     }
   } catch (error) {
-    showToast('Network error', 'error');
-  } finally {
-    setRequestPending(requestKey, false);
+    if (error.message !== 'Request aborted') {
+      showToast('Network error', 'error');
+    }
   }
 }
 
@@ -2697,22 +2859,25 @@ function loadProfile() {
 async function handleProfileSubmit(e) {
   e.preventDefault();
   const requestKey = 'profile_submit';
-  if (isRequestPending(requestKey)) {
+  if (orderRequestManager.isPending(requestKey)) {
     showToast('Saving profile, please wait...', 'info');
     return;
   }
-  setRequestPending(requestKey, true);
   const data = {
     email: document.getElementById('profile-email').value || null,
     phone: document.getElementById('profile-phone').value || null,
   };
   try {
-    const response = await fetch(`${API_BASE}/user/update/${currentUser.id}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-      credentials: 'include',
-    });
+    const response = await orderRequestManager.fetch(
+      requestKey,
+      `${API_BASE}/user/update/${currentUser.id}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+        credentials: 'include',
+      },
+    );
     const result = await response.json();
     if (result.code === 200) {
       currentUser = { ...currentUser, ...result.data };
@@ -2727,26 +2892,26 @@ async function handleProfileSubmit(e) {
       }
     }
   } catch (error) {
-    showToast('Network error', 'error');
-  } finally {
-    setRequestPending(requestKey, false);
+    if (error.message !== 'Request aborted') {
+      showToast('Network error', 'error');
+    }
   }
 }
 
 async function handlePasswordSubmit(e) {
   e.preventDefault();
   const requestKey = 'password_submit';
-  if (isRequestPending(requestKey)) {
+  if (orderRequestManager.isPending(requestKey)) {
     showToast('Changing password, please wait...', 'info');
     return;
   }
-  setRequestPending(requestKey, true);
   const data = {
     old_password: document.getElementById('old-password').value,
     new_password: document.getElementById('new-password').value,
   };
   try {
-    const response = await fetch(
+    const response = await orderRequestManager.fetch(
+      requestKey,
       `${API_BASE}/user/change_password/${currentUser.id}`,
       {
         method: 'POST',
@@ -2767,9 +2932,9 @@ async function handlePasswordSubmit(e) {
       }
     }
   } catch (error) {
-    showToast('Network error', 'error');
-  } finally {
-    setRequestPending(requestKey, false);
+    if (error.message !== 'Request aborted') {
+      showToast('Network error', 'error');
+    }
   }
 }
 
@@ -3204,10 +3369,13 @@ async function handleScanResult(qrData) {
     showScanError('Invalid QR code. Expected user ID.');
     return;
   }
+  const requestKey = 'scan_user';
   try {
-    const response = await fetch(`${API_BASE}/user/get/${userId}`, {
-      credentials: 'include',
-    });
+    const response = await orderRequestManager.fetch(
+      requestKey,
+      `${API_BASE}/user/get/${userId}`,
+      { credentials: 'include' },
+    );
     const result = await response.json();
     if (result.code === 200 && result.data) {
       stopScanning();
@@ -3224,6 +3392,9 @@ async function handleScanResult(qrData) {
       showScanError(result.message || 'Failed to find user');
     }
   } catch (err) {
+    if (err.message === 'Request aborted') {
+      return;
+    }
     const errorMessage = err instanceof Error ? err.message : String(err);
     showScanError(`Network error: ${errorMessage}`);
   }
@@ -3290,6 +3461,11 @@ function generateMyQRCode(userId) {
     colorLight: '#ffffff',
     correctLevel: QRCode.CorrectLevel.M,
   });
+  const img = container.querySelector('img');
+  if (img) {
+    img.title = '';
+    img.alt = '';
+  }
 }
 
 function downloadMyQRCode() {
@@ -3399,10 +3575,13 @@ function openImagePreview(indexOrId, isSelected = false) {
 async function loadAndPreviewImage(imageData) {
   const img = document.getElementById('preview-image');
   img.style.display = 'block';
+  const requestKey = `preview_image_${imageData.id}`;
   try {
-    const response = await fetch(`${API_BASE}/image/download/${imageData.id}`, {
-      credentials: 'include',
-    });
+    const response = await orderRequestManager.fetch(
+      requestKey,
+      `${API_BASE}/image/download/${imageData.id}`,
+      { credentials: 'include' },
+    );
     if (response.ok) {
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
@@ -3413,6 +3592,9 @@ async function loadAndPreviewImage(imageData) {
       showToast('Failed to load image', 'error');
     }
   } catch (error) {
+    if (error.message === 'Request aborted') {
+      return;
+    }
     img.style.display = 'none';
     showToast('Network error loading image', 'error');
   }
@@ -3573,10 +3755,13 @@ async function downloadCurrentImage() {
 }
 
 async function loadRecordImages(recordId) {
+  const requestKey = `load_images_${recordId}`;
   try {
-    const response = await fetch(`${API_BASE}/image/list/${recordId}`, {
-      credentials: 'include',
-    });
+    const response = await orderRequestManager.fetch(
+      requestKey,
+      `${API_BASE}/image/list/${recordId}`,
+      { credentials: 'include' },
+    );
     const result = await response.json();
     if (result.code === 200) {
       currentRecordImages[recordId] = result.data.images;
@@ -3584,6 +3769,9 @@ async function loadRecordImages(recordId) {
     }
     return [];
   } catch (error) {
+    if (error.message === 'Request aborted') {
+      return [];
+    }
     return [];
   }
 }

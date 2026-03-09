@@ -16,7 +16,7 @@ use std::{
 };
 
 use {
-    chrono::{DateTime, FixedOffset, Local, NaiveDate, NaiveDateTime, Utc},
+    chrono::{DateTime, Local, NaiveDate, NaiveDateTime, Utc},
     hyperlane::*,
     hyperlane_utils::{log::*, *},
     redis::RedisError,

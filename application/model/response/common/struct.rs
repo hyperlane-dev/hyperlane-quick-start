@@ -12,6 +12,6 @@ where
     pub(super) message: String,
     #[get(pub(crate))]
     pub(super) data: Option<T>,
-    #[get(pub(crate))]
-    pub(super) timestamp: Option<String>,
+    #[get(type(copy), pub(crate))]
+    pub(super) timestamp: Option<i64>,
 }
