@@ -395,6 +395,15 @@
         background-size: 16px;
       }
 
+      .controls-row {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+
       @media (max-width: 768px) {
         body {
           padding: 15px;
@@ -508,7 +517,7 @@
       <div id="emptyState" style="display: none"></div>
       <div id="feedItems" class="feed-items"></div>
 
-      <div class="pagination" id="pagination" style="display: none">
+      <div class="controls-row" id="controlsRow" style="display: none">
         <div class="page-size-selector">
           <label>Items per page:</label>
           <select id="pageSize" onchange="changePageSize()">
@@ -518,6 +527,9 @@
             <option value="100">100</option>
           </select>
         </div>
+      </div>
+
+      <div class="pagination" id="pagination" style="display: none">
         <button class="pagination-btn" id="prevBtn" onclick="previousPage()">
           Previous
         </button>
@@ -533,6 +545,66 @@
       let pageSize = 20;
       let totalItems = 0;
       let hasMoreItems = true;
+      let currentTimezone = getBrowserTimezone();
+
+      function getBrowserTimezone() {
+        const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const offset = -new Date().getTimezoneOffset() / 60;
+        const offsetStr = offset >= 0 ? `UTC+${offset}` : `UTC${offset}`;
+        const timezoneMap = {
+          'Asia/Shanghai': 'CST_CN',
+          'Asia/Hong_Kong': 'CST_CN',
+          'Asia/Taipei': 'CST_CN',
+          'Asia/Singapore': 'CST_CN',
+          'Asia/Tokyo': 'JST',
+          'Asia/Seoul': 'JST',
+          'Asia/Kolkata': 'IST',
+          'Asia/Calcutta': 'IST',
+          'Europe/London': 'GMT',
+          'Europe/Paris': 'CET',
+          'Europe/Berlin': 'CET',
+          'Europe/Madrid': 'CET',
+          'Europe/Rome': 'CET',
+          'Europe/Amsterdam': 'CET',
+          'Europe/Brussels': 'CET',
+          'Europe/Vienna': 'CET',
+          'Europe/Warsaw': 'CET',
+          'Europe/Budapest': 'CET',
+          'Europe/Prague': 'CET',
+          'Europe/Stockholm': 'CET',
+          'Europe/Oslo': 'CET',
+          'Europe/Copenhagen': 'CET',
+          'Europe/Helsinki': 'CET',
+          'Europe/Dublin': 'GMT',
+          'Europe/Lisbon': 'GMT',
+          'Europe/Athens': 'CET',
+          'Europe/Istanbul': 'CET',
+          'Europe/Moscow': 'CET',
+          'America/New_York': 'EST',
+          'America/Chicago': 'CST',
+          'America/Denver': 'MST',
+          'America/Phoenix': 'MST',
+          'America/Los_Angeles': 'PST',
+          'America/Anchorage': 'PST',
+          'America/Honolulu': 'PST',
+          'America/Toronto': 'EST',
+          'America/Vancouver': 'PST',
+          'America/Mexico_City': 'CST',
+          'America/Sao_Paulo': 'EST',
+          'America/Buenos_Aires': 'EST',
+          'America/Santiago': 'EST',
+          'Australia/Sydney': 'AEST',
+          'Australia/Melbourne': 'AEST',
+          'Australia/Brisbane': 'AEST',
+          'Australia/Perth': 'AEST',
+          'Australia/Adelaide': 'AEST',
+          'Pacific/Auckland': 'AEST',
+          'Pacific/Fiji': 'AEST',
+          UTC: 'UTC',
+          GMT: 'GMT',
+        };
+        return timezoneMap[timeZone] || 'UTC';
+      }
 
       const feedUrl = `${window.location.protocol}//${window.location.host}/api/rss/feed`;
 
@@ -543,7 +615,7 @@
           document.getElementById('emptyState').style.display = 'none';
 
           const offset = (page - 1) * pageSize;
-          const url = `${feedUrl}?limit=${pageSize + 1}&offset=${offset}`;
+          const url = `${feedUrl}?limit=${pageSize + 1}&offset=${offset}&timezone=${currentTimezone}`;
 
           const response = await fetch(url);
           if (!response.ok) {
@@ -609,11 +681,13 @@
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
         const pagination = document.getElementById('pagination');
+        const controlsRow = document.getElementById('controlsRow');
 
         if (pageInfo) pageInfo.textContent = `Page ${page}`;
         if (prevBtn) prevBtn.disabled = page === 1;
         if (nextBtn) nextBtn.disabled = !hasMoreItems;
         if (pagination) pagination.style.display = 'flex';
+        if (controlsRow) controlsRow.style.display = 'flex';
       }
 
       function previousPage() {

@@ -1,6 +1,73 @@
 use super::*;
 
 impl RssService {
+    fn timezone_to_offset(timezone: Timezone) -> FixedOffset {
+        match timezone {
+            Timezone::Utc => FixedOffset::east_opt(0).unwrap_or(FixedOffset::east_opt(0).unwrap()),
+            Timezone::Est => {
+                FixedOffset::west_opt(5 * 3600).unwrap_or(FixedOffset::east_opt(0).unwrap())
+            }
+            Timezone::Edt => {
+                FixedOffset::west_opt(4 * 3600).unwrap_or(FixedOffset::east_opt(0).unwrap())
+            }
+            Timezone::Cst => {
+                FixedOffset::west_opt(6 * 3600).unwrap_or(FixedOffset::east_opt(0).unwrap())
+            }
+            Timezone::Cdt => {
+                FixedOffset::west_opt(5 * 3600).unwrap_or(FixedOffset::east_opt(0).unwrap())
+            }
+            Timezone::Mst => {
+                FixedOffset::west_opt(7 * 3600).unwrap_or(FixedOffset::east_opt(0).unwrap())
+            }
+            Timezone::Mdt => {
+                FixedOffset::west_opt(6 * 3600).unwrap_or(FixedOffset::east_opt(0).unwrap())
+            }
+            Timezone::Pst => {
+                FixedOffset::west_opt(8 * 3600).unwrap_or(FixedOffset::east_opt(0).unwrap())
+            }
+            Timezone::Pdt => {
+                FixedOffset::west_opt(7 * 3600).unwrap_or(FixedOffset::east_opt(0).unwrap())
+            }
+            Timezone::Gmt => FixedOffset::east_opt(0).unwrap_or(FixedOffset::east_opt(0).unwrap()),
+            Timezone::CstCn => {
+                FixedOffset::east_opt(8 * 3600).unwrap_or(FixedOffset::east_opt(0).unwrap())
+            }
+            Timezone::Jst => {
+                FixedOffset::east_opt(9 * 3600).unwrap_or(FixedOffset::east_opt(0).unwrap())
+            }
+            Timezone::Ist => FixedOffset::east_opt(5 * 3600 + 30 * 60)
+                .unwrap_or(FixedOffset::east_opt(0).unwrap()),
+            Timezone::Aest => {
+                FixedOffset::east_opt(10 * 3600).unwrap_or(FixedOffset::east_opt(0).unwrap())
+            }
+            Timezone::Aedt => {
+                FixedOffset::east_opt(11 * 3600).unwrap_or(FixedOffset::east_opt(0).unwrap())
+            }
+            Timezone::Cet => {
+                FixedOffset::east_opt(3600).unwrap_or(FixedOffset::east_opt(0).unwrap())
+            }
+            Timezone::Cest => {
+                FixedOffset::east_opt(2 * 3600).unwrap_or(FixedOffset::east_opt(0).unwrap())
+            }
+        }
+    }
+
+    fn format_rfc822_date_with_timezone(timestamp: &str, timezone: Timezone) -> String {
+        if timestamp.is_empty() {
+            return String::new();
+        }
+        match NaiveDateTime::parse_from_str(timestamp, "%Y-%m-%d %H:%M:%S%.3f") {
+            Ok(naive_dt) => {
+                let utc_datetime: DateTime<Utc> =
+                    DateTime::from_naive_utc_and_offset(naive_dt, Utc);
+                let offset: FixedOffset = Self::timezone_to_offset(timezone);
+                let local_datetime: DateTime<FixedOffset> = utc_datetime.with_timezone(&offset);
+                local_datetime.to_rfc2822()
+            }
+            Err(_) => timestamp.to_string(),
+        }
+    }
+
     #[instrument_trace]
     pub async fn get_uploaded_files() -> Vec<UploadedFile> {
         let mut files: Vec<UploadedFile> = Vec::new();
@@ -95,6 +162,7 @@ impl RssService {
         base_url: &str,
         limit: Option<usize>,
         offset: Option<usize>,
+        timezone: Option<Timezone>,
     ) -> String {
         let files: Vec<UploadedFile> = Self::get_uploaded_files().await;
         let offset_value: usize = offset.unwrap_or(0);
@@ -103,6 +171,7 @@ impl RssService {
         } else {
             files.into_iter().skip(offset_value).collect()
         };
+        let tz: Timezone = timezone.unwrap_or(Timezone::Utc);
         let mut items: Vec<RssItem> = Vec::new();
         for file in limited_files {
             let full_url: String = format!("{base_url}{}", file.get_file_url());
@@ -125,7 +194,10 @@ impl RssService {
                     file.get_file_size(),
                     file.get_upload_time()
                 ))
-                .set_pub_date(Self::format_rfc822_date(file.get_upload_time()))
+                .set_pub_date(Self::format_rfc822_date_with_timezone(
+                    file.get_upload_time(),
+                    tz,
+                ))
                 .set_guid(full_url)
                 .set_enclosure(enclosure);
             items.push(item);
@@ -138,20 +210,6 @@ impl RssService {
             .set_language("en-US".to_string())
             .set_items(items);
         Self::build_rss_xml(&channel)
-    }
-
-    #[instrument_trace]
-    fn format_rfc822_date(timestamp: &str) -> String {
-        if timestamp.is_empty() {
-            return String::new();
-        }
-        match NaiveDateTime::parse_from_str(timestamp, "%Y-%m-%d %H:%M:%S%.3f") {
-            Ok(naive_dt) => {
-                let datetime: DateTime<Utc> = DateTime::from_naive_utc_and_offset(naive_dt, Utc);
-                datetime.to_rfc2822()
-            }
-            Err(_) => timestamp.to_string(),
-        }
     }
 
     #[instrument_trace]

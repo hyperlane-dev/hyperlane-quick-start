@@ -22,7 +22,7 @@ impl ServerHook for ServerStatusRoute {
             if ctx.try_send_body().await.is_err() {
                 break;
             }
-            sleep(Duration::from_millis(1000)).await;
+            sleep(Duration::from_secs(MONITOR_INTERVAL_SECONDS)).await;
         }
         ctx.set_closed(true);
     }

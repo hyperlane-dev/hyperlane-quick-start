@@ -3,6 +3,7 @@ pub mod cicd;
 pub mod gomoku;
 pub mod order;
 pub mod redis;
+pub mod rss;
 pub mod shortlink;
 pub mod websocket;
 

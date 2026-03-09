@@ -259,24 +259,15 @@
         background: #ffffff;
         border: 2px solid rgba(118, 75, 162, 0.15);
         border-radius: 12px;
-        padding: 24px;
+        padding: 20px;
         position: relative;
         overflow: hidden;
         transition: all 0.3s ease;
         box-shadow: 0 3px 12px rgba(118, 75, 162, 0.1);
-      }
-
-      .metric-card::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        right: 0;
-        width: 60px;
-        height: 60px;
-        background: rgba(102, 126, 234, 0.08);
-        border-radius: 50%;
-        transform: translate(30%, 30%);
-        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 140px;
       }
 
       .metric-card:hover {
@@ -286,19 +277,13 @@
         background: #ffffff;
       }
 
-      .metric-card:hover::after {
-        width: 80px;
-        height: 80px;
-        background: rgba(102, 126, 234, 0.12);
-      }
-
       .metric-title {
-        font-size: 1rem;
+        font-size: 0.9rem;
         color: #6c757d;
-        margin-bottom: 15px;
+        margin-bottom: 0;
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 8px;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 1px;
@@ -309,10 +294,11 @@
       }
 
       .metric-value {
-        font-size: 2.5rem;
+        font-size: 2.2rem;
         font-weight: 700;
-        margin-bottom: 15px;
+        margin-bottom: 0;
         color: #2c3e50;
+        line-height: 1.2;
       }
 
       .metric-unit {
@@ -334,10 +320,11 @@
       .progress-bar {
         height: 100%;
         background: #667eea;
-        border-radius: 6px;
+        border-radius: inherit;
         transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         position: relative;
         overflow: hidden;
+        min-width: 12px;
       }
 
       .progress-bar::after {
@@ -641,9 +628,6 @@
           <div class="metric-value" id="cpuUsage">
             0<span class="metric-unit">%</span>
           </div>
-          <div class="progress-container">
-            <div class="progress-bar" id="cpuProgress" style="width: 0%"></div>
-          </div>
         </div>
         <div class="metric-card">
           <div class="metric-title">
@@ -652,13 +636,6 @@
           </div>
           <div class="metric-value" id="memoryUsage">
             0<span class="metric-unit">%</span>
-          </div>
-          <div class="progress-container">
-            <div
-              class="progress-bar"
-              id="memoryProgress"
-              style="width: 0%"
-            ></div>
           </div>
         </div>
         <div class="metric-card">
@@ -669,20 +646,15 @@
           <div class="metric-value" id="diskUsage">
             0<span class="metric-unit">%</span>
           </div>
-          <div class="progress-container">
-            <div class="progress-bar" id="diskProgress" style="width: 0%"></div>
-          </div>
         </div>
         <div class="metric-card">
           <div class="metric-title">
             <span class="metric-icon">🌐</span>
             Network Traffic
           </div>
-          <div class="metric-value" id="networkRx">
-            0<span class="metric-unit">MB</span>
-          </div>
-          <div style="font-size: 1.2rem; color: #888; margin-top: 10px">
-            Upload: <span id="networkTx">0 MB</span>
+          <div class="metric-value" id="networkTraffic">
+            ↓ <span id="networkValue">0</span
+            ><span class="metric-unit">MB</span>
           </div>
         </div>
         <div class="metric-card">
@@ -759,6 +731,10 @@
 
           this.charts = {};
           this.isHistoryLoaded = false;
+          this.networkToggleTimer = null;
+          this.showingUpload = false;
+          this.currentNetworkRx = 0;
+          this.currentNetworkTx = 0;
 
           this.init();
         }
@@ -768,7 +744,33 @@
           this.loadSystemInfo();
           this.loadHistoryData().then(() => {
             this.connectSSE();
+            this.startNetworkToggle();
           });
+        }
+
+        startNetworkToggle() {
+          this.showNetworkDownload();
+          this.networkToggleTimer = setInterval(() => {
+            this.toggleNetworkDisplay();
+          }, 4000);
+        }
+
+        showNetworkDownload() {
+          const trafficEl = document.getElementById('networkTraffic');
+          if (!trafficEl) return;
+          this.showingUpload = false;
+          trafficEl.innerHTML = `↓ <span id="networkValue">${this.currentNetworkRx}</span><span class="metric-unit">MB</span>`;
+        }
+
+        toggleNetworkDisplay() {
+          const trafficEl = document.getElementById('networkTraffic');
+          if (!trafficEl) return;
+          this.showingUpload = !this.showingUpload;
+          if (this.showingUpload) {
+            trafficEl.innerHTML = `↑ <span id="networkValue">${this.currentNetworkTx}</span><span class="metric-unit">MB</span>`;
+          } else {
+            trafficEl.innerHTML = `↓ <span id="networkValue">${this.currentNetworkRx}</span><span class="metric-unit">MB</span>`;
+          }
         }
 
         async loadSystemInfo() {
@@ -854,24 +856,17 @@
         updateMetricsFromDataPoint(data) {
           document.getElementById('cpuUsage').innerHTML =
             `${data.cpu_usage.toFixed(1)}<span class="metric-unit">%</span>`;
-          document.getElementById('cpuProgress').style.width =
-            `${data.cpu_usage}%`;
 
           document.getElementById('memoryUsage').innerHTML =
             `${data.memory_usage.toFixed(1)}<span class="metric-unit">%</span>`;
-          document.getElementById('memoryProgress').style.width =
-            `${data.memory_usage}%`;
 
           document.getElementById('diskUsage').innerHTML =
             `${data.disk_usage.toFixed(1)}<span class="metric-unit">%</span>`;
-          document.getElementById('diskProgress').style.width =
-            `${data.disk_usage}%`;
 
           const rxMB = (data.network_rx / 1024 / 1024).toFixed(2);
           const txMB = (data.network_tx / 1024 / 1024).toFixed(2);
-          document.getElementById('networkRx').innerHTML =
-            `${rxMB}<span class="metric-unit">MB</span>`;
-          document.getElementById('networkTx').textContent = `${txMB} MB`;
+          this.currentNetworkRx = rxMB;
+          this.currentNetworkTx = txMB;
 
           document.getElementById('loadAverage').textContent =
             data.load_average.toFixed(2);
@@ -1120,24 +1115,17 @@
         updateServerStatus(data) {
           document.getElementById('cpuUsage').innerHTML =
             `${data.cpu_usage.toFixed(1)}<span class="metric-unit">%</span>`;
-          document.getElementById('cpuProgress').style.width =
-            `${data.cpu_usage}%`;
 
           document.getElementById('memoryUsage').innerHTML =
             `${data.memory_usage.toFixed(1)}<span class="metric-unit">%</span>`;
-          document.getElementById('memoryProgress').style.width =
-            `${data.memory_usage}%`;
 
           document.getElementById('diskUsage').innerHTML =
             `${data.disk_usage.toFixed(1)}<span class="metric-unit">%</span>`;
-          document.getElementById('diskProgress').style.width =
-            `${data.disk_usage}%`;
 
           const rxMB = (data.network_rx / 1024 / 1024).toFixed(2);
           const txMB = (data.network_tx / 1024 / 1024).toFixed(2);
-          document.getElementById('networkRx').innerHTML =
-            `${rxMB}<span class="metric-unit">MB</span>`;
-          document.getElementById('networkTx').textContent = `${txMB} MB`;
+          this.currentNetworkRx = rxMB;
+          this.currentNetworkTx = txMB;
 
           document.getElementById('loadAverage').textContent =
             data.load_average.toFixed(2);
@@ -1221,6 +1209,9 @@
         destroy() {
           if (this.eventSource) {
             this.eventSource.close();
+          }
+          if (this.networkToggleTimer) {
+            clearInterval(this.networkToggleTimer);
           }
 
           Object.values(this.charts).forEach((chart) => {
