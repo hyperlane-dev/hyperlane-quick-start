@@ -52,9 +52,6 @@ function initEventListeners() {
     .getElementById('record-form')
     ?.addEventListener('submit', handleRecordSubmit);
   document
-    .getElementById('user-form')
-    ?.addEventListener('submit', handleUserSubmit);
-  document
     .getElementById('profile-form')
     ?.addEventListener('submit', handleProfileSubmit);
   document
@@ -2540,12 +2537,6 @@ function goToUsersPage(pageNum) {
   loadUsers(direction);
 }
 
-function showCreateUserModal() {
-  document.getElementById('user-modal-title').textContent = 'New User';
-  document.getElementById('user-form').reset();
-  openModal('user-modal');
-}
-
 function viewUserRecords(userId, userName) {
   viewingUserId = userId;
   viewingUserName = userName;
@@ -2767,50 +2758,6 @@ function resetUserRecordFilters() {
   document.getElementById('user-filter-category').value = '';
   document.getElementById('user-filter-type').value = '';
   applyUserRecordFilters('reset');
-}
-
-async function handleUserSubmit(e) {
-  e.preventDefault();
-  const requestKey = 'user_submit';
-  if (orderRequestManager.isPending(requestKey)) {
-    showToast('Creating user, please wait...', 'info');
-    return;
-  }
-  const data = {
-    username: document.getElementById('user-username').value,
-    password: document.getElementById('user-password').value,
-    role: parseInt(document.getElementById('user-role-select').value, 10),
-    email: document.getElementById('user-email').value || null,
-    phone: document.getElementById('user-phone').value || null,
-  };
-  try {
-    const response = await orderRequestManager.fetch(
-      requestKey,
-      `${API_BASE}/user/create`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-        credentials: 'include',
-      },
-    );
-    const result = await response.json();
-    if (result.code === 200) {
-      closeModal('user-modal');
-      showToast('User created!', 'success');
-      loadUsers();
-    } else {
-      if (result.code === 401) {
-        handleAuthError(result.message);
-      } else {
-        showToast(result.message || 'Operation failed', 'error');
-      }
-    }
-  } catch (error) {
-    if (error.message !== 'Request aborted') {
-      showToast('Network error', 'error');
-    }
-  }
 }
 
 async function approveUser(userId, approved) {

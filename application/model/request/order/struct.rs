@@ -15,15 +15,6 @@ pub struct LoginRequest {
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
-pub struct CreateUserRequest {
-    pub(super) username: String,
-    pub(super) password: String,
-    pub(super) email: Option<String>,
-    pub(super) phone: Option<String>,
-    pub(super) role: i16,
-}
-
-#[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct UpdateUserRequest {
     pub(super) email: Option<String>,
     pub(super) phone: Option<String>,

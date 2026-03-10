@@ -8,10 +8,6 @@ pub struct UserRegisterRoute;
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct UserLoginRoute;
 
-#[route("/api/order/user/create")]
-#[derive(Clone, Copy, Data, Debug, Default)]
-pub struct UserCreateRoute;
-
 #[route("/api/order/user/update/{id}")]
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct UserUpdateRoute;

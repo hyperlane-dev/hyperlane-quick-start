@@ -93,39 +93,6 @@ impl ServerHook for UserLoginRoute {
     }
 }
 
-impl ServerHook for UserCreateRoute {
-    #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
-        Self
-    }
-
-    #[prologue_macros(post_method, request_body_json_result(request_opt: CreateUserRequest), response_header(CONTENT_TYPE => APPLICATION_JSON))]
-    #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
-        let request: CreateUserRequest = match request_opt {
-            Ok(data) => data,
-            Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error);
-                ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
-            }
-        };
-        match OrderService::create_user(request).await {
-            Ok(user) => {
-                let response: ApiResponse<UserResponse> =
-                    ApiResponse::<UserResponse>::success(user);
-                ctx.get_mut_response().set_body(response.to_json_bytes())
-            }
-            Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
-                ctx.get_mut_response().set_body(response.to_json_bytes())
-            }
-        };
-    }
-}
-
 impl ServerHook for UserUpdateRoute {
     #[instrument_trace]
     async fn new(_ctx: &mut Context) -> Self {

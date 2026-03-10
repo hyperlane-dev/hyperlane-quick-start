@@ -47,7 +47,23 @@ impl OrderService {
     }
 
     #[instrument_trace]
+    fn validate_email(email: &str) -> bool {
+        use hyperlane_utils::regex::Regex;
+        let regex: Regex = match Regex::new(EMAIL_REGEX_PATTERN) {
+            Ok(r) => r,
+            Err(_) => return false,
+        };
+        regex.is_match(email)
+    }
+
+    #[instrument_trace]
     pub async fn register_user(request: RegisterRequest) -> Result<UserResponse, String> {
+        if let Some(email) = request.try_get_email()
+            && !email.is_empty()
+            && !Self::validate_email(email)
+        {
+            return Err("Invalid email format".to_string());
+        }
         let existing_user: Option<OrderUserModel> =
             UserRepository::find_by_username(request.get_username().clone()).await?;
         if existing_user.is_some() {
@@ -95,33 +111,16 @@ impl OrderService {
     }
 
     #[instrument_trace]
-    pub async fn create_user(request: CreateUserRequest) -> Result<UserResponse, String> {
-        let existing_user: Option<OrderUserModel> =
-            UserRepository::find_by_username(request.get_username().clone()).await?;
-        if existing_user.is_some() {
-            return Err("Username already exists".to_string());
-        }
-        let password_hash: String = PasswordUtil::hash_password(request.get_password());
-        let active_model: OrderUserActiveModel = OrderUserActiveModel {
-            username: ActiveValue::Set(request.get_username().clone()),
-            password_hash: ActiveValue::Set(password_hash),
-            email: ActiveValue::Set(request.try_get_email().clone()),
-            phone: ActiveValue::Set(request.try_get_phone().clone()),
-            role: ActiveValue::Set(*request.get_role()),
-            status: ActiveValue::Set(UserStatus::Approved.to_i16()),
-            id: ActiveValue::NotSet,
-            created_at: ActiveValue::NotSet,
-            updated_at: ActiveValue::NotSet,
-        };
-        let result: OrderUserModel = UserRepository::insert(active_model).await?;
-        Ok(Self::model_to_user_response(&result))
-    }
-
-    #[instrument_trace]
     pub async fn update_user(
         user_id: i32,
         request: UpdateUserRequest,
     ) -> Result<UserResponse, String> {
+        if let Some(email) = request.try_get_email()
+            && !email.is_empty()
+            && !Self::validate_email(email)
+        {
+            return Err("Invalid email format".to_string());
+        }
         match UserRepository::find_by_id(user_id).await? {
             Some(model) => {
                 let mut active_model: OrderUserActiveModel = model.into();
