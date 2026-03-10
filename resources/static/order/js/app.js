@@ -1854,6 +1854,7 @@ function updateRecordsSummary(data) {
 
 async function loadRecords() {
   currentPageNum = 1;
+  cacheId = null;
   await applyFilters();
 }
 
