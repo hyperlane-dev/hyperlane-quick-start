@@ -853,6 +853,40 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   margin-bottom: 4px;
 }
 
+.record-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.record-bill-no {
+  font-size: 14px;
+  font-weight: 700;
+  color: #2c3e50;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.record-amount-inline {
+  font-size: 14px;
+  font-weight: 700;
+  text-align: right;
+  margin-left: 12px;
+  white-space: nowrap;
+}
+
+.record-amount-inline.income {
+  color: #16a34a;
+}
+
+.record-amount-inline.expense {
+  color: #dc2626;
+}
+
 .record-description {
   font-size: 13px;
   color: #4a5568;
@@ -932,7 +966,8 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   font-size: 17px;
   font-weight: 700;
   text-align: right;
-  padding: 0 16px;
+  padding: 0;
+  margin-left: auto;
 }
 
 .record-amount.income {
@@ -954,7 +989,9 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  justify-content: flex-start;
   gap: 4px;
+  margin-left: auto;
 }
 
 .btn-print {
@@ -1499,17 +1536,19 @@ input[type='number'].form-input::-webkit-inner-spin-button {
     width: 100%;
     order: 3;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
     padding-top: 12px;
     border-top: 1px solid #e0e0e0;
     margin-top: 4px;
+    gap: 12px;
   }
 
   .record-amount {
-    text-align: left;
+    text-align: right;
     font-size: 15px;
-    padding: 0 12px;
+    padding: 0;
+    margin-left: 0;
   }
 
   .record-date {

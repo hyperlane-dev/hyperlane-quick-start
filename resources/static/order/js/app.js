@@ -2037,11 +2037,11 @@ async function renderAllRecords(records) {
     <div class="record-item" data-record-id="${r.id}" data-bill-no="${escapeHtml(r.bill_no)}" ondblclick="copyBillNo('${escapeHtml(r.bill_no)}')">
       <div class="record-type ${r.transaction_type}">${r.transaction_type === 'income' ? '💰' : '💸'}</div>
       <div class="record-info">
-        <div class="record-category">${escapeHtml(r.category)}</div>
+        <div class="record-bill-no">${escapeHtml(r.bill_no)}</div>
         <div class="record-description">${escapeHtml(r.description || '')}</div>
         <div class="record-meta-row">
           <span class="record-meta-item"><span class="record-meta-label">ID:</span> <span class="record-meta-value">${r.id}</span></span>
-          <span class="record-meta-item"><span class="record-meta-label">Bill No:</span> <span class="record-meta-value">${escapeHtml(r.bill_no)}</span></span>
+          <span class="record-meta-item"><span class="record-meta-label">Category:</span> <span class="record-meta-value">${escapeHtml(r.category)}</span></span>
           <span class="record-meta-item" onclick="event.stopPropagation(); viewUserRecords(${r.user_id}, '${escapeHtml(displayName)}');" style="cursor: pointer;"><span class="record-meta-label">User:</span> <span class="record-meta-value" style="color: #58a6ff;">${escapeHtml(displayName)}</span></span>
         </div>
         <div class="record-date-row">
@@ -2652,11 +2652,11 @@ async function renderUserRecords(records) {
     <div class="record-item" data-record-id="${r.id}" data-bill-no="${escapeHtml(r.bill_no)}" ondblclick="copyBillNo('${escapeHtml(r.bill_no)}')">
       <div class="record-type ${r.transaction_type}">${r.transaction_type === 'income' ? '💰' : '💸'}</div>
       <div class="record-info">
-        <div class="record-category">${escapeHtml(r.category)}</div>
+        <div class="record-bill-no">${escapeHtml(r.bill_no)}</div>
         <div class="record-description">${escapeHtml(r.description || '')}</div>
         <div class="record-meta-row">
           <span class="record-meta-item"><span class="record-meta-label">ID:</span> <span class="record-meta-value">${r.id}</span></span>
-          <span class="record-meta-item"><span class="record-meta-label">Bill No:</span> <span class="record-meta-value">${escapeHtml(r.bill_no)}</span></span>
+          <span class="record-meta-item"><span class="record-meta-label">Category:</span> <span class="record-meta-value">${escapeHtml(r.category)}</span></span>
         </div>
         <div class="record-date-row">
           <span class="record-date-item"><span class="record-date-label">Date:</span> <span class="record-date-value">${formatDate(r.bill_date)}</span></span>
