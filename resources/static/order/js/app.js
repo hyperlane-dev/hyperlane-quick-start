@@ -1908,7 +1908,7 @@ async function applyFilters(pageDirection = null) {
         cacheId = allRecords[0].id;
       }
       totalRecords = data.total_count || allRecords.length;
-      await renderAllRecords(allRecords);
+      renderAllRecords(allRecords);
       updateRecordsSummary(data);
       renderPagination();
       requestAnimationFrame(() => {
@@ -2013,7 +2013,7 @@ function resetFilters() {
   applyFilters('reset');
 }
 
-async function renderAllRecords(records) {
+function renderAllRecords(records) {
   const container = document.getElementById('all-records-list');
   if (!records || !Array.isArray(records) || records.length === 0) {
     container.innerHTML = `
@@ -2024,13 +2024,14 @@ async function renderAllRecords(records) {
       </div>`;
     return;
   }
-  const recordHtmls = await Promise.all(
-    records.map(async (r) => {
-      const rJson = JSON.stringify(r).replace(/"/g, '&quot;');
-      const images = await loadRecordImages(r.id);
-      const imagesHtml = renderRecordImages(r.id, images);
-      const displayName = r.username || `User ${r.user_id}`;
-      return `
+  const recordHtmls = records.map((r) => {
+    const rJson = JSON.stringify(r).replace(/"/g, '&quot;');
+    if (r.images && r.images.length > 0) {
+      currentRecordImages[r.id] = r.images;
+    }
+    const imagesHtml = renderRecordImages(r.id, r.images || []);
+    const displayName = r.username || `User ${r.user_id}`;
+    return `
     <div class="record-item" data-record-id="${r.id}" data-bill-no="${escapeHtml(r.bill_no)}" ondblclick="copyBillNo('${escapeHtml(r.bill_no)}')">
       <div class="record-type ${r.transaction_type}">${r.transaction_type === 'income' ? '💰' : '💸'}</div>
       <div class="record-info">
@@ -2052,8 +2053,7 @@ async function renderAllRecords(records) {
         <button class="btn-print" onclick="event.stopPropagation(); printRecordData(JSON.parse(this.dataset.record));" data-record="${rJson}">🖨️ Print</button>
       </div>
     </div>`;
-    }),
-  );
+  });
   container.innerHTML = recordHtmls.join('');
 }
 
@@ -2595,7 +2595,7 @@ async function applyUserRecordFilters(pageDirection = null) {
         userRecordsCacheId = allRecords[0].id;
       }
       totalRecords = data.total_count || allRecords.length;
-      await renderUserRecords(allRecords);
+      renderUserRecords(allRecords);
       updateUserRecordStats(data);
       renderUserRecordPagination();
       requestAnimationFrame(() => {
@@ -2623,7 +2623,7 @@ async function applyUserRecordFilters(pageDirection = null) {
   }
 }
 
-async function renderUserRecords(records) {
+function renderUserRecords(records) {
   const container = document.getElementById('user-records-list');
   if (!records || !Array.isArray(records) || records.length === 0) {
     container.innerHTML = `
@@ -2634,12 +2634,13 @@ async function renderUserRecords(records) {
       </div>`;
     return;
   }
-  const recordHtmls = await Promise.all(
-    records.map(async (r) => {
-      const rJson = JSON.stringify(r).replace(/"/g, '&quot;');
-      const images = await loadRecordImages(r.id);
-      const imagesHtml = renderRecordImages(r.id, images);
-      return `
+  const recordHtmls = records.map((r) => {
+    const rJson = JSON.stringify(r).replace(/"/g, '&quot;');
+    if (r.images && r.images.length > 0) {
+      currentRecordImages[r.id] = r.images;
+    }
+    const imagesHtml = renderRecordImages(r.id, r.images || []);
+    return `
     <div class="record-item" data-record-id="${r.id}" data-bill-no="${escapeHtml(r.bill_no)}" ondblclick="copyBillNo('${escapeHtml(r.bill_no)}')">
       <div class="record-type ${r.transaction_type}">${r.transaction_type === 'income' ? '💰' : '💸'}</div>
       <div class="record-info">
@@ -2660,8 +2661,7 @@ async function renderUserRecords(records) {
         <button class="btn-print" onclick="event.stopPropagation(); printRecordData(JSON.parse(this.dataset.record));" data-record="${rJson}">🖨️ Print</button>
       </div>
     </div>`;
-    }),
-  );
+  });
   container.innerHTML = recordHtmls.join('');
 }
 

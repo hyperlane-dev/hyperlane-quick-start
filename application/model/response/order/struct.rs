@@ -45,6 +45,7 @@ pub struct RecordResponse {
     pub(super) username: Option<String>,
     pub(super) email: Option<String>,
     pub(super) phone: Option<String>,
+    pub(super) images: Vec<RecordImageResponse>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]

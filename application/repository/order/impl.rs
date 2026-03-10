@@ -376,6 +376,21 @@ impl RecordImageRepository {
     }
 
     #[instrument_trace]
+    pub async fn find_by_record_ids(
+        record_ids: Vec<i32>,
+    ) -> Result<Vec<OrderRecordImageModel>, String> {
+        let db: DatabaseConnection =
+            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+        let result: Vec<OrderRecordImageModel> = OrderRecordImageEntity::find()
+            .filter(OrderRecordImageColumn::RecordId.is_in(record_ids))
+            .order_by_desc(OrderRecordImageColumn::Id)
+            .all(&db)
+            .await
+            .map_err(|error: DbErr| error.to_string())?;
+        Ok(result)
+    }
+
+    #[instrument_trace]
     pub async fn insert(
         active_model: OrderRecordImageActiveModel,
     ) -> Result<OrderRecordImageModel, String> {

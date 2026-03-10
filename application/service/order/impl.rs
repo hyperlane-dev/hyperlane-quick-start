@@ -297,7 +297,7 @@ impl OrderService {
         .await?;
         let balance: Decimal = total_income - total_expense;
         let record_responses: Vec<RecordResponse> =
-            Self::enrich_records_with_users(paged_records).await?;
+            Self::enrich_records_with_users_and_images(paged_records).await?;
         let mut response: RecordListResponse = RecordListResponse::default();
         response
             .set_records(record_responses)
@@ -321,7 +321,7 @@ impl OrderService {
     }
 
     #[instrument_trace]
-    async fn enrich_records_with_users(
+    async fn enrich_records_with_users_and_images(
         records: Vec<OrderRecordModel>,
     ) -> Result<Vec<RecordResponse>, String> {
         let user_ids: Vec<i32> = records
@@ -330,11 +330,29 @@ impl OrderService {
             .collect::<HashSet<i32>>()
             .into_iter()
             .collect();
-        let users: Vec<OrderUserModel> = UserRepository::find_by_ids(user_ids).await?;
+        let record_ids: Vec<i32> = records
+            .iter()
+            .map(|r: &OrderRecordModel| r.get_id())
+            .collect();
+        let (users, images) = future::try_join(
+            UserRepository::find_by_ids(user_ids),
+            RecordImageRepository::find_by_record_ids(record_ids),
+        )
+        .await?;
         let user_map: HashMap<i32, OrderUserModel> = users
             .into_iter()
             .map(|u: OrderUserModel| (u.get_id(), u))
             .collect();
+        let mut images_map: HashMap<i32, Vec<RecordImageResponse>> = HashMap::new();
+        for image in images {
+            let record_id: i32 = image.get_record_id();
+            let image_response: RecordImageResponse =
+                Self::model_to_image_response(&image, record_id);
+            images_map
+                .entry(record_id)
+                .or_default()
+                .push(image_response);
+        }
         let responses: Vec<RecordResponse> = records
             .iter()
             .map(|record: &OrderRecordModel| {
@@ -345,6 +363,11 @@ impl OrderService {
                         .set_email(user.try_get_email().clone())
                         .set_phone(user.try_get_phone().clone());
                 }
+                let record_images: Vec<RecordImageResponse> = images_map
+                    .get(&record.get_id())
+                    .cloned()
+                    .unwrap_or_default();
+                response.set_images(record_images);
                 response
             })
             .collect();
