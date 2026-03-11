@@ -14,6 +14,14 @@
 
 > Hyperlane resources module containing various resources and utilities used by the framework.
 
+## Official Documentation
+
+- [Official Documentation](https://docs.ltpp.vip/hyperlane/)
+
+## Api Docs
+
+- [Api Docs](https://docs.rs/hyperlane/latest/)
+
 ## License
 
 This project is licensed under the MIT License. For more details, please see the [license](license) file.
