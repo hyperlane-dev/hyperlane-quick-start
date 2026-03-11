@@ -14,3 +14,8 @@ pub async fn try_send_body_hook(ctx: &mut Context) -> Result<(), ResponseError> 
     }
     send_result
 }
+
+#[instrument_trace]
+pub async fn send_body_hook(ctx: &mut Context) {
+    try_send_body_hook(ctx).await.unwrap()
+}
