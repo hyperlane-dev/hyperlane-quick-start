@@ -62,7 +62,7 @@ impl ServerHook for ChatSendedHook {
         info!("{request}{BR}{response}");
         let response_body: ResponseBody = ctx.get_response().get_body().clone();
         if let Ok(resp_data) = serde_json::from_slice::<WebSocketRespData>(&response_body)
-            && *resp_data.get_type() == MessageType::OnlineCount
+            && resp_data.get_type() == MessageType::OnlineCount
         {
             ctx.set_aborted(true);
             return;
