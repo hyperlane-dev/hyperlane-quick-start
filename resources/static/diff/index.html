@@ -4,7 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Smart Text Diff Tool</title>
+    <link href="../common/css/common.css" rel="stylesheet" />
     <script src="../common/js/tailwindcss.js"></script>
+    <script src="../common/js/common.js"></script>
     <script>
       tailwind.config = {
         theme: {
@@ -49,27 +51,6 @@
       };
     </script>
     <style>
-      html,
-      body {
-        height: 100%;
-      }
-
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        user-select: none;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-      }
-
-      *::-webkit-scrollbar {
-        display: none;
-      }
-
       .feed-item h3,
       .feed-item h3 a {
         user-select: text !important;

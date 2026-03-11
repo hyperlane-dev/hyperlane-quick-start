@@ -1,0 +1,72 @@
+.app-header {
+  text-align: center;
+  color: white;
+  padding: 40px 20px;
+  animation: fadeInDown 0.6s ease;
+}
+
+.app-header h1 a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.app-header h1 a .nav-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: contain;
+  vertical-align: middle;
+  margin-right: 12px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.app-header h1 a .text {
+  color: #ffd700;
+}
+
+.app-header h1 a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0;
+  height: 2px;
+  background: #ffd700;
+  transition: width 0.4s ease;
+}
+
+.app-header h1 a:hover::after {
+  width: 100%;
+}
+
+.app-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.app-subtitle {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 400;
+  margin-top: 8px;
+}
+
+@media (max-width: 768px) {
+  .app-title {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-title {
+    font-size: 1.8rem;
+  }
+
+  .app-header {
+    padding: 30px 15px;
+  }
+}
