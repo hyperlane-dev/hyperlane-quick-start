@@ -108,23 +108,7 @@ hyperlane-cli -h
 
 ## Appreciate
 
-> If you feel that `hyperlane` is helpful to you, feel free to donate
-
-### WeChat Pay
-
-<img src="https://docs.ltpp.vip/img/wechatpay.png" width="200">
-
-### Alipay
-
-<img src="https://docs.ltpp.vip/img/alipay.png" width="200">
-
-### Virtual Currency Pay
-
-| Virtual Currency | Virtual Currency Address                   |
-| ---------------- | ------------------------------------------ |
-| BTC              | 3QndxCJTf3mEniTgyRRQ1jcNTJajm9qSCy         |
-| ETH              | 0x8EB3794f67897ED397584d3a1248a79e0B8e97A6 |
-| BSC              | 0x8EB3794f67897ED397584d3a1248a79e0B8e97A6 |
+> I sincerely appreciate your support! If this project has been helpful to you, please consider showing your appreciation by visiting: [Click Here to Appreciate](https://docs.ltpp.vip/appreciate.html)
 
 ## License
 
