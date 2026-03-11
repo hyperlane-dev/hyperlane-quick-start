@@ -1,6 +1,7 @@
+mod r#fn;
 mod r#impl;
 mod r#struct;
 
-pub use r#struct::OrderViewRoute;
+pub use {r#fn::*, r#struct::*};
 
 use super::*;

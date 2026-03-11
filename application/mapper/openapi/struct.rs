@@ -66,6 +66,7 @@ use super::*;
         view::gomoku::openapi_gomoku_view,
         view::monitor::openapi_monitor_view,
         view::openapi::openapi_openapi_view,
+        view::order::openapi_order_view,
         view::redis::openapi_redis_view,
         view::rss::openapi_rss_view,
         view::shortlink::openapi_shortlink_view,
