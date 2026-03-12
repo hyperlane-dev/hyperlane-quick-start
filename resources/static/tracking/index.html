@@ -1359,6 +1359,12 @@
           return date.getTime() - date.getTimezoneOffset() * 60000;
         }
 
+        utcToLocalDateTimeStr(utcDateStr) {
+          if (!utcDateStr) return '';
+          const date = new Date(utcDateStr);
+          return date.toLocaleString();
+        }
+
         async search(page = 1, pageDirection = null) {
           if (pageDirection === 'next') {
             this.currentPage++;
