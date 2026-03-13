@@ -9,6 +9,7 @@
     <title>Order - Hyperlane</title>
     <link rel="icon" href="https://docs.ltpp.vip/img/hyperlane.png" />
     <link href="../common/css/common.css" rel="stylesheet" />
+    <link href="../common/css/header.css" rel="stylesheet" />
     <link href="./css/style.css" rel="stylesheet" />
     <script src="../common/js/echarts.js"></script>
     <script src="../common/js/qrcode.js"></script>
@@ -21,23 +22,25 @@
     <div id="app">
       <div id="login-page" class="login-page">
         <div class="login-container">
-          <div class="login-header">
-            <h1>
-              <a
-                href="https://github.com/hyperlane-dev/hyperlane"
-                target="_blank"
-              >
-                <img
-                  src="https://docs.ltpp.vip/img/hyperlane.png"
-                  alt=""
-                  class="nav-logo"
-                  onerror="this.style.display = 'none'"
-                />
-                <span>Hyperlane Order</span>
-              </a>
-            </h1>
-            <p>Manage your finances efficiently</p>
-          </div>
+          <header class="login-header shimmer-header light-bg">
+            <div class="header-content">
+              <h1 class="app-title">
+                <a
+                  href="https://github.com/hyperlane-dev/hyperlane"
+                  target="_blank"
+                >
+                  <img
+                    src="https://docs.ltpp.vip/img/hyperlane.png"
+                    alt=""
+                    class="nav-logo"
+                    onerror="this.style.display = 'none'"
+                  />
+                  <span class="text shimmer">Hyperlane Order</span>
+                </a>
+              </h1>
+              <p class="app-subtitle">Manage your finances efficiently</p>
+            </div>
+          </header>
           <form id="login-form" class="login-form">
             <div class="form-group">
               <label class="form-label">Username</label>
@@ -130,7 +133,7 @@
 
       <div id="main-app" class="main-app hidden">
         <aside class="sidebar">
-          <div class="sidebar-header">
+          <div class="sidebar-header light-bg">
             <h2>
               <a
                 href="https://github.com/hyperlane-dev/hyperlane"
@@ -142,7 +145,7 @@
                   class="nav-logo"
                   onerror="this.style.display = 'none'"
                 />
-                <span>Hyperlane Order</span>
+                <span class="text shimmer">Hyperlane Order</span>
               </a>
             </h2>
           </div>
@@ -188,7 +191,7 @@
 
         <div class="sidebar-overlay" id="sidebar-overlay"></div>
         <main class="main-content">
-          <header class="content-header">
+          <header class="content-header light-bg">
             <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
             <h1 id="page-title">Dashboard</h1>
           </header>

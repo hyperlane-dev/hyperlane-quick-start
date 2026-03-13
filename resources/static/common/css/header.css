@@ -26,6 +26,33 @@
   color: #ffd700;
 }
 
+.app-header h1 a .text.shimmer {
+  background: linear-gradient(90deg, #fff, #ffd700, #fff, #ffd700);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s linear infinite;
+}
+
+.app-header.shimmer-header h1 a::after {
+  background: linear-gradient(90deg, #ffd700, #fff, #ffd700);
+}
+
+.nav-title a .text.shimmer {
+  background: linear-gradient(90deg, #667eea, #ffd700, #667eea, #ffd700);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s linear infinite;
+  color: transparent;
+}
+
+.nav-title a::after {
+  background: linear-gradient(90deg, #667eea, #ffd700, #667eea) !important;
+}
+
 .app-header h1 a::after {
   content: '';
   position: absolute;
@@ -69,4 +96,142 @@
   .app-header {
     padding: 30px 15px;
   }
+}
+
+.app-header.light-bg {
+  color: #2c3e50;
+}
+
+.app-header.light-bg .app-title {
+  text-shadow: none;
+}
+
+.app-header.light-bg h1 a .text {
+  color: #667eea;
+}
+
+.app-header.light-bg h1 a .text.shimmer {
+  background: linear-gradient(90deg, #667eea, #764ba2, #667eea, #764ba2);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.app-header.light-bg.shimmer-header h1 a::after {
+  background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+}
+
+.app-header.light-bg .app-subtitle {
+  color: #5a6c7d;
+}
+
+.nav-title.light-bg a .text {
+  color: #667eea;
+}
+
+.nav-title.light-bg a .text.shimmer {
+  background: linear-gradient(90deg, #667eea, #764ba2, #667eea, #764ba2);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.nav-title.light-bg a::after {
+  background: linear-gradient(90deg, #667eea, #764ba2, #667eea) !important;
+}
+
+.login-header.light-bg h1 a .text {
+  color: #667eea;
+}
+
+.login-header.light-bg h1 a .text.shimmer {
+  background: linear-gradient(90deg, #667eea, #764ba2, #667eea, #764ba2);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.login-header.light-bg h1 a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.login-header.light-bg.shimmer-header h1 a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+  transition: width 0.4s ease;
+}
+
+.login-header.light-bg.shimmer-header h1 a:hover::after {
+  width: 100%;
+}
+
+.login-header.light-bg .app-subtitle {
+  color: #5a6c7d;
+}
+
+.content-header.light-bg h1 {
+  color: #667eea;
+}
+
+.content-header.light-bg h1::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+  transition: width 0.4s ease;
+}
+
+.content-header.light-bg h1:hover::after {
+  width: 100%;
+}
+
+.sidebar-header.light-bg h2 a {
+  color: inherit;
+  text-decoration: none;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.sidebar-header.light-bg h2 a .text {
+  color: #667eea;
+}
+
+.sidebar-header.light-bg h2 a .text.shimmer {
+  background: linear-gradient(90deg, #667eea, #764ba2, #667eea, #764ba2);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s linear infinite;
+  color: transparent;
+}
+
+.sidebar-header.light-bg h2 a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+  transition: width 0.4s ease;
+}
+
+.sidebar-header.light-bg h2 a:hover::after {
+  width: 100%;
 }

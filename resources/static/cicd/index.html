@@ -6,6 +6,7 @@
     <title>CICD Management - Hyperlane</title>
     <link rel="icon" href="https://docs.ltpp.vip/img/hyperlane.png" />
     <link href="../common/css/common.css" rel="stylesheet" />
+    <link href="../common/css/header.css" rel="stylesheet" />
     <script src="../common/js/common.js"></script>
     <style>
       * {
@@ -1104,9 +1105,20 @@
     </style>
   </head>
   <body>
-    <div class="header">
-      <div class="header-left">
-        <h1>
+    <header
+      class="app-header shimmer-header"
+      style="padding: 16px 24px; text-align: left"
+    >
+      <div
+        class="header-content"
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          max-width: 100%;
+        "
+      >
+        <h1 class="app-title" style="font-size: 1.5rem; margin: 0">
           <a href="https://github.com/hyperlane-dev/hyperlane" target="_blank">
             <img
               src="https://docs.ltpp.vip/img/hyperlane.png"
@@ -1114,14 +1126,14 @@
               class="nav-logo"
               onerror="this.style.display = 'none'"
             />
-            <span>Hyperlane CICD</span>
+            <span class="text shimmer">Hyperlane CICD</span>
           </a>
         </h1>
+        <button class="btn btn-primary" onclick="showCreateModal()">
+          <span>+</span> New Pipeline
+        </button>
       </div>
-      <button class="btn btn-primary" onclick="showCreateModal()">
-        <span>+</span> New Pipeline
-      </button>
-    </div>
+    </header>
 
     <div class="container">
       <div class="tabs">

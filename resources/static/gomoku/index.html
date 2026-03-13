@@ -10,6 +10,7 @@
     <title>Hyperlane Gomoku</title>
     <link rel="icon" href="https://docs.ltpp.vip/img/hyperlane.png" />
     <link href="../common/css/common.css" rel="stylesheet" />
+    <link href="../common/css/header.css" rel="stylesheet" />
     <script src="../common/js/common.js"></script>
     <style>
       :root {
@@ -601,20 +602,37 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <div class="app">
-      <header class="header">
-        <div class="brand">
-          <a href="https://github.com/hyperlane-dev/hyperlane" target="_blank">
-            <img
-              src="https://docs.ltpp.vip/img/hyperlane.png"
-              alt="Hyperlane"
-              onerror="this.style.display = 'none'"
-            />
-            <span>Hyperlane Gomoku</span>
-          </a>
-        </div>
-        <div class="status" id="connectionStatus">
-          <span class="status-dot"></span>
-          <span id="statusText">Disconnected</span>
+      <header
+        class="app-header shimmer-header light-bg"
+        style="padding: 12px 20px; text-align: left"
+      >
+        <div
+          class="header-content"
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 100%;
+          "
+        >
+          <h1 class="app-title" style="font-size: 1.5rem; margin: 0">
+            <a
+              href="https://github.com/hyperlane-dev/hyperlane"
+              target="_blank"
+            >
+              <img
+                src="https://docs.ltpp.vip/img/hyperlane.png"
+                alt="Hyperlane"
+                class="nav-logo"
+                onerror="this.style.display = 'none'"
+              />
+              <span class="text shimmer">Hyperlane Gomoku</span>
+            </a>
+          </h1>
+          <div class="status" id="connectionStatus">
+            <span class="status-dot"></span>
+            <span id="statusText">Disconnected</span>
+          </div>
         </div>
       </header>
 

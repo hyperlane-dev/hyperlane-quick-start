@@ -11,6 +11,7 @@
     <title>Hyperlane Chat</title>
     <link rel="icon" href="https://docs.ltpp.vip/img/hyperlane.png" />
     <link href="../common/css/common.css" rel="stylesheet" />
+    <link href="../common/css/header.css" rel="stylesheet" />
     <link href="../common/css/github.min.css" rel="stylesheet" />
     <script src="../common/js/markdown-it.min.js"></script>
     <script src="../common/js/highlight.min.js"></script>
@@ -150,6 +151,7 @@
         font-size: 1rem;
         font-weight: 600;
         margin: 0;
+        animation: fadeInDown 0.6s ease;
       }
 
       .nav-title a {
@@ -157,10 +159,6 @@
         text-decoration: none;
         position: relative;
         display: inline-block;
-      }
-
-      .nav-title a .text {
-        color: #667eea;
       }
 
       .nav-title a::after {
@@ -1382,9 +1380,9 @@
             src="https://docs.ltpp.vip/img/hyperlane.png"
             onerror="this.style.display = 'none'"
           />
-          <h1 class="nav-title">
+          <h1 class="nav-title light-bg">
             <a href="https://github.com/hyperlane-dev/hyperlane" target="_blank"
-              ><span class="text">Hyperlane Chat</span></a
+              ><span class="text shimmer">Hyperlane Chat</span></a
             >
           </h1>
         </div>
