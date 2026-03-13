@@ -3411,16 +3411,26 @@ function handleImageSelect(event) {
     }
     const reader = new FileReader();
     reader.onload = (e) => {
-      const imageData = {
-        id: Date.now() + Math.random(),
-        file_name: file.name,
-        original_name: file.name,
-        mime_type: file.type,
-        file_data: e.target.result.split(',')[1],
-        preview: e.target.result,
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.6);
+        const imageData = {
+          id: Date.now() + Math.random(),
+          file_name: file.name.replace(/\.[^/.]+$/, '') + '.jpg',
+          original_name: file.name,
+          mime_type: 'image/jpeg',
+          file_data: compressedDataUrl.split(',')[1],
+          preview: compressedDataUrl,
+        };
+        selectedImages.push(imageData);
+        renderImagePreviewList();
       };
-      selectedImages.push(imageData);
-      renderImagePreviewList();
+      img.src = e.target.result;
     };
     reader.readAsDataURL(file);
   });
