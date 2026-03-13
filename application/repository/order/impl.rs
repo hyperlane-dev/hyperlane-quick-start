@@ -428,4 +428,17 @@ impl RecordImageRepository {
             .map_err(|error: DbErr| error.to_string())?;
         Ok(result)
     }
+
+    #[instrument_trace]
+    pub async fn update(
+        active_model: OrderRecordImageActiveModel,
+    ) -> Result<OrderRecordImageModel, String> {
+        let db: DatabaseConnection =
+            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+        let result: OrderRecordImageModel = active_model
+            .update(&db)
+            .await
+            .map_err(|error: DbErr| error.to_string())?;
+        Ok(result)
+    }
 }

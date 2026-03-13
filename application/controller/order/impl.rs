@@ -69,8 +69,7 @@ impl ServerHook for UserLoginRoute {
                         let token_str: String = jwt_token.get_token().to_string();
                         let cookie_value: String =
                             format!("token={token_str}; Path=/; Max-Age=86400; HttpOnly");
-                        ctx.get_mut_response()
-                            .set_header("Set-Cookie", &cookie_value);
+                        ctx.get_mut_response().set_header(SET_COOKIE, &cookie_value);
                         let mut login_response: LoginResponse = LoginResponse::default();
                         login_response.set_user(user_response).set_token(token_str);
                         let response: ApiResponse<LoginResponse> =
@@ -693,6 +692,78 @@ impl ServerHook for OverviewStatisticsRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+    }
+}
+
+impl ServerHook for ImageUploadRoute {
+    #[instrument_trace]
+    async fn new(_ctx: &mut Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(
+        post_method,
+        request_header_option(X_FILE_NAME => file_name_opt),
+        request_header_option(X_ORIGINAL_NAME => original_name_opt),
+        request_header_option(X_MIME_TYPE => mime_type_opt),
+        response_header(CONTENT_TYPE => APPLICATION_JSON)
+    )]
+    #[instrument_trace]
+    async fn handle(self, ctx: &mut Context) {
+        let current_user_id: i32 = match OrderService::extract_user_from_cookie(ctx) {
+            Ok(id) => id,
+            Err(error) => {
+                let response: ApiResponse<()> =
+                    ApiResponse::<()>::error_with_code(ResponseCode::Unauthorized, error);
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+                return;
+            }
+        };
+        let file_name: String = match file_name_opt {
+            Some(s) => urlencoding::decode(&s).unwrap_or_default().to_string(),
+            None => {
+                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
+                    ResponseCode::BadRequest,
+                    "Missing X-File-Name header",
+                );
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+                return;
+            }
+        };
+        let mime_type: String = match mime_type_opt {
+            Some(s) => s,
+            None => {
+                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
+                    ResponseCode::BadRequest,
+                    "Missing X-Mime-Type header",
+                );
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+                return;
+            }
+        };
+        let file_data: Vec<u8> = ctx.get_request().get_body().clone();
+        let original_name: Option<String> = original_name_opt
+            .map(|s: String| urlencoding::decode(&s).unwrap_or_default().to_string());
+        match OrderService::upload_image(
+            current_user_id,
+            file_name,
+            original_name,
+            mime_type,
+            file_data,
+        )
+        .await
+        {
+            Ok(image_response) => {
+                let response: ApiResponse<RecordImageResponse> =
+                    ApiResponse::<RecordImageResponse>::success(image_response);
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+            }
+            Err(error) => {
+                let response: ApiResponse<()> =
+                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+            }
+        }
     }
 }
 

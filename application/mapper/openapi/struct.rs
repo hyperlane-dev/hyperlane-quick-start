@@ -32,6 +32,7 @@ use super::*;
         controller::openapi::openapi_openapi_json,
         controller::order::openapi_image_download,
         controller::order::openapi_image_list,
+        controller::order::openapi_image_upload,
         controller::order::openapi_overview_statistics,
         controller::order::openapi_record_create,
         controller::order::openapi_record_get,

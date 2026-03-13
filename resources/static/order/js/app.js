@@ -2070,6 +2070,27 @@ function showCreateRecordModal(targetUserId = null, targetUserName = null) {
   openModal('record-modal');
 }
 
+async function uploadImageToServer(imageData) {
+  const headers = {
+    'X-File-Name': encodeURIComponent(imageData.file_name),
+    'X-Mime-Type': imageData.mime_type,
+  };
+  if (imageData.original_name) {
+    headers['X-Original-Name'] = encodeURIComponent(imageData.original_name);
+  }
+  const response = await fetch(`${API_BASE}/image/upload`, {
+    method: 'POST',
+    headers: headers,
+    body: imageData.file_blob,
+    credentials: 'include',
+  });
+  const result = await response.json();
+  if (result.code === 200 && result.data) {
+    return result.data.id;
+  }
+  throw new Error(result.message || 'Image upload failed');
+}
+
 async function handleRecordSubmit(e) {
   e.preventDefault();
   const requestKey = 'record_submit';
@@ -2091,28 +2112,20 @@ async function handleRecordSubmit(e) {
       ? viewingUserId
       : null;
   try {
-    const images = selectedImages.map((img) => {
-      const base64Data = img.file_data;
-      const binaryString = atob(base64Data);
-      const bytes = new Uint8Array(binaryString.length);
-      for (let j = 0; j < binaryString.length; j++) {
-        bytes[j] = binaryString.charCodeAt(j);
+    let image_ids = [];
+    if (selectedImages.length > 0) {
+      for (const img of selectedImages) {
+        const imageId = await uploadImageToServer(img);
+        image_ids.push(imageId);
       }
-      return {
-        file_name: img.file_name,
-        original_name: img.original_name || null,
-        mime_type: img.mime_type,
-        file_size: bytes.length,
-        file_data: Array.from(bytes),
-      };
-    });
+    }
     const data = {
       transaction_type: transaction_type,
       amount: amount,
       category: category,
       description: description,
       target_user_id: target_user_id,
-      images: images,
+      image_ids: image_ids,
     };
     const response = await fetch(`${API_BASE}/record/create`, {
       method: 'POST',
@@ -2138,7 +2151,7 @@ async function handleRecordSubmit(e) {
     }
   } catch (error) {
     if (error.message !== 'Request aborted') {
-      showToast('Network error', 'error');
+      showToast(error.message || 'Network error', 'error');
     }
   } finally {
     setRecordModalLoading(false);
@@ -3419,16 +3432,22 @@ function handleImageSelect(event) {
         canvas.height = img.height;
         ctx.drawImage(img, 0, 0);
         const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.6);
-        const imageData = {
-          id: Date.now() + Math.random(),
-          file_name: file.name.replace(/\.[^/.]+$/, '') + '.jpg',
-          original_name: file.name,
-          mime_type: 'image/jpeg',
-          file_data: compressedDataUrl.split(',')[1],
-          preview: compressedDataUrl,
-        };
-        selectedImages.push(imageData);
-        renderImagePreviewList();
+        canvas.toBlob(
+          (blob) => {
+            const imageData = {
+              id: Date.now() + Math.random(),
+              file_name: file.name.replace(/\.[^/.]+$/, '') + '.jpg',
+              original_name: file.name,
+              mime_type: 'image/jpeg',
+              file_blob: blob,
+              preview: compressedDataUrl,
+            };
+            selectedImages.push(imageData);
+            renderImagePreviewList();
+          },
+          'image/jpeg',
+          0.6,
+        );
       };
       img.src = e.target.result;
     };

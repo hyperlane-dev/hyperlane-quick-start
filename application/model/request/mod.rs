@@ -5,6 +5,7 @@ pub mod order;
 pub mod redis;
 pub mod rss;
 pub mod shortlink;
+pub mod upload;
 pub mod websocket;
 
 use super::*;

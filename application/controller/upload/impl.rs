@@ -28,8 +28,8 @@ impl ServerHook for SaveRoute {
 
     #[prologue_macros(
         post_method,
-        request_header_option(CHUNKIFY_FILE_ID_HEADER => file_id_opt),
-        request_header_option(CHUNKIFY_CHUNK_INDEX_HEADER => chunk_index_opt)
+        request_header_option(HEADER_X_FILE_ID => file_id_opt),
+        request_header_option(HEADER_X_CHUNK_INDEX => chunk_index_opt)
     )]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
@@ -43,7 +43,7 @@ impl ServerHook for SaveRoute {
         match UploadService::save_file_chunk(&file_chunk_data, chunk_data).await {
             Ok(save_upload_dir) => {
                 ctx.get_mut_response()
-                    .set_header("save_upload_dir", save_upload_dir);
+                    .set_header(HEADER_SAVE_UPLOAD_DIR, save_upload_dir);
                 UploadService::set_common_success_response_body(ctx, EMPTY_STR).await;
             }
             Err(error) => {
@@ -61,7 +61,7 @@ impl ServerHook for MergeRoute {
 
     #[prologue_macros(
         post_method,
-        request_header_option(CHUNKIFY_FILE_ID_HEADER => file_id_opt)
+        request_header_option(HEADER_X_FILE_ID => file_id_opt)
     )]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
@@ -74,7 +74,7 @@ impl ServerHook for MergeRoute {
         match UploadService::merge_file_chunks(&file_chunk_data).await {
             Ok((save_upload_dir, url)) => {
                 ctx.get_mut_response()
-                    .set_header("save_upload_dir", save_upload_dir);
+                    .set_header(HEADER_SAVE_UPLOAD_DIR, save_upload_dir);
                 UploadService::set_common_success_response_body(ctx, &url).await;
             }
             Err(error) => {

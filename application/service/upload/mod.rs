@@ -4,7 +4,7 @@ mod r#struct;
 pub use {super::*, r#struct::*};
 
 use {
-    model::{application::upload::*, response::upload::*},
+    model::{application::upload::*, request::upload::*, response::upload::*},
     repository::upload::*,
 };
 

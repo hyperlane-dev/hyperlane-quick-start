@@ -235,14 +235,11 @@ impl OrderService {
         user_id: i32,
         request: CreateRecordRequest,
     ) -> Result<CreateRecordWithImagesResponse, String> {
-        let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
         let bill_no: String = Self::generate_bill_no();
         let bill_date: NaiveDate = request
             .try_get_bill_date()
             .unwrap_or_else(|| Local::now().naive_local().date());
-        let txn: DatabaseTransaction = db.begin().await.map_err(|e: DbErr| e.to_string())?;
-        let record_active_model: OrderRecordActiveModel = OrderRecordActiveModel {
+        let active_model: OrderRecordActiveModel = OrderRecordActiveModel {
             bill_no: ActiveValue::Set(bill_no.clone()),
             user_id: ActiveValue::Set(user_id),
             amount: ActiveValue::Set(request.get_amount()),
@@ -254,44 +251,19 @@ impl OrderService {
             created_at: ActiveValue::NotSet,
             updated_at: ActiveValue::NotSet,
         };
-        let record_result: OrderRecordModel =
-            RecordRepository::insert_with_transaction(&txn, record_active_model).await?;
+        let record_result: OrderRecordModel = RecordRepository::insert(active_model).await?;
         let record_id: i32 = record_result.get_id();
-        let mut saved_images: Vec<RecordImageResponse> = Vec::new();
-        for image_req in request.get_images() {
-            let file_data: Vec<u8> = image_req.get_file_data().clone();
-            let file_size: i32 = image_req.get_file_size();
-            let image_active_model: OrderRecordImageActiveModel = OrderRecordImageActiveModel {
-                record_id: ActiveValue::Set(record_id),
-                user_id: ActiveValue::Set(user_id),
-                file_name: ActiveValue::Set(image_req.get_file_name().clone()),
-                original_name: ActiveValue::Set(image_req.try_get_original_name().clone()),
-                mime_type: ActiveValue::Set(image_req.get_mime_type().clone()),
-                file_size: ActiveValue::Set(file_size),
-                file_data: ActiveValue::Set(file_data),
-                id: ActiveValue::NotSet,
-                created_at: ActiveValue::NotSet,
-            };
-            let image_result: OrderRecordImageModel =
-                match RecordImageRepository::insert_with_transaction(&txn, image_active_model).await
-                {
-                    Ok(result) => result,
-                    Err(error) => {
-                        let _: Result<(), DbErr> = txn.rollback().await;
-                        return Err(error);
-                    }
-                };
-            let image_response: RecordImageResponse =
-                Self::model_to_image_response(&image_result, record_id);
-            saved_images.push(image_response);
+        let image_ids: Vec<i32> = request.get_image_ids().clone();
+        if !image_ids.is_empty() {
+            Self::bind_images_to_record(record_id, image_ids).await?;
         }
-        txn.commit().await.map_err(|e: DbErr| e.to_string())?;
         let record_response: RecordResponse = Self::model_to_record_response(&record_result);
+        let images: RecordImageListResponse = Self::get_record_images(record_id).await?;
         let mut response: CreateRecordWithImagesResponse =
             CreateRecordWithImagesResponse::default();
         response
             .set_record(record_response)
-            .set_images(saved_images);
+            .set_images(images.get_images().clone());
         Ok(response)
     }
 
@@ -1453,6 +1425,42 @@ impl OrderService {
             }
             None => Ok(None),
         }
+    }
+
+    #[instrument_trace]
+    pub async fn upload_image(
+        user_id: i32,
+        file_name: String,
+        original_name: Option<String>,
+        mime_type: String,
+        file_data: Vec<u8>,
+    ) -> Result<RecordImageResponse, String> {
+        let file_size: i32 = file_data.len() as i32;
+        let active_model: OrderRecordImageActiveModel = OrderRecordImageActiveModel {
+            record_id: ActiveValue::Set(0),
+            user_id: ActiveValue::Set(user_id),
+            file_name: ActiveValue::Set(file_name),
+            original_name: ActiveValue::Set(original_name),
+            mime_type: ActiveValue::Set(mime_type),
+            file_size: ActiveValue::Set(file_size),
+            file_data: ActiveValue::Set(file_data),
+            id: ActiveValue::NotSet,
+            created_at: ActiveValue::NotSet,
+        };
+        let result: OrderRecordImageModel = RecordImageRepository::insert(active_model).await?;
+        Ok(Self::model_to_image_response(&result, 0))
+    }
+
+    #[instrument_trace]
+    pub async fn bind_images_to_record(record_id: i32, image_ids: Vec<i32>) -> Result<(), String> {
+        for image_id in image_ids {
+            if let Some(image_model) = RecordImageRepository::find_by_id(image_id).await? {
+                let mut active_model: OrderRecordImageActiveModel = image_model.into();
+                active_model.record_id = ActiveValue::Set(record_id);
+                RecordImageRepository::update(active_model).await?;
+            }
+        }
+        Ok(())
     }
 
     #[instrument_trace]

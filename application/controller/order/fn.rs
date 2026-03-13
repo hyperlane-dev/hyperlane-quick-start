@@ -165,6 +165,19 @@ pub fn openapi_record_get() {}
 pub fn openapi_overview_statistics() {}
 
 #[utoipa::path(
+    post,
+    path = "/api/order/image/upload",
+    responses(
+        (status = 200, description = "Image uploaded successfully"),
+        (status = 400, description = "Bad request"),
+        (status = 401, description = "Unauthorized"),
+        (status = 500, description = "Internal server error")
+    )
+)]
+#[instrument_trace]
+pub fn openapi_image_upload() {}
+
+#[utoipa::path(
     get,
     path = "/api/order/image/list/{record_id}",
     params(

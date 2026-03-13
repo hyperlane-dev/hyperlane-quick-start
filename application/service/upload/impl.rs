@@ -110,10 +110,10 @@ impl UploadService {
             && path.chars().all(|c| c.is_ascii_digit() || c == '/')
     }
 
-    #[request_header_option(CHUNKIFY_FILE_ID_HEADER => file_id_opt)]
-    #[request_header_option(CHUNKIFY_TOTAL_CHUNKS_HEADER => total_chunks_opt)]
-    #[request_header_option(CHUNKIFY_FILE_NAME_HEADER => file_name_opt)]
-    #[request_header_option(CHUNKIFY_DIRECTORY_HEADER => base_file_dir_opt)]
+    #[request_header_option(HEADER_X_FILE_ID => file_id_opt)]
+    #[request_header_option(HEADER_X_TOTAL_CHUNKS => total_chunks_opt)]
+    #[request_header_option(HEADER_X_FILE_NAME => file_name_opt)]
+    #[request_header_option(HEADER_X_DIRECTORY => base_file_dir_opt)]
     #[instrument_trace]
     pub async fn get_register_file_chunk_data<'a>(ctx: &mut Context) -> Option<FileChunkData> {
         let file_id: String = Self::validate_file_id(file_id_opt, ctx).ok()?;
