@@ -7,7 +7,6 @@ pub struct TrackingQueryRequest {
     pub(super) start_time: Option<i64>,
     #[get(type(copy), pub)]
     pub(super) end_time: Option<i64>,
-    pub(super) socket_addr: Option<String>,
     pub(super) header_key: Option<String>,
     pub(super) header_value: Option<String>,
     pub(super) body_content: Option<String>,
@@ -34,7 +33,6 @@ pub struct TrackingQueryResponse {
 pub struct TrackingRecordDTO {
     #[get(type(copy), pub)]
     pub(super) id: i64,
-    pub(super) socket_addr: String,
     pub(super) headers: serde_json::Value,
     pub(super) body: String,
     #[get(type(copy), pub)]

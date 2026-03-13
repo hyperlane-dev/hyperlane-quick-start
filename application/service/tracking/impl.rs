@@ -6,21 +6,11 @@ impl TrackingService {
         ctx: &mut Context,
         request: &RequestBody,
     ) -> Result<(), String> {
-        let mut socket_addr: String = String::new();
-        if let Some(stream) = ctx.try_get_stream().as_ref() {
-            socket_addr = stream
-                .read()
-                .await
-                .peer_addr()
-                .map(|data| data.to_string())
-                .unwrap_or_default();
-        }
         let timestamp: i64 = Utc::now().timestamp_millis();
         let headers: RequestHeaders = ctx.get_request().get_headers().clone();
         let body_str: String = String::from_utf8_lossy(request).to_string();
         let mut record: TrackingRecord = TrackingRecord::default();
         record
-            .set_socket_addr(socket_addr)
             .set_headers(headers)
             .set_body(body_str)
             .set_timestamp(timestamp);
@@ -48,7 +38,6 @@ impl TrackingService {
                 .set_header_value(request.try_get_header_value().clone())
                 .set_start_time(request.try_get_start_time())
                 .set_end_time(request.try_get_end_time())
-                .set_socket_addr(request.try_get_socket_addr().clone())
                 .set_page(page)
                 .set_page_size(page_size)
                 .set_cache_id(cache_id);
@@ -61,7 +50,6 @@ impl TrackingService {
                 .set_body_content(request.try_get_body_content().clone())
                 .set_start_time(request.try_get_start_time())
                 .set_end_time(request.try_get_end_time())
-                .set_socket_addr(request.try_get_socket_addr().clone())
                 .set_page(page)
                 .set_page_size(page_size)
                 .set_cache_id(cache_id);
@@ -73,7 +61,6 @@ impl TrackingService {
             query
                 .set_start_time(request.try_get_start_time())
                 .set_end_time(request.try_get_end_time())
-                .set_socket_addr(request.try_get_socket_addr().clone())
                 .set_page(page)
                 .set_page_size(page_size)
                 .set_cache_id(cache_id);
@@ -86,7 +73,6 @@ impl TrackingService {
             .map(|model| {
                 let mut dto: TrackingRecordDTO = TrackingRecordDTO::default();
                 dto.set_id(model.get_id())
-                    .set_socket_addr(model.get_socket_addr().clone())
                     .set_headers(serde_json::from_str(model.get_headers()).unwrap_or_default())
                     .set_body(model.get_body().clone())
                     .set_timestamp(model.get_timestamp())

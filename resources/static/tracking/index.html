@@ -954,15 +954,6 @@
             />
           </div>
           <div class="form-group">
-            <label class="form-label">Socket Address</label>
-            <input
-              class="form-input"
-              id="socketAddr"
-              placeholder="e.g: 127.0.0.1:8080"
-              type="text"
-            />
-          </div>
-          <div class="form-group">
             <label class="form-label">Header Key</label>
             <input
               class="form-input"
@@ -1336,11 +1327,6 @@
             requestBody.end_time = this.localDateTimeToTimestamp(endTime);
           }
 
-          const socketAddr = document.getElementById('socketAddr').value.trim();
-          if (socketAddr) {
-            requestBody.socket_addr = socketAddr;
-          }
-
           const headerKey = document.getElementById('headerKey').value.trim();
           if (headerKey) {
             requestBody.header_key = headerKey;
@@ -1408,7 +1394,6 @@
                 <thead>
                   <tr>
                     <th>ID</th>
-                    <th>Socket Address</th>
                     <th>Timestamp</th>
                     <th>Created At</th>
                     <th>Action</th>
@@ -1421,7 +1406,6 @@
             html += `
               <tr>
                 <td>${record.id}</td>
-                <td>${this.escapeHtml(record.socket_addr)}</td>
                 <td>${new Date(record.timestamp).toLocaleString()}</td>
                 <td>${new Date(record.created_at).toLocaleString()}</td>
                 <td>
@@ -1537,12 +1521,6 @@
               <div class="detail-value">${record.id}</div>
             </div>
             <div class="detail-section">
-              <div class="detail-label">Socket Address</div>
-              <div class="detail-value">${this.escapeHtml(
-                record.socket_addr,
-              )}</div>
-            </div>
-            <div class="detail-section">
               <div class="detail-label">Timestamp</div>
               <div class="detail-value">${record.timestamp} (${new Date(
                 record.timestamp,
@@ -1603,7 +1581,6 @@
         reset() {
           document.getElementById('startTime').value = '';
           document.getElementById('endTime').value = '';
-          document.getElementById('socketAddr').value = '';
           document.getElementById('headerKey').value = '';
           document.getElementById('headerValue').value = '';
           document.getElementById('bodyContent').value = '';

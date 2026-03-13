@@ -9,8 +9,6 @@ pub struct Model {
     #[get(type(copy), pub(crate))]
     pub(super) id: i64,
     #[get(pub(crate))]
-    pub(super) socket_addr: String,
-    #[get(pub(crate))]
     pub(super) headers: String,
     #[get(pub(crate))]
     pub(super) body: String,

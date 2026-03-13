@@ -9,7 +9,6 @@ pub struct TrackingQuery {
     pub(super) start_time: Option<i64>,
     #[get(type(copy))]
     pub(super) end_time: Option<i64>,
-    pub(super) socket_addr: Option<String>,
     #[get(type(copy))]
     pub(super) page: i64,
     #[get(type(copy))]
@@ -26,7 +25,6 @@ pub struct TrackingHeaderQuery {
     pub(super) start_time: Option<i64>,
     #[get(type(copy))]
     pub(super) end_time: Option<i64>,
-    pub(super) socket_addr: Option<String>,
     #[get(type(copy))]
     pub(super) page: i64,
     #[get(type(copy))]
@@ -42,7 +40,6 @@ pub struct TrackingBodyQuery {
     pub(super) start_time: Option<i64>,
     #[get(type(copy))]
     pub(super) end_time: Option<i64>,
-    pub(super) socket_addr: Option<String>,
     #[get(type(copy))]
     pub(super) page: i64,
     #[get(type(copy))]

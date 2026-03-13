@@ -22,7 +22,6 @@ impl TrackingRepository {
             .map_err(|error| DbErr::Custom(format!("Failed to serialize headers {error}")))?;
         spawn(async move {
             let active_model: ActiveModel = ActiveModel {
-                socket_addr: ActiveValue::Set(record.get_socket_addr().clone()),
                 headers: ActiveValue::Set(headers_json),
                 body: ActiveValue::Set(record.get_body().clone()),
                 timestamp: ActiveValue::Set(record.get_timestamp()),
@@ -43,9 +42,6 @@ impl TrackingRepository {
         }
         if let Some(end) = query.try_get_end_time() {
             select = select.filter(Column::Timestamp.lte(end));
-        }
-        if let Some(addr) = query.try_get_socket_addr() {
-            select = select.filter(Column::SocketAddr.contains(addr));
         }
         if let Some(cache) = query.try_get_cache_id() {
             select = select.filter(Column::Id.lte(cache));
@@ -69,9 +65,6 @@ impl TrackingRepository {
         }
         if let Some(end) = query.try_get_end_time() {
             select = select.filter(Column::Timestamp.lte(end));
-        }
-        if let Some(addr) = query.try_get_socket_addr() {
-            select = select.filter(Column::SocketAddr.contains(addr));
         }
         if let Some(cache) = query.try_get_cache_id() {
             select = select.filter(Column::Id.lte(cache));
@@ -148,9 +141,6 @@ impl TrackingRepository {
         }
         if let Some(end) = query.try_get_end_time() {
             select = select.filter(Column::Timestamp.lte(end));
-        }
-        if let Some(addr) = query.try_get_socket_addr() {
-            select = select.filter(Column::SocketAddr.contains(addr));
         }
         if let Some(cache) = query.try_get_cache_id() {
             select = select.filter(Column::Id.lte(cache));

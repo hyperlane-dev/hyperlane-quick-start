@@ -7,7 +7,6 @@ pub struct Tracking {
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]
 pub struct TrackingRecord {
-    pub(super) socket_addr: String,
     pub(super) headers: RequestHeaders,
     pub(super) body: String,
     #[get(type(copy), pub)]
