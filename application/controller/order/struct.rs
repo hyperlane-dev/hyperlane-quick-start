@@ -44,10 +44,6 @@ pub struct RecordGetRoute;
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct OverviewStatisticsRoute;
 
-#[route("/api/order/record/create_with_images")]
-#[derive(Clone, Copy, Data, Debug, Default)]
-pub struct RecordCreateWithImagesRoute;
-
 #[route("/api/order/image/list/{record_id}")]
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct ImageListRoute;

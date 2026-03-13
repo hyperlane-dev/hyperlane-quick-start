@@ -2091,61 +2091,37 @@ async function handleRecordSubmit(e) {
       ? viewingUserId
       : null;
   try {
-    if (selectedImages.length > 0) {
-      let recordId = null;
-      for (let i = 0; i < selectedImages.length; i++) {
-        const img = selectedImages[i];
-        const base64Data = img.file_data;
-        const binaryString = atob(base64Data);
-        const bytes = new Uint8Array(binaryString.length);
-        for (let j = 0; j < binaryString.length; j++) {
-          bytes[j] = binaryString.charCodeAt(j);
-        }
-        const headers = {
-          'X-File-Name': img.file_name,
-          'X-Mime-Type': img.mime_type,
-        };
-        if (recordId) {
-          headers['X-Record-Id'] = recordId.toString();
-        } else {
-          headers['X-Amount'] = amount.toString();
-          headers['X-Category'] = category;
-          headers['X-Transaction-Type'] = transaction_type;
-          if (description) {
-            headers['X-Description'] = description;
-          }
-          if (target_user_id) {
-            headers['X-Target-User-Id'] = target_user_id.toString();
-          }
-        }
-        if (img.original_name) {
-          headers['X-Original-Name'] = img.original_name;
-        }
-        const response = await fetch(`${API_BASE}/record/create_with_images`, {
-          method: 'POST',
-          headers: headers,
-          body: bytes,
-          credentials: 'include',
-        });
-        const result = await response.json();
-        if (result.code !== 200) {
-          if (result.code === 401) {
-            handleAuthError(result.message);
-          } else {
-            showToast(result.message || 'Operation failed', 'error');
-          }
-          setRecordModalLoading(false);
-          return;
-        }
-        if (
-          !recordId &&
-          result.data &&
-          result.data.record &&
-          result.data.record.id
-        ) {
-          recordId = result.data.record.id;
-        }
+    const images = selectedImages.map((img) => {
+      const base64Data = img.file_data;
+      const binaryString = atob(base64Data);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let j = 0; j < binaryString.length; j++) {
+        bytes[j] = binaryString.charCodeAt(j);
       }
+      return {
+        file_name: img.file_name,
+        original_name: img.original_name || null,
+        mime_type: img.mime_type,
+        file_size: bytes.length,
+        file_data: Array.from(bytes),
+      };
+    });
+    const data = {
+      transaction_type: transaction_type,
+      amount: amount,
+      category: category,
+      description: description,
+      target_user_id: target_user_id,
+      images: images,
+    };
+    const response = await fetch(`${API_BASE}/record/create`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+      credentials: 'include',
+    });
+    const result = await response.json();
+    if (result.code === 200) {
       closeModal('record-modal');
       selectedImages = [];
       renderImagePreviewList();
@@ -2154,32 +2130,10 @@ async function handleRecordSubmit(e) {
       else if (currentPage === 'records') loadRecords();
       else if (currentPage === 'user-records') loadUserRecords();
     } else {
-      const data = {
-        transaction_type: transaction_type,
-        amount: amount,
-        category: category,
-        description: description,
-        target_user_id: target_user_id,
-      };
-      const response = await fetch(`${API_BASE}/record/create`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-        credentials: 'include',
-      });
-      const result = await response.json();
-      if (result.code === 200) {
-        closeModal('record-modal');
-        showToast('Record created!', 'success');
-        if (currentPage === 'dashboard') loadDashboard();
-        else if (currentPage === 'records') loadRecords();
-        else if (currentPage === 'user-records') loadUserRecords();
+      if (result.code === 401) {
+        handleAuthError(result.message);
       } else {
-        if (result.code === 401) {
-          handleAuthError(result.message);
-        } else {
-          showToast(result.message || 'Operation failed', 'error');
-        }
+        showToast(result.message || 'Operation failed', 'error');
       }
     }
   } catch (error) {

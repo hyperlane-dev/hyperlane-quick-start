@@ -165,19 +165,6 @@ pub fn openapi_record_get() {}
 pub fn openapi_overview_statistics() {}
 
 #[utoipa::path(
-    post,
-    path = "/api/order/record/create_with_images",
-    responses(
-        (status = 200, description = "Record with images created successfully"),
-        (status = 400, description = "Bad request"),
-        (status = 401, description = "Unauthorized"),
-        (status = 500, description = "Internal server error")
-    )
-)]
-#[instrument_trace]
-pub fn openapi_record_create_with_images() {}
-
-#[utoipa::path(
     get,
     path = "/api/order/image/list/{record_id}",
     params(

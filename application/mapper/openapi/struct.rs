@@ -34,7 +34,6 @@ use super::*;
         controller::order::openapi_image_list,
         controller::order::openapi_overview_statistics,
         controller::order::openapi_record_create,
-        controller::order::openapi_record_create_with_images,
         controller::order::openapi_record_get,
         controller::order::openapi_record_list,
         controller::order::openapi_user_approve,
@@ -177,7 +176,7 @@ use super::*;
     )),
     info(
         title = "Hyperlane",
-        version = "latest",
+        version = "*",
         description = "A lightweight, high-performance, and cross-platform Rust HTTP server library built on Tokio. It simplifies modern web service development by providing built-in support for middleware, WebSocket, Server-Sent Events (SSE), and raw TCP communication. With a unified and ergonomic API across Windows_upgrade_type, Linux, and MacOS, it enables developers to build robust, scalable, and event-driven network applications with minimal overhead and maximum flexibility."
     )
 )]

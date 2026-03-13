@@ -44,6 +44,8 @@ pub struct CreateRecordRequest {
     #[get(type(copy), pub)]
     #[set(pub)]
     pub(super) target_user_id: Option<i32>,
+    #[set(pub)]
+    pub(super) images: Vec<ImageUploadRequest>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
