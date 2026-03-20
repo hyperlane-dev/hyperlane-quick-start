@@ -9,8 +9,8 @@ impl ServerHook for IndexRoute {
     #[prologue_macros(
       methods(get, post),
       response_status_code(302),
-      response_header(LOCATION => "http://120.53.248.2:66/")
-  )]
+      response_header(LOCATION => "https://docs.ltpp.vip/")
+    )]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {}
 }
