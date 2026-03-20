@@ -9,7 +9,19 @@ description = """Hyperlane bootstrap crate providing application initialization 
 keywords = ["http", "request", "response", "tcp", "cross-platform"]
 repository = "https://github.com/hyperlane-dev/hyperlane-quick-start.git"
 categories = ["network-programming", "web-programming"]
-exclude = ["target", "Cargo.lock", ".github", "tmp", "**/*.pid", "**/*.log"]
+exclude = [
+    "tmp",
+    "data",
+    "logs",
+    "target",
+    ".github",
+    ".vscode",
+    "process",
+    "node_modules",
+    "**/*.pid",
+    "**/*.log",
+    "Cargo.lock",
+]
 
 [lib]
 path = "lib.rs"

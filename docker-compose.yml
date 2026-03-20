@@ -1,6 +1,6 @@
 services:
   mysql:
-    image: mysql:8.0
+    image: mysql:latest
     container_name: hyperlane_mysql
     restart: always
     environment:
@@ -11,7 +11,7 @@ services:
     ports:
       - '3306:3306'
     volumes:
-      - ./tmp/mysql_data:/var/lib/mysql
+      - ./data/mysql_data:/var/lib/mysql
     networks:
       - hyperlane_network
     healthcheck:
@@ -26,12 +26,13 @@ services:
           'root',
           '-phyperlane',
         ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      interval: 6s
+      timeout: 1s
+      retries: 6
+      start_period: 6s
 
   postgresql:
-    image: postgres:17
+    image: postgres:latest
     container_name: hyperlane_postgresql
     restart: always
     environment:
@@ -42,31 +43,33 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - ./tmp/postgres_data:/var/lib/postgresql/data
+      - ./data/postgres_data:/var/lib/postgresql/data
     networks:
       - hyperlane_network
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready']
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      interval: 6s
+      timeout: 1s
+      retries: 6
+      start_period: 6s
 
   redis:
-    image: redis:7-alpine
+    image: redis:latest
     container_name: hyperlane_redis
     restart: always
     command: redis-server --requirepass hyperlane
     ports:
       - '6379:6379'
     volumes:
-      - ./tmp/redis_data:/data
+      - ./data/redis_data:/data
     networks:
       - hyperlane_network
     healthcheck:
       test: ['CMD', 'redis-cli', '-a', 'hyperlane', 'ping']
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      interval: 6s
+      timeout: 1s
+      retries: 6
+      start_period: 6s
 
 networks:
   hyperlane_network:
