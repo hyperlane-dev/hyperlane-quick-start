@@ -11,7 +11,7 @@ services:
     ports:
       - '3306:3306'
     volumes:
-      - ../../../data/dev/mysql_data:/var/lib/mysql
+      - ../../../data/dev/mysql:/var/lib/mysql
     networks:
       - hyperlane_quick_start_network_dev
     healthcheck:
@@ -43,7 +43,7 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - ../../../data/dev/postgres_data:/var/lib/postgresql
+      - ../../../data/dev/postgres:/var/lib/postgresql
     networks:
       - hyperlane_quick_start_network_dev
     healthcheck:
@@ -61,7 +61,7 @@ services:
     ports:
       - '6379:6379'
     volumes:
-      - ../../../data/dev/redis_data:/data
+      - ../../../data/dev/redis:/data
     networks:
       - hyperlane_quick_start_network_dev
     healthcheck:
