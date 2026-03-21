@@ -274,3 +274,20 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Deploy with Docker Compose
+        if: steps.release.outputs.released == 'true'
+        env:
+          TENCENT_CLOUD_REGISTRY_USERNAME: ${{ secrets.TENCENT_CLOUD_REGISTRY_USERNAME }}
+          TENCENT_CLOUD_REGISTRY_PASSWORD: ${{ secrets.TENCENT_CLOUD_REGISTRY_PASSWORD }}
+        run: |
+          echo "🐳 Logging in to Tencent Cloud Container Registry..."
+          echo "$TENCENT_CLOUD_REGISTRY_PASSWORD" | docker login ccr.ccs.tencentyun.com --username="$TENCENT_CLOUD_REGISTRY_USERNAME" --password-stdin
+          echo "🚀 Building Docker image..."
+          docker build -t hyperlane-quick-start-server:1.0.0 -f ./resources/docker/release/server.dockerfile .
+          echo "🏷️ Tagging Docker image for Tencent Cloud Container Registry..."
+          docker tag hyperlane-quick-start-server:1.0.0 ccr.ccs.tencentyun.com/linux_environment/hyperlane-quick-start-server:1.0.0
+          echo "📤 Pushing Docker image to Tencent Cloud Container Registry..."
+          docker push ccr.ccs.tencentyun.com/linux_environment/hyperlane-quick-start-server:1.0.0
+          echo "🚀 Deploying services with Docker Compose..."
+          docker-compose -f ./resources/docker/release/server_docker_compose.yml up -d --build
+          echo "✅ Deployment completed successfully"
