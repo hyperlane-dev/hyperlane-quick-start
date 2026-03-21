@@ -3,8 +3,9 @@ use super::*;
 impl TraceService {
     #[instrument_trace]
     pub async fn search_trace(trace: &str) -> String {
+        let env_config: &EnvConfig = EnvPlugin::get_or_init();
         let log_dir: PathBuf =
-            Path::new(SERVER_LOG_DIR).join(Level::Info.to_string().to_lowercase());
+            Path::new(env_config.get_server_log_dir()).join(Level::Info.to_string().to_lowercase());
         if !log_dir.exists() {
             return format!("Log directory not found {}", log_dir.display());
         }

@@ -72,7 +72,9 @@ impl LogService {
 
     #[instrument_trace]
     pub async fn read_log_file(level: Level) -> String {
-        let log_dir: PathBuf = Path::new(SERVER_LOG_DIR).join(level.to_string().to_lowercase());
+        let env_config: &EnvConfig = EnvPlugin::get_or_init();
+        let log_dir: PathBuf =
+            Path::new(env_config.get_server_log_dir()).join(level.to_string().to_lowercase());
         if !log_dir.exists() {
             return format!("Log directory not found {}", log_dir.display());
         }

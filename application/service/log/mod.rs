@@ -5,7 +5,7 @@ pub use r#struct::*;
 
 use {super::*, model::application::log::*};
 
-use hyperlane_config::framework::*;
+use hyperlane_plugin::{common::*, env::*};
 
 use std::{
     fs,
