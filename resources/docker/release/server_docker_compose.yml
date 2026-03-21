@@ -11,7 +11,7 @@ services:
     expose:
       - '3306'
     volumes:
-      - ../../../data/release/mysql_data:/var/lib/mysql
+      - ../../../data/release/mysql:/var/lib/mysql
     networks:
       - hyperlane_quick_start_network
     healthcheck:
@@ -43,7 +43,7 @@ services:
     expose:
       - '5432'
     volumes:
-      - ../../../data/release/postgres_data:/var/lib/postgresql
+      - ../../../data/release/postgres:/var/lib/postgresql
     networks:
       - hyperlane_quick_start_network
     healthcheck:
@@ -61,7 +61,7 @@ services:
     expose:
       - '6379'
     volumes:
-      - ../../../data/release/redis_data:/data
+      - ../../../data/release/redis:/data
     networks:
       - hyperlane_quick_start_network
     healthcheck:
@@ -77,8 +77,8 @@ services:
       dockerfile: ./resources/docker/release/server.dockerfile
     container_name: hyperlane_quick_start_server
     restart: always
-    expose:
-      - '65002'
+    ports:
+      - '65002:65002'
     networks:
       - hyperlane_quick_start_network
     depends_on:

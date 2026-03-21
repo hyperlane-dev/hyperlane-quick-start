@@ -274,3 +274,21 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Docker Buildx
+        if: steps.release.outputs.released == 'true'
+        uses: docker/setup-buildx-action@v3
+      - name: Deploy with Docker Compose
+        if: steps.release.outputs.released == 'true'
+        env:
+          TENCENT_CLOUD_REGISTRY_USERNAME: ${{ secrets.TENCENT_CLOUD_REGISTRY_USERNAME }}
+          TENCENT_CLOUD_REGISTRY_PASSWORD: ${{ secrets.TENCENT_CLOUD_REGISTRY_PASSWORD }}
+        run: |
+          echo "🚀 Building Docker image..."
+          docker build \
+            --progress=plain \
+            -t hkccr.ccs.tencentyun.com/hyperlane-dev/hyperlane-quick-start-server:1.0.0 \
+            -f ./resources/docker/release/server.dockerfile .
+          echo "🐳 Logging in to Tencent Cloud Container Registry..."
+          echo "$TENCENT_CLOUD_REGISTRY_PASSWORD" | docker login hkccr.ccs.tencentyun.com --username="$TENCENT_CLOUD_REGISTRY_USERNAME" --password-stdin
+          echo "📤 Pushing Docker image to Tencent Cloud Container Registry..."
+          docker push hkccr.ccs.tencentyun.com/hyperlane-dev/hyperlane-quick-start-server:1.0.0
