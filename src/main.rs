@@ -1,3 +1,4 @@
+#![recursion_limit = "1024"]
 use {
     hyperlane_bootstrap::{
         application::{cicd::*, db::*, env::*, logger::*, monitor::*},
