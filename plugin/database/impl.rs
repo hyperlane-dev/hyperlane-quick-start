@@ -80,10 +80,8 @@ impl DatabasePlugin {
         let timeout_millis: u64 = std::env::var(ENV_KEY_DB_CONNECTION_TIMEOUT_MILLIS)
             .ok()
             .and_then(|value: String| value.parse::<u64>().ok())
-            .expect(&format!(
-                "Environment variable {} is not set or invalid",
-                ENV_KEY_DB_CONNECTION_TIMEOUT_MILLIS
-            ));
+            .unwrap_or_else(|| panic!("Environment variable {} is not set or invalid",
+                ENV_KEY_DB_CONNECTION_TIMEOUT_MILLIS));
         Duration::from_millis(timeout_millis)
     }
 
@@ -92,10 +90,8 @@ impl DatabasePlugin {
         let millis: u64 = std::env::var(ENV_KEY_DB_RETRY_INTERVAL_MILLIS)
             .ok()
             .and_then(|value: String| value.parse::<u64>().ok())
-            .expect(&format!(
-                "Environment variable {} is not set or invalid",
-                ENV_KEY_DB_RETRY_INTERVAL_MILLIS
-            ));
+            .unwrap_or_else(|| panic!("Environment variable {} is not set or invalid",
+                ENV_KEY_DB_RETRY_INTERVAL_MILLIS));
         Duration::from_millis(millis)
     }
 

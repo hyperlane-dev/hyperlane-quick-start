@@ -6,4 +6,4 @@ pub use r#struct::*;
 use {super::*, config::*};
 
 #[allow(unused_imports)]
-use {hyperlane_application::*, hyperlane_config::framework::*, hyperlane_plugin::shutdown::*};
+use {hyperlane_application::*, hyperlane_plugin::env::*, hyperlane_plugin::shutdown::*};

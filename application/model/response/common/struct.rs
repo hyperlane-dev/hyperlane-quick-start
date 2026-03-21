@@ -6,12 +6,9 @@ pub struct ApiResponse<T>
 where
     T: Clone + Default + Serialize,
 {
-    #[get(type(copy), pub(crate))]
+    #[get(type(copy))]
     pub(super) code: i32,
-    #[get(pub(crate))]
     pub(super) message: String,
-    #[get(pub(crate))]
     pub(super) data: Option<T>,
-    #[get(pub(crate))]
     pub(super) timestamp: Option<String>,
 }

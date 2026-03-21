@@ -5,4 +5,7 @@ pub use r#struct::*;
 
 use super::*;
 
-use {framework::config::*, hyperlane_config::application::logger::*, hyperlane_plugin::logger::*};
+use {
+    hyperlane_config::application::logger::*,
+    hyperlane_plugin::{common::*, env::*, logger::*},
+};
