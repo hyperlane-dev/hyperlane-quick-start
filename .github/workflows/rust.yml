@@ -239,15 +239,12 @@ jobs:
               fi
             done
             BRANCH_NAME="${{ steps.package_info.outputs.branch_name }}"
-          if [ "$BRANCH_NAME" != "master" ]; then
-            TITLE="$TAG [$BRANCH_NAME] (Updated $(date '+%Y-%m-%d %H:%M:%S'))"
-          else
-            TITLE="$TAG (Updated $(date '+%Y-%m-%d %H:%M:%S'))"
-          fi
+          TITLE="$TAG [$BRANCH_NAME] (Updated $(date '+%Y-%m-%d %H:%M:%S'))"
           if gh release edit "$TAG" \
               --title "$TITLE" \
-              --notes "Release $TAG - Updated at $(date '+%Y-%m-%d %H:%M:%S UTC')
+              --notes "Release $TAG [$BRANCH_NAME] - Updated at $(date '+%Y-%m-%d %H:%M:%S UTC')
             ## Changes
+            - Branch: $BRANCH_NAME
             - Version: $VERSION
             - Package: $PACKAGE_NAME
             ## Links
@@ -270,15 +267,12 @@ jobs:
             fi
             echo "🆕 Creating new release: $TAG"
             BRANCH_NAME="${{ steps.package_info.outputs.branch_name }}"
-            if [ "$BRANCH_NAME" != "master" ]; then
-              TITLE="$TAG [$BRANCH_NAME] (Created $(date '+%Y-%m-%d %H:%M:%S'))"
-            else
-              TITLE="$TAG (Created $(date '+%Y-%m-%d %H:%M:%S'))"
-            fi
+            TITLE="$TAG [$BRANCH_NAME] (Created $(date '+%Y-%m-%d %H:%M:%S'))"
             if gh release create "$TAG" \
               --title "$TITLE" \
-              --notes "Release $TAG - Created at $(date '+%Y-%m-%d %H:%M:%S UTC')
+              --notes "Release $TAG [$BRANCH_NAME] - Created at $(date '+%Y-%m-%d %H:%M:%S UTC')
             ## Changes
+            - Branch: $BRANCH_NAME
             - Version: $VERSION
             - Package: $PACKAGE_NAME
             ## Links
