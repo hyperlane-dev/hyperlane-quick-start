@@ -1,7 +1,8 @@
 name: Rust
 on:
   push:
-    - '**'
+    branches:
+      - '**'
 env:
   CARGO_TERM_COLOR: always
 jobs:
