@@ -77,8 +77,8 @@ services:
       dockerfile: ./resources/docker/release/server.dockerfile
     container_name: hyperlane_quick_start_server
     restart: always
-    expose:
-      - '65002'
+    ports:
+      - '65002:65002'
     networks:
       - hyperlane_quick_start_network
     depends_on:
