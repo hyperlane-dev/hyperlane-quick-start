@@ -27,7 +27,7 @@ where
             .set_code(ResponseCode::Success as i32)
             .set_message("Success".to_string())
             .set_data(None)
-            .set_timestamp(Some(date()));
+            .set_timestamp(Some(Utc::now().timestamp_millis()));
         instance
     }
 
@@ -38,7 +38,7 @@ where
             .set_code(ResponseCode::Success as i32)
             .set_message("Success".to_string())
             .set_data(Some(data))
-            .set_timestamp(Some(date()));
+            .set_timestamp(Some(Utc::now().timestamp_millis()));
         instance
     }
 
@@ -49,7 +49,7 @@ where
             .set_code(ResponseCode::Success as i32)
             .set_message(message.into())
             .set_data(Some(data))
-            .set_timestamp(Some(date()));
+            .set_timestamp(Some(Utc::now().timestamp_millis()));
         instance
     }
 
@@ -60,7 +60,7 @@ where
             .set_code(ResponseCode::InternalError as i32)
             .set_message("Internal server error".to_string())
             .set_data(None)
-            .set_timestamp(Some(date()));
+            .set_timestamp(Some(Utc::now().timestamp_millis()));
         instance
     }
 
@@ -71,7 +71,7 @@ where
             .set_code(ResponseCode::InternalError as i32)
             .set_message(message.into())
             .set_data(None)
-            .set_timestamp(Some(date()));
+            .set_timestamp(Some(Utc::now().timestamp_millis()));
         instance
     }
 
@@ -82,7 +82,7 @@ where
             .set_code(code as i32)
             .set_message(message.to_string())
             .set_data(None)
-            .set_timestamp(Some(date()));
+            .set_timestamp(Some(Utc::now().timestamp_millis()));
         instance
     }
 
@@ -100,7 +100,7 @@ impl ApiResponse<()> {
             .set_code(ResponseCode::Success as i32)
             .set_message(message.into())
             .set_data(None)
-            .set_timestamp(Some(date()));
+            .set_timestamp(Some(Utc::now().timestamp_millis()));
         instance
     }
 }
