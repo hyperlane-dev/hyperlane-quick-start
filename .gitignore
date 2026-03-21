@@ -1,9 +1,6 @@
-/tmp
-/logs
+*.log
+*.pid
+/data
 /target
-/upload
-/process
 /.vscode
-**/*.log
-**/*.pid
-**/node_modules/**
+node_modules

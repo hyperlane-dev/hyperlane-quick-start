@@ -10,6 +10,7 @@ impl ProcessPlugin {
     {
         let args: Vec<String> = args().collect();
         debug!("Process create args {args:?}");
+        trace!("Pid file path: {}", pid_path.as_ref());
         let mut manager: ServerManager = ServerManager::new();
         manager
             .set_pid_file(pid_path.as_ref())

@@ -1,0 +1,94 @@
+services:
+  mysql:
+    image: mysql:latest
+    container_name: hyperlane_quick_start_mysql_dev
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: hyperlane
+      MYSQL_DATABASE: hyperlane
+      MYSQL_USER: hyperlane
+      MYSQL_PASSWORD: hyperlane
+    ports:
+      - '3306:3306'
+    volumes:
+      - ../../../data/dev/mysql_data:/var/lib/mysql
+    networks:
+      - hyperlane_quick_start_network_dev
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'mysqladmin',
+          'ping',
+          '-h',
+          'localhost',
+          '-u',
+          'root',
+          '-phyperlane',
+        ]
+      interval: 6s
+      timeout: 1s
+      retries: 6
+      start_period: 6s
+
+  postgresql:
+    image: postgres:latest
+    container_name: hyperlane_quick_start_postgresql_dev
+    restart: always
+    environment:
+      POSTGRES_DB: hyperlane
+      POSTGRES_USER: hyperlane
+      POSTGRES_PASSWORD: hyperlane
+      POSTGRES_HOST_AUTH_METHOD: md5
+    ports:
+      - '5432:5432'
+    volumes:
+      - ../../../data/dev/postgres_data:/var/lib/postgresql
+    networks:
+      - hyperlane_quick_start_network_dev
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready']
+      interval: 6s
+      timeout: 1s
+      retries: 6
+      start_period: 6s
+
+  redis:
+    image: redis:latest
+    container_name: hyperlane_quick_start_redis_dev
+    restart: always
+    command: redis-server --requirepass hyperlane
+    ports:
+      - '6379:6379'
+    volumes:
+      - ../../../data/dev/redis_data:/data
+    networks:
+      - hyperlane_quick_start_network_dev
+    healthcheck:
+      test: ['CMD', 'redis-cli', '-a', 'hyperlane', 'ping']
+      interval: 6s
+      timeout: 1s
+      retries: 6
+      start_period: 6s
+
+  server:
+    build:
+      context: ../../../
+      dockerfile: ./resources/docker/dev/server.dockerfile
+    container_name: hyperlane_quick_start_server_dev
+    restart: always
+    ports:
+      - '60000:60000'
+    networks:
+      - hyperlane_quick_start_network_dev
+    depends_on:
+      mysql:
+        condition: service_healthy
+      postgresql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+networks:
+  hyperlane_quick_start_network_dev:
+    driver: bridge

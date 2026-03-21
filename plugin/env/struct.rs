@@ -31,6 +31,11 @@ pub struct DockerComposeConfig {
 
 #[derive(Clone, Data, Debug, Default)]
 pub struct EnvConfig {
+    #[get(type(copy), pub)]
+    pub(super) db_connection_timeout_millis: u64,
+    #[get(type(copy), pub)]
+    pub(super) db_retry_interval_millis: u64,
+    #[get(pub)]
     pub(super) gpt_api_url: String,
     pub(super) gpt_model: String,
     #[get(pub(crate))]
@@ -39,50 +44,91 @@ pub struct EnvConfig {
     pub(super) postgresql_instances: Vec<PostgreSqlInstanceConfig>,
     #[get(pub(crate))]
     pub(super) redis_instances: Vec<RedisInstanceConfig>,
+    #[get(type(copy), pub)]
+    pub(super) server_port: u16,
+    #[get(pub)]
+    pub(super) server_host: String,
+    #[get(type(copy), pub)]
+    pub(super) server_buffer: usize,
+    #[get(type(copy), pub)]
+    pub(super) server_log_size: usize,
+    #[get(pub)]
+    pub(super) server_log_dir: String,
+    #[get(type(copy), pub)]
+    pub(super) server_inner_print: bool,
+    #[get(type(copy), pub)]
+    pub(super) server_inner_log: bool,
+    #[get(type(copy), pub)]
+    pub(super) server_nodelay: Option<bool>,
+    #[get(type(copy), pub)]
+    pub(super) server_tti: Option<u32>,
+    #[get(pub)]
+    pub(super) server_pid_file_path: String,
+    #[get(type(copy), pub)]
+    pub(super) server_request_http_read_timeout_ms: u64,
+    #[get(type(copy), pub)]
+    pub(super) server_request_max_body_size: usize,
 }
 
-#[derive(Clone, Data, Debug, Default)]
+#[derive(Clone, Debug, Default, serde::Deserialize, Data)]
 pub struct MySqlInstanceConfig {
     #[get(pub(crate))]
-    pub(super) database: String,
-    #[get(pub(crate))]
-    pub(super) host: String,
-    #[get(pub(crate))]
+    #[serde(rename = "name")]
     pub(super) name: String,
     #[get(pub(crate))]
-    pub(super) password: String,
+    #[serde(rename = "host")]
+    pub(super) host: String,
     #[get(type(copy), pub(crate))]
+    #[serde(default, rename = "port")]
     pub(super) port: usize,
     #[get(pub(crate))]
+    #[serde(rename = "database")]
+    pub(super) database: String,
+    #[get(pub(crate))]
+    #[serde(rename = "username")]
     pub(super) username: String,
+    #[get(pub(crate))]
+    #[serde(rename = "password")]
+    pub(super) password: String,
 }
 
-#[derive(Clone, Data, Debug, Default)]
+#[derive(Clone, Debug, Default, serde::Deserialize, Data)]
 pub struct PostgreSqlInstanceConfig {
     #[get(pub(crate))]
+    #[serde(rename = "name")]
+    pub(super) name: String,
+    #[get(pub(crate))]
+    #[serde(rename = "host")]
+    pub(super) host: String,
+    #[get(type(copy), pub(crate))]
+    #[serde(default, rename = "port")]
+    pub(super) port: usize,
+    #[get(pub(crate))]
+    #[serde(rename = "database")]
     pub(super) database: String,
     #[get(pub(crate))]
-    pub(super) host: String,
-    #[get(pub(crate))]
-    pub(super) name: String,
-    #[get(pub(crate))]
-    pub(super) password: String,
-    #[get(type(copy), pub(crate))]
-    pub(super) port: usize,
-    #[get(pub(crate))]
+    #[serde(rename = "username")]
     pub(super) username: String,
+    #[get(pub(crate))]
+    #[serde(rename = "password")]
+    pub(super) password: String,
 }
 
-#[derive(Clone, Data, Debug, Default)]
+#[derive(Clone, Debug, Default, serde::Deserialize, Data)]
 pub struct RedisInstanceConfig {
     #[get(pub(crate))]
-    pub(super) host: String,
-    #[get(pub(crate))]
+    #[serde(rename = "name")]
     pub(super) name: String,
     #[get(pub(crate))]
-    pub(super) password: String,
+    #[serde(rename = "host")]
+    pub(super) host: String,
     #[get(type(copy), pub(crate))]
+    #[serde(default, rename = "port")]
     pub(super) port: usize,
     #[get(pub(crate))]
+    #[serde(default, rename = "username")]
     pub(super) username: String,
+    #[get(pub(crate))]
+    #[serde(rename = "password")]
+    pub(super) password: String,
 }

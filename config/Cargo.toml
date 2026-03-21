@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane_config"
-version = "18.1.3"
+version = "18.1.6"
 readme = "README.md"
 edition = "2024"
 authors = ["root@ltpp.vip"]
@@ -9,7 +9,16 @@ description = """Hyperlane configuration module providing comprehensive configur
 keywords = ["http", "request", "response", "tcp", "cross-platform"]
 repository = "https://github.com/hyperlane-dev/hyperlane-quick-start.git"
 categories = ["network-programming", "web-programming"]
-exclude = ["target", "Cargo.lock", ".github", "tmp", "**/*.pid", "**/*.log"]
+exclude = [
+    "data",
+    "*.log",
+    "*.pid",
+    "target",
+    ".github",
+    ".vscode",
+    "node_modules",
+    "Cargo.lock",
+]
 
 [lib]
 path = "lib.rs"

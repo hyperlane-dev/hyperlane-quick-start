@@ -11,79 +11,11 @@ impl GetOrInit for EnvPlugin {
 
 impl EnvPlugin {
     #[instrument_trace]
-    pub fn try_get_config() -> Result<(), String> {
+    pub fn try_load_config() -> Result<(), String> {
         let config: EnvConfig = EnvConfig::load()?;
         GLOBAL_ENV_CONFIG
             .set(config.clone())
             .map_err(|_| "Failed to initialize global environment configuration".to_string())?;
-        info!("Environment Configuration Loaded Successfully");
-        info!(
-            "GPT API URL {}",
-            if config.get_gpt_api_url().is_empty() {
-                "(not set)"
-            } else {
-                config.get_gpt_api_url()
-            }
-        );
-        info!(
-            "GPT Model {}",
-            if config.get_gpt_model().is_empty() {
-                "(not set)"
-            } else {
-                config.get_gpt_model()
-            }
-        );
-        info!("MySQL Configuration:");
-        if config.get_mysql_instances().is_empty() {
-            info!("  (no MySQL instances configured)");
-        } else {
-            for instance in config.get_mysql_instances() {
-                info!(
-                    "  Instance '{}' {}:{}@{}:{}/{}",
-                    instance.get_name(),
-                    instance.get_username(),
-                    "***",
-                    instance.get_host(),
-                    instance.get_port(),
-                    instance.get_database()
-                );
-            }
-        }
-        info!("PostgreSQL Configuration:");
-        if config.get_postgresql_instances().is_empty() {
-            info!("  (no PostgreSQL instances configured)");
-        } else {
-            for instance in config.get_postgresql_instances() {
-                info!(
-                    "  Instance '{}' {}:{}@{}:{}/{}",
-                    instance.get_name(),
-                    instance.get_username(),
-                    "***",
-                    instance.get_host(),
-                    instance.get_port(),
-                    instance.get_database()
-                );
-            }
-        }
-        info!("Redis Configuration:");
-        if config.get_redis_instances().is_empty() {
-            info!("  (no Redis instances configured)");
-        } else {
-            for instance in config.get_redis_instances() {
-                info!(
-                    "  Instance '{}' {}:{}@{}:{}",
-                    instance.get_name(),
-                    if instance.get_username().is_empty() {
-                        "(none)"
-                    } else {
-                        instance.get_username()
-                    },
-                    "***",
-                    instance.get_host(),
-                    instance.get_port()
-                );
-            }
-        }
         Ok(())
     }
 }
@@ -182,192 +114,144 @@ impl EnvConfig {
 
     #[instrument_trace]
     pub(crate) fn load() -> Result<Self, String> {
+        dotenvy::from_path(SERVER_ENV_FILE_PATH)
+            .map_err(|error: dotenvy::Error| format!("Failed to load env file {error}"))?;
+        let get_env_required = |key: &str| -> Result<String, String> {
+            var(key).map_err(|_| format!("Environment variable {} is not set", key))
+        };
+        let get_env_u16 = |key: &str| -> Result<u16, String> {
+            var(key)
+                .map_err(|_| format!("Environment variable {} is not set", key))?
+                .parse()
+                .map_err(|_| format!("Environment variable {} must be a valid u16", key))
+        };
+        let get_env_u32 = |key: &str| -> Result<u32, String> {
+            var(key)
+                .map_err(|_| format!("Environment variable {} is not set", key))?
+                .parse()
+                .map_err(|_| format!("Environment variable {} must be a valid u32", key))
+        };
+        let get_env_u64 = |key: &str| -> Result<u64, String> {
+            var(key)
+                .map_err(|_| format!("Environment variable {} is not set", key))?
+                .parse()
+                .map_err(|_| format!("Environment variable {} must be a valid u64", key))
+        };
+        let get_env_usize = |key: &str| -> Result<usize, String> {
+            var(key)
+                .map_err(|_| format!("Environment variable {} is not set", key))?
+                .parse()
+                .map_err(|_| format!("Environment variable {} must be a valid usize", key))
+        };
+        let get_env_bool = |key: &str| -> Result<bool, String> {
+            let value = var(key).map_err(|_| format!("Environment variable {} is not set", key))?;
+            if value.eq_ignore_ascii_case("true") || value.eq_ignore_ascii_case("1") {
+                Ok(true)
+            } else if value.eq_ignore_ascii_case("false") || value.eq_ignore_ascii_case("0") {
+                Ok(false)
+            } else {
+                Err(format!(
+                    "Environment variable {} must be true/false or 1/0",
+                    key
+                ))
+            }
+        };
         let docker_config: DockerComposeConfig =
-            Self::load_from_docker_compose().unwrap_or_default();
-        if read_from_file::<Vec<u8>>(ENV_FILE_PATH).is_err() {
-            let mut data: String = String::new();
-            data.push_str(&format!("{ENV_KEY_GPT_API_URL}={BR}"));
-            data.push_str(&format!("{ENV_KEY_GPT_MODEL}={BR}"));
-            data.push_str(&format!(
-                "{ENV_KEY_DB_CONNECTION_TIMEOUT_MILLIS}={DEFAULT_DB_CONNECTION_TIMEOUT_MILLIS}{BR}"
-            ));
-            write_to_file(ENV_FILE_PATH, data.as_bytes())
-                .map_err(|error| format!("Failed to create example env file {error}"))?;
-        }
-        dotenvy::from_path(ENV_FILE_PATH)
-            .map_err(|error| format!("Failed to load env file {error}"))?;
-        let get_env = |key: &str| -> Option<String> { std::env::var(key).ok() };
-        let get_env_usize = |key: &str| -> Option<usize> {
-            std::env::var(key).ok().and_then(|value| value.parse().ok())
+            Self::load_from_docker_compose(SERVER_DOCKER_COMPOSE_FILE_PATH).unwrap_or_default();
+        let mysql_instances: Vec<MySqlInstanceConfig> =
+            Self::parse_mysql_instances(&docker_config)?;
+        let postgresql_instances: Vec<PostgreSqlInstanceConfig> =
+            Self::parse_postgresql_instances(&docker_config)?;
+        let redis_instances: Vec<RedisInstanceConfig> =
+            Self::parse_redis_instances(&docker_config)?;
+        let config: EnvConfig = EnvConfig {
+            db_connection_timeout_millis: get_env_u64(ENV_KEY_DB_CONNECTION_TIMEOUT_MILLIS)?,
+            db_retry_interval_millis: get_env_u64(ENV_KEY_DB_RETRY_INTERVAL_MILLIS)?,
+            gpt_api_url: var(ENV_KEY_GPT_API_URL).unwrap_or_default(),
+            gpt_model: var(ENV_KEY_GPT_MODEL).unwrap_or_default(),
+            mysql_instances,
+            postgresql_instances,
+            redis_instances,
+            server_port: get_env_u16(ENV_KEY_SERVER_PORT)?,
+            server_host: get_env_required(ENV_KEY_SERVER_HOST)?,
+            server_buffer: get_env_usize(ENV_KEY_SERVER_BUFFER)?,
+            server_log_size: get_env_usize(ENV_KEY_SERVER_LOG_SIZE)?,
+            server_log_dir: get_env_required(ENV_KEY_SERVER_LOG_DIR)?,
+            server_inner_print: get_env_bool(ENV_KEY_SERVER_INNER_PRINT)?,
+            server_inner_log: get_env_bool(ENV_KEY_SERVER_INNER_LOG)?,
+            server_nodelay: Some(get_env_bool(ENV_KEY_SERVER_NODELAY)?),
+            server_tti: Some(get_env_u32(ENV_KEY_SERVER_TTI)?),
+            server_pid_file_path: get_env_required(ENV_KEY_SERVER_PID_FILE_PATH)?,
+            server_request_http_read_timeout_ms: get_env_u64(
+                ENV_KEY_SERVER_REQUEST_HTTP_READ_TIMEOUT_MS,
+            )?,
+            server_request_max_body_size: get_env_usize(ENV_KEY_SERVER_REQUEST_MAX_BODY_SIZE)?,
         };
-        let mut config: EnvConfig = EnvConfig {
-            gpt_api_url: get_env(ENV_KEY_GPT_API_URL).unwrap_or_default(),
-            gpt_model: get_env(ENV_KEY_GPT_MODEL).unwrap_or_default(),
-            ..Default::default()
-        };
-        let default_mysql_host: String =
-            get_env(ENV_KEY_MYSQL_HOST).unwrap_or_else(|| DEFAULT_DB_HOST.to_string());
-        let default_mysql_port: usize = docker_config
-            .get_mysql_port()
-            .or_else(|| get_env_usize(ENV_KEY_MYSQL_PORT))
-            .unwrap_or(DEFAULT_MYSQL_PORT);
-        let default_mysql_database: String = docker_config
-            .try_get_mysql_database()
-            .clone()
-            .or_else(|| get_env(ENV_KEY_MYSQL_DATABASE))
-            .unwrap_or_default();
-        let default_mysql_username: String = docker_config
-            .try_get_mysql_username()
-            .clone()
-            .or_else(|| get_env(ENV_KEY_MYSQL_USERNAME))
-            .unwrap_or_default();
-        let default_mysql_password: String = docker_config
-            .try_get_mysql_password()
-            .clone()
-            .or_else(|| get_env(ENV_KEY_MYSQL_PASSWORD))
-            .unwrap_or_default();
-        let instance: MySqlInstanceConfig = MySqlInstanceConfig {
-            name: DEFAULT_MYSQL_INSTANCE_NAME.to_string(),
-            host: default_mysql_host,
-            port: default_mysql_port,
-            database: default_mysql_database,
-            username: default_mysql_username,
-            password: default_mysql_password,
-        };
-        config.get_mut_mysql_instances().push(instance);
-        let mut instance_index: usize = 1;
-        loop {
-            let prefix: String = format!("MYSQL_{instance_index}_");
-            let host_key: String = format!("{prefix}HOST");
-            if let Some(host) = get_env(&host_key) {
-                let port_key: String = format!("{prefix}PORT");
-                let database_key: String = format!("{prefix}DATABASE");
-                let username_key: String = format!("{prefix}USERNAME");
-                let password_key: String = format!("{prefix}PASSWORD");
-                let instance_name: String = format!("mysql_{instance_index}");
-                let instance: MySqlInstanceConfig = MySqlInstanceConfig {
-                    name: instance_name,
-                    host,
-                    port: get_env_usize(&port_key).unwrap_or(DEFAULT_MYSQL_PORT),
-                    database: get_env(&database_key).unwrap_or_default(),
-                    username: get_env(&username_key).unwrap_or_default(),
-                    password: get_env(&password_key).unwrap_or_default(),
-                };
-                config.get_mut_mysql_instances().push(instance);
-                instance_index += 1;
-            } else {
-                break;
-            }
-        }
-        let default_postgres_host: String =
-            get_env(ENV_KEY_POSTGRES_HOST).unwrap_or_else(|| DEFAULT_DB_HOST.to_string());
-        let default_postgres_port: usize = docker_config
-            .get_postgresql_port()
-            .or_else(|| get_env_usize(ENV_KEY_POSTGRES_PORT))
-            .unwrap_or(DEFAULT_POSTGRESQL_PORT);
-        let default_postgres_database: String = docker_config
-            .try_get_postgresql_database()
-            .clone()
-            .or_else(|| get_env(ENV_KEY_POSTGRES_DATABASE))
-            .unwrap_or_default();
-        let default_postgres_username: String = docker_config
-            .try_get_postgresql_username()
-            .clone()
-            .or_else(|| get_env(ENV_KEY_POSTGRES_USERNAME))
-            .unwrap_or_default();
-        let default_postgres_password: String = docker_config
-            .try_get_postgresql_password()
-            .clone()
-            .or_else(|| get_env(ENV_KEY_POSTGRES_PASSWORD))
-            .unwrap_or_default();
-        let instance: PostgreSqlInstanceConfig = PostgreSqlInstanceConfig {
-            name: DEFAULT_POSTGRESQL_INSTANCE_NAME.to_string(),
-            host: default_postgres_host,
-            port: default_postgres_port,
-            database: default_postgres_database,
-            username: default_postgres_username,
-            password: default_postgres_password,
-        };
-        config.get_mut_postgresql_instances().push(instance);
-        let mut instance_index: usize = 1;
-        loop {
-            let prefix: String = format!("POSTGRES_{instance_index}_");
-            let host_key: String = format!("{prefix}HOST");
-            if let Some(host) = get_env(&host_key) {
-                let port_key: String = format!("{prefix}PORT");
-                let database_key: String = format!("{prefix}DATABASE");
-                let username_key: String = format!("{prefix}USERNAME");
-                let password_key: String = format!("{prefix}PASSWORD");
-                let instance_name: String = format!("postgres_{instance_index}");
-                let instance: PostgreSqlInstanceConfig = PostgreSqlInstanceConfig {
-                    name: instance_name,
-                    host,
-                    port: get_env_usize(&port_key).unwrap_or(DEFAULT_POSTGRESQL_PORT),
-                    database: get_env(&database_key).unwrap_or_default(),
-                    username: get_env(&username_key).unwrap_or_default(),
-                    password: get_env(&password_key).unwrap_or_default(),
-                };
-                config.get_mut_postgresql_instances().push(instance);
-                instance_index += 1;
-            } else {
-                break;
-            }
-        }
-        let default_redis_host: String =
-            get_env(ENV_KEY_REDIS_HOST).unwrap_or_else(|| DEFAULT_DB_HOST.to_string());
-        let default_redis_port: usize = docker_config
-            .get_redis_port()
-            .or_else(|| get_env_usize(ENV_KEY_REDIS_PORT))
-            .unwrap_or(DEFAULT_REDIS_PORT);
-        let default_redis_username: String = docker_config
-            .try_get_redis_username()
-            .clone()
-            .or_else(|| get_env(ENV_KEY_REDIS_USERNAME))
-            .unwrap_or_default();
-        let default_redis_password: String = docker_config
-            .try_get_redis_password()
-            .clone()
-            .or_else(|| get_env(ENV_KEY_REDIS_PASSWORD))
-            .unwrap_or_default();
-        let instance: RedisInstanceConfig = RedisInstanceConfig {
-            name: DEFAULT_REDIS_INSTANCE_NAME.to_string(),
-            host: default_redis_host,
-            port: default_redis_port,
-            username: default_redis_username,
-            password: default_redis_password,
-        };
-        config.get_mut_redis_instances().push(instance);
-        let mut instance_index: usize = 1;
-        loop {
-            let prefix: String = format!("REDIS_{instance_index}_");
-            let host_key: String = format!("{prefix}HOST");
-            if let Some(host) = get_env(&host_key) {
-                let port_key: String = format!("{prefix}PORT");
-                let username_key: String = format!("{prefix}USERNAME");
-                let password_key: String = format!("{prefix}PASSWORD");
-                let instance_name: String = format!("redis_{instance_index}");
-                let instance: RedisInstanceConfig = RedisInstanceConfig {
-                    name: instance_name,
-                    host,
-                    port: get_env_usize(&port_key).unwrap_or(DEFAULT_REDIS_PORT),
-                    username: get_env(&username_key).unwrap_or_default(),
-                    password: get_env(&password_key).unwrap_or_default(),
-                };
-                config.get_mut_redis_instances().push(instance);
-                instance_index += 1;
-            } else {
-                break;
-            }
-        }
         Ok(config)
     }
 
+    fn parse_mysql_instances(
+        docker_config: &DockerComposeConfig,
+    ) -> Result<Vec<MySqlInstanceConfig>, String> {
+        let mysql_json: String = var(ENV_KEY_MYSQL)
+            .map_err(|_| format!("Environment variable {} is not set", ENV_KEY_MYSQL))?
+            .trim_matches('\'')
+            .to_string();
+        let mut instances: Vec<MySqlInstanceConfig> = serde_json::from_str(&mysql_json)
+            .map_err(|error: Error| format!("Failed to parse {}: {}", ENV_KEY_MYSQL, error))?;
+        for instance in instances.iter_mut() {
+            if instance.get_port() == 0 {
+                instance.set_port(docker_config.get_mysql_port().unwrap_or(3306));
+            }
+        }
+        Ok(instances)
+    }
+
+    fn parse_postgresql_instances(
+        docker_config: &DockerComposeConfig,
+    ) -> Result<Vec<PostgreSqlInstanceConfig>, String> {
+        let postgresql_json: String = var(ENV_KEY_POSTGRESQL)
+            .map_err(|_| format!("Environment variable {} is not set", ENV_KEY_POSTGRESQL))?
+            .trim_matches('\'')
+            .to_string();
+        let mut instances: Vec<PostgreSqlInstanceConfig> = serde_json::from_str(&postgresql_json)
+            .map_err(|error: Error| {
+            format!("Failed to parse {}: {}", ENV_KEY_POSTGRESQL, error)
+        })?;
+        for instance in instances.iter_mut() {
+            if instance.get_port() == 0 {
+                instance.set_port(docker_config.get_postgresql_port().unwrap_or(5432));
+            }
+        }
+        Ok(instances)
+    }
+
+    fn parse_redis_instances(
+        docker_config: &DockerComposeConfig,
+    ) -> Result<Vec<RedisInstanceConfig>, String> {
+        let redis_json: String = var(ENV_KEY_REDIS)
+            .map_err(|_| format!("Environment variable {} is not set", ENV_KEY_REDIS))?
+            .trim_matches('\'')
+            .to_string();
+        let mut instances: Vec<RedisInstanceConfig> = serde_json::from_str(&redis_json)
+            .map_err(|error: Error| format!("Failed to parse {}: {}", ENV_KEY_REDIS, error))?;
+        for instance in instances.iter_mut() {
+            if instance.get_port() == 0 {
+                instance.set_port(docker_config.get_redis_port().unwrap_or(6379));
+            }
+        }
+        Ok(instances)
+    }
+
     #[instrument_trace]
-    fn load_from_docker_compose() -> Result<DockerComposeConfig, String> {
-        let docker_compose_content: Vec<u8> = read_from_file(DOCKER_COMPOSE_FILE_PATH)
-            .map_err(|error| format!("Failed to read docker-compose.yml {error}"))?;
-        let yaml: serde_yaml::Value = serde_yaml::from_slice(&docker_compose_content)
-            .map_err(|error| format!("Failed to parse docker-compose.yml {error}"))?;
+    fn load_from_docker_compose(file_path: &str) -> Result<DockerComposeConfig, String> {
+        let docker_compose_content: Vec<u8> =
+            read_from_file(file_path).map_err(|error: Box<dyn std::error::Error>| {
+                format!("Failed to read docker-compose.yml {error}")
+            })?;
+        let yaml: serde_yaml::Value = serde_yaml::from_slice(&docker_compose_content).map_err(
+            |error: serde_yaml::Error| format!("Failed to parse docker-compose.yml {error}"),
+        )?;
         let mut config: DockerComposeConfig = DockerComposeConfig::default();
         if let Some(mysql) = yaml
             .get(DOCKER_YAML_SERVICES)
@@ -465,5 +349,178 @@ impl EnvConfig {
             }
         }
         Ok(config)
+    }
+
+    #[instrument_trace]
+    pub fn log_config() {
+        #[cfg(debug_assertions)]
+        let is_dev: bool = true;
+        #[cfg(not(debug_assertions))]
+        let is_dev: bool = false;
+        let config: &EnvConfig = EnvPlugin::get_or_init();
+        if is_dev {
+            info!("Environment Configuration Loaded Successfully");
+            info!("Database Configuration:");
+            info!(
+                "  DB_CONNECTION_TIMEOUT_MILLIS: {}",
+                config.get_db_connection_timeout_millis()
+            );
+            info!(
+                "  DB_RETRY_INTERVAL_MILLIS: {}",
+                config.get_db_retry_interval_millis()
+            );
+            info!("GPT Configuration:");
+            info!(
+                "  GPT_API_URL: {}",
+                if config.get_gpt_api_url().is_empty() {
+                    "(not set)"
+                } else {
+                    config.get_gpt_api_url()
+                }
+            );
+            info!(
+                "  GPT_MODEL: {}",
+                if config.get_gpt_model().is_empty() {
+                    "(not set)"
+                } else {
+                    config.get_gpt_model()
+                }
+            );
+            info!("MySQL Configuration:");
+            if config.get_mysql_instances().is_empty() {
+                info!("  (no MySQL instances configured)");
+            } else {
+                for instance in config.get_mysql_instances() {
+                    info!("  Instance '{}'", instance.get_name());
+                    info!("    Host: {}", instance.get_host());
+                    info!("    Port: {}", instance.get_port());
+                    info!("    Database: {}", instance.get_database());
+                    info!("    Username: {}", instance.get_username());
+                    info!("    Password: {}", instance.get_password());
+                }
+            }
+            info!("PostgreSQL Configuration:");
+            if config.get_postgresql_instances().is_empty() {
+                info!("  (no PostgreSQL instances configured)");
+            } else {
+                for instance in config.get_postgresql_instances() {
+                    info!("  Instance '{}'", instance.get_name());
+                    info!("    Host: {}", instance.get_host());
+                    info!("    Port: {}", instance.get_port());
+                    info!("    Database: {}", instance.get_database());
+                    info!("    Username: {}", instance.get_username());
+                    info!("    Password: {}", instance.get_password());
+                }
+            }
+            info!("Redis Configuration:");
+            if config.get_redis_instances().is_empty() {
+                info!("  (no Redis instances configured)");
+            } else {
+                for instance in config.get_redis_instances() {
+                    info!("  Instance '{}'", instance.get_name());
+                    info!("    Host: {}", instance.get_host());
+                    info!("    Port: {}", instance.get_port());
+                    info!(
+                        "    Username: {}",
+                        if instance.get_username().is_empty() {
+                            "(none)"
+                        } else {
+                            instance.get_username()
+                        }
+                    );
+                    info!("    Password: {}", instance.get_password());
+                }
+            }
+            info!("Server Configuration:");
+            info!("  SERVER_PORT: {}", config.get_server_port());
+            info!("  SERVER_HOST: {}", config.get_server_host());
+            info!("  SERVER_BUFFER: {}", config.get_server_buffer());
+            info!("  SERVER_LOG_SIZE: {}", config.get_server_log_size());
+            info!("  SERVER_LOG_DIR: {}", config.get_server_log_dir());
+            info!("  SERVER_INNER_PRINT: {}", config.get_server_inner_print());
+            info!("  SERVER_INNER_LOG: {}", config.get_server_inner_log());
+            info!("  SERVER_NODELAY: {:?}", config.get_server_nodelay());
+            info!("  SERVER_TTI: {:?}", config.get_server_tti());
+            info!(
+                "  SERVER_PID_FILE_PATH: {}",
+                config.get_server_pid_file_path()
+            );
+            info!(
+                "  SERVER_REQUEST_HTTP_READ_TIMEOUT_MS: {}",
+                config.get_server_request_http_read_timeout_ms()
+            );
+            info!(
+                "  SERVER_REQUEST_MAX_BODY_SIZE: {}",
+                config.get_server_request_max_body_size()
+            );
+        } else {
+            info!(
+                "GPT API URL {}",
+                if config.get_gpt_api_url().is_empty() {
+                    "(not set)"
+                } else {
+                    config.get_gpt_api_url()
+                }
+            );
+            info!(
+                "GPT Model {}",
+                if config.get_gpt_model().is_empty() {
+                    "(not set)"
+                } else {
+                    config.get_gpt_model()
+                }
+            );
+            info!("MySQL Configuration:");
+            if config.get_mysql_instances().is_empty() {
+                info!("  (no MySQL instances configured)");
+            } else {
+                for instance in config.get_mysql_instances() {
+                    info!(
+                        "  Instance '{}' {}:{}@{}:{}/{}",
+                        instance.get_name(),
+                        instance.get_username(),
+                        "***",
+                        instance.get_host(),
+                        instance.get_port(),
+                        instance.get_database()
+                    );
+                }
+            }
+            info!("PostgreSQL Configuration:");
+            if config.get_postgresql_instances().is_empty() {
+                info!("  (no PostgreSQL instances configured)");
+            } else {
+                for instance in config.get_postgresql_instances() {
+                    info!(
+                        "  Instance '{}' {}:{}@{}:{}/{}",
+                        instance.get_name(),
+                        instance.get_username(),
+                        "***",
+                        instance.get_host(),
+                        instance.get_port(),
+                        instance.get_database()
+                    );
+                }
+            }
+            info!("Redis Configuration:");
+            if config.get_redis_instances().is_empty() {
+                info!("  (no Redis instances configured)");
+            } else {
+                for instance in config.get_redis_instances() {
+                    info!(
+                        "  Instance '{}' {}:{}@{}:{}",
+                        instance.get_name(),
+                        if instance.get_username().is_empty() {
+                            "(none)"
+                        } else {
+                            instance.get_username()
+                        },
+                        "***",
+                        instance.get_host(),
+                        instance.get_port()
+                    );
+                }
+            }
+        }
     }
 }
