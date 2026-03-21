@@ -48,23 +48,14 @@ impl ServerHook for ChatHistoryRoute {
 
     #[prologue_macros(
         get_method,
-        response_header(CONTENT_TYPE => APPLICATION_JSON)
+        request_query_option("limit" => limit_opt),
+        request_query_option("before_id" => before_id_opt),
+        response_header(CONTENT_TYPE => APPLICATION_JSON),
     )]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
-        #[request_query_option("before_id" => before_id_opt)]
-        async fn get_before_id(ctx: &mut Context) -> Option<String> {
-            before_id_opt
-        }
-        #[request_query_option("limit" => limit_opt)]
-        async fn get_limit(_tx: &mut Context) -> Option<String> {
-            limit_opt
-        }
-        let before_id: Option<i64> = get_before_id(ctx)
-            .await
-            .and_then(|id| id.parse::<i64>().ok());
-        let limit: u64 = get_limit(ctx)
-            .await
+        let before_id: Option<i64> = before_id_opt.and_then(|id| id.parse::<i64>().ok());
+        let limit: u64 = limit_opt
             .and_then(|s| s.parse::<u64>().ok())
             .map(|l: u64| l.min(MAX_LIMIT))
             .unwrap_or(20);
