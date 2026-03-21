@@ -13,20 +13,6 @@ pub struct ConnectionCache<T: Clone> {
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct AutoCreationErrorHandler;
 
-#[derive(Clone, Data, Debug)]
-pub struct ErrorContext {
-    pub(super) database_name: Option<String>,
-    pub(super) error_message: String,
-    pub(super) error_type: String,
-    pub(super) log_level: String,
-    pub(super) operation: String,
-    pub(super) plugin_name: String,
-    pub(super) recovery_suggestion: String,
-    #[get(type(copy))]
-    pub(super) should_continue: bool,
-    pub(super) timestamp: SystemTime,
-}
-
 #[derive(Clone, Data, Debug, Default)]
 pub struct AutoCreationResult {
     #[get(type(copy))]

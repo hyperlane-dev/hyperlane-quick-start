@@ -10,6 +10,7 @@ pub mod utils;
 pub mod view;
 
 use {
+    chrono::Utc,
     hyperlane::*,
     hyperlane_utils::{log::*, *},
     serde::{Deserialize, Serialize},
