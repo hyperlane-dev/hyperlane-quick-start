@@ -28,7 +28,11 @@ impl BootstrapAsyncInit for ServerBootstrap {
             .server_config(config.get_server_config().clone());
         match server.run().await {
             Ok(server_hook) => {
-                let host_port: String = format!("{SERVER_HOST}{COLON}{SERVER_PORT}");
+                let host_port: String = format!(
+                    "{}{COLON}{}",
+                    ConfigBootstrap::get_server_host(),
+                    ConfigBootstrap::get_server_port()
+                );
                 Self::print_route_matcher(&server).await;
                 info!("Server listen in {host_port}");
                 ShutdownPlugin::set(server_hook.get_shutdown_hook());

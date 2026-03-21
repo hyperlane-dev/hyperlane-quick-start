@@ -5,4 +5,4 @@ pub use r#struct::*;
 
 use super::*;
 
-use hyperlane_config::framework::*;
+use hyperlane_plugin::{common::*, env::*};

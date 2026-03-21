@@ -1,19 +1,19 @@
 services:
   mysql:
     image: mysql:latest
-    container_name: hyperlane_mysql
+    container_name: hyperlane_quick_start_mysql
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: hyperlane
       MYSQL_DATABASE: hyperlane
       MYSQL_USER: hyperlane
       MYSQL_PASSWORD: hyperlane
-    ports:
-      - '3306:3306'
+    expose:
+      - '3306'
     volumes:
-      - ./data/mysql_data:/var/lib/mysql
+      - ../../../data/release/mysql_data:/var/lib/mysql
     networks:
-      - hyperlane_network
+      - hyperlane_quick_start_network
     healthcheck:
       test:
         [
@@ -33,19 +33,19 @@ services:
 
   postgresql:
     image: postgres:latest
-    container_name: hyperlane_postgresql
+    container_name: hyperlane_quick_start_postgresql
     restart: always
     environment:
       POSTGRES_DB: hyperlane
       POSTGRES_USER: hyperlane
       POSTGRES_PASSWORD: hyperlane
       POSTGRES_HOST_AUTH_METHOD: md5
-    ports:
-      - '5432:5432'
+    expose:
+      - '5432'
     volumes:
-      - ./data/postgres_data:/var/lib/postgresql
+      - ../../../data/release/postgres_data:/var/lib/postgresql
     networks:
-      - hyperlane_network
+      - hyperlane_quick_start_network
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready']
       interval: 6s
@@ -55,15 +55,15 @@ services:
 
   redis:
     image: redis:latest
-    container_name: hyperlane_redis
+    container_name: hyperlane_quick_start_redis
     restart: always
     command: redis-server --requirepass hyperlane
-    ports:
-      - '6379:6379'
+    expose:
+      - '6379'
     volumes:
-      - ./data/redis_data:/data
+      - ../../../data/release/redis_data:/data
     networks:
-      - hyperlane_network
+      - hyperlane_quick_start_network
     healthcheck:
       test: ['CMD', 'redis-cli', '-a', 'hyperlane', 'ping']
       interval: 6s
@@ -71,6 +71,24 @@ services:
       retries: 6
       start_period: 6s
 
+  server:
+    build:
+      context: ../../../
+      dockerfile: ./resources/docker/release/server.dockerfile
+    container_name: hyperlane_quick_start_server
+    restart: always
+    expose:
+      - '65002'
+    networks:
+      - hyperlane_quick_start_network
+    depends_on:
+      mysql:
+        condition: service_healthy
+      postgresql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
 networks:
-  hyperlane_network:
+  hyperlane_quick_start_network:
     driver: bridge
