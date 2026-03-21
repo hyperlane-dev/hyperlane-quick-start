@@ -8,8 +8,10 @@ WORKDIR /hyperlane-quick-start
 
 COPY . .
 
-RUN cargo build
+RUN cargo build && \
+    cp -f /hyperlane-quick-start/target/debug/hyperlane-quick-start /hyperlane-quick-start/hyperlane-quick-start && \
+    rm -rf /hyperlane-quick-start/target
 
 EXPOSE 60000
 
-CMD ["/hyperlane-quick-start/target/debug/hyperlane-quick-start"]
+CMD ["/hyperlane-quick-start/hyperlane-quick-start"]
