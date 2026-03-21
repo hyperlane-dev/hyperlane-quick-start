@@ -1,6 +1,7 @@
 name: Rust
 on:
   push:
+    - '**'
 env:
   CARGO_TERM_COLOR: always
 jobs:
@@ -10,6 +11,7 @@ jobs:
       version: ${{ steps.read.outputs.version }}
       tag: ${{ steps.read.outputs.tag }}
       package_name: ${{ steps.read.outputs.package_name }}
+      branch_name: ${{ steps.read.outputs.branch_name }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -40,13 +42,21 @@ jobs:
         run: |
           VERSION=$(toml get Cargo.toml package.version --raw)
           PACKAGE_NAME=$(toml get Cargo.toml package.name --raw)
+          BRANCH_NAME="${{ github.ref_name }}"
           echo "📦 Detected package: $PACKAGE_NAME v$VERSION"
+          echo "🌿 Branch: $BRANCH_NAME"
           if [ -z "$VERSION" ] || [ -z "$PACKAGE_NAME" ]; then
             echo "❌ Failed to read package info from Cargo.toml"
           fi
+          if [ "$BRANCH_NAME" = "master" ]; then
+            TAG="v$VERSION"
+          else
+            TAG="v$VERSION-$BRANCH_NAME"
+          fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "tag=v$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
           echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
+          echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
   check:
     needs: setup
@@ -106,7 +116,7 @@ jobs:
     permissions:
       contents: write
     needs: [setup, check, tests, clippy, build]
-    if: needs.setup.outputs.tag != ''
+    if: needs.setup.outputs.tag != '' && needs.setup.outputs.branch_name == 'master'
     runs-on: ubuntu-latest
     outputs:
       published: ${{ steps.publish.outputs.published }}
@@ -174,10 +184,11 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Get package name
+      - name: Get package name and branch info
         id: package_info
         run: |
           echo "package_name=${{ needs.setup.outputs.package_name }}" >> $GITHUB_OUTPUT
+          echo "branch_name=${{ needs.setup.outputs.branch_name }}" >> $GITHUB_OUTPUT
       - name: Check tag status
         id: check_tag
         run: |
@@ -226,8 +237,14 @@ jobs:
                 gh release delete-asset "$TAG" "$asset" --yes || true
               fi
             done
-            if gh release edit "$TAG" \
-              --title "$TAG (Updated $(date '+%Y-%m-%d %H:%M:%S'))" \
+            BRANCH_NAME="${{ steps.package_info.outputs.branch_name }}"
+          if [ "$BRANCH_NAME" != "master" ]; then
+            TITLE="$TAG [$BRANCH_NAME] (Updated $(date '+%Y-%m-%d %H:%M:%S'))"
+          else
+            TITLE="$TAG (Updated $(date '+%Y-%m-%d %H:%M:%S'))"
+          fi
+          if gh release edit "$TAG" \
+              --title "$TITLE" \
               --notes "Release $TAG - Updated at $(date '+%Y-%m-%d %H:%M:%S UTC')
             ## Changes
             - Version: $VERSION
@@ -251,8 +268,14 @@ jobs:
               git push origin "$TAG"
             fi
             echo "🆕 Creating new release: $TAG"
+            BRANCH_NAME="${{ steps.package_info.outputs.branch_name }}"
+            if [ "$BRANCH_NAME" != "master" ]; then
+              TITLE="$TAG [$BRANCH_NAME] (Created $(date '+%Y-%m-%d %H:%M:%S'))"
+            else
+              TITLE="$TAG (Created $(date '+%Y-%m-%d %H:%M:%S'))"
+            fi
             if gh release create "$TAG" \
-              --title "$TAG (Created $(date '+%Y-%m-%d %H:%M:%S'))" \
+              --title "$TITLE" \
               --notes "Release $TAG - Created at $(date '+%Y-%m-%d %H:%M:%S UTC')
             ## Changes
             - Version: $VERSION
@@ -273,21 +296,3 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Set up Docker Buildx
-        if: steps.release.outputs.released == 'true'
-        uses: docker/setup-buildx-action@v3
-      - name: Deploy with Docker Compose
-        if: steps.release.outputs.released == 'true'
-        env:
-          TENCENT_CLOUD_REGISTRY_USERNAME: ${{ secrets.TENCENT_CLOUD_REGISTRY_USERNAME }}
-          TENCENT_CLOUD_REGISTRY_PASSWORD: ${{ secrets.TENCENT_CLOUD_REGISTRY_PASSWORD }}
-        run: |
-          echo "🚀 Building Docker image..."
-          docker build \
-            --progress=plain \
-            -t hkccr.ccs.tencentyun.com/hyperlane-dev/hyperlane-quick-start-server:1.0.0 \
-            -f ./resources/docker/release/server.dockerfile .
-          echo "🐳 Logging in to Tencent Cloud Container Registry..."
-          echo "$TENCENT_CLOUD_REGISTRY_PASSWORD" | docker login hkccr.ccs.tencentyun.com --username="$TENCENT_CLOUD_REGISTRY_USERNAME" --password-stdin
-          echo "📤 Pushing Docker image to Tencent Cloud Container Registry..."
-          docker push hkccr.ccs.tencentyun.com/hyperlane-dev/hyperlane-quick-start-server:1.0.0
