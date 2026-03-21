@@ -1,7 +1,7 @@
 services:
   mysql:
     image: mysql:latest
-    container_name: hyperlane_quick_start_mysql
+    container_name: release_hyperlane_quick_start_mysql
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: hyperlane
@@ -13,7 +13,7 @@ services:
     volumes:
       - ../../../data/release/mysql:/var/lib/mysql
     networks:
-      - hyperlane_quick_start_network
+      - release_hyperlane_quick_start_network
     healthcheck:
       test:
         [
@@ -33,7 +33,7 @@ services:
 
   postgresql:
     image: postgres:latest
-    container_name: hyperlane_quick_start_postgresql
+    container_name: release_hyperlane_quick_start_postgresql
     restart: always
     environment:
       POSTGRES_DB: hyperlane
@@ -45,7 +45,7 @@ services:
     volumes:
       - ../../../data/release/postgres:/var/lib/postgresql
     networks:
-      - hyperlane_quick_start_network
+      - release_hyperlane_quick_start_network
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready']
       interval: 6s
@@ -55,7 +55,7 @@ services:
 
   redis:
     image: redis:latest
-    container_name: hyperlane_quick_start_redis
+    container_name: release_hyperlane_quick_start_redis
     restart: always
     command: redis-server --requirepass hyperlane
     expose:
@@ -63,7 +63,7 @@ services:
     volumes:
       - ../../../data/release/redis:/data
     networks:
-      - hyperlane_quick_start_network
+      - release_hyperlane_quick_start_network
     healthcheck:
       test: ['CMD', 'redis-cli', '-a', 'hyperlane', 'ping']
       interval: 6s
@@ -75,12 +75,12 @@ services:
     build:
       context: ../../../
       dockerfile: ./resources/docker/release/server.dockerfile
-    container_name: hyperlane_quick_start_server
+    container_name: release_hyperlane_quick_start_server
     restart: always
     ports:
       - '65002:65002'
     networks:
-      - hyperlane_quick_start_network
+      - release_hyperlane_quick_start_network
     depends_on:
       mysql:
         condition: service_healthy
@@ -90,5 +90,6 @@ services:
         condition: service_healthy
 
 networks:
-  hyperlane_quick_start_network:
+  release_hyperlane_quick_start_network:
+    external: true
     driver: bridge
