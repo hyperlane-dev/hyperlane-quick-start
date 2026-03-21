@@ -1,3 +1,5 @@
+#![recursion_limit = "1024"]
+
 pub mod controller;
 pub mod domain;
 pub mod exception;
