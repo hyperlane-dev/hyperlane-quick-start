@@ -21,7 +21,7 @@ pub struct OnlineUser {
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct ChatHistory {
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) id: i64,
     pub(super) session_id: String,
     pub(super) sender_name: String,

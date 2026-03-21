@@ -2,7 +2,7 @@ use super::*;
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct PipelineDto {
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) id: i32,
     pub(super) name: String,
     pub(super) description: Option<String>,
@@ -13,12 +13,12 @@ pub struct PipelineDto {
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct RunDto {
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) id: i32,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) pipeline_id: i32,
     pub(super) pipeline_name: Option<String>,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) run_number: i32,
     pub(super) status: CicdStatus,
     pub(super) triggered_by: Option<String>,
@@ -26,31 +26,31 @@ pub struct RunDto {
     pub(super) commit_message: Option<String>,
     pub(super) started_at: Option<i64>,
     pub(super) completed_at: Option<i64>,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) duration_ms: i32,
     pub(super) created_at: Option<i64>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct JobDto {
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) id: i32,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) run_id: i32,
     pub(super) name: String,
     pub(super) status: CicdStatus,
     pub(super) runner: Option<String>,
     pub(super) started_at: Option<i64>,
     pub(super) completed_at: Option<i64>,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) duration_ms: i32,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct StepDto {
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) id: i32,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) job_id: i32,
     pub(super) name: String,
     pub(super) command: Option<String>,
@@ -58,7 +58,7 @@ pub struct StepDto {
     pub(super) output: Option<String>,
     pub(super) started_at: Option<i64>,
     pub(super) completed_at: Option<i64>,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) duration_ms: i32,
 }
 
@@ -82,30 +82,30 @@ pub struct JobWithStepsDto {
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct PaginatedRunsDto {
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) total: i32,
     pub(super) runs: Vec<RunDto>,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) has_more: bool,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct StepLogDto {
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) step_id: i32,
     pub(super) step_name: String,
     pub(super) status: CicdStatus,
     pub(super) output: Option<String>,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) output_length: usize,
     pub(super) new_output: Option<String>,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) output_offset: usize,
     pub(super) stderr_output: Option<String>,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) stderr_length: usize,
     pub(super) new_stderr: Option<String>,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) stderr_offset: usize,
 }
 

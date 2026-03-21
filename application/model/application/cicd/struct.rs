@@ -2,7 +2,7 @@ use super::*;
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]
 pub struct CicdPipeline {
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) id: i32,
     pub(super) name: String,
     pub(super) description: Option<String>,
@@ -13,11 +13,11 @@ pub struct CicdPipeline {
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]
 pub struct CicdRun {
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) id: i32,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) pipeline_id: i32,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) run_number: i32,
     pub(super) status: String,
     pub(super) triggered_by: Option<String>,
@@ -25,7 +25,7 @@ pub struct CicdRun {
     pub(super) commit_message: Option<String>,
     pub(super) started_at: Option<String>,
     pub(super) completed_at: Option<String>,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) duration_ms: i32,
     pub(super) created_at: Option<String>,
     pub(super) updated_at: Option<String>,
@@ -33,16 +33,16 @@ pub struct CicdRun {
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]
 pub struct CicdJob {
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) id: i32,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) run_id: i32,
     pub(super) name: String,
     pub(super) status: String,
     pub(super) runner: Option<String>,
     pub(super) started_at: Option<String>,
     pub(super) completed_at: Option<String>,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) duration_ms: i32,
     pub(super) created_at: Option<String>,
     pub(super) updated_at: Option<String>,
@@ -50,9 +50,9 @@ pub struct CicdJob {
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]
 pub struct CicdStep {
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) id: i32,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) job_id: i32,
     pub(super) name: String,
     pub(super) command: Option<String>,
@@ -60,7 +60,7 @@ pub struct CicdStep {
     pub(super) output: Option<String>,
     pub(super) started_at: Option<String>,
     pub(super) completed_at: Option<String>,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) duration_ms: i32,
     pub(super) created_at: Option<String>,
     pub(super) updated_at: Option<String>,

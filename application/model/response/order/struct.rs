@@ -2,7 +2,7 @@ use super::*;
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct UserResponse {
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) id: i32,
     pub(super) username: String,
     pub(super) email: Option<String>,
@@ -21,20 +21,20 @@ pub struct LoginResponse {
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct UserListResponse {
     pub(super) users: Vec<UserResponse>,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) has_more: bool,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) last_id: Option<i32>,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) total_count: i64,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct RecordResponse {
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) id: i32,
     pub(super) bill_no: String,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) user_id: i32,
     pub(super) amount: String,
     pub(super) category: String,
@@ -54,33 +54,33 @@ pub struct RecordListResponse {
     pub(super) total_income: String,
     pub(super) total_expense: String,
     pub(super) balance: String,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) total_count: i64,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct TodayStatistics {
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) transactions: i64,
     pub(super) income: String,
     pub(super) expense: String,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) new_users: i64,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct ChangesStatistics {
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) transactions_change: Option<f64>,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) income_change: Option<f64>,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) expense_change: Option<f64>,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) new_users_change: Option<f64>,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) avg_income_change: Option<f64>,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) avg_expense_change: Option<f64>,
 }
 
@@ -101,7 +101,7 @@ pub struct MonthlyComparison {
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct CategoryItem {
     pub(super) name: String,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) value: i64,
 }
 
@@ -113,9 +113,9 @@ pub struct UserGrowth {
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct TransactionTypeDistribution {
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) income_count: i64,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) expense_count: i64,
     pub(super) income_amount: String,
     pub(super) expense_amount: String,
@@ -206,16 +206,16 @@ pub struct AverageTransactionStats {
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct RecordImageResponse {
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) id: i32,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) record_id: i32,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) user_id: i32,
     pub(super) file_name: String,
     pub(super) original_name: Option<String>,
     pub(super) mime_type: String,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) file_size: i32,
     pub(super) created_at: i64,
     pub(super) download_url: String,
@@ -225,22 +225,22 @@ pub struct RecordImageResponse {
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct RecordImageListResponse {
     pub(super) images: Vec<RecordImageResponse>,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) total_count: i32,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct RecordImageDetailResponse {
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) id: i32,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) record_id: i32,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) user_id: i32,
     pub(super) file_name: String,
     pub(super) original_name: Option<String>,
     pub(super) mime_type: String,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) file_size: i32,
     pub(super) file_data_base64: String,
     pub(super) created_at: i64,
@@ -248,9 +248,9 @@ pub struct RecordImageDetailResponse {
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct ImageDataResponse {
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) id: i32,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) record_id: i32,
     pub(super) file_name: String,
     pub(super) original_name: Option<String>,

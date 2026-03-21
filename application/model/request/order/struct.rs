@@ -28,30 +28,22 @@ pub struct ChangePasswordRequest {
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct CreateRecordRequest {
-    #[get(type(copy), pub)]
-    #[set(pub)]
+    #[get(type(copy))]
     #[schema(value_type = String)]
     pub(super) amount: Decimal,
-    #[set(pub)]
     pub(super) category: String,
-    #[set(pub)]
     pub(super) transaction_type: String,
-    #[set(pub)]
     pub(super) description: Option<String>,
     #[schema(value_type = String)]
-    #[set(pub)]
     pub(super) bill_date: Option<NaiveDate>,
-    #[get(type(copy), pub)]
-    #[set(pub)]
+    #[get(type(copy))]
     pub(super) target_user_id: Option<i32>,
-    #[get(pub)]
-    #[set(pub)]
     pub(super) image_ids: Vec<i32>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct RecordQueryRequest {
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) user_id: Option<i32>,
     #[schema(value_type = String)]
     pub(super) start_date: Option<NaiveDate>,
@@ -59,35 +51,32 @@ pub struct RecordQueryRequest {
     pub(super) end_date: Option<NaiveDate>,
     pub(super) category: Option<String>,
     pub(super) transaction_type: Option<String>,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) cache_id: Option<i32>,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) page: Option<i32>,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) limit: Option<u64>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct ApproveUserRequest {
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) approved: bool,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct UserListQueryRequest {
-    #[set(pub)]
     pub(super) keyword: Option<String>,
-    #[get(type(copy), pub)]
-    #[set(pub)]
+    #[get(type(copy))]
     pub(super) last_id: Option<i32>,
-    #[get(type(copy), pub)]
-    #[set(pub)]
+    #[get(type(copy))]
     pub(super) limit: Option<u64>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct CreateRecordWithImagesRequest {
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     #[schema(value_type = String)]
     pub(super) amount: Decimal,
     pub(super) category: String,
@@ -95,49 +84,44 @@ pub struct CreateRecordWithImagesRequest {
     pub(super) description: Option<String>,
     #[schema(value_type = String)]
     pub(super) bill_date: Option<NaiveDate>,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) target_user_id: Option<i32>,
     pub(super) images: Vec<ImageUploadRequest>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct ImageUploadRequest {
-    #[set(pub)]
     pub(super) file_name: String,
-    #[set(pub)]
     pub(super) original_name: Option<String>,
-    #[set(pub)]
     pub(super) mime_type: String,
-    #[get(type(copy), pub)]
-    #[set(pub)]
+    #[get(type(copy))]
     pub(super) file_size: i32,
     #[schema(value_type = String, format = Binary)]
-    #[set(pub)]
     pub(super) file_data: Vec<u8>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct RecordImageQueryRequest {
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) record_id: i32,
 }
 
 #[derive(Clone, Data, Debug, Default)]
 pub struct RecordPaginationQuery {
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) user_id: Option<i32>,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) start_date: Option<NaiveDate>,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) end_date: Option<NaiveDate>,
-    #[get(type(option), pub)]
+    #[get(type(option))]
     pub(super) category: Option<String>,
-    #[get(type(option), pub)]
+    #[get(type(option))]
     pub(super) transaction_type: Option<String>,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) cache_id: Option<i32>,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) page: i32,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) limit: u64,
 }

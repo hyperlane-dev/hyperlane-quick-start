@@ -8,12 +8,12 @@ pub struct GomokuPlayer {
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct GomokuMove {
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) x: usize,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) y: usize,
     pub(super) color: StoneColor,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) step: usize,
 }
 
@@ -21,7 +21,7 @@ pub struct GomokuMove {
 pub struct GomokuPlaceResult {
     pub(super) status: GameStatus,
     pub(super) winner: Option<StoneColor>,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) is_draw: bool,
     pub(super) move_data: GomokuMove,
 }

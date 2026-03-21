@@ -2,7 +2,7 @@ use super::*;
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct ShortlinkRecord {
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) id: i32,
     pub(super) url: String,
     pub(super) created_at: String,

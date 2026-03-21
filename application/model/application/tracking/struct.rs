@@ -9,6 +9,6 @@ pub struct Tracking {
 pub struct TrackingRecord {
     pub(super) headers: RequestHeaders,
     pub(super) body: String,
-    #[get(type(copy), pub)]
+    #[get(type(copy))]
     pub(super) timestamp: i64,
 }
