@@ -286,12 +286,12 @@ jobs:
           echo "🚀 Building Docker image..."
           docker build \
             --progress=plain \
-            -t ccr.ccs.tencentyun.com/linux_environment/hyperlane-quick-start-server:1.0.0 \
+            -t hkccr.ccs.tencentyun.com/hyperlane-dev/hyperlane-quick-start-server:1.0.0 \
             -f ./resources/docker/release/server.dockerfile .
           echo "🐳 Logging in to Tencent Cloud Container Registry..."
-          echo "$TENCENT_CLOUD_REGISTRY_PASSWORD" | docker login ccr.ccs.tencentyun.com --username="$TENCENT_CLOUD_REGISTRY_USERNAME" --password-stdin
+          echo "$TENCENT_CLOUD_REGISTRY_PASSWORD" | docker login hkccr.ccs.tencentyun.com --username="$TENCENT_CLOUD_REGISTRY_USERNAME" --password-stdin
           echo "📤 Pushing Docker image to Tencent Cloud Container Registry..."
-          docker push ccr.ccs.tencentyun.com/linux_environment/hyperlane-quick-start-server:1.0.0
+          docker push hkccr.ccs.tencentyun.com/hyperlane-dev/hyperlane-quick-start-server:1.0.0
           echo "🚀 Deploying services with Docker Compose..."
           docker-compose -f ./resources/docker/release/server_docker_compose.yml up -d --build
           echo "✅ Deployment completed successfully"
