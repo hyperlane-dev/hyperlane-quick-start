@@ -69,21 +69,22 @@ impl ServerHook for GomokuConnectedHook {
         Self
     }
 
+    #[request_query_option("uuid" => uuid_opt)]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
-        let user_id: String = GomokuWebSocketService::get_user_id(ctx).await;
-        if user_id.is_empty() {
+        let uuid: String = uuid_opt.unwrap_or_default();
+        if uuid.is_empty() {
             return;
         }
-        if let Some(room_id) = GomokuRoomMapper::get_user_room(&user_id).await {
+        if let Some(room_id) = GomokuRoomMapper::get_user_room(&uuid).await {
             let manager: &RoomBroadcastManager = get_room_broadcast_manager();
-            manager.subscribe_to_room(&user_id, &room_id).await;
-            trace!("User {user_id} connected and subscribed to room {room_id}");
+            manager.subscribe_to_room(&uuid, &room_id).await;
+            trace!("User {uuid} connected and subscribed to room {room_id}");
             if let Some(room) = GomokuRoomMapper::get_room(&room_id).await {
                 let resp_body: ResponseBody = GomokuWebSocketService::build_response_body(
                     GomokuMessageType::RoomState,
                     &room_id,
-                    &user_id,
+                    &uuid,
                     json!(room),
                 )
                 .unwrap_or_default();
@@ -99,6 +100,7 @@ impl ServerHook for GomokuRequestHook {
         Self
     }
 
+    #[request_query_option("uid" => uid_opt)]
     #[request_body_json_result(req_data_res: GomokuWsRequest)]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
@@ -106,17 +108,17 @@ impl ServerHook for GomokuRequestHook {
         if GomokuWebSocketService::handle_ping_request(ctx, &req_data).await {
             return;
         }
-        let sender_id: String = GomokuWebSocketService::get_user_id(ctx).await;
-        match GomokuWebSocketService::handle_request(ctx, &req_data, &sender_id).await {
+        let uid: String = uid_opt.unwrap_or_default();
+        match GomokuWebSocketService::handle_request(ctx, &req_data, &uid).await {
             Ok((resp_body, room_id)) => {
                 ctx.get_mut_response().set_body(&resp_body);
                 if !room_id.is_empty() {
-                    GomokuWebSocketService::broadcast_room(&room_id, &sender_id, &resp_body).await;
+                    GomokuWebSocketService::broadcast_room(&room_id, &uid, &resp_body).await;
                 }
             }
             Err(error) => {
                 let resp_body: ResponseBody =
-                    GomokuWebSocketService::error_response(&sender_id, &req_data, error);
+                    GomokuWebSocketService::error_response(&uid, &req_data, error);
                 ctx.get_mut_response().set_body(&resp_body);
             }
         }
@@ -139,42 +141,29 @@ impl ServerHook for GomokuClosedHook {
         Self
     }
 
+    #[request_query_option("uid" => uid_opt)]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
-        let user_id: String = GomokuWebSocketService::get_user_id(ctx).await;
-        if user_id.is_empty() {
+        let uid: String = uid_opt.unwrap_or_default();
+        if uid.is_empty() {
             return;
         }
         let manager: &RoomBroadcastManager = get_room_broadcast_manager();
-        manager.unsubscribe_user(&user_id).await;
-        trace!("User {user_id} disconnected, unsubscribed from WebSocket only");
+        manager.unsubscribe_user(&uid).await;
+        trace!("User {uid} disconnected, unsubscribed from WebSocket only");
     }
 }
 
 impl GomokuWebSocketService {
-    #[instrument_trace]
-    pub async fn get_user_id(ctx: &mut Context) -> String {
-        #[request_query_option("uid" => uid_opt)]
-        async fn get_uid(_ctx: &mut Context) -> Option<String> {
-            uid_opt
-        }
-        #[request_query_option("user_id" => user_id_opt)]
-        async fn get_user_id(_ctx: &mut Context) -> Option<String> {
-            user_id_opt
-        }
-        let uid: Option<String> = get_uid(ctx).await;
-        let user_id: Option<String> = get_user_id(ctx).await;
-        uid.or(user_id).unwrap_or_default()
-    }
-
+    #[request_query_option("uid" => uid_opt)]
     #[instrument_trace]
     pub async fn handle_ping_request(ctx: &mut Context, req_data: &GomokuWsRequest) -> bool {
         if req_data.get_type() == &GomokuMessageType::Ping {
-            let sender_id: String = Self::get_user_id(ctx).await;
+            let uid: String = uid_opt.unwrap_or_default();
             let resp_body: ResponseBody = Self::build_response_body(
                 GomokuMessageType::Pang,
                 req_data.get_room_id(),
-                &sender_id,
+                &uid,
                 json!({}),
             )
             .unwrap_or_default();

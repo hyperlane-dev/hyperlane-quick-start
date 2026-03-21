@@ -25,6 +25,7 @@ impl ServerHook for ChatRequestHook {
         Self
     }
 
+    #[request_query_option("uuid" => uuid_opt)]
     #[request_body_json_result(req_data_res: WebSocketReqData)]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
@@ -35,14 +36,14 @@ impl ServerHook for ChatRequestHook {
         let resp_data: WebSocketRespData = req_data.into_resp(ctx).await;
         let resp_data: ResponseBody = serde_json::to_vec(&resp_data).unwrap();
         ctx.get_mut_response().set_body(&resp_data);
-        let session_id: String = ChatService::get_name(ctx).await;
-        clone!(req_data, session_id => {
+        let uuid: String = uuid_opt.unwrap_or_default();
+        clone!(req_data, uuid => {
             let req_msg: &String = req_data.get_data();
             if ChatService::is_gpt_mentioned(req_msg) {
                 let req_msg_clone: String = req_msg.clone();
                 let ctx: &'static mut Context = context!(ctx);
                 spawn(async move {
-                    ChatService::process_gpt_request(session_id, req_msg_clone, ctx).await;
+                    ChatService::process_gpt_request(uuid, req_msg_clone, ctx).await;
                 });
             }
         });
@@ -55,6 +56,7 @@ impl ServerHook for ChatSendedHook {
         Self
     }
 
+    #[request_query_option("uuid" => uuid_opt)]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
         let request: String = get_request_json(ctx).await;
@@ -67,8 +69,8 @@ impl ServerHook for ChatSendedHook {
             ctx.set_aborted(true);
             return;
         }
-        let session_id: String = ChatService::get_name(ctx).await;
-        ChatService::save_message_from_response(&session_id, &response_body).await;
+        let uuid: String = uuid_opt.unwrap_or_default();
+        ChatService::save_message_from_response(&uuid, &response_body).await;
     }
 }
 
@@ -78,14 +80,15 @@ impl ServerHook for ChatClosedHook {
         Self
     }
 
+    #[request_query_option("uuid" => uuid_opt)]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
         let websocket: &WebSocket = get_global_websocket();
         let path: String = ctx.get_request().get_path().clone();
         let key: BroadcastType<String> = BroadcastType::PointToGroup(path.clone());
         let receiver_count: ReceiverCount = websocket.receiver_count_after_closed(key);
-        let username: String = ChatService::get_name(ctx).await;
-        ChatDomain::remove_online_user(&username).await;
+        let uuid: String = uuid_opt.unwrap_or_default();
+        ChatDomain::remove_online_user(&uuid).await;
         let resp_data: ResponseBody =
             ChatService::create_online_count_message(ctx, receiver_count.to_string()).await;
         ctx.get_mut_response().set_body(&resp_data);
@@ -265,16 +268,6 @@ impl ChatService {
             return Err(error);
         }
         Err(format!("Incorrect API response format {response_text}"))
-    }
-
-    #[instrument_trace]
-    pub async fn get_name(ctx: &mut Context) -> String {
-        #[request_query_option("uuid" => uuid_opt)]
-        #[instrument_trace]
-        async fn inner(_ctx: &mut Context) -> String {
-            uuid_opt.unwrap_or_default()
-        }
-        inner(ctx).await
     }
 
     #[instrument_trace]

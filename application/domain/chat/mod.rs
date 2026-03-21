@@ -7,7 +7,6 @@ pub use r#struct::*;
 use {
     super::*,
     model::{application::chat::*, request::chat::*, response::chat::*},
-    service::chat::*,
     r#static::*,
 };
 

@@ -6,15 +6,16 @@ impl ServerHook for GomokuRoute {
         Self
     }
 
+    #[request_query_option("uid" => uid_opt)]
     #[prologue_macros(ws_upgrade_type, get_method)]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
         let websocket: &WebSocket = get_global_websocket();
-        let user_id: String = GomokuWebSocketService::get_user_id(ctx).await;
-        let key_value: String = if user_id.trim().is_empty() {
+        let uid: String = uid_opt.unwrap_or_default();
+        let key_value: String = if uid.trim().is_empty() {
             ctx.get_request().get_path().clone()
         } else {
-            user_id
+            uid
         };
         let key: BroadcastType<String> = BroadcastType::PointToGroup(key_value);
         let config: WebSocketConfig<String> = WebSocketConfig::new(ctx)

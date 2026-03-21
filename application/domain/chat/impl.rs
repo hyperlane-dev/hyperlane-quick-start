@@ -20,12 +20,13 @@ impl WebSocketReqData {
         self.get_type().is_ping()
     }
 
+    #[request_query_option("uuid" => uuid_opt)]
     #[instrument_trace]
     pub async fn into_resp(&self, ctx: &mut Context) -> WebSocketRespData {
-        let name: String = ChatService::get_name(ctx).await;
+        let uuid: String = uuid_opt.unwrap_or_default();
         let mut resp: WebSocketRespData = WebSocketRespData::default();
         resp.set_type(*self.get_type())
-            .set_name(name)
+            .set_name(uuid)
             .set_data(self.get_data().clone())
             .set_time(Utc::now().timestamp_millis());
         resp
@@ -33,9 +34,10 @@ impl WebSocketReqData {
 }
 
 impl WebSocketRespData {
+    #[request_query_option("uuid" => uuid_opt)]
     #[instrument_trace]
     pub async fn from<T: ToString>(msg_type: MessageType, ctx: &mut Context, data: T) -> Self {
-        let name: String = ChatService::get_name(ctx).await;
+        let uuid: String = uuid_opt.unwrap_or_default();
         let mut resp_data: Self = Self::default();
         resp_data
             .set_type(msg_type)
@@ -44,7 +46,7 @@ impl WebSocketRespData {
         if msg_type == MessageType::OnlineCount {
             resp_data.set_name("System".to_string());
         } else {
-            resp_data.set_name(name.to_string());
+            resp_data.set_name(uuid.to_string());
         }
         resp_data
     }

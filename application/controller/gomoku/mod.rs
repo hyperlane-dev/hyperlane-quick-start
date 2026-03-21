@@ -4,6 +4,4 @@ mod r#struct;
 
 pub use r#fn::*;
 
-use {super::*, r#struct::*};
-
-use {service::chat::*, service::gomoku::*};
+use {super::*, service::chat::*, service::gomoku::*, r#struct::*};
