@@ -10,5 +10,6 @@ where
     pub(super) code: i32,
     pub(super) message: String,
     pub(super) data: Option<T>,
-    pub(super) timestamp: Option<String>,
+    #[get(type(copy))]
+    pub(super) timestamp: Option<i64>,
 }
