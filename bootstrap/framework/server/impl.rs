@@ -1,3 +1,5 @@
+use hyperlane_plugin::{common::GetOrInit, env::EnvPlugin};
+
 use super::*;
 
 impl ServerBootstrap {
@@ -28,10 +30,11 @@ impl BootstrapAsyncInit for ServerBootstrap {
             .server_config(config.get_server_config().clone());
         match server.run().await {
             Ok(server_hook) => {
+                let env_config: &EnvConfig = EnvPlugin::get_or_init();
                 let host_port: String = format!(
                     "{}{COLON}{}",
-                    ConfigBootstrap::get_server_host(),
-                    ConfigBootstrap::get_server_port()
+                    env_config.get_server_host(),
+                    env_config.get_server_port()
                 );
                 Self::print_route_matcher(&server).await;
                 info!("Server listen in {host_port}");

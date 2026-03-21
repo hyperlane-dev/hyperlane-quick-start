@@ -4,9 +4,9 @@ impl fmt::Display for PluginType {
     #[instrument_trace]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::MySQL => write!(f, "MySQL"),
-            Self::PostgreSQL => write!(f, "PostgreSQL"),
-            Self::Redis => write!(f, "Redis"),
+            Self::MySQL => write!(f, "{}", MYSQL_DISPLAY_NAME),
+            Self::PostgreSQL => write!(f, "{}", POSTGRESQL_DISPLAY_NAME),
+            Self::Redis => write!(f, "{}", REDIS_DISPLAY_NAME),
         }
     }
 }
@@ -17,9 +17,9 @@ impl FromStr for PluginType {
     #[instrument_trace]
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "MySQL" => Ok(Self::MySQL),
-            "PostgreSQL" => Ok(Self::PostgreSQL),
-            "Redis" => Ok(Self::Redis),
+            MYSQL_DISPLAY_NAME => Ok(Self::MySQL),
+            POSTGRESQL_DISPLAY_NAME => Ok(Self::PostgreSQL),
+            REDIS_DISPLAY_NAME => Ok(Self::Redis),
             _ => Err(()),
         }
     }
@@ -77,21 +77,29 @@ impl TableSchema {
 impl DatabasePlugin {
     #[instrument_trace]
     pub fn get_connection_timeout_duration() -> Duration {
-        let timeout_millis: u64 = std::env::var(ENV_KEY_DB_CONNECTION_TIMEOUT_MILLIS)
+        let timeout_millis: u64 = var(ENV_KEY_DB_CONNECTION_TIMEOUT_MILLIS)
             .ok()
             .and_then(|value: String| value.parse::<u64>().ok())
-            .unwrap_or_else(|| panic!("Environment variable {} is not set or invalid",
-                ENV_KEY_DB_CONNECTION_TIMEOUT_MILLIS));
+            .unwrap_or_else(|| {
+                panic!(
+                    "Environment variable {} is not set or invalid",
+                    ENV_KEY_DB_CONNECTION_TIMEOUT_MILLIS
+                )
+            });
         Duration::from_millis(timeout_millis)
     }
 
     #[instrument_trace]
     pub fn get_retry_duration() -> Duration {
-        let millis: u64 = std::env::var(ENV_KEY_DB_RETRY_INTERVAL_MILLIS)
+        let millis: u64 = var(ENV_KEY_DB_RETRY_INTERVAL_MILLIS)
             .ok()
             .and_then(|value: String| value.parse::<u64>().ok())
-            .unwrap_or_else(|| panic!("Environment variable {} is not set or invalid",
-                ENV_KEY_DB_RETRY_INTERVAL_MILLIS));
+            .unwrap_or_else(|| {
+                panic!(
+                    "Environment variable {} is not set or invalid",
+                    ENV_KEY_DB_RETRY_INTERVAL_MILLIS
+                )
+            });
         Duration::from_millis(millis)
     }
 
