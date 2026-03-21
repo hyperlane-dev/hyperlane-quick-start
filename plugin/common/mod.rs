@@ -2,6 +2,6 @@ mod r#trait;
 
 pub use r#trait::*;
 
-use crate::database::{AutoCreationError, AutoCreationResult, DatabaseSchema, PluginType};
+use crate::database::*;
 
 use std::future::Future;

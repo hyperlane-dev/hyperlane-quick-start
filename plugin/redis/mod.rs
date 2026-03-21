@@ -8,11 +8,12 @@ pub use {r#const::*, r#struct::*, r#type::*};
 
 use {super::*, database::*, env::*, r#static::*};
 
-use hyperlane_utils::redis::*;
-
-use tokio::{
-    spawn,
-    sync::{RwLock, RwLockWriteGuard},
-    task::{JoinHandle, spawn_blocking},
-    time::timeout,
+use {
+    hyperlane_utils::redis::*,
+    tokio::{
+        spawn,
+        sync::{RwLock, RwLockWriteGuard},
+        task::{JoinHandle, spawn_blocking},
+        time::timeout,
+    },
 };
