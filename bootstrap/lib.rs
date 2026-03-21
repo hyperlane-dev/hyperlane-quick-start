@@ -1,3 +1,5 @@
+#![recursion_limit = "1024"]
+
 pub mod application;
 pub mod common;
 pub mod framework;

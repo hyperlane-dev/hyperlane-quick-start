@@ -1,3 +1,5 @@
+#![recursion_limit = "1024"]
+
 pub mod docker;
 pub mod env;
 pub mod sql;
