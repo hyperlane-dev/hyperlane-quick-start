@@ -10,16 +10,13 @@ keywords = ["http", "request", "response", "tcp", "cross-platform"]
 repository = "https://github.com/hyperlane-dev/hyperlane-quick-start.git"
 categories = ["network-programming", "web-programming"]
 exclude = [
-    "tmp",
     "data",
-    "logs",
+    "*.log",
+    "*.pid",
     "target",
     ".github",
     ".vscode",
-    "process",
     "node_modules",
-    "**/*.pid",
-    "**/*.log",
     "Cargo.lock",
 ]
 

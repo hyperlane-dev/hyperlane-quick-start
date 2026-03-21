@@ -43,7 +43,7 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - ./data/postgres_data:/var/lib/postgresql/data
+      - ./data/postgres_data:/var/lib/postgresql
     networks:
       - hyperlane_network
     healthcheck:
