@@ -328,6 +328,23 @@
         flex-wrap: wrap;
       }
 
+      .title-short {
+        display: none;
+      }
+
+      .title-full {
+        display: inline;
+      }
+
+      .app-title,
+      .app-title span,
+      button,
+      .btn,
+      .pagination-btn,
+      .download-btn {
+        white-space: nowrap;
+      }
+
       @media (max-width: 768px) {
         body {
           padding: 15px;
@@ -335,6 +352,14 @@
 
         .app-title {
           font-size: 1.75rem;
+        }
+
+        .title-full {
+          display: none;
+        }
+
+        .title-short {
+          display: inline;
         }
 
         .app-subtitle {
@@ -414,7 +439,10 @@
                 class="nav-logo"
                 onerror="this.style.display = 'none'"
               />
-              <span class="text shimmer">Hyperlane RSS Feed Reader</span>
+              <span class="text shimmer"
+                ><span class="title-full">Hyperlane RSS Feed Reader</span
+                ><span class="title-short">RSS Reader</span></span
+              >
             </a>
           </h1>
           <p class="app-subtitle">

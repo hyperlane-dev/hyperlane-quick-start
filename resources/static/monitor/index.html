@@ -456,10 +456,33 @@
         }
       }
 
+      .title-short {
+        display: none;
+      }
+
+      .title-full {
+        display: inline;
+      }
+
+      .app-title,
+      .app-title span,
+      button,
+      .btn {
+        white-space: nowrap;
+      }
+
       @media (max-width: 480px) {
         .app-title {
           font-size: 1.5rem;
           letter-spacing: 1px;
+        }
+
+        .title-full {
+          display: none;
+        }
+
+        .title-short {
+          display: inline;
         }
 
         .metric-value {
@@ -506,7 +529,9 @@
                 onerror="this.style.display = 'none'"
               />
               <span class="text shimmer"
-                >Hyperlane Server Monitoring Dashboard</span
+                ><span class="title-full"
+                  >Hyperlane Server Monitoring Dashboard</span
+                ><span class="title-short">Server Monitor</span></span
               >
             </a>
           </h1>

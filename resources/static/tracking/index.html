@@ -503,8 +503,9 @@
       }
 
       .table-container {
-        overflow-x: hidden;
+        overflow-x: auto;
         margin-bottom: 20px;
+        -webkit-overflow-scrolling: touch;
       }
 
       table {
@@ -823,6 +824,23 @@
         font-size: 1.2rem;
       }
 
+      .title-short {
+        display: none;
+      }
+
+      .title-full {
+        display: inline;
+      }
+
+      .app-title,
+      .app-title span,
+      button,
+      .btn,
+      .page-btn,
+      .detail-btn {
+        white-space: nowrap;
+      }
+
       @media (max-width: 768px) {
         body {
           padding: 10px;
@@ -830,6 +848,14 @@
 
         .app-title {
           font-size: 1.75rem;
+        }
+
+        .title-full {
+          display: none;
+        }
+
+        .title-short {
+          display: inline;
         }
 
         .app-subtitle {
@@ -925,7 +951,9 @@
                 onerror="this.style.display = 'none'"
               />
               <span class="text shimmer"
-                >Hyperlane Event Tracking Query Dashboard</span
+                ><span class="title-full"
+                  >Hyperlane Event Tracking Query Dashboard</span
+                ><span class="title-short">Event Tracking</span></span
               >
             </a>
           </h1>

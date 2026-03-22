@@ -851,6 +851,24 @@
         margin-bottom: 16px;
       }
 
+      .title-short {
+        display: none;
+      }
+
+      .title-full {
+        display: inline;
+      }
+
+      .app-title,
+      .app-title span,
+      button,
+      .btn,
+      .tab,
+      .pipeline-name,
+      .run-title {
+        white-space: nowrap;
+      }
+
       @media (max-width: 768px) {
         .header {
           padding: 12px 16px;
@@ -860,8 +878,12 @@
           font-size: 1rem;
         }
 
-        .header h1 span:last-child {
+        .header h1 .title-full {
           display: none;
+        }
+
+        .header h1 .title-short {
+          display: inline;
         }
 
         .container {
@@ -1126,11 +1148,28 @@
               class="nav-logo"
               onerror="this.style.display = 'none'"
             />
-            <span class="text shimmer">Hyperlane CICD</span>
+            <span class="text shimmer"
+              ><span class="title-full">Hyperlane CICD</span
+              ><span class="title-short">CICD</span></span
+            >
           </a>
         </h1>
-        <button class="btn btn-primary" onclick="showCreateModal()">
-          <span>+</span> New Pipeline
+        <button
+          class="btn btn-primary"
+          onclick="showCreateModal()"
+          style="
+            margin-left: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-weight: 600;
+            font-size: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            flex-shrink: 0;
+            line-height: 1;
+          "
+        >
+          +
         </button>
       </div>
     </header>

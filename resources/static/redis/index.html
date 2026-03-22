@@ -309,6 +309,21 @@
         }
       }
 
+      .title-short {
+        display: none;
+      }
+
+      .title-full {
+        display: inline;
+      }
+
+      .app-title,
+      .app-title span,
+      button,
+      .btn {
+        white-space: nowrap;
+      }
+
       @media (max-width: 768px) {
         body {
           padding: 10px;
@@ -316,6 +331,14 @@
 
         .app-title {
           font-size: 1.75rem;
+        }
+
+        .title-full {
+          display: none;
+        }
+
+        .title-short {
+          display: inline;
         }
 
         .app-subtitle {
@@ -379,7 +402,10 @@
                 class="nav-logo"
                 onerror="this.style.display = 'none'"
               />
-              <span class="text shimmer">Hyperlane Redis Management</span>
+              <span class="text shimmer"
+                ><span class="title-full">Hyperlane Redis Management</span
+                ><span class="title-short">Redis Manager</span></span
+              >
             </a>
           </h1>
           <p class="app-subtitle">Manage your Redis cache records</p>
