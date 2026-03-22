@@ -25,11 +25,11 @@ resolver = "3"
 members = ["application", "bootstrap", "config", "plugin", "resources"]
 
 [workspace.dependencies]
-hyperlane_application = { path = "application", version = "18.3.0" }
-hyperlane_bootstrap = { path = "bootstrap", version = "18.3.0" }
-hyperlane_config = { path = "config", version = "18.3.0" }
-hyperlane_plugin = { path = "plugin", version = "18.3.0" }
-hyperlane_resources = { path = "resources", version = "18.3.0" }
+hyperlane_application = { path = "application", version = "18.3.1" }
+hyperlane_bootstrap = { path = "bootstrap", version = "18.3.1" }
+hyperlane_config = { path = "config", version = "18.3.1" }
+hyperlane_plugin = { path = "plugin", version = "18.3.1" }
+hyperlane_resources = { path = "resources", version = "18.3.1" }
 
 tracing = "0.1.44"
 hyperlane = "18.2.3"
