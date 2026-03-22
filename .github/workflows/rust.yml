@@ -117,26 +117,41 @@ jobs:
     permissions:
       contents: write
     needs: [setup, check, tests, clippy, build]
-    if: needs.setup.outputs.tag != '' && needs.setup.outputs.branch_name == 'master'
+    if: needs.setup.outputs.tag != ''
     runs-on: ubuntu-latest
     outputs:
       published: ${{ steps.publish.outputs.published }}
     steps:
+      - name: Check branch
+        id: check_branch
+        run: |
+          if [ "${{ needs.setup.outputs.branch_name }}" != "master" ]; then
+            echo "⚠️ Not on master branch (current: ${{ needs.setup.outputs.branch_name }}), skipping publish"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "✅ On master branch, proceeding with publish"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
       - name: Checkout
+        if: steps.check_branch.outputs.skip == 'false'
         uses: actions/checkout@v4
       - name: Restore toml-cli
+        if: steps.check_branch.outputs.skip == 'false'
         uses: actions/cache@v3
         with:
           path: ~/.cargo/bin/toml
           key: toml-cli-${{ runner.os }}
       - name: Install cargo-release
+        if: steps.check_branch.outputs.skip == 'false'
         run: cargo install cargo-release
       - name: Configure git
+        if: steps.check_branch.outputs.skip == 'false'
         run: |
           git config user.name "eastspire"
           git config user.email "root@ltpp.vip"
       - name: Publish to crates.io
         id: publish
+        if: steps.check_branch.outputs.skip == 'false'
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         run: |
@@ -239,10 +254,10 @@ jobs:
               fi
             done
             BRANCH_NAME="${{ steps.package_info.outputs.branch_name }}"
-          TITLE="$TAG [$BRANCH_NAME] (Updated $(date '+%Y-%m-%d %H:%M:%S'))"
+          TITLE="[$BRANCH_NAME]($TAG updated $(date '+%Y-%m-%d %H:%M:%S'))"
           if gh release edit "$TAG" \
               --title "$TITLE" \
-              --notes "Release $TAG [$BRANCH_NAME] - Updated at $(date '+%Y-%m-%d %H:%M:%S UTC')
+              --notes "[$BRANCH_NAME] - release $TAG updated at $(date '+%Y-%m-%d %H:%M:%S UTC')
             ## Changes
             - Branch: $BRANCH_NAME
             - Version: $VERSION
@@ -267,10 +282,10 @@ jobs:
             fi
             echo "🆕 Creating new release: $TAG"
             BRANCH_NAME="${{ steps.package_info.outputs.branch_name }}"
-            TITLE="$TAG [$BRANCH_NAME] (Created $(date '+%Y-%m-%d %H:%M:%S'))"
+            TITLE="[$BRANCH_NAME]($TAG created $(date '+%Y-%m-%d %H:%M:%S'))"
             if gh release create "$TAG" \
               --title "$TITLE" \
-              --notes "Release $TAG [$BRANCH_NAME] - Created at $(date '+%Y-%m-%d %H:%M:%S UTC')
+              --notes "[$BRANCH_NAME] - release $TAG created at $(date '+%Y-%m-%d %H:%M:%S UTC')
             ## Changes
             - Branch: $BRANCH_NAME
             - Version: $VERSION
