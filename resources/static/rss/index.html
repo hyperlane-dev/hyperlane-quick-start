@@ -84,7 +84,9 @@
         color: #2c3e50;
         font-size: 1.3rem;
         margin-bottom: 12px;
-        word-break: break-word;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       .feed-item h3 a {
@@ -191,6 +193,8 @@
         font-size: 2rem;
         margin-bottom: 10px;
         white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       .empty-state p {
@@ -344,6 +348,8 @@
       .pagination-btn,
       .download-btn {
         white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       @media (max-width: 768px) {
@@ -373,6 +379,9 @@
 
         .feed-item h3 {
           font-size: 1.1rem;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
         .feed-meta {
@@ -415,6 +424,9 @@
 
         .feed-item h3 {
           font-size: 1rem;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
         .pagination-btn {

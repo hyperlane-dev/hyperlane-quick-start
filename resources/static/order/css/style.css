@@ -47,6 +47,9 @@ body {
   font-size: 28px;
   font-weight: 600;
   margin-bottom: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .login-header .app-title a {
@@ -57,6 +60,9 @@ body {
 .login-header .app-subtitle {
   color: #666;
   font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .login-form {
@@ -109,6 +115,9 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sidebar-header h2 .nav-logo {
@@ -226,6 +235,9 @@ body {
   font-size: 20px;
   font-weight: 600;
   color: #2c3e50;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .btn {
@@ -444,6 +456,9 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   font-size: 16px;
   font-weight: 600;
   color: #2c3e50;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .card-body {
@@ -1158,6 +1173,9 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   font-size: 18px;
   font-weight: 600;
   color: #2c3e50;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .modal-close {
@@ -1235,6 +1253,9 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   font-weight: 600;
   color: #2c3e50;
   margin-bottom: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .toast-container {

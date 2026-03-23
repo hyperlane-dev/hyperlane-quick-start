@@ -179,6 +179,9 @@
   font-weight: 700;
   color: #2c3e50;
   margin-bottom: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .result-subtitle {
@@ -344,6 +347,9 @@
   font-weight: 700;
   color: #dc3545;
   margin-bottom: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .error-message {
@@ -409,6 +415,9 @@
   font-weight: 700;
   color: #2c3e50;
   margin-bottom: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .info-list {
