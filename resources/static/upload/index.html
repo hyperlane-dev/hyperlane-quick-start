@@ -644,12 +644,6 @@
         e.target.value = '';
       });
       async function uploadFile(file, fileId) {
-        const progressContainer = document.createElement('div');
-        progressContainer.className = 'progress-container';
-        progressContainer.innerHTML = `<div class="progress-bar"><div class="progress-fill"id="progress-fill-${fileId}"></div></div>`;
-        document
-          .querySelector('.upload-container')
-          .appendChild(progressContainer);
         const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
         const fileCopy = new File([file], file.name, { type: file.type });
         let uploadQueue = [];
@@ -677,13 +671,7 @@
                 progress: 100,
               })
                 .then(() => {
-                  statusEl.innerHTML = `Upload successful: ${data.name}`;
-                  statusEl.className = 'status success';
-                  statusEl.style.display = 'flex';
                   return getAllFiles();
-                })
-                .then((files) => {
-                  renderHistoryList(files);
                 })
                 .catch((err) => {
                   statusEl.textContent =
@@ -699,22 +687,10 @@
               throw new Error(data.msg);
             }
             const progress = Math.floor(((index + 1) / totalChunks) * 100);
-            const progressFill = document.getElementById(
-              `progress-fill-${fileId}`,
-            );
-            const progressText = document.getElementById(
-              `progress-text-${fileId}`,
-            );
             const historyProgress = document.querySelector(
               `#history-progress-${fileId}.history-progress-fill`,
             );
-            if (progressFill) progressFill.style.width = progress + '%';
-            if (progressText)
-              progressText.textContent = `Progress: ${progress}%`;
             if (historyProgress) historyProgress.style.width = progress + '%';
-            if (progressFill) progressFill.style.display = 'none';
-            if (progressFill) progressFill.offsetHeight;
-            if (progressFill) progressFill.style.display = 'block';
             return data;
           } catch (error) {
             throw error;
@@ -732,21 +708,6 @@
               name: file.name,
               size: file.size,
             });
-            const progressFill = document.getElementById(
-              `progress-fill-${fileId}`,
-            );
-            const historyProgress = document.querySelector(
-              `#history-progress-${fileId}.history-progress-fill`,
-            );
-            if (progressFill) {
-              progressFill.style.width = `${currentProgress}%`;
-              progressFill.style.transition = 'width 0.3s ease-in-out';
-            }
-            if (historyProgress) {
-              historyProgress.style.width = `${currentProgress}%`;
-              historyProgress.style.transition = 'width 0.3s ease-in-out';
-            }
-            await getAllFiles().then((files) => renderHistoryList(files));
           }
         };
         const processQueue = async () => {
@@ -885,18 +846,6 @@
           const lastChunkResponse = await processQueue();
           const data = lastChunkResponse || { url: '' };
           showStatus('Upload successful', 'success');
-          const progressContainer = document.querySelector(
-            `#progress-fill-${fileId}`,
-          )?.parentElement?.parentElement;
-          const progressText = document.getElementById(
-            `progress-text-${fileId}`,
-          );
-          if (progressContainer) progressContainer.remove();
-          if (progressText) progressText.remove();
-          const historyProgress = document.querySelector(
-            `#history-progress-${fileId}.history-progress-fill`,
-          );
-          if (historyProgress) historyProgress.style.width = '100%';
           await saveFileInfo({
             id: fileId,
             progress: 100,
