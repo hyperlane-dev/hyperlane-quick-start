@@ -476,8 +476,17 @@
         .chat-input textarea {
           white-space: nowrap;
           text-overflow: ellipsis;
-          max-height: 20px;
-          height: 20px;
+          overflow: hidden;
+          max-height: 36px;
+          min-height: 36px;
+          height: 36px;
+          line-height: 20px;
+          padding: 8px 10px;
+        }
+
+        .chat-input textarea::placeholder {
+          line-height: 20px;
+          vertical-align: middle;
         }
       }
 
@@ -1232,8 +1241,8 @@
 
       @media (max-width: 768px) {
         .nav-bar {
-          padding: 0 10px;
-          height: 44px;
+          padding: 0 12px;
+          height: 48px;
         }
 
         .nav-logo {
@@ -1246,64 +1255,88 @@
         }
 
         .connection-indicator {
-          font-size: 0.8rem;
+          font-size: 0.75rem;
         }
 
         .chat-messages {
-          padding: 10px;
+          padding: 12px 10px;
+        }
+
+        .message {
+          margin-bottom: 8px;
         }
 
         .message-avatar {
-          width: 36px;
-          height: 36px;
-          font-size: 0.9rem;
+          width: 32px;
+          height: 32px;
+          font-size: 0.8rem;
+          margin: 0 6px;
         }
 
         .message-name {
-          font-size: 0.8rem;
-          max-width: 150px;
+          font-size: 0.75rem;
+          max-width: 120px;
         }
 
         .message-content {
-          padding: 8px 12px;
-          font-size: 0.875rem;
+          padding: 8px 10px;
+          font-size: 0.85rem;
+          border-radius: 10px;
+          max-width: calc(100vw - 80px);
+        }
+
+        .message-time {
+          font-size: 0.7rem;
         }
 
         .chat-input {
-          margin: 0 8px 10px;
-          padding: 0 8px;
-          min-height: 50px;
+          margin: 0 8px 8px;
+          padding: 8px 10px;
+          min-height: 48px;
+          border-radius: 24px;
         }
 
         .chat-input textarea {
           min-width: 0;
-          padding: 8px 10px;
-          font-size: 0.9rem;
+          padding: 6px;
+          font-size: 0.85rem;
+          max-height: 32px;
+          min-height: 32px;
+          height: 32px;
+          line-height: 20px;
+        }
+
+        .chat-input textarea::placeholder {
+          font-size: 0.8rem;
+          line-height: 20px;
         }
 
         .chat-input button {
           padding: 6px 12px;
-          margin-left: 8px;
-          height: 34px;
+          margin-left: 6px;
+          height: 36px;
+          min-width: 36px;
         }
 
         .scroll-to-bottom {
           bottom: 70px;
-          right: 15px;
-          width: 44px;
-          height: 44px;
+          right: 12px;
+          width: 40px;
+          height: 40px;
         }
 
         .mention-dropdown {
           width: calc(100% - 20px);
-          max-width: 280px;
+          max-width: 260px;
+          left: 10px !important;
         }
 
         .upload-button {
-          margin-right: 8px;
+          margin-right: 6px;
           margin-left: 0;
-          width: 34px;
-          height: 34px;
+          width: 36px;
+          height: 36px;
+          min-width: 36px;
           padding: 0;
         }
 
@@ -1313,55 +1346,183 @@
 
         .upload-status,
         .toast {
-          min-width: 250px;
-          max-width: calc(100% - 40px);
+          min-width: 200px;
+          max-width: calc(100% - 20px);
           top: 10px;
           right: 10px;
+          left: 10px;
+        }
+
+        .link-preview {
+          margin-top: 8px;
+        }
+
+        .link-preview-image,
+        .link-preview-video {
+          max-height: 200px;
+        }
+
+        .message-text pre {
+          padding: 10px;
+          font-size: 0.8em;
+        }
+
+        .message-text code {
+          font-size: 0.85em;
         }
       }
 
       @media (max-width: 480px) {
         .nav-bar {
-          padding: 0 8px;
+          padding: 0 10px;
+          height: 44px;
         }
 
         .nav-title {
           font-size: 0.85rem;
         }
 
+        .connection-indicator {
+          font-size: 0.7rem;
+        }
+
+        .status-dot {
+          width: 6px;
+          height: 6px;
+        }
+
         .chat-messages {
-          padding: 8px;
+          padding: 8px 6px;
+        }
+
+        .message {
+          margin-bottom: 6px;
+        }
+
+        .message-avatar {
+          width: 28px;
+          height: 28px;
+          font-size: 0.75rem;
+          margin: 0 4px;
         }
 
         .message-content {
-          padding: 6px 10px;
-          font-size: 0.85rem;
+          padding: 6px 8px;
+          font-size: 0.8rem;
+          border-radius: 8px;
+          max-width: calc(100vw - 60px);
+        }
+
+        .message-name {
+          font-size: 0.7rem;
+          max-width: 100px;
+        }
+
+        .message-time {
+          font-size: 0.65rem;
         }
 
         .chat-input {
-          margin: 0 6px 8px;
-          padding: 0 6px;
+          margin: 0 6px 6px;
+          padding: 6px 8px;
           min-height: 44px;
+          border-radius: 22px;
         }
 
         .chat-input textarea {
-          padding: 6px 8px;
-          font-size: 0.85rem;
+          padding: 5px 4px;
+          font-size: 0.8rem;
+          max-height: 28px;
+          min-height: 28px;
+          height: 28px;
+          line-height: 18px;
+        }
+
+        .chat-input textarea::placeholder {
+          font-size: 0.75rem;
+          line-height: 18px;
         }
 
         .chat-input button {
           padding: 4px 10px;
-          margin-left: 6px;
-          height: 30px;
+          margin-left: 4px;
+          height: 32px;
+          min-width: 32px;
+          font-size: 0.85rem;
         }
 
         .upload-button {
-          width: 30px;
-          height: 30px;
+          width: 32px;
+          height: 32px;
+          min-width: 32px;
         }
 
         .upload-icon {
           font-size: 16px;
+        }
+
+        .send-icon {
+          font-size: 1.1em;
+          margin-left: 2px;
+        }
+
+        .scroll-to-bottom {
+          bottom: 60px;
+          right: 10px;
+          width: 36px;
+          height: 36px;
+          font-size: 0.9rem;
+        }
+
+        .unread-badge {
+          width: 18px;
+          height: 18px;
+          font-size: 0.7rem;
+        }
+
+        .mention-dropdown {
+          width: calc(100% - 16px);
+          max-width: none;
+          left: 8px !important;
+        }
+
+        .mention-item {
+          padding: 8px 10px;
+        }
+
+        .user-avatar {
+          width: 28px;
+          height: 28px;
+          font-size: 0.8rem;
+        }
+
+        .link-preview-image,
+        .link-preview-video {
+          max-height: 150px;
+        }
+
+        .link-preview-file {
+          padding: 10px 12px;
+        }
+
+        .link-preview-file-icon {
+          font-size: 24px;
+        }
+
+        .message-text pre {
+          padding: 8px;
+          font-size: 0.75em;
+          margin: 8px 0;
+        }
+
+        .message-text code {
+          font-size: 0.8em;
+        }
+
+        .image-modal-close {
+          width: 36px;
+          height: 36px;
+          font-size: 20px;
         }
       }
 
@@ -2381,12 +2542,24 @@
 
       function updatePlaceholder(onlineCountText) {
         const input = document.getElementById('messageInput');
-        const basePlaceholder = isMobile
-          ? '(use @name to mention users)'
-          : '(use @name to mention users, ctrl+enter or shift+enter for new line)';
+        const isSmallScreen = window.innerWidth <= 480;
+        let basePlaceholder;
+
+        if (isSmallScreen) {
+          basePlaceholder = '@name to mention';
+        } else if (isMobile) {
+          basePlaceholder = 'use @name to mention users';
+        } else {
+          basePlaceholder =
+            'use @name to mention users, ctrl+enter or shift+enter for new line';
+        }
 
         if (onlineCountText) {
-          input.placeholder = `${onlineCountText} ${basePlaceholder}`;
+          if (isSmallScreen) {
+            input.placeholder = `${onlineCountText} online - @name to mention`;
+          } else {
+            input.placeholder = `${onlineCountText} ${basePlaceholder}`;
+          }
         } else {
           input.placeholder = basePlaceholder;
         }
