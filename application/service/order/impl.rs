@@ -3,8 +3,7 @@ use super::*;
 impl PasswordUtil {
     #[instrument_trace]
     pub fn hash_password(password: &str) -> String {
-        use hyperlane_utils::sha2::{Digest, Sha256};
-        let mut hasher: Sha256 = Sha256::new();
+        let mut hasher: Md5 = Md5::new();
         hasher.update(password.as_bytes());
         format!("{:x}", hasher.finalize())
     }
@@ -48,7 +47,6 @@ impl OrderService {
 
     #[instrument_trace]
     fn validate_email(email: &str) -> bool {
-        use hyperlane_utils::regex::Regex;
         let regex: Regex = match Regex::new(EMAIL_REGEX_PATTERN) {
             Ok(r) => r,
             Err(_) => return false,
