@@ -3,9 +3,7 @@ use super::*;
 impl PasswordUtil {
     #[instrument_trace]
     pub fn hash_password(password: &str) -> String {
-        let mut hasher: Md5 = Md5::new();
-        hasher.update(password.as_bytes());
-        format!("{:x}", hasher.finalize())
+        format!("{:x}", compute(password.as_bytes()))
     }
 
     #[instrument_trace]

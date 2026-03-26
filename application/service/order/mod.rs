@@ -19,7 +19,7 @@ use std::collections::{HashMap, HashSet};
 use {
     chrono::{Datelike, Local, NaiveDate, NaiveDateTime, Timelike},
     futures::future,
-    md5::{Digest, Md5},
+    md5::compute,
     regex::Regex,
     rust_decimal::{Decimal, prelude::ToPrimitive},
     sea_orm::{ActiveValue, DatabaseConnection, DatabaseTransaction, TransactionTrait},
