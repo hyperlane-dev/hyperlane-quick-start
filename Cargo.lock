@@ -1740,7 +1740,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_application"
-version = "18.3.2"
+version = "18.4.0"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
@@ -1753,7 +1753,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_bootstrap"
-version = "18.3.2"
+version = "18.4.0"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
@@ -1766,7 +1766,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_config"
-version = "18.3.2"
+version = "18.4.0"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
@@ -1776,7 +1776,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_plugin"
-version = "18.3.2"
+version = "18.4.0"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
@@ -1787,7 +1787,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_resources"
-version = "18.3.2"
+version = "18.4.0"
 
 [[package]]
 name = "iana-time-zone"
