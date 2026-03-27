@@ -1602,9 +1602,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane"
-version = "18.3.1"
+version = "18.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6c267799935b4ed54925c729a75bd5f44e647de7339f5f8eda7278f2efe43067"
+checksum = "18ebb3ad2c8e45b9bb20de62ff4639a82908eca33b883a9c8d9051a7a9f70cb7"
 dependencies = [
  "http-type",
  "inventory",
@@ -1636,9 +1636,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-macros"
-version = "17.0.9"
+version = "18.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "57f365956fc3160d29ab468c012f3dcd3a1682832bb527466d215c3be42b8d65"
+checksum = "566ce1dba1137cd8f237fca964702ade3ccc21706495197a26bdb26ef81ff75e"
 dependencies = [
  "hyperlane",
  "proc-macro2",
@@ -1648,9 +1648,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-plugin-websocket"
-version = "11.0.8"
+version = "11.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ec2914718f35c22e49dd7538d357efa408e4c5c28ba5d9d8765695d033767c80"
+checksum = "184379b2c3a0c7372de650027cd5d13ffd4d1b82c30b7a783cb410c47733c5e1"
 dependencies = [
  "hyperlane",
  "hyperlane-broadcast",
@@ -1658,7 +1658,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "18.5.1"
+version = "19.0.1"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
@@ -1677,9 +1677,9 @@ checksum = "9b6f580fff377190b818d8c2ef52f68d1296490916da4923fe90287b7c80028c"
 
 [[package]]
 name = "hyperlane-utils"
-version = "24.2.1"
+version = "25.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7da680afa656b8bba20ac6e3caff8a36b2aa14561a78b0df62551811ec6cbdfd"
+checksum = "d172e9b8b4327a38f9e440cf3da5db2e44d89339ae354ad9eedc6926dd443d76"
 dependencies = [
  "ahash 0.8.12",
  "base64",
@@ -4448,9 +4448,9 @@ checksum = "e2eebbbfe4093922c2b6734d7c679ebfebd704a0d7e56dfcb0d05818ce28977d"
 
 [[package]]
 name = "uuid"
-version = "1.22.0"
+version = "1.23.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a68d3c8f01c0cfa54a75291d83601161799e4a89a39e0929f4b0354d88757a37"
+checksum = "5ac8b6f42ead25368cf5b098aeb3dc8a1a2c05a3eee8a9a1a68c640edbfc79d9"
 dependencies = [
  "arbitrary",
  "atomic",
@@ -4470,9 +4470,9 @@ dependencies = [
 
 [[package]]
 name = "uuid-rng-internal"
-version = "1.22.0"
+version = "1.23.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "02b76dc0e3c64be846ad2fd1378656e7de2120530d1e83d8f20ca6a0cdba01de"
+checksum = "5f6e374716a79a221b6bcf83bc46ec40bf30fcde0f7c204cc5b5eef14c1316e3"
 dependencies = [
  "getrandom 0.4.2",
  "rand 0.10.0",
