@@ -41,7 +41,7 @@ impl ServerHook for ChatRequestHook {
             let req_msg: &String = req_data.get_data();
             if ChatService::is_gpt_mentioned(req_msg) {
                 let req_msg_clone: String = req_msg.clone();
-                let ctx: &'static mut Context = context!(ctx);
+                let ctx: &'static mut Context = context!(ctx: &'static mut Context);
                 spawn(async move {
                     ChatService::process_gpt_request(uuid, req_msg_clone, ctx).await;
                 });
