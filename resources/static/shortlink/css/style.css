@@ -6,6 +6,17 @@
   margin-bottom: 20px;
 }
 
+.app-title,
+.app-title span,
+button,
+.btn,
+.generate-btn,
+.copy-btn,
+.open-btn,
+.new-link-btn {
+  white-space: nowrap;
+}
+
 .app-header .header-content {
   max-width: 800px;
   margin: 0 auto;

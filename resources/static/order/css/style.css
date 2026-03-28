@@ -2,6 +2,13 @@ body {
   background: #667eea;
 }
 
+.app-title,
+.app-title span,
+button,
+.btn {
+  white-space: nowrap;
+}
+
 .login-page {
   position: fixed;
   top: 0;
