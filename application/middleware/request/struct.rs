@@ -18,12 +18,8 @@ pub struct ResponseStatusCodeMiddleware;
 
 #[request_middleware(5)]
 #[derive(Clone, Copy, Data, Debug, Default)]
-pub struct ResponseBodyMiddleware;
-
-#[request_middleware(6)]
-#[derive(Clone, Copy, Data, Debug, Default)]
 pub struct OptionMethodMiddleware;
 
-#[request_middleware(7)]
+#[request_middleware(6)]
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct UpgradeMiddleware;
