@@ -4,15 +4,32 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Hyperlane - Home</title>
-    <link href="index.css" rel="stylesheet" />
+    <style>
+      .center-text {
+        text-align: center;
+      }
+      a {
+        color: #1e90ff;
+        text-decoration: none;
+        transition:
+          color 0.3s,
+          border-bottom-color 0.3s;
+      }
+      a:hover,
+      a:focus {
+        color: pink;
+        border-bottom-color: pink;
+        outline: none;
+        cursor: pointer;
+      }
+    </style>
   </head>
   <body>
     <h1 class="center-text">Hello hyperlane: {{ time }}</h1>
     <hr />
     <p class="center-text">
-      Server:
       <a href="https://github.com/hyperlane-dev/hyperlane" target="_blank"
-        >Hyperlane</a
+        >Server: Hyperlane</a
       >
     </p>
   </body>
