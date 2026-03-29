@@ -711,9 +711,9 @@
       function buildFunctionPatternMask(version) {
         var dimension = 17 + 4 * version.versionNumber;
         var matrix = BitMatrix_1.BitMatrix.createEmpty(dimension, dimension);
-        matrix.setRegion(0, 0, 9, 9, true); // Top left finder pattern + separator + format
-        matrix.setRegion(dimension - 8, 0, 8, 9, true); // Top right finder pattern + separator + format
-        matrix.setRegion(0, dimension - 8, 9, 8, true); // Bottom left finder pattern + separator + format
+        matrix.setRegion(0, 0, 9, 9, true);
+        matrix.setRegion(dimension - 8, 0, 8, 9, true);
+        matrix.setRegion(0, dimension - 8, 9, 8, true);
         for (
           var _i = 0, _a = version.alignmentPatternCenters;
           _i < _a.length;
@@ -737,11 +737,11 @@
             }
           }
         }
-        matrix.setRegion(6, 9, 1, dimension - 17, true); // Vertical timing pattern
-        matrix.setRegion(9, 6, dimension - 17, 1, true); // Horizontal timing pattern
+        matrix.setRegion(6, 9, 1, dimension - 17, true);
+        matrix.setRegion(9, 6, dimension - 17, 1, true);
         if (version.versionNumber > 6) {
-          matrix.setRegion(dimension - 11, 0, 3, 6, true); // Version info, top right
-          matrix.setRegion(0, dimension - 11, 6, 3, true); // Version info, bottom left
+          matrix.setRegion(dimension - 11, 0, 3, 6, true);
+          matrix.setRegion(0, dimension - 11, 6, 3, true);
         }
         return matrix;
       }
@@ -8469,7 +8469,7 @@
       function decode(bytes, twoS) {
         var outputBytes = new Uint8ClampedArray(bytes.length);
         outputBytes.set(bytes);
-        var field = new GenericGF_1.default(0x011d, 256, 0); // x^8 + x^4 + x^3 + x^2 + 1
+        var field = new GenericGF_1.default(0x011d, 256, 0);
         var poly = new GenericGFPoly_1.default(field, outputBytes);
         var syndromeCoefficients = new Uint8ClampedArray(twoS);
         var error = false;
@@ -10010,7 +10010,7 @@
       }
       function computeDimension(topLeft, topRight, bottomLeft, matrix) {
         var moduleSize =
-          (sum(countBlackWhiteRun(topLeft, bottomLeft, matrix, 5)) / 7 + // Divide by 7 since the ratio is 1:1:3:1:1
+          (sum(countBlackWhiteRun(topLeft, bottomLeft, matrix, 5)) / 7 +
             sum(countBlackWhiteRun(topLeft, topRight, matrix, 5)) / 7 +
             sum(countBlackWhiteRun(bottomLeft, topLeft, matrix, 5)) / 7 +
             sum(countBlackWhiteRun(topRight, topLeft, matrix, 5)) / 7) /
@@ -10104,7 +10104,7 @@
           matrix,
           Math.ceil(length / 2),
         );
-        var middleValue = towardsEnd.shift() + awayFromEnd.shift() - 1; // Substract one so we don't double count a pixel
+        var middleValue = towardsEnd.shift() + awayFromEnd.shift() - 1;
         return (_a = awayFromEnd.concat(middleValue)).concat.apply(
           _a,
           towardsEnd,
@@ -10229,7 +10229,7 @@
                   averageFinderPatternBlocksize &&
                 Math.abs(scans[4] - averageFinderPatternBlocksize) <
                   averageFinderPatternBlocksize &&
-                !v; // And make sure the current pixel is white since finder patterns are bordered in white
+                !v;
               var averageAlignmentPatternBlocksize = sum(scans.slice(-3)) / 3;
               var validAlignmentPattern =
                 Math.abs(scans[2] - averageAlignmentPatternBlocksize) <
@@ -10238,7 +10238,7 @@
                   averageAlignmentPatternBlocksize &&
                 Math.abs(scans[4] - averageAlignmentPatternBlocksize) <
                   averageAlignmentPatternBlocksize &&
-                v; // Is the current pixel black since alignment patterns are bordered in black
+                v;
               if (validFinderPattern) {
                 var endX_1 = x - scans[3] - scans[4];
                 var startX_1 = endX_1 - scans[2];
@@ -10338,7 +10338,7 @@
         var finderPatternGroups = finderPatternQuads
           .filter(function (q) {
             return q.bottom.y - q.top.y >= 2;
-          }) // All quads must be at least 2px tall since the center square is larger than a block
+          })
           .map(function (q) {
             var x =
               (q.top.startX + q.top.endX + q.bottom.startX + q.bottom.endX) / 4;
@@ -10361,7 +10361,7 @@
           })
           .filter(function (q) {
             return !!q;
-          }) // Filter out any rejected quads from above
+          })
           .sort(function (a, b) {
             return a.score - b.score;
           })
@@ -10397,7 +10397,7 @@
           })
           .filter(function (q) {
             return !!q;
-          }) // Filter out any rejected finder patterns from above
+          })
           .sort(function (a, b) {
             return a.score - b.score;
           });

@@ -70,36 +70,60 @@ impl RssService {
 
     #[instrument_trace]
     pub async fn get_uploaded_files() -> Vec<UploadedFile> {
-        let mut files: Vec<UploadedFile> = Vec::new();
-        if let Ok(entries) = std::fs::read_dir(UPLOAD_DIR) {
-            for entry in entries.flatten() {
-                Self::scan_directory_recursive(&entry.path(), &mut files);
+        let entries: Vec<DirEntry> = match read_dir(UPLOAD_DIR).await {
+            Ok(mut read_dir) => {
+                let mut entries: Vec<DirEntry> = Vec::new();
+                while let Ok(Some(entry)) = read_dir.next_entry().await {
+                    entries.push(entry);
+                }
+                entries
             }
-        }
-        files.sort_by(|a, b| b.get_upload_time().cmp(a.get_upload_time()));
+            Err(_) => return Vec::new(),
+        };
+        let tasks: Vec<_> = entries
+            .into_iter()
+            .map(|entry: DirEntry| {
+                let path: PathBuf = entry.path();
+                async move {
+                    let mut files: Vec<UploadedFile> = Vec::new();
+                    Self::scan_directory_recursive_sync(&path, &mut files).await;
+                    files
+                }
+            })
+            .collect();
+        let results: Vec<Vec<UploadedFile>> = join_all(tasks).await;
+        let mut files: Vec<UploadedFile> = results.into_iter().flatten().collect();
+        files.sort_by(|a: &UploadedFile, b: &UploadedFile| {
+            b.get_upload_time().cmp(a.get_upload_time())
+        });
         files
     }
 
-    #[instrument_trace]
-    fn scan_directory_recursive(path: &std::path::Path, files: &mut Vec<UploadedFile>) {
-        if let Ok(entries) = std::fs::read_dir(path) {
-            for entry in entries.flatten() {
-                let entry_path: std::path::PathBuf = entry.path();
+    fn scan_directory_recursive_sync<'a>(
+        path: &'a Path,
+        files: &'a mut Vec<UploadedFile>,
+    ) -> Pin<Box<dyn Future<Output = ()> + Send + 'a>> {
+        Box::pin(async move {
+            let mut read_dir: ReadDir = match read_dir(path).await {
+                Ok(read_dir) => read_dir,
+                Err(_) => return,
+            };
+            while let Ok(Some(entry)) = read_dir.next_entry().await {
+                let entry_path: PathBuf = entry.path();
                 if entry_path.is_dir() {
-                    Self::scan_directory_recursive(&entry_path, files);
+                    Self::scan_directory_recursive_sync(&entry_path, files).await;
                 } else if entry_path.is_file()
-                    && let Some(file_info) = Self::create_uploaded_file(&entry_path)
-                {
-                    files.push(file_info);
-                }
+                    && let Some(file_info) = Self::create_uploaded_file_sync(&entry_path) {
+                        files.push(file_info);
+                    }
             }
-        }
+        })
     }
 
     #[instrument_trace]
-    fn create_uploaded_file(path: &std::path::Path) -> Option<UploadedFile> {
-        let metadata: std::fs::Metadata = std::fs::metadata(path).ok()?;
-        let file_size: u64 = metadata.len();
+    fn create_uploaded_file_sync(path: &Path) -> Option<UploadedFile> {
+        let meta_data: std::fs::Metadata = metadata(path).ok()?;
+        let file_size: u64 = meta_data.len();
         let file_name: String = path.file_name()?.to_string_lossy().to_string();
         let file_path_str: String = path.to_string_lossy().to_string();
         let relative_path: String = file_path_str
@@ -107,15 +131,16 @@ impl RssService {
             .replace('\\', ROOT_PATH)
             .trim_start_matches(ROOT_PATH)
             .to_string();
-        let upload_time: String = metadata
+        let upload_time: String = meta_data
             .modified()
             .ok()
-            .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
-            .map(|d| {
-                let secs = d.as_secs() as i64;
-                let millis = d.subsec_millis() as i64;
-                let dt = chrono::DateTime::from_timestamp(secs, millis as u32 * 1_000_000)
-                    .unwrap_or_default();
+            .and_then(|t: SystemTime| t.duration_since(UNIX_EPOCH).ok())
+            .map(|d: Duration| {
+                let secs: i64 = d.as_secs() as i64;
+                let millis: i64 = d.subsec_millis() as i64;
+                let dt: chrono::DateTime<chrono::Utc> =
+                    chrono::DateTime::from_timestamp(secs, millis as u32 * 1_000_000)
+                        .unwrap_or_default();
                 dt.format("%Y-%m-%d %H:%M:%S%.3f").to_string()
             })
             .unwrap_or_else(time_millis);
@@ -172,36 +197,15 @@ impl RssService {
             files.into_iter().skip(offset_value).collect()
         };
         let tz: Timezone = timezone.unwrap_or(Timezone::Utc);
-        let mut items: Vec<RssItem> = Vec::new();
-        for file in limited_files {
-            let full_url: String = format!("{base_url}{}", file.get_file_url());
-            let enclosure: Option<RssEnclosure> = if !file.get_content_type().is_empty() {
-                let mut enclosure_obj: RssEnclosure = RssEnclosure::default();
-                enclosure_obj
-                    .set_url(full_url.clone())
-                    .set_length(file.get_file_size())
-                    .set_type(file.get_content_type().to_string());
-                Some(enclosure_obj)
-            } else {
-                None
-            };
-            let mut item: RssItem = RssItem::default();
-            item.set_title(file.get_file_name().to_string())
-                .set_link(full_url.clone())
-                .set_description(format!(
-                    "File {}, Size {} bytes, Upload Time {}.",
-                    file.get_file_name(),
-                    file.get_file_size(),
-                    file.get_upload_time()
-                ))
-                .set_pub_date(Self::format_rfc822_date_with_timezone(
-                    file.get_upload_time(),
-                    tz,
-                ))
-                .set_guid(full_url)
-                .set_enclosure(enclosure);
-            items.push(item);
-        }
+        let base_url_arc: std::sync::Arc<String> = std::sync::Arc::new(base_url.to_string());
+        let tasks: Vec<_> = limited_files
+            .into_iter()
+            .map(|file: UploadedFile| {
+                let base_url_clone: std::sync::Arc<String> = base_url_arc.clone();
+                async move { Self::convert_file_to_rss_item(file, &base_url_clone, tz).await }
+            })
+            .collect();
+        let items: Vec<RssItem> = join_all(tasks).await;
         let mut channel: RssChannel = RssChannel::default();
         channel
             .set_title("Uploaded Resources Feed".to_string())
@@ -210,6 +214,37 @@ impl RssService {
             .set_language("en-US".to_string())
             .set_items(items);
         Self::build_rss_xml(&channel)
+    }
+
+    #[instrument_trace]
+    async fn convert_file_to_rss_item(file: UploadedFile, base_url: &str, tz: Timezone) -> RssItem {
+        let full_url: String = format!("{base_url}{}", file.get_file_url());
+        let enclosure: Option<RssEnclosure> = if !file.get_content_type().is_empty() {
+            let mut enclosure_obj: RssEnclosure = RssEnclosure::default();
+            enclosure_obj
+                .set_url(full_url.clone())
+                .set_length(file.get_file_size())
+                .set_type(file.get_content_type().to_string());
+            Some(enclosure_obj)
+        } else {
+            None
+        };
+        let mut item: RssItem = RssItem::default();
+        item.set_title(file.get_file_name().to_string())
+            .set_link(full_url.clone())
+            .set_description(format!(
+                "File {}, Size {} bytes, Upload Time {}.",
+                file.get_file_name(),
+                file.get_file_size(),
+                file.get_upload_time()
+            ))
+            .set_pub_date(Self::format_rfc822_date_with_timezone(
+                file.get_upload_time(),
+                tz,
+            ))
+            .set_guid(full_url)
+            .set_enclosure(enclosure);
+        item
     }
 
     #[instrument_trace]
