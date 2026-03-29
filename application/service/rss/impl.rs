@@ -113,9 +113,10 @@ impl RssService {
                 if entry_path.is_dir() {
                     Self::scan_directory_recursive_sync(&entry_path, files).await;
                 } else if entry_path.is_file()
-                    && let Some(file_info) = Self::create_uploaded_file_sync(&entry_path) {
-                        files.push(file_info);
-                    }
+                    && let Some(file_info) = Self::create_uploaded_file_sync(&entry_path)
+                {
+                    files.push(file_info);
+                }
             }
         })
     }
