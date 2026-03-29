@@ -13,6 +13,7 @@ pub mod redis;
 pub mod rss;
 pub mod shortlink;
 pub mod sse;
+pub mod templates;
 pub mod trace;
 pub mod tracking;
 pub mod upload;
