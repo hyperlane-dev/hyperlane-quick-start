@@ -8,7 +8,7 @@ impl ServerHook for TemplatesRoute {
 
     #[prologue_macros(
         get_method,
-        response_body(TEMPLATES_INDEX_HTML.replace("{{ time }}", &date()))
+        response_body(TEMPLATES_INDEX_HTML.replace("{{ time }}", &time()))
     )]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {}
