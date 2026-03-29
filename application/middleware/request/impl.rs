@@ -64,7 +64,10 @@ impl ServerHook for ResponseBodyMiddleware {
         Self
     }
 
-    // #[epilogue_macros(response_header())]
+    #[prologue_macros(
+        response_status_code(302),
+        response_header(LOCATION => DEFAULT_REDIRECT_URL)
+    )]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {}
 }
