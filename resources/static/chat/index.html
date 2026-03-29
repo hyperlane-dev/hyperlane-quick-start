@@ -441,35 +441,20 @@
         color: #2c3e50;
         line-height: 1.4;
         resize: none;
-        overflow-y: hidden;
-        overflow-x: hidden;
+        overflow: hidden;
         font-family: inherit;
         min-height: 20px;
         max-height: 40px;
         white-space: pre-wrap;
         word-wrap: break-word;
         overflow-wrap: break-word;
-        scrollbar-width: thin;
-        scrollbar-color: rgba(0, 0, 0, 0.2) rgba(0, 0, 0, 0.05);
+        text-overflow: ellipsis;
       }
 
-      .chat-input textarea::-webkit-scrollbar {
-        width: 6px;
-      }
-
-      .chat-input textarea::-webkit-scrollbar-track {
-        background: rgba(0, 0, 0, 0.05);
-        border-radius: 3px;
-      }
-
-      .chat-input textarea::-webkit-scrollbar-thumb {
-        background: rgba(0, 0, 0, 0.2);
-        border-radius: 3px;
-        transition: background 0.2s ease;
-      }
-
-      .chat-input textarea::-webkit-scrollbar-thumb:hover {
-        background: rgba(0, 0, 0, 0.3);
+      .chat-input textarea:placeholder-shown {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       @media (max-width: 768px) {

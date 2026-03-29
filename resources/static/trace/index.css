@@ -15,12 +15,7 @@ body {
 }
 
 .search-card {
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
   margin-bottom: 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  animation: fadeInUp 0.6s ease;
 }
 
 .search-container {
@@ -29,8 +24,16 @@ body {
   margin-bottom: 0;
 }
 
+.search-container hl-button {
+  width: auto;
+  flex-shrink: 0;
+}
+
 #traceId {
   flex: 1;
+}
+
+#traceId::part(input) {
   padding: 12px 16px;
   border: 2px solid #e9ecef;
   border-radius: 8px;
@@ -39,31 +42,29 @@ body {
   font-family: 'Courier New', monospace;
 }
 
-#traceId:focus {
+#traceId::part(input):focus {
   outline: none;
   border-color: #667eea;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-button {
-  background: #667eea;
-  color: white;
-  border: none;
-  padding: 12px 32px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: 600;
-  transition: all 0.3s ease;
+hl-button {
+  --hl-button-bg: #667eea;
+  --hl-button-color: white;
+  --hl-button-border: none;
+  --hl-button-padding: 12px 32px;
+  --hl-button-radius: 8px;
+  --hl-button-font-size: 16px;
+  --hl-button-font-weight: 600;
   box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
 }
 
-button:hover {
+hl-button::part(button):hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
-button:active {
+hl-button::part(button):active {
   transform: translateY(0);
 }
 
@@ -74,11 +75,7 @@ button {
 }
 
 .result-card {
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  animation: fadeInUp 0.6s ease 0.1s both;
+  animation-delay: 0.1s;
 }
 
 .request-url {
@@ -209,20 +206,20 @@ button {
 
   .search-card,
   .result-card {
-    padding: 16px;
+    --hl-card-padding: 16px;
   }
 
   .search-container {
     flex-direction: column;
   }
 
-  #traceId {
+  #traceId::part(input) {
     font-size: 14px;
   }
 
-  button {
-    width: 100%;
-    padding: 10px 24px;
+  hl-button {
+    --hl-button-width: 100%;
+    --hl-button-padding: 10px 24px;
   }
 
   #result {

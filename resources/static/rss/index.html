@@ -9,41 +9,40 @@
     <link href="../common/css/header.css" rel="stylesheet" />
     <link href="index.css" rel="stylesheet" />
     <script src="../common/js/common.js"></script>
+    <script
+      src="../common/components/hyperlane-loading.js"
+      type="module"
+    ></script>
+    <script
+      src="../common/components/hyperlane-pagination.js"
+      type="module"
+    ></script>
+    <script
+      src="../common/components/hyperlane-select.js"
+      type="module"
+    ></script>
+    <script
+      src="../common/components/hyperlane-header.js"
+      type="module"
+    ></script>
+    <script src="./components/hyperlane-feed-item.js" type="module"></script>
   </head>
 
   <body>
     <div class="container">
-      <header class="app-header shimmer-header">
-        <div class="header-content">
-          <h1 class="app-title">
-            <a
-              href="https://github.com/hyperlane-dev/hyperlane"
-              target="_blank"
-            >
-              <img
-                src="https://docs.ltpp.vip/img/hyperlane.png"
-                alt=""
-                class="nav-logo"
-                onerror="this.style.display = 'none'"
-              />
-              <span class="text shimmer"
-                ><span class="title-full">Hyperlane RSS Feed Reader</span
-                ><span class="title-short">RSS Reader</span></span
-              >
-            </a>
-          </h1>
-          <p class="app-subtitle">
-            <a href="/upload" target="_blank" class="subscribe-link"
-              >Subscribe to the latest uploaded resources</a
-            >
-          </p>
-        </div>
-      </header>
+      <hyperlane-header title="Hyperlane RSS Feed Reader" shimmer>
+        <p class="app-subtitle">
+          <a href="/upload" target="_blank" class="subscribe-link"
+            >Subscribe to the latest uploaded resources</a
+          >
+        </p>
+      </hyperlane-header>
 
-      <div id="loading" class="loading">
-        <div class="spinner"></div>
-        <p>Loading feed...</p>
-      </div>
+      <hyperlane-loading
+        id="loading"
+        visible
+        text="Loading feed..."
+      ></hyperlane-loading>
 
       <div id="error" style="display: none"></div>
       <div id="emptyState" style="display: none"></div>
@@ -52,24 +51,19 @@
       <div class="controls-row" id="controlsRow" style="display: none">
         <div class="page-size-selector">
           <label>Items per page:</label>
-          <select id="pageSize" onchange="changePageSize()">
-            <option value="10">10</option>
-            <option value="20" selected>20</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-          </select>
+          <hyperlane-select
+            id="pageSize"
+            value="20"
+            options='[{"value":"10","label":"10"},{"value":"20","label":"20"},{"value":"50","label":"50"},{"value":"100","label":"100"}]'
+          ></hyperlane-select>
         </div>
       </div>
 
-      <div class="pagination" id="pagination" style="display: none">
-        <button class="pagination-btn" id="prevBtn" onclick="previousPage()">
-          Previous
-        </button>
-        <span class="pagination-info" id="pageInfo">Page 1</span>
-        <button class="pagination-btn" id="nextBtn" onclick="nextPage()">
-          Next
-        </button>
-      </div>
+      <hyperlane-pagination
+        id="pagination"
+        current="1"
+        total="1"
+      ></hyperlane-pagination>
     </div>
 
     <script src="index.js"></script>

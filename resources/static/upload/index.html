@@ -9,38 +9,50 @@
     <link href="../common/css/header.css" rel="stylesheet" />
     <link href="index.css" rel="stylesheet" />
     <script src="../common/js/common.js"></script>
+    <script
+      src="../common/components/hyperlane-button.js"
+      type="module"
+    ></script>
+    <script
+      src="../common/components/hyperlane-status.js"
+      type="module"
+    ></script>
+    <script
+      src="../common/components/hyperlane-progress.js"
+      type="module"
+    ></script>
+    <script
+      src="../common/components/hyperlane-header.js"
+      type="module"
+    ></script>
+    <script
+      src="../common/components/hyperlane-file-input.js"
+      type="module"
+    ></script>
+    <script
+      src="./components/hyperlane-upload-history.js"
+      type="module"
+    ></script>
   </head>
 
   <body>
     <div class="container">
-      <header class="app-header shimmer-header">
-        <div class="header-content">
-          <h1 class="app-title">
-            <a
-              href="https://github.com/hyperlane-dev/hyperlane"
-              target="_blank"
-            >
-              <img
-                src="https://docs.ltpp.vip/img/hyperlane.png"
-                alt=""
-                class="nav-logo"
-                onerror="this.style.display = 'none'"
-              />
-              <span class="text shimmer">Hyperlane File Upload</span>
-            </a>
-          </h1>
-          <p class="app-subtitle">Upload and manage your files</p>
-        </div>
-      </header>
+      <hyperlane-header
+        title="Hyperlane File Upload"
+        subtitle="Upload and manage your files"
+        shimmer
+      ></hyperlane-header>
 
       <div class="upload-container">
-        <div id="status" class="status" style="display: none"></div>
+        <hyperlane-status id="status-component"></hyperlane-status>
         <div class="history-container">
-          <div id="history"></div>
+          <hyperlane-upload-history
+            id="uploadHistory"
+          ></hyperlane-upload-history>
         </div>
 
         <div class="action-group">
-          <label for="file-input" class="btn">
+          <hyperlane-file-input id="file-input" multiple>
             <svg
               width="20"
               height="20"
@@ -56,10 +68,9 @@
               />
             </svg>
             Select Files
-          </label>
-          <input type="file" id="file-input" class="file-input" multiple />
+          </hyperlane-file-input>
 
-          <button class="btn" id="exportBtn">
+          <hyperlane-button id="exportBtn" variant="success">
             <svg
               width="20"
               height="20"
@@ -75,9 +86,9 @@
               />
             </svg>
             Export Data
-          </button>
+          </hyperlane-button>
 
-          <label for="importFile" class="btn">
+          <hyperlane-file-input id="importFile" accept=".json">
             <svg
               width="20"
               height="20"
@@ -93,13 +104,7 @@
               />
             </svg>
             Import Data
-          </label>
-          <input
-            type="file"
-            id="importFile"
-            class="file-input"
-            accept=".json"
-          />
+          </hyperlane-file-input>
         </div>
       </div>
     </div>

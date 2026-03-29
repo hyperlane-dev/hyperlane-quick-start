@@ -19,49 +19,73 @@ const ShortlinkApp = {
       form.addEventListener('submit', (e) => this.handleFormSubmit(e));
     }
 
+    const generateBtn = document.getElementById('generateBtn');
+    if (generateBtn) {
+      generateBtn.addEventListener('hyperlane-click', () => {
+        const form = document.getElementById('shortlinkForm');
+        if (form) {
+          const submitEvent = new SubmitEvent('submit', {
+            bubbles: true,
+            cancelable: true,
+          });
+          form.dispatchEvent(submitEvent);
+        }
+      });
+    }
+
     const copyBtn = document.getElementById('copyBtn');
     if (copyBtn) {
-      copyBtn.addEventListener('click', () => this.copyShortlink());
+      copyBtn.addEventListener('hyperlane-click', () => this.copyShortlink());
     }
 
     const openBtn = document.getElementById('openBtn');
     if (openBtn) {
-      openBtn.addEventListener('click', () => this.openShortlink());
+      openBtn.addEventListener('hyperlane-click', () => this.openShortlink());
     }
 
     const newLinkBtn = document.getElementById('newLinkBtn');
     if (newLinkBtn) {
-      newLinkBtn.addEventListener('click', () => this.resetForm());
+      newLinkBtn.addEventListener('hyperlane-click', () => this.resetForm());
     }
 
     const retryBtn = document.getElementById('retryBtn');
     if (retryBtn) {
-      retryBtn.addEventListener('click', () => this.retryLastAction());
+      retryBtn.addEventListener('hyperlane-click', () =>
+        this.retryLastAction(),
+      );
     }
 
     const urlInput = document.getElementById('urlInput');
     if (urlInput) {
-      urlInput.addEventListener('blur', () => this.validateUrl(urlInput));
-      urlInput.addEventListener('input', () => this.clearInputError(urlInput));
+      urlInput.addEventListener('hyperlane-blur', () =>
+        this.validateUrl(urlInput),
+      );
+      urlInput.addEventListener('hyperlane-input', () =>
+        this.clearInputError(urlInput),
+      );
     }
   },
 
   setupFormValidation: function () {
     const urlInput = document.getElementById('urlInput');
     if (urlInput) {
-      urlInput.addEventListener('invalid', function (e) {
-        if (this.validity.valueMissing) {
-          this.setCustomValidity('Please enter a URL to shorten');
-        } else if (this.validity.typeMismatch) {
-          this.setCustomValidity(
-            'Please enter a valid URL starting with http:// or https://',
-          );
-        }
-      });
+      const nativeInput = urlInput.shadowRoot?.querySelector('input');
+      if (nativeInput) {
+        nativeInput.addEventListener('invalid', (e) => {
+          const target = e.target;
+          if (target.validity.valueMissing) {
+            target.setCustomValidity('Please enter a URL to shorten');
+          } else if (target.validity.typeMismatch) {
+            target.setCustomValidity(
+              'Please enter a valid URL starting with http:// or https://',
+            );
+          }
+        });
 
-      urlInput.addEventListener('input', function () {
-        this.setCustomValidity('');
-      });
+        nativeInput.addEventListener('input', (e) => {
+          e.target.setCustomValidity('');
+        });
+      }
     }
   },
 
@@ -108,16 +132,22 @@ const ShortlinkApp = {
   showInputError: function (input, message) {
     this.clearInputError(input);
     this.showToast(message, 'error');
-    input.style.borderColor = '#dc3545';
-    input.style.animation = 'shake 0.5s ease';
-    setTimeout(() => {
-      input.style.animation = '';
-    }, 500);
+    const inputEl = input.shadowRoot?.querySelector('input');
+    if (inputEl) {
+      inputEl.style.borderColor = '#dc3545';
+      inputEl.style.animation = 'shake 0.5s ease';
+      setTimeout(() => {
+        inputEl.style.animation = '';
+      }, 500);
+    }
     input.focus();
   },
 
   clearInputError: function (input) {
-    input.style.borderColor = '';
+    const inputEl = input.shadowRoot?.querySelector('input');
+    if (inputEl) {
+      inputEl.style.borderColor = '';
+    }
   },
 
   generateShortlink: async function (url) {
@@ -177,7 +207,8 @@ const ShortlinkApp = {
     this.showElement('resultContainer');
     this.hideElement('shortlinkForm');
     this.hideElement('errorContainer');
-    this.hideElement('loadingContainer');
+    const loadingContainer = document.getElementById('loadingContainer');
+    if (loadingContainer) loadingContainer.removeAttribute('visible');
   },
 
   copyShortlink: async function () {
@@ -195,11 +226,9 @@ const ShortlinkApp = {
       if (copyBtn) {
         const originalText = copyBtn.innerHTML;
         copyBtn.innerHTML = '✓';
-        copyBtn.style.background = '#28a745';
 
         setTimeout(() => {
           copyBtn.innerHTML = originalText;
-          copyBtn.style.background = '#28a745';
         }, 2000);
       }
     } catch (error) {
@@ -252,7 +281,8 @@ const ShortlinkApp = {
     this.showElement('shortlinkForm');
     this.hideElement('resultContainer');
     this.hideElement('errorContainer');
-    this.hideElement('loadingContainer');
+    const loadingContainer = document.getElementById('loadingContainer');
+    if (loadingContainer) loadingContainer.removeAttribute('visible');
 
     const urlInput = document.getElementById('urlInput');
     if (urlInput) {
@@ -277,13 +307,14 @@ const ShortlinkApp = {
   },
 
   showLoading: function (show) {
+    const loadingContainer = document.getElementById('loadingContainer');
     if (show) {
       this.hideElement('shortlinkForm');
       this.hideElement('resultContainer');
       this.hideElement('errorContainer');
-      this.showElement('loadingContainer');
+      if (loadingContainer) loadingContainer.setAttribute('visible', '');
     } else {
-      this.hideElement('loadingContainer');
+      if (loadingContainer) loadingContainer.removeAttribute('visible');
     }
   },
 
@@ -295,25 +326,30 @@ const ShortlinkApp = {
 
     this.hideElement('shortlinkForm');
     this.hideElement('resultContainer');
-    this.hideElement('loadingContainer');
+    const loadingContainer = document.getElementById('loadingContainer');
+    if (loadingContainer) loadingContainer.removeAttribute('visible');
     this.showElement('errorContainer');
   },
 
   showToast: function (message, type = 'success') {
-    const container = document.getElementById('toastContainer');
-    if (!container) return;
+    if (window.HLToast) {
+      window.HLToast.show(message, type, 4000);
+    } else {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
 
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.textContent = message;
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
 
-    container.appendChild(toast);
+      container.appendChild(toast);
 
-    setTimeout(() => {
-      if (toast.parentNode) {
-        toast.parentNode.removeChild(toast);
-      }
-    }, 4000);
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.parentNode.removeChild(toast);
+        }
+      }, 4000);
+    }
   },
 
   showElement: function (elementId) {
@@ -333,6 +369,11 @@ const ShortlinkApp = {
 
 const Toast = {
   show: function (message, type = 'success', duration = 3000) {
+    if (window.HLToast) {
+      window.HLToast.show(message, type, duration);
+      return;
+    }
+
     const container = document.getElementById('toastContainer');
     if (!container) return;
 

@@ -14,31 +14,35 @@
     <link href="./css/style.css" rel="stylesheet" />
     <script src="../common/js/request-manager.js"></script>
     <script src="../common/js/common.js"></script>
+    <script
+      src="../common/components/hyperlane-button.js"
+      type="module"
+    ></script>
+    <script
+      src="../common/components/hyperlane-input.js"
+      type="module"
+    ></script>
+    <script
+      src="../common/components/hyperlane-loading.js"
+      type="module"
+    ></script>
+    <script
+      src="../common/components/hyperlane-header.js"
+      type="module"
+    ></script>
+    <script
+      src="../common/components/hyperlane-toast.js"
+      type="module"
+    ></script>
     <script src="./js/app.js" defer></script>
   </head>
   <body>
     <div class="container">
-      <header class="app-header shimmer-header">
-        <div class="header-content">
-          <h1 class="app-title">
-            <a
-              href="https://github.com/hyperlane-dev/hyperlane"
-              target="_blank"
-            >
-              <img
-                src="https://docs.ltpp.vip/img/hyperlane.png"
-                alt=""
-                class="nav-logo"
-                onerror="this.style.display = 'none'"
-              />
-              <span class="text shimmer">Shortlink Generator</span>
-            </a>
-          </h1>
-          <p class="app-subtitle">
-            Transform your long URLs into short, shareable links
-          </p>
-        </div>
-      </header>
+      <hyperlane-header
+        title="Shortlink Generator"
+        subtitle="Transform your long URLs into short, shareable links"
+        shimmer
+      ></hyperlane-header>
 
       <main class="main-content">
         <div class="form-container">
@@ -49,14 +53,14 @@
                 <span class="required">*</span>
               </label>
               <div class="input-wrapper">
-                <input
+                <hyperlane-input
                   type="url"
                   id="urlInput"
-                  class="url-input"
                   placeholder="https://example.com/very/long/url/path"
                   required
-                />
-                <div class="input-icon">🌐</div>
+                >
+                  <span slot="icon">🌐</span>
+                </hyperlane-input>
               </div>
               <span class="input-hint"
                 >Make sure your URL starts with http:// or https://</span
@@ -64,10 +68,10 @@
             </div>
 
             <div class="button-group">
-              <button type="submit" id="generateBtn" class="generate-btn">
+              <hyperlane-button type="submit" id="generateBtn" size="large">
                 <span class="btn-text">Generate Shortlink</span>
                 <span class="btn-icon">⚡</span>
-              </button>
+              </hyperlane-button>
             </div>
           </form>
 
@@ -82,33 +86,29 @@
                 <div class="shortlink-label">Shortlink:</div>
                 <div class="shortlink-value">
                   <span id="shortlinkText" class="shortlink-text"></span>
-                  <button
-                    id="copyBtn"
-                    class="copy-btn"
-                    title="Copy to clipboard"
-                  >
+                  <hyperlane-button id="copyBtn" variant="success" size="small">
                     📋
-                  </button>
+                  </hyperlane-button>
                 </div>
               </div>
 
               <div class="actions">
-                <button id="openBtn" class="open-btn">
+                <hyperlane-button id="openBtn" variant="success">
                   <span class="btn-text">Open Link</span>
                   <span class="btn-icon">🔗</span>
-                </button>
-                <button id="newLinkBtn" class="new-link-btn">
+                </hyperlane-button>
+                <hyperlane-button id="newLinkBtn">
                   <span class="btn-text">Create Another</span>
                   <span class="btn-icon">➕</span>
-                </button>
+                </hyperlane-button>
               </div>
             </div>
           </div>
 
-          <div id="loadingContainer" class="loading-container hidden">
-            <div class="loading-spinner"></div>
-            <p class="loading-text">Generating your shortlink...</p>
-          </div>
+          <hyperlane-loading
+            id="loadingContainer"
+            text="Generating your shortlink..."
+          ></hyperlane-loading>
 
           <div id="errorContainer" class="error-container hidden">
             <div class="error-icon">⚠️</div>
@@ -116,10 +116,10 @@
               <h3 class="error-title">Oops! Something went wrong</h3>
               <p id="errorMessage" class="error-message"></p>
             </div>
-            <button id="retryBtn" class="retry-btn">
+            <hyperlane-button id="retryBtn" variant="danger">
               <span class="btn-text">Try Again</span>
               <span class="btn-icon">🔄</span>
-            </button>
+            </hyperlane-button>
           </div>
         </div>
 

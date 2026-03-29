@@ -4,20 +4,33 @@ const UPLOAD_REGISTER_URL = '/api/upload/register';
 const UPLOAD_SAVE_URL = '/api/upload/save';
 const UPLOAD_MERGE_URL = '/api/upload/merge';
 const MAX_CONCURRENT_UPLOADS = 6;
-const fileInput = document.getElementById('file-input');
-const statusEl = document.getElementById('status');
-const uploadBtnStyle = document.querySelector('.upload-btn');
-let selectedFile = null;
-if (uploadBtnStyle) {
-  uploadBtnStyle.remove();
-}
 const DB_NAME = 'FileUploadDB';
 const DB_VERSION = 1;
 const STORE_NAME = 'uploadedFiles';
 let db = null;
-async function refreshData() {
-  renderHistoryList(await getAllFiles());
+
+function getStatusComponent() {
+  return document.getElementById('status-component');
 }
+
+function showStatus(message, type) {
+  const statusComponent = getStatusComponent();
+  if (statusComponent) {
+    statusComponent.show(message, type);
+    setTimeout(() => {
+      statusComponent.hide();
+    }, 3000);
+  }
+}
+
+async function refreshData() {
+  const files = await getAllFiles();
+  const uploadHistory = document.getElementById('uploadHistory');
+  if (uploadHistory) {
+    uploadHistory.files = files;
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   initDB()
     .then(async () => {
@@ -26,52 +39,86 @@ document.addEventListener('DOMContentLoaded', () => {
     .catch((err) => {
       throw new Error('Database initialization failed:', err);
     });
-});
-function renderHistoryList(files) {
-  let historyContainer = document.getElementById('history');
-  if (!historyContainer) return;
 
-  files.sort(
-    (a, b) => new Date(b.uploadTime || 0) - new Date(a.uploadTime || 0),
-  );
-
-  if (files.length === 0) {
-    historyContainer.innerHTML =
-      '<p style="text-align: center; color: #718096;">No upload records</p>';
-    return;
+  const fileInput = document.getElementById('file-input');
+  if (fileInput) {
+    fileInput.addEventListener('hyperlane-files-selected', (e) => {
+      const files = e.detail.files;
+      files.forEach((file) => {
+        const fileId = generateUniqueId();
+        uploadFile(file, fileId);
+      });
+      fileInput.clear();
+    });
   }
 
-  const list = document.createElement('ul');
-  list.className = 'history-list';
+  const importFile = document.getElementById('importFile');
+  if (importFile) {
+    importFile.addEventListener('hyperlane-files-selected', async (e) => {
+      const files = e.detail.files;
+      if (!files || files.length === 0) return;
+      const file = files[0];
 
-  files.forEach((file) => {
-    const item = document.createElement('li');
-    item.className = 'history-item';
+      try {
+        const text = await file.text();
+        const importData = JSON.parse(text);
 
-    const progress = file.progress || 0;
-    const isComplete = progress >= 100;
+        if (!Array.isArray(importData)) {
+          throw new Error('Invalid import data format');
+        }
 
-    item.innerHTML = `
-      <div class="history-item-header">
-        <span class="filename">${file.name}</span>
-        <span class="filesize">${formatFileSize(file.size)}</span>
-      </div>
-      <div class="progress-bar">
-        <div class="progress-fill" style="width: ${progress}%"></div>
-      </div>
-    `;
+        const transaction = db.transaction([STORE_NAME], 'readwrite');
+        const store = transaction.objectStore(STORE_NAME);
 
-    if (file.url) {
-      item.onclick = () => window.open(file.url, '_blank');
-      item.style.cursor = 'pointer';
-    }
+        for (const record of importData) {
+          const existingRecord = await new Promise((resolve) => {
+            const request = store.get(record.id);
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => resolve(null);
+          });
 
-    list.appendChild(item);
-  });
+          if (!existingRecord) {
+            await new Promise((resolve, reject) => {
+              const request = store.put(record);
+              request.onsuccess = () => resolve();
+              request.onerror = () => reject(request.error);
+            });
+          }
+        }
 
-  historyContainer.innerHTML = '';
-  historyContainer.appendChild(list);
-}
+        showStatus('Import successful', 'success');
+        await refreshData();
+      } catch (error) {
+        showStatus('Import failed: ' + error.message, 'error');
+      }
+
+      importFile.clear();
+    });
+  }
+
+  const exportBtn = document.getElementById('exportBtn');
+  if (exportBtn) {
+    exportBtn.addEventListener('hyperlane-click', async () => {
+      try {
+        const files = await getAllFiles();
+        const exportData = JSON.stringify(files, null, 2);
+        const blob = new Blob([exportData], { type: 'application/json' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'upload_history.json';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        showStatus('Export successful', 'success');
+      } catch (error) {
+        showStatus('Export failed: ' + error.message, 'error');
+      }
+    });
+  }
+});
+
 function initDB() {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
@@ -91,6 +138,7 @@ function initDB() {
     };
   });
 }
+
 async function cleanupInvalidRecords() {
   if (!db) return;
 
@@ -119,6 +167,7 @@ async function cleanupInvalidRecords() {
     console.error('Error cleaning up invalid records:', error);
   }
 }
+
 function saveFileInfo(fileInfo) {
   return new Promise((resolve, reject) => {
     if (!db) {
@@ -153,6 +202,7 @@ function saveFileInfo(fileInfo) {
     getRequest.onerror = (event) => reject(event.target.error);
   });
 }
+
 function getAllFiles() {
   return new Promise((resolve, reject) => {
     if (!db) {
@@ -166,21 +216,13 @@ function getAllFiles() {
     request.onerror = (event) => reject(event.target.error);
   });
 }
-fileInput.addEventListener('change', (e) => {
-  const files = Array.from(e.target.files);
-  files.forEach((file) => {
-    const fileId = generateUniqueId();
-    uploadFile(file, fileId);
-  });
-  e.target.value = '';
-});
+
 async function uploadFile(file, fileId) {
   const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
   const fileCopy = new File([file], file.name, { type: file.type });
-  let uploadQueue = [];
-  let currentIndex = 0;
   let completedChunks = 0;
   let lastProgressUpdate = 0;
+
   const uploadChunk = async (chunk, index, totalChunks, fileId, file) => {
     try {
       const response = await fetch(UPLOAD_SAVE_URL, {
@@ -205,28 +247,19 @@ async function uploadFile(file, fileId) {
             return getAllFiles();
           })
           .catch((err) => {
-            statusEl.textContent =
-              'Upload successful but failed to save record';
-            statusEl.className = 'status error';
-            statusEl.style.display = 'flex';
+            showStatus('Upload successful but failed to save record', 'error');
           });
         return data;
       } else if (data.code === 0) {
-        statusEl.textContent = `Upload failed: ${data.msg}`;
-        statusEl.className = 'status error';
-        statusEl.style.display = 'flex';
+        showStatus(`Upload failed: ${data.msg}`, 'error');
         throw new Error(data.msg);
       }
-      const progress = Math.floor(((index + 1) / totalChunks) * 100);
-      const historyProgress = document.querySelector(
-        `#history-progress-${fileId}.history-progress-fill`,
-      );
-      if (historyProgress) historyProgress.style.width = progress + '%';
       return data;
     } catch (error) {
       throw error;
     }
   };
+
   const updateProgress = async () => {
     const currentProgress = Math.floor((completedChunks / totalChunks) * 100);
     if (currentProgress >= lastProgressUpdate) {
@@ -239,12 +272,15 @@ async function uploadFile(file, fileId) {
       });
     }
   };
+
   const processQueue = async () => {
     const headers = {
       'X-File-Id': fileId,
     };
     let registerSuccess = false;
     let registerSuccessfulUploads = null;
+    let retries = 0;
+
     while (!registerSuccess) {
       try {
         const response = await fetch(UPLOAD_REGISTER_URL, {
@@ -261,9 +297,11 @@ async function uploadFile(file, fileId) {
         }
       } catch (error) {
         registerSuccess = false;
+        retries++;
         await new Promise((resolve) => setTimeout(resolve, 1000 * retries));
       }
     }
+
     const tasks = [];
     for (let i = 0; i < totalChunks; i++) {
       const start = i * CHUNK_SIZE;
@@ -277,9 +315,11 @@ async function uploadFile(file, fileId) {
         file: fileCopy,
       });
     }
+
     async function processTasksWithConcurrencyLimit(tasks, concurrencyLimit) {
       const results = [];
       const runningTasks = new Set();
+
       async function runTask(task) {
         try {
           const result = await uploadChunk(
@@ -316,6 +356,7 @@ async function uploadFile(file, fileId) {
           }
         }
       }
+
       while (tasks.length > 0 || runningTasks.size > 0) {
         while (runningTasks.size < concurrencyLimit && tasks.length > 0) {
           const task = tasks.shift();
@@ -332,12 +373,16 @@ async function uploadFile(file, fileId) {
       }
       return results;
     }
+
     const results = await processTasksWithConcurrencyLimit(
       tasks,
       MAX_CONCURRENT_UPLOADS,
     );
+
     let mergeSuccess = false;
     let mergeSuccessfulUploads = null;
+    retries = 0;
+
     while (!mergeSuccess) {
       try {
         const response = await fetch(UPLOAD_MERGE_URL, {
@@ -352,11 +397,12 @@ async function uploadFile(file, fileId) {
         }
       } catch (error) {
         mergeSuccess = false;
+        retries++;
         await new Promise((resolve) => setTimeout(resolve, 1000 * retries));
       }
     }
+
     if (mergeSuccessfulUploads) {
-      uploadQueue = [];
       return mergeSuccessfulUploads;
     } else {
       throw new Error('Some chunks failed to upload, please try again');
@@ -380,15 +426,7 @@ async function uploadFile(file, fileId) {
     showStatus('Upload failed: ' + error.message, 'error');
   }
 }
-function resetStatus() {
-  statusEl.style.display = 'none';
-}
-function showStatus(message, type) {
-  statusEl.textContent = message;
-  statusEl.className = 'status ' + type;
-  statusEl.style.display = 'flex';
-  setTimeout(resetStatus, 3000);
-}
+
 function generateUniqueId() {
   return (
     Date.now().toString(36) +
@@ -396,71 +434,3 @@ function generateUniqueId() {
     Math.random().toString(36).substr(2)
   );
 }
-function formatFileSize(bytes) {
-  if (bytes === 0) return '0 Bytes';
-  const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-}
-
-document.getElementById('exportBtn').addEventListener('click', async () => {
-  try {
-    const files = await getAllFiles();
-    const exportData = JSON.stringify(files, null, 2);
-    const blob = new Blob([exportData], { type: 'application/json' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'upload_history.json';
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
-    showStatus('Export successful', 'success');
-  } catch (error) {
-    showStatus('Export failed: ' + error.message, 'error');
-  }
-});
-
-document
-  .getElementById('importFile')
-  .addEventListener('change', async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    try {
-      const text = await file.text();
-      const importData = JSON.parse(text);
-
-      if (!Array.isArray(importData)) {
-        throw new Error('Invalid import data format');
-      }
-
-      const transaction = db.transaction([STORE_NAME], 'readwrite');
-      const store = transaction.objectStore(STORE_NAME);
-
-      for (const record of importData) {
-        const existingRecord = await new Promise((resolve) => {
-          const request = store.get(record.id);
-          request.onsuccess = () => resolve(request.result);
-          request.onerror = () => resolve(null);
-        });
-
-        if (!existingRecord) {
-          await new Promise((resolve, reject) => {
-            const request = store.put(record);
-            request.onsuccess = () => resolve();
-            request.onerror = () => reject(request.error);
-          });
-        }
-      }
-
-      showStatus('Import successful', 'success');
-      await refreshData();
-    } catch (error) {
-      showStatus('Import failed: ' + error.message, 'error');
-    }
-
-    event.target.value = '';
-  });

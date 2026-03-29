@@ -9,42 +9,41 @@
     <link href="../common/css/header.css" rel="stylesheet" />
     <link href="index.css" rel="stylesheet" />
     <script src="../common/js/common.js"></script>
+    <script
+      src="../common/components/hyperlane-button.js"
+      type="module"
+    ></script>
+    <script
+      src="../common/components/hyperlane-input.js"
+      type="module"
+    ></script>
+    <script src="../common/components/hyperlane-card.js" type="module"></script>
+    <script
+      src="../common/components/hyperlane-header.js"
+      type="module"
+    ></script>
+    <script src="./components/hyperlane-trace-search.js" type="module"></script>
+    <script src="./components/hyperlane-trace-result.js" type="module"></script>
   </head>
 
   <body>
     <div class="container">
-      <header class="app-header shimmer-header">
-        <div class="header-content">
-          <h1 class="app-title">
-            <a
-              href="https://github.com/hyperlane-dev/hyperlane"
-              target="_blank"
-            >
-              <img
-                src="https://docs.ltpp.vip/img/hyperlane.png"
-                alt=""
-                class="nav-logo"
-                onerror="this.style.display = 'none'"
-              />
-              <span class="text shimmer">Hyperlane Trace Query</span>
-            </a>
-          </h1>
-          <p class="app-subtitle">Search and analyze trace records</p>
-        </div>
-      </header>
+      <hyperlane-header
+        title="Hyperlane Trace Query"
+        subtitle="Search and analyze trace records"
+        shimmer
+      ></hyperlane-header>
 
-      <div class="search-card">
-        <div class="search-container">
-          <input type="text" id="traceId" placeholder="Enter Trace ID" />
-          <button onclick="searchTrace()">Search</button>
-        </div>
-      </div>
+      <hyperlane-card class="search-card" padding="24px">
+        <hyperlane-trace-search id="traceSearch"></hyperlane-trace-search>
+      </hyperlane-card>
 
-      <div class="result-card">
-        <pre id="result" class="empty-result">
-Please enter a Trace ID and click the search button</pre
-        >
-      </div>
+      <hyperlane-card class="result-card" padding="24px">
+        <hyperlane-trace-result
+          id="traceResult"
+          status="empty"
+        ></hyperlane-trace-result>
+      </hyperlane-card>
     </div>
 
     <script src="index.js"></script>

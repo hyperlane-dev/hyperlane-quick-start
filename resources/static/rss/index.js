@@ -7,7 +7,6 @@ let currentTimezone = getBrowserTimezone();
 function getBrowserTimezone() {
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const offset = -new Date().getTimezoneOffset() / 60;
-  const offsetStr = offset >= 0 ? `UTC+${offset}` : `UTC${offset}`;
   const timezoneMap = {
     'Asia/Shanghai': 'CST_CN',
     'Asia/Hong_Kong': 'CST_CN',
@@ -67,7 +66,12 @@ const feedUrl = `${window.location.protocol}//${window.location.host}/api/rss/fe
 
 async function loadFeed(page = 1) {
   try {
-    document.getElementById('loading').style.display = 'block';
+    const loading = document.getElementById('loading');
+    const feedItemsContainer = document.getElementById('feedItems');
+
+    if (loading) loading.setAttribute('visible', '');
+    if (feedItemsContainer) feedItemsContainer.innerHTML = '';
+
     document.getElementById('error').style.display = 'none';
     document.getElementById('emptyState').style.display = 'none';
 
@@ -92,7 +96,8 @@ async function loadFeed(page = 1) {
   } catch (error) {
     showError(error.message);
   } finally {
-    document.getElementById('loading').style.display = 'none';
+    const loading = document.getElementById('loading');
+    if (loading) loading.removeAttribute('visible');
   }
 }
 
@@ -108,7 +113,7 @@ function displayFeed(xmlDoc, page) {
   if (items.length === 0 && page === 1) {
     showEmptyState();
     const pagination = document.getElementById('pagination');
-    if (pagination) pagination.style.display = 'none';
+    if (pagination) pagination.removeAttribute('visible');
     return;
   }
 
@@ -123,8 +128,8 @@ function displayFeed(xmlDoc, page) {
   feedItemsContainer.innerHTML = '';
 
   items.forEach((item, index) => {
-    const itemElement = createFeedItem(item, index);
-    feedItemsContainer.appendChild(itemElement);
+    const feedItemElement = createFeedItemElement(item, index);
+    feedItemsContainer.appendChild(feedItemElement);
   });
 
   updatePagination(page);
@@ -132,19 +137,42 @@ function displayFeed(xmlDoc, page) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+function createFeedItemElement(item, index) {
+  const title = item.querySelector('title')?.textContent || 'Untitled';
+  const link = item.querySelector('link')?.textContent || '#';
+  const description = item.querySelector('description')?.textContent || '';
+  const pubDate = item.querySelector('pubDate')?.textContent || '';
+  const enclosure = item.querySelector('enclosure');
+
+  const fileSize = enclosure ? enclosure.getAttribute('length') || '' : '';
+  const fileType = enclosure ? enclosure.getAttribute('type') || '' : '';
+
+  const feedItem = document.createElement('hyperlane-feed-item');
+  feedItem.setAttribute('title', title);
+  feedItem.setAttribute('link', link);
+  feedItem.setAttribute('description', description);
+  feedItem.setAttribute('pub-date', pubDate);
+  feedItem.setAttribute('file-size', fileSize);
+  feedItem.setAttribute('file-type', fileType);
+  feedItem.setAttribute('index', index);
+
+  return feedItem;
+}
+
 function updatePagination(page) {
   currentPage = page;
-  const pageInfo = document.getElementById('pageInfo');
-  const prevBtn = document.getElementById('prevBtn');
-  const nextBtn = document.getElementById('nextBtn');
   const pagination = document.getElementById('pagination');
   const controlsRow = document.getElementById('controlsRow');
 
-  if (pageInfo) pageInfo.textContent = `Page ${page}`;
-  if (prevBtn) prevBtn.disabled = page === 1;
-  if (nextBtn) nextBtn.disabled = !hasMoreItems;
-  if (pagination) pagination.style.display = 'flex';
-  if (controlsRow) controlsRow.style.display = 'flex';
+  if (pagination) {
+    pagination.setAttribute('current', page);
+    pagination.setAttribute('total', hasMoreItems ? page + 1 : page);
+    pagination.setAttribute('visible', '');
+  }
+
+  if (controlsRow) {
+    controlsRow.style.display = 'flex';
+  }
 }
 
 function previousPage() {
@@ -160,117 +188,9 @@ function nextPage() {
 }
 
 function changePageSize() {
-  pageSize = parseInt(document.getElementById('pageSize').value);
+  const pageSizeSelect = document.getElementById('pageSize');
+  pageSize = parseInt(pageSizeSelect.value);
   loadFeed(1);
-}
-
-function createFeedItem(item, index) {
-  const title = item.querySelector('title')?.textContent || 'Untitled';
-  const link = item.querySelector('link')?.textContent || '#';
-  const description = item.querySelector('description')?.textContent || '';
-  const pubDate = item.querySelector('pubDate')?.textContent || '';
-  const enclosure = item.querySelector('enclosure');
-
-  const div = document.createElement('div');
-  div.className = 'feed-item';
-  div.style.animationDelay = `${index * 0.1}s`;
-
-  const fileSize = enclosure
-    ? formatFileSize(parseInt(enclosure.getAttribute('length') || '0'))
-    : '';
-  const fileType = enclosure ? enclosure.getAttribute('type') || '' : '';
-  const fileIcon = getFileIcon(fileType);
-
-  div.innerHTML = `
-          <h3><a href="${escapeHtml(link)}" target="_blank">${escapeHtml(
-            title,
-          )}</a></h3>
-          <div class="feed-meta">
-              ${
-                pubDate
-                  ? `<div class="meta-item"><span class="meta-icon">📅</span>${escapeHtml(
-                      pubDate,
-                    )}</div>`
-                  : ''
-              }
-              ${
-                fileSize
-                  ? `<div class="meta-item"><span class="meta-icon">📦</span>${fileSize}</div>`
-                  : ''
-              }
-              ${
-                fileType
-                  ? `<div class="meta-item"><span class="meta-icon">📄</span>${getFileTypeName(
-                      fileType,
-                    )}</div>`
-                  : ''
-              }
-          </div>
-          <div class="feed-description">${escapeHtml(description)}</div>
-          ${
-            enclosure
-              ? `
-          <div class="file-preview">
-              <div class="file-icon">${fileIcon}</div>
-              <div class="file-details">
-                  <div class="file-name">${escapeHtml(title)}</div>
-                  <div class="file-size">${fileSize} • ${getFileTypeName(
-                    fileType,
-                  )}</div>
-              </div>
-              <a href="${escapeHtml(
-                link,
-              )}" class="download-btn" download="${escapeHtml(
-                title,
-              )}">Download</a>
-          </div>
-          `
-              : ''
-          }
-      `;
-
-  return div;
-}
-
-function getFileIcon(mimeType) {
-  if (mimeType.startsWith('image/')) return '🖼️';
-  if (mimeType.startsWith('video/')) return '🎬';
-  if (mimeType.startsWith('audio/')) return '🎵';
-  if (mimeType.includes('pdf')) return '📕';
-  if (mimeType.includes('zip') || mimeType.includes('compressed')) return '🗜️';
-  if (mimeType.includes('text')) return '📝';
-  return '📄';
-}
-
-function getFileTypeName(mimeType) {
-  const types = {
-    'image/': 'Image',
-    'video/': 'Video',
-    'audio/': 'Audio',
-    'application/pdf': 'PDF',
-    'application/zip': 'Archive',
-    'text/': 'Text',
-  };
-
-  for (const [key, value] of Object.entries(types)) {
-    if (mimeType.includes(key)) return value;
-  }
-
-  return mimeType.split('/')[1]?.toUpperCase() || 'File';
-}
-
-function formatFileSize(bytes) {
-  if (bytes === 0) return '0 Bytes';
-  const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-}
-
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
 }
 
 function showError(message) {
@@ -290,4 +210,32 @@ function showEmptyState() {
   emptyDiv.style.display = 'block';
 }
 
-loadFeed(1);
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  const pageSizeSelect = document.getElementById('pageSize');
+  if (pageSizeSelect) {
+    pageSizeSelect.addEventListener('hyperlane-change', function (e) {
+      pageSize = parseInt(e.detail.value);
+      loadFeed(1);
+    });
+  }
+
+  const pagination = document.getElementById('pagination');
+  if (pagination) {
+    pagination.addEventListener('hyperlane-page-change', function (e) {
+      const newPage = e.detail.page;
+      if (e.detail.direction === 'prev' && currentPage > 1) {
+        loadFeed(newPage);
+      } else if (e.detail.direction === 'next' && hasMoreItems) {
+        loadFeed(newPage);
+      }
+    });
+  }
+
+  loadFeed(1);
+});

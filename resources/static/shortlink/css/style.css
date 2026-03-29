@@ -93,14 +93,6 @@ button,
   border-color: #28a745;
 }
 
-.input-icon {
-  position: absolute;
-  left: 16px;
-  font-size: 1.2rem;
-  color: #6c757d;
-  pointer-events: none;
-}
-
 .input-hint {
   display: block;
   margin-top: 8px;
@@ -221,6 +213,11 @@ button,
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.shortlink-value hl-button {
+  width: auto;
+  flex-shrink: 0;
 }
 
 .shortlink-text {
@@ -504,14 +501,6 @@ button,
   .app-title a {
     flex-direction: column;
     gap: 10px;
-  }
-
-  .url-input {
-    padding: 14px 16px 14px 46px;
-  }
-
-  .input-icon {
-    left: 12px;
   }
 
   .generate-btn {
