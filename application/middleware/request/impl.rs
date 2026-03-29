@@ -58,20 +58,6 @@ impl ServerHook for ResponseStatusCodeMiddleware {
     async fn handle(self, ctx: &mut Context) {}
 }
 
-impl ServerHook for ResponseBodyMiddleware {
-    #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
-        Self
-    }
-
-    #[prologue_macros(
-        response_status_code(302),
-        response_header(LOCATION => DEFAULT_REDIRECT_URL)
-    )]
-    #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {}
-}
-
 impl ServerHook for OptionMethodMiddleware {
     #[instrument_trace]
     async fn new(_ctx: &mut Context) -> Self {
