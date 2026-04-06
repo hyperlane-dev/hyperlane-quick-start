@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane-quick-start"
-version = "19.0.6"
+version = "20.0.0"
 readme = "README.md"
 edition = "2024"
 authors = ["root@ltpp.vip"]
@@ -32,8 +32,8 @@ hyperlane_plugin = { path = "plugin", version = "19.0.6" }
 hyperlane_resources = { path = "resources", version = "19.0.6" }
 
 tracing = "0.1.44"
-hyperlane = "18.4.0"
-hyperlane-utils = "25.0.0"
+hyperlane = "19.0.0"
+hyperlane-utils = "26.0.0"
 serde = { version = "1.0.228", features = ["derive"] }
 
 [dependencies]
