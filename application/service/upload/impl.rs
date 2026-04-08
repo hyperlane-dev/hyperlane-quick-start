@@ -9,27 +9,25 @@ impl UploadService {
     }
 
     #[instrument_trace]
-    fn validate_file_id(file_id_opt: Option<String>, ctx: &mut Context) -> Result<String, ()> {
+    async fn validate_file_id(
+        file_id_opt: Option<String>,
+        ctx: &mut Context,
+    ) -> Result<String, ()> {
         match file_id_opt {
             Some(id) => Ok(id),
             None => {
-                spawn({
-                    let ctx: &'static mut Context = context!(ctx: &'static mut Context);
-                    async move {
-                        Self::set_common_error_response_body(
-                            ctx,
-                            ChunkStrategyError::MissingFileId.to_string(),
-                        )
-                        .await;
-                    }
-                });
+                Self::set_common_error_response_body(
+                    ctx,
+                    ChunkStrategyError::MissingFileId.to_string(),
+                )
+                .await;
                 Err(())
             }
         }
     }
 
     #[instrument_trace]
-    fn validate_total_chunks(
+    async fn validate_total_chunks(
         total_chunks_opt: Option<String>,
         ctx: &mut Context,
     ) -> Result<usize, ()> {
@@ -37,50 +35,38 @@ impl UploadService {
             Some(total) => match total.parse::<usize>() {
                 Ok(t) => Ok(t),
                 Err(_) => {
-                    spawn({
-                        let ctx: &'static mut Context = context!(ctx: &'static mut Context);
-                        async move {
-                            Self::set_common_error_response_body(
-                                ctx,
-                                ChunkStrategyError::InvalidTotalChunks.to_string(),
-                            )
-                            .await;
-                        }
-                    });
+                    Self::set_common_error_response_body(
+                        ctx,
+                        ChunkStrategyError::InvalidTotalChunks.to_string(),
+                    )
+                    .await;
                     Err(())
                 }
             },
             None => {
-                spawn({
-                    let ctx: &'static mut Context = context!(ctx: &'static mut Context);
-                    async move {
-                        Self::set_common_error_response_body(
-                            ctx,
-                            ChunkStrategyError::MissingTotalChunks.to_string(),
-                        )
-                        .await;
-                    }
-                });
+                Self::set_common_error_response_body(
+                    ctx,
+                    ChunkStrategyError::MissingTotalChunks.to_string(),
+                )
+                .await;
                 Err(())
             }
         }
     }
 
     #[instrument_trace]
-    fn validate_file_name(file_name_opt: Option<String>, ctx: &mut Context) -> Result<String, ()> {
+    async fn validate_file_name(
+        file_name_opt: Option<String>,
+        ctx: &mut Context,
+    ) -> Result<String, ()> {
         match file_name_opt {
             Some(name) => Ok(urlencoding::decode(&name).unwrap_or_default().into_owned()),
             None => {
-                spawn({
-                    let ctx: &'static mut Context = context!(ctx: &'static mut Context);
-                    async move {
-                        Self::set_common_error_response_body(
-                            ctx,
-                            ChunkStrategyError::MissingFileName.to_string(),
-                        )
-                        .await;
-                    }
-                });
+                Self::set_common_error_response_body(
+                    ctx,
+                    ChunkStrategyError::MissingFileName.to_string(),
+                )
+                .await;
                 Err(())
             }
         }
@@ -116,9 +102,11 @@ impl UploadService {
     #[request_header_option(HEADER_X_DIRECTORY => base_file_dir_opt)]
     #[instrument_trace]
     pub async fn get_register_file_chunk_data<'a>(ctx: &mut Context) -> Option<FileChunkData> {
-        let file_id: String = Self::validate_file_id(file_id_opt, ctx).ok()?;
-        let total_chunks: usize = Self::validate_total_chunks(total_chunks_opt, ctx).ok()?;
-        let file_name: String = Self::validate_file_name(file_name_opt, ctx).ok()?;
+        let file_id: String = Self::validate_file_id(file_id_opt, ctx).await.ok()?;
+        let total_chunks: usize = Self::validate_total_chunks(total_chunks_opt, ctx)
+            .await
+            .ok()?;
+        let file_name: String = Self::validate_file_name(file_name_opt, ctx).await.ok()?;
         let base_file_dir: String = Self::validate_and_decode_directory(base_file_dir_opt);
         let mut data: FileChunkData = FileChunkData::default();
         data.set_file_id(file_id)

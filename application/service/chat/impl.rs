@@ -37,16 +37,10 @@ impl ServerHook for ChatRequestHook {
         let resp_data: ResponseBody = serde_json::to_vec(&resp_data).unwrap();
         ctx.get_mut_response().set_body(&resp_data);
         let uuid: String = uuid_opt.unwrap_or_default();
-        clone!(req_data, uuid => {
-            let req_msg: &String = req_data.get_data();
-            if ChatService::is_gpt_mentioned(req_msg) {
-                let req_msg_clone: String = req_msg.clone();
-                let ctx: &'static mut Context = context!(ctx: &'static mut Context);
-                spawn(async move {
-                    ChatService::process_gpt_request(uuid, req_msg_clone, ctx).await;
-                });
-            }
-        });
+        let req_msg: &String = req_data.get_data();
+        if ChatService::is_gpt_mentioned(req_msg) {
+            ChatService::process_gpt_request(uuid, req_msg.clone(), ctx).await;
+        }
     }
 }
 
