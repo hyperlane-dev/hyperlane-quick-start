@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane-quick-start"
-version = "19.0.6"
+version = "21.0.0"
 readme = "README.md"
 edition = "2024"
 authors = ["root@ltpp.vip"]
@@ -25,15 +25,15 @@ resolver = "3"
 members = ["application", "bootstrap", "config", "plugin", "resources"]
 
 [workspace.dependencies]
-hyperlane_application = { path = "application", version = "19.0.6" }
-hyperlane_bootstrap = { path = "bootstrap", version = "19.0.6" }
-hyperlane_config = { path = "config", version = "19.0.6" }
-hyperlane_plugin = { path = "plugin", version = "19.0.6" }
-hyperlane_resources = { path = "resources", version = "19.0.6" }
+hyperlane_application = { path = "application", version = "20.0.0" }
+hyperlane_bootstrap = { path = "bootstrap", version = "20.0.0" }
+hyperlane_config = { path = "config", version = "20.0.0" }
+hyperlane_plugin = { path = "plugin", version = "20.0.0" }
+hyperlane_resources = { path = "resources", version = "20.0.0" }
 
 tracing = "0.1.44"
-hyperlane = "18.4.0"
-hyperlane-utils = "25.0.0"
+hyperlane = "20.0.0"
+hyperlane-utils = "27.0.0"
 serde = { version = "1.0.228", features = ["derive"] }
 
 [dependencies]
