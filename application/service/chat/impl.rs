@@ -39,6 +39,14 @@ impl ServerHook for ChatRequestHook {
         let uuid: String = uuid_opt.unwrap_or_default();
         let req_msg: &String = req_data.get_data();
         if ChatService::is_gpt_mentioned(req_msg) {
+            let user_resp_data: WebSocketRespData =
+                WebSocketRespData::from(MessageType::Text, ctx, req_msg).await;
+            let user_resp_json: ResponseBody = serde_json::to_vec(&user_resp_data).unwrap();
+            let websocket: &WebSocket = get_global_websocket();
+            let path: String = ctx.get_request().get_path().clone();
+            let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
+            let _: Result<Option<ReceiverCount>, SendError<Vec<u8>>> =
+                websocket.try_send(key, user_resp_json);
             ChatService::process_gpt_request(uuid, req_msg.clone(), ctx).await;
         }
     }
@@ -166,11 +174,6 @@ impl ChatService {
         let gpt_resp_data: WebSocketRespData =
             WebSocketRespData::from(MessageType::GptResponse, ctx, &api_response).await;
         let gpt_resp_json: ResponseBody = serde_json::to_vec(&gpt_resp_data).unwrap();
-        let websocket: &WebSocket = get_global_websocket();
-        let path: String = ctx.get_request().get_path().clone();
-        let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
-        let _: Result<Option<ReceiverCount>, SendError<Vec<u8>>> =
-            websocket.try_send(key, gpt_resp_json.clone());
         ctx.get_mut_response().set_body(&gpt_resp_json);
         let session_id_clone: String = session_id.clone();
         let api_response_clone: String = api_response.clone();
