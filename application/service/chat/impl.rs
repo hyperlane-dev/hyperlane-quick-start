@@ -45,7 +45,6 @@ impl ServerHook for ChatRequestHook {
         let uuid: String = uuid_opt.unwrap_or_default();
         let req_msg: String = req_data.get_data().clone();
         if ChatService::is_gpt_mentioned(&req_msg) {
-            let leak_ctx: &mut Context = ctx.leak_mut();
             let path: String = ctx.get_request().get_path().clone();
             let websocket: &WebSocket = get_global_websocket();
             let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
@@ -65,7 +64,7 @@ impl ServerHook for ChatRequestHook {
                 serde_json::to_vec(&system_resp_data).unwrap_or_default();
             let _: Result<Option<ReceiverCount>, SendError<Vec<u8>>> =
                 websocket.try_send(key, system_resp_json);
-            ChatService::process_gpt_request(uuid, req_msg, leak_ctx).await;
+            ChatService::process_gpt_request(uuid, req_msg, ctx).await;
         }
     }
 }
