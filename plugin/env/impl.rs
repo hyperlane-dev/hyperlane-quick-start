@@ -168,6 +168,7 @@ impl EnvConfig {
             db_connection_timeout_millis: get_env_u64(ENV_KEY_DB_CONNECTION_TIMEOUT_MILLIS)?,
             db_retry_interval_millis: get_env_u64(ENV_KEY_DB_RETRY_INTERVAL_MILLIS)?,
             gpt_api_url: var(ENV_KEY_GPT_API_URL).unwrap_or_default(),
+            gpt_api_key: var(ENV_KEY_GPT_API_KEY).unwrap_or_default(),
             gpt_model: var(ENV_KEY_GPT_MODEL).unwrap_or_default(),
             mysql_instances,
             postgresql_instances,

@@ -96,7 +96,27 @@
         </div>
 
         <div class="diff-section">
-          <div id="diff-result" class="diff-result">Enter text to compare</div>
+          <div class="diff-view-toggle">
+            <button
+              id="view-side-by-side"
+              class="btn btn-toggle active"
+              onclick="switchViewMode('side-by-side')"
+            >
+              <span class="icon">📑</span>
+              Split View
+            </button>
+            <button
+              id="view-inline"
+              class="btn btn-toggle"
+              onclick="switchViewMode('inline')"
+            >
+              <span class="icon">📃</span>
+              Inline View
+            </button>
+          </div>
+          <div id="diff-result" class="diff-result">
+            <div class="diff-empty-state">Enter text to compare</div>
+          </div>
         </div>
       </main>
     </div>

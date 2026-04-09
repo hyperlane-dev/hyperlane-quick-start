@@ -4,6 +4,7 @@ pub const ENV_KEY_MYSQL: &str = "MYSQL";
 pub const ENV_KEY_POSTGRESQL: &str = "POSTGRESQL";
 pub const ENV_KEY_REDIS: &str = "REDIS";
 pub const ENV_KEY_GPT_API_URL: &str = "GPT_API_URL";
+pub const ENV_KEY_GPT_API_KEY: &str = "GPT_API_KEY";
 pub const ENV_KEY_GPT_MODEL: &str = "GPT_MODEL";
 pub const ENV_KEY_SERVER_PORT: &str = "SERVER_PORT";
 pub const ENV_KEY_SERVER_HOST: &str = "SERVER_HOST";

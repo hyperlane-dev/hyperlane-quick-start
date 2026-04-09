@@ -43,7 +43,7 @@ impl WebSocketRespData {
             .set_type(msg_type)
             .set_data(data.to_string())
             .set_time(Utc::now().timestamp_millis());
-        if msg_type == MessageType::OnlineCount {
+        if matches!(msg_type, MessageType::System | MessageType::OnlineCount) {
             resp_data.set_name("System".to_string());
         } else {
             resp_data.set_name(uuid.to_string());

@@ -43,17 +43,23 @@ impl ServerHook for ChatRequestHook {
         let resp_data: ResponseBody = serde_json::to_vec(&resp_data).unwrap();
         ctx.get_mut_response().set_body(&resp_data);
         let uuid: String = uuid_opt.unwrap_or_default();
-        let req_msg: &String = req_data.get_data();
-        if ChatService::is_gpt_mentioned(req_msg) {
-            let user_resp_data: WebSocketRespData =
-                WebSocketRespData::from(MessageType::Text, ctx, req_msg).await;
-            let user_resp_json: ResponseBody = serde_json::to_vec(&user_resp_data).unwrap();
-            let websocket: &WebSocket = get_global_websocket();
+        let req_msg: String = req_data.get_data().clone();
+        if ChatService::is_gpt_mentioned(&req_msg) {
+            let leak_ctx: &mut Context = ctx.leak_mut();
             let path: String = ctx.get_request().get_path().clone();
+            let user_resp_data: WebSocketRespData = WebSocketRespData::from(
+                MessageType::System,
+                ctx,
+                format!("{GPT} is thinking, please wait ..."),
+            )
+            .await;
+            let user_resp_json: ResponseBody =
+                serde_json::to_vec(&user_resp_data).unwrap_or_default();
+            let websocket: &WebSocket = get_global_websocket();
             let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
             let _: Result<Option<ReceiverCount>, SendError<Vec<u8>>> =
                 websocket.try_send(key, user_resp_json);
-            ChatService::process_gpt_request(uuid, req_msg.clone(), ctx).await;
+            ChatService::process_gpt_request(uuid, req_msg, leak_ctx).await;
         }
     }
 }
@@ -72,7 +78,10 @@ impl ServerHook for ChatSendedHook {
         info!("{request}{BR}{response}");
         let response_body: ResponseBody = ctx.get_response().get_body().clone();
         if let Ok(resp_data) = serde_json::from_slice::<WebSocketRespData>(&response_body)
-            && resp_data.get_type() == MessageType::OnlineCount
+            && matches!(
+                resp_data.get_type(),
+                MessageType::System | MessageType::OnlineCount
+            )
         {
             ctx.set_aborted(true);
             return;
@@ -181,20 +190,18 @@ impl ChatService {
             WebSocketRespData::from(MessageType::GptResponse, ctx, &api_response).await;
         let gpt_resp_json: ResponseBody = serde_json::to_vec(&gpt_resp_data).unwrap();
         ctx.get_mut_response().set_body(&gpt_resp_json);
-        let session_id_clone: String = session_id.clone();
-        let api_response_clone: String = api_response.clone();
         spawn(async move {
             let save_res: Result<(), String> = Self::save_message(
-                &session_id_clone,
+                &session_id,
                 "GPT Assistant",
                 "assistant",
                 "GptResponse",
-                &api_response_clone,
+                &api_response,
             )
             .await;
             if save_res.is_err() {
                 error!(
-                    "Failed to save GPT response for session {session_id_clone} {}",
+                    "Failed to save GPT response for session {session_id} {}",
                     save_res.err().unwrap_or_default()
                 );
             }
@@ -216,9 +223,12 @@ impl ChatService {
     }
 
     #[instrument_trace]
-    fn build_gpt_request_headers() -> HashMapXxHash3_64<&'static str, String> {
+    fn build_gpt_request_headers(api_key: &str) -> HashMapXxHash3_64<&'static str, String> {
         let mut headers: HashMapXxHash3_64<&'static str, String> = hash_map_xx_hash3_64();
         headers.insert(CONTENT_TYPE, APPLICATION_JSON.to_string());
+        if !api_key.is_empty() {
+            headers.insert("Authorization", format!("Bearer {api_key}"));
+        }
         headers
     }
 
@@ -277,18 +287,17 @@ impl ChatService {
     async fn call_gpt_api_with_context(session: &ChatSession) -> Result<String, String> {
         let config: &EnvConfig = EnvPlugin::get_or_init();
         let gpt_model: &str = config.get_gpt_model();
+        let api_key: &str = config.get_gpt_api_key();
         let messages: Vec<serde_json::Value> = Self::build_gpt_request_messages(session);
         let body: serde_json::Value = json!({
             GPT_MODEL: gpt_model,
             JSON_FIELD_MESSAGES: messages
         });
-        let headers: HashMapXxHash3_64<&str, String> = Self::build_gpt_request_headers();
+        let headers: HashMapXxHash3_64<&str, String> = Self::build_gpt_request_headers(api_key);
         let mut request_builder: BoxAsyncRequestTrait = RequestBuilder::new()
             .post(config.get_gpt_api_url())
             .json(body)
             .headers(headers)
-            .redirect()
-            .http1_1_only()
             .build_async();
         match request_builder.send().await {
             Ok(response) => {

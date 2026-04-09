@@ -716,6 +716,16 @@
         overflow-wrap: break-word;
       }
 
+      .message-text ul,
+      .message-text ol {
+        padding-left: 1.5em;
+        margin: 0.5em 0;
+      }
+
+      .message-text li {
+        margin: 0.25em 0;
+      }
+
       .message-text code {
         background-color: rgba(0, 0, 0, 0.1);
         padding: 2px 4px;
@@ -1609,6 +1619,7 @@
       const fileInput = document.getElementById('file-input');
 
       const MessageType = {
+        System: 'System',
         OnlineCount: 'OnlineCount',
         GptResponse: 'GptResponse',
       };

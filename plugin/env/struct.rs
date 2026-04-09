@@ -28,6 +28,7 @@ pub struct EnvConfig {
     #[get(type(copy))]
     pub(super) db_retry_interval_millis: u64,
     pub(super) gpt_api_url: String,
+    pub(super) gpt_api_key: String,
     pub(super) gpt_model: String,
     pub(super) mysql_instances: Vec<MySqlInstanceConfig>,
     pub(super) postgresql_instances: Vec<PostgreSqlInstanceConfig>,
