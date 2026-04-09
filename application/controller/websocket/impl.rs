@@ -9,14 +9,19 @@ impl ServerHook for WebSocketRoute {
     #[prologue_macros(ws_upgrade_type, ws_from_stream(request))]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
-        if let Ok(request) = request.try_get_body_json() {
-            match WebSocketService::get_response_body(&request) {
-                Ok(response) => ctx.get_mut_response().set_body(&response),
-                Err(error) => ctx.get_mut_response().set_body(&error),
-            };
-            if try_send_body_hook(ctx).await.is_err() {
-                return;
+        match request.try_get_body_json() {
+            Ok(request) => {
+                match WebSocketService::get_response_body(&request) {
+                    Ok(response) => ctx.get_mut_response().set_body(&response),
+                    Err(error) => ctx.get_mut_response().set_body(&error),
+                };
             }
+            Err(error) => {
+                ctx.get_mut_response().set_body(error.to_string());
+            }
+        };
+        if try_send_body_hook(ctx).await.is_err() {
+            return;
         }
     }
 }
