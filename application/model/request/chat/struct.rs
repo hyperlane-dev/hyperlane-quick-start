@@ -2,6 +2,7 @@ use super::*;
 
 #[derive(Clone, Data, Default, Deserialize, Serialize, ToSchema)]
 pub struct WebSocketReqData {
+    #[get(type(copy))]
     pub(super) r#type: MessageType,
     pub(super) data: String,
 }

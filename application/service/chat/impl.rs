@@ -26,10 +26,16 @@ impl ServerHook for ChatRequestHook {
     }
 
     #[request_query_option("uuid" => uuid_opt)]
-    #[request_body_json_result(req_data_res: WebSocketReqData)]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
-        let req_data: WebSocketReqData = req_data_res.unwrap();
+        let request: &Request = ctx.get_request();
+        let req_data: WebSocketReqData = match request.try_get_body_json() {
+            Ok(data) => data,
+            Err(error) => {
+                ctx.get_mut_response().set_body(error.to_string());
+                return;
+            }
+        };
         if ChatService::handle_ping_request(ctx, &req_data).await {
             return;
         }

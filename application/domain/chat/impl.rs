@@ -25,7 +25,7 @@ impl WebSocketReqData {
     pub async fn into_resp(&self, ctx: &mut Context) -> WebSocketRespData {
         let uuid: String = uuid_opt.unwrap_or_default();
         let mut resp: WebSocketRespData = WebSocketRespData::default();
-        resp.set_type(*self.get_type())
+        resp.set_type(self.get_type())
             .set_name(uuid)
             .set_data(self.get_data().clone())
             .set_time(Utc::now().timestamp_millis());
