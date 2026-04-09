@@ -9,8 +9,7 @@ impl ServerHook for WebSocketRoute {
     #[prologue_macros(ws_upgrade_type, ws_from_stream(request))]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
-        let request_body: serde_json::Result<WebSocketMessage> = request.try_get_body_json();
-        if let Ok(request) = request_body {
+        if let Ok(request) = request.try_get_body_json() {
             match WebSocketService::get_response_body(&request) {
                 Ok(response) => ctx.get_mut_response().set_body(&response),
                 Err(error) => ctx.get_mut_response().set_body(&error),
