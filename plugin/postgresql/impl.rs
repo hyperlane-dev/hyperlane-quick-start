@@ -498,7 +498,7 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
     async fn create_tables_if_not_exist(&self) -> Result<Vec<String>, AutoCreationError> {
         let connection: DatabaseConnection = self.create_target_connection().await?;
         let schema: &DatabaseSchema = self.get_database_schema();
-        let mut created_tables: Vec<String> = Vec::new();
+        let mut created_tables: Vec<String> = vec![];
         for table in schema.ordered_tables() {
             if !self.table_exists(&connection, table.get_name()).await? {
                 self.create_table(&connection, table).await?;

@@ -541,9 +541,9 @@ impl OrderService {
         let start_date: NaiveDate = end_date - chrono::Duration::days(days);
         let records: Vec<OrderRecordModel> =
             RecordRepository::find_by_bill_date_range(start_date, end_date).await?;
-        let mut dates: Vec<String> = Vec::new();
-        let mut income: Vec<String> = Vec::new();
-        let mut expense: Vec<String> = Vec::new();
+        let mut dates: Vec<String> = vec![];
+        let mut income: Vec<String> = vec![];
+        let mut expense: Vec<String> = vec![];
         let mut current_date: NaiveDate = start_date;
         while current_date <= end_date {
             dates.push(current_date.to_string());
@@ -575,9 +575,9 @@ impl OrderService {
     #[instrument_trace]
     async fn get_monthly_comparison(months: i64) -> Result<MonthlyComparison, String> {
         let now: chrono::DateTime<Local> = Local::now();
-        let mut months_list: Vec<String> = Vec::new();
-        let mut income_list: Vec<String> = Vec::new();
-        let mut expense_list: Vec<String> = Vec::new();
+        let mut months_list: Vec<String> = vec![];
+        let mut income_list: Vec<String> = vec![];
+        let mut expense_list: Vec<String> = vec![];
         for i in (0..months).rev() {
             let target_date: chrono::DateTime<Local> = now - chrono::Duration::days(i * 30);
             let year: i32 = target_date.year();
@@ -645,8 +645,8 @@ impl OrderService {
     async fn get_user_growth(days: i64) -> Result<UserGrowth, String> {
         let end_date: NaiveDate = Local::now().naive_local().date();
         let start_date: NaiveDate = end_date - chrono::Duration::days(days);
-        let mut dates: Vec<String> = Vec::new();
-        let mut counts: Vec<i64> = Vec::new();
+        let mut dates: Vec<String> = vec![];
+        let mut counts: Vec<i64> = vec![];
         let mut current_date: NaiveDate = start_date;
         while current_date <= end_date {
             dates.push(current_date.to_string());
@@ -694,8 +694,8 @@ impl OrderService {
         let start_date: NaiveDate = end_date - chrono::Duration::days(days);
         let records: Vec<OrderRecordModel> =
             RecordRepository::find_by_bill_date_range(start_date, end_date).await?;
-        let mut dates: Vec<String> = Vec::new();
-        let mut counts: Vec<i64> = Vec::new();
+        let mut dates: Vec<String> = vec![];
+        let mut counts: Vec<i64> = vec![];
         let mut current_date: NaiveDate = start_date;
         while current_date <= end_date {
             dates.push(current_date.to_string());
@@ -744,9 +744,9 @@ impl OrderService {
     async fn get_user_activity(days: i64) -> Result<UserActivity, String> {
         let end_date: NaiveDate = Local::now().naive_local().date();
         let start_date: NaiveDate = end_date - chrono::Duration::days(days);
-        let mut dates: Vec<String> = Vec::new();
-        let mut active_users: Vec<i64> = Vec::new();
-        let mut new_records: Vec<i64> = Vec::new();
+        let mut dates: Vec<String> = vec![];
+        let mut active_users: Vec<i64> = vec![];
+        let mut new_records: Vec<i64> = vec![];
         let records: Vec<OrderRecordModel> =
             RecordRepository::find_by_bill_date_range(start_date, end_date).await?;
         let mut current_date: NaiveDate = start_date;
@@ -789,7 +789,7 @@ impl OrderService {
         let start_date: NaiveDate = end_date - chrono::Duration::days(days);
         let records: Vec<OrderRecordModel> =
             RecordRepository::find_by_bill_date_range(start_date, end_date).await?;
-        let mut result: Vec<IncomeExpenseRatioItem> = Vec::new();
+        let mut result: Vec<IncomeExpenseRatioItem> = vec![];
         let mut current_date: NaiveDate = start_date;
         while current_date <= end_date {
             let day_records: Vec<&OrderRecordModel> = records
@@ -902,7 +902,7 @@ impl OrderService {
     #[instrument_trace]
     async fn get_period_over_period_analysis() -> Result<Vec<PeriodOverPeriodItem>, String> {
         let today: NaiveDate = Local::now().naive_local().date();
-        let mut result: Vec<PeriodOverPeriodItem> = Vec::new();
+        let mut result: Vec<PeriodOverPeriodItem> = vec![];
         let periods: Vec<(String, NaiveDate, NaiveDate, NaiveDate, NaiveDate)> = vec![
             (
                 "WoW".to_string(),
@@ -1031,7 +1031,7 @@ impl OrderService {
             end_date.and_hms_opt(23, 59, 59).unwrap(),
         )
         .await?;
-        let mut result: Vec<UserRetentionItem> = Vec::new();
+        let mut result: Vec<UserRetentionItem> = vec![];
         let records: Vec<OrderRecordModel> =
             RecordRepository::find_by_bill_date_range(start_date, end_date).await?;
         for day_offset in 0..=days {
@@ -1221,7 +1221,7 @@ impl OrderService {
         let record_result: OrderRecordModel =
             RecordRepository::insert_with_transaction(&txn, record_active_model).await?;
         let record_id: i32 = record_result.get_id();
-        let mut saved_images: Vec<RecordImageResponse> = Vec::new();
+        let mut saved_images: Vec<RecordImageResponse> = vec![];
         for image_req in request.get_images() {
             let file_data: Vec<u8> = image_req.get_file_data().clone();
             let file_size: i32 = image_req.get_file_size();
@@ -1378,7 +1378,7 @@ impl OrderService {
             .into_iter()
             .map(|user: OrderUserModel| (user.get_id(), user.get_username().clone()))
             .collect();
-        let mut image_responses: Vec<RecordImageResponse> = Vec::new();
+        let mut image_responses: Vec<RecordImageResponse> = vec![];
         for img in &images {
             let mut response: RecordImageResponse = Self::model_to_image_response(img, record_id);
             let username: String = user_map

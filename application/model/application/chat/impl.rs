@@ -5,7 +5,7 @@ impl Default for ChatSession {
     fn default() -> Self {
         Self {
             session_id: String::new(),
-            messages: Vec::new(),
+            messages: vec![],
             last_activity: Instant::now(),
         }
     }

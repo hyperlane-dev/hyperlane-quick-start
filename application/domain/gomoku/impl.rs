@@ -5,7 +5,7 @@ impl GomokuDomain {
     pub fn create_room(room_id: &str, owner_id: &str) -> GomokuRoom {
         let mut room: GomokuRoom = GomokuRoom::default();
         let mut owner: GomokuPlayer = GomokuPlayer::default();
-        let mut players: Vec<GomokuPlayer> = Vec::new();
+        let mut players: Vec<GomokuPlayer> = vec![];
         owner
             .set_user_id(owner_id.to_string())
             .set_color(StoneColor::Black);
@@ -113,7 +113,7 @@ impl GomokuDomain {
 
     #[instrument_trace]
     fn build_empty_board(size: usize) -> Vec<Vec<u8>> {
-        let mut board: Vec<Vec<u8>> = Vec::new();
+        let mut board: Vec<Vec<u8>> = vec![];
         let row: Vec<u8> = vec![0; size];
         let mut index: usize = 0;
         while index < size {

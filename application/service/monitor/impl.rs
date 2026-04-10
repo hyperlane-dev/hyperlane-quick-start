@@ -124,8 +124,8 @@ impl MonitorService {
         }
         stats.set_total_packets(total_packets);
         stats.set_total_bytes(total_bytes);
-        stats.set_top_connections(Vec::new());
-        stats.set_recent_packets(Vec::new());
+        stats.set_top_connections(vec![]);
+        stats.set_recent_packets(vec![]);
         Some(stats)
     }
 

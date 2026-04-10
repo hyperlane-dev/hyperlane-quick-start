@@ -354,7 +354,7 @@ impl RedisAutoCreation {
 
     #[instrument_trace]
     async fn setup_redis_namespace(&self) -> Result<Vec<String>, AutoCreationError> {
-        let mut setup_operations: Vec<String> = Vec::new();
+        let mut setup_operations: Vec<String> = vec![];
         let mut conn: Connection = self.create_mutable_connection().await?;
         let app_key: String = format!("{}:initialized", self.instance.get_name());
         let exists: i32 = redis::cmd("EXISTS")

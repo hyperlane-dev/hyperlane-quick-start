@@ -42,8 +42,8 @@ impl DockerConfig {
             disable_network: true,
             read_only: true,
             workdir: "/workspace".to_string(),
-            env_vars: Vec::new(),
-            volumes: Vec::new(),
+            env_vars: vec![],
+            volumes: vec![],
         }
     }
 

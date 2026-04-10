@@ -25,7 +25,7 @@ impl RedisService {
             .query(&mut *conn)
             .map_err(|error: RedisError| error.to_string())?;
         if all_keys.is_empty() {
-            return Ok(Vec::new());
+            return Ok(vec![]);
         }
         let values: Vec<String> =
             Commands::mget(&mut *conn, &all_keys).map_err(|error: RedisError| error.to_string())?;

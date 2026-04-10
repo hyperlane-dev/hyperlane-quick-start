@@ -27,22 +27,22 @@ impl DbBootstrap {
     pub fn build_mysql_schema() -> DatabaseSchema {
         DatabaseSchema::default()
             .add_table(TableSchema::new(
-                Vec::new(),
+                vec![],
                 MysqlTableName::CicdPipeline.to_string(),
                 MYSQL_CICD_PIPELINE_TABLE_SQL.to_string(),
             ))
             .add_table(TableSchema::new(
-                Vec::new(),
+                vec![],
                 MysqlTableName::CicdRun.to_string(),
                 MYSQL_CICD_RUN_TABLE_SQL.to_string(),
             ))
             .add_table(TableSchema::new(
-                Vec::new(),
+                vec![],
                 MysqlTableName::CicdJob.to_string(),
                 MYSQL_CICD_JOB_TABLE_SQL.to_string(),
             ))
             .add_table(TableSchema::new(
-                Vec::new(),
+                vec![],
                 MysqlTableName::CicdStep.to_string(),
                 MYSQL_CICD_STEP_TABLE_SQL.to_string(),
             ))
@@ -52,25 +52,25 @@ impl DbBootstrap {
     pub fn build_postgresql_schema() -> DatabaseSchema {
         DatabaseSchema::default()
             .add_table(TableSchema::new(
-                Vec::new(),
+                vec![],
                 PostgresqlTableName::ChatHistory.to_string(),
                 POSTGRESQL_CHAT_HISTORY_TABLE_SQL.to_string(),
             ))
             .add_index(POSTGRESQL_CHAT_HISTORY_INDEX_SQL.to_string())
             .add_table(TableSchema::new(
-                Vec::new(),
+                vec![],
                 PostgresqlTableName::TrackingRecord.to_string(),
                 POSTGRESQL_TRACKING_RECORD_TABLE_SQL.to_string(),
             ))
             .add_index(POSTGRESQL_TRACKING_RECORD_INDEX_SQL.to_string())
             .add_table(TableSchema::new(
-                Vec::new(),
+                vec![],
                 PostgresqlTableName::Shortlink.to_string(),
                 POSTGRESQL_SHORTLINK_TABLE_SQL.to_string(),
             ))
             .add_index(POSTGRESQL_SHORTLINK_INDEX_SQL.to_string())
             .add_table(TableSchema::new(
-                Vec::new(),
+                vec![],
                 "order_user".to_string(),
                 POSTGRESQL_ORDER_USER_TABLE_SQL.to_string(),
             ))

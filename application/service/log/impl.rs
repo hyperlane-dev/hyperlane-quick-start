@@ -58,7 +58,7 @@ impl LogService {
     pub async fn process_date_directory(log_dir: &Path, date_dir: &str) -> Vec<String> {
         let date_path: PathBuf = log_dir.join(date_dir);
         let log_files: Vec<String> = Self::get_sorted_log_files(&date_path);
-        let mut logs: Vec<String> = Vec::new();
+        let mut logs: Vec<String> = vec![];
         for log_file_name in log_files.iter().take(MAX_LOG_FILES_PER_DATE) {
             let full_path: PathBuf = date_path.join(log_file_name);
             if let Ok(content) = Self::read_and_reverse_log_file(&full_path).await
@@ -81,7 +81,7 @@ impl LogService {
         let level_string: String = level.to_string();
         let log_dir_string: String = log_dir.display().to_string();
         let date_dirs: Vec<String> = Self::get_sorted_dirs(&log_dir);
-        let mut all_logs: Vec<String> = Vec::new();
+        let mut all_logs: Vec<String> = vec![];
         for date_dir in date_dirs.iter().take(MAX_DATE_DIRS) {
             let logs: Vec<String> = Self::process_date_directory(&log_dir, date_dir).await;
             all_logs.extend(logs);

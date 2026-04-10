@@ -30,7 +30,7 @@ impl PerformanceRingBuffer {
 
     pub fn get_all_sorted(&self) -> Vec<PerformanceDataPoint> {
         if self.count == 0 {
-            return Vec::new();
+            return vec![];
         }
         let mut result: Vec<PerformanceDataPoint> = Vec::with_capacity(self.count);
         if self.count < self.capacity {

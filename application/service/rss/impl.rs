@@ -72,20 +72,20 @@ impl RssService {
     pub async fn get_uploaded_files() -> Vec<UploadedFile> {
         let entries: Vec<DirEntry> = match read_dir(UPLOAD_DIR).await {
             Ok(mut read_dir) => {
-                let mut entries: Vec<DirEntry> = Vec::new();
+                let mut entries: Vec<DirEntry> = vec![];
                 while let Ok(Some(entry)) = read_dir.next_entry().await {
                     entries.push(entry);
                 }
                 entries
             }
-            Err(_) => return Vec::new(),
+            Err(_) => return vec![],
         };
         let tasks: Vec<_> = entries
             .into_iter()
             .map(|entry: DirEntry| {
                 let path: PathBuf = entry.path();
                 async move {
-                    let mut files: Vec<UploadedFile> = Vec::new();
+                    let mut files: Vec<UploadedFile> = vec![];
                     Self::scan_directory_recursive_sync(&path, &mut files).await;
                     files
                 }

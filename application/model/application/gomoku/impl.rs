@@ -45,13 +45,13 @@ impl Default for GomokuRoom {
         Self {
             room_id: String::new(),
             owner_id: String::new(),
-            players: Vec::new(),
-            spectators: Vec::new(),
-            board: Vec::new(),
+            players: vec![],
+            spectators: vec![],
+            board: vec![],
             status: GameStatus::Waiting,
             next_turn: StoneColor::Black,
             winner: None,
-            moves: Vec::new(),
+            moves: vec![],
         }
     }
 }

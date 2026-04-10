@@ -381,7 +381,7 @@ impl ServerHook for GetIncrementalRunDetailRoute {
             Some(offsets_str) => {
                 serde_json::from_str::<Vec<StepOffsetParam>>(offsets_str).unwrap_or_default()
             }
-            None => Vec::new(),
+            None => vec![],
         };
         match CicdService::get_incremental_run_detail(run_id, step_offsets).await {
             Ok(Some(detail)) => {
@@ -459,7 +459,7 @@ impl ServerHook for RunLogsSseRoute {
                 return;
             }
         }
-        let mut receivers: Vec<(i32, BroadcastMapReceiver<String>)> = Vec::new();
+        let mut receivers: Vec<(i32, BroadcastMapReceiver<String>)> = vec![];
         for step_id in &step_ids {
             if let Some(receiver) = log_manager.create_step_receiver(run_id, *step_id).await {
                 receivers.push((*step_id, receiver));

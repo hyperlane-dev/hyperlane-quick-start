@@ -345,7 +345,7 @@ impl CicdService {
         log_manager: &LogStreamManager,
     ) -> Result<String, String> {
         let mut reader: ChildStdout = reader;
-        let mut output_buffer: Vec<u8> = Vec::new();
+        let mut output_buffer: Vec<u8> = vec![];
         match reader.read_to_end(&mut output_buffer).await {
             Ok(_) => {
                 let output: String = String::from_utf8_lossy(&output_buffer).to_string();
@@ -368,7 +368,7 @@ impl CicdService {
         log_manager: &LogStreamManager,
     ) -> Result<String, String> {
         let mut reader: ChildStderr = reader;
-        let mut output_buffer: Vec<u8> = Vec::new();
+        let mut output_buffer: Vec<u8> = vec![];
         match reader.read_to_end(&mut output_buffer).await {
             Ok(_) => {
                 let output: String = String::from_utf8_lossy(&output_buffer).to_string();
@@ -484,7 +484,7 @@ impl CicdService {
         let run: Option<RunDto> = Self::get_run_by_id(run_id).await?;
         if let Some(run_dto) = run {
             let jobs: Vec<JobDto> = Self::get_jobs_by_run(run_id).await?;
-            let mut jobs_with_steps: Vec<JobWithStepsDto> = Vec::new();
+            let mut jobs_with_steps: Vec<JobWithStepsDto> = vec![];
             for job in jobs {
                 let steps: Vec<StepDto> = Self::get_steps_by_job(job.get_id()).await?;
                 let mut dto: JobWithStepsDto = JobWithStepsDto::default();
@@ -550,11 +550,11 @@ impl CicdService {
         let run: Option<RunDto> = Self::get_run_by_id(run_id).await?;
         if let Some(run_dto) = run {
             let jobs: Vec<JobDto> = Self::get_jobs_by_run(run_id).await?;
-            let mut jobs_with_steps: Vec<JobWithIncrementalStepsDto> = Vec::new();
+            let mut jobs_with_steps: Vec<JobWithIncrementalStepsDto> = vec![];
             let log_manager: &LogStreamManager = get_log_stream_manager();
             for job in jobs {
                 let steps: Vec<StepDto> = Self::get_steps_by_job(job.get_id()).await?;
-                let mut step_logs: Vec<StepLogDto> = Vec::new();
+                let mut step_logs: Vec<StepLogDto> = vec![];
                 for step in steps {
                     let step_id: i32 = step.get_id();
                     let offset: usize = step_offsets
@@ -657,7 +657,7 @@ impl StepOutputBuilder {
     }
 
     fn build(self) -> String {
-        let mut parts: Vec<String> = Vec::new();
+        let mut parts: Vec<String> = vec![];
         let stdout: String = self.stdout.trim().to_string();
         let stderr: String = self.stderr.trim().to_string();
         if !stdout.is_empty() {

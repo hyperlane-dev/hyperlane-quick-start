@@ -86,7 +86,7 @@ impl ChatDomain {
                 let mut session: ChatSession = ChatSession::default();
                 session
                     .set_session_id(session_id.to_string())
-                    .set_messages(Vec::new())
+                    .set_messages(vec![])
                     .set_last_activity(std::time::Instant::now());
                 session
             })

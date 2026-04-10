@@ -120,7 +120,7 @@ impl DatabasePlugin {
             ));
         }
         let env: &'static EnvConfig = EnvPlugin::get_or_init();
-        let mut initialization_results: Vec<String> = Vec::new();
+        let mut initialization_results: Vec<String> = vec![];
         for instance in env.get_mysql_instances() {
             match MySqlPlugin::perform_auto_creation(instance, mysql_schema.clone()).await {
                 Ok(result) => {
@@ -272,7 +272,7 @@ impl DatabaseSchema {
 
     #[instrument_trace]
     pub fn ordered_tables(&self) -> Vec<&TableSchema> {
-        let mut ordered: Vec<&TableSchema> = Vec::new();
+        let mut ordered: Vec<&TableSchema> = vec![];
         let mut remaining: Vec<&TableSchema> = self.get_tables().iter().collect();
         while !remaining.is_empty() {
             let mut added_any: bool = false;

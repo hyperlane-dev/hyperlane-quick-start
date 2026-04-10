@@ -6,6 +6,7 @@ impl ServerHook for ChatConnectedHook {
         Self
     }
 
+    #[request_query_option("uuid" => uuid_opt)]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
         let websocket: &WebSocket = get_global_websocket();
@@ -16,6 +17,10 @@ impl ServerHook for ChatConnectedHook {
             ChatService::create_online_count_message(ctx, receiver_count.to_string()).await;
         ctx.get_mut_response().set_body(resp_data.clone());
         ChatService::broadcast_online_count(key, resp_data.clone());
+        let uuid: String = uuid_opt.unwrap_or_default();
+        if !uuid.is_empty() {
+            ChatDomain::add_online_user(&uuid).await;
+        }
     }
 }
 
@@ -45,26 +50,23 @@ impl ServerHook for ChatRequestHook {
         let uuid: String = uuid_opt.unwrap_or_default();
         let req_msg: String = req_data.get_data().clone();
         if ChatService::is_gpt_mentioned(&req_msg) {
-            let path: String = ctx.get_request().get_path().clone();
-            let websocket: &WebSocket = get_global_websocket();
-            let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
-            let user_resp_data: WebSocketRespData =
-                WebSocketRespData::from(MessageType::Text, ctx, &req_msg).await;
-            let user_resp_json: ResponseBody =
-                serde_json::to_vec(&user_resp_data).unwrap_or_default();
-            let _: Result<Option<ReceiverCount>, SendError<Vec<u8>>> =
-                websocket.try_send(key.clone(), user_resp_json);
-            let system_resp_data: WebSocketRespData = WebSocketRespData::from(
-                MessageType::System,
-                ctx,
-                format!("{GPT} is running, please wait ..."),
-            )
-            .await;
-            let system_resp_json: ResponseBody =
-                serde_json::to_vec(&system_resp_data).unwrap_or_default();
-            let _: Result<Option<ReceiverCount>, SendError<Vec<u8>>> =
-                websocket.try_send(key, system_resp_json);
-            ChatService::process_gpt_request(uuid, req_msg, ctx).await;
+            let mut ctx_clone: Context = ctx.clone();
+            spawn(async move {
+                let path: String = ctx_clone.get_request().get_path().clone();
+                let system_resp_data: WebSocketRespData = WebSocketRespData::from(
+                    MessageType::System,
+                    &mut ctx_clone,
+                    format!("{GPT} is running, please wait ..."),
+                )
+                .await;
+                let websocket: &WebSocket = get_global_websocket();
+                let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
+                let system_resp_json: ResponseBody =
+                    serde_json::to_vec(&system_resp_data).unwrap_or_default();
+                let _: Result<Option<ReceiverCount>, SendError<Vec<u8>>> =
+                    websocket.try_send(key, system_resp_json);
+                ChatService::process_gpt_request(uuid, req_msg, &mut ctx_clone).await;
+            });
         }
     }
 }
@@ -180,28 +182,65 @@ impl ChatService {
 
     #[instrument_trace]
     pub async fn process_gpt_request(session_id: String, message: String, ctx: &mut Context) {
+        let path: String = ctx.get_request().get_path().clone();
+        let websocket: &WebSocket = get_global_websocket();
+        let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
         let mut session: ChatSession = ChatDomain::get_or_create_session(&session_id).await;
         let cleaned_msg: String = Self::remove_mentions(&message);
         session.add_message(ROLE_USER.to_string(), cleaned_msg);
-        let api_response: String = match Self::call_gpt_api_with_context(&session).await {
-            Ok(gpt_response) => {
-                session.add_message(ROLE_ASSISTANT.to_string(), gpt_response.clone());
-                ChatDomain::update_session(session).await;
-                format!("{MENTION_PREFIX}{session_id}{SPACE}{gpt_response}")
+        ChatDomain::update_session(session.clone()).await;
+        let continue_prompt: &str = "Continue from where you left off.";
+        let mut is_first_iteration: bool = true;
+        loop {
+            let mut current_session: ChatSession =
+                ChatDomain::get_or_create_session(&session_id).await;
+            if !is_first_iteration {
+                current_session.add_message(ROLE_USER.to_string(), continue_prompt.to_string());
+                ChatDomain::update_session(current_session.clone()).await;
+                current_session = ChatDomain::get_or_create_session(&session_id).await;
             }
-            Err(error) => format!("API call failed {error}"),
-        };
-        let gpt_resp_data: WebSocketRespData =
-            WebSocketRespData::from(MessageType::GptResponse, ctx, &api_response).await;
-        let gpt_resp_json: ResponseBody = serde_json::to_vec(&gpt_resp_data).unwrap();
-        ctx.get_mut_response().set_body(&gpt_resp_json);
-        spawn(async move {
+            is_first_iteration = false;
+            let api_result: Result<String, String> =
+                Self::call_gpt_api_with_context(&current_session).await;
+            let (response_content, should_stop): (String, bool) = match api_result {
+                Ok(gpt_response) => {
+                    let trimmed_response: &str = gpt_response.trim();
+                    let stop_flag: &str = "[STOP]";
+                    let should_stop: bool = trimmed_response.contains(stop_flag);
+                    let cleaned_response: String = if should_stop {
+                        trimmed_response.replace(stop_flag, "").trim().to_string()
+                    } else {
+                        trimmed_response.to_string()
+                    };
+                    if cleaned_response.is_empty() {
+                        ("[No more content]".to_string(), true)
+                    } else {
+                        let mut updated_session: ChatSession =
+                            ChatDomain::get_or_create_session(&session_id).await;
+                        updated_session
+                            .add_message(ROLE_ASSISTANT.to_string(), cleaned_response.clone());
+                        ChatDomain::update_session(updated_session).await;
+                        let formatted_response: String =
+                            format!("{MENTION_PREFIX}{session_id}{SPACE}{cleaned_response}");
+                        (formatted_response, should_stop)
+                    }
+                }
+                Err(error) => {
+                    let error_msg: String = format!("API call failed {error}");
+                    (error_msg, true)
+                }
+            };
+            let gpt_resp_data: WebSocketRespData =
+                WebSocketRespData::from(MessageType::GptResponse, ctx, &response_content).await;
+            let gpt_resp_json: ResponseBody = serde_json::to_vec(&gpt_resp_data).unwrap();
+            let _: Result<Option<ReceiverCount>, SendError<Vec<u8>>> =
+                websocket.try_send(key.clone(), gpt_resp_json);
             let save_res: Result<(), String> = Self::save_message(
                 &session_id,
                 "GPT Assistant",
                 "assistant",
                 "GptResponse",
-                &api_response,
+                &response_content,
             )
             .await;
             if save_res.is_err() {
@@ -210,12 +249,21 @@ impl ChatService {
                     save_res.err().unwrap_or_default()
                 );
             }
-        });
+            if should_stop {
+                break;
+            }
+        }
     }
 
     #[instrument_trace]
     fn build_gpt_request_messages(session: &ChatSession) -> Vec<serde_json::Value> {
-        session
+        let stop_instruction: &str = "If you have completed your response and do not need to continue, add [STOP] at the end of your message. Otherwise, continue outputting without adding [STOP].";
+        let system_message: serde_json::Value = json!({
+            JSON_FIELD_ROLE: "system",
+            JSON_FIELD_CONTENT: stop_instruction
+        });
+        let mut messages: Vec<serde_json::Value> = vec![system_message];
+        let session_messages: Vec<serde_json::Value> = session
             .get_messages()
             .iter()
             .map(|msg| {
@@ -224,7 +272,9 @@ impl ChatService {
                     JSON_FIELD_CONTENT: msg.get_content()
                 })
             })
-            .collect()
+            .collect();
+        messages.extend(session_messages);
+        messages
     }
 
     #[instrument_trace]
