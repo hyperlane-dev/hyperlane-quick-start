@@ -8,6 +8,7 @@ where
 {
     #[get(type(copy))]
     pub(super) code: i32,
+    #[set(type(AsRef<str>))]
     pub(super) message: String,
     pub(super) data: Option<T>,
     #[get(type(copy))]
