@@ -13,7 +13,11 @@ impl Default for ChatSession {
 
 impl ChatSession {
     #[instrument_trace]
-    pub fn add_message(&mut self, role: String, content: String) {
+    pub fn add_message<R, C>(&mut self, role: R, content: C)
+    where
+        R: AsRef<str>,
+        C: AsRef<str>,
+    {
         let mut message: ChatMessage = ChatMessage::default();
         message.set_role(role).set_content(content);
         self.get_mut_messages().push(message);

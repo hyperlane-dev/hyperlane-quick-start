@@ -187,27 +187,14 @@ impl ChatService {
         let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
         let mut session: ChatSession = ChatDomain::get_or_create_session(&session_id).await;
         let cleaned_msg: String = Self::remove_mentions(&message);
-        session.add_message(ROLE_USER.to_string(), cleaned_msg);
+        session.add_message(ROLE_USER, cleaned_msg);
         ChatDomain::update_session(session.clone()).await;
-        let continue_prompt: &str = "Continue from where you left off.";
         let mut is_first_iteration: bool = true;
-        let mut iteration_count: usize = 0;
         loop {
-            iteration_count += 1;
-            if iteration_count > MAX_GPT_ITERATIONS {
-                let final_msg: String =
-                    format!("{MENTION_PREFIX}{session_id}{SPACE}[Maximum response length reached]");
-                let final_resp_data: WebSocketRespData =
-                    WebSocketRespData::from(MessageType::GptResponse, ctx, &final_msg).await;
-                let final_resp_json: ResponseBody = serde_json::to_vec(&final_resp_data).unwrap();
-                let _: Result<Option<ReceiverCount>, SendError<Vec<u8>>> =
-                    websocket.try_send(key.clone(), final_resp_json);
-                break;
-            }
             let mut current_session: ChatSession =
                 ChatDomain::get_or_create_session(&session_id).await;
             if !is_first_iteration {
-                current_session.add_message(ROLE_USER.to_string(), continue_prompt.to_string());
+                current_session.add_message(ROLE_USER, CONTINUE_PROMPT);
                 ChatDomain::update_session(current_session.clone()).await;
                 current_session = ChatDomain::get_or_create_session(&session_id).await;
             }
@@ -221,7 +208,7 @@ impl ChatService {
                     } else {
                         let mut updated_session: ChatSession =
                             ChatDomain::get_or_create_session(&session_id).await;
-                        updated_session.add_message(ROLE_ASSISTANT.to_string(), content.clone());
+                        updated_session.add_message(ROLE_ASSISTANT, &content);
                         ChatDomain::update_session(updated_session).await;
                         let formatted_response: String =
                             format!("{MENTION_PREFIX}{session_id}{SPACE}{content}");

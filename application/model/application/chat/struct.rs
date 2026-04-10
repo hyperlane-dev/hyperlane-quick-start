@@ -2,7 +2,9 @@ use super::*;
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]
 pub struct ChatMessage {
+    #[set(type(AsRef<str>))]
     pub(super) role: String,
+    #[set(type(AsRef<str>))]
     pub(super) content: String,
 }
 
