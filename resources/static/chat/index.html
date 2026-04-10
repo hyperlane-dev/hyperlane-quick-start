@@ -2496,16 +2496,14 @@
       }
 
       function reconnect() {
-        if (reconnectAttempts < maxReconnectAttempts) {
-          reconnectAttempts++;
-          setTimeout(() => {
-            connect();
-          }, reconnectInterval);
-        } else {
-          console.error(
-            'Maximum reconnection attempts reached, stopping reconnection',
-          );
-        }
+        reconnectAttempts++;
+        const currentInterval = Math.min(
+          reconnectInterval * Math.pow(2, Math.floor(reconnectAttempts / 5)),
+          30000,
+        );
+        setTimeout(() => {
+          connect();
+        }, currentInterval);
       }
 
       function sendWebSocketMessage(message) {
