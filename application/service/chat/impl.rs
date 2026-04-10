@@ -191,7 +191,19 @@ impl ChatService {
         ChatDomain::update_session(session.clone()).await;
         let continue_prompt: &str = "Continue from where you left off.";
         let mut is_first_iteration: bool = true;
+        let mut iteration_count: usize = 0;
         loop {
+            iteration_count += 1;
+            if iteration_count > MAX_GPT_ITERATIONS {
+                let final_msg: String =
+                    format!("{MENTION_PREFIX}{session_id}{SPACE}[Maximum response length reached]");
+                let final_resp_data: WebSocketRespData =
+                    WebSocketRespData::from(MessageType::GptResponse, ctx, &final_msg).await;
+                let final_resp_json: ResponseBody = serde_json::to_vec(&final_resp_data).unwrap();
+                let _: Result<Option<ReceiverCount>, SendError<Vec<u8>>> =
+                    websocket.try_send(key.clone(), final_resp_json);
+                break;
+            }
             let mut current_session: ChatSession =
                 ChatDomain::get_or_create_session(&session_id).await;
             if !is_first_iteration {
@@ -200,34 +212,25 @@ impl ChatService {
                 current_session = ChatDomain::get_or_create_session(&session_id).await;
             }
             is_first_iteration = false;
-            let api_result: Result<String, String> =
+            let api_result: Result<(String, bool), String> =
                 Self::call_gpt_api_with_context(&current_session).await;
-            let (response_content, should_stop): (String, bool) = match api_result {
-                Ok(gpt_response) => {
-                    let trimmed_response: &str = gpt_response.trim();
-                    let stop_flag: &str = "[STOP]";
-                    let should_stop: bool = trimmed_response.contains(stop_flag);
-                    let cleaned_response: String = if should_stop {
-                        trimmed_response.replace(stop_flag, "").trim().to_string()
-                    } else {
-                        trimmed_response.to_string()
-                    };
-                    if cleaned_response.is_empty() {
-                        ("[No more content]".to_string(), true)
+            let (response_content, should_continue): (String, bool) = match api_result {
+                Ok((content, should_continue_flag)) => {
+                    if content.is_empty() {
+                        ("[No more content]".to_string(), false)
                     } else {
                         let mut updated_session: ChatSession =
                             ChatDomain::get_or_create_session(&session_id).await;
-                        updated_session
-                            .add_message(ROLE_ASSISTANT.to_string(), cleaned_response.clone());
+                        updated_session.add_message(ROLE_ASSISTANT.to_string(), content.clone());
                         ChatDomain::update_session(updated_session).await;
                         let formatted_response: String =
-                            format!("{MENTION_PREFIX}{session_id}{SPACE}{cleaned_response}");
-                        (formatted_response, should_stop)
+                            format!("{MENTION_PREFIX}{session_id}{SPACE}{content}");
+                        (formatted_response, should_continue_flag)
                     }
                 }
                 Err(error) => {
                     let error_msg: String = format!("API call failed {error}");
-                    (error_msg, true)
+                    (error_msg, false)
                 }
             };
             let gpt_resp_data: WebSocketRespData =
@@ -249,18 +252,39 @@ impl ChatService {
                     save_res.err().unwrap_or_default()
                 );
             }
-            if should_stop {
+            if !should_continue {
                 break;
             }
         }
     }
 
     #[instrument_trace]
-    fn build_gpt_request_messages(session: &ChatSession) -> Vec<serde_json::Value> {
-        let stop_instruction: &str = "If you have completed your response and do not need to continue, add [STOP] at the end of your message. Otherwise, continue outputting without adding [STOP].";
+    fn build_gpt_request_body(session: &ChatSession) -> serde_json::Value {
+        let json_schema: serde_json::Value = json!({
+            "type": "json_schema",
+            "json_schema": {
+                "name": "chat_response",
+                "strict": true,
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        JSON_FIELD_RESPONSE_CONTENT: {
+                            "type": "string",
+                            "description": "The response content to the user's message"
+                        },
+                        JSON_FIELD_SHOULD_CONTINUE: {
+                            "type": "boolean",
+                            "description": "Set to true if you have more content to provide and want to continue in the next iteration. Set to false if your response is complete."
+                        }
+                    },
+                    "required": [JSON_FIELD_RESPONSE_CONTENT, JSON_FIELD_SHOULD_CONTINUE],
+                    "additionalProperties": false
+                }
+            }
+        });
         let system_message: serde_json::Value = json!({
-            JSON_FIELD_ROLE: "system",
-            JSON_FIELD_CONTENT: stop_instruction
+            JSON_FIELD_ROLE: SYSTEM,
+            JSON_FIELD_CONTENT: SYSTEM_INSTRUCTION
         });
         let mut messages: Vec<serde_json::Value> = vec![system_message];
         let session_messages: Vec<serde_json::Value> = session
@@ -274,7 +298,11 @@ impl ChatService {
             })
             .collect();
         messages.extend(session_messages);
-        messages
+        json!({
+            GPT_MODEL: EnvPlugin::get_or_init().get_gpt_model(),
+            JSON_FIELD_MESSAGES: messages,
+            RESPONSE_FORMAT: json_schema
+        })
     }
 
     #[instrument_trace]
@@ -282,7 +310,7 @@ impl ChatService {
         let mut headers: HashMapXxHash3_64<&'static str, String> = hash_map_xx_hash3_64();
         headers.insert(CONTENT_TYPE, APPLICATION_JSON.to_string());
         if !api_key.is_empty() {
-            headers.insert("Authorization", format!("Bearer {api_key}"));
+            headers.insert(AUTHORIZATION, format!("{BEARER_WITH_SPACE}{api_key}"));
         }
         headers
     }
@@ -318,7 +346,7 @@ impl ChatService {
     }
 
     #[instrument_trace]
-    fn handle_gpt_api_response(response_text: &str) -> Result<String, String> {
+    fn handle_gpt_api_response(response_text: &str) -> Result<(String, bool), String> {
         if response_text.trim().is_empty() {
             return Err(
                 "API response is empty, possible authentication failure or network issue"
@@ -329,25 +357,36 @@ impl ChatService {
             serde_json::from_str(response_text).map_err(|error| {
                 format!("JSON parsing failed {error} (response content {response_text})",)
             })?;
-        if let Some(content) = Self::extract_response_content(&response_json) {
-            return Ok(content);
-        }
-        if let Some(error) = Self::extract_error_message(&response_json) {
-            return Err(error);
-        }
-        Err(format!("Incorrect API response format {response_text}"))
+        let content_str: String = match Self::extract_response_content(&response_json) {
+            Some(content) => content,
+            None => {
+                if let Some(error) = Self::extract_error_message(&response_json) {
+                    return Err(error);
+                }
+                return Err(format!("Incorrect API response format {response_text}"));
+            }
+        };
+        let parsed_content: serde_json::Value =
+            serde_json::from_str(&content_str).map_err(|error| {
+                format!("Failed to parse inner JSON content {error} (content: {content_str})")
+            })?;
+        let response_content: String = parsed_content
+            .get(JSON_FIELD_RESPONSE_CONTENT)
+            .and_then(|v: &serde_json::Value| v.as_str())
+            .unwrap_or("")
+            .to_string();
+        let should_continue: bool = parsed_content
+            .get(JSON_FIELD_SHOULD_CONTINUE)
+            .and_then(|v: &serde_json::Value| v.as_bool())
+            .unwrap_or(false);
+        Ok((response_content, should_continue))
     }
 
     #[instrument_trace]
-    async fn call_gpt_api_with_context(session: &ChatSession) -> Result<String, String> {
+    async fn call_gpt_api_with_context(session: &ChatSession) -> Result<(String, bool), String> {
         let config: &EnvConfig = EnvPlugin::get_or_init();
-        let gpt_model: &str = config.get_gpt_model();
         let api_key: &str = config.get_gpt_api_key();
-        let messages: Vec<serde_json::Value> = Self::build_gpt_request_messages(session);
-        let body: serde_json::Value = json!({
-            GPT_MODEL: gpt_model,
-            JSON_FIELD_MESSAGES: messages
-        });
+        let body: serde_json::Value = Self::build_gpt_request_body(session);
         let headers: HashMapXxHash3_64<&str, String> = Self::build_gpt_request_headers(api_key);
         let mut request_builder: BoxAsyncRequestTrait = RequestBuilder::new()
             .post(config.get_gpt_api_url())
