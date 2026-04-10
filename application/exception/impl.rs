@@ -22,8 +22,10 @@ impl ServerHook for TaskPanicHook {
     async fn handle(self, ctx: &mut Context) {
         debug!("TaskPanicHook request => {}", ctx.get_request());
         error!("TaskPanicHook => {}", self.get_response_body());
-        let api_response: ApiResponse<()> =
-            ApiResponse::error_with_code(ResponseCode::InternalError, self.get_response_body());
+        let api_response: ApiResponse<&str> = ApiResponse::new(
+            ApiResponseStatus::InternalServerError,
+            self.get_response_body(),
+        );
         let response_body: Vec<u8> = api_response.to_json_bytes();
     }
 }
@@ -59,8 +61,10 @@ impl ServerHook for RequestErrorHook {
             debug!("RequestErrorHook request => {}", ctx.get_request());
             error!("RequestErrorHook => {}", self.get_response_body());
         }
-        let api_response: ApiResponse<()> =
-            ApiResponse::error_with_code(ResponseCode::InternalError, self.get_response_body());
+        let api_response: ApiResponse<&str> = ApiResponse::new(
+            ApiResponseStatus::InternalServerError,
+            self.get_response_body(),
+        );
         let response_body: Vec<u8> = api_response.to_json_bytes();
     }
 }

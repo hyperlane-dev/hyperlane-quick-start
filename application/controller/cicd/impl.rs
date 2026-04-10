@@ -16,20 +16,20 @@ impl ServerHook for CreatePipelineRoute {
         let param: CreatePipelineParam = match param {
             Ok(data) => data,
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error.to_string());
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, error.to_string());
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
         };
         match CicdService::create_pipeline(param).await {
             Ok(id) => {
-                let response: ApiResponse<i32> = ApiResponse::success(id);
+                let response: ApiResponse<i32> = ApiResponse::new(ApiResponseStatus::Success, id);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -50,12 +50,13 @@ impl ServerHook for ListPipelinesRoute {
     async fn handle(self, ctx: &mut Context) {
         match CicdService::get_all_pipelines().await {
             Ok(pipelines) => {
-                let response: ApiResponse<Vec<PipelineDto>> = ApiResponse::success(pipelines);
+                let response: ApiResponse<Vec<PipelineDto>> =
+                    ApiResponse::new(ApiResponseStatus::Success, pipelines);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -82,8 +83,8 @@ impl ServerHook for GetPipelineRoute {
         {
             Some(id) => id,
             None => {
-                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                    ResponseCode::BadRequest,
+                let response: ApiResponse<&str> = ApiResponse::new(
+                    ApiResponseStatus::InvalidRequest,
                     "Missing or invalid id parameter",
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes());
@@ -92,19 +93,18 @@ impl ServerHook for GetPipelineRoute {
         };
         match CicdService::get_pipeline_by_id(id).await {
             Ok(Some(pipeline)) => {
-                let response: ApiResponse<PipelineDto> = ApiResponse::success(pipeline);
+                let response: ApiResponse<PipelineDto> =
+                    ApiResponse::new(ApiResponseStatus::Success, pipeline);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Ok(None) => {
-                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                    ResponseCode::NotFound,
-                    "Pipeline not found",
-                );
+                let response: ApiResponse<&str> =
+                    ApiResponse::new(ApiResponseStatus::ResourceNotFound, "Pipeline not found");
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -127,20 +127,20 @@ impl ServerHook for TriggerRunRoute {
         let param: TriggerRunParam = match param {
             Ok(data) => data,
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error.to_string());
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, error.to_string());
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
         };
         match CicdService::trigger_run(param).await {
             Ok(id) => {
-                let response: ApiResponse<i32> = ApiResponse::success(id);
+                let response: ApiResponse<i32> = ApiResponse::new(ApiResponseStatus::Success, id);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -177,12 +177,13 @@ impl ServerHook for ListRunsRoute {
             .set_last_id(last_id);
         match CicdService::query_runs(param).await {
             Ok(result) => {
-                let response: ApiResponse<PaginatedRunsDto> = ApiResponse::success(result);
+                let response: ApiResponse<PaginatedRunsDto> =
+                    ApiResponse::new(ApiResponseStatus::Success, result);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -205,8 +206,8 @@ impl ServerHook for GetRunRoute {
         let id: i32 = match querys.get("id").and_then(|s: &String| s.parse().ok()) {
             Some(id) => id,
             None => {
-                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                    ResponseCode::BadRequest,
+                let response: ApiResponse<&str> = ApiResponse::new(
+                    ApiResponseStatus::InvalidRequest,
                     "Missing or invalid id parameter",
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes());
@@ -215,17 +216,18 @@ impl ServerHook for GetRunRoute {
         };
         match CicdService::get_run_by_id(id).await {
             Ok(Some(run)) => {
-                let response: ApiResponse<RunDto> = ApiResponse::success(run);
+                let response: ApiResponse<RunDto> =
+                    ApiResponse::new(ApiResponseStatus::Success, run);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Ok(None) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::NotFound, "Run not found");
+                let response: ApiResponse<&str> =
+                    ApiResponse::new(ApiResponseStatus::ResourceNotFound, "Run not found");
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -252,8 +254,8 @@ impl ServerHook for GetRunDetailRoute {
         {
             Some(id) => id,
             None => {
-                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                    ResponseCode::BadRequest,
+                let response: ApiResponse<&str> = ApiResponse::new(
+                    ApiResponseStatus::InvalidRequest,
                     "Missing or invalid id parameter",
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes());
@@ -262,17 +264,18 @@ impl ServerHook for GetRunDetailRoute {
         };
         match CicdService::get_run_detail(id).await {
             Ok(Some(detail)) => {
-                let response: ApiResponse<RunDetailDto> = ApiResponse::success(detail);
+                let response: ApiResponse<RunDetailDto> =
+                    ApiResponse::new(ApiResponseStatus::Success, detail);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Ok(None) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::NotFound, "Run not found");
+                let response: ApiResponse<&str> =
+                    ApiResponse::new(ApiResponseStatus::ResourceNotFound, "Run not found");
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -295,21 +298,23 @@ impl ServerHook for UpdateJobRoute {
         let param: UpdateJobStatusParam = match param {
             Ok(data) => data,
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error.to_string());
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, error.to_string());
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
         };
         match CicdService::update_job_status(param).await {
             Ok(()) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::success_without_data("Job status updated successfully");
+                let response: ApiResponse<&str> = ApiResponse::new(
+                    ApiResponseStatus::Success,
+                    "Job status updated successfully",
+                );
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -332,21 +337,23 @@ impl ServerHook for UpdateStepRoute {
         let param: UpdateStepStatusParam = match param {
             Ok(data) => data,
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error.to_string());
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, error.to_string());
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
         };
         match CicdService::update_step_status(param).await {
             Ok(()) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::success_without_data("Step status updated successfully");
+                let response: ApiResponse<&str> = ApiResponse::new(
+                    ApiResponseStatus::Success,
+                    "Step status updated successfully",
+                );
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -369,8 +376,8 @@ impl ServerHook for GetIncrementalRunDetailRoute {
         let run_id: i32 = match querys.get("run_id").and_then(|s: &String| s.parse().ok()) {
             Some(id) => id,
             None => {
-                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                    ResponseCode::BadRequest,
+                let response: ApiResponse<&str> = ApiResponse::new(
+                    ApiResponseStatus::InvalidRequest,
                     "Missing or invalid run_id parameter",
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes());
@@ -385,17 +392,18 @@ impl ServerHook for GetIncrementalRunDetailRoute {
         };
         match CicdService::get_incremental_run_detail(run_id, step_offsets).await {
             Ok(Some(detail)) => {
-                let response: ApiResponse<IncrementalRunDetailDto> = ApiResponse::success(detail);
+                let response: ApiResponse<IncrementalRunDetailDto> =
+                    ApiResponse::new(ApiResponseStatus::Success, detail);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Ok(None) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::NotFound, "Run not found");
+                let response: ApiResponse<&str> =
+                    ApiResponse::new(ApiResponseStatus::ResourceNotFound, "Run not found");
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -435,8 +443,8 @@ impl ServerHook for RunLogsSseRoute {
         let run_id: i32 = match querys.get("run_id").and_then(|s: &String| s.parse().ok()) {
             Some(id) => id,
             None => {
-                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                    ResponseCode::BadRequest,
+                let response: ApiResponse<&str> = ApiResponse::new(
+                    ApiResponseStatus::InvalidRequest,
                     "Missing or invalid run_id parameter",
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes());

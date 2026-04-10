@@ -13,7 +13,8 @@ impl ServerHook for OnlineUsersRoute {
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
         let user_list: UserListResponse = ChatDomain::get_online_users_list().await;
-        let response: ApiResponse<UserListResponse> = ApiResponse::success(user_list);
+        let response: ApiResponse<UserListResponse> =
+            ApiResponse::new(ApiResponseStatus::Success, user_list);
         ctx.get_mut_response().set_body(response.to_json_bytes());
     }
 }
@@ -61,11 +62,13 @@ impl ServerHook for ChatHistoryRoute {
             .unwrap_or(20);
         match ChatService::get_chat_history(before_id, limit).await {
             Ok(history) => {
-                let response: ApiResponse<ChatHistoryResponse> = ApiResponse::success(history);
+                let response: ApiResponse<ChatHistoryResponse> =
+                    ApiResponse::new(ApiResponseStatus::Success, history);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
             }
             Err(error) => {
-                let error_response: ApiResponse<()> = ApiResponse::error(&error);
+                let error_response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::InternalServerError, error);
                 ctx.get_mut_response()
                     .set_body(error_response.to_json_bytes());
             }

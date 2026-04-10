@@ -19,8 +19,8 @@ impl ServerHook for DatasetRoute {
                     .set_body(&dataset_content);
             }
             Err(error) => {
-                let error_response: ApiResponse<()> =
-                    ApiResponse::error_with_code(ResponseCode::InternalError, error);
+                let error_response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::InternalServerError, error);
                 ctx.get_mut_response()
                     .set_body(error_response.to_json_bytes());
             }

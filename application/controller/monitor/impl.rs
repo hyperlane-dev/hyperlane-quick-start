@@ -41,7 +41,8 @@ impl ServerHook for SystemInfoRoute {
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
         let system_info: SystemInfo = MonitorService::get_system_info().await;
-        let response: ApiResponse<SystemInfo> = ApiResponse::success(system_info);
+        let response: ApiResponse<SystemInfo> =
+            ApiResponse::new(ApiResponseStatus::Success, system_info);
         ctx.get_mut_response().set_body(response.to_json_bytes());
     }
 }
@@ -92,7 +93,7 @@ impl ServerHook for PerformanceHistoryRoute {
         let history_response: PerformanceHistoryResponse =
             MonitorService::get_performance_history_response().await;
         let response: ApiResponse<PerformanceHistoryResponse> =
-            ApiResponse::success(history_response);
+            ApiResponse::new(ApiResponseStatus::Success, history_response);
         ctx.get_mut_response().set_body(response.to_json_bytes());
     }
 }

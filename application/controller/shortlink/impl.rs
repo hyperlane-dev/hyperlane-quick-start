@@ -16,20 +16,21 @@ impl ServerHook for InsertRoute {
         let request: ShortlinkInsertRequest = match request_opt {
             Ok(data) => data,
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error.to_string());
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, error.to_string());
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
         };
         match ShortlinkService::insert_shortlink(request).await {
             Ok(encrypted_id) => {
-                let response: ApiResponse<String> = ApiResponse::<String>::success(encrypted_id);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::Success, encrypted_id);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -52,8 +53,8 @@ impl ServerHook for QueryRoute {
         let encrypted_id: String = match id_opt {
             Some(id_str) => id_str,
             None => {
-                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                    ResponseCode::BadRequest,
+                let response: ApiResponse<&str> = ApiResponse::new(
+                    ApiResponseStatus::InvalidRequest,
                     "Shortlink ID parameter is required",
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes());
@@ -63,7 +64,7 @@ impl ServerHook for QueryRoute {
         match ShortlinkService::query_shortlink(encrypted_id).await {
             Ok(Some(record)) => {
                 let response: ApiResponse<ShortlinkRecord> =
-                    ApiResponse::<ShortlinkRecord>::success(record);
+                    ApiResponse::new(ApiResponseStatus::Success, record);
                 ctx.get_mut_response().set_status_code(302).set_header(
                     LOCATION,
                     response
@@ -74,15 +75,13 @@ impl ServerHook for QueryRoute {
                 )
             }
             Ok(None) => {
-                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                    ResponseCode::NotFound,
-                    "Shortlink not found",
-                );
+                let response: ApiResponse<&str> =
+                    ApiResponse::new(ApiResponseStatus::ResourceNotFound, "Shortlink not found");
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };

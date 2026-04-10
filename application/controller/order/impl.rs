@@ -12,8 +12,8 @@ impl ServerHook for UserRegisterRoute {
         let request: RegisterRequest = match request_opt {
             Ok(data) => data,
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error.to_string());
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, error.to_string());
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -21,12 +21,12 @@ impl ServerHook for UserRegisterRoute {
         match OrderService::register_user(request).await {
             Ok(user) => {
                 let response: ApiResponse<UserResponse> =
-                    ApiResponse::<UserResponse>::success(user);
+                    ApiResponse::new(ApiResponseStatus::Success, user);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -45,8 +45,8 @@ impl ServerHook for UserLoginRoute {
         let request: LoginRequest = match request_opt {
             Ok(data) => data,
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error.to_string());
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, error.to_string());
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -73,19 +73,19 @@ impl ServerHook for UserLoginRoute {
                         let mut login_response: LoginResponse = LoginResponse::default();
                         login_response.set_user(user_response).set_token(token_str);
                         let response: ApiResponse<LoginResponse> =
-                            ApiResponse::<LoginResponse>::success(login_response);
+                            ApiResponse::new(ApiResponseStatus::Success, login_response);
                         ctx.get_mut_response().set_body(response.to_json_bytes());
                     }
                     Err(error) => {
-                        let response: ApiResponse<()> =
-                            ApiResponse::<()>::error_with_code(ResponseCode::InternalError, error);
+                        let response: ApiResponse<String> =
+                            ApiResponse::new(ApiResponseStatus::InternalServerError, error);
                         ctx.get_mut_response().set_body(response.to_json_bytes());
                     }
                 }
             }
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::Unauthorized, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::Unauthorized, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
             }
         };
@@ -105,19 +105,15 @@ impl ServerHook for UserUpdateRoute {
             Some(id_str) => match id_str.parse::<i32>() {
                 Ok(id) => id,
                 Err(_) => {
-                    let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                        ResponseCode::BadRequest,
-                        "Invalid user ID",
-                    );
+                    let response: ApiResponse<&str> =
+                        ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid user ID");
                     ctx.get_mut_response().set_body(response.to_json_bytes());
                     return;
                 }
             },
             None => {
-                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                    ResponseCode::BadRequest,
-                    "User ID is required",
-                );
+                let response: ApiResponse<&str> =
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, "User ID is required");
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -125,8 +121,8 @@ impl ServerHook for UserUpdateRoute {
         let current_user_id: i32 = match OrderService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::Unauthorized, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::Unauthorized, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -134,24 +130,22 @@ impl ServerHook for UserUpdateRoute {
         let current_user: UserResponse = match OrderService::get_user(current_user_id).await {
             Ok(Some(user_info)) => user_info,
             Ok(None) => {
-                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                    ResponseCode::Unauthorized,
-                    "User not found",
-                );
+                let response: ApiResponse<&str> =
+                    ApiResponse::new(ApiResponseStatus::Unauthorized, "User not found");
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
         };
         let user_role: UserRole = current_user.get_role().parse().unwrap_or_default();
         if !user_role.is_admin() && current_user_id != target_user_id {
-            let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                ResponseCode::Forbidden,
+            let response: ApiResponse<&str> = ApiResponse::new(
+                ApiResponseStatus::Forbidden,
                 "You can only update your own data",
             );
             ctx.get_mut_response().set_body(response.to_json_bytes());
@@ -160,8 +154,8 @@ impl ServerHook for UserUpdateRoute {
         let request: UpdateUserRequest = match request_opt {
             Ok(data) => data,
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error.to_string());
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, error.to_string());
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -169,12 +163,12 @@ impl ServerHook for UserUpdateRoute {
         match OrderService::update_user(target_user_id, request).await {
             Ok(user) => {
                 let response: ApiResponse<UserResponse> =
-                    ApiResponse::<UserResponse>::success(user);
+                    ApiResponse::new(ApiResponseStatus::Success, user);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -194,19 +188,15 @@ impl ServerHook for UserChangePasswordRoute {
             Some(id_str) => match id_str.parse::<i32>() {
                 Ok(id) => id,
                 Err(_) => {
-                    let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                        ResponseCode::BadRequest,
-                        "Invalid user ID",
-                    );
+                    let response: ApiResponse<&str> =
+                        ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid user ID");
                     ctx.get_mut_response().set_body(response.to_json_bytes());
                     return;
                 }
             },
             None => {
-                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                    ResponseCode::BadRequest,
-                    "User ID is required",
-                );
+                let response: ApiResponse<&str> =
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, "User ID is required");
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -214,20 +204,20 @@ impl ServerHook for UserChangePasswordRoute {
         let request: ChangePasswordRequest = match request_opt {
             Ok(data) => data,
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error.to_string());
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, error.to_string());
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
         };
         match OrderService::change_password(user_id, request).await {
             Ok(_) => {
-                let response: ApiResponse<()> = ApiResponse::<()>::success(());
+                let response: ApiResponse<()> = ApiResponse::new(ApiResponseStatus::Success, ());
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -247,19 +237,15 @@ impl ServerHook for UserApproveRoute {
             Some(id_str) => match id_str.parse::<i32>() {
                 Ok(id) => id,
                 Err(_) => {
-                    let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                        ResponseCode::BadRequest,
-                        "Invalid user ID",
-                    );
+                    let response: ApiResponse<&str> =
+                        ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid user ID");
                     ctx.get_mut_response().set_body(response.to_json_bytes());
                     return;
                 }
             },
             None => {
-                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                    ResponseCode::BadRequest,
-                    "User ID is required",
-                );
+                let response: ApiResponse<&str> =
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, "User ID is required");
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -267,8 +253,8 @@ impl ServerHook for UserApproveRoute {
         let request: ApproveUserRequest = match request_opt {
             Ok(data) => data,
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error.to_string());
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, error.to_string());
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -276,12 +262,12 @@ impl ServerHook for UserApproveRoute {
         match OrderService::approve_user(user_id, request.get_approved()).await {
             Ok(user) => {
                 let response: ApiResponse<UserResponse> =
-                    ApiResponse::<UserResponse>::success(user);
+                    ApiResponse::new(ApiResponseStatus::Success, user);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -300,8 +286,8 @@ impl ServerHook for UserListRoute {
         let current_user_id: i32 = match OrderService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::Unauthorized, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::Unauthorized, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -309,16 +295,14 @@ impl ServerHook for UserListRoute {
         let current_user: UserResponse = match OrderService::get_user(current_user_id).await {
             Ok(Some(user_info)) => user_info,
             Ok(None) => {
-                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                    ResponseCode::Unauthorized,
-                    "User not found",
-                );
+                let response: ApiResponse<&str> =
+                    ApiResponse::new(ApiResponseStatus::Unauthorized, "User not found");
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -341,12 +325,12 @@ impl ServerHook for UserListRoute {
         match OrderService::list_users(query).await {
             Ok(data) => {
                 let response: ApiResponse<UserListResponse> =
-                    ApiResponse::<UserListResponse>::success(data);
+                    ApiResponse::new(ApiResponseStatus::Success, data);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -366,19 +350,15 @@ impl ServerHook for UserGetRoute {
             Some(id_str) => match id_str.parse::<i32>() {
                 Ok(id) => id,
                 Err(_) => {
-                    let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                        ResponseCode::BadRequest,
-                        "Invalid user ID",
-                    );
+                    let response: ApiResponse<&str> =
+                        ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid user ID");
                     ctx.get_mut_response().set_body(response.to_json_bytes());
                     return;
                 }
             },
             None => {
-                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                    ResponseCode::BadRequest,
-                    "User ID is required",
-                );
+                let response: ApiResponse<&str> =
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, "User ID is required");
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -386,17 +366,17 @@ impl ServerHook for UserGetRoute {
         match OrderService::get_user(user_id).await {
             Ok(Some(user)) => {
                 let response: ApiResponse<UserResponse> =
-                    ApiResponse::<UserResponse>::success(user);
+                    ApiResponse::new(ApiResponseStatus::Success, user);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Ok(None) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::NotFound, "User not found");
+                let response: ApiResponse<&str> =
+                    ApiResponse::new(ApiResponseStatus::ResourceNotFound, "User not found");
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -415,8 +395,8 @@ impl ServerHook for RecordCreateRoute {
         let request: CreateRecordRequest = match request_opt {
             Ok(data) => data,
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error.to_string());
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, error.to_string());
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -424,8 +404,8 @@ impl ServerHook for RecordCreateRoute {
         let current_user_id: i32 = match OrderService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::Unauthorized, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::Unauthorized, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -433,24 +413,22 @@ impl ServerHook for RecordCreateRoute {
         let current_user: UserResponse = match OrderService::get_user(current_user_id).await {
             Ok(Some(user_info)) => user_info,
             Ok(None) => {
-                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                    ResponseCode::Unauthorized,
-                    "User not found",
-                );
+                let response: ApiResponse<&str> =
+                    ApiResponse::new(ApiResponseStatus::Unauthorized, "User not found");
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
         };
         let user_role: UserRole = current_user.get_role().parse().unwrap_or_default();
         if !user_role.is_admin() {
-            let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                ResponseCode::Forbidden,
+            let response: ApiResponse<&str> = ApiResponse::new(
+                ApiResponseStatus::Forbidden,
                 "Only admin can create records",
             );
             ctx.get_mut_response().set_body(response.to_json_bytes());
@@ -460,8 +438,8 @@ impl ServerHook for RecordCreateRoute {
             Some(target_id) => {
                 let user_role: UserRole = current_user.get_role().parse().unwrap_or_default();
                 if !user_role.is_admin() {
-                    let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                        ResponseCode::Forbidden,
+                    let response: ApiResponse<&str> = ApiResponse::new(
+                        ApiResponseStatus::Forbidden,
                         "Only admin can create records for other users",
                     );
                     ctx.get_mut_response().set_body(response.to_json_bytes());
@@ -474,12 +452,12 @@ impl ServerHook for RecordCreateRoute {
         match OrderService::create_record(target_user_id, request).await {
             Ok(result) => {
                 let response: ApiResponse<CreateRecordWithImagesResponse> =
-                    ApiResponse::<CreateRecordWithImagesResponse>::success(result);
+                    ApiResponse::new(ApiResponseStatus::Success, result);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
             }
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
             }
         }
@@ -506,8 +484,8 @@ impl ServerHook for RecordListRoute {
         let current_user_id: i32 = match OrderService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::Unauthorized, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::Unauthorized, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -515,16 +493,14 @@ impl ServerHook for RecordListRoute {
         let current_user: UserResponse = match OrderService::get_user(current_user_id).await {
             Ok(Some(user_info)) => user_info,
             Ok(None) => {
-                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                    ResponseCode::Unauthorized,
-                    "User not found",
-                );
+                let response: ApiResponse<&str> =
+                    ApiResponse::new(ApiResponseStatus::Unauthorized, "User not found");
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -574,12 +550,12 @@ impl ServerHook for RecordListRoute {
         match OrderService::list_records(query).await {
             Ok(list_response) => {
                 let response: ApiResponse<RecordListResponse> =
-                    ApiResponse::<RecordListResponse>::success(list_response);
+                    ApiResponse::new(ApiResponseStatus::Success, list_response);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -599,19 +575,15 @@ impl ServerHook for RecordGetRoute {
             Some(id_str) => match id_str.parse::<i32>() {
                 Ok(id) => id,
                 Err(_) => {
-                    let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                        ResponseCode::BadRequest,
-                        "Invalid record ID",
-                    );
+                    let response: ApiResponse<&str> =
+                        ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid record ID");
                     ctx.get_mut_response().set_body(response.to_json_bytes());
                     return;
                 }
             },
             None => {
-                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                    ResponseCode::BadRequest,
-                    "Record ID is required",
-                );
+                let response: ApiResponse<&str> =
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, "Record ID is required");
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -619,17 +591,17 @@ impl ServerHook for RecordGetRoute {
         match OrderService::get_record(record_id).await {
             Ok(Some(record)) => {
                 let response: ApiResponse<RecordResponse> =
-                    ApiResponse::<RecordResponse>::success(record);
+                    ApiResponse::new(ApiResponseStatus::Success, record);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Ok(None) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::NotFound, "Record not found");
+                let response: ApiResponse<&str> =
+                    ApiResponse::new(ApiResponseStatus::ResourceNotFound, "Record not found");
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -648,8 +620,8 @@ impl ServerHook for OverviewStatisticsRoute {
         let current_user_id: i32 = match OrderService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::Unauthorized, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::Unauthorized, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -657,24 +629,22 @@ impl ServerHook for OverviewStatisticsRoute {
         let current_user: UserResponse = match OrderService::get_user(current_user_id).await {
             Ok(Some(user_info)) => user_info,
             Ok(None) => {
-                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                    ResponseCode::Unauthorized,
-                    "User not found",
-                );
+                let response: ApiResponse<&str> =
+                    ApiResponse::new(ApiResponseStatus::Unauthorized, "User not found");
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
         };
         let user_role: UserRole = current_user.get_role().parse().unwrap_or_default();
         if !user_role.is_admin() {
-            let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                ResponseCode::Forbidden,
+            let response: ApiResponse<&str> = ApiResponse::new(
+                ApiResponseStatus::Forbidden,
                 "Only admin can access overview statistics",
             );
             ctx.get_mut_response().set_body(response.to_json_bytes());
@@ -683,12 +653,12 @@ impl ServerHook for OverviewStatisticsRoute {
         match OrderService::get_overview_statistics().await {
             Ok(statistics) => {
                 let response: ApiResponse<OverviewStatisticsResponse> =
-                    ApiResponse::<OverviewStatisticsResponse>::success(statistics);
+                    ApiResponse::new(ApiResponseStatus::Success, statistics);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -713,8 +683,8 @@ impl ServerHook for ImageUploadRoute {
         let current_user_id: i32 = match OrderService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::Unauthorized, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::Unauthorized, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -722,8 +692,8 @@ impl ServerHook for ImageUploadRoute {
         let file_name: String = match file_name_opt {
             Some(s) => urlencoding::decode(&s).unwrap_or_default().to_string(),
             None => {
-                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                    ResponseCode::BadRequest,
+                let response: ApiResponse<&str> = ApiResponse::new(
+                    ApiResponseStatus::InvalidRequest,
                     "Missing X-File-Name header",
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes());
@@ -733,8 +703,8 @@ impl ServerHook for ImageUploadRoute {
         let mime_type: String = match mime_type_opt {
             Some(s) => s,
             None => {
-                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                    ResponseCode::BadRequest,
+                let response: ApiResponse<&str> = ApiResponse::new(
+                    ApiResponseStatus::InvalidRequest,
                     "Missing X-Mime-Type header",
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes());
@@ -755,12 +725,12 @@ impl ServerHook for ImageUploadRoute {
         {
             Ok(image_response) => {
                 let response: ApiResponse<RecordImageResponse> =
-                    ApiResponse::<RecordImageResponse>::success(image_response);
+                    ApiResponse::new(ApiResponseStatus::Success, image_response);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
             }
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
             }
         }
@@ -780,19 +750,15 @@ impl ServerHook for ImageListRoute {
             Some(id_str) => match id_str.parse::<i32>() {
                 Ok(id) => id,
                 Err(_) => {
-                    let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                        ResponseCode::BadRequest,
-                        "Invalid record ID",
-                    );
+                    let response: ApiResponse<&str> =
+                        ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid record ID");
                     ctx.get_mut_response().set_body(response.to_json_bytes());
                     return;
                 }
             },
             None => {
-                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                    ResponseCode::BadRequest,
-                    "Record ID is required",
-                );
+                let response: ApiResponse<&str> =
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, "Record ID is required");
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -800,12 +766,12 @@ impl ServerHook for ImageListRoute {
         match OrderService::get_record_images(record_id).await {
             Ok(images) => {
                 let response: ApiResponse<RecordImageListResponse> =
-                    ApiResponse::<RecordImageListResponse>::success(images);
+                    ApiResponse::new(ApiResponseStatus::Success, images);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
             }
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
             }
         };
@@ -824,8 +790,8 @@ impl ServerHook for ImageDownloadRoute {
         let current_user_id: i32 = match OrderService::extract_user_from_cookie(ctx) {
             Ok(user_id) => user_id,
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::Unauthorized, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::Unauthorized, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -834,19 +800,15 @@ impl ServerHook for ImageDownloadRoute {
             Some(id_str) => match id_str.parse::<i32>() {
                 Ok(id) => id,
                 Err(_) => {
-                    let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                        ResponseCode::BadRequest,
-                        "Invalid image ID",
-                    );
+                    let response: ApiResponse<&str> =
+                        ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid image ID");
                     ctx.get_mut_response().set_body(response.to_json_bytes());
                     return;
                 }
             },
             None => {
-                let response: ApiResponse<()> = ApiResponse::<()>::error_with_code(
-                    ResponseCode::BadRequest,
-                    "Image ID is required",
-                );
+                let response: ApiResponse<&str> =
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, "Image ID is required");
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -868,13 +830,13 @@ impl ServerHook for ImageDownloadRoute {
                     .set_body(file_data);
             }
             Ok(None) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::NotFound, "Image not found");
+                let response: ApiResponse<&str> =
+                    ApiResponse::new(ApiResponseStatus::ResourceNotFound, "Image not found");
                 ctx.get_mut_response().set_body(response.to_json_bytes());
             }
             Err(error) => {
-                let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::DatabaseError, error);
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
             }
         };
