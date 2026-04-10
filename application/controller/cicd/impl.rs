@@ -17,7 +17,7 @@ impl ServerHook for CreatePipelineRoute {
             Ok(data) => data,
             Err(error) => {
                 let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error);
+                    ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error.to_string());
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -128,7 +128,7 @@ impl ServerHook for TriggerRunRoute {
             Ok(data) => data,
             Err(error) => {
                 let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error);
+                    ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error.to_string());
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -296,7 +296,7 @@ impl ServerHook for UpdateJobRoute {
             Ok(data) => data,
             Err(error) => {
                 let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error);
+                    ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error.to_string());
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -333,7 +333,7 @@ impl ServerHook for UpdateStepRoute {
             Ok(data) => data,
             Err(error) => {
                 let response: ApiResponse<()> =
-                    ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error);
+                    ApiResponse::<()>::error_with_code(ResponseCode::BadRequest, error.to_string());
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }

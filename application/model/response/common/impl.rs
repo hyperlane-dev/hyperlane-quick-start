@@ -25,7 +25,7 @@ where
         let mut instance: ApiResponse<T> = Self::default();
         instance
             .set_code(ResponseCode::Success as i32)
-            .set_message("Success".to_string())
+            .set_message("Success")
             .set_data(None)
             .set_timestamp(Some(Utc::now().timestamp_millis()));
         instance
@@ -36,18 +36,21 @@ where
         let mut instance: ApiResponse<T> = Self::default();
         instance
             .set_code(ResponseCode::Success as i32)
-            .set_message("Success".to_string())
+            .set_message("Success")
             .set_data(Some(data))
             .set_timestamp(Some(Utc::now().timestamp_millis()));
         instance
     }
 
     #[instrument_trace]
-    pub fn success_with_message(data: T, message: impl Into<String>) -> Self {
+    pub fn success_with_message<M>(data: T, message: M) -> Self
+    where
+        M: AsRef<str>,
+    {
         let mut instance: ApiResponse<T> = Self::default();
         instance
             .set_code(ResponseCode::Success as i32)
-            .set_message(message.into())
+            .set_message(message)
             .set_data(Some(data))
             .set_timestamp(Some(Utc::now().timestamp_millis()));
         instance
@@ -58,29 +61,35 @@ where
         let mut instance: ApiResponse<T> = Self::default();
         instance
             .set_code(ResponseCode::InternalError as i32)
-            .set_message("Internal server error".to_string())
+            .set_message("Internal server error")
             .set_data(None)
             .set_timestamp(Some(Utc::now().timestamp_millis()));
         instance
     }
 
     #[instrument_trace]
-    pub fn error(message: impl Into<String>) -> Self {
+    pub fn error<M>(message: M) -> Self
+    where
+        M: AsRef<str>,
+    {
         let mut instance: ApiResponse<T> = Self::default();
         instance
             .set_code(ResponseCode::InternalError as i32)
-            .set_message(message.into())
+            .set_message(message)
             .set_data(None)
             .set_timestamp(Some(Utc::now().timestamp_millis()));
         instance
     }
 
     #[instrument_trace]
-    pub fn error_with_code(code: ResponseCode, message: impl ToString) -> Self {
+    pub fn error_with_code<M>(code: ResponseCode, message: M) -> Self
+    where
+        M: AsRef<str>,
+    {
         let mut instance: ApiResponse<T> = Self::default();
         instance
             .set_code(code as i32)
-            .set_message(message.to_string())
+            .set_message(message)
             .set_data(None)
             .set_timestamp(Some(Utc::now().timestamp_millis()));
         instance
@@ -94,11 +103,14 @@ where
 
 impl ApiResponse<()> {
     #[instrument_trace]
-    pub fn success_without_data(message: impl Into<String>) -> Self {
+    pub fn success_without_data<M>(message: M) -> Self
+    where
+        M: AsRef<str>,
+    {
         let mut instance: ApiResponse<()> = Self::default();
         instance
             .set_code(ResponseCode::Success as i32)
-            .set_message(message.into())
+            .set_message(message)
             .set_data(None)
             .set_timestamp(Some(Utc::now().timestamp_millis()));
         instance
