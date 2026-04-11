@@ -265,6 +265,7 @@ impl ChatService {
         messages.extend(session_messages);
         json!({
             GPT_MODEL: EnvPlugin::get_or_init().get_gpt_model(),
+            GPT_ENABLE_THINKING: EnvPlugin::get_or_init().get_gpt_enable_thinking(),
             JSON_FIELD_MESSAGES: messages,
         })
     }

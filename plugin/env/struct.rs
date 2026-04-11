@@ -30,6 +30,8 @@ pub struct EnvConfig {
     pub(super) gpt_api_url: String,
     pub(super) gpt_api_key: String,
     pub(super) gpt_model: String,
+    #[get(type(copy))]
+    pub(super) gpt_enable_thinking: bool,
     pub(super) mysql_instances: Vec<MySqlInstanceConfig>,
     pub(super) postgresql_instances: Vec<PostgreSqlInstanceConfig>,
     pub(super) redis_instances: Vec<RedisInstanceConfig>,

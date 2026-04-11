@@ -16,4 +16,5 @@ pub const JSON_FIELD_MESSAGE: &str = "message";
 pub const JSON_FIELD_MESSAGES: &str = "messages";
 pub const SYSTEM: &str = "system";
 pub const GPT_MODEL: &str = "model";
+pub const GPT_ENABLE_THINKING: &str = "enable_thinking";
 pub const ONLINE_CONNECTIONS: &str = "Current number of online connections";

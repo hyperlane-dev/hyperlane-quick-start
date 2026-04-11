@@ -170,6 +170,7 @@ impl EnvConfig {
             gpt_api_url: var(ENV_KEY_GPT_API_URL).unwrap_or_default(),
             gpt_api_key: var(ENV_KEY_GPT_API_KEY).unwrap_or_default(),
             gpt_model: var(ENV_KEY_GPT_MODEL).unwrap_or_default(),
+            gpt_enable_thinking: get_env_bool(ENV_KEY_GPT_ENABLE_THINKING)?,
             mysql_instances,
             postgresql_instances,
             redis_instances,
