@@ -374,15 +374,17 @@ impl ChatService {
         let config: &EnvConfig = EnvPlugin::get_or_init();
         let api_key: &str = config.get_gpt_api_key();
         let body: serde_json::Value = Self::build_gpt_request_body(session);
+        debug!("GPT API request body: {}", body);
         let headers: HashMapXxHash3_64<&str, String> = Self::build_gpt_request_headers(api_key);
-        let mut request_builder: BoxAsyncRequestTrait = RequestBuilder::new()
-            .post(config.get_gpt_api_url())
-            .json(body)
-            .headers(headers)
-            .build_async();
+        let client: reqwest::Client = reqwest::Client::new();
+        let mut request_builder: reqwest::RequestBuilder =
+            client.post(config.get_gpt_api_url()).json(&body);
+        for (key, value) in headers {
+            request_builder = request_builder.header(key, value);
+        }
         match request_builder.send().await {
             Ok(response) => {
-                let response_text: String = response.text().get_body();
+                let response_text: String = response.text().await.unwrap_or_default();
                 Self::handle_gpt_api_response(&response_text)
             }
             Err(error) => Err(format!("Request sending failed {error}")),
