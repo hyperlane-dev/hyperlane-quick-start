@@ -10,6 +10,6 @@ RUN cargo build && \
     cp -f /hyperlane-quick-start/target/debug/hyperlane-quick-start /hyperlane-quick-start/hyperlane-quick-start && \
     rm -rf /hyperlane-quick-start/target
 
-EXPOSE 60000
+EXPOSE 80
 
 CMD ["/hyperlane-quick-start/hyperlane-quick-start"]

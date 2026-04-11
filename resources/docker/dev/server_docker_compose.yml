@@ -78,7 +78,7 @@ services:
     container_name: dev_hyperlane_quick_start_server
     restart: always
     ports:
-      - '60000:60000'
+      - '80:80'
     networks:
       - dev_hyperlane_quick_start_network
     depends_on:
