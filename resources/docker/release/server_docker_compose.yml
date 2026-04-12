@@ -81,8 +81,6 @@ services:
       - '65002:65002'
     networks:
       - release_hyperlane_quick_start_network
-    extra_hosts:
-      - 'host.docker.internal:host-gateway'
     depends_on:
       mysql:
         condition: service_healthy
