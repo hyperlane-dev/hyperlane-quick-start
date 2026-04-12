@@ -5,6 +5,7 @@ pub const MENTION_PREFIX: char = '@';
 pub const GPT_MENTION_UPPER: &str = "@GPT";
 pub const GPT_MENTION_FULL: &str = "@GPT Assistant";
 pub const GPT_MENTION_LOWER: &str = "@gpt";
+pub const ROLE_SYSTEM: &str = "system";
 pub const ROLE_USER: &str = "user";
 pub const ROLE_ASSISTANT: &str = "assistant";
 pub const JSON_FIELD_ROLE: &str = "role";

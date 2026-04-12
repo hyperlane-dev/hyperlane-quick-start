@@ -199,48 +199,53 @@ impl ChatService {
             let api_result: Result<(String, bool), String> =
                 Self::call_gpt_api_with_context(&current_session).await;
             let (response_content, should_continue): (String, bool) = match api_result {
-                Ok((content, should_continue_flag)) => {
-                    if content.is_empty() {
-                        (
-                            format!("{MENTION_PREFIX}{uuid}{SPACE}{TASK_HAS_COMPLETED}"),
-                            false,
-                        )
-                    } else {
-                        let mut updated_session: ChatSession =
-                            ChatDomain::get_or_create_session(&uuid).await;
-                        updated_session.add_message(ROLE_ASSISTANT, &content);
-                        ChatDomain::update_session(updated_session).await;
-                        let formatted_response: String =
-                            format!("{MENTION_PREFIX}{uuid}{SPACE}{content}");
-                        (formatted_response, should_continue_flag)
+                Ok((content, continue_flag)) => {
+                    let mut updated_session: ChatSession =
+                        ChatDomain::get_or_create_session(&uuid).await;
+                    updated_session.add_message(ROLE_ASSISTANT, &content);
+                    if continue_flag {
+                        updated_session.add_message(ROLE_USER, USER_PROMPT);
                     }
+                    ChatDomain::update_session(updated_session).await;
+                    let formatted_response: String =
+                        format!("{MENTION_PREFIX}{uuid}{SPACE}{content}");
+                    (formatted_response, continue_flag)
                 }
                 Err(error) => {
-                    let error_msg: String =
-                        format!("{MENTION_PREFIX}{uuid}{SPACE}{TASK_HAS_COMPLETED}{SPACE}{error}");
+                    let error_msg: String = format!("{MENTION_PREFIX}{uuid}{SPACE}{error}");
                     (error_msg, false)
                 }
             };
-            let gpt_resp_data: WebSocketRespData =
-                WebSocketRespData::from(MessageType::GptResponse, ctx, &response_content).await;
-            let gpt_resp_json: ResponseBody = serde_json::to_vec(&gpt_resp_data).unwrap();
-            let _: Result<Option<ReceiverCount>, SendError<Vec<u8>>> =
-                websocket.try_send(key.clone(), gpt_resp_json);
-            let save_res: Result<(), String> = Self::save_message(
-                &uuid,
-                "GPT Assistant",
-                "assistant",
-                "GptResponse",
-                &response_content,
-            )
-            .await;
-            if save_res.is_err() {
-                error!(
-                    "Failed to save GPT response for uuid {uuid} {}",
-                    save_res.err().unwrap_or_default()
-                );
+            if !response_content.is_empty() {
+                let gpt_resp_data: WebSocketRespData =
+                    WebSocketRespData::from(MessageType::GptResponse, ctx, &response_content).await;
+                let gpt_resp_json: ResponseBody = serde_json::to_vec(&gpt_resp_data).unwrap();
+                let _: Result<Option<ReceiverCount>, SendError<Vec<u8>>> =
+                    websocket.try_send(key.clone(), gpt_resp_json);
+                let save_res: Result<(), String> = Self::save_message(
+                    &uuid,
+                    "GPT Assistant",
+                    "assistant",
+                    "GptResponse",
+                    &response_content,
+                )
+                .await;
+                if save_res.is_err() {
+                    error!(
+                        "Failed to save GPT response for uuid {uuid} {}",
+                        save_res.err().unwrap_or_default()
+                    );
+                }
             }
             if !should_continue {
+                let task_has_completed_msg: String =
+                    format!("{MENTION_PREFIX}{uuid}{SPACE}{TASK_HAS_COMPLETED}");
+                let system_resp_data: WebSocketRespData =
+                    WebSocketRespData::from(MessageType::System, ctx, task_has_completed_msg).await;
+                let system_resp_json: ResponseBody =
+                    serde_json::to_vec(&system_resp_data).unwrap_or_default();
+                let _: Result<Option<ReceiverCount>, SendError<Vec<u8>>> =
+                    websocket.try_send(key.clone(), system_resp_json);
                 break;
             }
         }
@@ -248,11 +253,9 @@ impl ChatService {
 
     #[instrument_trace]
     fn build_gpt_request_body(session: &ChatSession) -> serde_json::Value {
-        let message: serde_json::Value = json!({
-            JSON_FIELD_ROLE: ROLE_USER,
-            JSON_FIELD_CONTENT: SYSTEM_INSTRUCTION
-        });
-        let mut messages: Vec<serde_json::Value> = vec![message];
+        let schema_json: serde_json::Value =
+            serde_json::from_str(GPT_RESPONSE_SCHEMA).unwrap_or(json!({}));
+        let mut messages: Vec<serde_json::Value> = Vec::new();
         let session_messages: Vec<serde_json::Value> = session
             .get_messages()
             .iter()
@@ -268,6 +271,14 @@ impl ChatService {
             GPT_MODEL: EnvPlugin::get_or_init().get_gpt_model(),
             GPT_ENABLE_THINKING: EnvPlugin::get_or_init().get_gpt_enable_thinking(),
             JSON_FIELD_MESSAGES: messages,
+            "response_format": {
+                "type": RESPONSE_FORMAT_TYPE,
+                "json_schema": {
+                    "name": RESPONSE_FORMAT_SCHEMA_NAME,
+                    "strict": true,
+                    "schema": schema_json
+                }
+            }
         })
     }
 
@@ -312,12 +323,13 @@ impl ChatService {
             serde_json::from_str(response_text).map_err(|error| {
                 format!("JSON parsing failed {error} (response content {response_text})",)
             })?;
-        let content: String = Self::extract_response_content(&response_json)
+        let raw_content: String = Self::extract_response_content(&response_json)
             .unwrap_or_default()
             .trim()
             .to_string();
-        let should_continue: bool = !content.trim().is_empty();
-        Ok((content, should_continue))
+        let parsed: GptStructuredResponse =
+            serde_json::from_str(&raw_content).map_err(|_| response_text.to_string())?;
+        Ok((parsed.get_data().clone(), parsed.get_continue_flag()))
     }
 
     #[instrument_trace]
@@ -336,8 +348,12 @@ impl ChatService {
         match request_builder.send().await {
             Ok(response) => {
                 let response_text: String = response.text().await.unwrap_or_default();
-                debug!("GPT API response: {}", response_text);
-                Self::handle_gpt_api_response(&response_text)
+                let compact_response: String =
+                    serde_json::from_str::<serde_json::Value>(&response_text)
+                        .map(|v: serde_json::Value| v.to_string())
+                        .unwrap_or(response_text);
+                debug!("GPT API response: {}", compact_response);
+                Self::handle_gpt_api_response(&compact_response)
             }
             Err(error) => Err(format!("Request sending failed {error}")),
         }
