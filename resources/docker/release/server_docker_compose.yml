@@ -93,5 +93,5 @@ services:
 
 networks:
   release_hyperlane_quick_start_network:
-    external: true
+    # external: true
     driver: bridge
