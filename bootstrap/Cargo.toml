@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane_bootstrap"
-version = "21.0.8"
+version = "21.0.9"
 readme = "README.md"
 edition = "2024"
 authors = ["root@ltpp.vip"]
