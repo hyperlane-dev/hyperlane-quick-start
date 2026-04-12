@@ -216,7 +216,8 @@ impl ChatService {
                     }
                 }
                 Err(error) => {
-                    let error_msg: String = format!("API call failed {error}");
+                    let error_msg: String =
+                        format!("{MENTION_PREFIX}{uuid}{SPACE}{TASK_HAS_COMPLETED}{SPACE}{error}");
                     (error_msg, false)
                 }
             };
