@@ -2,8 +2,7 @@ use super::*;
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct UserResponse {
-    #[get(type(copy))]
-    pub(super) id: i32,
+    pub(super) id: String,
     pub(super) username: String,
     pub(super) email: Option<String>,
     pub(super) phone: Option<String>,
@@ -23,8 +22,7 @@ pub struct UserListResponse {
     pub(super) users: Vec<UserResponse>,
     #[get(type(copy))]
     pub(super) has_more: bool,
-    #[get(type(copy))]
-    pub(super) last_id: Option<i32>,
+    pub(super) last_id: Option<String>,
     #[get(type(copy))]
     pub(super) total_count: i64,
 }

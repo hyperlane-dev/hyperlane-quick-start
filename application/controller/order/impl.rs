@@ -312,7 +312,7 @@ impl ServerHook for UserListRoute {
         if user_role.is_admin() {
             let querys: &RequestQuerys = ctx.get_request().get_querys();
             let keyword: Option<String> = querys.get("keyword").cloned();
-            let last_id: Option<i32> = querys.get("last_id").and_then(|s: &String| s.parse().ok());
+            let last_id: Option<String> = querys.get("last_id").cloned();
             let limit: Option<u64> = querys
                 .get("limit")
                 .and_then(|s: &String| s.parse().ok())

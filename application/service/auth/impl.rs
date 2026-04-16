@@ -14,6 +14,19 @@ impl PasswordUtil {
 
 impl AuthService {
     #[instrument_trace]
+    pub fn encode_id(id: i32) -> Result<String, String> {
+        Encode::execute(CHARSETS, &id.to_string()).map_err(|_| "Failed to encode ID".to_string())
+    }
+
+    #[instrument_trace]
+    pub fn decode_id(encoded_id: &str) -> Result<i32, String> {
+        Decode::execute(CHARSETS, encoded_id)
+            .map_err(|_| "Invalid ID format".to_string())?
+            .parse::<i32>()
+            .map_err(|_| "Invalid ID format".to_string())
+    }
+
+    #[instrument_trace]
     pub fn extract_user_from_cookie(ctx: &Context) -> Result<i32, String> {
         let token: String = match ctx.get_request().try_get_cookie(TOKEN) {
             Some(cookie) => cookie,
@@ -72,7 +85,7 @@ impl AuthService {
             updated_at: ActiveValue::NotSet,
         };
         let result: AuthUserModel = UserRepository::insert(active_model).await?;
-        Ok(Self::model_to_user_response(&result))
+        Self::model_to_user_response(&result)
     }
 
     #[instrument_trace]
@@ -91,7 +104,7 @@ impl AuthService {
                 if !valid {
                     return Err("Invalid password".to_string());
                 }
-                let user_response: UserResponse = Self::model_to_user_response(&model);
+                let user_response: UserResponse = Self::model_to_user_response(&model)?;
                 let user_id: i32 = model.get_id();
                 let role: i16 = model.get_role();
                 Ok((user_response, user_id, role))
@@ -122,7 +135,7 @@ impl AuthService {
                 }
                 active_model.updated_at = ActiveValue::NotSet;
                 let result: AuthUserModel = UserRepository::update(active_model).await?;
-                Ok(Self::model_to_user_response(&result))
+                Self::model_to_user_response(&result)
             }
             None => Err("User not found".to_string()),
         }
@@ -167,7 +180,7 @@ impl AuthService {
                 active_model.status = ActiveValue::Set(status);
                 active_model.updated_at = ActiveValue::NotSet;
                 let result: AuthUserModel = UserRepository::update(active_model).await?;
-                Ok(Self::model_to_user_response(&result))
+                Self::model_to_user_response(&result)
             }
             None => Err("User not found".to_string()),
         }
@@ -177,46 +190,55 @@ impl AuthService {
     pub async fn list_users(query: UserListQueryRequest) -> Result<UserListResponse, String> {
         let limit: u64 = query.get_limit().unwrap_or(20);
         let keyword: Option<String> = query.try_get_keyword().clone();
-        let last_id: Option<i32> = query.get_last_id();
+        let last_id: Option<i32> = query
+            .try_get_last_id()
+            .as_ref()
+            .map(|id: &String| Self::decode_id(id))
+            .transpose()?;
         let (paged_users, total_count, has_more) =
             UserRepository::query_with_pagination(keyword, last_id, limit).await?;
-        let last_id: Option<i32> = paged_users.last().map(|u: &AuthUserModel| u.get_id());
+        let encoded_last_id: Option<String> = paged_users
+            .last()
+            .map(|u: &AuthUserModel| Self::encode_id(u.get_id()))
+            .transpose()?;
         let user_responses: Vec<UserResponse> = paged_users
             .iter()
             .map(Self::model_to_user_response)
-            .collect();
+            .collect::<Result<Vec<UserResponse>, String>>()?;
         let mut response: UserListResponse = UserListResponse::default();
         response
             .set_users(user_responses)
             .set_has_more(has_more)
-            .set_last_id(last_id)
+            .set_last_id(encoded_last_id)
             .set_total_count(total_count);
         Ok(response)
     }
 
     #[instrument_trace]
     pub async fn get_user(user_id: i32) -> Result<Option<UserResponse>, String> {
-        Ok(UserRepository::find_by_id(user_id)
-            .await?
-            .map(|model: AuthUserModel| Self::model_to_user_response(&model)))
+        match UserRepository::find_by_id(user_id).await? {
+            Some(model) => Ok(Some(Self::model_to_user_response(&model)?)),
+            None => Ok(None),
+        }
     }
 
     #[instrument_trace]
-    fn model_to_user_response(model: &AuthUserModel) -> UserResponse {
+    fn model_to_user_response(model: &AuthUserModel) -> Result<UserResponse, String> {
         let mut response: UserResponse = UserResponse::default();
         let created_at: Option<i64> = model
             .try_get_created_at()
             .map(|dt| dt.and_utc().timestamp_millis());
         let role: UserRole = UserRole::try_from(model.get_role()).unwrap_or_default();
         let status: UserStatus = UserStatus::try_from(model.get_status()).unwrap_or_default();
+        let encoded_id: String = Self::encode_id(model.get_id())?;
         response
-            .set_id(model.get_id())
+            .set_id(encoded_id)
             .set_username(model.get_username().clone())
             .set_email(model.try_get_email().clone())
             .set_phone(model.try_get_phone().clone())
             .set_role(role.as_str().to_string())
             .set_status(status.as_str().to_string())
             .set_created_at(created_at);
-        response
+        Ok(response)
     }
 }

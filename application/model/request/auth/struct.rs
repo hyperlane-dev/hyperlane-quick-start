@@ -35,8 +35,7 @@ pub struct ApproveUserRequest {
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct UserListQueryRequest {
     pub(super) keyword: Option<String>,
-    #[get(type(copy))]
-    pub(super) last_id: Option<i32>,
+    pub(super) last_id: Option<String>,
     #[get(type(copy))]
     pub(super) limit: Option<u64>,
 }

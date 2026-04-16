@@ -102,7 +102,7 @@ impl ServerHook for UserUpdateRoute {
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
         let target_user_id: i32 = match id_opt {
-            Some(id_str) => match id_str.parse::<i32>() {
+            Some(id_str) => match AuthService::decode_id(&id_str) {
                 Ok(id) => id,
                 Err(_) => {
                     let response: ApiResponse<&str> =
@@ -185,7 +185,7 @@ impl ServerHook for UserChangePasswordRoute {
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
         let user_id: i32 = match id_opt {
-            Some(id_str) => match id_str.parse::<i32>() {
+            Some(id_str) => match AuthService::decode_id(&id_str) {
                 Ok(id) => id,
                 Err(_) => {
                     let response: ApiResponse<&str> =
@@ -234,7 +234,7 @@ impl ServerHook for UserApproveRoute {
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
         let user_id: i32 = match id_opt {
-            Some(id_str) => match id_str.parse::<i32>() {
+            Some(id_str) => match AuthService::decode_id(&id_str) {
                 Ok(id) => id,
                 Err(_) => {
                     let response: ApiResponse<&str> =
@@ -312,7 +312,7 @@ impl ServerHook for UserListRoute {
         if user_role.is_admin() {
             let querys: &RequestQuerys = ctx.get_request().get_querys();
             let keyword: Option<String> = querys.get("keyword").cloned();
-            let last_id: Option<i32> = querys.get("last_id").and_then(|s: &String| s.parse().ok());
+            let last_id: Option<String> = querys.get("last_id").cloned();
             let limit: Option<u64> = querys
                 .get("limit")
                 .and_then(|s: &String| s.parse().ok())
@@ -347,7 +347,7 @@ impl ServerHook for UserGetRoute {
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
         let user_id: i32 = match id_opt {
-            Some(id_str) => match id_str.parse::<i32>() {
+            Some(id_str) => match AuthService::decode_id(&id_str) {
                 Ok(id) => id,
                 Err(_) => {
                     let response: ApiResponse<&str> =

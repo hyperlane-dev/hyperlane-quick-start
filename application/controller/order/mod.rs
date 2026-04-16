@@ -9,8 +9,8 @@ use {
     mapper::auth::user::*,
     model::{
         application::order::*,
-        request::order::*,
-        response::{common::*, order::*},
+        request::{auth::*, order::*},
+        response::{auth::*, common::*, order::*},
     },
     service::{auth::*, order::*},
     r#struct::*,

@@ -1,16 +1,19 @@
-mod r#const;
 mod r#impl;
 mod r#struct;
 
-pub use r#const::*;
 pub use r#struct::*;
 
 use {
     super::*,
     mapper::auth::user::*,
     mapper::order::{image::*, record::*},
-    model::{application::order::*, request::order::*, response::order::*},
+    model::{
+        application::order::*,
+        request::{auth::*, order::*},
+        response::{auth::*, order::*},
+    },
     repository::{auth::*, order::*},
+    service::auth::*,
 };
 
 use hyperlane_plugin::{common::*, postgresql::*};
@@ -20,7 +23,6 @@ use std::collections::{HashMap, HashSet};
 use {
     chrono::{Datelike, Local, NaiveDate, NaiveDateTime, Timelike},
     futures::future,
-    md5::compute,
     regex::Regex,
     rust_decimal::{Decimal, prelude::ToPrimitive},
     sea_orm::{ActiveValue, DatabaseConnection, DatabaseTransaction, TransactionTrait},

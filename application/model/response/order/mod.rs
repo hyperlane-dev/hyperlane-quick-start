@@ -2,6 +2,4 @@ mod r#struct;
 
 pub use r#struct::*;
 
-pub use super::auth::*;
-
 use super::*;
