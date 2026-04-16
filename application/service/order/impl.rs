@@ -15,7 +15,7 @@ impl PasswordUtil {
 impl OrderService {
     #[instrument_trace]
     pub fn extract_user_from_cookie(ctx: &Context) -> Result<i32, String> {
-        let token: String = match ctx.get_request().try_get_cookie("token") {
+        let token: String = match ctx.get_request().try_get_cookie(TOKEN) {
             Some(cookie) => cookie,
             None => return Err("Authentication token not found".to_string()),
         };
@@ -60,13 +60,13 @@ impl OrderService {
         {
             return Err("Invalid email format".to_string());
         }
-        let existing_user: Option<OrderUserModel> =
+        let existing_user: Option<AuthUserModel> =
             UserRepository::find_by_username(request.get_username().clone()).await?;
         if existing_user.is_some() {
             return Err("Username already exists".to_string());
         }
         let password_hash: String = PasswordUtil::hash_password(request.get_password());
-        let active_model: OrderUserActiveModel = OrderUserActiveModel {
+        let active_model: AuthUserActiveModel = AuthUserActiveModel {
             username: ActiveValue::Set(request.get_username().clone()),
             password_hash: ActiveValue::Set(password_hash),
             email: ActiveValue::Set(request.try_get_email().clone()),
@@ -77,13 +77,13 @@ impl OrderService {
             created_at: ActiveValue::NotSet,
             updated_at: ActiveValue::NotSet,
         };
-        let result: OrderUserModel = UserRepository::insert(active_model).await?;
+        let result: AuthUserModel = UserRepository::insert(active_model).await?;
         Ok(Self::model_to_user_response(&result))
     }
 
     #[instrument_trace]
     pub async fn login_user(request: LoginRequest) -> Result<(UserResponse, i32, i16), String> {
-        let user: Option<OrderUserModel> =
+        let user: Option<AuthUserModel> =
             UserRepository::find_by_username(request.get_username().clone()).await?;
         match user {
             Some(model) => {
@@ -119,7 +119,7 @@ impl OrderService {
         }
         match UserRepository::find_by_id(user_id).await? {
             Some(model) => {
-                let mut active_model: OrderUserActiveModel = model.into();
+                let mut active_model: AuthUserActiveModel = model.into();
                 if let Some(email) = request.try_get_email() {
                     active_model.email = ActiveValue::Set(Some(email.clone()));
                 }
@@ -127,7 +127,7 @@ impl OrderService {
                     active_model.phone = ActiveValue::Set(Some(phone.clone()));
                 }
                 active_model.updated_at = ActiveValue::NotSet;
-                let result: OrderUserModel = UserRepository::update(active_model).await?;
+                let result: AuthUserModel = UserRepository::update(active_model).await?;
                 Ok(Self::model_to_user_response(&result))
             }
             None => Err("User not found".to_string()),
@@ -150,7 +150,7 @@ impl OrderService {
                 }
                 let new_password_hash: String =
                     PasswordUtil::hash_password(request.get_new_password());
-                let mut active_model: OrderUserActiveModel = model.into();
+                let mut active_model: AuthUserActiveModel = model.into();
                 active_model.password_hash = ActiveValue::Set(new_password_hash);
                 active_model.updated_at = ActiveValue::NotSet;
                 UserRepository::update(active_model).await?;
@@ -164,7 +164,7 @@ impl OrderService {
     pub async fn approve_user(user_id: i32, approved: bool) -> Result<UserResponse, String> {
         match UserRepository::find_by_id(user_id).await? {
             Some(model) => {
-                let mut active_model: OrderUserActiveModel = model.into();
+                let mut active_model: AuthUserActiveModel = model.into();
                 let status: i16 = if approved {
                     UserStatus::Approved.to_i16()
                 } else {
@@ -172,7 +172,7 @@ impl OrderService {
                 };
                 active_model.status = ActiveValue::Set(status);
                 active_model.updated_at = ActiveValue::NotSet;
-                let result: OrderUserModel = UserRepository::update(active_model).await?;
+                let result: AuthUserModel = UserRepository::update(active_model).await?;
                 Ok(Self::model_to_user_response(&result))
             }
             None => Err("User not found".to_string()),
@@ -186,7 +186,7 @@ impl OrderService {
         let last_id: Option<i32> = query.get_last_id();
         let (paged_users, total_count, has_more) =
             UserRepository::query_with_pagination(keyword, last_id, limit).await?;
-        let last_id: Option<i32> = paged_users.last().map(|u: &OrderUserModel| u.get_id());
+        let last_id: Option<i32> = paged_users.last().map(|u: &AuthUserModel| u.get_id());
         let user_responses: Vec<UserResponse> = paged_users
             .iter()
             .map(Self::model_to_user_response)
@@ -204,11 +204,11 @@ impl OrderService {
     pub async fn get_user(user_id: i32) -> Result<Option<UserResponse>, String> {
         Ok(UserRepository::find_by_id(user_id)
             .await?
-            .map(|model: OrderUserModel| Self::model_to_user_response(&model)))
+            .map(|model: AuthUserModel| Self::model_to_user_response(&model)))
     }
 
     #[instrument_trace]
-    fn model_to_user_response(model: &OrderUserModel) -> UserResponse {
+    fn model_to_user_response(model: &AuthUserModel) -> UserResponse {
         let mut response: UserResponse = UserResponse::default();
         let created_at: Option<i64> = model
             .try_get_created_at()
@@ -347,9 +347,9 @@ impl OrderService {
             RecordImageRepository::find_by_record_ids(record_ids),
         )
         .await?;
-        let user_map: HashMap<i32, OrderUserModel> = users
+        let user_map: HashMap<i32, AuthUserModel> = users
             .into_iter()
-            .map(|u: OrderUserModel| (u.get_id(), u))
+            .map(|u: AuthUserModel| (u.get_id(), u))
             .collect();
         let mut images_map: HashMap<i32, Vec<RecordImageResponse>> = HashMap::new();
         for image in images {
@@ -384,7 +384,7 @@ impl OrderService {
 
     #[instrument_trace]
     async fn enrich_record_with_user(response: &mut RecordResponse) -> Result<(), String> {
-        let user: Option<OrderUserModel> =
+        let user: Option<AuthUserModel> =
             UserRepository::find_by_id(response.get_user_id()).await?;
         if let Some(user) = user {
             response
@@ -1026,7 +1026,7 @@ impl OrderService {
     async fn get_user_retention(days: i64) -> Result<Vec<UserRetentionItem>, String> {
         let end_date: NaiveDate = Local::now().naive_local().date();
         let start_date: NaiveDate = end_date - chrono::Duration::days(days);
-        let users: Vec<OrderUserModel> = UserRepository::find_by_created_at_range(
+        let users: Vec<AuthUserModel> = UserRepository::find_by_created_at_range(
             start_date.and_hms_opt(0, 0, 0).unwrap(),
             end_date.and_hms_opt(23, 59, 59).unwrap(),
         )
@@ -1373,10 +1373,10 @@ impl OrderService {
             .collect::<HashSet<_>>()
             .into_iter()
             .collect();
-        let users: Vec<OrderUserModel> = UserRepository::find_by_ids(user_ids).await?;
+        let users: Vec<AuthUserModel> = UserRepository::find_by_ids(user_ids).await?;
         let user_map: HashMap<i32, String> = users
             .into_iter()
-            .map(|user: OrderUserModel| (user.get_id(), user.get_username().clone()))
+            .map(|user: AuthUserModel| (user.get_id(), user.get_username().clone()))
             .collect();
         let mut image_responses: Vec<RecordImageResponse> = vec![];
         for img in &images {

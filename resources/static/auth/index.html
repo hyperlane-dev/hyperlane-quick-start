@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+      name="viewport"
+    />
+    <title>Hyperlane - Authentication</title>
+    <link rel="icon" href="https://docs.ltpp.vip/img/hyperlane.png" />
+    <link href="../common/css/common.css" rel="stylesheet" />
+    <link href="../common/css/header.css" rel="stylesheet" />
+    <link href="./css/style.css" rel="stylesheet" />
+    <script src="../common/js/request-manager.js"></script>
+    <script src="../common/js/common.js"></script>
+    <script src="./js/app.js" defer></script>
+  </head>
+  <body>
+    <div id="app">
+      <div id="login-page" class="auth-page">
+        <div class="auth-container">
+          <header class="auth-header shimmer-header light-bg">
+            <div class="header-content">
+              <h1 class="app-title">
+                <a
+                  href="https://github.com/hyperlane-dev/hyperlane"
+                  target="_blank"
+                >
+                  <img
+                    src="https://docs.ltpp.vip/img/hyperlane.png"
+                    alt=""
+                    class="nav-logo"
+                    onerror="this.style.display = 'none'"
+                  />
+                  <span class="text shimmer">Hyperlane Auth</span>
+                </a>
+              </h1>
+              <p class="app-subtitle">Secure authentication for all services</p>
+            </div>
+          </header>
+          <form id="login-form" class="auth-form">
+            <div class="form-group">
+              <label class="form-label">Username</label>
+              <input
+                type="text"
+                id="login-username"
+                class="form-input"
+                placeholder="Enter username"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <input
+                type="password"
+                id="login-password"
+                class="form-input"
+                placeholder="Enter password"
+                required
+              />
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">
+              Login
+            </button>
+          </form>
+          <div class="auth-footer">
+            <p>
+              Don't have an account? <a href="#" id="show-register">Register</a>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div id="register-page" class="auth-page hidden">
+        <div class="auth-container">
+          <div class="auth-header">
+            <h1>Create Account</h1>
+            <p>Register for a new account</p>
+          </div>
+          <form id="register-form" class="auth-form">
+            <div class="form-group">
+              <label class="form-label">Username *</label>
+              <input
+                type="text"
+                id="reg-username"
+                class="form-input"
+                placeholder="Choose a username"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password *</label>
+              <input
+                type="password"
+                id="reg-password"
+                class="form-input"
+                placeholder="Choose a password"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input
+                type="email"
+                id="reg-email"
+                class="form-input"
+                placeholder="Your email"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone</label>
+              <input
+                type="tel"
+                id="reg-phone"
+                class="form-input"
+                placeholder="Your phone number"
+              />
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">
+              Register
+            </button>
+          </form>
+          <div class="auth-footer">
+            <p>
+              Already have an account? <a href="#" id="show-login">Login</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast-container" id="toast-container"></div>
+  </body>
+</html>

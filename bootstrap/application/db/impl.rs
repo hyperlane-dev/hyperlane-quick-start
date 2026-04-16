@@ -71,11 +71,13 @@ impl DbBootstrap {
             .add_index(POSTGRESQL_SHORTLINK_INDEX_SQL.to_string())
             .add_table(TableSchema::new(
                 vec![],
-                "order_user".to_string(),
-                POSTGRESQL_ORDER_USER_TABLE_SQL.to_string(),
+                "auth_user".to_string(),
+                POSTGRESQL_AUTH_USER_TABLE_SQL.to_string(),
             ))
+            .add_index(POSTGRESQL_AUTH_INDEX_SQL.to_string())
+            .add_init_data(POSTGRESQL_AUTH_DATA_SQL.to_string())
             .add_table(TableSchema::new(
-                vec!["order_user".to_string()],
+                vec!["auth_user".to_string()],
                 "order_record".to_string(),
                 POSTGRESQL_ORDER_RECORD_TABLE_SQL.to_string(),
             ))
@@ -85,7 +87,6 @@ impl DbBootstrap {
                 POSTGRESQL_ORDER_RECORD_IMAGE_TABLE_SQL.to_string(),
             ))
             .add_index(POSTGRESQL_ORDER_INDEX_SQL.to_string())
-            .add_init_data(POSTGRESQL_ORDER_DATA_SQL.to_string())
     }
 }
 

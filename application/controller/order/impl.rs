@@ -18,7 +18,7 @@ impl ServerHook for UserRegisterRoute {
                 return;
             }
         };
-        match OrderService::register_user(request).await {
+        match AuthService::register_user(request).await {
             Ok(user) => {
                 let response: ApiResponse<UserResponse> =
                     ApiResponse::new(ApiResponseStatus::Success, user);
@@ -51,7 +51,7 @@ impl ServerHook for UserLoginRoute {
                 return;
             }
         };
-        match OrderService::login_user(request).await {
+        match AuthService::login_user(request).await {
             Ok((user_response, user_id, role)) => {
                 let jwt_config: JwtConfig = JwtConfig::new(
                     JwtConfigEnum::SecretKey.to_string(),
@@ -118,7 +118,7 @@ impl ServerHook for UserUpdateRoute {
                 return;
             }
         };
-        let current_user_id: i32 = match OrderService::extract_user_from_cookie(ctx) {
+        let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
                 let response: ApiResponse<String> =
@@ -127,7 +127,7 @@ impl ServerHook for UserUpdateRoute {
                 return;
             }
         };
-        let current_user: UserResponse = match OrderService::get_user(current_user_id).await {
+        let current_user: UserResponse = match AuthService::get_user(current_user_id).await {
             Ok(Some(user_info)) => user_info,
             Ok(None) => {
                 let response: ApiResponse<&str> =
@@ -283,7 +283,7 @@ impl ServerHook for UserListRoute {
     #[prologue_macros(get_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
-        let current_user_id: i32 = match OrderService::extract_user_from_cookie(ctx) {
+        let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
                 let response: ApiResponse<String> =
@@ -292,7 +292,7 @@ impl ServerHook for UserListRoute {
                 return;
             }
         };
-        let current_user: UserResponse = match OrderService::get_user(current_user_id).await {
+        let current_user: UserResponse = match AuthService::get_user(current_user_id).await {
             Ok(Some(user_info)) => user_info,
             Ok(None) => {
                 let response: ApiResponse<&str> =
@@ -401,7 +401,7 @@ impl ServerHook for RecordCreateRoute {
                 return;
             }
         };
-        let current_user_id: i32 = match OrderService::extract_user_from_cookie(ctx) {
+        let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
                 let response: ApiResponse<String> =
@@ -410,7 +410,7 @@ impl ServerHook for RecordCreateRoute {
                 return;
             }
         };
-        let current_user: UserResponse = match OrderService::get_user(current_user_id).await {
+        let current_user: UserResponse = match AuthService::get_user(current_user_id).await {
             Ok(Some(user_info)) => user_info,
             Ok(None) => {
                 let response: ApiResponse<&str> =
@@ -481,7 +481,7 @@ impl ServerHook for RecordListRoute {
     #[request_query_option("page" => page_opt)]
     #[request_query_option("limit" => limit_opt)]
     async fn handle(self, ctx: &mut Context) {
-        let current_user_id: i32 = match OrderService::extract_user_from_cookie(ctx) {
+        let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
                 let response: ApiResponse<String> =
@@ -490,7 +490,7 @@ impl ServerHook for RecordListRoute {
                 return;
             }
         };
-        let current_user: UserResponse = match OrderService::get_user(current_user_id).await {
+        let current_user: UserResponse = match AuthService::get_user(current_user_id).await {
             Ok(Some(user_info)) => user_info,
             Ok(None) => {
                 let response: ApiResponse<&str> =
@@ -617,7 +617,7 @@ impl ServerHook for OverviewStatisticsRoute {
     #[prologue_macros(get_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
-        let current_user_id: i32 = match OrderService::extract_user_from_cookie(ctx) {
+        let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
                 let response: ApiResponse<String> =
@@ -626,7 +626,7 @@ impl ServerHook for OverviewStatisticsRoute {
                 return;
             }
         };
-        let current_user: UserResponse = match OrderService::get_user(current_user_id).await {
+        let current_user: UserResponse = match AuthService::get_user(current_user_id).await {
             Ok(Some(user_info)) => user_info,
             Ok(None) => {
                 let response: ApiResponse<&str> =

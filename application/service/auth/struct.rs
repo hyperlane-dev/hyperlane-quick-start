@@ -1,7 +1,7 @@
 use super::*;
 
 #[derive(Clone, Copy, Data, Debug, Default)]
-pub struct RecordRepository;
+pub struct PasswordUtil;
 
 #[derive(Clone, Copy, Data, Debug, Default)]
-pub struct RecordImageRepository;
+pub struct AuthService;

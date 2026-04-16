@@ -130,8 +130,8 @@ function showPage(pageId) {
 }
 
 function checkAuth() {
-  const savedUser = localStorage.getItem('order_user');
-  const savedToken = localStorage.getItem('order_token');
+  const savedUser = localStorage.getItem('auth_user');
+  const savedToken = localStorage.getItem('auth_token');
   if (savedUser && savedToken) {
     currentUser = JSON.parse(savedUser);
     currentToken = savedToken;
@@ -1726,8 +1726,8 @@ async function handleLogin(e) {
     if (result.code === 200) {
       currentUser = result.data.user;
       currentToken = result.data.token;
-      localStorage.setItem('order_user', JSON.stringify(currentUser));
-      localStorage.setItem('order_token', currentToken);
+      localStorage.setItem('auth_user', JSON.stringify(currentUser));
+      localStorage.setItem('auth_token', currentToken);
       showToast('Login successful!', 'success');
       document.getElementById('login-form')?.reset();
       showMainApp();
@@ -1788,8 +1788,8 @@ function handleLogout() {
   currentToken = null;
   viewingUserId = null;
   viewingUserName = null;
-  localStorage.removeItem('order_user');
-  localStorage.removeItem('order_token');
+  localStorage.removeItem('auth_user');
+  localStorage.removeItem('auth_token');
   window.location.hash = '';
   document
     .querySelectorAll('.admin-only')
@@ -1807,8 +1807,8 @@ function handleAuthError(message) {
   currentToken = null;
   viewingUserId = null;
   viewingUserName = null;
-  localStorage.removeItem('order_user');
-  localStorage.removeItem('order_token');
+  localStorage.removeItem('auth_user');
+  localStorage.removeItem('auth_token');
   window.location.hash = '';
   document
     .querySelectorAll('.admin-only')
@@ -2796,7 +2796,7 @@ async function handleProfileSubmit(e) {
     const result = await response.json();
     if (result.code === 200) {
       currentUser = { ...currentUser, ...result.data };
-      localStorage.setItem('order_user', JSON.stringify(currentUser));
+      localStorage.setItem('auth_user', JSON.stringify(currentUser));
       updateUserInfo();
       showToast('Profile updated!', 'success');
     } else {

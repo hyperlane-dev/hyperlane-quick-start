@@ -1,3 +1,4 @@
+pub mod auth;
 pub mod chat;
 pub mod cicd;
 pub mod common;

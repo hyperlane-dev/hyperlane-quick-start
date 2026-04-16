@@ -7,9 +7,10 @@ pub use r#struct::*;
 
 use {
     super::*,
-    mapper::order::{image::*, record::*, user::*},
+    mapper::auth::user::*,
+    mapper::order::{image::*, record::*},
     model::{application::order::*, request::order::*, response::order::*},
-    repository::order::*,
+    repository::{auth::*, order::*},
 };
 
 use hyperlane_plugin::{common::*, postgresql::*};

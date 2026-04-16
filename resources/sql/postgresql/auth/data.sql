@@ -1,5 +1,5 @@
 INSERT INTO
-    order_user (
+    auth_user (
         username,
         password_hash,
         role,
