@@ -16,7 +16,10 @@ use {
     service::auth::*,
 };
 
-use hyperlane_plugin::{common::*, postgresql::*};
+use {
+    hyperlane_config::application::charset::*,
+    hyperlane_plugin::{common::*, postgresql::*},
+};
 
 use std::collections::{HashMap, HashSet};
 

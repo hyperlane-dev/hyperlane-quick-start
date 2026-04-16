@@ -2,6 +2,20 @@ use super::*;
 
 impl OrderService {
     #[instrument_trace]
+    pub fn encode_id(id: i32) -> Result<String, String> {
+        Encode::execute(CHARSETS, &id.to_string()).map_err(|_| "Failed to encode ID".to_string())
+    }
+
+    #[instrument_trace]
+    pub fn decode_id(encoded_id: &str) -> Result<i32, String> {
+        let decoded: String =
+            Decode::execute(CHARSETS, encoded_id).map_err(|_| "Invalid ID format".to_string())?;
+        decoded
+            .parse::<i32>()
+            .map_err(|_| "Invalid ID format".to_string())
+    }
+
+    #[instrument_trace]
     pub fn extract_user_from_cookie(ctx: &Context) -> Result<i32, String> {
         let token: String = match ctx.get_request().try_get_cookie(TOKEN) {
             Some(cookie) => cookie,
@@ -246,11 +260,15 @@ impl OrderService {
         };
         let record_result: OrderRecordModel = RecordRepository::insert(active_model).await?;
         let record_id: i32 = record_result.get_id();
-        let image_ids: Vec<i32> = request.get_image_ids().clone();
+        let encoded_image_ids: Vec<String> = request.get_image_ids().clone();
+        let image_ids: Vec<i32> = encoded_image_ids
+            .iter()
+            .map(|encoded_id: &String| Self::decode_id(encoded_id))
+            .collect::<Result<Vec<i32>, String>>()?;
         if !image_ids.is_empty() {
             Self::bind_images_to_record(record_id, image_ids).await?;
         }
-        let record_response: RecordResponse = Self::model_to_record_response(&record_result);
+        let record_response: RecordResponse = Self::model_to_record_response(&record_result)?;
         let images: RecordImageListResponse = Self::get_record_images(record_id).await?;
         let mut response: CreateRecordWithImagesResponse =
             CreateRecordWithImagesResponse::default();
@@ -317,7 +335,7 @@ impl OrderService {
     pub async fn get_record(record_id: i32) -> Result<Option<RecordResponse>, String> {
         match RecordRepository::find_by_id(record_id).await? {
             Some(model) => {
-                let mut response: RecordResponse = Self::model_to_record_response(&model);
+                let mut response: RecordResponse = Self::model_to_record_response(&model)?;
                 Self::enrich_record_with_user(&mut response).await?;
                 Ok(Some(response))
             }
@@ -352,37 +370,35 @@ impl OrderService {
         for image in images {
             let record_id: i32 = image.get_record_id();
             let image_response: RecordImageResponse =
-                Self::model_to_image_response(&image, record_id);
+                Self::model_to_image_response(&image, record_id)?;
             images_map
                 .entry(record_id)
                 .or_default()
                 .push(image_response);
         }
-        let responses: Vec<RecordResponse> = records
-            .iter()
-            .map(|record: &OrderRecordModel| {
-                let mut response: RecordResponse = Self::model_to_record_response(record);
-                if let Some(user) = user_map.get(&response.get_user_id()) {
-                    response
-                        .set_username(Some(user.get_username().clone()))
-                        .set_email(user.try_get_email().clone())
-                        .set_phone(user.try_get_phone().clone());
-                }
-                let record_images: Vec<RecordImageResponse> = images_map
-                    .get(&record.get_id())
-                    .cloned()
-                    .unwrap_or_default();
-                response.set_images(record_images);
+        let mut responses: Vec<RecordResponse> = Vec::new();
+        for record in records {
+            let mut response: RecordResponse = Self::model_to_record_response(&record)?;
+            let user_id: i32 = record.get_user_id();
+            if let Some(user) = user_map.get(&user_id) {
                 response
-            })
-            .collect();
+                    .set_username(Some(user.get_username().clone()))
+                    .set_email(user.try_get_email().clone())
+                    .set_phone(user.try_get_phone().clone());
+            }
+            let record_id: i32 = record.get_id();
+            let record_images: Vec<RecordImageResponse> =
+                images_map.get(&record_id).cloned().unwrap_or_default();
+            response.set_images(record_images);
+            responses.push(response);
+        }
         Ok(responses)
     }
 
     #[instrument_trace]
     async fn enrich_record_with_user(response: &mut RecordResponse) -> Result<(), String> {
-        let user: Option<AuthUserModel> =
-            UserRepository::find_by_id(response.get_user_id()).await?;
+        let user_id: i32 = Self::decode_id(response.get_user_id())?;
+        let user: Option<AuthUserModel> = UserRepository::find_by_id(user_id).await?;
         if let Some(user) = user {
             response
                 .set_username(Some(user.get_username().clone()))
@@ -393,7 +409,7 @@ impl OrderService {
     }
 
     #[instrument_trace]
-    fn model_to_record_response(model: &OrderRecordModel) -> RecordResponse {
+    fn model_to_record_response(model: &OrderRecordModel) -> Result<RecordResponse, String> {
         let mut response: RecordResponse = RecordResponse::default();
         let created_at: Option<i64> = model
             .try_get_created_at()
@@ -403,17 +419,19 @@ impl OrderService {
             .and_time(chrono::NaiveTime::from_hms_opt(0, 0, 0).unwrap())
             .and_utc()
             .timestamp_millis();
+        let encoded_id: String = Self::encode_id(model.get_id())?;
+        let encoded_user_id: String = Self::encode_id(model.get_user_id())?;
         response
-            .set_id(model.get_id())
+            .set_id(encoded_id)
             .set_bill_no(model.get_bill_no().clone())
-            .set_user_id(model.get_user_id())
+            .set_user_id(encoded_user_id)
             .set_amount(model.get_amount().to_string())
             .set_category(model.get_category().clone())
             .set_transaction_type(model.get_transaction_type().clone())
             .set_description(model.try_get_description().clone())
             .set_bill_date(bill_date)
             .set_created_at(created_at);
-        response
+        Ok(response)
     }
 
     #[instrument_trace]
@@ -1087,17 +1105,16 @@ impl OrderService {
                 entry.0 = user.get_username().clone();
             }
         }
-        let mut result: Vec<TopUserItem> = user_stats
-            .into_iter()
-            .map(|(user_id, (username, count, total))| {
-                let mut item: TopUserItem = TopUserItem::default();
-                item.set_user_id(user_id);
-                item.set_username(username);
-                item.set_transaction_count(count);
-                item.set_total_amount(total.to_string());
-                item
-            })
-            .collect();
+        let mut result: Vec<TopUserItem> = Vec::new();
+        for (user_id, (username, count, total)) in user_stats {
+            let mut item: TopUserItem = TopUserItem::default();
+            let encoded_user_id: String = Self::encode_id(user_id)?;
+            item.set_user_id(encoded_user_id)
+                .set_username(username)
+                .set_transaction_count(count)
+                .set_total_amount(total.to_string());
+            result.push(item);
+        }
         result.sort_by(|a, b| {
             let a_amt: Decimal = a.get_total_amount().parse().unwrap_or(Decimal::ZERO);
             let b_amt: Decimal = b.get_total_amount().parse().unwrap_or(Decimal::ZERO);
@@ -1243,11 +1260,11 @@ impl OrderService {
                     }
                 };
             let image_response: RecordImageResponse =
-                Self::model_to_image_response(&image_result, record_id);
+                Self::model_to_image_response(&image_result, record_id)?;
             saved_images.push(image_response);
         }
         txn.commit().await.map_err(|e: DbErr| e.to_string())?;
-        let record_response: RecordResponse = Self::model_to_record_response(&record_result);
+        let record_response: RecordResponse = Self::model_to_record_response(&record_result)?;
         let mut response: CreateRecordWithImagesResponse =
             CreateRecordWithImagesResponse::default();
         response
@@ -1304,9 +1321,9 @@ impl OrderService {
                 }
             };
         txn.commit().await.map_err(|e: DbErr| e.to_string())?;
-        let record_response: RecordResponse = Self::model_to_record_response(&record_result);
+        let record_response: RecordResponse = Self::model_to_record_response(&record_result)?;
         let image_response: RecordImageResponse =
-            Self::model_to_image_response(&image_result, record_id);
+            Self::model_to_image_response(&image_result, record_id)?;
         let mut response: CreateRecordWithImagesResponse =
             CreateRecordWithImagesResponse::default();
         response
@@ -1348,9 +1365,9 @@ impl OrderService {
                 }
             };
         txn.commit().await.map_err(|e: DbErr| e.to_string())?;
-        let record_response: RecordResponse = Self::model_to_record_response(&record_model);
+        let record_response: RecordResponse = Self::model_to_record_response(&record_model)?;
         let image_response: RecordImageResponse =
-            Self::model_to_image_response(&image_result, record_id);
+            Self::model_to_image_response(&image_result, record_id)?;
         let mut response: CreateRecordWithImagesResponse =
             CreateRecordWithImagesResponse::default();
         response
@@ -1377,7 +1394,7 @@ impl OrderService {
             .collect();
         let mut image_responses: Vec<RecordImageResponse> = vec![];
         for img in &images {
-            let mut response: RecordImageResponse = Self::model_to_image_response(img, record_id);
+            let mut response: RecordImageResponse = Self::model_to_image_response(img, record_id)?;
             let username: String = user_map
                 .get(&img.get_user_id())
                 .cloned()
@@ -1407,9 +1424,11 @@ impl OrderService {
         match RecordImageRepository::find_by_id(image_id).await? {
             Some(model) => {
                 let mut response: ImageDataResponse = ImageDataResponse::default();
+                let encoded_id: String = Self::encode_id(model.get_id())?;
+                let encoded_record_id: String = Self::encode_id(model.get_record_id())?;
                 response
-                    .set_id(model.get_id())
-                    .set_record_id(model.get_record_id())
+                    .set_id(encoded_id)
+                    .set_record_id(encoded_record_id)
                     .set_file_name(model.get_file_name().clone())
                     .set_original_name(model.try_get_original_name().clone())
                     .set_mime_type(model.get_mime_type().clone())
@@ -1441,7 +1460,7 @@ impl OrderService {
             created_at: ActiveValue::NotSet,
         };
         let result: OrderRecordImageModel = RecordImageRepository::insert(active_model).await?;
-        Ok(Self::model_to_image_response(&result, 0))
+        Self::model_to_image_response(&result, 0)
     }
 
     #[instrument_trace]
@@ -1460,23 +1479,26 @@ impl OrderService {
     fn model_to_image_response(
         model: &OrderRecordImageModel,
         record_id: i32,
-    ) -> RecordImageResponse {
+    ) -> Result<RecordImageResponse, String> {
         let created_at: i64 = model
             .try_get_created_at()
             .map(|dt| dt.and_utc().timestamp_millis())
             .unwrap_or(0);
         let mut response: RecordImageResponse = RecordImageResponse::default();
-        let download_url: String = format!("/api/order/image/download/{}", model.get_id());
+        let encoded_id: String = Self::encode_id(model.get_id())?;
+        let encoded_record_id: String = Self::encode_id(record_id)?;
+        let encoded_user_id: String = Self::encode_id(model.get_user_id())?;
+        let download_url: String = format!("/api/order/image/download/{}", encoded_id);
         response
-            .set_id(model.get_id())
-            .set_record_id(record_id)
-            .set_user_id(model.get_user_id())
+            .set_id(encoded_id)
+            .set_record_id(encoded_record_id)
+            .set_user_id(encoded_user_id)
             .set_file_name(model.get_file_name().clone())
             .set_original_name(model.try_get_original_name().clone())
             .set_mime_type(model.get_mime_type().clone())
             .set_file_size(model.get_file_size())
             .set_created_at(created_at)
             .set_download_url(download_url);
-        response
+        Ok(response)
     }
 }

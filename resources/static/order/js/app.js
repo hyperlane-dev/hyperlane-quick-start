@@ -149,7 +149,7 @@ function showMainApp() {
   const isAdmin = currentUser && currentUser.role === 'admin';
   if (routeState.page) {
     if (routeState.page === 'user-records' && routeState.userId) {
-      viewingUserId = parseInt(routeState.userId);
+      viewingUserId = routeState.userId;
       viewingUserName = routeState.userName || 'User';
     }
     navigateTo(routeState.page, false);
@@ -164,7 +164,7 @@ function initHashRouter() {
     const routeState = parseRouteHash();
     if (routeState.page) {
       if (routeState.page === 'user-records' && routeState.userId) {
-        viewingUserId = parseInt(routeState.userId);
+        viewingUserId = routeState.userId;
         viewingUserName = routeState.userName || 'User';
       }
       switchToPage(routeState.page);
@@ -2041,7 +2041,7 @@ function renderAllRecords(records) {
         <div class="record-meta-row">
           <span class="record-meta-item"><span class="record-meta-label">ID:</span> <span class="record-meta-value">${r.id}</span></span>
           <span class="record-meta-item"><span class="record-meta-label">Category:</span> <span class="record-meta-value">${escapeHtml(r.category)}</span></span>
-          <span class="record-meta-item" onclick="event.stopPropagation(); viewUserRecords(${r.user_id}, '${escapeHtml(displayName)}');" style="cursor: pointer;"><span class="record-meta-label">User:</span> <span class="record-meta-value" style="color: #58a6ff;">${escapeHtml(displayName)}</span></span>
+          <span class="record-meta-item" onclick="event.stopPropagation(); viewUserRecords('${r.user_id}', '${escapeHtml(displayName)}');" style="cursor: pointer;"><span class="record-meta-label">User:</span> <span class="record-meta-value" style="color: #58a6ff;">${escapeHtml(displayName)}</span></span>
         </div>
         <div class="record-date-row">
           <span class="record-date-item"><span class="record-date-label">Date:</span> <span class="record-date-value">${formatDate(r.bill_date)}</span></span>
@@ -2426,7 +2426,7 @@ function renderUsers(users) {
       const statusText = u.status;
       const contactInfo = [u.email, u.phone].filter(Boolean).join(' • ');
       return `
-    <div class="user-item" onclick="viewUserRecords(${u.id}, '${escapeHtml(u.username)}')" style="cursor: pointer;">
+    <div class="user-item" onclick="viewUserRecords('${u.id}', '${escapeHtml(u.username)}')" style="cursor: pointer;">
       <div class="user-avatar ${avatarClass}">${u.username.charAt(0).toUpperCase()}</div>
       <div class="user-info-details">
         <div class="user-name">${escapeHtml(u.username)} <span style="color: #8b949e; font-size: 12px;">(${roleText})</span></div>
@@ -2434,8 +2434,8 @@ function renderUsers(users) {
       </div>
       <div class="user-status ${statusClass}">${statusText}</div>
       <div class="user-actions" onclick="event.stopPropagation();">
-        ${u.status !== 'approved' ? `<button class="btn btn-sm btn-primary" onclick="approveUser(${u.id}, true)">Approve</button>` : ''}
-        ${u.status === 'pending' ? `<button class="btn btn-sm btn-danger" onclick="approveUser(${u.id}, false)">Reject</button>` : ''}
+        ${u.status !== 'approved' ? `<button class="btn btn-sm btn-primary" onclick="approveUser('${u.id}', true)">Approve</button>` : ''}
+        ${u.status === 'pending' ? `<button class="btn btn-sm btn-danger" onclick="approveUser('${u.id}', false)">Reject</button>` : ''}
       </div>
     </div>`;
     })
@@ -3712,7 +3712,7 @@ function renderRecordImages(recordId, images) {
   const imageHtml = images
     .map(
       (img) => `
-    <div class="record-image-thumbnail" onclick="event.stopPropagation(); openRecordImagePreview(${recordId}, ${img.id})">
+    <div class="record-image-thumbnail" onclick="event.stopPropagation(); openRecordImagePreview('${recordId}', '${img.id}')">
       <img src="${img.download_url}" alt="" loading="lazy" onerror="this.style.display='none'; this.parentElement.style.display='none'" />
     </div>
   `,

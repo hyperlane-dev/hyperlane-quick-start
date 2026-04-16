@@ -2,11 +2,9 @@ use super::*;
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct RecordResponse {
-    #[get(type(copy))]
-    pub(super) id: i32,
+    pub(super) id: String,
     pub(super) bill_no: String,
-    #[get(type(copy))]
-    pub(super) user_id: i32,
+    pub(super) user_id: String,
     pub(super) amount: String,
     pub(super) category: String,
     pub(super) transaction_type: String,
@@ -160,7 +158,7 @@ pub struct UserRetentionItem {
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct TopUserItem {
-    pub(super) user_id: i32,
+    pub(super) user_id: String,
     pub(super) username: String,
     pub(super) transaction_count: i64,
     pub(super) total_amount: String,
@@ -177,12 +175,9 @@ pub struct AverageTransactionStats {
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct RecordImageResponse {
-    #[get(type(copy))]
-    pub(super) id: i32,
-    #[get(type(copy))]
-    pub(super) record_id: i32,
-    #[get(type(copy))]
-    pub(super) user_id: i32,
+    pub(super) id: String,
+    pub(super) record_id: String,
+    pub(super) user_id: String,
     pub(super) file_name: String,
     pub(super) original_name: Option<String>,
     pub(super) mime_type: String,
@@ -202,12 +197,9 @@ pub struct RecordImageListResponse {
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct RecordImageDetailResponse {
-    #[get(type(copy))]
-    pub(super) id: i32,
-    #[get(type(copy))]
-    pub(super) record_id: i32,
-    #[get(type(copy))]
-    pub(super) user_id: i32,
+    pub(super) id: String,
+    pub(super) record_id: String,
+    pub(super) user_id: String,
     pub(super) file_name: String,
     pub(super) original_name: Option<String>,
     pub(super) mime_type: String,
@@ -219,10 +211,8 @@ pub struct RecordImageDetailResponse {
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct ImageDataResponse {
-    #[get(type(copy))]
-    pub(super) id: i32,
-    #[get(type(copy))]
-    pub(super) record_id: i32,
+    pub(super) id: String,
+    pub(super) record_id: String,
     pub(super) file_name: String,
     pub(super) original_name: Option<String>,
     pub(super) mime_type: String,

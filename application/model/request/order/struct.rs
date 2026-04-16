@@ -10,9 +10,8 @@ pub struct CreateRecordRequest {
     pub(super) description: Option<String>,
     #[schema(value_type = String)]
     pub(super) bill_date: Option<NaiveDate>,
-    #[get(type(copy))]
-    pub(super) target_user_id: Option<i32>,
-    pub(super) image_ids: Vec<i32>,
+    pub(super) target_user_id: Option<String>,
+    pub(super) image_ids: Vec<String>,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
@@ -43,8 +42,7 @@ pub struct CreateRecordWithImagesRequest {
     pub(super) description: Option<String>,
     #[schema(value_type = String)]
     pub(super) bill_date: Option<NaiveDate>,
-    #[get(type(copy))]
-    pub(super) target_user_id: Option<i32>,
+    pub(super) target_user_id: Option<String>,
     pub(super) images: Vec<ImageUploadRequest>,
 }
 
@@ -61,8 +59,7 @@ pub struct ImageUploadRequest {
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct RecordImageQueryRequest {
-    #[get(type(copy))]
-    pub(super) record_id: i32,
+    pub(super) record_id: String,
 }
 
 #[derive(Clone, Data, Debug, Default)]

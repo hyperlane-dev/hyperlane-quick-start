@@ -102,7 +102,7 @@ impl ServerHook for UserUpdateRoute {
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
         let target_user_id: i32 = match id_opt {
-            Some(id_str) => match id_str.parse::<i32>() {
+            Some(id_str) => match AuthService::decode_id(&id_str) {
                 Ok(id) => id,
                 Err(_) => {
                     let response: ApiResponse<&str> =
@@ -185,7 +185,7 @@ impl ServerHook for UserChangePasswordRoute {
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
         let user_id: i32 = match id_opt {
-            Some(id_str) => match id_str.parse::<i32>() {
+            Some(id_str) => match AuthService::decode_id(&id_str) {
                 Ok(id) => id,
                 Err(_) => {
                     let response: ApiResponse<&str> =
@@ -234,7 +234,7 @@ impl ServerHook for UserApproveRoute {
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
         let user_id: i32 = match id_opt {
-            Some(id_str) => match id_str.parse::<i32>() {
+            Some(id_str) => match AuthService::decode_id(&id_str) {
                 Ok(id) => id,
                 Err(_) => {
                     let response: ApiResponse<&str> =
@@ -347,7 +347,7 @@ impl ServerHook for UserGetRoute {
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
         let user_id: i32 = match id_opt {
-            Some(id_str) => match id_str.parse::<i32>() {
+            Some(id_str) => match AuthService::decode_id(&id_str) {
                 Ok(id) => id,
                 Err(_) => {
                     let response: ApiResponse<&str> =
@@ -445,7 +445,15 @@ impl ServerHook for RecordCreateRoute {
                     ctx.get_mut_response().set_body(response.to_json_bytes());
                     return;
                 }
-                target_id
+                match OrderService::decode_id(target_id) {
+                    Ok(decoded_id) => decoded_id,
+                    Err(error) => {
+                        let response: ApiResponse<String> =
+                            ApiResponse::new(ApiResponseStatus::InvalidRequest, error);
+                        ctx.get_mut_response().set_body(response.to_json_bytes());
+                        return;
+                    }
+                }
             }
             None => current_user_id,
         };
@@ -509,7 +517,7 @@ impl ServerHook for RecordListRoute {
         let user_role: UserRole = current_user.get_role().parse().unwrap_or_default();
         if user_role.is_admin() {
             if let Some(user_id_str) = user_id_opt
-                && let Ok(user_id) = user_id_str.parse::<i32>()
+                && let Ok(user_id) = AuthService::decode_id(&user_id_str)
             {
                 query.set_user_id(Some(user_id));
             }
@@ -572,7 +580,7 @@ impl ServerHook for RecordGetRoute {
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
         let record_id: i32 = match id_opt {
-            Some(id_str) => match id_str.parse::<i32>() {
+            Some(id_str) => match OrderService::decode_id(&id_str) {
                 Ok(id) => id,
                 Err(_) => {
                     let response: ApiResponse<&str> =
@@ -747,7 +755,7 @@ impl ServerHook for ImageListRoute {
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
         let record_id: i32 = match record_id_opt {
-            Some(id_str) => match id_str.parse::<i32>() {
+            Some(id_str) => match OrderService::decode_id(&id_str) {
                 Ok(id) => id,
                 Err(_) => {
                     let response: ApiResponse<&str> =
@@ -797,7 +805,7 @@ impl ServerHook for ImageDownloadRoute {
             }
         };
         let image_id: i32 = match id_opt {
-            Some(id_str) => match id_str.parse::<i32>() {
+            Some(id_str) => match OrderService::decode_id(&id_str) {
                 Ok(id) => id,
                 Err(_) => {
                     let response: ApiResponse<&str> =
