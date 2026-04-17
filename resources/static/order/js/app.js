@@ -22,32 +22,38 @@ const API_BASE = '/api/order';
 
 const orderRequestManager = window.requestManager;
 
-document.addEventListener('DOMContentLoaded', () => {
+async function checkAuth() {
+  try {
+    const response = await fetch('/api/auth/user/info', {
+      method: 'GET',
+      credentials: 'include',
+    });
+    if (response.ok) {
+      const result = await response.json();
+      if (result.code === 200 && result.data) {
+        currentUser = result.data;
+        showMainApp();
+        return;
+      }
+    }
+    window.location.href = '/auth?location=/order';
+  } catch (error) {
+    window.location.href = '/auth?location=/order';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
   initEventListeners();
   initHashRouter();
-  checkAuth();
+  await checkAuth();
   initScanFeature();
   initMyQRFeature();
 });
 
 function initEventListeners() {
   document
-    .getElementById('login-form')
-    ?.addEventListener('submit', handleLogin);
-  document
-    .getElementById('register-form')
-    ?.addEventListener('submit', handleRegister);
-  document.getElementById('show-register')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    showPage('register-page');
-  });
-  document.getElementById('show-login')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    showPage('login-page');
-  });
-  document
     .getElementById('logout-btn')
-    ?.addEventListener('click', handleLogout);
+    ?.addEventListener('click', () => handleLogout());
   document
     .getElementById('record-form')
     ?.addEventListener('submit', handleRecordSubmit);
@@ -127,18 +133,6 @@ function showPage(pageId) {
     el.classList.add('hidden');
   });
   document.getElementById(pageId)?.classList.remove('hidden');
-}
-
-function checkAuth() {
-  const savedUser = localStorage.getItem('auth_user');
-  const savedToken = localStorage.getItem('auth_token');
-  if (savedUser && savedToken) {
-    currentUser = JSON.parse(savedUser);
-    currentToken = savedToken;
-    showMainApp();
-  } else {
-    showPage('login-page');
-  }
 }
 
 function showMainApp() {
@@ -1702,123 +1696,37 @@ window.addEventListener('resize', () => {
   topUsersChart?.resize();
 });
 
-async function handleLogin(e) {
-  e.preventDefault();
-  const requestKey = 'login';
-  if (orderRequestManager.isPending(requestKey)) {
-    showToast('Login in progress, please wait...', 'info');
-    return;
-  }
-  const username = document.getElementById('login-username').value;
-  const password = document.getElementById('login-password').value;
-  try {
-    const response = await orderRequestManager.fetch(
-      requestKey,
-      `${API_BASE}/user/login`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
-        credentials: 'include',
-      },
-    );
-    const result = await response.json();
-    if (result.code === 200) {
-      currentUser = result.data.user;
-      currentToken = result.data.token;
-      localStorage.setItem('auth_user', JSON.stringify(currentUser));
-      localStorage.setItem('auth_token', currentToken);
-      showToast('Login successful!', 'success');
-      document.getElementById('login-form')?.reset();
-      showMainApp();
-    } else {
-      showToast(result.message || 'Login failed', 'error');
-    }
-  } catch (error) {
-    if (error.message !== 'Request aborted') {
-      showToast('Network error: ' + error.message, 'error');
-    }
-  }
-}
-
-async function handleRegister(e) {
-  e.preventDefault();
-  const requestKey = 'register';
-  if (orderRequestManager.isPending(requestKey)) {
-    showToast('Registration in progress, please wait...', 'info');
-    return;
-  }
-  const data = {
-    username: document.getElementById('reg-username').value,
-    password: document.getElementById('reg-password').value,
-    email: document.getElementById('reg-email').value || null,
-    phone: document.getElementById('reg-phone').value || null,
-  };
-  try {
-    const response = await orderRequestManager.fetch(
-      requestKey,
-      `${API_BASE}/user/register`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-        credentials: 'include',
-      },
-    );
-    const result = await response.json();
-    if (result.code === 200) {
-      showToast(
-        'Registration successful! Please wait for approval.',
-        'success',
-      );
-      document.getElementById('register-form')?.reset();
-      showPage('login-page');
-    } else {
-      showToast(result.message || 'Registration failed', 'error');
-    }
-  } catch (error) {
-    if (error.message !== 'Request aborted') {
-      showToast('Network error: ' + error.message, 'error');
-    }
-  }
-}
-
-function handleLogout() {
+async function handleLogout() {
   currentUser = null;
   currentToken = null;
   viewingUserId = null;
   viewingUserName = null;
-  localStorage.removeItem('auth_user');
-  localStorage.removeItem('auth_token');
-  window.location.hash = '';
-  document
-    .querySelectorAll('.admin-only')
-    .forEach((el) => el.classList.add('hidden'));
-  document.getElementById('current-user').textContent = 'User';
-  const roleBadge = document.getElementById('user-role');
-  roleBadge.textContent = 'user';
-  roleBadge.className = 'role-badge';
-  showPage('login-page');
-  showToast('Logged out successfully', 'info');
+  try {
+    await fetch('/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include',
+    });
+  } catch (error) {
+    console.error('Logout request failed:', error);
+  }
+  window.location.href = '/auth?location=/order';
 }
 
-function handleAuthError(message) {
+async function handleAuthError(message) {
   currentUser = null;
   currentToken = null;
   viewingUserId = null;
   viewingUserName = null;
-  localStorage.removeItem('auth_user');
-  localStorage.removeItem('auth_token');
-  window.location.hash = '';
-  document
-    .querySelectorAll('.admin-only')
-    .forEach((el) => el.classList.add('hidden'));
-  document.getElementById('current-user').textContent = 'User';
-  const roleBadge = document.getElementById('user-role');
-  roleBadge.textContent = 'user';
-  roleBadge.className = 'role-badge';
-  showPage('login-page');
   showToast(message || 'Authentication failed, please login again', 'error');
+  try {
+    await fetch('/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include',
+    });
+  } catch (error) {
+    console.error('Logout request failed:', error);
+  }
+  window.location.href = '/auth?location=/order';
 }
 
 async function loadDashboard() {

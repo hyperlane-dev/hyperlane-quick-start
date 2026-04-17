@@ -27,3 +27,11 @@ pub struct UserListRoute;
 #[route("/api/auth/user/get/{id}")]
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct UserGetRoute;
+
+#[route("/api/auth/logout")]
+#[derive(Clone, Copy, Data, Debug, Default)]
+pub struct UserLogoutRoute;
+
+#[route("/api/auth/user/info")]
+#[derive(Clone, Copy, Data, Debug, Default)]
+pub struct UserInfoRoute;

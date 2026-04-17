@@ -382,3 +382,56 @@ impl ServerHook for UserGetRoute {
         };
     }
 }
+
+impl ServerHook for UserLogoutRoute {
+    #[instrument_trace]
+    async fn new(_ctx: &mut Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(post_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
+    #[instrument_trace]
+    async fn handle(self, ctx: &mut Context) {
+        let clear_cookie: String = "token=; Path=/; Max-Age=0; HttpOnly".to_string();
+        ctx.get_mut_response().set_header(SET_COOKIE, &clear_cookie);
+        let response: ApiResponse<&str> =
+            ApiResponse::new(ApiResponseStatus::Success, "Logged out successfully");
+        ctx.get_mut_response().set_body(response.to_json_bytes());
+    }
+}
+
+impl ServerHook for UserInfoRoute {
+    #[instrument_trace]
+    async fn new(_ctx: &mut Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(get_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
+    #[instrument_trace]
+    async fn handle(self, ctx: &mut Context) {
+        match AuthService::extract_user_from_cookie(ctx) {
+            Ok(user_id) => match AuthService::get_user(user_id).await {
+                Ok(Some(user)) => {
+                    let response: ApiResponse<UserResponse> =
+                        ApiResponse::new(ApiResponseStatus::Success, user);
+                    ctx.get_mut_response().set_body(response.to_json_bytes());
+                }
+                Ok(None) => {
+                    let response: ApiResponse<&str> =
+                        ApiResponse::new(ApiResponseStatus::Unauthorized, "User not found");
+                    ctx.get_mut_response().set_body(response.to_json_bytes());
+                }
+                Err(error) => {
+                    let response: ApiResponse<String> =
+                        ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                    ctx.get_mut_response().set_body(response.to_json_bytes());
+                }
+            },
+            Err(error) => {
+                let response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::Unauthorized, error);
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+            }
+        }
+    }
+}
