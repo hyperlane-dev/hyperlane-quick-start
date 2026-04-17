@@ -3187,16 +3187,16 @@ function tickScan() {
 }
 
 async function handleScanResult(qrData) {
-  const userId = parseInt(qrData, 10);
-  if (isNaN(userId)) {
+  if (!qrData || qrData.trim().length === 0) {
     showScanError('Invalid QR code. Expected user ID.');
     return;
   }
+  const encodedUserId = qrData.trim();
   const requestKey = 'scan_user';
   try {
     const response = await orderRequestManager.fetch(
       requestKey,
-      `${API_BASE}/user/get/${userId}`,
+      `${API_BASE}/user/get/${encodedUserId}`,
       { credentials: 'include' },
     );
     const result = await response.json();
@@ -3208,9 +3208,7 @@ async function handleScanResult(qrData) {
       viewUserRecords(userData.id, userData.username);
       showToast(`Found user: ${userData.username}`, 'success');
     } else if (result.code === 404) {
-      showScanError(
-        `User ID ${userId} not found. Please scan another QR code.`,
-      );
+      showScanError(`User not found. Please scan another QR code.`);
     } else {
       showScanError(result.message || 'Failed to find user');
     }
