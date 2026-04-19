@@ -321,7 +321,7 @@ impl ChatService {
         }
         let response_json: serde_json::Value =
             serde_json::from_str(response_text).map_err(|error| {
-                format!("JSON parsing failed {error} (response content {response_text})",)
+                format!("JSON parsing failed {error} (response content {response_text})")
             })?;
         let raw_content: String = Self::extract_response_content(&response_json)
             .unwrap_or_default()
