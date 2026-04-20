@@ -20,6 +20,17 @@ let usersTotalCount = 0;
 
 const API_BASE = '/api/order';
 
+const UserRole = Object.freeze({
+  ADMIN: 'admin',
+  USER: 'user',
+});
+
+const UserStatus = Object.freeze({
+  PENDING: 'pending',
+  APPROVED: 'approved',
+  REJECTED: 'rejected',
+});
+
 const orderRequestManager = window.requestManager;
 
 async function checkAuth() {
@@ -140,7 +151,7 @@ function showMainApp() {
   updateUserInfo();
   initDatePickers();
   const routeState = parseRouteHash();
-  const isAdmin = currentUser && currentUser.role === 'admin';
+  const isAdmin = currentUser && currentUser.role === UserRole.ADMIN;
   if (routeState.page) {
     if (routeState.page === 'user-records' && routeState.userId) {
       viewingUserId = routeState.userId;
@@ -195,7 +206,7 @@ function updateRouteHash(page, extraParams = {}) {
 }
 
 function switchToPage(page) {
-  const isAdmin = currentUser && currentUser.role === 'admin';
+  const isAdmin = currentUser && currentUser.role === UserRole.ADMIN;
   if (page === 'dashboard' && !isAdmin) {
     navigateTo('records', true);
     return;
@@ -235,7 +246,7 @@ function updateUserInfo() {
   const roleBadge = document.getElementById('user-role');
   roleBadge.textContent = currentUser.role;
   roleBadge.className = `role-badge ${currentUser.role}`;
-  if (currentUser.role === 'admin') {
+  if (currentUser.role === UserRole.ADMIN) {
     document
       .querySelectorAll('.admin-only')
       .forEach((el) => el.classList.remove('hidden'));
@@ -1786,7 +1797,7 @@ async function applyFilters(pageDirection = null) {
   if (endDate) params.append('end_date', endDate);
   if (category) params.append('category', category);
   if (type) params.append('transaction_type', type);
-  if (currentUser && currentUser.role !== 'admin') {
+  if (currentUser && currentUser.role !== UserRole.ADMIN) {
     params.append('user_id', currentUser.id);
   }
   if (cacheId) {
@@ -2014,7 +2025,7 @@ async function handleRecordSubmit(e) {
     document.getElementById('record-description').value || null;
   const target_user_id =
     currentUser &&
-    currentUser.role === 'admin' &&
+    currentUser.role === UserRole.ADMIN &&
     viewingUserId &&
     currentPage === 'user-records'
       ? viewingUserId
@@ -2327,9 +2338,9 @@ function renderUsers(users) {
   }
   container.innerHTML = users
     .map((u) => {
-      const roleText = u.role === 'admin' ? 'Admin' : 'User';
+      const roleText = u.role === UserRole.ADMIN ? 'Admin' : 'User';
       const avatarClass =
-        u.role === 'admin' ? 'user-avatar-admin' : 'user-avatar-user';
+        u.role === UserRole.ADMIN ? 'user-avatar-admin' : 'user-avatar-user';
       const statusClass = u.status;
       const statusText = u.status;
       const contactInfo = [u.email, u.phone].filter(Boolean).join(' • ');
@@ -2342,8 +2353,8 @@ function renderUsers(users) {
       </div>
       <div class="user-status ${statusClass}">${statusText}</div>
       <div class="user-actions" onclick="event.stopPropagation();">
-        ${u.status !== 'approved' ? `<button class="btn btn-sm btn-primary" onclick="approveUser('${u.id}', true)">Approve</button>` : ''}
-        ${u.status === 'pending' ? `<button class="btn btn-sm btn-danger" onclick="approveUser('${u.id}', false)">Reject</button>` : ''}
+        ${u.status !== UserStatus.APPROVED ? `<button class="btn btn-sm btn-primary" onclick="approveUser('${u.id}', true)">Approve</button>` : ''}
+        ${u.status === UserStatus.PENDING ? `<button class="btn btn-sm btn-danger" onclick="approveUser('${u.id}', false)">Reject</button>` : ''}
       </div>
     </div>`;
     })
