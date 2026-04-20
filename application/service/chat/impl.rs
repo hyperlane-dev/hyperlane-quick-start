@@ -256,6 +256,8 @@ impl ChatService {
         let schema_json: serde_json::Value =
             serde_json::from_str(GPT_RESPONSE_SCHEMA).unwrap_or(json!({}));
         let mut messages: Vec<serde_json::Value> = Vec::new();
+        let model: &String = EnvPlugin::get_or_init().get_gpt_model();
+        let enable_thinking: bool = EnvPlugin::get_or_init().get_gpt_enable_thinking();
         let session_messages: Vec<serde_json::Value> = session
             .get_messages()
             .iter()
@@ -268,16 +270,20 @@ impl ChatService {
             .collect();
         messages.extend(session_messages);
         json!({
-            GPT_MODEL: EnvPlugin::get_or_init().get_gpt_model(),
-            GPT_ENABLE_THINKING: EnvPlugin::get_or_init().get_gpt_enable_thinking(),
-            JSON_FIELD_MESSAGES: messages,
+            "model": model,
+            "enable_thinking": enable_thinking,
+            "messages": messages,
             "response_format": {
-                "type": RESPONSE_FORMAT_TYPE,
+                "type": "json_schema",
                 "json_schema": {
-                    "name": RESPONSE_FORMAT_SCHEMA_NAME,
+                    "name": "chat_response",
                     "strict": true,
                     "schema": schema_json
                 }
+            },
+            "chat_template_kwargs": {
+                "enable_thinking": enable_thinking,
+                "clear_thinking": true
             }
         })
     }
