@@ -329,12 +329,12 @@ impl ChatService {
             serde_json::from_str(response_text).map_err(|error| {
                 format!("JSON parsing failed {error} (response content {response_text})")
             })?;
-        let raw_content: String = Self::extract_response_content(&response_json)
-            .unwrap_or_default()
-            .trim()
-            .to_string();
-        let parsed: GptStructuredResponse =
-            serde_json::from_str(&raw_content).map_err(|_| response_text.to_string())?;
+        let raw_content_opt: Option<String> = Self::extract_response_content(&response_json);
+        let mut parsed: GptStructuredResponse = GptStructuredResponse::default();
+        parsed.set_data(response_text.to_string());
+        if let Some(raw_content) = raw_content_opt {
+            parsed = serde_json::from_str(&raw_content).map_err(|_| raw_content.to_string())?;
+        }
         Ok((parsed.get_data().clone(), parsed.get_continue_flag()))
     }
 
