@@ -1,5 +1,9 @@
 use super::*;
 
+#[route("/api/auth/rsa/public-key")]
+#[derive(Clone, Copy, Data, Debug, Default)]
+pub struct RsaPublicKeyRoute;
+
 #[route("/api/auth/register")]
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct UserRegisterRoute;

@@ -1,5 +1,14 @@
 use super::*;
 
+impl Default for AuthService {
+    fn default() -> Self {
+        Self {
+            rsa_private_key: Arc::new(RwLock::new(None)),
+            rsa_key_cache: Arc::new(RwLock::new(None)),
+        }
+    }
+}
+
 impl PasswordUtil {
     #[instrument_trace]
     pub fn hash_password(password: &str) -> String {
@@ -13,6 +22,54 @@ impl PasswordUtil {
 }
 
 impl AuthService {
+    #[instrument_trace]
+    pub fn get_auth_service() -> &'static AuthService {
+        AUTH_SERVICE.get_or_init(AuthService::default)
+    }
+
+    #[instrument_trace]
+    pub async fn generate_rsa_key_pair(&self) -> Result<RsaPublicKeyResponse, String> {
+        if let Some(ref cache) = *self.rsa_key_cache.read().await
+            && cache.created_at.elapsed().as_secs() < RSA_KEY_CACHE_TTL_SECS
+        {
+            let response: RsaPublicKeyResponse = serde_json::from_str(&cache.response_json)
+                .map_err(|error| format!("Failed to parse cached key: {}", error))?;
+            return Ok(response);
+        }
+        let (private_key, public_key): (RsaPrivateKey, rsa::RsaPublicKey) =
+            RsaUtil::generate_key_pair()?;
+        let (n_b64, e_b64): (String, String) = RsaUtil::public_key_to_jwk(&public_key)?;
+        {
+            let mut key_guard = self.rsa_private_key.write().await;
+            *key_guard = Some(private_key);
+        }
+        let mut response: RsaPublicKeyResponse = RsaPublicKeyResponse::default();
+        response.set_n(n_b64).set_e(e_b64);
+        let response_json: String = serde_json::to_string(&response)
+            .map_err(|error| format!("Failed to serialize key: {}", error))?;
+        let cache: RsaKeyCache = RsaKeyCache {
+            response_json,
+            created_at: Instant::now(),
+        };
+        {
+            let mut cache_write = self.rsa_key_cache.write().await;
+            *cache_write = Some(cache);
+        }
+        Ok(response)
+    }
+
+    #[instrument_trace]
+    async fn decrypt_rsa_field(&self, encrypted_text: &str) -> Result<String, String> {
+        let key_guard: RwLockReadGuard<'_, Option<RsaPrivateKey>> =
+            self.get_rsa_private_key().read().await;
+        let private_key: &RsaPrivateKey = key_guard
+            .as_ref()
+            .ok_or_else(|| "RSA private key not initialized".to_string())?;
+        let encrypted_bytes: Vec<u8> = RsaUtil::base64_decode(encrypted_text)?;
+        let decrypted: String = RsaUtil::decrypt_with_private_key(private_key, &encrypted_bytes)?;
+        Ok(decrypted)
+    }
+
     #[instrument_trace]
     pub fn encode_id(id: i32) -> Result<String, String> {
         Encode::execute(CHARSETS, &id.to_string()).map_err(|_| "Failed to encode ID".to_string())
@@ -60,21 +117,24 @@ impl AuthService {
     }
 
     #[instrument_trace]
-    pub async fn register_user(request: RegisterRequest) -> Result<UserResponse, String> {
+    pub async fn register_user(&self, request: RegisterRequest) -> Result<UserResponse, String> {
+        let decrypted_password: String = self.decrypt_rsa_field(request.get_password()).await?;
+        let decrypted_username: String = self.decrypt_rsa_field(request.get_username()).await?;
         if let Some(email) = request.try_get_email()
             && !email.is_empty()
             && !Self::validate_email(email)
         {
             return Err("Invalid email format".to_string());
         }
-        let existing_user: Option<AuthUserModel> =
-            UserRepository::find_by_username(request.get_username().clone()).await?;
-        if existing_user.is_some() {
+        if UserRepository::find_by_username(decrypted_username.clone())
+            .await?
+            .is_some()
+        {
             return Err("Username already exists".to_string());
         }
-        let password_hash: String = PasswordUtil::hash_password(request.get_password());
+        let password_hash: String = PasswordUtil::hash_password(&decrypted_password);
         let active_model: AuthUserActiveModel = AuthUserActiveModel {
-            username: ActiveValue::Set(request.get_username().clone()),
+            username: ActiveValue::Set(decrypted_username),
             password_hash: ActiveValue::Set(password_hash),
             email: ActiveValue::Set(request.try_get_email().clone()),
             phone: ActiveValue::Set(request.try_get_phone().clone()),
@@ -89,18 +149,21 @@ impl AuthService {
     }
 
     #[instrument_trace]
-    pub async fn login_user(request: LoginRequest) -> Result<(UserResponse, i32, i16), String> {
+    pub async fn login_user(
+        &self,
+        request: LoginRequest,
+    ) -> Result<(UserResponse, i32, i16), String> {
+        let decrypted_password: String = self.decrypt_rsa_field(request.get_password()).await?;
+        let decrypted_username: String = self.decrypt_rsa_field(request.get_username()).await?;
         let user: Option<AuthUserModel> =
-            UserRepository::find_by_username(request.get_username().clone()).await?;
+            UserRepository::find_by_username(decrypted_username.clone()).await?;
         match user {
             Some(model) => {
                 if model.get_status() != UserStatus::Approved.to_i16() {
                     return Err("User is not approved".to_string());
                 }
-                let valid: bool = PasswordUtil::verify_password(
-                    request.get_password(),
-                    model.get_password_hash(),
-                );
+                let valid: bool =
+                    PasswordUtil::verify_password(&decrypted_password, model.get_password_hash());
                 if !valid {
                     return Err("Invalid password".to_string());
                 }
@@ -143,20 +206,25 @@ impl AuthService {
 
     #[instrument_trace]
     pub async fn change_password(
+        &self,
         user_id: i32,
         request: ChangePasswordRequest,
     ) -> Result<(), String> {
+        let decrypted_old_password: String =
+            self.decrypt_rsa_field(request.get_old_password()).await?;
+        let decrypted_new_password: String =
+            self.decrypt_rsa_field(request.get_new_password()).await?;
         match UserRepository::find_by_id(user_id).await? {
             Some(model) => {
                 let valid: bool = PasswordUtil::verify_password(
-                    request.get_old_password(),
+                    &decrypted_old_password,
                     model.get_password_hash(),
                 );
                 if !valid {
                     return Err("Old password is incorrect".to_string());
                 }
                 let new_password_hash: String =
-                    PasswordUtil::hash_password(request.get_new_password());
+                    PasswordUtil::hash_password(&decrypted_new_password);
                 let mut active_model: AuthUserActiveModel = model.into();
                 active_model.password_hash = ActiveValue::Set(new_password_hash);
                 active_model.updated_at = ActiveValue::NotSet;

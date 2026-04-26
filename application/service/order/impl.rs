@@ -2,20 +2,6 @@ use super::*;
 
 impl OrderService {
     #[instrument_trace]
-    pub fn encode_id(id: i32) -> Result<String, String> {
-        Encode::execute(CHARSETS, &id.to_string()).map_err(|_| "Failed to encode ID".to_string())
-    }
-
-    #[instrument_trace]
-    pub fn decode_id(encoded_id: &str) -> Result<i32, String> {
-        let decoded: String =
-            Decode::execute(CHARSETS, encoded_id).map_err(|_| "Invalid ID format".to_string())?;
-        decoded
-            .parse::<i32>()
-            .map_err(|_| "Invalid ID format".to_string())
-    }
-
-    #[instrument_trace]
     pub fn extract_user_from_cookie(ctx: &Context) -> Result<i32, String> {
         let token: String = match ctx.get_request().try_get_cookie(TOKEN) {
             Some(cookie) => cookie,
@@ -263,7 +249,7 @@ impl OrderService {
         let encoded_image_ids: Vec<String> = request.get_image_ids().clone();
         let image_ids: Vec<i32> = encoded_image_ids
             .iter()
-            .map(|encoded_id: &String| Self::decode_id(encoded_id))
+            .map(|encoded_id: &String| AuthService::decode_id(encoded_id))
             .collect::<Result<Vec<i32>, String>>()?;
         if !image_ids.is_empty() {
             Self::bind_images_to_record(record_id, image_ids).await?;
@@ -397,7 +383,7 @@ impl OrderService {
 
     #[instrument_trace]
     async fn enrich_record_with_user(response: &mut RecordResponse) -> Result<(), String> {
-        let user_id: i32 = Self::decode_id(response.get_user_id())?;
+        let user_id: i32 = AuthService::decode_id(response.get_user_id())?;
         let user: Option<AuthUserModel> = UserRepository::find_by_id(user_id).await?;
         if let Some(user) = user {
             response
@@ -419,8 +405,8 @@ impl OrderService {
             .and_time(chrono::NaiveTime::from_hms_opt(0, 0, 0).unwrap())
             .and_utc()
             .timestamp_millis();
-        let encoded_id: String = Self::encode_id(model.get_id())?;
-        let encoded_user_id: String = Self::encode_id(model.get_user_id())?;
+        let encoded_id: String = AuthService::encode_id(model.get_id())?;
+        let encoded_user_id: String = AuthService::encode_id(model.get_user_id())?;
         response
             .set_id(encoded_id)
             .set_bill_no(model.get_bill_no().clone())
@@ -1108,7 +1094,7 @@ impl OrderService {
         let mut result: Vec<TopUserItem> = Vec::new();
         for (user_id, (username, count, total)) in user_stats {
             let mut item: TopUserItem = TopUserItem::default();
-            let encoded_user_id: String = Self::encode_id(user_id)?;
+            let encoded_user_id: String = AuthService::encode_id(user_id)?;
             item.set_user_id(encoded_user_id)
                 .set_username(username)
                 .set_transaction_count(count)
@@ -1424,8 +1410,8 @@ impl OrderService {
         match RecordImageRepository::find_by_id(image_id).await? {
             Some(model) => {
                 let mut response: ImageDataResponse = ImageDataResponse::default();
-                let encoded_id: String = Self::encode_id(model.get_id())?;
-                let encoded_record_id: String = Self::encode_id(model.get_record_id())?;
+                let encoded_id: String = AuthService::encode_id(model.get_id())?;
+                let encoded_record_id: String = AuthService::encode_id(model.get_record_id())?;
                 response
                     .set_id(encoded_id)
                     .set_record_id(encoded_record_id)
@@ -1485,9 +1471,9 @@ impl OrderService {
             .map(|dt| dt.and_utc().timestamp_millis())
             .unwrap_or(0);
         let mut response: RecordImageResponse = RecordImageResponse::default();
-        let encoded_id: String = Self::encode_id(model.get_id())?;
-        let encoded_record_id: String = Self::encode_id(record_id)?;
-        let encoded_user_id: String = Self::encode_id(model.get_user_id())?;
+        let encoded_id: String = AuthService::encode_id(model.get_id())?;
+        let encoded_record_id: String = AuthService::encode_id(record_id)?;
+        let encoded_user_id: String = AuthService::encode_id(model.get_user_id())?;
         let download_url: String = format!("/api/order/image/download/{}", encoded_id);
         response
             .set_id(encoded_id)

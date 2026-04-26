@@ -1,6 +1,12 @@
 use super::*;
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
+pub struct RsaPublicKeyResponse {
+    pub(super) n: String,
+    pub(super) e: String,
+}
+
+#[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct UserResponse {
     pub(super) id: String,
     pub(super) username: String,

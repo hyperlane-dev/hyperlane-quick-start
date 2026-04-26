@@ -1,6 +1,17 @@
 use super::*;
 
 #[utoipa::path(
+    get,
+    path = "/api/auth/rsa/public-key",
+    responses(
+        (status = 200, description = "RSA public key retrieved successfully"),
+        (status = 500, description = "Internal server error")
+    )
+)]
+#[instrument_trace]
+pub fn openapi_auth_rsa_public_key() {}
+
+#[utoipa::path(
     post,
     path = "/api/auth/register",
     responses(

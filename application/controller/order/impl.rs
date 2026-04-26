@@ -18,7 +18,7 @@ impl ServerHook for UserRegisterRoute {
                 return;
             }
         };
-        match AuthService::register_user(request).await {
+        match AuthService::get_auth_service().register_user(request).await {
             Ok(user) => {
                 let response: ApiResponse<UserResponse> =
                     ApiResponse::new(ApiResponseStatus::Success, user);
@@ -51,7 +51,7 @@ impl ServerHook for UserLoginRoute {
                 return;
             }
         };
-        match AuthService::login_user(request).await {
+        match AuthService::get_auth_service().login_user(request).await {
             Ok((user_response, user_id, role)) => {
                 let jwt_config: JwtConfig = JwtConfig::new(
                     JwtConfigEnum::SecretKey.to_string(),
@@ -445,7 +445,7 @@ impl ServerHook for RecordCreateRoute {
                     ctx.get_mut_response().set_body(response.to_json_bytes());
                     return;
                 }
-                match OrderService::decode_id(target_id) {
+                match AuthService::decode_id(target_id) {
                     Ok(decoded_id) => decoded_id,
                     Err(error) => {
                         let response: ApiResponse<String> =
@@ -580,7 +580,7 @@ impl ServerHook for RecordGetRoute {
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
         let record_id: i32 = match id_opt {
-            Some(id_str) => match OrderService::decode_id(&id_str) {
+            Some(id_str) => match AuthService::decode_id(&id_str) {
                 Ok(id) => id,
                 Err(_) => {
                     let response: ApiResponse<&str> =
@@ -755,7 +755,7 @@ impl ServerHook for ImageListRoute {
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
         let record_id: i32 = match record_id_opt {
-            Some(id_str) => match OrderService::decode_id(&id_str) {
+            Some(id_str) => match AuthService::decode_id(&id_str) {
                 Ok(id) => id,
                 Err(_) => {
                     let response: ApiResponse<&str> =
@@ -805,7 +805,7 @@ impl ServerHook for ImageDownloadRoute {
             }
         };
         let image_id: i32 = match id_opt {
-            Some(id_str) => match OrderService::decode_id(&id_str) {
+            Some(id_str) => match AuthService::decode_id(&id_str) {
                 Ok(id) => id,
                 Err(_) => {
                     let response: ApiResponse<&str> =
