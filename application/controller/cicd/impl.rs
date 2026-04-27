@@ -28,8 +28,9 @@ impl ServerHook for CreatePipelineRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -55,8 +56,9 @@ impl ServerHook for ListPipelinesRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -103,8 +105,9 @@ impl ServerHook for GetPipelineRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -139,8 +142,9 @@ impl ServerHook for TriggerRunRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -182,8 +186,9 @@ impl ServerHook for ListRunsRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -226,8 +231,9 @@ impl ServerHook for GetRunRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -274,8 +280,9 @@ impl ServerHook for GetRunDetailRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -313,8 +320,9 @@ impl ServerHook for UpdateJobRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -352,8 +360,9 @@ impl ServerHook for UpdateStepRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -402,8 +411,9 @@ impl ServerHook for GetIncrementalRunDetailRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };

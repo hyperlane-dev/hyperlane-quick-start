@@ -25,8 +25,9 @@ impl ServerHook for UserRegisterRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -121,8 +122,9 @@ impl ServerHook for UserUpdateRoute {
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::Unauthorized, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -136,8 +138,9 @@ impl ServerHook for UserUpdateRoute {
                 return;
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -274,8 +277,9 @@ impl ServerHook for UserApproveRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -309,8 +313,9 @@ impl ServerHook for UserListRoute {
                 return;
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -337,8 +342,9 @@ impl ServerHook for UserListRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -383,8 +389,9 @@ impl ServerHook for UserGetRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -412,8 +419,9 @@ impl ServerHook for RecordCreateRoute {
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::Unauthorized, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -427,8 +435,9 @@ impl ServerHook for RecordCreateRoute {
                 return;
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -472,8 +481,9 @@ impl ServerHook for RecordCreateRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes());
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
             }
         }
@@ -500,8 +510,9 @@ impl ServerHook for RecordListRoute {
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::Unauthorized, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -515,8 +526,9 @@ impl ServerHook for RecordListRoute {
                 return;
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -570,8 +582,9 @@ impl ServerHook for RecordListRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -616,8 +629,9 @@ impl ServerHook for RecordGetRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -636,8 +650,9 @@ impl ServerHook for OverviewStatisticsRoute {
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::Unauthorized, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -651,8 +666,9 @@ impl ServerHook for OverviewStatisticsRoute {
                 return;
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -673,8 +689,9 @@ impl ServerHook for OverviewStatisticsRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -745,8 +762,9 @@ impl ServerHook for ImageUploadRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes());
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
             }
         }
@@ -786,8 +804,9 @@ impl ServerHook for ImageListRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes());
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
             }
         };
@@ -851,8 +870,9 @@ impl ServerHook for ImageDownloadRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes());
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
             }
         };

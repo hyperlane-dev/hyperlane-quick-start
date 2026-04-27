@@ -151,8 +151,9 @@ impl ServerHook for UserUpdateRoute {
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::Unauthorized, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -166,8 +167,9 @@ impl ServerHook for UserUpdateRoute {
                 return;
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -325,8 +327,9 @@ impl ServerHook for UserListRoute {
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::Unauthorized, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -340,8 +343,9 @@ impl ServerHook for UserListRoute {
                 return;
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
             }
@@ -368,8 +372,9 @@ impl ServerHook for UserListRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -462,14 +467,16 @@ impl ServerHook for UserInfoRoute {
                     ctx.get_mut_response().set_body(response.to_json_bytes());
                 }
                 Err(error) => {
-                    let response: ApiResponse<String> =
-                        ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                    let mut response: ApiResponse<String> =
+                        ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                    response.set_message(&error);
                     ctx.get_mut_response().set_body(response.to_json_bytes());
                 }
             },
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::Unauthorized, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
             }
         }
