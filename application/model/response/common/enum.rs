@@ -7,7 +7,6 @@ pub enum ApiResponseStatus {
     Unauthorized,
     Forbidden,
     ResourceNotFound,
-    BusinessError,
     DatabaseError,
     BusinessLogicError,
     InternalServerError,

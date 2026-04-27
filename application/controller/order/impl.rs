@@ -171,7 +171,7 @@ impl ServerHook for UserUpdateRoute {
             }
             Err(error) => {
                 let mut response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::BusinessError, error.clone());
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
@@ -224,7 +224,7 @@ impl ServerHook for UserChangePasswordRoute {
             }
             Err(error) => {
                 let mut response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::BusinessError, error.clone());
+                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
