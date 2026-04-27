@@ -55,7 +55,7 @@ impl ServerHook for UserRegisterRoute {
             }
             Err(error) => {
                 let mut response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error.clone());
+                    ApiResponse::new(ApiResponseStatus::BusinessError, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
@@ -200,8 +200,9 @@ impl ServerHook for UserUpdateRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::BusinessError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -253,7 +254,7 @@ impl ServerHook for UserChangePasswordRoute {
             }
             Err(error) => {
                 let mut response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error.clone());
+                    ApiResponse::new(ApiResponseStatus::BusinessError, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
@@ -304,7 +305,7 @@ impl ServerHook for UserApproveRoute {
             }
             Err(error) => {
                 let mut response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error.clone());
+                    ApiResponse::new(ApiResponseStatus::BusinessError, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
@@ -414,7 +415,7 @@ impl ServerHook for UserGetRoute {
             }
             Err(error) => {
                 let mut response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error.clone());
+                    ApiResponse::new(ApiResponseStatus::BusinessError, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }

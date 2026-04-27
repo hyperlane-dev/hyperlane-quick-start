@@ -9,6 +9,10 @@ const registerForm = document.getElementById('register-form');
 
 let isSubmitting = false;
 
+RsaCrypto.fetchPublicKey().catch((error) => {
+  console.error('Failed to preload RSA public key:', error);
+});
+
 showRegisterLink.addEventListener('click', (e) => {
   e.preventDefault();
   loginPage.classList.add('hidden');
