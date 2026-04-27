@@ -2,8 +2,8 @@ use super::*;
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct RsaPublicKeyResponse {
-    pub(super) n: String,
-    pub(super) e: String,
+    pub(super) modulus: String,
+    pub(super) exponent: String,
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]

@@ -91,6 +91,8 @@ registerForm.addEventListener('submit', async (e) => {
     await RsaCrypto.fetchPublicKey();
     const encryptedUsername = await RsaCrypto.encryptField(username);
     const encryptedPassword = await RsaCrypto.encryptField(password);
+    const encryptedEmail = email ? await RsaCrypto.encryptField(email) : null;
+    const encryptedPhone = phone ? await RsaCrypto.encryptField(phone) : null;
     const response = await fetch(`${API_BASE}/register`, {
       method: 'POST',
       headers: {
@@ -99,8 +101,8 @@ registerForm.addEventListener('submit', async (e) => {
       body: JSON.stringify({
         username: encryptedUsername,
         password: encryptedPassword,
-        email,
-        phone,
+        email: encryptedEmail,
+        phone: encryptedPhone,
       }),
     });
     const data = await response.json();

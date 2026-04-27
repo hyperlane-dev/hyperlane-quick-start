@@ -44,17 +44,14 @@ impl AuthService {
             *key_guard = Some(private_key);
         }
         let mut response: RsaPublicKeyResponse = RsaPublicKeyResponse::default();
-        response.set_n(n_b64).set_e(e_b64);
+        response.set_modulus(n_b64).set_exponent(e_b64);
         let response_json: String = serde_json::to_string(&response)
             .map_err(|error| format!("Failed to serialize key: {}", error))?;
         let cache: RsaKeyCache = RsaKeyCache {
             response_json,
             created_at: Instant::now(),
         };
-        {
-            let mut cache_write = self.rsa_key_cache.write().await;
-            *cache_write = Some(cache);
-        }
+        *self.rsa_key_cache.write().await = Some(cache);
         Ok(response)
     }
 
@@ -120,7 +117,15 @@ impl AuthService {
     pub async fn register_user(&self, request: RegisterRequest) -> Result<UserResponse, String> {
         let decrypted_password: String = self.decrypt_rsa_field(request.get_password()).await?;
         let decrypted_username: String = self.decrypt_rsa_field(request.get_username()).await?;
-        if let Some(email) = request.try_get_email()
+        let decrypted_email: Option<String> = match request.try_get_email() {
+            Some(email) if !email.is_empty() => Some(self.decrypt_rsa_field(email).await?),
+            _ => None,
+        };
+        let decrypted_phone: Option<String> = match request.try_get_phone() {
+            Some(phone) if !phone.is_empty() => Some(self.decrypt_rsa_field(phone).await?),
+            _ => None,
+        };
+        if let Some(ref email) = decrypted_email
             && !email.is_empty()
             && !Self::validate_email(email)
         {
@@ -136,8 +141,8 @@ impl AuthService {
         let active_model: AuthUserActiveModel = AuthUserActiveModel {
             username: ActiveValue::Set(decrypted_username),
             password_hash: ActiveValue::Set(password_hash),
-            email: ActiveValue::Set(request.try_get_email().clone()),
-            phone: ActiveValue::Set(request.try_get_phone().clone()),
+            email: ActiveValue::Set(decrypted_email),
+            phone: ActiveValue::Set(decrypted_phone),
             role: ActiveValue::Set(UserRole::User.to_i16()),
             status: ActiveValue::Set(UserStatus::Pending.to_i16()),
             id: ActiveValue::NotSet,
@@ -178,10 +183,19 @@ impl AuthService {
 
     #[instrument_trace]
     pub async fn update_user(
+        &self,
         user_id: i32,
         request: UpdateUserRequest,
     ) -> Result<UserResponse, String> {
-        if let Some(email) = request.try_get_email()
+        let decrypted_email: Option<String> = match request.try_get_email() {
+            Some(email) if !email.is_empty() => Some(self.decrypt_rsa_field(email).await?),
+            _ => None,
+        };
+        let decrypted_phone: Option<String> = match request.try_get_phone() {
+            Some(phone) if !phone.is_empty() => Some(self.decrypt_rsa_field(phone).await?),
+            _ => None,
+        };
+        if let Some(ref email) = decrypted_email
             && !email.is_empty()
             && !Self::validate_email(email)
         {
@@ -190,11 +204,11 @@ impl AuthService {
         match UserRepository::find_by_id(user_id).await? {
             Some(model) => {
                 let mut active_model: AuthUserActiveModel = model.into();
-                if let Some(email) = request.try_get_email() {
-                    active_model.email = ActiveValue::Set(Some(email.clone()));
+                if decrypted_email.is_some() {
+                    active_model.email = ActiveValue::Set(decrypted_email);
                 }
-                if let Some(phone) = request.try_get_phone() {
-                    active_model.phone = ActiveValue::Set(Some(phone.clone()));
+                if decrypted_phone.is_some() {
+                    active_model.phone = ActiveValue::Set(decrypted_phone);
                 }
                 active_model.updated_at = ActiveValue::NotSet;
                 let result: AuthUserModel = UserRepository::update(active_model).await?;

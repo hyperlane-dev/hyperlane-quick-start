@@ -55,7 +55,7 @@ impl ServerHook for UserRegisterRoute {
             }
             Err(error) => {
                 let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                    ApiResponse::new_error(ApiResponseStatus::BusinessLogicError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -189,7 +189,10 @@ impl ServerHook for UserUpdateRoute {
                 return;
             }
         };
-        match AuthService::update_user(target_user_id, request).await {
+        match AuthService::get_auth_service()
+            .update_user(target_user_id, request)
+            .await
+        {
             Ok(user) => {
                 let response: ApiResponse<UserResponse> =
                     ApiResponse::new(ApiResponseStatus::Success, user);
@@ -249,7 +252,7 @@ impl ServerHook for UserChangePasswordRoute {
             }
             Err(error) => {
                 let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                    ApiResponse::new_error(ApiResponseStatus::BusinessLogicError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -299,7 +302,7 @@ impl ServerHook for UserApproveRoute {
             }
             Err(error) => {
                 let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                    ApiResponse::new_error(ApiResponseStatus::BusinessLogicError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -408,7 +411,7 @@ impl ServerHook for UserGetRoute {
             }
             Err(error) => {
                 let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                    ApiResponse::new_error(ApiResponseStatus::BusinessLogicError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };

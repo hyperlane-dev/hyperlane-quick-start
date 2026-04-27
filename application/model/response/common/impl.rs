@@ -53,6 +53,31 @@ where
     }
 
     #[instrument_trace]
+    pub fn new_with_message(status: ApiResponseStatus, message: String, data: T) -> Self {
+        let mut instance: ApiResponse<T> = Self::default();
+        instance
+            .set_code(status.into())
+            .set_message(message)
+            .set_data(Some(data))
+            .set_timestamp(Some(Utc::now().timestamp_millis()));
+        instance
+    }
+
+    #[instrument_trace]
+    pub fn new_error(status: ApiResponseStatus, message: String) -> Self
+    where
+        T: From<String>,
+    {
+        let mut instance: ApiResponse<T> = Self::default();
+        instance
+            .set_code(status.into())
+            .set_message(message.clone())
+            .set_data(Some(T::from(message)))
+            .set_timestamp(Some(Utc::now().timestamp_millis()));
+        instance
+    }
+
+    #[instrument_trace]
     pub fn try_to_json_string(&self) -> serde_json::Result<String> {
         serde_json::to_string(self)
     }

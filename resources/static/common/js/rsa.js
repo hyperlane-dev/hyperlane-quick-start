@@ -9,11 +9,11 @@ var RsaCrypto = (function () {
         throw new Error(result.data || 'Failed to fetch public key');
       }
       var data = result.data;
-      if (data.n && data.e) {
+      if (data.modulus && data.exponent) {
         jwkKey = {
           kty: 'RSA',
-          n: data.n,
-          e: data.e,
+          n: data.modulus,
+          e: data.exponent,
           alg: 'RSA-OAEP-256',
           ext: true,
         };

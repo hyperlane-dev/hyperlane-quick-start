@@ -160,7 +160,10 @@ impl ServerHook for UserUpdateRoute {
                 return;
             }
         };
-        match OrderService::update_user(target_user_id, request).await {
+        match AuthService::get_auth_service()
+            .update_user(target_user_id, request)
+            .await
+        {
             Ok(user) => {
                 let response: ApiResponse<UserResponse> =
                     ApiResponse::new(ApiResponseStatus::Success, user);
@@ -168,7 +171,7 @@ impl ServerHook for UserUpdateRoute {
             }
             Err(error) => {
                 let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                    ApiResponse::new_error(ApiResponseStatus::BusinessLogicError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -210,14 +213,17 @@ impl ServerHook for UserChangePasswordRoute {
                 return;
             }
         };
-        match OrderService::change_password(user_id, request).await {
+        match AuthService::get_auth_service()
+            .change_password(user_id, request)
+            .await
+        {
             Ok(_) => {
                 let response: ApiResponse<()> = ApiResponse::new(ApiResponseStatus::Success, ());
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
                 let response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::DatabaseError, error);
+                    ApiResponse::new_error(ApiResponseStatus::BusinessLogicError, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -259,7 +265,7 @@ impl ServerHook for UserApproveRoute {
                 return;
             }
         };
-        match OrderService::approve_user(user_id, request.get_approved()).await {
+        match AuthService::approve_user(user_id, request.get_approved()).await {
             Ok(user) => {
                 let response: ApiResponse<UserResponse> =
                     ApiResponse::new(ApiResponseStatus::Success, user);
@@ -322,7 +328,7 @@ impl ServerHook for UserListRoute {
                 .set_last_id(last_id)
                 .set_limit(limit);
         }
-        match OrderService::list_users(query).await {
+        match AuthService::list_users(query).await {
             Ok(data) => {
                 let response: ApiResponse<UserListResponse> =
                     ApiResponse::new(ApiResponseStatus::Success, data);
@@ -363,7 +369,7 @@ impl ServerHook for UserGetRoute {
                 return;
             }
         };
-        match OrderService::get_user(user_id).await {
+        match AuthService::get_user(user_id).await {
             Ok(Some(user)) => {
                 let response: ApiResponse<UserResponse> =
                     ApiResponse::new(ApiResponseStatus::Success, user);
@@ -688,7 +694,7 @@ impl ServerHook for ImageUploadRoute {
     )]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
-        let current_user_id: i32 = match OrderService::extract_user_from_cookie(ctx) {
+        let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
                 let response: ApiResponse<String> =
@@ -795,7 +801,7 @@ impl ServerHook for ImageDownloadRoute {
     #[prologue_macros(get_method, route_param_option(ID_KEY => id_opt))]
     #[instrument_trace]
     async fn handle(self, ctx: &mut Context) {
-        let current_user_id: i32 = match OrderService::extract_user_from_cookie(ctx) {
+        let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(user_id) => user_id,
             Err(error) => {
                 let response: ApiResponse<String> =

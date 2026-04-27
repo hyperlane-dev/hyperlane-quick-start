@@ -2697,11 +2697,16 @@ async function handleProfileSubmit(e) {
     showToast('Saving profile, please wait...', 'info');
     return;
   }
-  const data = {
-    email: document.getElementById('profile-email').value || null,
-    phone: document.getElementById('profile-phone').value || null,
-  };
+  const email = document.getElementById('profile-email').value || null;
+  const phone = document.getElementById('profile-phone').value || null;
   try {
+    await RsaCrypto.fetchPublicKey();
+    const encryptedEmail = email ? await RsaCrypto.encryptField(email) : null;
+    const encryptedPhone = phone ? await RsaCrypto.encryptField(phone) : null;
+    const data = {
+      email: encryptedEmail,
+      phone: encryptedPhone,
+    };
     const response = await orderRequestManager.fetch(
       requestKey,
       `${API_BASE}/user/update/${currentUser.id}`,
@@ -2739,11 +2744,16 @@ async function handlePasswordSubmit(e) {
     showToast('Changing password, please wait...', 'info');
     return;
   }
-  const data = {
-    old_password: document.getElementById('old-password').value,
-    new_password: document.getElementById('new-password').value,
-  };
+  const oldPassword = document.getElementById('old-password').value;
+  const newPassword = document.getElementById('new-password').value;
   try {
+    await RsaCrypto.fetchPublicKey();
+    const encryptedOldPassword = await RsaCrypto.encryptField(oldPassword);
+    const encryptedNewPassword = await RsaCrypto.encryptField(newPassword);
+    const data = {
+      old_password: encryptedOldPassword,
+      new_password: encryptedNewPassword,
+    };
     const response = await orderRequestManager.fetch(
       requestKey,
       `${API_BASE}/user/change_password/${currentUser.id}`,
