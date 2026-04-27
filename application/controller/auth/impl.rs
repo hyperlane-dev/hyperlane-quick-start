@@ -54,8 +54,9 @@ impl ServerHook for UserRegisterRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new_error(ApiResponseStatus::BusinessLogicError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -251,8 +252,9 @@ impl ServerHook for UserChangePasswordRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new_error(ApiResponseStatus::BusinessLogicError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -301,8 +303,9 @@ impl ServerHook for UserApproveRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new_error(ApiResponseStatus::BusinessLogicError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
@@ -410,8 +413,9 @@ impl ServerHook for UserGetRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
-                let response: ApiResponse<String> =
-                    ApiResponse::new_error(ApiResponseStatus::BusinessLogicError, error);
+                let mut response: ApiResponse<String> =
+                    ApiResponse::new(ApiResponseStatus::DatabaseError, error.clone());
+                response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
