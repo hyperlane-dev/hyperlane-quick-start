@@ -9,7 +9,7 @@ use {
     mapper::auth::user::*,
     model::{
         application::order::*,
-        request::{auth::*, order::*},
+        request::order::*,
         response::{auth::*, common::*, order::*},
     },
     service::{auth::*, order::*},
@@ -17,5 +17,3 @@ use {
 };
 
 use hyperlane_config::application::shortlink::*;
-
-use serde_json::json;

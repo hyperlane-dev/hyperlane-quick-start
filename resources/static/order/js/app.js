@@ -19,6 +19,7 @@ let usersCurrentPage = 1;
 let usersTotalCount = 0;
 
 const API_BASE = '/api/order';
+const AUTH_API_BASE = '/api/auth';
 
 const UserRole = Object.freeze({
   ADMIN: 'admin',
@@ -2260,7 +2261,7 @@ async function loadUsers(pageDirection = null) {
       params.append('last_id', cursor);
       params.append('direction', 'prev');
     }
-    const url = `${API_BASE}/user/list?${params.toString()}`;
+    const url = `${AUTH_API_BASE}/user/list?${params.toString()}`;
     const response = await orderRequestManager.fetch(requestKey, url, {
       credentials: 'include',
     });
@@ -2656,7 +2657,7 @@ async function approveUser(userId, approved) {
   try {
     const response = await orderRequestManager.fetch(
       requestKey,
-      `${API_BASE}/user/approve/${userId}`,
+      `${AUTH_API_BASE}/user/approve/${userId}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -2709,7 +2710,7 @@ async function handleProfileSubmit(e) {
     };
     const response = await orderRequestManager.fetch(
       requestKey,
-      `${API_BASE}/user/update/${currentUser.id}`,
+      `${AUTH_API_BASE}/user/update/${currentUser.id}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -2756,7 +2757,7 @@ async function handlePasswordSubmit(e) {
     };
     const response = await orderRequestManager.fetch(
       requestKey,
-      `${API_BASE}/user/change_password/${currentUser.id}`,
+      `${AUTH_API_BASE}/user/change_password/${currentUser.id}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -3217,7 +3218,7 @@ async function handleScanResult(qrData) {
   try {
     const response = await orderRequestManager.fetch(
       requestKey,
-      `${API_BASE}/user/get/${encodedUserId}`,
+      `${AUTH_API_BASE}/user/get/${encodedUserId}`,
       { credentials: 'include' },
     );
     const result = await response.json();
