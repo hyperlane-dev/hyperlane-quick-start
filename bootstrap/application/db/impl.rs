@@ -18,6 +18,7 @@ impl std::fmt::Display for PostgresqlTableName {
             PostgresqlTableName::TrackingRecord => write!(f, "tracking_record"),
             PostgresqlTableName::Shortlink => write!(f, "shortlink"),
             PostgresqlTableName::Order => write!(f, "order"),
+            PostgresqlTableName::Notification => write!(f, "notification"),
         }
     }
 }
@@ -87,6 +88,12 @@ impl DbBootstrap {
                 POSTGRESQL_ORDER_RECORD_IMAGE_TABLE_SQL.to_string(),
             ))
             .add_index(POSTGRESQL_ORDER_INDEX_SQL.to_string())
+            .add_table(TableSchema::new(
+                vec![],
+                PostgresqlTableName::Notification.to_string(),
+                POSTGRESQL_NOTIFICATION_TABLE_SQL.to_string(),
+            ))
+            .add_index(POSTGRESQL_NOTIFICATION_INDEX_SQL.to_string())
     }
 }
 

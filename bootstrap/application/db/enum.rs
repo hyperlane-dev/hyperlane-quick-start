@@ -10,4 +10,5 @@ pub enum PostgresqlTableName {
     TrackingRecord,
     Shortlink,
     Order,
+    Notification,
 }

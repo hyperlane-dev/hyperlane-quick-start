@@ -5,6 +5,7 @@ pub mod diff;
 pub mod favicon;
 pub mod gomoku;
 pub mod monitor;
+pub mod notification;
 pub mod openapi;
 pub mod order;
 pub mod redis;

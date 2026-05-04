@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Hyperlane - Notifications</title>
+    <link rel="icon" href="https://docs.ltpp.vip/img/hyperlane.png" />
+    <link href="../common/css/common.css" rel="stylesheet" />
+    <link href="../common/css/header.css" rel="stylesheet" />
+    <link href="../common/css/toast.css" rel="stylesheet" />
+    <link href="./css/style.css" rel="stylesheet" />
+    <script src="../common/js/common.js"></script>
+    <script src="../common/js/toast.js"></script>
+    <script src="../common/components/hyperlane-confirm.js"></script>
+    <script src="./js/app.js" defer></script>
+  </head>
+  <body>
+    <div class="container">
+      <header class="app-header shimmer-header">
+        <div class="header-content">
+          <h1 class="app-title">
+            <a
+              href="https://github.com/hyperlane-dev/hyperlane"
+              target="_blank"
+            >
+              <img
+                src="https://docs.ltpp.vip/img/hyperlane.png"
+                alt=""
+                class="nav-logo"
+                onerror="this.style.display = 'none'"
+              />
+              <span class="text shimmer">Hyperlane Notifications</span>
+            </a>
+          </h1>
+          <p class="app-subtitle">Manage your notifications</p>
+        </div>
+      </header>
+
+      <div class="stats-panel">
+        <div class="stat-card">
+          <div class="stat-label">Total Notifications</div>
+          <div class="stat-value" id="totalNotifications">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Unread</div>
+          <div class="stat-value" id="unreadCount">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Current Page</div>
+          <div class="stat-value" id="currentPage">1</div>
+        </div>
+      </div>
+
+      <div class="action-panel">
+        <div class="button-group">
+          <button class="btn btn-primary" onclick="app.openCreateModal()">
+            + New Notification
+          </button>
+          <button class="btn btn-primary" onclick="app.markAllAsRead()">
+            Mark All as Read
+          </button>
+          <button class="btn btn-secondary" onclick="app.refresh()">
+            Refresh
+          </button>
+        </div>
+        <div class="filter-group">
+          <select
+            class="form-select"
+            id="filterType"
+            onchange="app.applyFilters()"
+          >
+            <option value="">All Types</option>
+            <option value="system">System</option>
+            <option value="message">Message</option>
+            <option value="alert">Alert</option>
+          </select>
+          <select
+            class="form-select"
+            id="filterRead"
+            onchange="app.applyFilters()"
+          >
+            <option value="">All Status</option>
+            <option value="false">Unread</option>
+            <option value="true">Read</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="results-panel">
+        <div class="results-title">Notifications</div>
+        <div id="resultsContainer">
+          <div class="no-data">Loading notifications...</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="detailModal">
+      <div class="modal-content">
+        <button
+          class="modal-close"
+          onclick="app.closeModal()"
+          aria-label="Close"
+        >
+          <span>&times;</span>
+        </button>
+        <div class="modal-title" id="modalTitle">Notification Detail</div>
+        <div id="modalContent"></div>
+      </div>
+    </div>
+
+    <div class="modal" id="createModal">
+      <div class="modal-content">
+        <button
+          class="modal-close"
+          onclick="app.closeCreateModal()"
+          aria-label="Close"
+        >
+          <span>&times;</span>
+        </button>
+        <div class="modal-title">Create Notification</div>
+        <div class="form-group">
+          <label class="form-label">Title</label>
+          <input
+            type="text"
+            class="form-input"
+            id="createTitle"
+            placeholder="Enter notification title"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Content</label>
+          <textarea
+            class="form-textarea"
+            id="createContent"
+            rows="4"
+            placeholder="Enter notification content"
+          ></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Type</label>
+          <select class="form-select" id="createType">
+            <option value="system">System</option>
+            <option value="message">Message</option>
+            <option value="alert">Alert</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-secondary" onclick="app.closeCreateModal()">
+            Cancel
+          </button>
+          <button class="btn btn-primary" onclick="app.submitCreate()">
+            Create
+          </button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -3,6 +3,7 @@ pub mod cicd;
 pub mod gomoku;
 pub mod log;
 pub mod monitor;
+pub mod notification;
 pub mod order;
 pub mod rss;
 pub mod shortlink;

@@ -2,6 +2,7 @@ pub mod auth;
 pub mod chat;
 pub mod cicd;
 pub mod gomoku;
+pub mod notification;
 pub mod order;
 pub mod redis;
 pub mod rss;

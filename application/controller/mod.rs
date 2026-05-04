@@ -7,6 +7,7 @@ pub mod health;
 pub mod index;
 pub mod log;
 pub mod monitor;
+pub mod notification;
 pub mod online;
 pub mod openapi;
 pub mod order;

@@ -4,6 +4,7 @@ pub mod cicd;
 pub mod gomoku;
 pub mod log;
 pub mod monitor;
+pub mod notification;
 pub mod openapi;
 pub mod order;
 pub mod redis;
