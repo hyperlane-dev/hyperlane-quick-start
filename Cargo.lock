@@ -1937,7 +1937,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "21.2.0"
+version = "21.3.0"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
@@ -1956,9 +1956,9 @@ checksum = "9b6f580fff377190b818d8c2ef52f68d1296490916da4923fe90287b7c80028c"
 
 [[package]]
 name = "hyperlane-utils"
-version = "30.1.0"
+version = "30.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1afd47f1f15fc872aa61bbfc09fb224c010b7bf39f68f50524bf3f00607d2f8b"
+checksum = "60c4c834eb865b96a92e47262c348ad054f92b22ef4beed5d4b5c784d8f1b119"
 dependencies = [
  "aes 0.9.0",
  "ahash 0.8.12",
@@ -2023,11 +2023,12 @@ dependencies = [
  "utoipa-rapidoc",
  "utoipa-swagger-ui",
  "uuid",
+ "which",
 ]
 
 [[package]]
 name = "hyperlane_application"
-version = "21.2.0"
+version = "21.3.0"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
@@ -2040,7 +2041,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_bootstrap"
-version = "21.2.0"
+version = "21.3.0"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
@@ -2054,7 +2055,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_config"
-version = "21.2.0"
+version = "21.3.0"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
@@ -2064,7 +2065,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_plugin"
-version = "21.2.0"
+version = "21.3.0"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
@@ -2075,7 +2076,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_resources"
-version = "21.2.0"
+version = "21.3.0"
 
 [[package]]
 name = "iana-time-zone"
@@ -3363,9 +3364,9 @@ dependencies = [
 
 [[package]]
 name = "redis"
-version = "1.2.0"
+version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f44e94c96d8870a387d88ce3de3fdd608cbfc0705f03cb343cdde91509d3e49a"
+checksum = "72d32a1ac9123f0d84fda64bfc02a271d9868483162dd2d9099b5c362ece064c"
 dependencies = [
  "arcstr",
  "combine",
@@ -3463,9 +3464,9 @@ dependencies = [
 
 [[package]]
 name = "reqwest"
-version = "0.13.2"
+version = "0.13.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ab3f43e3283ab1488b624b44b0e988d0acea0b3214e694730a055cb6b2efa801"
+checksum = "62e0021ea2c22aed41653bc7e1419abb2c97e038ff2c33d0e1309e49a97deec0"
 dependencies = [
  "base64",
  "bytes",
@@ -4068,9 +4069,9 @@ dependencies = [
 
 [[package]]
 name = "serde_with"
-version = "3.18.0"
+version = "3.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dd5414fad8e6907dbdd5bc441a50ae8d6e26151a03b1de04d89a5576de61d01f"
+checksum = "f05839ce67618e14a09b286535c0d9c94e85ef25469b0e13cb4f844e5593eb19"
 dependencies = [
  "base64",
  "chrono",
@@ -4087,9 +4088,9 @@ dependencies = [
 
 [[package]]
 name = "serde_with_macros"
-version = "3.18.0"
+version = "3.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d3db8978e608f1fe7357e211969fd9abdcae80bac1ba7a3369bb7eb6b404eb65"
+checksum = "cf2ebbe86054f9b45bc3881e865683ccfaccce97b9b4cb53f3039d67f355a334"
 dependencies = [
  "darling",
  "proc-macro2",
@@ -5071,9 +5072,9 @@ checksum = "b6c140620e7ffbb22c2dee59cafe6084a59b5ffc27a8859a5f0d494b5d52b6be"
 
 [[package]]
 name = "utoipa"
-version = "5.4.0"
+version = "5.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2fcc29c80c21c31608227e0912b2d7fddba57ad76b606890627ba8ee7964e993"
+checksum = "8bde15df68e80b16c7d16b9616e80770ad158988daa56a27dccd1e55558b0160"
 dependencies = [
  "indexmap 2.14.0",
  "serde",
@@ -5083,9 +5084,9 @@ dependencies = [
 
 [[package]]
 name = "utoipa-gen"
-version = "5.4.0"
+version = "5.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6d79d08d92ab8af4c5e8a6da20c47ae3f61a0f1dabc1997cdf2d082b757ca08b"
+checksum = "6ba0b99ee52df3028635d93840c797102da61f8a7bb3cf751032455895b52ef8"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -5388,6 +5389,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "22cfaf3c063993ff62e73cb4311efde4db1efb31ab78a3e5c457939ad5cc0bed"
 dependencies = [
  "rustls-pki-types",
+]
+
+[[package]]
+name = "which"
+version = "8.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "81995fafaaaf6ae47a7d0cc83c67caf92aeb7e5331650ae6ff856f7c0c60c459"
+dependencies = [
+ "libc",
 ]
 
 [[package]]
