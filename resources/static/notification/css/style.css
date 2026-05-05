@@ -75,10 +75,11 @@ body {
   background: rgba(255, 255, 255, 0.98);
   border-radius: 12px;
   padding: 20px;
+  margin-top: 20px;
   margin-bottom: 20px;
   box-shadow: 0 4px 20px rgba(102, 126, 234, 0.15);
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   flex-wrap: wrap;
   gap: 15px;
@@ -177,7 +178,13 @@ body {
   background: #e9ecef;
 }
 
-.filter-group {
+.results-header .filter-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.action-panel .filter-group {
   display: flex;
   gap: 10px;
 }
@@ -199,6 +206,10 @@ body {
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
+hyperlane-select {
+  min-width: 140px;
+}
+
 .results-panel {
   background: rgba(255, 255, 255, 0.98);
   border-radius: 12px;
@@ -206,10 +217,18 @@ body {
   box-shadow: 0 4px 20px rgba(102, 126, 234, 0.15);
 }
 
+.results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
 .results-title {
   font-size: 1.3rem;
   color: #2c3e50;
-  margin-bottom: 20px;
   font-weight: 600;
 }
 
@@ -561,8 +580,14 @@ body {
     justify-content: center;
   }
 
-  .filter-group {
-    justify-content: center;
+  .results-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .results-header .filter-group {
+    justify-content: flex-start;
+    width: 100%;
   }
 
   .notification-item {

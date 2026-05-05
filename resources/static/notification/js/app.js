@@ -8,6 +8,7 @@ class NotificationApp {
   }
 
   async init() {
+    this.setupFilterListeners();
     await this.loadUnreadCount();
     await this.loadNotifications();
   }
@@ -30,8 +31,8 @@ class NotificationApp {
 
   async loadNotifications(page = 1) {
     this.currentPage = page;
-    const type = document.getElementById('filterType').value;
-    const isRead = document.getElementById('filterRead').value;
+    const type = document.getElementById('filterType').value || '';
+    const isRead = document.getElementById('filterRead').value || '';
 
     let url = `${this.apiBase}/list?page=${page}&limit=${this.pageSize}`;
     if (type) url += `&notification_type=${encodeURIComponent(type)}`;
@@ -301,6 +302,21 @@ class NotificationApp {
 
   applyFilters() {
     this.loadNotifications(1);
+  }
+
+  setupFilterListeners() {
+    const filterType = document.getElementById('filterType');
+    const filterRead = document.getElementById('filterRead');
+    if (filterType) {
+      filterType.addEventListener('hyperlane-change', () => {
+        this.applyFilters();
+      });
+    }
+    if (filterRead) {
+      filterRead.addEventListener('hyperlane-change', () => {
+        this.applyFilters();
+      });
+    }
   }
 
   refresh() {

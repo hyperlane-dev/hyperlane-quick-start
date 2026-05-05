@@ -12,6 +12,10 @@
     <script src="../common/js/common.js"></script>
     <script src="../common/js/toast.js"></script>
     <script src="../common/components/hyperlane-confirm.js"></script>
+    <script
+      src="../common/components/hyperlane-select.js"
+      type="module"
+    ></script>
     <script src="./js/app.js" defer></script>
   </head>
   <body>
@@ -51,6 +55,29 @@
         </div>
       </div>
 
+      <div class="results-panel">
+        <div class="results-header">
+          <div class="results-title">Notifications</div>
+          <div class="filter-group">
+            <hyperlane-select
+              id="filterType"
+              placeholder="All Types"
+              options='[{"value":"","label":"All Types"},{"value":"system","label":"System"},{"value":"message","label":"Message"},{"value":"alert","label":"Alert"}]'
+              value=""
+            ></hyperlane-select>
+            <hyperlane-select
+              id="filterRead"
+              placeholder="All Status"
+              options='[{"value":"","label":"All Status"},{"value":"false","label":"Unread"},{"value":"true","label":"Read"}]'
+              value=""
+            ></hyperlane-select>
+          </div>
+        </div>
+        <div id="resultsContainer">
+          <div class="no-data">Loading notifications...</div>
+        </div>
+      </div>
+
       <div class="action-panel">
         <div class="button-group">
           <button class="btn btn-primary" onclick="app.openCreateModal()">
@@ -62,34 +89,6 @@
           <button class="btn btn-secondary" onclick="app.refresh()">
             Refresh
           </button>
-        </div>
-        <div class="filter-group">
-          <select
-            class="form-select"
-            id="filterType"
-            onchange="app.applyFilters()"
-          >
-            <option value="">All Types</option>
-            <option value="system">System</option>
-            <option value="message">Message</option>
-            <option value="alert">Alert</option>
-          </select>
-          <select
-            class="form-select"
-            id="filterRead"
-            onchange="app.applyFilters()"
-          >
-            <option value="">All Status</option>
-            <option value="false">Unread</option>
-            <option value="true">Read</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="results-panel">
-        <div class="results-title">Notifications</div>
-        <div id="resultsContainer">
-          <div class="no-data">Loading notifications...</div>
         </div>
       </div>
     </div>
@@ -138,11 +137,11 @@
         </div>
         <div class="form-group">
           <label class="form-label">Type</label>
-          <select class="form-select" id="createType">
-            <option value="system">System</option>
-            <option value="message">Message</option>
-            <option value="alert">Alert</option>
-          </select>
+          <hyperlane-select
+            id="createType"
+            options='[{"value":"system","label":"System"},{"value":"message","label":"Message"},{"value":"alert","label":"Alert"}]'
+            value="system"
+          ></hyperlane-select>
         </div>
         <div class="form-actions">
           <button class="btn btn-secondary" onclick="app.closeCreateModal()">

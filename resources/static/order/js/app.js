@@ -85,6 +85,19 @@ function initEventListeners() {
     .getElementById('user-search-keyword')
     ?.addEventListener('input', handleUserSearchInput);
 
+  document
+    .getElementById('filter-type')
+    ?.addEventListener('hyperlane-change', () => applyFilters());
+  document
+    .getElementById('filter-category')
+    ?.addEventListener('hyperlane-change', () => applyFilters());
+  document
+    .getElementById('user-filter-type')
+    ?.addEventListener('hyperlane-change', () => applyUserRecordFilters());
+  document
+    .getElementById('user-filter-category')
+    ?.addEventListener('hyperlane-change', () => applyUserRecordFilters());
+
   document.querySelectorAll('.nav-item').forEach((item) => {
     item.addEventListener('click', () => {
       const page = item.dataset.page;
@@ -1929,8 +1942,10 @@ function renderPagination() {
 function resetFilters() {
   document.getElementById('filter-start-date').value = '';
   document.getElementById('filter-end-date').value = '';
-  document.getElementById('filter-category').value = '';
-  document.getElementById('filter-type').value = '';
+  const filterCategory = document.getElementById('filter-category');
+  if (filterCategory) filterCategory.value = '';
+  const filterType = document.getElementById('filter-type');
+  if (filterType) filterType.value = '';
   applyFilters('reset');
 }
 
@@ -2643,8 +2658,10 @@ function goToUserRecordPrevPage() {
 function resetUserRecordFilters() {
   document.getElementById('user-filter-start-date').value = '';
   document.getElementById('user-filter-end-date').value = '';
-  document.getElementById('user-filter-category').value = '';
-  document.getElementById('user-filter-type').value = '';
+  const userFilterCategory = document.getElementById('user-filter-category');
+  if (userFilterCategory) userFilterCategory.value = '';
+  const userFilterType = document.getElementById('user-filter-type');
+  if (userFilterType) userFilterType.value = '';
   applyUserRecordFilters('reset');
 }
 

@@ -395,6 +395,57 @@ button,
   background-size: 12px;
 }
 
+hyperlane-select {
+  display: block;
+  width: 100%;
+}
+
+hyperlane-select .select-trigger {
+  padding: 10px 36px 10px 12px;
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  color: #2c3e50;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+hyperlane-select .select-trigger:hover:not(.disabled) {
+  border-color: #667eea;
+}
+
+hyperlane-select .select-trigger.open {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+  background: #fff;
+}
+
+hyperlane-select .select-dropdown {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+hyperlane-select .option-item {
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+hyperlane-select .option-item.selected {
+  background: #667eea;
+  color: white;
+}
+
+hyperlane-select .option-item:hover {
+  background: #f0f4ff;
+  color: #667eea;
+}
+
+hyperlane-select .option-item.selected:hover {
+  background: #5a6fd6;
+  color: white;
+}
+
 input[type='date'].form-input {
   appearance: none;
   -webkit-appearance: none;
