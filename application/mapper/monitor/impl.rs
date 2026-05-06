@@ -22,9 +22,9 @@ impl PerformanceRingBuffer {
         } else {
             self.buffer[self.write_index] = data_point;
         }
-        self.write_index = (self.write_index + 1) % self.capacity;
+        self.set_write_index((self.write_index + 1) % self.capacity);
         if self.count < self.capacity {
-            self.count += 1;
+            self.set_count(self.count + 1);
         }
     }
 
@@ -68,7 +68,7 @@ impl PerformanceRingBuffer {
 
     pub fn clear(&mut self) {
         self.buffer.clear();
-        self.write_index = 0;
-        self.count = 0;
+        self.set_write_index(0);
+        self.set_count(0);
     }
 }

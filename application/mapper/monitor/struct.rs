@@ -1,9 +1,12 @@
 use super::*;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Data, Debug)]
 pub struct PerformanceRingBuffer {
-    pub buffer: Vec<PerformanceDataPoint>,
-    pub write_index: usize,
-    pub count: usize,
-    pub capacity: usize,
+    pub(super) buffer: Vec<PerformanceDataPoint>,
+    #[get(type(copy))]
+    pub(super) write_index: usize,
+    #[get(type(copy))]
+    pub(super) count: usize,
+    #[get(type(copy))]
+    pub(super) capacity: usize,
 }

@@ -652,8 +652,8 @@ impl StepOutputBuilder {
     }
 
     fn mark_timeout(&mut self, secs: u64) {
-        self.is_timeout = true;
-        self.timeout_secs = secs;
+        self.set_is_timeout(true);
+        self.set_timeout_secs(secs);
     }
 
     fn build(self) -> String {
