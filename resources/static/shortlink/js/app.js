@@ -179,6 +179,14 @@ const ShortlinkApp = {
         this.currentShortlinkId = result.data;
         this.displayResult(result.data);
         this.showToast('Shortlink generated successfully!', 'success');
+      } else if (
+        HyperlaneErrorHandler.handleResponse(
+          result,
+          'Failed to generate shortlink',
+          (msg, type) => this.showToast(msg, type),
+        )
+      ) {
+        return;
       } else {
         throw new Error(result.message || 'Failed to generate shortlink');
       }
@@ -258,6 +266,14 @@ const ShortlinkApp = {
       const result = await response.json();
       if (result.code === 200 && result.data && result.data.url) {
         window.open(result.data.url, '_blank');
+      } else if (
+        HyperlaneErrorHandler.handleResponse(
+          result,
+          'Failed to retrieve original URL',
+          (msg, type) => this.showToast(msg, type),
+        )
+      ) {
+        return;
       } else {
         throw new Error('Failed to retrieve original URL');
       }

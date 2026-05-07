@@ -32,6 +32,10 @@ document.getElementById('create-btn').addEventListener('click', async () => {
       document.getElementById('create-key').value = '';
       document.getElementById('create-value').value = '';
       loadRecords();
+    } else if (
+      HyperlaneErrorHandler.handleResponse(result, 'Create failed', showToast)
+    ) {
+      return;
     } else {
       showToast(result.message, 'error');
     }
@@ -62,6 +66,10 @@ document.getElementById('edit-btn').addEventListener('click', async () => {
       showToast(result.message, 'success');
       toggleModal(false);
       loadRecords();
+    } else if (
+      HyperlaneErrorHandler.handleResponse(result, 'Update failed', showToast)
+    ) {
+      return;
     } else {
       showToast(result.message, 'error');
     }
@@ -91,6 +99,10 @@ async function deleteRecord(key) {
     if (result.code === 200) {
       showToast(result.message, 'success');
       loadRecords();
+    } else if (
+      HyperlaneErrorHandler.handleResponse(result, 'Delete failed', showToast)
+    ) {
+      return;
     } else {
       showToast(result.message, 'error');
     }
@@ -106,6 +118,14 @@ async function loadRecords() {
     const result = await response.json();
     if (result.code === 200) {
       renderRecords(result.data);
+    } else if (
+      HyperlaneErrorHandler.handleResponse(
+        result,
+        'Failed to load records',
+        showToast,
+      )
+    ) {
+      return;
     } else {
       document.getElementById('records-list').innerHTML =
         '<p style="text-align: center; color: #6c757d;">Failed to load records</p>';

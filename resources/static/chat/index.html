@@ -16,6 +16,7 @@
     <script src="../common/js/markdown-it.min.js"></script>
     <script src="../common/js/highlight.min.js"></script>
     <script src="../common/js/common.js"></script>
+    <script src="../common/js/error-handler.js"></script>
     <style>
       .btn-upload {
         padding: 8px 16px;
@@ -3117,6 +3118,14 @@
               uploadedChunks.add(index);
               saveProgress();
               return data;
+            } else if (
+              HyperlaneErrorHandler.handleResponse(
+                data,
+                'Upload failed',
+                (msg, type) => showUploadStatus(msg, type),
+              )
+            ) {
+              throw new Error(data.msg || 'Upload failed');
             } else if (data.code === 0) {
               showUploadStatus(`Upload failed: ${data.msg}`, 'error');
               throw new Error(data.msg);
@@ -3157,6 +3166,14 @@
               registerSuccessfulUploads = await response.json();
               if (registerSuccessfulUploads.code == 200) {
                 registerSuccess = true;
+              } else if (
+                HyperlaneErrorHandler.handleResponse(
+                  registerSuccessfulUploads,
+                  'Register upload failed',
+                  (msg, type) => showUploadStatus(msg, type),
+                )
+              ) {
+                registerSuccess = false;
               }
             } catch (error) {
               registerSuccess = false;
@@ -3266,6 +3283,14 @@
               mergeSuccessfulUploads = await response.json();
               if (registerSuccessfulUploads.code == 200) {
                 mergeSuccess = true;
+              } else if (
+                HyperlaneErrorHandler.handleResponse(
+                  mergeSuccessfulUploads,
+                  'Merge upload failed',
+                  (msg, type) => showUploadStatus(msg, type),
+                )
+              ) {
+                mergeSuccess = false;
               }
             } catch (error) {
               mergeSuccess = false;

@@ -1,4 +1,5 @@
 pub mod auth;
+pub mod blog;
 pub mod chat;
 pub mod cicd;
 pub mod dataset;
@@ -14,6 +15,7 @@ pub mod shortlink;
 pub mod trace;
 pub mod tracking;
 pub mod upload;
+pub mod user;
 pub mod websocket;
 
 use super::*;

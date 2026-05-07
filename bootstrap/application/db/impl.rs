@@ -19,6 +19,11 @@ impl std::fmt::Display for PostgresqlTableName {
             PostgresqlTableName::Shortlink => write!(f, "shortlink"),
             PostgresqlTableName::Order => write!(f, "order"),
             PostgresqlTableName::Notification => write!(f, "notification"),
+            PostgresqlTableName::BlogPost => write!(f, "blog_post"),
+            PostgresqlTableName::BlogComment => write!(f, "blog_comment"),
+            PostgresqlTableName::BlogLike => write!(f, "blog_like"),
+            PostgresqlTableName::BlogFavorite => write!(f, "blog_favorite"),
+            PostgresqlTableName::BlogImage => write!(f, "blog_image"),
         }
     }
 }
@@ -94,6 +99,32 @@ impl DbBootstrap {
                 POSTGRESQL_NOTIFICATION_TABLE_SQL.to_string(),
             ))
             .add_index(POSTGRESQL_NOTIFICATION_INDEX_SQL.to_string())
+            .add_table(TableSchema::new(
+                vec![],
+                PostgresqlTableName::BlogPost.to_string(),
+                POSTGRESQL_BLOG_POST_TABLE_SQL.to_string(),
+            ))
+            .add_table(TableSchema::new(
+                vec![PostgresqlTableName::BlogPost.to_string()],
+                PostgresqlTableName::BlogComment.to_string(),
+                POSTGRESQL_BLOG_COMMENT_TABLE_SQL.to_string(),
+            ))
+            .add_table(TableSchema::new(
+                vec![PostgresqlTableName::BlogPost.to_string()],
+                PostgresqlTableName::BlogLike.to_string(),
+                POSTGRESQL_BLOG_LIKE_TABLE_SQL.to_string(),
+            ))
+            .add_table(TableSchema::new(
+                vec![PostgresqlTableName::BlogPost.to_string()],
+                PostgresqlTableName::BlogFavorite.to_string(),
+                POSTGRESQL_BLOG_FAVORITE_TABLE_SQL.to_string(),
+            ))
+            .add_table(TableSchema::new(
+                vec![PostgresqlTableName::BlogPost.to_string()],
+                PostgresqlTableName::BlogImage.to_string(),
+                POSTGRESQL_BLOG_IMAGE_TABLE_SQL.to_string(),
+            ))
+            .add_index(POSTGRESQL_BLOG_INDEX_SQL.to_string())
     }
 }
 

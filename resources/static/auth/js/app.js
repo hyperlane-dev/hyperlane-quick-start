@@ -60,6 +60,10 @@ loginForm.addEventListener('submit', async (e) => {
         const locationUrl = getQueryParam('location') || '/';
         window.location.href = locationUrl;
       }, 360);
+    } else if (
+      HyperlaneErrorHandler.handleResponse(data, 'Login failed', showToast)
+    ) {
+      return;
     } else {
       showToast(data.data || 'Login failed', 'error');
     }
@@ -115,6 +119,14 @@ registerForm.addEventListener('submit', async (e) => {
       registerPage.classList.add('hidden');
       loginPage.classList.remove('hidden');
       registerForm.reset();
+    } else if (
+      HyperlaneErrorHandler.handleResponse(
+        data,
+        'Registration failed',
+        showToast,
+      )
+    ) {
+      return;
     } else {
       showToast(data.data || 'Registration failed', 'error');
     }

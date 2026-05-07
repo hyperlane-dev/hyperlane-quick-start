@@ -20,9 +20,9 @@ pub struct UserUpdateRoute;
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct UserChangePasswordRoute;
 
-#[route("/api/auth/user/approve/{id}")]
+#[route("/api/auth/user/update_status/{id}")]
 #[derive(Clone, Copy, Data, Debug, Default)]
-pub struct UserApproveRoute;
+pub struct UserUpdateStatusRoute;
 
 #[route("/api/auth/user/list")]
 #[derive(Clone, Copy, Data, Debug, Default)]
@@ -31,6 +31,10 @@ pub struct UserListRoute;
 #[route("/api/auth/user/get/{id}")]
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct UserGetRoute;
+
+#[route("/api/auth/user/delete/{id}")]
+#[derive(Clone, Copy, Data, Debug, Default)]
+pub struct UserDeleteRoute;
 
 #[route("/api/auth/logout")]
 #[derive(Clone, Copy, Data, Debug, Default)]

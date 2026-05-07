@@ -27,7 +27,7 @@ pub struct ChangePasswordRequest {
 }
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
-pub struct ApproveUserRequest {
+pub struct UpdateUserStatusRequest {
     #[get(type(copy))]
     pub(super) approved: bool,
 }

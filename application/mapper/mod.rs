@@ -1,4 +1,5 @@
 pub mod auth;
+pub mod blog;
 pub mod chat;
 pub mod cicd;
 pub mod gomoku;
@@ -10,5 +11,6 @@ pub mod order;
 pub mod redis;
 pub mod shortlink;
 pub mod tracking;
+pub mod user;
 
 use super::*;
