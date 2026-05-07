@@ -15,7 +15,7 @@ impl ServerHook for UserListRoute {
             Ok(id) => id,
             Err(error) => {
                 let mut response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                    ApiResponse::new(ApiResponseStatus::Unauthorized, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
@@ -146,7 +146,7 @@ impl ServerHook for UserUpdateRoute {
             Ok(id) => id,
             Err(error) => {
                 let mut response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                    ApiResponse::new(ApiResponseStatus::Unauthorized, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
@@ -317,7 +317,7 @@ impl ServerHook for UserDeleteRoute {
             Ok(id) => id,
             Err(error) => {
                 let mut response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                    ApiResponse::new(ApiResponseStatus::Unauthorized, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;

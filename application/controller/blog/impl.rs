@@ -26,7 +26,7 @@ impl ServerHook for BlogPostCreateRoute {
             Ok(id) => id,
             Err(error) => {
                 let mut response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                    ApiResponse::new(ApiResponseStatus::Unauthorized, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
@@ -92,7 +92,7 @@ impl ServerHook for BlogPostUpdateRoute {
             Ok(id) => id,
             Err(error) => {
                 let mut response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                    ApiResponse::new(ApiResponseStatus::Unauthorized, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
@@ -148,7 +148,7 @@ impl ServerHook for BlogPostDeleteRoute {
             Ok(id) => id,
             Err(error) => {
                 let mut response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                    ApiResponse::new(ApiResponseStatus::Unauthorized, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
@@ -287,7 +287,7 @@ impl ServerHook for BlogPostMyListRoute {
             Ok(id) => id,
             Err(error) => {
                 let mut response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                    ApiResponse::new(ApiResponseStatus::Unauthorized, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
@@ -357,7 +357,7 @@ impl ServerHook for BlogPostLikeRoute {
             Ok(id) => id,
             Err(error) => {
                 let mut response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                    ApiResponse::new(ApiResponseStatus::Unauthorized, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
@@ -413,7 +413,7 @@ impl ServerHook for BlogPostFavoriteRoute {
             Ok(id) => id,
             Err(error) => {
                 let mut response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                    ApiResponse::new(ApiResponseStatus::Unauthorized, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
@@ -450,7 +450,7 @@ impl ServerHook for BlogPostFavoriteListRoute {
             Ok(id) => id,
             Err(error) => {
                 let mut response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                    ApiResponse::new(ApiResponseStatus::Unauthorized, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
@@ -509,7 +509,7 @@ impl ServerHook for BlogCommentCreateRoute {
             Ok(id) => id,
             Err(error) => {
                 let mut response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                    ApiResponse::new(ApiResponseStatus::Unauthorized, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;
@@ -565,7 +565,7 @@ impl ServerHook for BlogCommentDeleteRoute {
             Ok(id) => id,
             Err(error) => {
                 let mut response: ApiResponse<String> =
-                    ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
+                    ApiResponse::new(ApiResponseStatus::Unauthorized, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return;

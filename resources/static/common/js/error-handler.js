@@ -12,6 +12,19 @@ const HyperlaneErrorHandler = {
   },
 
   handleResponse: function (result, defaultMessage, toastCallback) {
+    if (result.code === 401) {
+      if (typeof Toast !== 'undefined') {
+        Toast.error(
+          result.message || 'Authentication failed, please login again',
+        );
+      } else if (toastCallback) {
+        toastCallback(
+          result.message || 'Authentication failed, please login again',
+          'error',
+        );
+      }
+      return true;
+    }
     if (result.code === 500) {
       if (typeof Toast !== 'undefined') {
         Toast.error(result.message || 'Server error, please try again later');
@@ -27,6 +40,20 @@ const HyperlaneErrorHandler = {
   },
 
   handleResponseWithLogout: function (result, defaultMessage, toastCallback) {
+    if (result.code === 401) {
+      if (typeof Toast !== 'undefined') {
+        Toast.error(
+          result.message || 'Authentication expired, please login again',
+        );
+      } else if (toastCallback) {
+        toastCallback(
+          result.message || 'Authentication expired, please login again',
+          'error',
+        );
+      }
+      this.logout();
+      return true;
+    }
     if (result.code === 500) {
       if (typeof Toast !== 'undefined') {
         Toast.error(result.message || 'Server error, please try again later');
@@ -36,7 +63,6 @@ const HyperlaneErrorHandler = {
           'error',
         );
       }
-      this.logout();
       return true;
     }
     return false;
