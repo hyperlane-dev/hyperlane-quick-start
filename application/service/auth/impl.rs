@@ -106,11 +106,18 @@ impl AuthService {
 
     #[instrument_trace]
     fn validate_email(email: &str) -> bool {
-        let regex: Regex = match Regex::new(EMAIL_REGEX_PATTERN) {
-            Ok(r) => r,
-            Err(_) => return false,
-        };
-        regex.is_match(email)
+        match EMAIL_REGEX.as_ref() {
+            Some(regex) => regex.is_match(email),
+            None => false,
+        }
+    }
+
+    #[instrument_trace]
+    fn validate_phone(phone: &str) -> bool {
+        match PHONE_REGEX_OPT.as_ref() {
+            Some(regex) => regex.is_match(phone),
+            None => false,
+        }
     }
 
     #[instrument_trace]
@@ -130,6 +137,12 @@ impl AuthService {
             && !Self::validate_email(email)
         {
             return Err("Invalid email format".to_string());
+        }
+        if let Some(ref phone) = decrypted_phone
+            && !phone.is_empty()
+            && !Self::validate_phone(phone)
+        {
+            return Err("Invalid phone format".to_string());
         }
         if UserRepository::find_by_username(decrypted_username.clone())
             .await?
@@ -201,16 +214,21 @@ impl AuthService {
         {
             return Err("Invalid email format".to_string());
         }
+        if let Some(ref phone) = decrypted_phone
+            && !phone.is_empty()
+            && !Self::validate_phone(phone)
+        {
+            return Err("Invalid phone format".to_string());
+        }
         match UserRepository::find_by_id(user_id).await? {
             Some(model) => {
                 let mut active_model: AuthUserActiveModel = model.into();
-                if decrypted_email.is_some() {
-                    active_model.email = ActiveValue::Set(decrypted_email);
+                if let Some(email) = decrypted_email {
+                    active_model.email = ActiveValue::Set(Some(email));
                 }
-                if decrypted_phone.is_some() {
-                    active_model.phone = ActiveValue::Set(decrypted_phone);
+                if let Some(phone) = decrypted_phone {
+                    active_model.phone = ActiveValue::Set(Some(phone));
                 }
-                active_model.updated_at = ActiveValue::NotSet;
                 let result: AuthUserModel = UserRepository::update(active_model).await?;
                 Self::model_to_user_response(&result)
             }
@@ -241,7 +259,6 @@ impl AuthService {
                     PasswordUtil::hash_password(&decrypted_new_password);
                 let mut active_model: AuthUserActiveModel = model.into();
                 active_model.password_hash = ActiveValue::Set(new_password_hash);
-                active_model.updated_at = ActiveValue::NotSet;
                 UserRepository::update(active_model).await?;
                 Ok(())
             }
@@ -250,7 +267,7 @@ impl AuthService {
     }
 
     #[instrument_trace]
-    pub async fn approve_user(user_id: i32, approved: bool) -> Result<UserResponse, String> {
+    pub async fn update_user_status(user_id: i32, approved: bool) -> Result<UserResponse, String> {
         match UserRepository::find_by_id(user_id).await? {
             Some(model) => {
                 let mut active_model: AuthUserActiveModel = model.into();
@@ -260,7 +277,6 @@ impl AuthService {
                     UserStatus::Rejected.to_i16()
                 };
                 active_model.status = ActiveValue::Set(status);
-                active_model.updated_at = ActiveValue::NotSet;
                 let result: AuthUserModel = UserRepository::update(active_model).await?;
                 Self::model_to_user_response(&result)
             }
@@ -301,6 +317,17 @@ impl AuthService {
         match UserRepository::find_by_id(user_id).await? {
             Some(model) => Ok(Some(Self::model_to_user_response(&model)?)),
             None => Ok(None),
+        }
+    }
+
+    #[instrument_trace]
+    pub async fn delete_user(user_id: i32) -> Result<(), String> {
+        match UserRepository::find_by_id(user_id).await? {
+            Some(_) => {
+                UserRepository::delete_by_id(user_id).await?;
+                Ok(())
+            }
+            None => Err("User not found".to_string()),
         }
     }
 

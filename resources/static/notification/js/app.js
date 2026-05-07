@@ -23,6 +23,14 @@ class NotificationApp {
       const result = await response.json();
       if (result.code === 200 && result.data) {
         document.getElementById('unreadCount').textContent = result.data.count;
+      } else if (
+        HyperlaneErrorHandler.handleResponse(
+          result,
+          'Failed to load unread count',
+          Toast.error.bind(Toast),
+        )
+      ) {
+        return;
       }
     } catch (error) {
       console.error('Failed to load unread count:', error);
@@ -50,6 +58,14 @@ class NotificationApp {
 
       if (result.code === 200 && result.data) {
         this.displayNotifications(result.data);
+      } else if (
+        HyperlaneErrorHandler.handleResponse(
+          result,
+          'Failed to load notifications',
+          Toast.error.bind(Toast),
+        )
+      ) {
+        return;
       } else {
         this.showError(result.message || 'Failed to load notifications');
       }
@@ -154,6 +170,14 @@ class NotificationApp {
         Toast.success('Marked as read');
         await this.loadUnreadCount();
         await this.loadNotifications(this.currentPage);
+      } else if (
+        HyperlaneErrorHandler.handleResponse(
+          result,
+          'Failed to mark as read',
+          Toast.error.bind(Toast),
+        )
+      ) {
+        return;
       } else {
         Toast.error(result.message || 'Failed to mark as read');
       }
@@ -174,6 +198,14 @@ class NotificationApp {
         Toast.success('All notifications marked as read');
         await this.loadUnreadCount();
         await this.loadNotifications(1);
+      } else if (
+        HyperlaneErrorHandler.handleResponse(
+          result,
+          'Failed to mark all as read',
+          Toast.error.bind(Toast),
+        )
+      ) {
+        return;
       } else {
         Toast.error(result.message || 'Failed to mark all as read');
       }
@@ -199,6 +231,14 @@ class NotificationApp {
         Toast.success('Notification deleted');
         await this.loadUnreadCount();
         await this.loadNotifications(this.currentPage);
+      } else if (
+        HyperlaneErrorHandler.handleResponse(
+          result,
+          'Failed to delete notification',
+          Toast.error.bind(Toast),
+        )
+      ) {
+        return;
       } else {
         Toast.error(result.message || 'Failed to delete notification');
       }
@@ -287,6 +327,14 @@ class NotificationApp {
         this.closeCreateModal();
         await this.loadUnreadCount();
         await this.loadNotifications(1);
+      } else if (
+        HyperlaneErrorHandler.handleResponse(
+          result,
+          'Failed to create notification',
+          Toast.error.bind(Toast),
+        )
+      ) {
+        return;
       } else {
         Toast.error(result.message || 'Failed to create notification');
       }

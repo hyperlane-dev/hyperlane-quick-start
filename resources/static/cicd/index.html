@@ -8,6 +8,7 @@
     <link href="../common/css/common.css" rel="stylesheet" />
     <link href="../common/css/header.css" rel="stylesheet" />
     <script src="../common/js/common.js"></script>
+    <script src="../common/js/error-handler.js"></script>
     <style>
       * {
         scrollbar-width: thin;
@@ -1485,6 +1486,14 @@ jobs:
           if (result.code === 200) {
             pipelines = result.data || [];
             renderPipelines();
+          } else if (
+            HyperlaneErrorHandler.handleResponse(
+              result,
+              'Failed to load pipelines',
+              showToast,
+            )
+          ) {
+            return;
           }
         } catch (error) {
           console.error('Error loading pipelines:', error);
@@ -1561,6 +1570,14 @@ jobs:
             document.getElementById('create-description').value = '';
             document.getElementById('create-config').value = '';
             showToast('Pipeline created successfully', 'success');
+          } else if (
+            HyperlaneErrorHandler.handleResponse(
+              result,
+              'Failed to create pipeline',
+              showToast,
+            )
+          ) {
+            return;
           } else {
             showToast('Error: ' + result.message, 'error');
           }
@@ -1614,6 +1631,14 @@ jobs:
               'success',
             );
             await loadRuns(true);
+          } else if (
+            HyperlaneErrorHandler.handleResponse(
+              result,
+              'Failed to trigger pipeline',
+              showToast,
+            )
+          ) {
+            return;
           } else {
             showToast('Error: ' + result.message, 'error');
           }

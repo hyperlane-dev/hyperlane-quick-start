@@ -1,4 +1,5 @@
 pub mod auth;
+pub mod blog;
 pub mod chat;
 pub mod cicd;
 pub mod diff;
@@ -15,5 +16,6 @@ pub mod static_resource;
 pub mod trace;
 pub mod tracking;
 pub mod upload;
+pub mod user;
 
 use super::*;

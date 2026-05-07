@@ -430,6 +430,14 @@ async function loadOverview() {
     } else {
       if (result.code === 401) {
         handleAuthError(result.message);
+      } else if (
+        HyperlaneErrorHandler.handleResponse(
+          result,
+          'Error loading overview data',
+          showToast,
+        )
+      ) {
+        return;
       } else {
         showToast(result.message || 'Error loading overview data', 'error');
       }
@@ -1859,6 +1867,14 @@ async function applyFilters(pageDirection = null) {
     } else {
       if (result.code === 401) {
         handleAuthError(result.message);
+      } else if (
+        HyperlaneErrorHandler.handleResponse(
+          result,
+          'Error loading records',
+          showToast,
+        )
+      ) {
+        return;
       } else {
         showToast(result.message || 'Error loading records', 'error');
       }
@@ -2080,6 +2096,14 @@ async function handleRecordSubmit(e) {
     } else {
       if (result.code === 401) {
         handleAuthError(result.message);
+      } else if (
+        HyperlaneErrorHandler.handleResponse(
+          result,
+          'Operation failed',
+          showToast,
+        )
+      ) {
+        return;
       } else {
         showToast(result.message || 'Operation failed', 'error');
       }
@@ -2297,6 +2321,14 @@ async function loadUsers(pageDirection = null) {
     } else {
       if (result.code === 401) {
         handleAuthError(result.message);
+      } else if (
+        HyperlaneErrorHandler.handleResponse(
+          result,
+          'Error loading users',
+          showToast,
+        )
+      ) {
+        return;
       } else {
         showToast(result.message || 'Error loading users', 'error');
       }
@@ -2368,10 +2400,7 @@ function renderUsers(users) {
         <div class="user-meta">ID: ${u.id}${contactInfo ? ' • ' + escapeHtml(contactInfo) : ''}</div>
       </div>
       <div class="user-status ${statusClass}">${statusText}</div>
-      <div class="user-actions" onclick="event.stopPropagation();">
-        ${u.status !== UserStatus.APPROVED ? `<button class="btn btn-sm btn-primary" onclick="approveUser('${u.id}', true)">Approve</button>` : ''}
-        ${u.status === UserStatus.PENDING ? `<button class="btn btn-sm btn-danger" onclick="approveUser('${u.id}', false)">Reject</button>` : ''}
-      </div>
+      <div class="user-actions" onclick="event.stopPropagation();"></div>
     </div>`;
     })
     .join('');
@@ -2665,41 +2694,6 @@ function resetUserRecordFilters() {
   applyUserRecordFilters('reset');
 }
 
-async function approveUser(userId, approved) {
-  const requestKey = `approve_user_${userId}`;
-  if (orderRequestManager.isPending(requestKey)) {
-    showToast('Processing, please wait...', 'info');
-    return;
-  }
-  try {
-    const response = await orderRequestManager.fetch(
-      requestKey,
-      `${AUTH_API_BASE}/user/approve/${userId}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ approved }),
-        credentials: 'include',
-      },
-    );
-    const result = await response.json();
-    if (result.code === 200) {
-      showToast(approved ? 'User approved!' : 'User rejected!', 'success');
-      loadUsers();
-    } else {
-      if (result.code === 401) {
-        handleAuthError(result.message);
-      } else {
-        showToast(result.message || 'Operation failed', 'error');
-      }
-    }
-  } catch (error) {
-    if (error.message !== 'Request aborted') {
-      showToast('Network error', 'error');
-    }
-  }
-}
-
 function loadProfile() {
   if (!currentUser) return;
   document.getElementById('profile-username').textContent =
@@ -2744,6 +2738,10 @@ async function handleProfileSubmit(e) {
     } else {
       if (result.code === 401) {
         handleAuthError(result.message);
+      } else if (
+        HyperlaneErrorHandler.handleResponse(result, 'Update failed', showToast)
+      ) {
+        return;
       } else {
         showToast(result.message || 'Update failed', 'error');
       }
@@ -2789,6 +2787,10 @@ async function handlePasswordSubmit(e) {
     } else {
       if (result.code === 401) {
         handleAuthError(result.message);
+      } else if (
+        HyperlaneErrorHandler.handleResponse(result, 'Change failed', showToast)
+      ) {
+        return;
       } else {
         showToast(result.message || 'Change failed', 'error');
       }

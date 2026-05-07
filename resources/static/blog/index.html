@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+      name="viewport"
+    />
+    <title>Hyperlane - Blog</title>
+    <link rel="icon" href="https://docs.ltpp.vip/img/hyperlane.png" />
+    <link href="../common/css/common.css" rel="stylesheet" />
+    <link href="../common/css/header.css" rel="stylesheet" />
+    <link href="./css/style.css" rel="stylesheet" />
+    <script src="../common/js/markdown-it.min.js"></script>
+    <script src="../common/js/highlight.min.js"></script>
+    <script src="../common/js/common.js"></script>
+    <script src="../common/js/error-handler.js"></script>
+    <script src="../common/components/hyperlane-confirm.js"></script>
+    <script src="./js/app.js" defer></script>
+  </head>
+  <body>
+    <div id="app">
+      <div id="main-app" class="main-app">
+        <aside class="sidebar">
+          <div class="sidebar-header light-bg">
+            <h2>
+              <a
+                href="https://github.com/hyperlane-dev/hyperlane"
+                target="_blank"
+              >
+                <img
+                  src="https://docs.ltpp.vip/img/hyperlane.png"
+                  alt=""
+                  class="nav-logo"
+                  onerror="this.style.display = 'none'"
+                />
+                <span class="text shimmer">Hyperlane Blog</span>
+              </a>
+            </h2>
+          </div>
+          <nav class="sidebar-nav">
+            <div class="nav-item active" data-page="explore">
+              <span class="nav-icon">🌐</span>
+              <span>Explore</span>
+            </div>
+            <div class="nav-item" data-page="my-posts">
+              <span class="nav-icon">📝</span>
+              <span>My Posts</span>
+            </div>
+            <div class="nav-item" data-page="favorites">
+              <span class="nav-icon">⭐</span>
+              <span>Favorites</span>
+            </div>
+            <div class="nav-item" data-page="write">
+              <span class="nav-icon">✏️</span>
+              <span>Write</span>
+            </div>
+          </nav>
+          <div class="sidebar-footer">
+            <div class="user-info">
+              <span id="current-user">User</span>
+            </div>
+            <button id="logout-btn" class="btn btn-sm btn-primary">
+              Logout
+            </button>
+          </div>
+        </aside>
+
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+        <main class="main-content">
+          <header class="content-header light-bg">
+            <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
+            <h1 id="page-title">Explore</h1>
+          </header>
+
+          <div id="explore-page" class="page-content">
+            <div class="stats-grid">
+              <div class="stat-card balance">
+                <div class="stat-label">Total Posts</div>
+                <div class="stat-value" id="explore-total-posts">0</div>
+              </div>
+              <div class="stat-card income">
+                <div class="stat-label">Total Likes</div>
+                <div class="stat-value" id="explore-total-likes">0</div>
+              </div>
+              <div class="stat-card expense">
+                <div class="stat-label">Total Comments</div>
+                <div class="stat-value" id="explore-total-comments">0</div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">Posts</span>
+                <div class="filter-group">
+                  <input
+                    type="text"
+                    class="form-input form-input-sm"
+                    id="searchKeyword"
+                    placeholder="Search posts..."
+                    oninput="app.onSearchInput()"
+                  />
+                </div>
+              </div>
+              <div class="card-body">
+                <div id="exploreList" class="post-list">
+                  <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">Loading posts...</div>
+                  </div>
+                </div>
+                <div id="explorePagination" class="pagination-container">
+                  <div class="pagination-info">
+                    <span>Total: 0 posts</span>
+                    <span>Showing 0 - 0</span>
+                  </div>
+                  <div class="pagination-controls"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="my-posts-page" class="page-content hidden">
+            <div class="stats-grid">
+              <div class="stat-card balance">
+                <div class="stat-label">My Posts</div>
+                <div class="stat-value" id="my-total-posts">0</div>
+              </div>
+              <div class="stat-card income">
+                <div class="stat-label">Total Likes</div>
+                <div class="stat-value" id="my-total-likes">0</div>
+              </div>
+              <div class="stat-card expense">
+                <div class="stat-label">Total Comments</div>
+                <div class="stat-value" id="my-total-comments">0</div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">My Posts</span>
+                <div></div>
+              </div>
+              <div class="card-body">
+                <div id="myPostsList" class="post-list">
+                  <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">Loading your posts...</div>
+                  </div>
+                </div>
+                <div id="myPostsPagination" class="pagination-container">
+                  <div class="pagination-info">
+                    <span id="my-posts-pagination-total">Total: 0 posts</span>
+                    <span id="my-posts-pagination-range">Showing 0 - 0</span>
+                  </div>
+                  <div
+                    id="my-posts-pagination-controls"
+                    class="pagination-controls"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="favorites-page" class="page-content hidden">
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">Favorites</span>
+                <div></div>
+              </div>
+              <div class="card-body">
+                <div id="favoritesList" class="post-list">
+                  <div class="no-data">Favorites feature coming soon</div>
+                </div>
+                <div id="favoritesPagination" class="pagination-container">
+                  <div class="pagination-info">
+                    <span id="favorites-pagination-total">Total: 0 posts</span>
+                    <span id="favorites-pagination-range">Showing 0 - 0</span>
+                  </div>
+                  <div
+                    id="favorites-pagination-controls"
+                    class="pagination-controls"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="write-page" class="page-content hidden">
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">Write Post</span>
+                <div></div>
+              </div>
+              <div class="card-body">
+                <div class="editor-container">
+                  <div class="form-group">
+                    <label class="form-label">Title</label>
+                    <input
+                      type="text"
+                      class="form-input"
+                      id="writeTitle"
+                      placeholder="Enter post title"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Summary (optional)</label>
+                    <input
+                      type="text"
+                      class="form-input"
+                      id="writeSummary"
+                      placeholder="Brief summary"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Cover Image</label>
+                    <div class="image-upload-row">
+                      <label class="file-upload-btn">
+                        <input
+                          type="file"
+                          id="coverImageInput"
+                          accept="image/*"
+                          onchange="app.uploadCoverImage(this)"
+                        />
+                        <span>Choose File</span>
+                      </label>
+                      <span id="coverImageName"></span>
+                      <input type="hidden" id="coverImageId" />
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label"
+                      >Content (Markdown supported)</label
+                    >
+                    <textarea
+                      class="form-textarea editor"
+                      id="writeContent"
+                      rows="12"
+                      placeholder="Write your post in Markdown..."
+                    ></textarea>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Images</label>
+                    <label class="file-upload-btn">
+                      <input
+                        type="file"
+                        id="contentImagesInput"
+                        accept="image/*"
+                        multiple
+                        onchange="app.uploadContentImages(this)"
+                      />
+                      <span>Choose Files</span>
+                    </label>
+                    <div
+                      class="image-preview-list"
+                      id="contentImagesPreview"
+                    ></div>
+                  </div>
+                  <div class="form-actions">
+                    <label class="checkbox-label">
+                      <input type="checkbox" id="writePublish" checked />
+                      Publish immediately
+                    </label>
+                    <button
+                      class="btn btn-secondary"
+                      onclick="app.previewPost()"
+                    >
+                      Preview
+                    </button>
+                    <button class="btn btn-primary" onclick="app.submitPost()">
+                      Publish
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <div class="modal" id="postDetailModal">
+      <div class="modal-content modal-large">
+        <div class="modal-header">
+          <span class="modal-title">Post Detail</span>
+          <button class="modal-close" onclick="app.closePostDetail()">
+            &times;
+          </button>
+        </div>
+        <div class="modal-body" id="postDetailContent"></div>
+      </div>
+    </div>
+
+    <div class="modal" id="previewModal">
+      <div class="modal-content modal-large">
+        <div class="modal-header">
+          <span class="modal-title">Preview</span>
+          <button class="modal-close" onclick="app.closePreview()">
+            &times;
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="preview-title" id="previewTitle"></div>
+          <div class="markdown-body" id="previewBody"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="editModal">
+      <div class="modal-content modal-large">
+        <div class="modal-header">
+          <span class="modal-title">Edit Post</span>
+          <button class="modal-close" onclick="app.closeEdit()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="editor-container">
+            <div class="form-group">
+              <label class="form-label">Title</label>
+              <input type="text" class="form-input" id="editTitle" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Summary</label>
+              <input type="text" class="form-input" id="editSummary" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Content</label>
+              <textarea
+                class="form-textarea editor"
+                id="editContent"
+                rows="12"
+              ></textarea>
+            </div>
+            <div class="form-actions">
+              <label class="checkbox-label">
+                <input type="checkbox" id="editPublish" />
+                Published
+              </label>
+              <button class="btn btn-secondary" onclick="app.closeEdit()">
+                Cancel
+              </button>
+              <button class="btn btn-primary" onclick="app.submitEdit()">
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="replyModal">
+      <div class="modal-content modal-large">
+        <div class="modal-header">
+          <span class="modal-title">Reply to Comment</span>
+          <button class="modal-close" onclick="app.closeReply()">
+            &times;
+          </button>
+        </div>
+        <div class="modal-body">
+          <div style="margin-bottom: 16px">
+            <div
+              style="
+                font-size: 15px;
+                font-weight: 700;
+                color: #2c3e50;
+                margin-bottom: 4px;
+              "
+            >
+              Reply to Comment
+            </div>
+            <div
+              id="replyTargetText"
+              style="
+                font-size: 13px;
+                color: #666;
+                line-height: 1.5;
+                padding: 10px 12px;
+                background: #f8f9fa;
+                border-radius: 6px;
+                border-left: 3px solid #667eea;
+              "
+            ></div>
+          </div>
+          <div class="form-group" style="margin-bottom: 12px">
+            <textarea
+              class="form-textarea"
+              id="replyContent"
+              rows="4"
+              placeholder="Write your reply..."
+              style="resize: vertical; min-height: 80px"
+            ></textarea>
+          </div>
+          <div
+            class="form-actions"
+            style="border-top: none; padding-top: 0; justify-content: flex-end"
+          >
+            <button class="btn btn-secondary" onclick="app.closeReply()">
+              Cancel
+            </button>
+            <button class="btn btn-primary" onclick="app.submitReply()">
+              Reply
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="imagePreviewModal">
+      <div class="modal-content modal-content-fullscreen theme-adaptive">
+        <div class="modal-header">
+          <span class="image-preview-uploader" id="imagePreviewUploader"></span>
+          <button class="modal-close" onclick="app.closeImagePreview()">
+            &times;
+          </button>
+        </div>
+        <div class="modal-body image-preview-body">
+          <div class="image-preview-container" id="imagePreviewContainer">
+            <img
+              id="blogPreviewImage"
+              class="preview-image"
+              src=""
+              alt="Preview"
+              onerror="this.style.display = 'none'"
+            />
+          </div>
+          <div class="image-preview-controls">
+            <button type="button" class="btn" onclick="app.zoomOut()">
+              <span>➖</span>
+            </button>
+            <button type="button" class="btn" onclick="app.zoomIn()">
+              <span>➕</span>
+            </button>
+            <button type="button" class="btn" onclick="app.resetZoom()">
+              <span>🔄️</span>
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              onclick="app.downloadCurrentImage()"
+            >
+              <span>⬇️</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

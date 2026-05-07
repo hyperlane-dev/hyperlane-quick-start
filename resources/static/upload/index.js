@@ -294,6 +294,14 @@ async function uploadFile(file, fileId) {
         registerSuccessfulUploads = await response.json();
         if (registerSuccessfulUploads.code == 200) {
           registerSuccess = true;
+        } else if (
+          HyperlaneErrorHandler.handleResponse(
+            registerSuccessfulUploads,
+            'Register upload failed',
+            showToast,
+          )
+        ) {
+          registerSuccess = false;
         }
       } catch (error) {
         registerSuccess = false;
@@ -394,6 +402,14 @@ async function uploadFile(file, fileId) {
         mergeSuccessfulUploads = await response.json();
         if (registerSuccessfulUploads.code == 200) {
           mergeSuccess = true;
+        } else if (
+          HyperlaneErrorHandler.handleResponse(
+            mergeSuccessfulUploads,
+            'Merge upload failed',
+            showToast,
+          )
+        ) {
+          mergeSuccess = false;
         }
       } catch (error) {
         mergeSuccess = false;

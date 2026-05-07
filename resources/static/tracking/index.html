@@ -9,6 +9,7 @@
     <link href="../common/css/common.css" rel="stylesheet" />
     <link href="../common/css/header.css" rel="stylesheet" />
     <script src="../common/js/common.js"></script>
+    <script src="../common/js/error-handler.js"></script>
     <style>
       @import url('./css/css2');
 
@@ -1388,6 +1389,14 @@
 
             if (result.code === 200 && result.data) {
               this.displayResults(result.data);
+            } else if (
+              HyperlaneErrorHandler.handleResponse(
+                result,
+                'Query failed',
+                (msg, type) => this.showError(msg),
+              )
+            ) {
+              return;
             } else {
               this.showError(result.message || 'Query failed');
             }

@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+      name="viewport"
+    />
+    <title>Hyperlane - User Management</title>
+    <link rel="icon" href="https://docs.ltpp.vip/img/hyperlane.png" />
+    <link href="../common/css/common.css" rel="stylesheet" />
+    <link href="../common/css/header.css" rel="stylesheet" />
+    <link href="../common/css/toast.css" rel="stylesheet" />
+    <link href="./css/style.css" rel="stylesheet" />
+    <script src="../common/js/common.js"></script>
+    <script src="../common/js/toast.js"></script>
+    <script src="../common/js/error-handler.js"></script>
+    <script src="../common/components/hyperlane-confirm.js"></script>
+    <script
+      src="../common/components/hyperlane-pagination.js"
+      type="module"
+    ></script>
+    <script src="./js/app.js" defer></script>
+  </head>
+  <body>
+    <div id="app">
+      <div id="main-app" class="main-app">
+        <aside class="sidebar">
+          <div class="sidebar-header light-bg">
+            <h2>
+              <a
+                href="https://github.com/hyperlane-dev/hyperlane"
+                target="_blank"
+              >
+                <img
+                  src="https://docs.ltpp.vip/img/hyperlane.png"
+                  alt=""
+                  class="nav-logo"
+                  onerror="this.style.display = 'none'"
+                />
+                <span class="text shimmer">Hyperlane Users</span>
+              </a>
+            </h2>
+          </div>
+          <nav class="sidebar-nav">
+            <div class="nav-item active" data-page="users">
+              <span class="nav-icon">👥</span>
+              <span>Users</span>
+            </div>
+          </nav>
+          <div class="sidebar-footer">
+            <div class="user-info">
+              <span id="current-user">User</span>
+              <span id="user-role" class="role-badge">user</span>
+            </div>
+            <button id="logout-btn" class="btn btn-sm btn-primary">
+              Logout
+            </button>
+          </div>
+        </aside>
+
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+        <main class="main-content">
+          <header class="content-header light-bg">
+            <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
+            <h1 id="page-title">User Management</h1>
+          </header>
+
+          <div id="users-page" class="page-content">
+            <div class="stats-grid">
+              <div class="stat-card balance">
+                <div class="stat-label">Total Users</div>
+                <div class="stat-value" id="totalUsers">0</div>
+              </div>
+              <div class="stat-card income">
+                <div class="stat-label">Admins</div>
+                <div class="stat-value" id="adminCount">0</div>
+              </div>
+              <div class="stat-card expense">
+                <div class="stat-label">Pending</div>
+                <div class="stat-value" id="pendingCount">0</div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">Users</span>
+                <div class="filter-group">
+                  <input
+                    type="text"
+                    class="form-input form-input-sm"
+                    id="searchKeyword"
+                    placeholder="Search users..."
+                    oninput="app.onSearchInput()"
+                  />
+                </div>
+              </div>
+              <div class="card-body">
+                <div id="resultsContainer">
+                  <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">Loading users...</div>
+                  </div>
+                </div>
+                <div
+                  id="paginationContainer"
+                  class="pagination-container"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <div class="modal" id="detailModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="modal-title" id="modalTitle">User Detail</span>
+          <button
+            class="modal-close"
+            onclick="app.closeModal()"
+            aria-label="Close"
+          >
+            <span>&times;</span>
+          </button>
+        </div>
+        <div class="modal-body" id="modalContent"></div>
+      </div>
+    </div>
+
+    <div class="toast-container" id="toast-container"></div>
+  </body>
+</html>

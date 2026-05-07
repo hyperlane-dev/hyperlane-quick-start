@@ -71,18 +71,18 @@ pub fn openapi_auth_user_change_password() {}
 
 #[utoipa::path(
     post,
-    path = "/api/auth/user/approve/{id}",
+    path = "/api/auth/user/update_status/{id}",
     params(
         ("id" = i32, Path, description = "User ID")
     ),
     responses(
-        (status = 200, description = "User approval status updated successfully"),
+        (status = 200, description = "User status updated successfully"),
         (status = 400, description = "Bad request"),
         (status = 500, description = "Internal server error")
     )
 )]
 #[instrument_trace]
-pub fn openapi_auth_user_approve() {}
+pub fn openapi_auth_user_update_status() {}
 
 #[utoipa::path(
     get,
@@ -111,3 +111,19 @@ pub fn openapi_auth_user_list() {}
 )]
 #[instrument_trace]
 pub fn openapi_auth_user_get() {}
+
+#[utoipa::path(
+    post,
+    path = "/api/auth/user/delete/{id}",
+    params(
+        ("id" = i32, Path, description = "User ID")
+    ),
+    responses(
+        (status = 200, description = "User deleted successfully"),
+        (status = 400, description = "Bad request"),
+        (status = 403, description = "Forbidden"),
+        (status = 500, description = "Internal server error")
+    )
+)]
+#[instrument_trace]
+pub fn openapi_auth_user_delete() {}

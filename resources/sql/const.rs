@@ -20,6 +20,14 @@ pub const POSTGRESQL_NOTIFICATION_TABLE_SQL: &str =
     include_str!("./postgresql/notification/notification_table.sql");
 pub const POSTGRESQL_NOTIFICATION_INDEX_SQL: &str =
     include_str!("./postgresql/notification/index.sql");
+pub const POSTGRESQL_BLOG_POST_TABLE_SQL: &str = include_str!("./postgresql/blog/post_table.sql");
+pub const POSTGRESQL_BLOG_COMMENT_TABLE_SQL: &str =
+    include_str!("./postgresql/blog/comment_table.sql");
+pub const POSTGRESQL_BLOG_LIKE_TABLE_SQL: &str = include_str!("./postgresql/blog/like_table.sql");
+pub const POSTGRESQL_BLOG_FAVORITE_TABLE_SQL: &str =
+    include_str!("./postgresql/blog/favorite_table.sql");
+pub const POSTGRESQL_BLOG_IMAGE_TABLE_SQL: &str = include_str!("./postgresql/blog/image_table.sql");
+pub const POSTGRESQL_BLOG_INDEX_SQL: &str = include_str!("./postgresql/blog/index.sql");
 pub const MYSQL_CICD_PIPELINE_TABLE_SQL: &str = include_str!("./mysql/cicd/pipeline_table.sql");
 pub const MYSQL_CICD_RUN_TABLE_SQL: &str = include_str!("./mysql/cicd/run_table.sql");
 pub const MYSQL_CICD_JOB_TABLE_SQL: &str = include_str!("./mysql/cicd/job_table.sql");

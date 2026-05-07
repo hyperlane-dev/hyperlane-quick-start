@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS blog_like (
+    id SERIAL PRIMARY KEY,
+    post_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (post_id, user_id)
+);

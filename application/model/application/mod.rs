@@ -1,3 +1,4 @@
+pub mod blog;
 pub mod chat;
 pub mod cicd;
 pub mod gomoku;
@@ -9,5 +10,6 @@ pub mod rss;
 pub mod shortlink;
 pub mod tracking;
 pub mod upload;
+pub mod user;
 
 use super::*;

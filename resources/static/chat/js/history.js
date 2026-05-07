@@ -56,6 +56,14 @@ const ChatHistory = {
         } else {
           this.hasMore = false;
         }
+      } else if (
+        HyperlaneErrorHandler.handleResponse(
+          result,
+          'Failed to load history',
+          console.error,
+        )
+      ) {
+        return;
       } else {
         console.error('Failed to load history:', result.message);
         this.hasMore = false;

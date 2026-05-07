@@ -11,4 +11,9 @@ pub enum PostgresqlTableName {
     Shortlink,
     Order,
     Notification,
+    BlogPost,
+    BlogComment,
+    BlogLike,
+    BlogFavorite,
+    BlogImage,
 }

@@ -2,6 +2,38 @@ use super::*;
 
 impl UserRepository {
     #[instrument_trace]
+    fn validate_email(email: &str) -> bool {
+        match EMAIL_REGEX.as_ref() {
+            Some(regex) => regex.is_match(email),
+            None => false,
+        }
+    }
+
+    #[instrument_trace]
+    fn validate_phone(phone: &str) -> bool {
+        match PHONE_REGEX_OPT.as_ref() {
+            Some(regex) => regex.is_match(phone),
+            None => false,
+        }
+    }
+
+    #[instrument_trace]
+    fn validate_active_model(active_model: &AuthUserActiveModel) -> Result<(), String> {
+        if let ActiveValue::Set(Some(ref email)) = active_model.email
+            && !email.is_empty()
+            && !Self::validate_email(email)
+        {
+            return Err("Invalid email format".to_string());
+        }
+        if let ActiveValue::Set(Some(ref phone)) = active_model.phone
+            && !phone.is_empty()
+            && !Self::validate_phone(phone)
+        {
+            return Err("Invalid phone format".to_string());
+        }
+        Ok(())
+    }
+    #[instrument_trace]
     pub async fn find_by_id(user_id: i32) -> Result<Option<AuthUserModel>, String> {
         let db: DatabaseConnection =
             PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
@@ -38,6 +70,7 @@ impl UserRepository {
 
     #[instrument_trace]
     pub async fn insert(active_model: AuthUserActiveModel) -> Result<AuthUserModel, String> {
+        Self::validate_active_model(&active_model)?;
         let db: DatabaseConnection =
             PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
         let result: AuthUserModel = active_model
@@ -49,6 +82,7 @@ impl UserRepository {
 
     #[instrument_trace]
     pub async fn update(active_model: AuthUserActiveModel) -> Result<AuthUserModel, String> {
+        Self::validate_active_model(&active_model)?;
         let db: DatabaseConnection =
             PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
         let result: AuthUserModel = active_model
@@ -131,5 +165,16 @@ impl UserRepository {
             .await
             .map_err(|error: DbErr| error.to_string())?;
         Ok(result)
+    }
+
+    #[instrument_trace]
+    pub async fn delete_by_id(user_id: i32) -> Result<(), String> {
+        let db: DatabaseConnection =
+            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+        AuthUserEntity::delete_by_id(user_id)
+            .exec(&db)
+            .await
+            .map_err(|error: DbErr| error.to_string())?;
+        Ok(())
     }
 }
