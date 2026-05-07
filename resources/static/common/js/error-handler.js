@@ -23,34 +23,6 @@ const HyperlaneErrorHandler = {
           'error',
         );
       }
-      return true;
-    }
-    if (result.code === 500) {
-      if (typeof Toast !== 'undefined') {
-        Toast.error(result.message || 'Server error, please try again later');
-      } else if (toastCallback) {
-        toastCallback(
-          result.message || 'Server error, please try again later',
-          'error',
-        );
-      }
-      return true;
-    }
-    return false;
-  },
-
-  handleResponseWithLogout: function (result, defaultMessage, toastCallback) {
-    if (result.code === 401) {
-      if (typeof Toast !== 'undefined') {
-        Toast.error(
-          result.message || 'Authentication expired, please login again',
-        );
-      } else if (toastCallback) {
-        toastCallback(
-          result.message || 'Authentication expired, please login again',
-          'error',
-        );
-      }
       this.logout();
       return true;
     }

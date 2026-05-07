@@ -24,7 +24,7 @@ class NotificationApp {
       if (result.code === 200 && result.data) {
         document.getElementById('unreadCount').textContent = result.data.count;
       } else if (
-        HyperlaneErrorHandler.handleResponseWithLogout(
+        HyperlaneErrorHandler.handleResponse(
           result,
           'Failed to load unread count',
           Toast.error.bind(Toast),
@@ -59,7 +59,7 @@ class NotificationApp {
       if (result.code === 200 && result.data) {
         this.displayNotifications(result.data);
       } else if (
-        HyperlaneErrorHandler.handleResponseWithLogout(
+        HyperlaneErrorHandler.handleResponse(
           result,
           'Failed to load notifications',
           Toast.error.bind(Toast),
@@ -171,7 +171,7 @@ class NotificationApp {
         await this.loadUnreadCount();
         await this.loadNotifications(this.currentPage);
       } else if (
-        HyperlaneErrorHandler.handleResponseWithLogout(
+        HyperlaneErrorHandler.handleResponse(
           result,
           'Failed to mark as read',
           Toast.error.bind(Toast),
@@ -199,7 +199,7 @@ class NotificationApp {
         await this.loadUnreadCount();
         await this.loadNotifications(1);
       } else if (
-        HyperlaneErrorHandler.handleResponseWithLogout(
+        HyperlaneErrorHandler.handleResponse(
           result,
           'Failed to mark all as read',
           Toast.error.bind(Toast),
@@ -232,7 +232,7 @@ class NotificationApp {
         await this.loadUnreadCount();
         await this.loadNotifications(this.currentPage);
       } else if (
-        HyperlaneErrorHandler.handleResponseWithLogout(
+        HyperlaneErrorHandler.handleResponse(
           result,
           'Failed to delete notification',
           Toast.error.bind(Toast),
@@ -328,7 +328,7 @@ class NotificationApp {
         await this.loadUnreadCount();
         await this.loadNotifications(1);
       } else if (
-        HyperlaneErrorHandler.handleResponseWithLogout(
+        HyperlaneErrorHandler.handleResponse(
           result,
           'Failed to create notification',
           Toast.error.bind(Toast),
