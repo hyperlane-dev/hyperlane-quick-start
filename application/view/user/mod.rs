@@ -4,4 +4,4 @@ mod r#struct;
 
 pub use {r#fn::*, r#struct::*};
 
-use super::*;
+use {super::*, utils::auth::*};

@@ -58,7 +58,7 @@ loginForm.addEventListener('submit', async (e) => {
       localStorage.setItem('auth_token', data.data.token);
       setTimeout(() => {
         const locationUrl = getQueryParam('location') || '/';
-        window.location.href = locationUrl;
+        window.location.href = decodeURIComponent(locationUrl);
       }, 360);
     } else if (
       HyperlaneErrorHandler.handleResponse(data, 'Login failed', showToast)

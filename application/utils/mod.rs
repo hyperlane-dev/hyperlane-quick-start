@@ -1,3 +1,4 @@
+pub mod auth;
 pub mod crypto;
 pub mod json;
 pub mod send;

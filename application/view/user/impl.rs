@@ -15,8 +15,8 @@ impl ServerHook for UserViewRoute {
     async fn handle(self, ctx: &mut Context) {
         let is_authenticated: bool = ctx.get_request().try_get_cookie(TOKEN).is_some();
         if !is_authenticated {
-            ctx.get_mut_response()
-                .set_header(LOCATION, format!("/auth?{LOCATION}=/user"));
+            let redirect_url: String = build_auth_redirect_url(ctx);
+            ctx.get_mut_response().set_header(LOCATION, redirect_url);
         }
     }
 }
