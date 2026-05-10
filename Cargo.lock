@@ -1941,7 +1941,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "21.3.0"
+version = "21.3.1"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
