@@ -19,7 +19,7 @@ impl ServerHook for TaskPanicHook {
     )]
     #[epilogue_macros(response_body(&response_body), try_send)]
     #[instrument_trace]
-    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
+    async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
         debug!("TaskPanicHook request => {}", ctx.get_request());
         error!("TaskPanicHook => {}", self.get_response_body());
         let api_response: ApiResponse<&str> = ApiResponse::new(
@@ -34,7 +34,7 @@ impl ServerHook for TaskPanicHook {
 impl ServerHook for RequestErrorHook {
     #[request_error_data(request_error_data)]
     #[instrument_trace]
-    async fn new(_stream: &mut Stream, _ctx: &mut Context) -> Self {
+    async fn new(_stream: &mut Stream, ctx: &mut Context) -> Self {
         Self {
             response_status_code: request_error_data.get_http_status_code(),
             content_type: ContentType::format_content_type_with_charset(APPLICATION_JSON, UTF8),
@@ -52,7 +52,7 @@ impl ServerHook for RequestErrorHook {
     )]
     #[epilogue_macros(response_body(&response_body), try_send)]
     #[instrument_trace]
-    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
+    async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
         if self.get_response_status_code() == HttpStatus::BadRequest.code() {
             debug!("Context aborted");
             return Status::Reject;
