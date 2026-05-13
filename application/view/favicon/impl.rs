@@ -2,7 +2,7 @@ use super::*;
 
 impl ServerHook for FaviconRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_stream: &mut Stream, _ctx: &mut Context) -> Self {
         Self
     }
 
@@ -12,5 +12,7 @@ impl ServerHook for FaviconRoute {
         response_header(LOCATION => LOGO_IMG_URL)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {}
+    async fn handle(self, _stream: &mut Stream, _ctx: &mut Context) -> Status {
+        Status::Continue
+    }
 }
