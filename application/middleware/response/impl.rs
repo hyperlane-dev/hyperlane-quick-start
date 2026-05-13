@@ -23,7 +23,7 @@ impl ServerHook for LogMiddleware {
     }
 
     #[instrument_trace]
-    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
+    async fn handle(self, _: &mut Stream, ctx: &mut Context) -> Status {
         let request_json: String = get_request_json(ctx).await;
         let response_json: String = get_response_json(ctx).await;
         info!("{request_json}");
