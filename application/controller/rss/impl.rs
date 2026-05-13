@@ -2,17 +2,17 @@ use super::*;
 
 impl ServerHook for RssFeedRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(
-        get_method,
-        request_query_option("limit" => limit_opt),
-        request_query_option("offset" => offset_opt),
-        request_query_option("timezone" => timezone_opt),
-        request_header_option(HOST => host_opt),
+        is_get_method,
+        try_get_request_query("limit" => limit_opt),
+        try_get_request_query("offset" => offset_opt),
+        try_get_request_query("timezone" => timezone_opt),
     )]
+    #[try_get_request_header(HOST => host_opt)]
     #[epilogue_macros(
         response_header(
             CONTENT_TYPE,
@@ -21,7 +21,7 @@ impl ServerHook for RssFeedRoute {
         response_body(rss_xml)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let limit: Option<usize> = limit_opt
             .and_then(|l| l.parse().ok())
             .map(|l: usize| l.min(MAX_LIMIT));
@@ -31,5 +31,6 @@ impl ServerHook for RssFeedRoute {
         let base_url: String = format!("{HTTP_LOWERCASE}://{host}");
         let rss_xml: String =
             RssService::generate_rss_feed(&base_url, limit, offset, timezone).await;
+        Status::Continue
     }
 }

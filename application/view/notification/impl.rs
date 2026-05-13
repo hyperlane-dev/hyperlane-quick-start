@@ -2,7 +2,7 @@ use super::*;
 
 impl ServerHook for NotificationViewRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
@@ -12,5 +12,7 @@ impl ServerHook for NotificationViewRoute {
         response_header(LOCATION => "/static/notification/index.html")
     )]
     #[instrument_trace]
-    async fn handle(self, _ctx: &mut Context) {}
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
+        Status::Continue
+    }
 }

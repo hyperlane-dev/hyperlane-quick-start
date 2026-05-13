@@ -2,24 +2,24 @@ use super::*;
 
 impl ServerHook for InsertRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(
-        post_method,
+        is_post_method,
         request_body_json_result(request_opt: ShortlinkInsertRequest),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let request: ShortlinkInsertRequest = match request_opt {
             Ok(data) => data,
             Err(error) => {
                 let response: ApiResponse<String> =
                     ApiResponse::new(ApiResponseStatus::InvalidRequest, error.to_string());
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match ShortlinkService::insert_shortlink(request).await {
@@ -35,22 +35,23 @@ impl ServerHook for InsertRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for QueryRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(
-        get_method,
-        route_param_option(ID_KEY => id_opt),
+        is_get_method,
+        try_get_route_param(ID_KEY => id_opt),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let encrypted_id: String = match id_opt {
             Some(id_str) => id_str,
             None => {
@@ -59,7 +60,7 @@ impl ServerHook for QueryRoute {
                     "Shortlink ID parameter is required",
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match ShortlinkService::query_shortlink(encrypted_id).await {
@@ -87,5 +88,6 @@ impl ServerHook for QueryRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }

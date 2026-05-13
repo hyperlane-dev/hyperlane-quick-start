@@ -2,13 +2,13 @@ use super::*;
 
 impl ServerHook for DatasetRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[prologue_macros(get_method)]
+    #[prologue_macros(is_get_method)]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         match DatasetService::fetch_dataset().await {
             Ok(dataset_content) => {
                 ctx.get_mut_response()
@@ -25,5 +25,6 @@ impl ServerHook for DatasetRoute {
                     .set_body(error_response.to_json_bytes());
             }
         }
+        Status::Continue
     }
 }

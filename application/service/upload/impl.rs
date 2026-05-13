@@ -96,12 +96,15 @@ impl UploadService {
             && path.chars().all(|c| c.is_ascii_digit() || c == '/')
     }
 
-    #[request_header_option(HEADER_X_FILE_ID => file_id_opt)]
-    #[request_header_option(HEADER_X_TOTAL_CHUNKS => total_chunks_opt)]
-    #[request_header_option(HEADER_X_FILE_NAME => file_name_opt)]
-    #[request_header_option(HEADER_X_DIRECTORY => base_file_dir_opt)]
+    #[try_get_request_header(HEADER_X_FILE_ID => file_id_opt)]
+    #[try_get_request_header(HEADER_X_TOTAL_CHUNKS => total_chunks_opt)]
+    #[try_get_request_header(HEADER_X_FILE_NAME => file_name_opt)]
+    #[try_get_request_header(HEADER_X_DIRECTORY => base_file_dir_opt)]
     #[instrument_trace]
-    pub async fn get_register_file_chunk_data<'a>(ctx: &mut Context) -> Option<FileChunkData> {
+    pub async fn get_register_file_chunk_data<'a>(
+        _stream: &mut Stream,
+        ctx: &mut Context,
+    ) -> Option<FileChunkData> {
         let file_id: String = Self::validate_file_id(file_id_opt, ctx).await.ok()?;
         let total_chunks: usize = Self::validate_total_chunks(total_chunks_opt, ctx)
             .await
@@ -180,18 +183,18 @@ impl UploadService {
         result
     }
 
-    #[response_status_code(200)]
     #[instrument_trace]
-    pub async fn set_common_success_response_body<'a>(ctx: &mut Context, url: &'a str) {
+    pub async fn set_common_success_response_body(ctx: &mut Context, url: &str) {
+        ctx.get_mut_response().set_status_code(200);
         let mut data: UploadResponse<'_> = UploadResponse::default();
         data.set_code(200).set_msg(OK).set_url(url);
         let data_json: ResponseBody = serde_json::to_vec(&data).unwrap_or_default();
         ctx.get_mut_response().set_body(&data_json);
     }
 
-    #[response_status_code(200)]
     #[instrument_trace]
-    pub async fn set_common_error_response_body<'a>(ctx: &mut Context, error: String) {
+    pub async fn set_common_error_response_body(ctx: &mut Context, error: String) {
+        ctx.get_mut_response().set_status_code(200);
         let mut data: UploadResponse<'_> = UploadResponse::default();
         data.set_msg(&error);
         let data_json: ResponseBody = serde_json::to_vec(&data).unwrap_or_default();

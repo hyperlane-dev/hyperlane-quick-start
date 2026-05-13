@@ -2,13 +2,13 @@ use super::*;
 
 impl ServerHook for RsaPublicKeyRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[prologue_macros(get_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
+    #[prologue_macros(is_get_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         match AuthService::get_auth_service()
             .generate_rsa_key_pair()
             .await
@@ -26,25 +26,26 @@ impl ServerHook for RsaPublicKeyRoute {
                     .set_body(api_response.to_json_bytes());
             }
         }
+        Status::Continue
     }
 }
 
 impl ServerHook for UserRegisterRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[prologue_macros(post_method, request_body_json_result(request_opt: RegisterRequest), response_header(CONTENT_TYPE => APPLICATION_JSON))]
+    #[prologue_macros(is_post_method, request_body_json_result(request_opt: RegisterRequest), response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let request: RegisterRequest = match request_opt {
             Ok(data) => data,
             Err(error) => {
                 let response: ApiResponse<String> =
                     ApiResponse::new(ApiResponseStatus::InvalidRequest, error.to_string());
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match AuthService::get_auth_service().register_user(request).await {
@@ -60,25 +61,26 @@ impl ServerHook for UserRegisterRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for UserLoginRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[prologue_macros(post_method, request_body_json_result(request_opt: LoginRequest), response_header(CONTENT_TYPE => APPLICATION_JSON))]
+    #[prologue_macros(is_post_method, request_body_json_result(request_opt: LoginRequest), response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let request: LoginRequest = match request_opt {
             Ok(data) => data,
             Err(error) => {
                 let response: ApiResponse<String> =
                     ApiResponse::new(ApiResponseStatus::InvalidRequest, error.to_string());
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match AuthService::get_auth_service().login_user(request).await {
@@ -119,18 +121,19 @@ impl ServerHook for UserLoginRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes());
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for UserUpdateRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[prologue_macros(post_method, route_param_option(ID_KEY => id_opt), request_body_json_result(request_opt: UpdateUserRequest), response_header(CONTENT_TYPE => APPLICATION_JSON))]
+    #[prologue_macros(is_post_method, try_get_route_param(ID_KEY => id_opt), request_body_json_result(request_opt: UpdateUserRequest), response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let target_user_id: i32 = match id_opt {
             Some(id_str) => match AuthService::decode_id(&id_str) {
                 Ok(id) => id,
@@ -138,14 +141,14 @@ impl ServerHook for UserUpdateRoute {
                     let response: ApiResponse<&str> =
                         ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid user ID");
                     ctx.get_mut_response().set_body(response.to_json_bytes());
-                    return;
+                    return Status::Continue;
                 }
             },
             None => {
                 let response: ApiResponse<&str> =
                     ApiResponse::new(ApiResponseStatus::InvalidRequest, "User ID is required");
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
@@ -155,7 +158,7 @@ impl ServerHook for UserUpdateRoute {
                     ApiResponse::new(ApiResponseStatus::Unauthorized, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         let current_user: UserResponse = match AuthService::get_user(current_user_id).await {
@@ -164,14 +167,14 @@ impl ServerHook for UserUpdateRoute {
                 let response: ApiResponse<&str> =
                     ApiResponse::new(ApiResponseStatus::Unauthorized, "User not found");
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
             Err(error) => {
                 let mut response: ApiResponse<String> =
                     ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         let user_role: UserRole = current_user.get_role().parse().unwrap_or_default();
@@ -181,7 +184,7 @@ impl ServerHook for UserUpdateRoute {
                 "You can only update your own data",
             );
             ctx.get_mut_response().set_body(response.to_json_bytes());
-            return;
+            return Status::Continue;
         }
         let request: UpdateUserRequest = match request_opt {
             Ok(data) => data,
@@ -189,7 +192,7 @@ impl ServerHook for UserUpdateRoute {
                 let response: ApiResponse<String> =
                     ApiResponse::new(ApiResponseStatus::InvalidRequest, error.to_string());
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match AuthService::get_auth_service()
@@ -208,18 +211,19 @@ impl ServerHook for UserUpdateRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for UserChangePasswordRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[prologue_macros(post_method, route_param_option(ID_KEY => id_opt), request_body_json_result(request_opt: ChangePasswordRequest), response_header(CONTENT_TYPE => APPLICATION_JSON))]
+    #[prologue_macros(is_post_method, try_get_route_param(ID_KEY => id_opt), request_body_json_result(request_opt: ChangePasswordRequest), response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let user_id: i32 = match id_opt {
             Some(id_str) => match AuthService::decode_id(&id_str) {
                 Ok(id) => id,
@@ -227,14 +231,14 @@ impl ServerHook for UserChangePasswordRoute {
                     let response: ApiResponse<&str> =
                         ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid user ID");
                     ctx.get_mut_response().set_body(response.to_json_bytes());
-                    return;
+                    return Status::Continue;
                 }
             },
             None => {
                 let response: ApiResponse<&str> =
                     ApiResponse::new(ApiResponseStatus::InvalidRequest, "User ID is required");
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         let request: ChangePasswordRequest = match request_opt {
@@ -243,7 +247,7 @@ impl ServerHook for UserChangePasswordRoute {
                 let response: ApiResponse<String> =
                     ApiResponse::new(ApiResponseStatus::InvalidRequest, error.to_string());
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match AuthService::get_auth_service()
@@ -261,18 +265,19 @@ impl ServerHook for UserChangePasswordRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for UserUpdateStatusRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[prologue_macros(post_method, route_param_option(ID_KEY => id_opt), request_body_json_result(request_opt: UpdateUserStatusRequest), response_header(CONTENT_TYPE => APPLICATION_JSON))]
+    #[prologue_macros(is_post_method, try_get_route_param(ID_KEY => id_opt), request_body_json_result(request_opt: UpdateUserStatusRequest), response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let user_id: i32 = match id_opt {
             Some(id_str) => match AuthService::decode_id(&id_str) {
                 Ok(id) => id,
@@ -280,14 +285,14 @@ impl ServerHook for UserUpdateStatusRoute {
                     let response: ApiResponse<&str> =
                         ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid user ID");
                     ctx.get_mut_response().set_body(response.to_json_bytes());
-                    return;
+                    return Status::Continue;
                 }
             },
             None => {
                 let response: ApiResponse<&str> =
                     ApiResponse::new(ApiResponseStatus::InvalidRequest, "User ID is required");
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         let request: UpdateUserStatusRequest = match request_opt {
@@ -296,7 +301,7 @@ impl ServerHook for UserUpdateStatusRoute {
                 let response: ApiResponse<String> =
                     ApiResponse::new(ApiResponseStatus::InvalidRequest, error.to_string());
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match AuthService::update_user_status(user_id, request.get_approved()).await {
@@ -312,18 +317,19 @@ impl ServerHook for UserUpdateStatusRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for UserListRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[prologue_macros(get_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
+    #[prologue_macros(is_get_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
@@ -331,7 +337,7 @@ impl ServerHook for UserListRoute {
                     ApiResponse::new(ApiResponseStatus::Unauthorized, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         let current_user: UserResponse = match AuthService::get_user(current_user_id).await {
@@ -340,14 +346,14 @@ impl ServerHook for UserListRoute {
                 let response: ApiResponse<&str> =
                     ApiResponse::new(ApiResponseStatus::Unauthorized, "User not found");
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
             Err(error) => {
                 let mut response: ApiResponse<String> =
                     ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         let mut query: UserListQueryRequest = UserListQueryRequest::default();
@@ -378,18 +384,19 @@ impl ServerHook for UserListRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for UserGetRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[prologue_macros(get_method, route_param_option(ID_KEY => id_opt), response_header(CONTENT_TYPE => APPLICATION_JSON))]
+    #[prologue_macros(is_get_method, try_get_route_param(ID_KEY => id_opt), response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let user_id: i32 = match id_opt {
             Some(id_str) => match AuthService::decode_id(&id_str) {
                 Ok(id) => id,
@@ -397,14 +404,14 @@ impl ServerHook for UserGetRoute {
                     let response: ApiResponse<&str> =
                         ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid user ID");
                     ctx.get_mut_response().set_body(response.to_json_bytes());
-                    return;
+                    return Status::Continue;
                 }
             },
             None => {
                 let response: ApiResponse<&str> =
                     ApiResponse::new(ApiResponseStatus::InvalidRequest, "User ID is required");
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match AuthService::get_user(user_id).await {
@@ -425,18 +432,19 @@ impl ServerHook for UserGetRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for UserDeleteRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[prologue_macros(post_method, route_param_option(ID_KEY => id_opt), response_header(CONTENT_TYPE => APPLICATION_JSON))]
+    #[prologue_macros(is_post_method, try_get_route_param(ID_KEY => id_opt), response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
@@ -444,7 +452,7 @@ impl ServerHook for UserDeleteRoute {
                     ApiResponse::new(ApiResponseStatus::Unauthorized, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         let current_user: UserResponse = match AuthService::get_user(current_user_id).await {
@@ -453,14 +461,14 @@ impl ServerHook for UserDeleteRoute {
                 let response: ApiResponse<&str> =
                     ApiResponse::new(ApiResponseStatus::Unauthorized, "User not found");
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
             Err(error) => {
                 let mut response: ApiResponse<String> =
                     ApiResponse::new(ApiResponseStatus::BusinessLogicError, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         let user_role: UserRole = current_user.get_role().parse().unwrap_or_default();
@@ -468,7 +476,7 @@ impl ServerHook for UserDeleteRoute {
             let response: ApiResponse<&str> =
                 ApiResponse::new(ApiResponseStatus::Forbidden, "Only admin can delete users");
             ctx.get_mut_response().set_body(response.to_json_bytes());
-            return;
+            return Status::Continue;
         }
         let target_user_id: i32 = match id_opt {
             Some(id_str) => match AuthService::decode_id(&id_str) {
@@ -477,21 +485,21 @@ impl ServerHook for UserDeleteRoute {
                     let response: ApiResponse<&str> =
                         ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid user ID");
                     ctx.get_mut_response().set_body(response.to_json_bytes());
-                    return;
+                    return Status::Continue;
                 }
             },
             None => {
                 let response: ApiResponse<&str> =
                     ApiResponse::new(ApiResponseStatus::InvalidRequest, "User ID is required");
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         if current_user_id == target_user_id {
             let response: ApiResponse<&str> =
                 ApiResponse::new(ApiResponseStatus::Forbidden, "Cannot delete yourself");
             ctx.get_mut_response().set_body(response.to_json_bytes());
-            return;
+            return Status::Continue;
         }
         match AuthService::delete_user(target_user_id).await {
             Ok(_) => {
@@ -506,35 +514,37 @@ impl ServerHook for UserDeleteRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for UserLogoutRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[prologue_macros(post_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
+    #[prologue_macros(is_post_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let clear_cookie: String = "token=; Path=/; Max-Age=0; HttpOnly".to_string();
         ctx.get_mut_response().set_header(SET_COOKIE, &clear_cookie);
         let response: ApiResponse<&str> =
             ApiResponse::new(ApiResponseStatus::Success, "Logged out successfully");
         ctx.get_mut_response().set_body(response.to_json_bytes());
+        Status::Continue
     }
 }
 
 impl ServerHook for UserInfoRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[prologue_macros(get_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
+    #[prologue_macros(is_get_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         match AuthService::extract_user_from_cookie(ctx) {
             Ok(user_id) => match AuthService::get_user(user_id).await {
                 Ok(Some(user)) => {
@@ -561,5 +571,6 @@ impl ServerHook for UserInfoRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes());
             }
         }
+        Status::Continue
     }
 }

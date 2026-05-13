@@ -2,20 +2,21 @@ use super::*;
 
 impl ServerHook for OnlineRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[prologue_macros(ws_upgrade_type, get_method)]
+    #[prologue_macros(is_ws_upgrade_type, is_get_method)]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
         let websocket: &WebSocket = get_global_websocket();
         let path: String = ctx.get_request().get_path().clone();
         let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
-        let config: WebSocketConfig<String> = WebSocketConfig::new(ctx)
+        let config: WebSocketConfig<String> = WebSocketConfig::new(stream, ctx)
             .set_broadcast_type(key)
             .set_connected_hook::<OnlineConnectedHook>()
             .set_closed_hook::<OnlineClosedHook>();
         websocket.run(config).await;
+        Status::Continue
     }
 }

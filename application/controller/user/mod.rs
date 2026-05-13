@@ -12,6 +12,6 @@ use {
         request::user::*,
         response::{common::*, user::*},
     },
-    service::user::*,
+    service::{auth::*, user::*},
     r#struct::*,
 };

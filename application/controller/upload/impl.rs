@@ -2,41 +2,40 @@ use super::*;
 
 impl ServerHook for RegisterRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[post_method]
+    #[is_post_method]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
         let file_chunk_data_opt: Option<FileChunkData> =
-            UploadService::get_register_file_chunk_data(ctx).await;
+            UploadService::get_register_file_chunk_data(stream, ctx).await;
         if file_chunk_data_opt.is_none() {
-            return;
+            return Status::Continue;
         }
         let file_chunk_data: FileChunkData = file_chunk_data_opt.unwrap_or_default();
         UploadService::add_file_id_map(&file_chunk_data).await;
         UploadService::set_common_success_response_body(ctx, "").await;
+        Status::Continue
     }
 }
 
 impl ServerHook for SaveRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[prologue_macros(
-        post_method,
-        request_header_option(HEADER_X_FILE_ID => file_id_opt),
-        request_header_option(HEADER_X_CHUNK_INDEX => chunk_index_opt)
-    )]
+    #[prologue_macros(is_post_method)]
+    #[try_get_request_header(HEADER_X_FILE_ID => file_id_opt)]
+    #[try_get_request_header(HEADER_X_CHUNK_INDEX => chunk_index_opt)]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let file_chunk_data_opt: Option<FileChunkData> =
             UploadService::get_save_file_chunk_data(ctx, file_id_opt, chunk_index_opt).await;
         if file_chunk_data_opt.is_none() {
-            return;
+            return Status::Continue;
         }
         let file_chunk_data: FileChunkData = file_chunk_data_opt.unwrap_or_default();
         let chunk_data: RequestBody = ctx.get_request().get_body().clone();
@@ -50,25 +49,24 @@ impl ServerHook for SaveRoute {
                 UploadService::set_common_error_response_body(ctx, error).await;
             }
         }
+        Status::Continue
     }
 }
 
 impl ServerHook for MergeRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[prologue_macros(
-        post_method,
-        request_header_option(HEADER_X_FILE_ID => file_id_opt)
-    )]
+    #[prologue_macros(is_post_method)]
+    #[try_get_request_header(HEADER_X_FILE_ID => file_id_opt)]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let file_chunk_data_opt: Option<FileChunkData> =
             UploadService::get_merge_file_chunk_data(ctx, file_id_opt).await;
         if file_chunk_data_opt.is_none() {
-            return;
+            return Status::Continue;
         }
         let file_chunk_data: FileChunkData = file_chunk_data_opt.unwrap_or_default();
         match UploadService::merge_file_chunks(&file_chunk_data).await {
@@ -81,5 +79,6 @@ impl ServerHook for MergeRoute {
                 UploadService::set_common_error_response_body(ctx, error).await;
             }
         }
+        Status::Continue
     }
 }

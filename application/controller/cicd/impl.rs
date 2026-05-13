@@ -2,24 +2,24 @@ use super::*;
 
 impl ServerHook for CreatePipelineRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(
-        post_method,
+        is_post_method,
         request_body_json_result(param: CreatePipelineParam),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let param: CreatePipelineParam = match param {
             Ok(data) => data,
             Err(error) => {
                 let response: ApiResponse<String> =
                     ApiResponse::new(ApiResponseStatus::InvalidRequest, error.to_string());
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match CicdService::create_pipeline(param).await {
@@ -34,12 +34,13 @@ impl ServerHook for CreatePipelineRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for ListPipelinesRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
@@ -48,7 +49,7 @@ impl ServerHook for ListPipelinesRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         match CicdService::get_all_pipelines().await {
             Ok(pipelines) => {
                 let response: ApiResponse<Vec<PipelineDto>> =
@@ -62,12 +63,13 @@ impl ServerHook for ListPipelinesRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for GetPipelineRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
@@ -76,7 +78,7 @@ impl ServerHook for GetPipelineRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let id: i32 = match ctx
             .get_request()
             .get_querys()
@@ -90,7 +92,7 @@ impl ServerHook for GetPipelineRoute {
                     "Missing or invalid id parameter",
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match CicdService::get_pipeline_by_id(id).await {
@@ -111,29 +113,30 @@ impl ServerHook for GetPipelineRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for TriggerRunRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(
-        post_method,
+        is_post_method,
         request_body_json_result(param: TriggerRunParam),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let param: TriggerRunParam = match param {
             Ok(data) => data,
             Err(error) => {
                 let response: ApiResponse<String> =
                     ApiResponse::new(ApiResponseStatus::InvalidRequest, error.to_string());
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match CicdService::trigger_run(param).await {
@@ -148,12 +151,13 @@ impl ServerHook for TriggerRunRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for ListRunsRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
@@ -162,7 +166,7 @@ impl ServerHook for ListRunsRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         const MAX_PAGE_SIZE: i32 = 100;
         let querys: &RequestQuerys = ctx.get_request().get_querys();
         let page_size: Option<i32> = querys
@@ -192,12 +196,13 @@ impl ServerHook for ListRunsRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for GetRunRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
@@ -206,7 +211,7 @@ impl ServerHook for GetRunRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let querys: &RequestQuerys = ctx.get_request().get_querys();
         let id: i32 = match querys.get("id").and_then(|s: &String| s.parse().ok()) {
             Some(id) => id,
@@ -216,7 +221,7 @@ impl ServerHook for GetRunRoute {
                     "Missing or invalid id parameter",
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match CicdService::get_run_by_id(id).await {
@@ -237,12 +242,13 @@ impl ServerHook for GetRunRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for GetRunDetailRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
@@ -251,7 +257,7 @@ impl ServerHook for GetRunDetailRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let id: i32 = match ctx
             .get_request()
             .get_querys()
@@ -265,7 +271,7 @@ impl ServerHook for GetRunDetailRoute {
                     "Missing or invalid id parameter",
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match CicdService::get_run_detail(id).await {
@@ -286,29 +292,30 @@ impl ServerHook for GetRunDetailRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for UpdateJobRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(
-        post_method,
+        is_post_method,
         request_body_json_result(param: UpdateJobStatusParam),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let param: UpdateJobStatusParam = match param {
             Ok(data) => data,
             Err(error) => {
                 let response: ApiResponse<String> =
                     ApiResponse::new(ApiResponseStatus::InvalidRequest, error.to_string());
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match CicdService::update_job_status(param).await {
@@ -326,29 +333,30 @@ impl ServerHook for UpdateJobRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for UpdateStepRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(
-        post_method,
+        is_post_method,
         request_body_json_result(param: UpdateStepStatusParam),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let param: UpdateStepStatusParam = match param {
             Ok(data) => data,
             Err(error) => {
                 let response: ApiResponse<String> =
                     ApiResponse::new(ApiResponseStatus::InvalidRequest, error.to_string());
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match CicdService::update_step_status(param).await {
@@ -366,12 +374,13 @@ impl ServerHook for UpdateStepRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for GetIncrementalRunDetailRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
@@ -380,7 +389,7 @@ impl ServerHook for GetIncrementalRunDetailRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let querys: &RequestQuerys = ctx.get_request().get_querys();
         let run_id: i32 = match querys.get("run_id").and_then(|s: &String| s.parse().ok()) {
             Some(id) => id,
@@ -390,7 +399,7 @@ impl ServerHook for GetIncrementalRunDetailRoute {
                     "Missing or invalid run_id parameter",
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         let step_offsets: Vec<StepOffsetParam> = match querys.get("offsets") {
@@ -417,12 +426,13 @@ impl ServerHook for GetIncrementalRunDetailRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for CicdViewRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
@@ -432,12 +442,14 @@ impl ServerHook for CicdViewRoute {
         response_header(LOCATION => "/static/cicd/index.html")
     )]
     #[instrument_trace]
-    async fn handle(self, _ctx: &mut Context) {}
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
+        Status::Continue
+    }
 }
 
 impl ServerHook for RunLogsSseRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
@@ -448,7 +460,7 @@ impl ServerHook for RunLogsSseRoute {
         response_header(CONNECTION => KEEP_ALIVE)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
         let querys: &RequestQuerys = ctx.get_request().get_querys();
         let run_id: i32 = match querys.get("run_id").and_then(|s: &String| s.parse().ok()) {
             Some(id) => id,
@@ -458,10 +470,10 @@ impl ServerHook for RunLogsSseRoute {
                     "Missing or invalid run_id parameter",
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
-        ctx.send().await;
+        let _: Result<(), ResponseError> = stream.try_send(ctx.get_mut_response().build()).await;
         let log_manager: &LogStreamManager = get_log_stream_manager();
         let mut step_ids: Vec<i32> = log_manager.get_run_step_ids(run_id).await;
         if step_ids.is_empty() {
@@ -472,9 +484,10 @@ impl ServerHook for RunLogsSseRoute {
                     "event: complete\ndata: {{\"run_id\":{run_id},\"reason\":\"no_active_streams\"}}{HTTP_DOUBLE_BR}"
                 );
                 ctx.get_mut_response().set_body(&completion_event);
-                ctx.send_body().await;
-                ctx.set_closed(true);
-                return;
+                let _: Result<(), ResponseError> =
+                    stream.try_send(ctx.get_mut_response().build()).await;
+                stream.set_closed(true);
+                return Status::Reject;
             }
         }
         let mut receivers: Vec<(i32, BroadcastMapReceiver<String>)> = vec![];
@@ -488,9 +501,10 @@ impl ServerHook for RunLogsSseRoute {
                 "event: complete\ndata: {{\"run_id\":{run_id},\"reason\":\"no_active_streams\"}}{HTTP_DOUBLE_BR}"
             );
             ctx.get_mut_response().set_body(&completion_event);
-            ctx.send_body().await;
-            ctx.set_closed(true);
-            return;
+            let _: Result<(), ResponseError> =
+                stream.try_send(ctx.get_mut_response().build()).await;
+            stream.set_closed(true);
+            return Status::Reject;
         }
         let timeout_duration: Duration = Duration::from_secs(3600);
         let start_time: Instant = Instant::now();
@@ -500,7 +514,8 @@ impl ServerHook for RunLogsSseRoute {
                     "event: complete\ndata: {{\"run_id\":{run_id},\"reason\":\"timeout\"}}{HTTP_DOUBLE_BR}"
                 );
                 ctx.get_mut_response().set_body(&timeout_event);
-                ctx.send_body().await;
+                let _: Result<(), ResponseError> =
+                    stream.try_send(ctx.get_mut_response().build()).await;
                 break;
             }
             let mut has_activity: bool = false;
@@ -517,7 +532,8 @@ impl ServerHook for RunLogsSseRoute {
                             HTTP_DOUBLE_BR
                         );
                         ctx.get_mut_response().set_body(&log_event);
-                        ctx.send_body().await;
+                        let _: Result<(), ResponseError> =
+                            stream.try_send(ctx.get_mut_response().build()).await;
                     }
                 }
             }
@@ -527,7 +543,8 @@ impl ServerHook for RunLogsSseRoute {
                     "event: complete\ndata: {{\"run_id\":{run_id},\"reason\":\"run_completed\"}}{HTTP_DOUBLE_BR}"
                 );
                 ctx.get_mut_response().set_body(&completion_event);
-                ctx.send_body().await;
+                let _: Result<(), ResponseError> =
+                    stream.try_send(ctx.get_mut_response().build()).await;
                 break;
             }
             for step_id in &current_step_ids {
@@ -542,7 +559,8 @@ impl ServerHook for RunLogsSseRoute {
                 sleep(Duration::from_millis(10)).await;
             }
         }
-        ctx.set_closed(true);
+        stream.set_closed(true);
+        Status::Reject
     }
 }
 

@@ -1780,9 +1780,9 @@ checksum = "8fd36b3951bc456af9972c285e9e0601415eaa9fc24085fa31835308a45a6e7b"
 
 [[package]]
 name = "http-type"
-version = "19.0.1"
+version = "20.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2dec2fef7d9a978edf6a16b9096e0f28dab6d8f99a66965df8794ddb59197248"
+checksum = "fa1a439d94482ff34c09a6aaa99abb3cee704844c98283f7422918fbd75b21d2"
 dependencies = [
  "hex",
  "http-compress",
@@ -1890,9 +1890,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane"
-version = "21.2.0"
+version = "21.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0cce96c9422fdc1d72d3359f58351baf31c8add3ec3ef57134272eae6b01d4ba"
+checksum = "fc6cc2ba9886b47c1d287c1ab04e51010bd6d902d67b4174958c1cd184f4453f"
 dependencies = [
  "http-type",
  "inventory",
@@ -1924,9 +1924,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-macros"
-version = "22.0.0"
+version = "23.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c1fa27da5cbe2754884b22208435fd2c21b4044df3f75d1ba633faae643c4859"
+checksum = "5da5127a1201b483d84bb4dadd5815a295c318fbec6787d62803b9a56d0254c1"
 dependencies = [
  "hyperlane",
  "proc-macro2",
@@ -1936,9 +1936,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-plugin-websocket"
-version = "14.0.3"
+version = "14.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5a008210ec5e872b432b9315a36f3f22a308f6678ca1d5fcac4686038632d725"
+checksum = "af72bd33a49a2e603d96d8972c3ccc73ec34071067b132e1dac9658fb6179c56"
 dependencies = [
  "hyperlane",
  "hyperlane-broadcast",
@@ -1965,9 +1965,9 @@ checksum = "1ace5921c9575f186d21ac72b5876e5f7dcc11b107f4a876f36fd78c15b522d9"
 
 [[package]]
 name = "hyperlane-utils"
-version = "32.0.0"
+version = "33.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "391e8940d21a0621e4f7dd9dc14c82c0f161a8843dac3e98b2502b1d081c7498"
+checksum = "faae9fbe4e49c4b266d00aaf55b721086f7b7820249e698d4b31ac197350a1c3"
 dependencies = [
  "aes 0.9.0",
  "ahash 0.8.12",

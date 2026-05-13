@@ -2,23 +2,25 @@ use super::*;
 
 impl ServerHook for SseRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(
         methods(get, post),
         response_body(EMPTY_STR),
-        response_header(CONTENT_TYPE => TEXT_EVENT_STREAM)
+        response_header(CONTENT_TYPE => TEXT_EVENT_STREAM),
+        try_send
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
-        ctx.send().await;
+    async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
         for i in 0..10 {
-            ctx.get_mut_response()
-                .set_body(format!("data:{i}{HTTP_DOUBLE_BR}"));
-            ctx.send_body().await;
+            let data: String = format!("data:{i}{HTTP_DOUBLE_BR}");
+            if stream.try_send(&data).await.is_err() {
+                break;
+            }
         }
-        ctx.set_closed(true);
+        stream.set_closed(true);
+        Status::Reject
     }
 }

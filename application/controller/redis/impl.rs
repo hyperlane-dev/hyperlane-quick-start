@@ -2,7 +2,7 @@ use super::*;
 
 impl ServerHook for ListRecordsRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
@@ -11,7 +11,7 @@ impl ServerHook for ListRecordsRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         match RedisService::get_all_redis_records().await {
             Ok(records) => {
                 let response: ApiResponse<Vec<RedisRecord>> =
@@ -24,29 +24,30 @@ impl ServerHook for ListRecordsRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for CreateRecordRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(
-        post_method,
+        is_post_method,
         request_body_json_result(record_opt: RedisRecord),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let record: RedisRecord = match record_opt {
             Ok(data) => data,
             Err(error) => {
                 let response: ApiResponse<String> =
                     ApiResponse::new(ApiResponseStatus::InvalidRequest, error.to_string());
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match RedisService::create_redis_record(record).await {
@@ -61,29 +62,30 @@ impl ServerHook for CreateRecordRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for UpdateRecordRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(
-        post_method,
+        is_post_method,
         request_body_json_result(record_opt: RedisRecord),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let record: RedisRecord = match record_opt {
             Ok(data) => data,
             Err(error) => {
                 let response: ApiResponse<String> =
                     ApiResponse::new(ApiResponseStatus::InvalidRequest, error.to_string());
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match RedisService::update_redis_record(record).await {
@@ -98,21 +100,22 @@ impl ServerHook for UpdateRecordRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for DeleteRecordRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(
-        post_method,
+        is_post_method,
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let querys: &RequestQuerys = ctx.get_request().get_querys();
         let key: &String = match querys.get("key") {
             Some(k) => k,
@@ -122,7 +125,7 @@ impl ServerHook for DeleteRecordRoute {
                     "Key parameter is required",
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match RedisService::delete_redis_record(key).await {
@@ -137,5 +140,6 @@ impl ServerHook for DeleteRecordRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }

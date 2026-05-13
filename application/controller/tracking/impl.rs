@@ -2,16 +2,16 @@ use super::*;
 
 impl ServerHook for TrackingReportRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(
-        post_method,
+        is_post_method,
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let body: RequestBody = ctx.get_request().get_body().clone();
         match TrackingService::save_tracking_record(ctx, &body).await {
             Ok(_) => {
@@ -25,21 +25,22 @@ impl ServerHook for TrackingReportRoute {
                     .set_body(error_response.to_json_bytes());
             }
         }
+        Status::Continue
     }
 }
 
 impl ServerHook for TrackingQueryRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(
-        post_method,
+        is_post_method,
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let body: &RequestBody = ctx.get_request().get_body();
         let request: TrackingQueryRequest = match serde_json::from_slice(body) {
             Ok(req) => req,
@@ -50,7 +51,7 @@ impl ServerHook for TrackingQueryRoute {
                 );
                 ctx.get_mut_response()
                     .set_body(error_response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match TrackingService::query_tracking_records(request).await {
@@ -66,5 +67,6 @@ impl ServerHook for TrackingQueryRoute {
                     .set_body(error_response.to_json_bytes());
             }
         }
+        Status::Continue
     }
 }

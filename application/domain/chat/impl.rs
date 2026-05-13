@@ -20,9 +20,9 @@ impl WebSocketReqData {
         self.get_type().is_ping()
     }
 
-    #[request_query_option("uuid" => uuid_opt)]
     #[instrument_trace]
-    pub async fn into_resp(&self, ctx: &mut Context) -> WebSocketRespData {
+    pub async fn into_resp(&self, _stream: &mut Stream, ctx: &mut Context) -> WebSocketRespData {
+        let uuid_opt: Option<RequestQuerysValue> = ctx.get_request().try_get_query("uuid");
         let uuid: String = uuid_opt.unwrap_or_default();
         let mut resp: WebSocketRespData = WebSocketRespData::default();
         resp.set_type(self.get_type())
@@ -34,9 +34,14 @@ impl WebSocketReqData {
 }
 
 impl WebSocketRespData {
-    #[request_query_option("uuid" => uuid_opt)]
     #[instrument_trace]
-    pub async fn from<T: ToString>(msg_type: MessageType, ctx: &mut Context, data: T) -> Self {
+    pub async fn from<T: ToString>(
+        msg_type: MessageType,
+        _stream: &mut Stream,
+        ctx: &mut Context,
+        data: T,
+    ) -> Self {
+        let uuid_opt: Option<RequestQuerysValue> = ctx.get_request().try_get_query("uuid");
         let uuid: String = uuid_opt.unwrap_or_default();
         let mut resp_data: Self = Self::default();
         resp_data
@@ -54,10 +59,11 @@ impl WebSocketRespData {
     #[instrument_trace]
     pub async fn get_json_data<T: ToString>(
         msg_type: MessageType,
+        stream: &mut Stream,
         ctx: &mut Context,
         data: T,
     ) -> serde_json::Result<ResponseBody> {
-        serde_json::to_vec(&WebSocketRespData::from(msg_type, ctx, data).await)
+        serde_json::to_vec(&WebSocketRespData::from(msg_type, stream, ctx, data).await)
     }
 }
 

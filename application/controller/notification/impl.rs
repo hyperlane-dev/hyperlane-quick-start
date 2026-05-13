@@ -2,24 +2,24 @@ use super::*;
 
 impl ServerHook for NotificationCreateRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(
-        post_method,
+        is_post_method,
         request_body_json_result(request_opt: CreateNotificationRequest),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let request: CreateNotificationRequest = match request_opt {
             Ok(data) => data,
             Err(error) => {
                 let response: ApiResponse<String> =
                     ApiResponse::new(ApiResponseStatus::InvalidRequest, error.to_string());
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
@@ -29,7 +29,7 @@ impl ServerHook for NotificationCreateRoute {
                     ApiResponse::new(ApiResponseStatus::Unauthorized, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match NotificationService::create_notification(current_user_id, request).await {
@@ -45,22 +45,23 @@ impl ServerHook for NotificationCreateRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for NotificationListRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[prologue_macros(get_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
+    #[prologue_macros(is_get_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
-    #[request_query_option("notification_type" => notification_type_opt)]
-    #[request_query_option("is_read" => is_read_opt)]
-    #[request_query_option("page" => page_opt)]
-    #[request_query_option("limit" => limit_opt)]
-    async fn handle(self, ctx: &mut Context) {
+    #[try_get_request_query("notification_type" => notification_type_opt)]
+    #[try_get_request_query("is_read" => is_read_opt)]
+    #[try_get_request_query("page" => page_opt)]
+    #[try_get_request_query("limit" => limit_opt)]
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
@@ -68,7 +69,7 @@ impl ServerHook for NotificationListRoute {
                     ApiResponse::new(ApiResponseStatus::Unauthorized, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         let mut query: NotificationListQueryRequest = NotificationListQueryRequest::default();
@@ -103,22 +104,23 @@ impl ServerHook for NotificationListRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for NotificationGetRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(
-        get_method,
-        route_param_option(ID_KEY => id_opt),
+        is_get_method,
+        try_get_route_param(ID_KEY => id_opt),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let notification_id: i32 = match id_opt {
             Some(id_str) => match AuthService::decode_id(&id_str) {
                 Ok(id) => id,
@@ -128,7 +130,7 @@ impl ServerHook for NotificationGetRoute {
                         "Invalid notification ID",
                     );
                     ctx.get_mut_response().set_body(response.to_json_bytes());
-                    return;
+                    return Status::Continue;
                 }
             },
             None => {
@@ -137,7 +139,7 @@ impl ServerHook for NotificationGetRoute {
                     "Notification ID is required",
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
@@ -147,7 +149,7 @@ impl ServerHook for NotificationGetRoute {
                     ApiResponse::new(ApiResponseStatus::Unauthorized, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match NotificationService::get_notification(notification_id, current_user_id).await {
@@ -170,22 +172,23 @@ impl ServerHook for NotificationGetRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for NotificationReadRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(
-        post_method,
-        route_param_option(ID_KEY => id_opt),
+        is_post_method,
+        try_get_route_param(ID_KEY => id_opt),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let notification_id: i32 = match id_opt {
             Some(id_str) => match AuthService::decode_id(&id_str) {
                 Ok(id) => id,
@@ -195,7 +198,7 @@ impl ServerHook for NotificationReadRoute {
                         "Invalid notification ID",
                     );
                     ctx.get_mut_response().set_body(response.to_json_bytes());
-                    return;
+                    return Status::Continue;
                 }
             },
             None => {
@@ -204,7 +207,7 @@ impl ServerHook for NotificationReadRoute {
                     "Notification ID is required",
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
@@ -214,7 +217,7 @@ impl ServerHook for NotificationReadRoute {
                     ApiResponse::new(ApiResponseStatus::Unauthorized, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match NotificationService::mark_as_read(notification_id, current_user_id).await {
@@ -230,18 +233,19 @@ impl ServerHook for NotificationReadRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for NotificationReadAllRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[prologue_macros(post_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
+    #[prologue_macros(is_post_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
@@ -249,7 +253,7 @@ impl ServerHook for NotificationReadAllRoute {
                     ApiResponse::new(ApiResponseStatus::Unauthorized, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match NotificationService::mark_all_as_read(current_user_id).await {
@@ -267,22 +271,23 @@ impl ServerHook for NotificationReadAllRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for NotificationDeleteRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(
-        post_method,
-        route_param_option(ID_KEY => id_opt),
+        is_post_method,
+        try_get_route_param(ID_KEY => id_opt),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let notification_id: i32 = match id_opt {
             Some(id_str) => match AuthService::decode_id(&id_str) {
                 Ok(id) => id,
@@ -292,7 +297,7 @@ impl ServerHook for NotificationDeleteRoute {
                         "Invalid notification ID",
                     );
                     ctx.get_mut_response().set_body(response.to_json_bytes());
-                    return;
+                    return Status::Continue;
                 }
             },
             None => {
@@ -301,7 +306,7 @@ impl ServerHook for NotificationDeleteRoute {
                     "Notification ID is required",
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
@@ -311,7 +316,7 @@ impl ServerHook for NotificationDeleteRoute {
                     ApiResponse::new(ApiResponseStatus::Unauthorized, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match NotificationService::delete_notification(notification_id, current_user_id).await {
@@ -329,18 +334,19 @@ impl ServerHook for NotificationDeleteRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for NotificationUnreadCountRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[prologue_macros(get_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
+    #[prologue_macros(is_get_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
@@ -348,7 +354,7 @@ impl ServerHook for NotificationUnreadCountRoute {
                     ApiResponse::new(ApiResponseStatus::Unauthorized, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match NotificationService::get_unread_count(current_user_id).await {
@@ -366,5 +372,6 @@ impl ServerHook for NotificationUnreadCountRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }

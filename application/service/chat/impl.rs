@@ -2,49 +2,50 @@ use super::*;
 
 impl ServerHook for ChatConnectedHook {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[request_query_option("uuid" => uuid_opt)]
+    #[try_get_request_query("uuid" => uuid_opt)]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
         let websocket: &WebSocket = get_global_websocket();
         let path: String = ctx.get_request().get_path().clone();
         let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
         let receiver_count: ReceiverCount = websocket.receiver_count(key.clone());
         let resp_data: ResponseBody =
-            ChatService::create_online_count_message(ctx, receiver_count.to_string()).await;
+            ChatService::create_online_count_message(stream, ctx, receiver_count.to_string()).await;
         ctx.get_mut_response().set_body(resp_data.clone());
         ChatService::broadcast_online_count(key, resp_data.clone());
         let uuid: String = uuid_opt.unwrap_or_default();
         if !uuid.is_empty() {
             ChatDomain::add_online_user(&uuid).await;
         }
+        Status::Continue
     }
 }
 
 impl ServerHook for ChatRequestHook {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[request_query_option("uuid" => uuid_opt)]
+    #[try_get_request_query("uuid" => uuid_opt)]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
         let request: &Request = ctx.get_request();
         let req_data: WebSocketReqData = match request.try_get_body_json() {
             Ok(data) => data,
             Err(error) => {
                 ctx.get_mut_response().set_body(error.to_string());
-                return;
+                return Status::Continue;
             }
         };
-        if ChatService::handle_ping_request(ctx, &req_data).await {
-            return;
+        if ChatService::handle_ping_request(stream, ctx, &req_data).await {
+            return Status::Continue;
         }
-        let resp_data: WebSocketRespData = req_data.into_resp(ctx).await;
+        let resp_data: WebSocketRespData = req_data.into_resp(stream, ctx).await;
         let resp_data: ResponseBody = serde_json::to_vec(&resp_data).unwrap();
         ctx.get_mut_response().set_body(&resp_data);
         let uuid: String = uuid_opt.unwrap_or_default();
@@ -55,9 +56,15 @@ impl ServerHook for ChatRequestHook {
                 let path: String = ctx_clone.get_request().get_path().clone();
                 let task_running_msg: String =
                     format!("{MENTION_PREFIX}{uuid}{SPACE}{TASK_IS_RUNNING}");
-                let system_resp_data: WebSocketRespData =
-                    WebSocketRespData::from(MessageType::System, &mut ctx_clone, task_running_msg)
-                        .await;
+                let uuid_opt: Option<RequestQuerysValue> =
+                    ctx_clone.get_request().try_get_query("uuid");
+                let uuid_clone: String = uuid_opt.unwrap_or_default();
+                let mut system_resp_data: WebSocketRespData = WebSocketRespData::default();
+                system_resp_data
+                    .set_type(MessageType::System)
+                    .set_name(uuid_clone)
+                    .set_data(task_running_msg)
+                    .set_time(Utc::now().timestamp_millis());
                 let websocket: &WebSocket = get_global_websocket();
                 let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
                 let system_resp_json: ResponseBody =
@@ -67,18 +74,19 @@ impl ServerHook for ChatRequestHook {
                 ChatService::process_gpt_request(uuid, req_msg, &mut ctx_clone).await;
             });
         }
+        Status::Continue
     }
 }
 
 impl ServerHook for ChatSendedHook {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[request_query_option("uuid" => uuid_opt)]
+    #[try_get_request_query("uuid" => uuid_opt)]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
         let request: String = get_request_json(ctx).await;
         let response: String = get_response_json(ctx).await;
         info!("{request}{BR}{response}");
@@ -89,23 +97,24 @@ impl ServerHook for ChatSendedHook {
                 MessageType::System | MessageType::OnlineCount
             )
         {
-            ctx.set_aborted(true);
-            return;
+            stream.set_closed(true);
+            return Status::Reject;
         }
         let uuid: String = uuid_opt.unwrap_or_default();
         ChatService::save_message_from_response(&uuid, &response_body).await;
+        Status::Continue
     }
 }
 
 impl ServerHook for ChatClosedHook {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[request_query_option("uuid" => uuid_opt)]
+    #[try_get_request_query("uuid" => uuid_opt)]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
         let websocket: &WebSocket = get_global_websocket();
         let path: String = ctx.get_request().get_path().clone();
         let key: BroadcastType<String> = BroadcastType::PointToGroup(path.clone());
@@ -113,23 +122,20 @@ impl ServerHook for ChatClosedHook {
         let uuid: String = uuid_opt.unwrap_or_default();
         ChatDomain::remove_online_user(&uuid).await;
         let resp_data: ResponseBody =
-            ChatService::create_online_count_message(ctx, receiver_count.to_string()).await;
+            ChatService::create_online_count_message(stream, ctx, receiver_count.to_string()).await;
         ctx.get_mut_response().set_body(&resp_data);
+        Status::Continue
     }
 }
 
 impl ChatService {
     #[instrument_trace]
-    pub async fn pre_ws_upgrade(ctx: &mut Context) {
-        let mut socket_addr: String = String::new();
-        if let Some(stream) = ctx.try_get_stream().as_ref() {
-            socket_addr = stream
-                .read()
-                .await
-                .peer_addr()
-                .map(|data| data.to_string())
-                .unwrap_or_default();
-        }
+    pub async fn pre_ws_upgrade(stream: &mut Stream, ctx: &mut Context) {
+        let socket_addr: String = stream
+            .get_stream()
+            .peer_addr()
+            .map(|data| data.to_string())
+            .unwrap_or_default();
         let encode_addr: String = Encode::execute(CHARSETS, &socket_addr).unwrap_or_default();
         ctx.get_mut_response()
             .set_header(HEADER_X_CLIENT_ADDR, &encode_addr);
@@ -137,11 +143,12 @@ impl ChatService {
 
     #[instrument_trace]
     pub async fn create_online_count_message(
+        stream: &mut Stream,
         ctx: &mut Context,
         receiver_count: String,
     ) -> ResponseBody {
         let data: String = format!("{ONLINE_CONNECTIONS} {receiver_count}");
-        WebSocketRespData::get_json_data(MessageType::OnlineCount, ctx, data)
+        WebSocketRespData::get_json_data(MessageType::OnlineCount, stream, ctx, data)
             .await
             .unwrap()
     }
@@ -161,10 +168,14 @@ impl ChatService {
     }
 
     #[instrument_trace]
-    pub async fn handle_ping_request(ctx: &mut Context, req_data: &WebSocketReqData) -> bool {
+    pub async fn handle_ping_request(
+        stream: &mut Stream,
+        ctx: &mut Context,
+        req_data: &WebSocketReqData,
+    ) -> bool {
         if req_data.is_ping() {
             let resp_data: WebSocketRespData =
-                WebSocketRespData::from(MessageType::Pang, ctx, EMPTY_STR).await;
+                WebSocketRespData::from(MessageType::Pang, stream, ctx, EMPTY_STR).await;
             let resp_data: ResponseBody = serde_json::to_vec(&resp_data).unwrap();
             ctx.get_mut_response().set_body(&resp_data);
             return true;
@@ -217,8 +228,14 @@ impl ChatService {
                 }
             };
             if !response_content.is_empty() {
-                let gpt_resp_data: WebSocketRespData =
-                    WebSocketRespData::from(MessageType::GptResponse, ctx, &response_content).await;
+                let uuid_opt: Option<RequestQuerysValue> = ctx.get_request().try_get_query("uuid");
+                let uuid_ctx: String = uuid_opt.unwrap_or_default();
+                let mut gpt_resp_data: WebSocketRespData = WebSocketRespData::default();
+                gpt_resp_data
+                    .set_type(MessageType::GptResponse)
+                    .set_name(uuid_ctx)
+                    .set_data(response_content.clone())
+                    .set_time(Utc::now().timestamp_millis());
                 let gpt_resp_json: ResponseBody = serde_json::to_vec(&gpt_resp_data).unwrap();
                 let _: Result<Option<ReceiverCount>, SendError<Vec<u8>>> =
                     websocket.try_send(key.clone(), gpt_resp_json);
@@ -240,8 +257,12 @@ impl ChatService {
             if !should_continue {
                 let task_has_completed_msg: String =
                     format!("{MENTION_PREFIX}{uuid}{SPACE}{TASK_HAS_COMPLETED}");
-                let system_resp_data: WebSocketRespData =
-                    WebSocketRespData::from(MessageType::System, ctx, task_has_completed_msg).await;
+                let mut system_resp_data: WebSocketRespData = WebSocketRespData::default();
+                system_resp_data
+                    .set_type(MessageType::System)
+                    .set_name("System".to_string())
+                    .set_data(task_has_completed_msg)
+                    .set_time(Utc::now().timestamp_millis());
                 let system_resp_json: ResponseBody =
                     serde_json::to_vec(&system_resp_data).unwrap_or_default();
                 let _: Result<Option<ReceiverCount>, SendError<Vec<u8>>> =

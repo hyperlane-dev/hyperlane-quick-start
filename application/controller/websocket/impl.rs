@@ -2,14 +2,14 @@ use super::*;
 
 impl ServerHook for WebSocketRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[prologue_macros(ws_upgrade_type, ws_from_stream(request))]
+    #[try_get_websocket_request(request)]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
-        match request.try_get_body_json() {
+    async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
+        match serde_json::from_slice(&request) {
             Ok(request) => {
                 match WebSocketService::get_response_body(&request) {
                     Ok(response) => ctx.get_mut_response().set_body(&response),
@@ -20,8 +20,8 @@ impl ServerHook for WebSocketRoute {
                 ctx.get_mut_response().set_body(error.to_string());
             }
         };
-        if try_send_body_hook(ctx).await.is_err() {
-            return;
+        if try_send_body_hook(stream, ctx).await.is_err() {
+            return Status::Reject;
         }
     }
 }

@@ -2,7 +2,7 @@ use super::*;
 
 impl ServerHook for OpenApiViewRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
@@ -11,10 +11,11 @@ impl ServerHook for OpenApiViewRoute {
         response_header(CONTENT_TYPE => TEXT_HTML)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         SwaggerUi::new("/openapi/{file}").url("/openapi/openapi.json", ApiDoc::openapi());
         let res: String =
             RapiDoc::with_openapi("/openapi/openapi.json", ApiDoc::openapi()).to_html();
         ctx.get_mut_response().set_body(&res);
+        Status::Continue
     }
 }

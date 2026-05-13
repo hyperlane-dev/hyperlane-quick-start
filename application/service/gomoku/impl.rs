@@ -65,16 +65,16 @@ impl Default for RoomBroadcastManager {
 
 impl ServerHook for GomokuConnectedHook {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[request_query_option("uuid" => uuid_opt)]
+    #[try_get_request_query("uuid" => uuid_opt)]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let uuid: String = uuid_opt.unwrap_or_default();
         if uuid.is_empty() {
-            return;
+            return Status::Continue;
         }
         if let Some(room_id) = GomokuRoomMapper::get_user_room(&uuid).await {
             let manager: &RoomBroadcastManager = get_room_broadcast_manager();
@@ -91,22 +91,23 @@ impl ServerHook for GomokuConnectedHook {
                 ctx.get_mut_response().set_body(&resp_body);
             }
         }
+        Status::Continue
     }
 }
 
 impl ServerHook for GomokuRequestHook {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[request_query_option("uid" => uid_opt)]
+    #[try_get_request_query("uid" => uid_opt)]
     #[request_body_json_result(req_data_res: GomokuWsRequest)]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
         let req_data: GomokuWsRequest = req_data_res.unwrap();
-        if GomokuWebSocketService::handle_ping_request(ctx, &req_data).await {
-            return;
+        if GomokuWebSocketService::handle_ping_request(stream, ctx, &req_data).await {
+            return Status::Continue;
         }
         let uid: String = uid_opt.unwrap_or_default();
         match GomokuWebSocketService::handle_request(ctx, &req_data, &uid).await {
@@ -122,42 +123,50 @@ impl ServerHook for GomokuRequestHook {
                 ctx.get_mut_response().set_body(&resp_body);
             }
         }
+        Status::Continue
     }
 }
 
 impl ServerHook for GomokuSendedHook {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[instrument_trace]
-    async fn handle(self, _ctx: &mut Context) {}
+    async fn handle(self, _stream: &mut Stream, _: &mut Context) -> Status {
+        Status::Continue
+    }
 }
 
 impl ServerHook for GomokuClosedHook {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[request_query_option("uid" => uid_opt)]
+    #[try_get_request_query("uid" => uid_opt)]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let uid: String = uid_opt.unwrap_or_default();
         if uid.is_empty() {
-            return;
+            return Status::Continue;
         }
         let manager: &RoomBroadcastManager = get_room_broadcast_manager();
         manager.unsubscribe_user(&uid).await;
         trace!("User {uid} disconnected, unsubscribed from WebSocket only");
+        Status::Continue
     }
 }
 
 impl GomokuWebSocketService {
-    #[request_query_option("uid" => uid_opt)]
+    #[try_get_request_query("uid" => uid_opt)]
     #[instrument_trace]
-    pub async fn handle_ping_request(ctx: &mut Context, req_data: &GomokuWsRequest) -> bool {
+    pub async fn handle_ping_request(
+        _stream: &mut Stream,
+        ctx: &mut Context,
+        req_data: &GomokuWsRequest,
+    ) -> bool {
         if req_data.get_type() == &GomokuMessageType::Ping {
             let uid: String = uid_opt.unwrap_or_default();
             let resp_body: ResponseBody = Self::build_response_body(
@@ -175,7 +184,7 @@ impl GomokuWebSocketService {
 
     #[instrument_trace]
     pub async fn handle_request(
-        _ctx: &mut Context,
+        _: &mut Context,
         req_data: &GomokuWsRequest,
         sender_id: &str,
     ) -> Result<(ResponseBody, String), String> {

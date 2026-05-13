@@ -129,7 +129,6 @@ impl MonitorService {
         Some(stats)
     }
 
-    #[response_header(CONTENT_TYPE => APPLICATION_JSON)]
     #[instrument_trace]
     pub async fn get_network_capture_data(ctx: &mut Context) {
         let response_data: NetworkStats = get_network_stats().await.unwrap_or_default();

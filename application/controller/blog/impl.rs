@@ -2,24 +2,24 @@ use super::*;
 
 impl ServerHook for BlogPostCreateRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(
-        post_method,
+        is_post_method,
         request_body_json_result(request_opt: CreateBlogPostRequest),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let request: CreateBlogPostRequest = match request_opt {
             Ok(data) => data,
             Err(error) => {
                 let response: ApiResponse<String> =
                     ApiResponse::new(ApiResponseStatus::InvalidRequest, error.to_string());
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
@@ -29,7 +29,7 @@ impl ServerHook for BlogPostCreateRoute {
                     ApiResponse::new(ApiResponseStatus::Unauthorized, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match BlogService::create_post(current_user_id, request).await {
@@ -45,23 +45,24 @@ impl ServerHook for BlogPostCreateRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for BlogPostUpdateRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(
-        post_method,
-        route_param_option(ID_KEY => id_opt),
+        is_post_method,
+        try_get_route_param(ID_KEY => id_opt),
         request_body_json_result(request_opt: UpdateBlogPostRequest),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let post_id: i32 = match id_opt {
             Some(id_str) => match AuthService::decode_id(&id_str) {
                 Ok(id) => id,
@@ -69,14 +70,14 @@ impl ServerHook for BlogPostUpdateRoute {
                     let response: ApiResponse<&str> =
                         ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid post ID");
                     ctx.get_mut_response().set_body(response.to_json_bytes());
-                    return;
+                    return Status::Continue;
                 }
             },
             None => {
                 let response: ApiResponse<&str> =
                     ApiResponse::new(ApiResponseStatus::InvalidRequest, "Post ID is required");
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         let request: UpdateBlogPostRequest = match request_opt {
@@ -85,7 +86,7 @@ impl ServerHook for BlogPostUpdateRoute {
                 let response: ApiResponse<String> =
                     ApiResponse::new(ApiResponseStatus::InvalidRequest, error.to_string());
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
@@ -95,7 +96,7 @@ impl ServerHook for BlogPostUpdateRoute {
                     ApiResponse::new(ApiResponseStatus::Unauthorized, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match BlogService::update_post(post_id, current_user_id, request).await {
@@ -111,22 +112,23 @@ impl ServerHook for BlogPostUpdateRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for BlogPostDeleteRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(
-        post_method,
-        route_param_option(ID_KEY => id_opt),
+        is_post_method,
+        try_get_route_param(ID_KEY => id_opt),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let post_id: i32 = match id_opt {
             Some(id_str) => match AuthService::decode_id(&id_str) {
                 Ok(id) => id,
@@ -134,14 +136,14 @@ impl ServerHook for BlogPostDeleteRoute {
                     let response: ApiResponse<&str> =
                         ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid post ID");
                     ctx.get_mut_response().set_body(response.to_json_bytes());
-                    return;
+                    return Status::Continue;
                 }
             },
             None => {
                 let response: ApiResponse<&str> =
                     ApiResponse::new(ApiResponseStatus::InvalidRequest, "Post ID is required");
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
@@ -151,7 +153,7 @@ impl ServerHook for BlogPostDeleteRoute {
                     ApiResponse::new(ApiResponseStatus::Unauthorized, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match BlogService::delete_post(post_id, current_user_id).await {
@@ -167,22 +169,23 @@ impl ServerHook for BlogPostDeleteRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for BlogPostGetRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(
-        get_method,
-        route_param_option(ID_KEY => id_opt),
+        is_get_method,
+        try_get_route_param(ID_KEY => id_opt),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let post_id: i32 = match id_opt {
             Some(id_str) => match AuthService::decode_id(&id_str) {
                 Ok(id) => id,
@@ -190,14 +193,14 @@ impl ServerHook for BlogPostGetRoute {
                     let response: ApiResponse<&str> =
                         ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid post ID");
                     ctx.get_mut_response().set_body(response.to_json_bytes());
-                    return;
+                    return Status::Continue;
                 }
             },
             None => {
                 let response: ApiResponse<&str> =
                     ApiResponse::new(ApiResponseStatus::InvalidRequest, "Post ID is required");
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         let current_user_id: Option<i32> = AuthService::extract_user_from_cookie(ctx).ok();
@@ -219,22 +222,23 @@ impl ServerHook for BlogPostGetRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for BlogPostListRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[prologue_macros(get_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
+    #[prologue_macros(is_get_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
-    #[request_query_option("keyword" => keyword_opt)]
-    #[request_query_option("is_published" => is_published_opt)]
-    #[request_query_option("page" => page_opt)]
-    #[request_query_option("limit" => limit_opt)]
-    async fn handle(self, ctx: &mut Context) {
+    #[try_get_request_query("keyword" => keyword_opt)]
+    #[try_get_request_query("is_published" => is_published_opt)]
+    #[try_get_request_query("page" => page_opt)]
+    #[try_get_request_query("limit" => limit_opt)]
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let current_user_id: Option<i32> = AuthService::extract_user_from_cookie(ctx).ok();
         let mut query: BlogPostListQueryRequest = BlogPostListQueryRequest::default();
         if let Some(keyword) = keyword_opt {
@@ -268,21 +272,22 @@ impl ServerHook for BlogPostListRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for BlogPostMyListRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[prologue_macros(get_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
+    #[prologue_macros(is_get_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
-    #[request_query_option("keyword" => keyword_opt)]
-    #[request_query_option("page" => page_opt)]
-    #[request_query_option("limit" => limit_opt)]
-    async fn handle(self, ctx: &mut Context) {
+    #[try_get_request_query("keyword" => keyword_opt)]
+    #[try_get_request_query("page" => page_opt)]
+    #[try_get_request_query("limit" => limit_opt)]
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
@@ -290,7 +295,7 @@ impl ServerHook for BlogPostMyListRoute {
                     ApiResponse::new(ApiResponseStatus::Unauthorized, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         let mut query: BlogPostListQueryRequest = BlogPostListQueryRequest::default();
@@ -320,22 +325,23 @@ impl ServerHook for BlogPostMyListRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for BlogPostLikeRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(
-        post_method,
-        route_param_option(ID_KEY => id_opt),
+        is_post_method,
+        try_get_route_param(ID_KEY => id_opt),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let post_id: i32 = match id_opt {
             Some(id_str) => match AuthService::decode_id(&id_str) {
                 Ok(id) => id,
@@ -343,14 +349,14 @@ impl ServerHook for BlogPostLikeRoute {
                     let response: ApiResponse<&str> =
                         ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid post ID");
                     ctx.get_mut_response().set_body(response.to_json_bytes());
-                    return;
+                    return Status::Continue;
                 }
             },
             None => {
                 let response: ApiResponse<&str> =
                     ApiResponse::new(ApiResponseStatus::InvalidRequest, "Post ID is required");
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
@@ -360,7 +366,7 @@ impl ServerHook for BlogPostLikeRoute {
                     ApiResponse::new(ApiResponseStatus::Unauthorized, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match BlogService::toggle_like(post_id, current_user_id).await {
@@ -376,22 +382,23 @@ impl ServerHook for BlogPostLikeRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for BlogPostFavoriteRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(
-        post_method,
-        route_param_option(ID_KEY => id_opt),
+        is_post_method,
+        try_get_route_param(ID_KEY => id_opt),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let post_id: i32 = match id_opt {
             Some(id_str) => match AuthService::decode_id(&id_str) {
                 Ok(id) => id,
@@ -399,14 +406,14 @@ impl ServerHook for BlogPostFavoriteRoute {
                     let response: ApiResponse<&str> =
                         ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid post ID");
                     ctx.get_mut_response().set_body(response.to_json_bytes());
-                    return;
+                    return Status::Continue;
                 }
             },
             None => {
                 let response: ApiResponse<&str> =
                     ApiResponse::new(ApiResponseStatus::InvalidRequest, "Post ID is required");
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
@@ -416,7 +423,7 @@ impl ServerHook for BlogPostFavoriteRoute {
                     ApiResponse::new(ApiResponseStatus::Unauthorized, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match BlogService::toggle_favorite(post_id, current_user_id).await {
@@ -432,20 +439,21 @@ impl ServerHook for BlogPostFavoriteRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for BlogPostFavoriteListRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[prologue_macros(get_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
+    #[prologue_macros(is_get_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
-    #[request_query_option("page" => page_opt)]
-    #[request_query_option("limit" => limit_opt)]
-    async fn handle(self, ctx: &mut Context) {
+    #[try_get_request_query("page" => page_opt)]
+    #[try_get_request_query("limit" => limit_opt)]
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
@@ -453,7 +461,7 @@ impl ServerHook for BlogPostFavoriteListRoute {
                     ApiResponse::new(ApiResponseStatus::Unauthorized, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         let mut query: BlogPostListQueryRequest = BlogPostListQueryRequest::default();
@@ -480,29 +488,30 @@ impl ServerHook for BlogPostFavoriteListRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for BlogCommentCreateRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(
-        post_method,
+        is_post_method,
         request_body_json_result(request_opt: CreateBlogCommentRequest),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let request: CreateBlogCommentRequest = match request_opt {
             Ok(data) => data,
             Err(error) => {
                 let response: ApiResponse<String> =
                     ApiResponse::new(ApiResponseStatus::InvalidRequest, error.to_string());
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
@@ -512,7 +521,7 @@ impl ServerHook for BlogCommentCreateRoute {
                     ApiResponse::new(ApiResponseStatus::Unauthorized, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match BlogService::create_comment(current_user_id, request).await {
@@ -528,22 +537,23 @@ impl ServerHook for BlogCommentCreateRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for BlogCommentDeleteRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(
-        post_method,
-        route_param_option(ID_KEY => id_opt),
+        is_post_method,
+        try_get_route_param(ID_KEY => id_opt),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let comment_id: i32 = match id_opt {
             Some(id_str) => match AuthService::decode_id(&id_str) {
                 Ok(id) => id,
@@ -551,14 +561,14 @@ impl ServerHook for BlogCommentDeleteRoute {
                     let response: ApiResponse<&str> =
                         ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid comment ID");
                     ctx.get_mut_response().set_body(response.to_json_bytes());
-                    return;
+                    return Status::Continue;
                 }
             },
             None => {
                 let response: ApiResponse<&str> =
                     ApiResponse::new(ApiResponseStatus::InvalidRequest, "Comment ID is required");
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
@@ -568,7 +578,7 @@ impl ServerHook for BlogCommentDeleteRoute {
                     ApiResponse::new(ApiResponseStatus::Unauthorized, error.clone());
                 response.set_message(&error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match BlogService::delete_comment(comment_id, current_user_id).await {
@@ -584,21 +594,22 @@ impl ServerHook for BlogCommentDeleteRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for BlogCommentListRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[prologue_macros(get_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
+    #[prologue_macros(is_get_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
-    #[request_query_option("post_id" => post_id_opt)]
-    #[request_query_option("page" => page_opt)]
-    #[request_query_option("limit" => limit_opt)]
-    async fn handle(self, ctx: &mut Context) {
+    #[try_get_request_query("post_id" => post_id_opt)]
+    #[try_get_request_query("page" => page_opt)]
+    #[try_get_request_query("limit" => limit_opt)]
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let mut query: BlogCommentListQueryRequest = BlogCommentListQueryRequest::default();
         match post_id_opt {
             Some(post_id) => query.set_post_id(post_id),
@@ -606,7 +617,7 @@ impl ServerHook for BlogCommentListRoute {
                 let response: ApiResponse<&str> =
                     ApiResponse::new(ApiResponseStatus::InvalidRequest, "Post ID is required");
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         if let Some(page_str) = page_opt
@@ -632,31 +643,29 @@ impl ServerHook for BlogCommentListRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
+        Status::Continue
     }
 }
 
 impl ServerHook for BlogImageUploadRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[prologue_macros(
-        post_method,
-        request_header_option(X_FILE_NAME => file_name_opt),
-        request_header_option(X_ORIGINAL_NAME => original_name_opt),
-        request_header_option(X_MIME_TYPE => mime_type_opt),
-        response_header(CONTENT_TYPE => APPLICATION_JSON)
-    )]
+    #[prologue_macros(is_post_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
+    #[try_get_request_header(X_FILE_NAME => file_name_opt)]
+    #[try_get_request_header(X_ORIGINAL_NAME => original_name_opt)]
+    #[try_get_request_header(X_MIME_TYPE => mime_type_opt)]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
                 let response: ApiResponse<String> =
                     ApiResponse::new(ApiResponseStatus::Unauthorized, error);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         let file_name: String = match file_name_opt {
@@ -667,7 +676,7 @@ impl ServerHook for BlogImageUploadRoute {
                     "Missing X-File-Name header",
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         let mime_type: String = match mime_type_opt {
@@ -678,7 +687,7 @@ impl ServerHook for BlogImageUploadRoute {
                     "Missing X-Mime-Type header",
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         let file_data: Vec<u8> = ctx.get_request().get_body().clone();
@@ -705,18 +714,19 @@ impl ServerHook for BlogImageUploadRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes());
             }
         }
+        Status::Continue
     }
 }
 
 impl ServerHook for BlogImageDownloadRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
-    #[prologue_macros(get_method, route_param_option(ID_KEY => id_opt))]
+    #[prologue_macros(is_get_method, try_get_route_param(ID_KEY => id_opt))]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let image_id: i32 = match id_opt {
             Some(id_str) => match AuthService::decode_id(&id_str) {
                 Ok(id) => id,
@@ -724,14 +734,14 @@ impl ServerHook for BlogImageDownloadRoute {
                     let response: ApiResponse<&str> =
                         ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid image ID");
                     ctx.get_mut_response().set_body(response.to_json_bytes());
-                    return;
+                    return Status::Continue;
                 }
             },
             None => {
                 let response: ApiResponse<&str> =
                     ApiResponse::new(ApiResponseStatus::InvalidRequest, "Image ID is required");
                 ctx.get_mut_response().set_body(response.to_json_bytes());
-                return;
+                return Status::Continue;
             }
         };
         match BlogService::get_image_data(image_id).await {
@@ -762,5 +772,6 @@ impl ServerHook for BlogImageDownloadRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes());
             }
         };
+        Status::Continue
     }
 }

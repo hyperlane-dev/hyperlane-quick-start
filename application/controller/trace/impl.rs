@@ -2,22 +2,23 @@ use super::*;
 
 impl ServerHook for TraceRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(
-        get_method,
+        is_get_method,
         response_header(CONTENT_TYPE => ContentType::format_content_type_with_charset(TEXT_PLAIN, UTF8)),
-        route_param_option("trace" => trace_opt)
+        try_get_route_param("trace" => trace_opt)
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let trace: String = trace_opt.unwrap_or_default();
         let decoded_trace: String = decode(&trace)
             .unwrap_or_else(|_| trace.clone().into())
             .into_owned();
         let result: String = TraceService::search_trace(&decoded_trace).await;
         ctx.get_mut_response().set_body(&result);
+        Status::Continue
     }
 }

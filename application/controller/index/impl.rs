@@ -2,7 +2,7 @@ use super::*;
 
 impl ServerHook for IndexRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
@@ -12,5 +12,7 @@ impl ServerHook for IndexRoute {
       response_header(LOCATION => "https://docs.ltpp.vip/")
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {}
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
+        Status::Continue
+    }
 }

@@ -2,7 +2,7 @@ use super::*;
 
 impl ServerHook for UploadViewRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
@@ -12,23 +12,25 @@ impl ServerHook for UploadViewRoute {
         response_header(LOCATION => "/static/upload/index.html")
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {}
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
+        Status::Continue
+    }
 }
 
 impl ServerHook for UploadFileRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(
         methods(get),
-        route_param_option(UPLOAD_DIR_KEY => dir_opt),
-        route_param_option(UPLOAD_FILE_KEY => file_opt),
-        request_header_option(RANGE => range_header_opt)
+        try_get_route_param(UPLOAD_DIR_KEY => dir_opt),
+        try_get_route_param(UPLOAD_FILE_KEY => file_opt),
     )]
+    #[try_get_request_header(RANGE => range_header_opt)]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let dir: String = dir_opt.unwrap_or_default();
         let file: String = file_opt.unwrap_or_default();
         let has_range_request: bool = range_header_opt.is_some();
@@ -69,5 +71,6 @@ impl ServerHook for UploadFileRoute {
                     );
             }
         }
+        Status::Continue
     }
 }

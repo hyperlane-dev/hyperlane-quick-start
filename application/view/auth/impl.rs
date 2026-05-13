@@ -2,13 +2,13 @@ use super::*;
 
 impl ServerHook for AuthViewRoute {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(methods(get, post))]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let querys: &RequestQuerys = ctx.get_request().get_querys();
         let location_target: String = querys
             .get(LOCATION)
@@ -24,5 +24,6 @@ impl ServerHook for AuthViewRoute {
         ctx.get_mut_response()
             .set_status_code(302)
             .set_header(LOCATION, &location);
+        Status::Continue
     }
 }
