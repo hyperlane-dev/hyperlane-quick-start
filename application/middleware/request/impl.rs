@@ -2,7 +2,7 @@ use super::*;
 
 impl ServerHook for HttpRequestMiddleware {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_stream: &mut Stream, _ctx: &mut Context) -> Self {
         Self
     }
 
@@ -11,14 +11,15 @@ impl ServerHook for HttpRequestMiddleware {
         send,
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
-        ctx.set_closed(true);
+    async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
+        stream.set_closed(true);
+        Status::Continue
     }
 }
 
 impl ServerHook for CrossMiddleware {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_stream: &mut Stream, _ctx: &mut Context) -> Self {
         Self
     }
 
@@ -27,12 +28,14 @@ impl ServerHook for CrossMiddleware {
     #[response_header(ACCESS_CONTROL_ALLOW_METHODS => ALL_METHODS)]
     #[response_header(ACCESS_CONTROL_ALLOW_HEADERS => WILDCARD_ANY)]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {}
+    async fn handle(self, _stream: &mut Stream, _ctx: &mut Context) -> Status {
+        Status::Continue
+    }
 }
 
 impl ServerHook for ResponseHeaderMiddleware {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_stream: &mut Stream, _ctx: &mut Context) -> Self {
         Self
     }
 
@@ -42,25 +45,28 @@ impl ServerHook for ResponseHeaderMiddleware {
     #[response_header(TRACE => uuid::Uuid::new_v4().to_string())]
     #[epilogue_macros(response_header(CONTENT_TYPE => content_type))]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
+    async fn handle(self, _stream: &mut Stream, _ctx: &mut Context) -> Status {
         let content_type: String = ContentType::format_content_type_with_charset(TEXT_HTML, UTF8);
+        Status::Continue
     }
 }
 
 impl ServerHook for ResponseStatusCodeMiddleware {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_stream: &mut Stream, _ctx: &mut Context) -> Self {
         Self
     }
 
     #[response_status_code(200)]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {}
+    async fn handle(self, _stream: &mut Stream, _ctx: &mut Context) -> Status {
+        Status::Continue
+    }
 }
 
 impl ServerHook for OptionMethodMiddleware {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_stream: &mut Stream, _ctx: &mut Context) -> Self {
         Self
     }
 
@@ -69,14 +75,14 @@ impl ServerHook for OptionMethodMiddleware {
         send
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {
-        ctx.set_aborted(true);
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
+        Status::Reject
     }
 }
 
 impl ServerHook for UpgradeMiddleware {
     #[instrument_trace]
-    async fn new(_ctx: &mut Context) -> Self {
+    async fn new(_stream: &mut Stream, _ctx: &mut Context) -> Self {
         Self
     }
 
@@ -91,5 +97,7 @@ impl ServerHook for UpgradeMiddleware {
         send
     )]
     #[instrument_trace]
-    async fn handle(self, ctx: &mut Context) {}
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
+        Status::Continue
+    }
 }
