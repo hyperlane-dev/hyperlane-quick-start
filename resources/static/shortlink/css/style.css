@@ -211,13 +211,22 @@ button,
 
 .shortlink-value {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   gap: 12px;
 }
 
-.shortlink-value hl-button {
-  width: auto;
+.shortlink-value > hyperlane-button {
   flex-shrink: 0;
+  width: auto !important;
+  min-width: 0 !important;
+  height: auto !important;
+}
+
+.shortlink-value > hyperlane-button::part(button) {
+  width: auto;
+  min-width: 44px;
+  height: 100%;
+  border-radius: 8px;
 }
 
 .shortlink-text {
@@ -471,21 +480,32 @@ button,
   }
 
   .actions {
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: nowrap;
   }
 
-  .open-btn,
-  .new-link-btn {
+  .actions > hyperlane-button {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .actions > hyperlane-button::part(button) {
     width: 100%;
+    padding: 12px 16px;
+    font-size: 0.9rem;
   }
 
   .shortlink-value {
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: nowrap;
     align-items: stretch;
   }
 
-  .copy-btn {
-    align-self: flex-end;
+  .shortlink-value > hyperlane-button {
+    flex-shrink: 0;
+    width: auto !important;
+    min-width: 0 !important;
+    height: auto !important;
   }
 }
 

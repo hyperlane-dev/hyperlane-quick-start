@@ -291,16 +291,21 @@ const ShortlinkApp = {
     if (form) {
       form.reset();
     }
-
+    const urlInput = document.getElementById('urlInput');
+    if (urlInput) {
+      urlInput.value = '';
+      const nativeInput = urlInput.shadowRoot?.querySelector('input');
+      if (nativeInput) {
+        nativeInput.value = '';
+        nativeInput.setCustomValidity('');
+      }
+    }
     this.currentShortlinkId = null;
-
     this.showElement('shortlinkForm');
     this.hideElement('resultContainer');
     this.hideElement('errorContainer');
     const loadingContainer = document.getElementById('loadingContainer');
     if (loadingContainer) loadingContainer.removeAttribute('visible');
-
-    const urlInput = document.getElementById('urlInput');
     if (urlInput) {
       urlInput.focus();
     }
