@@ -245,42 +245,15 @@ const ShortlinkApp = {
     }
   },
 
-  openShortlink: async function () {
+  openShortlink: function () {
     if (!this.currentShortlinkId) {
       this.showToast('No shortlink to open', 'error');
       return;
     }
-
-    const requestKey = 'open_shortlink';
-    if (this.requestManager.isPending(requestKey)) {
-      return;
-    }
-
     const shortlinkUrl = this.api.query(this.currentShortlinkId);
-
     try {
-      const response = await this.requestManager.fetch(
-        requestKey,
-        shortlinkUrl,
-      );
-      const result = await response.json();
-      if (result.code === 200 && result.data && result.data.url) {
-        window.open(result.data.url, '_blank');
-      } else if (
-        HyperlaneErrorHandler.handleResponse(
-          result,
-          'Failed to retrieve original URL',
-          (msg, type) => this.showToast(msg, type),
-        )
-      ) {
-        return;
-      } else {
-        throw new Error('Failed to retrieve original URL');
-      }
+      window.open(shortlinkUrl, '_blank');
     } catch (error) {
-      if (error.message === 'Request aborted') {
-        return;
-      }
       console.error('Error opening shortlink:', error);
       this.showToast('Failed to open shortlink', 'error');
     }
