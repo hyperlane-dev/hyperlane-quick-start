@@ -92,6 +92,7 @@ use super::*;
         view::chat::openapi_chat_view,
         view::cicd::openapi_cicd_view,
         view::diff::openapi_diff_view,
+        view::euv::openapi_euv_view,
         view::favicon::openapi_favicon,
         view::gomoku::openapi_gomoku_view,
         view::monitor::openapi_monitor_view,

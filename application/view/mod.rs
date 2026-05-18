@@ -3,6 +3,7 @@ pub mod blog;
 pub mod chat;
 pub mod cicd;
 pub mod diff;
+pub mod euv;
 pub mod favicon;
 pub mod gomoku;
 pub mod monitor;
