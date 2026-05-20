@@ -1,15 +1,39 @@
 <!doctype html>
 <html>
   <head>
-    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>euv</title>
   </head>
   <body>
     <div id="app"></div>
   </body>
   <script type="module">
-    import init, { main } from './pkg/euv_example.js';
+    import init, { main } from './pkg/euv.js';
     await init();
     main();
+  </script>
+  <script>
+    (function () {
+      async function connect() {
+        try {
+          const res = await fetch('/__euv_reload');
+          const data = await res.json();
+          if (data.type === 'Reload') {
+            location.reload();
+          } else if (data.type === 'Error') {
+            console.error('[euv] build error:', data.message);
+            setTimeout(connect, 1000);
+          } else {
+            setTimeout(connect, 1000);
+          }
+        } catch (e) {
+          setTimeout(connect, 2000);
+        }
+      }
+      connect();
+    })();
   </script>
 </html>
