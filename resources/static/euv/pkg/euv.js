@@ -686,12 +686,12 @@ function __wbg_get_imports() {
         },
         __wbindgen_cast_0000000000000002: function(arg0, arg1) {
             // Cast intrinsic for `Closure(Closure { owned: true, function: Function { arguments: [NamedExternref("Event")], shim_idx: 26, ret: Unit, inner_ret: Some(Unit) }, mutable: true }) -> Externref`.
-            const ret = makeMutClosure(arg0, arg1, wasm_bindgen__convert__closures_____invoke__hb920bee5c4f0db86);
+            const ret = makeMutClosure(arg0, arg1, wasm_bindgen__convert__closures_____invoke__he7a046e00acbcb63);
             return ret;
         },
         __wbindgen_cast_0000000000000003: function(arg0, arg1) {
             // Cast intrinsic for `Closure(Closure { owned: true, function: Function { arguments: [], shim_idx: 4, ret: Unit, inner_ret: Some(Unit) }, mutable: true }) -> Externref`.
-            const ret = makeMutClosure(arg0, arg1, wasm_bindgen__convert__closures_____invoke__h5ae96e0627fa240f);
+            const ret = makeMutClosure(arg0, arg1, wasm_bindgen__convert__closures_____invoke__h66abcaa5aeaaba19);
             return ret;
         },
         __wbindgen_cast_0000000000000004: function(arg0, arg1) {
@@ -715,12 +715,12 @@ function __wbg_get_imports() {
     };
 }
 
-function wasm_bindgen__convert__closures_____invoke__h5ae96e0627fa240f(arg0, arg1) {
-    wasm.wasm_bindgen__convert__closures_____invoke__h5ae96e0627fa240f(arg0, arg1);
+function wasm_bindgen__convert__closures_____invoke__h66abcaa5aeaaba19(arg0, arg1) {
+    wasm.wasm_bindgen__convert__closures_____invoke__h66abcaa5aeaaba19(arg0, arg1);
 }
 
-function wasm_bindgen__convert__closures_____invoke__hb920bee5c4f0db86(arg0, arg1, arg2) {
-    wasm.wasm_bindgen__convert__closures_____invoke__hb920bee5c4f0db86(arg0, arg1, arg2);
+function wasm_bindgen__convert__closures_____invoke__he7a046e00acbcb63(arg0, arg1, arg2) {
+    wasm.wasm_bindgen__convert__closures_____invoke__he7a046e00acbcb63(arg0, arg1, arg2);
 }
 
 function wasm_bindgen__convert__closures_____invoke__h976e37d46e347395(arg0, arg1, arg2) {
