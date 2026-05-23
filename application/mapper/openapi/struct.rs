@@ -95,7 +95,7 @@ use super::*;
         view::euv::openapi_euv_view,
         view::favicon::openapi_favicon,
         view::gomoku::openapi_gomoku_view,
-        view::json_editor::openapi_json_editor_view,
+        view::json::openapi_json_view,
         view::monitor::openapi_monitor_view,
         view::blog::openapi_blog_view,
         view::notification::openapi_notification_view,

@@ -1,5 +1,5 @@
 use super::*;
 
-#[route("/json_editor")]
+#[route("/json")]
 #[derive(Clone, Copy, Data, Debug, Default)]
 pub struct JsonEditorViewRoute;

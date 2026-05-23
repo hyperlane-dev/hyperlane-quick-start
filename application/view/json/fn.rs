@@ -2,7 +2,7 @@ use super::*;
 
 #[utoipa::path(
     get,
-    path = "/json_editor",
+    path = "/json",
     responses(
         (status = 200, description = "Success"),
         (status = 400, description = "Bad Request"),
@@ -11,4 +11,4 @@ use super::*;
     )
 )]
 #[instrument_trace]
-pub fn openapi_json_editor_view() {}
+pub fn openapi_json_view() {}

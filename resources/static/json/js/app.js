@@ -126,7 +126,6 @@
         if (childrenEl) {
           const expanded = childrenEl.classList.toggle('expanded');
           toggleEl.classList.toggle('expanded', expanded);
-          toggleEl.textContent = expanded ? '▼' : '▶';
         }
       });
     }
