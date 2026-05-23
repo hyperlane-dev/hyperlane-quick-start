@@ -6,6 +6,7 @@ pub mod diff;
 pub mod euv;
 pub mod favicon;
 pub mod gomoku;
+pub mod json_editor;
 pub mod monitor;
 pub mod notification;
 pub mod openapi;

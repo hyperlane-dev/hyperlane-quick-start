@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hyperlane - JSON Editor</title>
+    <link rel="icon" href="https://docs.ltpp.vip/img/hyperlane.png" />
+    <link href="../common/css/common.css" rel="stylesheet" />
+    <link href="./css/style.css" rel="stylesheet" />
+    <script src="../common/js/toast.js"></script>
+    <script src="./js/app.js" defer></script>
+  </head>
+  <body>
+    <div class="container">
+      <header class="app-header shimmer-header">
+        <div class="header-content">
+          <h1 class="app-title">
+            <a
+              href="https://github.com/hyperlane-dev/hyperlane"
+              target="_blank"
+            >
+              <img
+                src="https://docs.ltpp.vip/img/hyperlane.png"
+                alt=""
+                class="nav-logo"
+                onerror="this.style.display = 'none'"
+              />
+              <span class="text shimmer">Hyperlane JSON Editor</span>
+            </a>
+          </h1>
+          <p class="app-subtitle">
+            Parse, edit and format JSON with nested string deserialization
+          </p>
+        </div>
+      </header>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">输入包含转义 JSON 的字符串</span>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-label">原始 JSON（可直接编辑）</label>
+            <textarea
+              id="json-input"
+              class="form-textarea json-input"
+              rows="10"
+              placeholder="请输入 JSON 字符串..."
+            ></textarea>
+          </div>
+          <div class="input-actions">
+            <button id="btn-parse" class="btn btn-primary">解析</button>
+            <button id="btn-copy" class="btn btn-secondary">复制</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">字段结构</span>
+          <span id="top-field-count" class="field-count">0 个顶级字段</span>
+        </div>
+        <div class="card-body tree-card-body">
+          <div id="tree-root" class="tree-root"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="edit-modal" class="modal">
+      <div class="modal-content">
+        <button class="modal-close" id="modal-close-btn" aria-label="Close">
+          <span>&times;</span>
+        </button>
+        <div class="modal-title">编辑字段</div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">字段名</label>
+            <input
+              type="text"
+              id="edit-key"
+              class="form-input modal-input"
+              readonly
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">类型</label>
+            <input
+              type="text"
+              id="edit-type"
+              class="form-input modal-input"
+              readonly
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">值</label>
+            <textarea
+              id="edit-value"
+              class="form-textarea modal-textarea"
+              rows="6"
+            ></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="btn-cancel" class="btn btn-secondary">取消</button>
+          <button id="btn-save" class="btn btn-primary">保存</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
