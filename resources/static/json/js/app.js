@@ -162,7 +162,7 @@
 
     const editEl = document.createElement('span');
     editEl.className = 'tree-edit';
-    editEl.textContent = '编辑';
+    editEl.textContent = 'Edit';
     editEl.addEventListener('click', (e) => {
       e.stopPropagation();
       openEditModal(key, value, path, parentIsJsonString);
@@ -252,13 +252,13 @@
   function renderTree(data) {
     dom.treeRoot.innerHTML = '';
     if (data === null || typeof data !== 'object') {
-      dom.topFieldCount.textContent = '0 个顶级字段';
+      dom.topFieldCount.textContent = '0 top-level fields';
       return;
     }
     const entries = Array.isArray(data)
       ? data.map((v, i) => [String(i), v])
       : Object.entries(data);
-    dom.topFieldCount.textContent = `${entries.length} 个顶级字段`;
+    dom.topFieldCount.textContent = `${entries.length} top-level fields`;
     entries.forEach(([key, value]) => {
       const { node, children } = buildTreeNode(key, value, 0, [key], false);
       dom.treeRoot.appendChild(node);
@@ -511,13 +511,13 @@
       try {
         newValue = JSON.parse(rawValue);
       } catch (e) {
-        alert('Invalid JSON: ' + e.message);
+        Toast.error('Invalid JSON: ' + e.message);
         return;
       }
     } else if (typeStr === 'number') {
       newValue = Number(rawValue);
       if (Number.isNaN(newValue)) {
-        alert('Invalid number');
+        Toast.error('Invalid number');
         return;
       }
     } else if (typeStr === 'boolean') {
@@ -526,7 +526,7 @@
       } else if (rawValue.trim().toLowerCase() === 'false') {
         newValue = false;
       } else {
-        alert('Invalid boolean');
+        Toast.error('Invalid boolean');
         return;
       }
     } else if (typeStr === 'null') {
@@ -546,6 +546,7 @@
     dom.btnParse.addEventListener('click', () => {
       const raw = dom.jsonInput.value.trim();
       if (!raw) {
+        Toast.warning('JSON content cannot be empty');
         STATE.rootData = null;
         renderTree(null);
         return;
@@ -554,7 +555,7 @@
         STATE.rootData = JSON.parse(raw);
         renderTree(STATE.rootData);
       } catch (e) {
-        alert('JSON parse error: ' + e.message);
+        Toast.error('JSON parse error: ' + e.message);
       }
     });
 
@@ -567,13 +568,13 @@
         .writeText(text)
         .then(() => {
           const original = dom.btnCopy.textContent;
-          dom.btnCopy.textContent = '已复制';
+          dom.btnCopy.textContent = 'Copied';
           setTimeout(() => {
             dom.btnCopy.textContent = original;
           }, 1500);
         })
         .catch(() => {
-          alert('Copy failed');
+          Toast.error('Copy failed');
         });
     });
 
@@ -587,8 +588,8 @@
     });
 
     dom.jsonInput.value = '';
-    STATE.rootData = sample;
-    renderTree(sample);
+    STATE.rootData = '';
+    renderTree('');
   }
 
   document.addEventListener('DOMContentLoaded', init);

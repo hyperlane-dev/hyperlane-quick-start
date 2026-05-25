@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -36,29 +36,31 @@
 
       <div class="card">
         <div class="card-header">
-          <span class="card-title">输入包含转义 JSON 的字符串</span>
+          <span class="card-title">Enter JSON string with escaped content</span>
         </div>
         <div class="card-body">
           <div class="form-group">
-            <label class="form-label">原始 JSON（可直接编辑）</label>
+            <label class="form-label">Raw JSON (editable)</label>
             <textarea
               id="json-input"
               class="form-textarea json-input"
               rows="10"
-              placeholder="请输入 JSON 字符串..."
+              placeholder="Enter JSON string..."
             ></textarea>
           </div>
           <div class="input-actions">
-            <button id="btn-parse" class="btn btn-primary">解析</button>
-            <button id="btn-copy" class="btn btn-secondary">复制</button>
+            <button id="btn-parse" class="btn btn-primary">Parse</button>
+            <button id="btn-copy" class="btn btn-secondary">Copy</button>
           </div>
         </div>
       </div>
 
       <div class="card">
         <div class="card-header">
-          <span class="card-title">字段结构</span>
-          <span id="top-field-count" class="field-count">0 个顶级字段</span>
+          <span class="card-title">Field Structure</span>
+          <span id="top-field-count" class="field-count"
+            >0 top-level fields</span
+          >
         </div>
         <div class="card-body tree-card-body">
           <div id="tree-root" class="tree-root"></div>
@@ -71,10 +73,10 @@
         <button class="modal-close" id="modal-close-btn" aria-label="Close">
           <span>&times;</span>
         </button>
-        <div class="modal-title">编辑字段</div>
+        <div class="modal-title">Edit Field</div>
         <div class="modal-body">
           <div class="form-group">
-            <label class="form-label">字段名</label>
+            <label class="form-label">Key</label>
             <input
               type="text"
               id="edit-key"
@@ -83,7 +85,7 @@
             />
           </div>
           <div class="form-group">
-            <label class="form-label">类型</label>
+            <label class="form-label">Type</label>
             <input
               type="text"
               id="edit-type"
@@ -92,7 +94,7 @@
             />
           </div>
           <div class="form-group">
-            <label class="form-label">值</label>
+            <label class="form-label">Value</label>
             <textarea
               id="edit-value"
               class="form-textarea modal-textarea"
@@ -101,8 +103,8 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button id="btn-cancel" class="btn btn-secondary">取消</button>
-          <button id="btn-save" class="btn btn-primary">保存</button>
+          <button id="btn-cancel" class="btn btn-secondary">Cancel</button>
+          <button id="btn-save" class="btn btn-primary">Save</button>
         </div>
       </div>
     </div>
