@@ -45,6 +45,7 @@ impl ServerHook for StaticResourceRoute {
                     .set_body(&content)
                     .set_status_code(200)
                     .set_header(CONTENT_TYPE, content_type)
+                    .set_header(CONTENT_ENCODING, GZIP)
                     .set_header(CACHE_CONTROL, NO_CACHE_NO_STORE_MUST_REVALIDATE)
                     .set_header(PRAGMA, NO_CACHE)
                     .set_header(EXPIRES, EXPIRES_DISABLED);
