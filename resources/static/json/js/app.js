@@ -586,31 +586,7 @@
       }
     });
 
-    const sample = {
-      code: 0,
-      msg: '成功',
-      data: {
-        layout_info:
-          '{"vertical_space":8,"margin_left":8,"margin_right":8,"corner_radius":12,"padding_bottom":75}',
-        module_list: [
-          {
-            module_id: 'wm_order_confirm_action_bar',
-            template_id: 'waimai_order_confirm_action_bar_style_1',
-            template_ph_id: '',
-            data_type: 0,
-            json_data:
-              '{"address_type":3,"nested":"{\"deep_key\":\"deep_value\",\"deep_num\":42}"}',
-            data_id: 'tsp_order_preview_component_plan_navigation_v1',
-            render_mode: 'mach',
-            view_type: 'block',
-          },
-        ],
-        config:
-          '{"theme":"dark","settings":"{\\"fontSize\\":14,\\"autoSave\\":true,\\"nestedPref\\":\\"{\\\\\\"lang\\\\\\":\\\\\\"zh-CN\\\\\\",\\\\\\"timezone\\\\\\":\\\\\\"UTC+8\\\\\\"}\\"}"}',
-      },
-      traceid: '-1120726414353242186',
-    };
-    dom.jsonInput.value = JSON.stringify(sample, null, 2);
+    dom.jsonInput.value = '';
     STATE.rootData = sample;
     renderTree(sample);
   }
