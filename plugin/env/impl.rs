@@ -116,7 +116,7 @@ impl EnvConfig {
     #[instrument_trace]
     pub(crate) fn load() -> Result<Self, String> {
         dotenvy::from_path(SERVER_ENV_FILE_PATH)
-            .map_err(|error: dotenvy::Error| format!("Failed to load env file {}", error))?;
+            .map_err(|error: dotenvy::Error| format!("Failed to load env file {error}"))?;
         let get_env_required = |key: &str| -> Result<String, String> {
             var(key).map_err(|_: VarError| format!("Environment variable {key} is not set"))
         };
@@ -207,9 +207,7 @@ impl EnvConfig {
                 .map_err(|_: VarError| format!("Environment variable {ENV_KEY_MYSQL} is not set"))?
                 .trim_matches('\''),
         )
-        .map_err(|error: serde_json::Error| {
-            format!("Failed to parse {ENV_KEY_MYSQL}: {}", error)
-        })?;
+        .map_err(|error: serde_json::Error| format!("Failed to parse {ENV_KEY_MYSQL}: {error}"))?;
         instances
             .iter_mut()
             .for_each(|instance: &mut MySqlInstanceConfig| {
@@ -231,7 +229,7 @@ impl EnvConfig {
                 .trim_matches('\''),
         )
         .map_err(|error: serde_json::Error| {
-            format!("Failed to parse {ENV_KEY_POSTGRESQL}: {}", error)
+            format!("Failed to parse {ENV_KEY_POSTGRESQL}: {error}")
         })?;
         instances
             .iter_mut()
@@ -251,9 +249,7 @@ impl EnvConfig {
                 .map_err(|_: VarError| format!("Environment variable {ENV_KEY_REDIS} is not set"))?
                 .trim_matches('\''),
         )
-        .map_err(|error: serde_json::Error| {
-            format!("Failed to parse {ENV_KEY_REDIS}: {}", error)
-        })?;
+        .map_err(|error: serde_json::Error| format!("Failed to parse {ENV_KEY_REDIS}: {error}"))?;
         instances
             .iter_mut()
             .for_each(|instance: &mut RedisInstanceConfig| {
@@ -268,10 +264,10 @@ impl EnvConfig {
     fn load_from_docker_compose(file_path: &str) -> Result<DockerComposeConfig, String> {
         let docker_compose_content: Vec<u8> =
             read_from_file(file_path).map_err(|error: Box<dyn std::error::Error>| {
-                format!("Failed to read docker-compose.yml {}", error)
+                format!("Failed to read docker-compose.yml {error}")
             })?;
         let yaml: serde_yaml::Value = serde_yaml::from_slice(&docker_compose_content).map_err(
-            |error: serde_yaml::Error| format!("Failed to parse docker-compose.yml {}", error),
+            |error: serde_yaml::Error| format!("Failed to parse docker-compose.yml {error}"),
         )?;
         let mut config: DockerComposeConfig = DockerComposeConfig::default();
         if let Some(mysql) = yaml
