@@ -9,4 +9,8 @@ use {super::*, r#static::*};
 
 use hyperlane_resources::{docker::*, env::*};
 
-use std::{env::var, sync::OnceLock};
+use std::{
+    env::{VarError, var},
+    num::ParseIntError,
+    sync::OnceLock,
+};
