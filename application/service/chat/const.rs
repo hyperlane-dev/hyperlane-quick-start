@@ -1,6 +1,7 @@
 pub const USER_PROMPT: &str = "Please re-evaluate whether the user's latest task has been completed. Continue only if the task is not finished.";
 pub const TASK_HAS_COMPLETED: &str = "task completed.";
 pub const TASK_IS_RUNNING: &str = "task is running.";
+pub const SYSTEM_NAME: &str = "System";
 pub const GPT_RESPONSE_SCHEMA: &str = r#"{
   "type": "object",
   "properties": {

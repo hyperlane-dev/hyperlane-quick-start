@@ -56,13 +56,10 @@ impl ServerHook for ChatRequestHook {
                 let path: String = ctx_clone.get_request().get_path().clone();
                 let task_running_msg: String =
                     format!("{MENTION_PREFIX}{uuid}{SPACE}{TASK_IS_RUNNING}");
-                let uuid_opt: Option<RequestQuerysValue> =
-                    ctx_clone.get_request().try_get_query("uuid");
-                let uuid_clone: String = uuid_opt.unwrap_or_default();
                 let mut system_resp_data: WebSocketRespData = WebSocketRespData::default();
                 system_resp_data
                     .set_type(MessageType::System)
-                    .set_name(uuid_clone)
+                    .set_name(SYSTEM_NAME.to_string())
                     .set_data(task_running_msg)
                     .set_time(Utc::now().timestamp_millis());
                 let websocket: &WebSocket = get_global_websocket();
@@ -260,7 +257,7 @@ impl ChatService {
                 let mut system_resp_data: WebSocketRespData = WebSocketRespData::default();
                 system_resp_data
                     .set_type(MessageType::System)
-                    .set_name("System".to_string())
+                    .set_name(SYSTEM_NAME.to_string())
                     .set_data(task_has_completed_msg)
                     .set_time(Utc::now().timestamp_millis());
                 let system_resp_json: ResponseBody =
@@ -409,7 +406,7 @@ impl ChatService {
                 .unwrap_or("")
                 .to_string();
             let session_id: String = session_id.to_string();
-            let sender_type: &str = if sender_name == "System" {
+            let sender_type: &str = if sender_name == SYSTEM_NAME {
                 "system"
             } else if sender_name == "GPT Assistant" || message_type == "GptResponse" {
                 "assistant"
