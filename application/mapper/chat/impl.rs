@@ -15,7 +15,7 @@ impl From<Model> for ChatHistory {
             .set_created_at(
                 model
                     .created_at
-                    .map(|dt| dt.and_utc().timestamp_millis())
+                    .map(|dt: NaiveDateTime| dt.and_utc().timestamp_millis())
                     .unwrap_or(0),
             );
         history

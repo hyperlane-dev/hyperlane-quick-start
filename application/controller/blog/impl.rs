@@ -68,14 +68,14 @@ impl ServerHook for BlogPostUpdateRoute {
                 Ok(id) => id,
                 Err(_) => {
                     let response: ApiResponse<&str> =
-                        ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid post ID");
+                        ApiResponse::new(ApiResponseStatus::InvalidRequest, ERROR_INVALID_POST_ID);
                     ctx.get_mut_response().set_body(response.to_json_bytes());
                     return Status::Continue;
                 }
             },
             None => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::InvalidRequest, "Post ID is required");
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, ERROR_POST_ID_REQUIRED);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
             }
@@ -134,14 +134,14 @@ impl ServerHook for BlogPostDeleteRoute {
                 Ok(id) => id,
                 Err(_) => {
                     let response: ApiResponse<&str> =
-                        ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid post ID");
+                        ApiResponse::new(ApiResponseStatus::InvalidRequest, ERROR_INVALID_POST_ID);
                     ctx.get_mut_response().set_body(response.to_json_bytes());
                     return Status::Continue;
                 }
             },
             None => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::InvalidRequest, "Post ID is required");
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, ERROR_POST_ID_REQUIRED);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
             }
@@ -159,7 +159,7 @@ impl ServerHook for BlogPostDeleteRoute {
         match BlogService::delete_post(post_id, current_user_id).await {
             Ok(()) => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::Success, "Post deleted successfully");
+                    ApiResponse::new(ApiResponseStatus::Success, SUCCESS_POST_DELETED);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
@@ -191,14 +191,14 @@ impl ServerHook for BlogPostGetRoute {
                 Ok(id) => id,
                 Err(_) => {
                     let response: ApiResponse<&str> =
-                        ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid post ID");
+                        ApiResponse::new(ApiResponseStatus::InvalidRequest, ERROR_INVALID_POST_ID);
                     ctx.get_mut_response().set_body(response.to_json_bytes());
                     return Status::Continue;
                 }
             },
             None => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::InvalidRequest, "Post ID is required");
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, ERROR_POST_ID_REQUIRED);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
             }
@@ -212,7 +212,7 @@ impl ServerHook for BlogPostGetRoute {
             }
             Ok(None) => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::ResourceNotFound, "Post not found");
+                    ApiResponse::new(ApiResponseStatus::ResourceNotFound, ERROR_POST_NOT_FOUND);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
@@ -257,7 +257,7 @@ impl ServerHook for BlogPostListRoute {
         if let Some(limit_str) = limit_opt
             && let Ok(limit) = limit_str.parse::<u64>()
         {
-            query.set_limit(Some(limit.min(100)));
+            query.set_limit(Some(limit.min(MAX_LIST_LIMIT)));
         }
         match BlogService::list_posts(query, current_user_id).await {
             Ok(list_response) => {
@@ -310,7 +310,7 @@ impl ServerHook for BlogPostMyListRoute {
         if let Some(limit_str) = limit_opt
             && let Ok(limit) = limit_str.parse::<u64>()
         {
-            query.set_limit(Some(limit.min(100)));
+            query.set_limit(Some(limit.min(MAX_LIST_LIMIT)));
         }
         match BlogService::list_my_posts(current_user_id, query).await {
             Ok(list_response) => {
@@ -347,14 +347,14 @@ impl ServerHook for BlogPostLikeRoute {
                 Ok(id) => id,
                 Err(_) => {
                     let response: ApiResponse<&str> =
-                        ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid post ID");
+                        ApiResponse::new(ApiResponseStatus::InvalidRequest, ERROR_INVALID_POST_ID);
                     ctx.get_mut_response().set_body(response.to_json_bytes());
                     return Status::Continue;
                 }
             },
             None => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::InvalidRequest, "Post ID is required");
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, ERROR_POST_ID_REQUIRED);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
             }
@@ -404,14 +404,14 @@ impl ServerHook for BlogPostFavoriteRoute {
                 Ok(id) => id,
                 Err(_) => {
                     let response: ApiResponse<&str> =
-                        ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid post ID");
+                        ApiResponse::new(ApiResponseStatus::InvalidRequest, ERROR_INVALID_POST_ID);
                     ctx.get_mut_response().set_body(response.to_json_bytes());
                     return Status::Continue;
                 }
             },
             None => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::InvalidRequest, "Post ID is required");
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, ERROR_POST_ID_REQUIRED);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
             }
@@ -473,7 +473,7 @@ impl ServerHook for BlogPostFavoriteListRoute {
         if let Some(limit_str) = limit_opt
             && let Ok(limit) = limit_str.parse::<u64>()
         {
-            query.set_limit(Some(limit.min(100)));
+            query.set_limit(Some(limit.min(MAX_LIST_LIMIT)));
         }
         match BlogService::list_favorite_posts(current_user_id, query).await {
             Ok(list_response) => {
@@ -558,15 +558,17 @@ impl ServerHook for BlogCommentDeleteRoute {
             Some(id_str) => match AuthService::decode_id(&id_str) {
                 Ok(id) => id,
                 Err(_) => {
-                    let response: ApiResponse<&str> =
-                        ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid comment ID");
+                    let response: ApiResponse<&str> = ApiResponse::new(
+                        ApiResponseStatus::InvalidRequest,
+                        ERROR_INVALID_COMMENT_ID,
+                    );
                     ctx.get_mut_response().set_body(response.to_json_bytes());
                     return Status::Continue;
                 }
             },
             None => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::InvalidRequest, "Comment ID is required");
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, ERROR_COMMENT_ID_REQUIRED);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
             }
@@ -584,7 +586,7 @@ impl ServerHook for BlogCommentDeleteRoute {
         match BlogService::delete_comment(comment_id, current_user_id).await {
             Ok(()) => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::Success, "Comment deleted successfully");
+                    ApiResponse::new(ApiResponseStatus::Success, SUCCESS_COMMENT_DELETED);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
@@ -615,7 +617,7 @@ impl ServerHook for BlogCommentListRoute {
             Some(post_id) => query.set_post_id(post_id),
             None => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::InvalidRequest, "Post ID is required");
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, ERROR_POST_ID_REQUIRED);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
             }
@@ -628,7 +630,7 @@ impl ServerHook for BlogCommentListRoute {
         if let Some(limit_str) = limit_opt
             && let Ok(limit) = limit_str.parse::<u64>()
         {
-            query.set_limit(Some(limit.min(100)));
+            query.set_limit(Some(limit.min(MAX_LIST_LIMIT)));
         }
         match BlogService::list_comments(query).await {
             Ok(list_response) => {
@@ -671,10 +673,8 @@ impl ServerHook for BlogImageUploadRoute {
         let file_name: String = match file_name_opt {
             Some(s) => urlencoding::decode(&s).unwrap_or_default().to_string(),
             None => {
-                let response: ApiResponse<&str> = ApiResponse::new(
-                    ApiResponseStatus::InvalidRequest,
-                    "Missing X-File-Name header",
-                );
+                let response: ApiResponse<&str> =
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, ERROR_MISSING_X_FILE_NAME);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
             }
@@ -682,10 +682,8 @@ impl ServerHook for BlogImageUploadRoute {
         let mime_type: String = match mime_type_opt {
             Some(s) => s,
             None => {
-                let response: ApiResponse<&str> = ApiResponse::new(
-                    ApiResponseStatus::InvalidRequest,
-                    "Missing X-Mime-Type header",
-                );
+                let response: ApiResponse<&str> =
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, ERROR_MISSING_X_MIME_TYPE);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
             }
@@ -732,14 +730,14 @@ impl ServerHook for BlogImageDownloadRoute {
                 Ok(id) => id,
                 Err(_) => {
                     let response: ApiResponse<&str> =
-                        ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid image ID");
+                        ApiResponse::new(ApiResponseStatus::InvalidRequest, ERROR_INVALID_IMAGE_ID);
                     ctx.get_mut_response().set_body(response.to_json_bytes());
                     return Status::Continue;
                 }
             },
             None => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::InvalidRequest, "Image ID is required");
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, ERROR_IMAGE_ID_REQUIRED);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
             }
@@ -762,7 +760,7 @@ impl ServerHook for BlogImageDownloadRoute {
             }
             Ok(None) => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::ResourceNotFound, "Image not found");
+                    ApiResponse::new(ApiResponseStatus::ResourceNotFound, ERROR_IMAGE_NOT_FOUND);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
             }
             Err(error) => {

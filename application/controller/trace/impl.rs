@@ -15,7 +15,7 @@ impl ServerHook for TraceRoute {
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let trace: String = trace_opt.unwrap_or_default();
         let decoded_trace: String = decode(&trace)
-            .unwrap_or_else(|_| trace.clone().into())
+            .unwrap_or_else(|_: std::string::FromUtf8Error| trace.clone().into())
             .into_owned();
         let result: String = TraceService::search_trace(&decoded_trace).await;
         ctx.get_mut_response().set_body(&result);

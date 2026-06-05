@@ -131,7 +131,7 @@ impl ChatService {
         let socket_addr: String = stream
             .get_stream()
             .peer_addr()
-            .map(|data| data.to_string())
+            .map(|data: std::net::SocketAddr| data.to_string())
             .unwrap_or_default();
         let encode_addr: String = Encode::execute(CHARSETS, &socket_addr).unwrap_or_default();
         ctx.get_mut_response()
@@ -159,7 +159,7 @@ impl ChatService {
     #[instrument_trace]
     fn remove_mentions(text: &str) -> String {
         text.split_whitespace()
-            .filter(|word| !word.starts_with(MENTION_PREFIX))
+            .filter(|word: &&str| !word.starts_with(MENTION_PREFIX))
             .collect::<Vec<&str>>()
             .join(SPACE)
     }
@@ -279,7 +279,7 @@ impl ChatService {
         let session_messages: Vec<serde_json::Value> = session
             .get_messages()
             .iter()
-            .map(|msg| {
+            .map(|msg: &ChatMessage| {
                 json!({
                     JSON_FIELD_ROLE: msg.get_role(),
                     JSON_FIELD_CONTENT: msg.get_content()
@@ -344,14 +344,15 @@ impl ChatService {
             );
         }
         let response_json: serde_json::Value =
-            serde_json::from_str(response_text).map_err(|error| {
+            serde_json::from_str(response_text).map_err(|error: serde_json::Error| {
                 format!("JSON parsing failed {error} (response content {response_text})")
             })?;
         let raw_content_opt: Option<String> = Self::extract_response_content(&response_json);
         let mut parsed: GptStructuredResponse = GptStructuredResponse::default();
         parsed.set_data(response_text.to_string());
         if let Some(raw_content) = raw_content_opt {
-            parsed = serde_json::from_str(&raw_content).map_err(|_| raw_content.to_string())?;
+            parsed = serde_json::from_str(&raw_content)
+                .map_err(|_: serde_json::Error| raw_content.to_string())?;
         }
         Ok((parsed.get_data().clone(), parsed.get_continue_flag()))
     }
@@ -389,7 +390,7 @@ impl ChatService {
         if let Ok(resp_data) = serde_json::from_str::<serde_json::Value>(&response_body_string) {
             let message_type: String = resp_data
                 .get("type")
-                .and_then(|v| v.as_str())
+                .and_then(|v: &serde_json::Value| v.as_str())
                 .unwrap_or("Unknown")
                 .to_string();
             if message_type == "Ping" || message_type == "Pang" {
@@ -397,12 +398,12 @@ impl ChatService {
             }
             let sender_name: String = resp_data
                 .get("name")
-                .and_then(|v| v.as_str())
+                .and_then(|v: &serde_json::Value| v.as_str())
                 .unwrap_or("Unknown")
                 .to_string();
             let content: String = resp_data
                 .get("data")
-                .and_then(|v| v.as_str())
+                .and_then(|v: &serde_json::Value| v.as_str())
                 .unwrap_or("")
                 .to_string();
             let session_id: String = session_id.to_string();

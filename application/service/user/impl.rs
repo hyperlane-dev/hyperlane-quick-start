@@ -11,7 +11,7 @@ impl UserService {
 
     #[instrument_trace]
     pub async fn list_users(query: UserListQueryRequest) -> Result<UserListResponse, String> {
-        let limit: u64 = query.get_limit().unwrap_or(20);
+        let limit: u64 = query.get_limit().unwrap_or(DEFAULT_PAGE_LIMIT);
         let keyword: Option<String> = query.try_get_keyword().clone();
         let last_id: Option<i32> = query
             .try_get_last_id()
@@ -47,20 +47,20 @@ impl UserService {
                 let mut active_model: UserActiveModel = model.into();
                 if let Some(email) = request.try_get_email() {
                     if !email.is_empty() && !Self::validate_email(email) {
-                        return Err("Invalid email format".to_string());
+                        return Err(ERROR_INVALID_EMAIL_FORMAT.to_string());
                     }
                     active_model.email = ActiveValue::Set(Some(email.clone()));
                 }
                 if let Some(phone) = request.try_get_phone() {
                     if !phone.is_empty() && !Self::validate_phone(phone) {
-                        return Err("Invalid phone format".to_string());
+                        return Err(ERROR_INVALID_PHONE_FORMAT.to_string());
                     }
                     active_model.phone = ActiveValue::Set(Some(phone.clone()));
                 }
                 let result: UserModel = UserRepository::update(active_model).await?;
                 Self::model_to_user_response(&result)
             }
-            None => Err("User not found".to_string()),
+            None => Err(ERROR_USER_NOT_FOUND.to_string()),
         }
     }
 
@@ -86,7 +86,7 @@ impl UserService {
             Some(model) => {
                 let target_role: UserRole = UserRole::try_from(model.get_role())?;
                 if !approved && target_role.is_admin() {
-                    return Err("Cannot reject an admin user".to_string());
+                    return Err(ERROR_CANNOT_REJECT_ADMIN.to_string());
                 }
                 let mut active_model: UserActiveModel = model.into();
                 let status: i16 = if approved {
@@ -98,7 +98,7 @@ impl UserService {
                 let result: UserModel = UserRepository::update(active_model).await?;
                 Self::model_to_user_response(&result)
             }
-            None => Err("User not found".to_string()),
+            None => Err(ERROR_USER_NOT_FOUND.to_string()),
         }
     }
 
@@ -114,7 +114,7 @@ impl UserService {
                     model.get_password_hash(),
                 );
                 if !valid {
-                    return Err("Old password is incorrect".to_string());
+                    return Err(ERROR_OLD_PASSWORD_INCORRECT.to_string());
                 }
                 let new_password_hash: String =
                     PasswordUtil::hash_password(request.get_new_password());
@@ -123,7 +123,7 @@ impl UserService {
                 UserRepository::update(active_model).await?;
                 Ok(())
             }
-            None => Err("User not found".to_string()),
+            None => Err(ERROR_USER_NOT_FOUND.to_string()),
         }
     }
 
@@ -134,7 +134,7 @@ impl UserService {
                 UserRepository::delete_by_id(user_id).await?;
                 Ok(())
             }
-            None => Err("User not found".to_string()),
+            None => Err(ERROR_USER_NOT_FOUND.to_string()),
         }
     }
 
@@ -143,7 +143,7 @@ impl UserService {
         let mut response: UserResponse = UserResponse::default();
         let created_at: Option<i64> = model
             .try_get_created_at()
-            .map(|dt| dt.and_utc().timestamp_millis());
+            .map(|dt: NaiveDateTime| dt.and_utc().timestamp_millis());
         let role: UserRole = UserRole::try_from(model.get_role()).unwrap_or_default();
         let status: UserStatus = UserStatus::try_from(model.get_status()).unwrap_or_default();
         let encoded_id: String = AuthService::encode_id(model.get_id())?;

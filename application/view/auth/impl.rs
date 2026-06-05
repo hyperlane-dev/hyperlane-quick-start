@@ -19,7 +19,10 @@ impl ServerHook for AuthViewRoute {
             location_target
         } else {
             let encoded_location: String = urlencoding::encode(&location_target).to_string();
-            format!("/static/auth/index.html?{LOCATION}={encoded_location}")
+            format!(
+                "{}{AUTH_VIEW_REDIRECT_QUERY_PREFIX}{encoded_location}",
+                AUTH_VIEW_REDIRECT_PATH
+            )
         };
         ctx.get_mut_response()
             .set_status_code(302)

@@ -1,0 +1,13 @@
+pub const ERROR_INVALID_DIRECTORY_OR_FILE_NAME: &str = "Invalid directory or file name";
+pub const ERROR_FILE_NOT_FOUND_OR_EMPTY: &str = "File not found or empty";
+pub const ERROR_INVALID_RANGE_HEADER_FORMAT: &str = "Invalid range header format";
+pub const ERROR_INVALID_RANGE_SPECIFICATION: &str = "Invalid range specification";
+pub const ERROR_INVALID_RANGE_BOTH_EMPTY: &str = "Invalid range: both start and end are empty";
+pub const ERROR_INVALID_END_RANGE: &str = "Invalid end range";
+pub const ERROR_INVALID_START_RANGE: &str = "Invalid start range";
+pub const ERROR_RANGE_START_EXCEEDS_FILE_SIZE: &str = "Range start exceeds file size";
+pub const ERROR_INVALID_RANGE_START_GREATER_THAN_END: &str = "Invalid range: start > end";
+pub const ERROR_FILE_NOT_FOUND: &str = "File not found";
+pub const ERROR_FILE_IS_EMPTY: &str = "File is empty";
+pub const RANGE_HEADER_PREFIX: &str = "bytes=";
+pub const BYTES_UNIT: &str = "bytes";

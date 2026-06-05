@@ -115,7 +115,7 @@ impl DockerResult {
             }
         } else {
             format!(
-                "Error: Exit code {}\nStdout: {}\nStderr: {}",
+                "Error: Exit code {}{BR}Stdout: {}{BR}Stderr: {}",
                 self.get_exit_code(),
                 self.get_stdout().trim(),
                 self.get_stderr().trim()

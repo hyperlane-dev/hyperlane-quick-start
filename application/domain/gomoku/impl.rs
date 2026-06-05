@@ -43,7 +43,11 @@ impl GomokuDomain {
         if Self::get_player_color(room, user_id).is_some() {
             return false;
         }
-        if room.get_spectators().iter().any(|item| item == user_id) {
+        if room
+            .get_spectators()
+            .iter()
+            .any(|item: &String| item == user_id)
+        {
             return false;
         }
         room.get_mut_spectators().push(user_id.to_string());
@@ -56,7 +60,7 @@ impl GomokuDomain {
         if let Some(index) = room
             .get_players()
             .iter()
-            .position(|player| player.get_user_id() == user_id)
+            .position(|player: &GomokuPlayer| player.get_user_id() == user_id)
         {
             room.get_mut_players().remove(index);
             removed = true;
@@ -64,15 +68,17 @@ impl GomokuDomain {
         if let Some(index) = room
             .get_spectators()
             .iter()
-            .position(|spectator| spectator == user_id)
+            .position(|spectator: &String| spectator == user_id)
         {
             room.get_mut_spectators().remove(index);
             removed = true;
         }
         if removed && room.get_status() == &GameStatus::InProgress {
             room.set_status(GameStatus::Finished);
-            let winner: Option<StoneColor> =
-                room.get_players().first().map(|player| *player.get_color());
+            let winner: Option<StoneColor> = room
+                .get_players()
+                .first()
+                .map(|player: &GomokuPlayer| *player.get_color());
             room.set_winner(winner);
         }
         removed

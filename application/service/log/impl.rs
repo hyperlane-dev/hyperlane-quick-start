@@ -4,11 +4,15 @@ impl LogService {
     #[instrument_trace]
     pub fn get_sorted_dirs(path: &Path) -> Vec<String> {
         fs::read_dir(path)
-            .map(|entries| {
+            .map(|entries: std::fs::ReadDir| {
                 let mut dirs: Vec<String> = entries
                     .filter_map(Result::ok)
-                    .filter(|error| error.file_type().is_ok_and(|ft| ft.is_dir()))
-                    .filter_map(|error| error.file_name().into_string().ok())
+                    .filter(|entry: &std::fs::DirEntry| {
+                        entry
+                            .file_type()
+                            .is_ok_and(|ft: std::fs::FileType| ft.is_dir())
+                    })
+                    .filter_map(|entry: std::fs::DirEntry| entry.file_name().into_string().ok())
                     .collect();
                 dirs.sort();
                 dirs.reverse();
@@ -20,12 +24,16 @@ impl LogService {
     #[instrument_trace]
     pub fn get_sorted_log_files(path: &Path) -> Vec<String> {
         fs::read_dir(path)
-            .map(|entries| {
+            .map(|entries: std::fs::ReadDir| {
                 let mut files: Vec<String> = entries
                     .filter_map(Result::ok)
-                    .filter(|error| error.file_type().is_ok_and(|ft| ft.is_file()))
-                    .filter_map(|error| error.file_name().into_string().ok())
-                    .filter(|name| name.ends_with(LOG_FILE_EXTENSION))
+                    .filter(|entry: &std::fs::DirEntry| {
+                        entry
+                            .file_type()
+                            .is_ok_and(|ft: std::fs::FileType| ft.is_file())
+                    })
+                    .filter_map(|entry: std::fs::DirEntry| entry.file_name().into_string().ok())
+                    .filter(|name: &String| name.ends_with(LOG_FILE_EXTENSION))
                     .collect();
                 files.sort();
                 files.reverse();
@@ -38,7 +46,7 @@ impl LogService {
     pub async fn read_and_reverse_log_file(full_path: &Path) -> Result<String, String> {
         async_read_from_file::<Vec<u8>>(full_path.to_str().unwrap_or_default())
             .await
-            .map(|content| {
+            .map(|content: Vec<u8>| {
                 let content_str: String = String::from_utf8_lossy(&content).to_string();
                 if content_str.trim().is_empty() {
                     String::new()
@@ -46,7 +54,7 @@ impl LogService {
                     content_str.lines().rev().collect::<Vec<&str>>().join(BR)
                 }
             })
-            .map_err(|_| {
+            .map_err(|_: Box<dyn std::error::Error>| {
                 format!(
                     "Failed to read file {}",
                     full_path.to_str().unwrap_or("invalid path")

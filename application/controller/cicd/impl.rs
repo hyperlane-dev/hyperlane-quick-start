@@ -89,7 +89,7 @@ impl ServerHook for GetPipelineRoute {
             None => {
                 let response: ApiResponse<&str> = ApiResponse::new(
                     ApiResponseStatus::InvalidRequest,
-                    "Missing or invalid id parameter",
+                    ERROR_MISSING_OR_INVALID_ID,
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
@@ -102,8 +102,10 @@ impl ServerHook for GetPipelineRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Ok(None) => {
-                let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::ResourceNotFound, "Pipeline not found");
+                let response: ApiResponse<&str> = ApiResponse::new(
+                    ApiResponseStatus::ResourceNotFound,
+                    ERROR_PIPELINE_NOT_FOUND,
+                );
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
@@ -167,7 +169,6 @@ impl ServerHook for ListRunsRoute {
     )]
     #[instrument_trace]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
-        const MAX_PAGE_SIZE: i32 = 100;
         let querys: &RequestQuerys = ctx.get_request().get_querys();
         let page_size: Option<i32> = querys
             .get("page_size")
@@ -218,7 +219,7 @@ impl ServerHook for GetRunRoute {
             None => {
                 let response: ApiResponse<&str> = ApiResponse::new(
                     ApiResponseStatus::InvalidRequest,
-                    "Missing or invalid id parameter",
+                    ERROR_MISSING_OR_INVALID_ID,
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
@@ -232,7 +233,7 @@ impl ServerHook for GetRunRoute {
             }
             Ok(None) => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::ResourceNotFound, "Run not found");
+                    ApiResponse::new(ApiResponseStatus::ResourceNotFound, ERROR_RUN_NOT_FOUND);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
@@ -268,7 +269,7 @@ impl ServerHook for GetRunDetailRoute {
             None => {
                 let response: ApiResponse<&str> = ApiResponse::new(
                     ApiResponseStatus::InvalidRequest,
-                    "Missing or invalid id parameter",
+                    ERROR_MISSING_OR_INVALID_ID,
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
@@ -282,7 +283,7 @@ impl ServerHook for GetRunDetailRoute {
             }
             Ok(None) => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::ResourceNotFound, "Run not found");
+                    ApiResponse::new(ApiResponseStatus::ResourceNotFound, ERROR_RUN_NOT_FOUND);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
@@ -320,10 +321,8 @@ impl ServerHook for UpdateJobRoute {
         };
         match CicdService::update_job_status(param).await {
             Ok(()) => {
-                let response: ApiResponse<&str> = ApiResponse::new(
-                    ApiResponseStatus::Success,
-                    "Job status updated successfully",
-                );
+                let response: ApiResponse<&str> =
+                    ApiResponse::new(ApiResponseStatus::Success, SUCCESS_JOB_STATUS_UPDATED);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
@@ -361,10 +360,8 @@ impl ServerHook for UpdateStepRoute {
         };
         match CicdService::update_step_status(param).await {
             Ok(()) => {
-                let response: ApiResponse<&str> = ApiResponse::new(
-                    ApiResponseStatus::Success,
-                    "Step status updated successfully",
-                );
+                let response: ApiResponse<&str> =
+                    ApiResponse::new(ApiResponseStatus::Success, SUCCESS_STEP_STATUS_UPDATED);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
@@ -396,7 +393,7 @@ impl ServerHook for GetIncrementalRunDetailRoute {
             None => {
                 let response: ApiResponse<&str> = ApiResponse::new(
                     ApiResponseStatus::InvalidRequest,
-                    "Missing or invalid run_id parameter",
+                    ERROR_MISSING_OR_INVALID_RUN_ID,
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
@@ -416,7 +413,7 @@ impl ServerHook for GetIncrementalRunDetailRoute {
             }
             Ok(None) => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::ResourceNotFound, "Run not found");
+                    ApiResponse::new(ApiResponseStatus::ResourceNotFound, ERROR_RUN_NOT_FOUND);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
@@ -439,7 +436,7 @@ impl ServerHook for CicdViewRoute {
     #[prologue_macros(
         methods(get, post),
         response_status_code(302),
-        response_header(LOCATION => "/static/cicd/index.html")
+        response_header(LOCATION => CICD_VIEW_REDIRECT_PATH)
     )]
     #[instrument_trace]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
@@ -467,7 +464,7 @@ impl ServerHook for RunLogsSseRoute {
             None => {
                 let response: ApiResponse<&str> = ApiResponse::new(
                     ApiResponseStatus::InvalidRequest,
-                    "Missing or invalid run_id parameter",
+                    ERROR_MISSING_OR_INVALID_RUN_ID,
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
@@ -477,11 +474,11 @@ impl ServerHook for RunLogsSseRoute {
         let log_manager: &LogStreamManager = get_log_stream_manager();
         let mut step_ids: Vec<i32> = log_manager.get_run_step_ids(run_id).await;
         if step_ids.is_empty() {
-            sleep(Duration::from_millis(500)).await;
+            sleep(Duration::from_millis(SSE_INITIAL_POLL_DELAY_MS)).await;
             step_ids = log_manager.get_run_step_ids(run_id).await;
             if step_ids.is_empty() {
                 let completion_event: String = format!(
-                    "event: complete\ndata: {{\"run_id\":{run_id},\"reason\":\"no_active_streams\"}}{HTTP_DOUBLE_BR}"
+                    "event: {SSE_EVENT_COMPLETE}{BR}data: {{\"run_id\":{run_id},\"reason\":\"{SSE_REASON_NO_ACTIVE_STREAMS}\"}}{HTTP_DOUBLE_BR}"
                 );
                 ctx.get_mut_response().set_body(&completion_event);
                 let _: Result<(), ResponseError> =
@@ -498,7 +495,7 @@ impl ServerHook for RunLogsSseRoute {
         }
         if receivers.is_empty() {
             let completion_event: String = format!(
-                "event: complete\ndata: {{\"run_id\":{run_id},\"reason\":\"no_active_streams\"}}{HTTP_DOUBLE_BR}"
+                "event: {SSE_EVENT_COMPLETE}{BR}data: {{\"run_id\":{run_id},\"reason\":\"{SSE_REASON_NO_ACTIVE_STREAMS}\"}}{HTTP_DOUBLE_BR}"
             );
             ctx.get_mut_response().set_body(&completion_event);
             let _: Result<(), ResponseError> =
@@ -506,12 +503,12 @@ impl ServerHook for RunLogsSseRoute {
             stream.set_closed(true);
             return Status::Reject;
         }
-        let timeout_duration: Duration = Duration::from_secs(3600);
+        let timeout_duration: Duration = Duration::from_secs(SSE_CONNECTION_TIMEOUT_SECS);
         let start_time: Instant = Instant::now();
         loop {
             if start_time.elapsed() > timeout_duration {
                 let timeout_event: String = format!(
-                    "event: complete\ndata: {{\"run_id\":{run_id},\"reason\":\"timeout\"}}{HTTP_DOUBLE_BR}"
+                    "event: {SSE_EVENT_COMPLETE}{BR}data: {{\"run_id\":{run_id},\"reason\":\"{SSE_REASON_TIMEOUT}\"}}{HTTP_DOUBLE_BR}"
                 );
                 ctx.get_mut_response().set_body(&timeout_event);
                 let _: Result<(), ResponseError> =
@@ -524,7 +521,7 @@ impl ServerHook for RunLogsSseRoute {
                     if let Ok(entry) = serde_json::from_str::<LogEntry>(&entry_json) {
                         has_activity = true;
                         let log_event: String = format!(
-                            "event: log\ndata: {{\"step_id\":{},\"timestamp\":{},\"is_stderr\":{},\"content\":\"{}\"}}{}",
+                            "event: {SSE_EVENT_LOG}{BR}data: {{\"step_id\":{},\"timestamp\":{},\"is_stderr\":{},\"content\":\"{}\"}}{}",
                             step_id,
                             entry.get_timestamp(),
                             entry.get_is_stderr(),
@@ -540,7 +537,7 @@ impl ServerHook for RunLogsSseRoute {
             let current_step_ids: Vec<i32> = log_manager.get_run_step_ids(run_id).await;
             if current_step_ids.is_empty() && !has_activity {
                 let completion_event: String = format!(
-                    "event: complete\ndata: {{\"run_id\":{run_id},\"reason\":\"run_completed\"}}{HTTP_DOUBLE_BR}"
+                    "event: {SSE_EVENT_COMPLETE}{BR}data: {{\"run_id\":{run_id},\"reason\":\"{SSE_REASON_RUN_COMPLETED}\"}}{HTTP_DOUBLE_BR}"
                 );
                 ctx.get_mut_response().set_body(&completion_event);
                 let _: Result<(), ResponseError> =
@@ -556,7 +553,7 @@ impl ServerHook for RunLogsSseRoute {
                 }
             }
             if !has_activity {
-                sleep(Duration::from_millis(10)).await;
+                sleep(Duration::from_millis(SSE_IDLE_SLEEP_MS)).await;
             }
         }
         stream.set_closed(true);
@@ -565,16 +562,17 @@ impl ServerHook for RunLogsSseRoute {
 }
 
 impl RunLogsSseRoute {
-    fn escape_json_string(s: &str) -> String {
-        s.chars()
-            .map(|c| match c {
+    fn escape_json_string(escape: &str) -> String {
+        escape
+            .chars()
+            .map(|escape_item| match escape_item {
                 '"' => "\\\"".to_string(),
                 '\\' => "\\\\".to_string(),
                 '\n' => "\\n".to_string(),
                 '\r' => "\\r".to_string(),
                 '\t' => "\\t".to_string(),
-                c if c.is_control() => format!("\\u{:04x}", c as u32),
-                c => c.to_string(),
+                escape_item if escape_item.is_control() => format!("\\u{:04x}", escape_item as u32),
+                escape_item => escape_item.to_string(),
             })
             .collect()
     }

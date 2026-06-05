@@ -4,22 +4,22 @@ impl ShortlinkService {
     #[instrument_trace]
     fn decrypt_id(encoded_id: &str) -> Result<i32, String> {
         let decoded: String = hyperlane_utils::Decode::execute(CHARSETS, encoded_id)
-            .map_err(|_| "Invalid shortlink ID format".to_string())?;
+            .map_err(|_: DecodeError| ERROR_INVALID_SHORTLINK_ID_FORMAT.to_string())?;
         decoded
             .parse::<i32>()
-            .map_err(|_| "Invalid shortlink ID format".to_string())
+            .map_err(|_: std::num::ParseIntError| ERROR_INVALID_SHORTLINK_ID_FORMAT.to_string())
     }
 
     #[instrument_trace]
     fn encrypt_id(id: i32) -> Result<String, String> {
         hyperlane_utils::Encode::execute(CHARSETS, &id.to_string())
-            .map_err(|_| "Failed to encrypt shortlink ID".to_string())
+            .map_err(|_: EncodeError| ERROR_FAILED_TO_ENCRYPT_SHORTLINK_ID.to_string())
     }
 
     #[instrument_trace]
     pub async fn insert_shortlink(request: ShortlinkInsertRequest) -> Result<String, String> {
         if request.get_url().is_empty() {
-            return Err("URL cannot be empty".to_string());
+            return Err(ERROR_URL_CANNOT_BE_EMPTY.to_string());
         }
         let existing_record: Option<ShortlinkModel> =
             ShortlinkRepository::find_by_url(request.get_url()).await?;

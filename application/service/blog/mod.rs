@@ -5,7 +5,10 @@ pub use r#struct::*;
 
 use {
     super::*,
-    mapper::blog::{comment::*, favorite::*, image::*, like::*, post::*},
+    mapper::{
+        auth::*,
+        blog::{comment::*, favorite::*, image::*, like::*, post::*},
+    },
     model::{request::blog::*, response::blog::*},
     repository::{auth::*, blog::*},
     service::auth::*,

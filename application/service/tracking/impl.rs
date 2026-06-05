@@ -15,7 +15,7 @@ impl TrackingService {
             .set_body(body_str)
             .set_timestamp(timestamp);
         let result: Result<(), DbErr> = TrackingRepository::insert(record).await;
-        result.map_err(|error| format!("Failed to insert tracking record {error}"))
+        result.map_err(|error: DbErr| format!("Failed to insert tracking record {error}"))
     }
 
     #[instrument_trace]
@@ -28,8 +28,12 @@ impl TrackingService {
         {
             return Err("start_time must be less than or equal to end_time".to_string());
         }
-        let page: i64 = (request.try_get_page()).unwrap_or(1).max(1);
-        let page_size: i64 = (request.try_get_page_size()).unwrap_or(20).clamp(1, 100);
+        let page: i64 = (request.try_get_page())
+            .unwrap_or(DEFAULT_PAGE_NUMBER)
+            .max(DEFAULT_PAGE_NUMBER);
+        let page_size: i64 = (request.try_get_page_size())
+            .unwrap_or(DEFAULT_PAGE_SIZE)
+            .clamp(DEFAULT_PAGE_NUMBER, MAX_PAGE_SIZE);
         let cache_id: Option<i64> = request.try_get_cache_id();
         let (models, total): (Vec<Model>, i64) = if request.try_get_header_key().clone().is_some() {
             let mut header_query: TrackingHeaderQuery = TrackingHeaderQuery::default();
@@ -43,7 +47,7 @@ impl TrackingService {
                 .set_cache_id(cache_id);
             TrackingRepository::query_by_header(&header_query)
                 .await
-                .map_err(|error| format!("Failed to query by header {error}"))?
+                .map_err(|error: DbErr| format!("Failed to query by header {error}"))?
         } else if request.try_get_body_content().clone().is_some() {
             let mut body_query: TrackingBodyQuery = TrackingBodyQuery::default();
             body_query
@@ -55,7 +59,7 @@ impl TrackingService {
                 .set_cache_id(cache_id);
             TrackingRepository::query_by_body_content(&body_query)
                 .await
-                .map_err(|error| format!("Failed to query by body content {error}"))?
+                .map_err(|error: DbErr| format!("Failed to query by body content {error}"))?
         } else {
             let mut query: TrackingQuery = TrackingQuery::default();
             query
@@ -66,11 +70,11 @@ impl TrackingService {
                 .set_cache_id(cache_id);
             TrackingRepository::query(&query)
                 .await
-                .map_err(|error| format!("Failed to query tracking records {error}"))?
+                .map_err(|error: DbErr| format!("Failed to query tracking records {error}"))?
         };
         let records: Vec<TrackingRecordDTO> = models
             .into_iter()
-            .map(|model| {
+            .map(|model: Model| {
                 let mut dto: TrackingRecordDTO = TrackingRecordDTO::default();
                 dto.set_id(model.get_id())
                     .set_headers(serde_json::from_str(model.get_headers()).unwrap_or_default())
@@ -79,7 +83,7 @@ impl TrackingService {
                     .set_created_at(
                         model
                             .try_get_created_at()
-                            .map(|dt| dt.and_utc().timestamp_millis())
+                            .map(|dt: NaiveDateTime| dt.and_utc().timestamp_millis())
                             .unwrap_or(0),
                     );
                 dto

@@ -47,7 +47,7 @@ impl ServerHook for TrackingQueryRoute {
             Err(error) => {
                 let error_response: ApiResponse<String> = ApiResponse::new(
                     ApiResponseStatus::InvalidRequest,
-                    format!("Invalid request body {error}"),
+                    format!("{} {error}", ERROR_INVALID_REQUEST_BODY_PREFIX),
                 );
                 ctx.get_mut_response()
                     .set_body(error_response.to_json_bytes());

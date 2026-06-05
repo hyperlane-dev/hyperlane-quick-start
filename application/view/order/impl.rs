@@ -9,7 +9,7 @@ impl ServerHook for OrderViewRoute {
     #[prologue_macros(
         methods(get, post),
         response_status_code(302),
-        response_header(LOCATION => "/static/order/index.html")
+        response_header(LOCATION => ORDER_VIEW_REDIRECT_PATH)
     )]
     #[instrument_trace]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {

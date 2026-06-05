@@ -92,15 +92,17 @@ impl ServerHook for UserLoginRoute {
                 );
                 let jwt_service: JwtService = JwtService::from(jwt_config);
                 let mut extra_claims: HashMap<String, serde_json::Value> = HashMap::new();
-                extra_claims.insert("user_id".to_string(), json!(user_id));
-                extra_claims.insert("role".to_string(), json!(role));
+                extra_claims.insert(JWT_CLAIM_USER_ID.to_string(), json!(user_id));
+                extra_claims.insert(JWT_CLAIM_ROLE.to_string(), json!(role));
                 let token_result: Result<JwtToken, String> = jwt_service
                     .generate_token_with_extra_claims(user_response.get_username(), extra_claims);
                 match token_result {
                     Ok(jwt_token) => {
                         let token_str: String = jwt_token.get_token().to_string();
-                        let cookie_value: String =
-                            format!("token={token_str}; Path=/; Max-Age=86400; HttpOnly");
+                        let cookie_value: String = format!(
+                            "token={}; Path=/; Max-Age={}; HttpOnly",
+                            token_str, COOKIE_MAX_AGE_SECONDS
+                        );
                         ctx.get_mut_response().set_header(SET_COOKIE, &cookie_value);
                         let mut login_response: LoginResponse = LoginResponse::default();
                         login_response.set_user(user_response).set_token(token_str);
@@ -139,14 +141,14 @@ impl ServerHook for UserUpdateRoute {
                 Ok(id) => id,
                 Err(_) => {
                     let response: ApiResponse<&str> =
-                        ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid user ID");
+                        ApiResponse::new(ApiResponseStatus::InvalidRequest, ERROR_INVALID_USER_ID);
                     ctx.get_mut_response().set_body(response.to_json_bytes());
                     return Status::Continue;
                 }
             },
             None => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::InvalidRequest, "User ID is required");
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, ERROR_USER_ID_REQUIRED);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
             }
@@ -165,7 +167,7 @@ impl ServerHook for UserUpdateRoute {
             Ok(Some(user_info)) => user_info,
             Ok(None) => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::Unauthorized, "User not found");
+                    ApiResponse::new(ApiResponseStatus::Unauthorized, ERROR_USER_NOT_FOUND);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
             }
@@ -179,10 +181,8 @@ impl ServerHook for UserUpdateRoute {
         };
         let user_role: UserRole = current_user.get_role().parse().unwrap_or_default();
         if !user_role.is_admin() && current_user_id != target_user_id {
-            let response: ApiResponse<&str> = ApiResponse::new(
-                ApiResponseStatus::Forbidden,
-                "You can only update your own data",
-            );
+            let response: ApiResponse<&str> =
+                ApiResponse::new(ApiResponseStatus::Forbidden, ERROR_UPDATE_OWN_DATA_ONLY);
             ctx.get_mut_response().set_body(response.to_json_bytes());
             return Status::Continue;
         }
@@ -229,14 +229,14 @@ impl ServerHook for UserChangePasswordRoute {
                 Ok(id) => id,
                 Err(_) => {
                     let response: ApiResponse<&str> =
-                        ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid user ID");
+                        ApiResponse::new(ApiResponseStatus::InvalidRequest, ERROR_INVALID_USER_ID);
                     ctx.get_mut_response().set_body(response.to_json_bytes());
                     return Status::Continue;
                 }
             },
             None => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::InvalidRequest, "User ID is required");
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, ERROR_USER_ID_REQUIRED);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
             }
@@ -283,14 +283,14 @@ impl ServerHook for UserUpdateStatusRoute {
                 Ok(id) => id,
                 Err(_) => {
                     let response: ApiResponse<&str> =
-                        ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid user ID");
+                        ApiResponse::new(ApiResponseStatus::InvalidRequest, ERROR_INVALID_USER_ID);
                     ctx.get_mut_response().set_body(response.to_json_bytes());
                     return Status::Continue;
                 }
             },
             None => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::InvalidRequest, "User ID is required");
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, ERROR_USER_ID_REQUIRED);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
             }
@@ -344,7 +344,7 @@ impl ServerHook for UserListRoute {
             Ok(Some(user_info)) => user_info,
             Ok(None) => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::Unauthorized, "User not found");
+                    ApiResponse::new(ApiResponseStatus::Unauthorized, ERROR_USER_NOT_FOUND);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
             }
@@ -402,14 +402,14 @@ impl ServerHook for UserGetRoute {
                 Ok(id) => id,
                 Err(_) => {
                     let response: ApiResponse<&str> =
-                        ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid user ID");
+                        ApiResponse::new(ApiResponseStatus::InvalidRequest, ERROR_INVALID_USER_ID);
                     ctx.get_mut_response().set_body(response.to_json_bytes());
                     return Status::Continue;
                 }
             },
             None => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::InvalidRequest, "User ID is required");
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, ERROR_USER_ID_REQUIRED);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
             }
@@ -422,7 +422,7 @@ impl ServerHook for UserGetRoute {
             }
             Ok(None) => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::ResourceNotFound, "User not found");
+                    ApiResponse::new(ApiResponseStatus::ResourceNotFound, ERROR_USER_NOT_FOUND);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
@@ -459,7 +459,7 @@ impl ServerHook for UserDeleteRoute {
             Ok(Some(user_info)) => user_info,
             Ok(None) => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::Unauthorized, "User not found");
+                    ApiResponse::new(ApiResponseStatus::Unauthorized, ERROR_USER_NOT_FOUND);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
             }
@@ -474,7 +474,7 @@ impl ServerHook for UserDeleteRoute {
         let user_role: UserRole = current_user.get_role().parse().unwrap_or_default();
         if !user_role.is_admin() {
             let response: ApiResponse<&str> =
-                ApiResponse::new(ApiResponseStatus::Forbidden, "Only admin can delete users");
+                ApiResponse::new(ApiResponseStatus::Forbidden, ERROR_ONLY_ADMIN_CAN_DELETE);
             ctx.get_mut_response().set_body(response.to_json_bytes());
             return Status::Continue;
         }
@@ -483,28 +483,28 @@ impl ServerHook for UserDeleteRoute {
                 Ok(id) => id,
                 Err(_) => {
                     let response: ApiResponse<&str> =
-                        ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid user ID");
+                        ApiResponse::new(ApiResponseStatus::InvalidRequest, ERROR_INVALID_USER_ID);
                     ctx.get_mut_response().set_body(response.to_json_bytes());
                     return Status::Continue;
                 }
             },
             None => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::InvalidRequest, "User ID is required");
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, ERROR_USER_ID_REQUIRED);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
             }
         };
         if current_user_id == target_user_id {
             let response: ApiResponse<&str> =
-                ApiResponse::new(ApiResponseStatus::Forbidden, "Cannot delete yourself");
+                ApiResponse::new(ApiResponseStatus::Forbidden, ERROR_CANNOT_DELETE_YOURSELF);
             ctx.get_mut_response().set_body(response.to_json_bytes());
             return Status::Continue;
         }
         match AuthService::delete_user(target_user_id).await {
             Ok(_) => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::Success, "User deleted successfully");
+                    ApiResponse::new(ApiResponseStatus::Success, SUCCESS_USER_DELETED);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
@@ -527,10 +527,10 @@ impl ServerHook for UserLogoutRoute {
     #[prologue_macros(is_post_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
-        let clear_cookie: String = "token=; Path=/; Max-Age=0; HttpOnly".to_string();
+        let clear_cookie: String = COOKIE_CLEAR_FORMAT.to_string();
         ctx.get_mut_response().set_header(SET_COOKIE, &clear_cookie);
         let response: ApiResponse<&str> =
-            ApiResponse::new(ApiResponseStatus::Success, "Logged out successfully");
+            ApiResponse::new(ApiResponseStatus::Success, SUCCESS_LOGGED_OUT);
         ctx.get_mut_response().set_body(response.to_json_bytes());
         Status::Continue
     }
@@ -554,7 +554,7 @@ impl ServerHook for UserInfoRoute {
                 }
                 Ok(None) => {
                     let response: ApiResponse<&str> =
-                        ApiResponse::new(ApiResponseStatus::Unauthorized, "User not found");
+                        ApiResponse::new(ApiResponseStatus::Unauthorized, ERROR_USER_NOT_FOUND);
                     ctx.get_mut_response().set_body(response.to_json_bytes());
                 }
                 Err(error) => {

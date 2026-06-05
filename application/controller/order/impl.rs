@@ -32,7 +32,7 @@ impl ServerHook for RecordCreateRoute {
             Ok(Some(user_info)) => user_info,
             Ok(None) => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::Unauthorized, "User not found");
+                    ApiResponse::new(ApiResponseStatus::Unauthorized, ERROR_USER_NOT_FOUND);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
             }
@@ -48,7 +48,7 @@ impl ServerHook for RecordCreateRoute {
         if !user_role.is_admin() {
             let response: ApiResponse<&str> = ApiResponse::new(
                 ApiResponseStatus::Forbidden,
-                "Only admin can create records",
+                ERROR_ONLY_ADMIN_CAN_CREATE_RECORDS,
             );
             ctx.get_mut_response().set_body(response.to_json_bytes());
             return Status::Continue;
@@ -59,7 +59,7 @@ impl ServerHook for RecordCreateRoute {
                 if !user_role.is_admin() {
                     let response: ApiResponse<&str> = ApiResponse::new(
                         ApiResponseStatus::Forbidden,
-                        "Only admin can create records for other users",
+                        ERROR_ONLY_ADMIN_CAN_CREATE_FOR_OTHERS,
                     );
                     ctx.get_mut_response().set_body(response.to_json_bytes());
                     return Status::Continue;
@@ -124,7 +124,7 @@ impl ServerHook for RecordListRoute {
             Ok(Some(user_info)) => user_info,
             Ok(None) => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::Unauthorized, "User not found");
+                    ApiResponse::new(ApiResponseStatus::Unauthorized, ERROR_USER_NOT_FOUND);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
             }
@@ -208,15 +208,17 @@ impl ServerHook for RecordGetRoute {
             Some(id_str) => match AuthService::decode_id(&id_str) {
                 Ok(id) => id,
                 Err(_) => {
-                    let response: ApiResponse<&str> =
-                        ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid record ID");
+                    let response: ApiResponse<&str> = ApiResponse::new(
+                        ApiResponseStatus::InvalidRequest,
+                        ERROR_INVALID_RECORD_ID,
+                    );
                     ctx.get_mut_response().set_body(response.to_json_bytes());
                     return Status::Continue;
                 }
             },
             None => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::InvalidRequest, "Record ID is required");
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, ERROR_RECORD_ID_REQUIRED);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
             }
@@ -229,7 +231,7 @@ impl ServerHook for RecordGetRoute {
             }
             Ok(None) => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::ResourceNotFound, "Record not found");
+                    ApiResponse::new(ApiResponseStatus::ResourceNotFound, ERROR_RECORD_NOT_FOUND);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
@@ -266,7 +268,7 @@ impl ServerHook for OverviewStatisticsRoute {
             Ok(Some(user_info)) => user_info,
             Ok(None) => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::Unauthorized, "User not found");
+                    ApiResponse::new(ApiResponseStatus::Unauthorized, ERROR_USER_NOT_FOUND);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
             }
@@ -280,10 +282,8 @@ impl ServerHook for OverviewStatisticsRoute {
         };
         let user_role: UserRole = current_user.get_role().parse().unwrap_or_default();
         if !user_role.is_admin() {
-            let response: ApiResponse<&str> = ApiResponse::new(
-                ApiResponseStatus::Forbidden,
-                "Only admin can access overview statistics",
-            );
+            let response: ApiResponse<&str> =
+                ApiResponse::new(ApiResponseStatus::Forbidden, ERROR_ONLY_ADMIN_OVERVIEW);
             ctx.get_mut_response().set_body(response.to_json_bytes());
             return Status::Continue;
         }
@@ -328,10 +328,8 @@ impl ServerHook for ImageUploadRoute {
         let file_name: String = match file_name_opt {
             Some(s) => urlencoding::decode(&s).unwrap_or_default().to_string(),
             None => {
-                let response: ApiResponse<&str> = ApiResponse::new(
-                    ApiResponseStatus::InvalidRequest,
-                    "Missing X-File-Name header",
-                );
+                let response: ApiResponse<&str> =
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, ERROR_MISSING_X_FILE_NAME);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
             }
@@ -339,10 +337,8 @@ impl ServerHook for ImageUploadRoute {
         let mime_type: String = match mime_type_opt {
             Some(s) => s,
             None => {
-                let response: ApiResponse<&str> = ApiResponse::new(
-                    ApiResponseStatus::InvalidRequest,
-                    "Missing X-Mime-Type header",
-                );
+                let response: ApiResponse<&str> =
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, ERROR_MISSING_X_MIME_TYPE);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
             }
@@ -388,15 +384,17 @@ impl ServerHook for ImageListRoute {
             Some(id_str) => match AuthService::decode_id(&id_str) {
                 Ok(id) => id,
                 Err(_) => {
-                    let response: ApiResponse<&str> =
-                        ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid record ID");
+                    let response: ApiResponse<&str> = ApiResponse::new(
+                        ApiResponseStatus::InvalidRequest,
+                        ERROR_INVALID_RECORD_ID,
+                    );
                     ctx.get_mut_response().set_body(response.to_json_bytes());
                     return Status::Continue;
                 }
             },
             None => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::InvalidRequest, "Record ID is required");
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, ERROR_RECORD_ID_REQUIRED);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
             }
@@ -441,14 +439,14 @@ impl ServerHook for ImageDownloadRoute {
                 Ok(id) => id,
                 Err(_) => {
                     let response: ApiResponse<&str> =
-                        ApiResponse::new(ApiResponseStatus::InvalidRequest, "Invalid image ID");
+                        ApiResponse::new(ApiResponseStatus::InvalidRequest, ERROR_INVALID_IMAGE_ID);
                     ctx.get_mut_response().set_body(response.to_json_bytes());
                     return Status::Continue;
                 }
             },
             None => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::InvalidRequest, "Image ID is required");
+                    ApiResponse::new(ApiResponseStatus::InvalidRequest, ERROR_IMAGE_ID_REQUIRED);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
             }
@@ -471,7 +469,7 @@ impl ServerHook for ImageDownloadRoute {
             }
             Ok(None) => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::ResourceNotFound, "Image not found");
+                    ApiResponse::new(ApiResponseStatus::ResourceNotFound, ERROR_IMAGE_NOT_FOUND);
                 ctx.get_mut_response().set_body(response.to_json_bytes());
             }
             Err(error) => {

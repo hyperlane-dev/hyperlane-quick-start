@@ -27,8 +27,14 @@ impl NotificationService {
         user_id: i32,
         query: NotificationListQueryRequest,
     ) -> Result<NotificationListResponse, String> {
-        let page: i32 = query.get_page().unwrap_or(1).max(1);
-        let limit: u64 = query.get_limit().unwrap_or(20).min(100);
+        let page: i32 = query
+            .get_page()
+            .unwrap_or(DEFAULT_PAGE_NUMBER)
+            .max(DEFAULT_PAGE_NUMBER);
+        let limit: u64 = query
+            .get_limit()
+            .unwrap_or(DEFAULT_PAGE_LIMIT)
+            .min(MAX_PAGE_LIMIT);
         let mut repository_query: NotificationQuery = NotificationQuery::default();
         repository_query
             .set_user_id(Some(user_id))
@@ -61,7 +67,7 @@ impl NotificationService {
         match model {
             Some(notification) => {
                 if notification.get_user_id() != user_id {
-                    return Err("You can only access your own notifications".to_string());
+                    return Err(ERROR_ACCESS_OWN_NOTIFICATIONS_ONLY.to_string());
                 }
                 let response: NotificationResponse = Self::model_to_response(&notification)?;
                 Ok(Some(response))
@@ -77,11 +83,11 @@ impl NotificationService {
         match model {
             Some(notification) => {
                 if notification.get_user_id() != user_id {
-                    return Err("You can only update your own notifications".to_string());
+                    return Err(ERROR_UPDATE_OWN_NOTIFICATIONS_ONLY.to_string());
                 }
                 NotificationRepository::update_read_status(notification_id, true).await
             }
-            None => Err("Notification not found".to_string()),
+            None => Err(ERROR_NOTIFICATION_NOT_FOUND.to_string()),
         }
     }
 
@@ -91,8 +97,8 @@ impl NotificationService {
         query
             .set_user_id(Some(user_id))
             .set_is_read(Some(false))
-            .set_page(1)
-            .set_limit(1000);
+            .set_page(DEFAULT_PAGE_NUMBER)
+            .set_limit(MARK_ALL_READ_LIMIT);
         let (models, _): (Vec<NotificationModel>, i64) =
             NotificationRepository::query_with_pagination(query).await?;
         for model in models {
@@ -108,11 +114,11 @@ impl NotificationService {
         match model {
             Some(notification) => {
                 if notification.get_user_id() != user_id {
-                    return Err("You can only delete your own notifications".to_string());
+                    return Err(ERROR_DELETE_OWN_NOTIFICATIONS_ONLY.to_string());
                 }
                 NotificationRepository::soft_delete_by_id(notification_id).await
             }
-            None => Err("Notification not found".to_string()),
+            None => Err(ERROR_NOTIFICATION_NOT_FOUND.to_string()),
         }
     }
 

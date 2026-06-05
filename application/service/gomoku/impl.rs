@@ -20,8 +20,9 @@ impl RoomBroadcastManager {
             }
             trace!("User {user_id} switching from room {old_room} to {room_id}");
         }
-        let _receiver: BroadcastMapReceiver<String> =
-            self.broadcast_map.subscribe_or_insert(room_id, 128);
+        let _receiver: BroadcastMapReceiver<String> = self
+            .broadcast_map
+            .subscribe_or_insert(room_id, DEFAULT_BROADCAST_CAPACITY);
         subs.insert(user_id.to_string(), room_id.to_string());
         trace!("User {user_id} subscribed to room {room_id}");
     }
@@ -209,7 +210,7 @@ impl GomokuWebSocketService {
             room_id = Self::generate_room_id(sender_id);
         }
         if GomokuRoomMapper::get_room(&room_id).await.is_some() {
-            return Err("Room already exists".to_string());
+            return Err(ERROR_ROOM_ALREADY_EXISTS.to_string());
         }
         let room: GomokuRoom = GomokuDomain::create_room(&room_id, sender_id);
         GomokuRoomMapper::save_room(room.clone()).await;
@@ -262,7 +263,7 @@ impl GomokuWebSocketService {
             .ok_or("Room not found".to_string())?;
         let added: bool = GomokuDomain::add_spectator(&mut room, sender_id);
         if !added {
-            return Err("Already in room".to_string());
+            return Err(ERROR_ALREADY_IN_ROOM.to_string());
         }
         GomokuRoomMapper::set_user_room(sender_id, &room_id).await;
         let manager: &RoomBroadcastManager = get_room_broadcast_manager();
@@ -367,11 +368,11 @@ impl GomokuWebSocketService {
     fn parse_position(payload: &serde_json::Value) -> Result<(usize, usize), String> {
         let x: usize = payload
             .get("x")
-            .and_then(|val| val.as_u64())
+            .and_then(|val: &serde_json::Value| val.as_u64())
             .ok_or("Invalid x".to_string())? as usize;
         let y: usize = payload
             .get("y")
-            .and_then(|val| val.as_u64())
+            .and_then(|val: &serde_json::Value| val.as_u64())
             .ok_or("Invalid y".to_string())? as usize;
         Ok((x, y))
     }
@@ -389,7 +390,7 @@ impl GomokuWebSocketService {
             .set_sender_id(sender_id.to_string())
             .set_payload(payload)
             .set_time(Utc::now().timestamp_millis());
-        serde_json::to_vec(&resp).map_err(|error| error.to_string())
+        serde_json::to_vec(&resp).map_err(|error: serde_json::Error| error.to_string())
     }
 
     #[instrument_trace]

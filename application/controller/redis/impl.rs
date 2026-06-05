@@ -53,7 +53,7 @@ impl ServerHook for CreateRecordRoute {
         match RedisService::create_redis_record(record).await {
             Ok(_) => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::Success, "Record created successfully");
+                    ApiResponse::new(ApiResponseStatus::Success, SUCCESS_RECORD_CREATED);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
@@ -91,7 +91,7 @@ impl ServerHook for UpdateRecordRoute {
         match RedisService::update_redis_record(record).await {
             Ok(_) => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::Success, "Record updated successfully");
+                    ApiResponse::new(ApiResponseStatus::Success, SUCCESS_RECORD_UPDATED);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
@@ -122,7 +122,7 @@ impl ServerHook for DeleteRecordRoute {
             None => {
                 let response: ApiResponse<&str> = ApiResponse::new(
                     ApiResponseStatus::InvalidRequest,
-                    "Key parameter is required",
+                    ERROR_KEY_PARAMETER_REQUIRED,
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
@@ -131,7 +131,7 @@ impl ServerHook for DeleteRecordRoute {
         match RedisService::delete_redis_record(key).await {
             Ok(_) => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::Success, "Record deleted successfully");
+                    ApiResponse::new(ApiResponseStatus::Success, SUCCESS_RECORD_DELETED);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {

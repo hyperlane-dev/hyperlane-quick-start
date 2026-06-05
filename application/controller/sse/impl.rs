@@ -14,7 +14,7 @@ impl ServerHook for SseRoute {
     )]
     #[instrument_trace]
     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
-        for i in 0..10 {
+        for i in 0..SSE_DEMO_ITERATION_COUNT {
             let data: String = format!("data:{i}{HTTP_DOUBLE_BR}");
             if stream.try_send(&data).await.is_err() {
                 break;

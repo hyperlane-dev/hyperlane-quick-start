@@ -93,7 +93,7 @@ impl UploadService {
     fn is_valid_directory_path(path: &str) -> bool {
         !path.is_empty()
             && !path.contains("../")
-            && path.chars().all(|c| c.is_ascii_digit() || c == '/')
+            && path.chars().all(|c: char| c.is_ascii_digit() || c == '/')
     }
 
     #[try_get_request_header(HEADER_X_FILE_ID => file_id_opt)]
@@ -221,13 +221,13 @@ impl UploadService {
 
     #[instrument_trace]
     pub fn parse_range_header(range_header: &str, file_size: u64) -> Result<RangeRequest, String> {
-        if !range_header.starts_with("bytes=") {
+        if !range_header.starts_with(RANGE_HEADER_PREFIX) {
             return Err("Invalid range header format".to_string());
         }
         let range_spec: &str = &range_header[6..];
         let parts: Vec<&str> = range_spec.split('-').collect();
         if parts.len() != 2 {
-            return Err("Invalid range specification".to_string());
+            return Err(ERROR_INVALID_RANGE_SPECIFICATION.to_string());
         }
         let start_str: &str = parts[0];
         let end_str: &str = parts[1];
@@ -235,18 +235,26 @@ impl UploadService {
             return Err("Invalid range: both start and end are empty".to_string());
         }
         let start: u64 = if start_str.is_empty() {
-            let suffix_length: u64 = end_str.parse().map_err(|_| "Invalid end range")?;
+            let suffix_length: u64 = end_str
+                .parse()
+                .map_err(|_: ParseIntError| ERROR_INVALID_END_RANGE)?;
             file_size.saturating_sub(suffix_length)
         } else {
-            start_str.parse().map_err(|_| "Invalid start range")?
+            start_str
+                .parse()
+                .map_err(|_: ParseIntError| ERROR_INVALID_START_RANGE)?
         };
         let end: Option<u64> = if end_str.is_empty() {
             None
         } else {
-            Some(end_str.parse().map_err(|_| "Invalid end range")?)
+            Some(
+                end_str
+                    .parse()
+                    .map_err(|_: ParseIntError| ERROR_INVALID_END_RANGE)?,
+            )
         };
         if start >= file_size {
-            return Err("Range start exceeds file size".to_string());
+            return Err(ERROR_RANGE_START_EXCEEDS_FILE_SIZE.to_string());
         }
         let mut range_request: RangeRequest = RangeRequest::default();
         range_request.set_start(start).set_end(end);
@@ -256,14 +264,14 @@ impl UploadService {
     #[instrument_trace]
     pub async fn read_file_range(path: &str, start: u64, length: u64) -> Result<Vec<u8>, String> {
         use std::io::{Read, Seek, SeekFrom};
-        let mut file: std::fs::File =
-            std::fs::File::open(path).map_err(|error| format!("Failed to open file {error}"))?;
+        let mut file: std::fs::File = std::fs::File::open(path)
+            .map_err(|error: std::io::Error| format!("Failed to open file {error}"))?;
         file.seek(SeekFrom::Start(start))
-            .map_err(|error| format!("Failed to seek file {error}"))?;
+            .map_err(|error: std::io::Error| format!("Failed to seek file {error}"))?;
         let mut buffer: Vec<u8> = vec![0; length as usize];
         let bytes_read: usize = file
             .read(&mut buffer)
-            .map_err(|error| format!("Failed to read file {error}"))?;
+            .map_err(|error: std::io::Error| format!("Failed to read file {error}"))?;
         buffer.truncate(bytes_read);
         Ok(buffer)
     }
@@ -284,9 +292,9 @@ impl UploadService {
         decode_file: &str,
     ) -> Result<(std::fs::Metadata, String), String> {
         let file_metadata: std::fs::Metadata =
-            std::fs::metadata(path).map_err(|_| "File not found".to_string())?;
+            std::fs::metadata(path).map_err(|_: std::io::Error| "File not found".to_string())?;
         if file_metadata.len() == 0 {
-            return Err("File is empty".to_string());
+            return Err(ERROR_FILE_IS_EMPTY.to_string());
         }
         let extension_name: String = FileExtension::get_extension_name(decode_file);
         let mut file_type: &str = FileExtension::parse(&extension_name).get_content_type();
@@ -310,7 +318,7 @@ impl UploadService {
             .unwrap_or(file_size - 1)
             .min(file_size - 1);
         if start > end {
-            return Err("Invalid range: start > end".to_string());
+            return Err(ERROR_INVALID_RANGE_START_GREATER_THAN_END.to_string());
         }
         let content_length: u64 = end - start + 1;
         let data: Vec<u8> = Self::read_file_range(path, start, content_length).await?;
@@ -381,13 +389,13 @@ impl UploadService {
             file_id,
             file_name,
             total_chunks,
-            |a, b| format!("{a}.{b}"),
+            |str_1: &str, size_1: usize| format!("{str_1}.{size_1}"),
         )
-        .map_err(|error| error.to_string())?;
+        .map_err(|error: ChunkStrategyError| error.to_string())?;
         upload_strategy
             .save_chunk(&chunk_data, chunk_index)
             .await
-            .map_err(|error| error.to_string())?;
+            .map_err(|error: ChunkStrategyError| error.to_string())?;
         Ok(save_upload_dir.clone())
     }
 
@@ -406,9 +414,9 @@ impl UploadService {
             file_id,
             file_name,
             total_chunks,
-            |a, b| format!("{a}.{b}"),
+            |str_1: &str, size_1: usize| format!("{str_1}.{size_1}"),
         )
-        .map_err(|error| error.to_string())?;
+        .map_err(|error: ChunkStrategyError| error.to_string())?;
         let url_encode_dir: String =
             Encode::execute(CHARSETS, &format!("{base_file_dir}/{file_id}")).unwrap_or_default();
         let url_encode_dir_file_name: String =
@@ -417,7 +425,7 @@ impl UploadService {
         upload_strategy
             .merge_chunks()
             .await
-            .map_err(|error| error.to_string())?;
+            .map_err(|error: ChunkStrategyError| error.to_string())?;
         Self::remove_file_id_map(file_id).await;
         Ok((save_upload_dir.clone(), url))
     }

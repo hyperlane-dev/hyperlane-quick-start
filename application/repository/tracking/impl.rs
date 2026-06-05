@@ -18,8 +18,10 @@ impl TrackingRepository {
 
     #[instrument_trace]
     pub async fn insert(record: TrackingRecord) -> Result<(), DbErr> {
-        let headers_json: String = serde_json::to_string(record.get_headers())
-            .map_err(|error| DbErr::Custom(format!("Failed to serialize headers {error}")))?;
+        let headers_json: String =
+            serde_json::to_string(record.get_headers()).map_err(|error: serde_json::Error| {
+                DbErr::Custom(format!("Failed to serialize headers {error}"))
+            })?;
         spawn(async move {
             let active_model: ActiveModel = ActiveModel {
                 headers: ActiveValue::Set(headers_json),
@@ -73,12 +75,12 @@ impl TrackingRepository {
         let header_key: String = query
             .try_get_header_key()
             .as_ref()
-            .map(|s| s.to_lowercase())
+            .map(|s: &String| s.to_lowercase())
             .unwrap_or_default();
         let header_value: &Option<String> = query.try_get_header_value();
         let filtered_records: Vec<Model> = all_records
             .into_iter()
-            .filter(|record| {
+            .filter(|record: &Model| {
                 if let Ok(headers) =
                     serde_json::from_str::<HashMap<String, Vec<String>>>(record.get_headers())
                 {
@@ -149,7 +151,7 @@ impl TrackingRepository {
         let content: String = query.try_get_body_content().clone().unwrap_or_default();
         let filtered_records: Vec<Model> = all_records
             .into_iter()
-            .filter(|record| record.get_body().contains(&content))
+            .filter(|record: &Model| record.get_body().contains(&content))
             .collect();
         let total: i64 = filtered_records.len() as i64;
         let page: i64 = query.get_page();

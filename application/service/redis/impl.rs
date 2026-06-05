@@ -20,8 +20,8 @@ impl RedisService {
         let conn_arc: ArcRwLock<Connection> =
             RedisPlugin::get_connection(DEFAULT_REDIS_INSTANCE_NAME, None).await?;
         let mut conn: RwLockWriteGuard<'_, Connection> = conn_arc.write().await;
-        let all_keys: Vec<String> = cmd("KEYS")
-            .arg("*")
+        let all_keys: Vec<String> = cmd(REDIS_KEYS_COMMAND)
+            .arg(REDIS_KEYS_PATTERN_ALL)
             .query(&mut *conn)
             .map_err(|error: RedisError| error.to_string())?;
         if all_keys.is_empty() {

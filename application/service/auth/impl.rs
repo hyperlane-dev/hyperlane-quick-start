@@ -33,7 +33,9 @@ impl AuthService {
             && cache.created_at.elapsed().as_secs() < RSA_KEY_CACHE_TTL_SECS
         {
             let response: RsaPublicKeyResponse = serde_json::from_str(&cache.response_json)
-                .map_err(|error| format!("Failed to parse cached key: {}", error))?;
+                .map_err(|error: serde_json::Error| {
+                    format!("Failed to parse cached key: {}", error)
+                })?;
             return Ok(response);
         }
         let (private_key, public_key): (RsaPrivateKey, rsa::RsaPublicKey) =
@@ -46,7 +48,7 @@ impl AuthService {
         let mut response: RsaPublicKeyResponse = RsaPublicKeyResponse::default();
         response.set_modulus(n_b64).set_exponent(e_b64);
         let response_json: String = serde_json::to_string(&response)
-            .map_err(|error| format!("Failed to serialize key: {}", error))?;
+            .map_err(|error: serde_json::Error| format!("Failed to serialize key: {}", error))?;
         let cache: RsaKeyCache = RsaKeyCache {
             response_json,
             created_at: Instant::now(),
@@ -61,7 +63,7 @@ impl AuthService {
             self.get_rsa_private_key().read().await;
         let private_key: &RsaPrivateKey = key_guard
             .as_ref()
-            .ok_or_else(|| "RSA private key not initialized".to_string())?;
+            .ok_or_else(|| ERROR_RSA_PRIVATE_KEY_NOT_INITIALIZED.to_string())?;
         let encrypted_bytes: Vec<u8> = RsaUtil::base64_decode(encrypted_text)?;
         let decrypted: String = RsaUtil::decrypt_with_private_key(private_key, &encrypted_bytes)?;
         Ok(decrypted)
@@ -69,22 +71,23 @@ impl AuthService {
 
     #[instrument_trace]
     pub fn encode_id(id: i32) -> Result<String, String> {
-        Encode::execute(CHARSETS, &id.to_string()).map_err(|_| "Failed to encode ID".to_string())
+        Encode::execute(CHARSETS, &id.to_string())
+            .map_err(|_: EncodeError| ERROR_FAILED_TO_ENCODE_ID.to_string())
     }
 
     #[instrument_trace]
     pub fn decode_id(encoded_id: &str) -> Result<i32, String> {
         Decode::execute(CHARSETS, encoded_id)
-            .map_err(|_| "Invalid ID format".to_string())?
+            .map_err(|_: DecodeError| ERROR_INVALID_ID_FORMAT.to_string())?
             .parse::<i32>()
-            .map_err(|_| "Invalid ID format".to_string())
+            .map_err(|_: std::num::ParseIntError| ERROR_INVALID_ID_FORMAT.to_string())
     }
 
     #[instrument_trace]
     pub fn extract_user_from_cookie(ctx: &Context) -> Result<i32, String> {
         let token: String = match ctx.get_request().try_get_cookie(TOKEN) {
             Some(cookie) => cookie,
-            None => return Err("Authentication token not found".to_string()),
+            None => return Err(ERROR_AUTHENTICATION_TOKEN_NOT_FOUND.to_string()),
         };
         let jwt_config: JwtConfig = JwtConfig::new(
             JwtConfigEnum::SecretKey.to_string(),
@@ -92,14 +95,15 @@ impl AuthService {
             JwtConfigEnum::Issuer.to_string(),
         );
         let jwt_service: JwtService = JwtService::from(jwt_config);
-        let user_id_value: serde_json::Value = match jwt_service.get_from_token(&token, "user_id") {
-            Ok(Some(value)) => value,
-            Ok(None) => return Err("user_id not found in token".to_string()),
-            Err(_) => return Err("Invalid token".to_string()),
-        };
+        let user_id_value: serde_json::Value =
+            match jwt_service.get_from_token(&token, JWT_CLAIM_USER_ID) {
+                Ok(Some(value)) => value,
+                Ok(None) => return Err(ERROR_USER_ID_NOT_FOUND_IN_TOKEN.to_string()),
+                Err(_) => return Err(ERROR_INVALID_TOKEN.to_string()),
+            };
         let user_id: i32 = match user_id_value.as_i64() {
             Some(id) => id as i32,
-            None => return Err("Invalid user_id format in token".to_string()),
+            None => return Err(ERROR_INVALID_USER_ID_FORMAT_IN_TOKEN.to_string()),
         };
         Ok(user_id)
     }
@@ -136,19 +140,19 @@ impl AuthService {
             && !email.is_empty()
             && !Self::validate_email(email)
         {
-            return Err("Invalid email format".to_string());
+            return Err(ERROR_INVALID_EMAIL_FORMAT.to_string());
         }
         if let Some(ref phone) = decrypted_phone
             && !phone.is_empty()
             && !Self::validate_phone(phone)
         {
-            return Err("Invalid phone format".to_string());
+            return Err(ERROR_INVALID_PHONE_FORMAT.to_string());
         }
         if UserRepository::find_by_username(decrypted_username.clone())
             .await?
             .is_some()
         {
-            return Err("Username already exists".to_string());
+            return Err(ERROR_USERNAME_ALREADY_EXISTS.to_string());
         }
         let password_hash: String = PasswordUtil::hash_password(&decrypted_password);
         let active_model: AuthUserActiveModel = AuthUserActiveModel {
@@ -178,19 +182,19 @@ impl AuthService {
         match user {
             Some(model) => {
                 if model.get_status() != UserStatus::Approved.to_i16() {
-                    return Err("User is not approved".to_string());
+                    return Err(ERROR_USER_IS_NOT_APPROVED.to_string());
                 }
                 let valid: bool =
                     PasswordUtil::verify_password(&decrypted_password, model.get_password_hash());
                 if !valid {
-                    return Err("Invalid password".to_string());
+                    return Err(ERROR_INVALID_PASSWORD.to_string());
                 }
                 let user_response: UserResponse = Self::model_to_user_response(&model)?;
                 let user_id: i32 = model.get_id();
                 let role: i16 = model.get_role();
                 Ok((user_response, user_id, role))
             }
-            None => Err("User not found".to_string()),
+            None => Err(ERROR_USER_NOT_FOUND.to_string()),
         }
     }
 
@@ -212,13 +216,13 @@ impl AuthService {
             && !email.is_empty()
             && !Self::validate_email(email)
         {
-            return Err("Invalid email format".to_string());
+            return Err(ERROR_INVALID_EMAIL_FORMAT.to_string());
         }
         if let Some(ref phone) = decrypted_phone
             && !phone.is_empty()
             && !Self::validate_phone(phone)
         {
-            return Err("Invalid phone format".to_string());
+            return Err(ERROR_INVALID_PHONE_FORMAT.to_string());
         }
         match UserRepository::find_by_id(user_id).await? {
             Some(model) => {
@@ -232,7 +236,7 @@ impl AuthService {
                 let result: AuthUserModel = UserRepository::update(active_model).await?;
                 Self::model_to_user_response(&result)
             }
-            None => Err("User not found".to_string()),
+            None => Err(ERROR_USER_NOT_FOUND.to_string()),
         }
     }
 
@@ -253,7 +257,7 @@ impl AuthService {
                     model.get_password_hash(),
                 );
                 if !valid {
-                    return Err("Old password is incorrect".to_string());
+                    return Err(ERROR_OLD_PASSWORD_IS_INCORRECT.to_string());
                 }
                 let new_password_hash: String =
                     PasswordUtil::hash_password(&decrypted_new_password);
@@ -262,7 +266,7 @@ impl AuthService {
                 UserRepository::update(active_model).await?;
                 Ok(())
             }
-            None => Err("User not found".to_string()),
+            None => Err(ERROR_USER_NOT_FOUND.to_string()),
         }
     }
 
@@ -280,13 +284,13 @@ impl AuthService {
                 let result: AuthUserModel = UserRepository::update(active_model).await?;
                 Self::model_to_user_response(&result)
             }
-            None => Err("User not found".to_string()),
+            None => Err(ERROR_USER_NOT_FOUND.to_string()),
         }
     }
 
     #[instrument_trace]
     pub async fn list_users(query: UserListQueryRequest) -> Result<UserListResponse, String> {
-        let limit: u64 = query.get_limit().unwrap_or(20);
+        let limit: u64 = query.get_limit().unwrap_or(DEFAULT_PAGE_LIMIT);
         let keyword: Option<String> = query.try_get_keyword().clone();
         let last_id: Option<i32> = query
             .try_get_last_id()
@@ -327,7 +331,7 @@ impl AuthService {
                 UserRepository::delete_by_id(user_id).await?;
                 Ok(())
             }
-            None => Err("User not found".to_string()),
+            None => Err(ERROR_USER_NOT_FOUND.to_string()),
         }
     }
 
@@ -336,7 +340,7 @@ impl AuthService {
         let mut response: UserResponse = UserResponse::default();
         let created_at: Option<i64> = model
             .try_get_created_at()
-            .map(|dt| dt.and_utc().timestamp_millis());
+            .map(|dt: NaiveDateTime| dt.and_utc().timestamp_millis());
         let role: UserRole = UserRole::try_from(model.get_role()).unwrap_or_default();
         let status: UserStatus = UserStatus::try_from(model.get_status()).unwrap_or_default();
         let encoded_id: String = Self::encode_id(model.get_id())?;

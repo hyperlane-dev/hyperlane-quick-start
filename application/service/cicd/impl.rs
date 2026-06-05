@@ -10,12 +10,12 @@ impl From<CicdPipelineModel> for PipelineDto {
             .set_created_at(
                 model
                     .try_get_created_at()
-                    .map(|dt| dt.and_utc().timestamp_millis()),
+                    .map(|dt: NaiveDateTime| dt.and_utc().timestamp_millis()),
             )
             .set_updated_at(
                 model
                     .try_get_updated_at()
-                    .map(|dt| dt.and_utc().timestamp_millis()),
+                    .map(|dt: NaiveDateTime| dt.and_utc().timestamp_millis()),
             );
         dto
     }
@@ -36,18 +36,18 @@ impl From<CicdRunModel> for RunDto {
             .set_started_at(
                 model
                     .try_get_started_at()
-                    .map(|dt| dt.and_utc().timestamp_millis()),
+                    .map(|dt: NaiveDateTime| dt.and_utc().timestamp_millis()),
             )
             .set_completed_at(
                 model
                     .try_get_completed_at()
-                    .map(|dt| dt.and_utc().timestamp_millis()),
+                    .map(|dt: NaiveDateTime| dt.and_utc().timestamp_millis()),
             )
             .set_duration_ms(model.get_duration_ms())
             .set_created_at(
                 model
                     .try_get_created_at()
-                    .map(|dt| dt.and_utc().timestamp_millis()),
+                    .map(|dt: NaiveDateTime| dt.and_utc().timestamp_millis()),
             );
         dto
     }
@@ -65,12 +65,12 @@ impl From<CicdJobModel> for JobDto {
             .set_started_at(
                 model
                     .try_get_started_at()
-                    .map(|dt| dt.and_utc().timestamp_millis()),
+                    .map(|dt: NaiveDateTime| dt.and_utc().timestamp_millis()),
             )
             .set_completed_at(
                 model
                     .try_get_completed_at()
-                    .map(|dt| dt.and_utc().timestamp_millis()),
+                    .map(|dt: NaiveDateTime| dt.and_utc().timestamp_millis()),
             )
             .set_duration_ms(model.get_duration_ms());
         dto
@@ -90,12 +90,12 @@ impl From<CicdStepModel> for StepDto {
             .set_started_at(
                 model
                     .try_get_started_at()
-                    .map(|dt| dt.and_utc().timestamp_millis()),
+                    .map(|dt: NaiveDateTime| dt.and_utc().timestamp_millis()),
             )
             .set_completed_at(
                 model
                     .try_get_completed_at()
-                    .map(|dt| dt.and_utc().timestamp_millis()),
+                    .map(|dt: NaiveDateTime| dt.and_utc().timestamp_millis()),
             )
             .set_duration_ms(model.get_duration_ms());
         dto
@@ -130,7 +130,7 @@ impl CicdService {
         let pipeline: Option<CicdPipelineModel> =
             PipelineRepository::find_by_id(pipeline_id).await?;
         let config_content: String = pipeline
-            .and_then(|p| p.try_get_config_content().clone())
+            .and_then(|model: CicdPipelineModel| model.try_get_config_content().clone())
             .ok_or_else(|| "Pipeline config content is required".to_string())?;
         let run_number: i32 = RunRepository::get_next_run_number(pipeline_id).await?;
         let run_result: CicdRunModel = RunRepository::create(
@@ -155,7 +155,7 @@ impl CicdService {
     #[instrument_trace]
     async fn parse_config_and_create_jobs(run_id: i32, config_content: &str) -> Result<(), String> {
         let config: PipelineConfig = serde_yaml::from_str(config_content)
-            .map_err(|error| format!("Failed to parse config: {error}"))?;
+            .map_err(|error: serde_yaml::Error| format!("Failed to parse config: {error}"))?;
         for (job_name, job_config) in config.get_jobs() {
             let job_result: CicdJobModel = JobRepository::create(run_id, job_name.clone()).await?;
             let job_id: i32 = job_result.get_id();
@@ -268,9 +268,9 @@ impl CicdService {
     ) -> Result<String, String> {
         let is_windows: bool = cfg!(target_os = "windows");
         let shell: String = if is_windows {
-            std::env::var("COMSPEC").unwrap_or_else(|_| "cmd.exe".to_string())
+            std::env::var("COMSPEC").unwrap_or_else(|_: std::env::VarError| "cmd.exe".to_string())
         } else {
-            std::env::var("SHELL").unwrap_or_else(|_| "bash".to_string())
+            std::env::var("SHELL").unwrap_or_else(|_: std::env::VarError| "bash".to_string())
         };
         let mut cmd: Command = Command::new(&shell);
         if is_windows {
@@ -285,7 +285,7 @@ impl CicdService {
         let stdout: ChildStdout = child
             .stdout
             .take()
-            .ok_or_else(|| "Failed to take stdout".to_string())?;
+            .ok_or_else(|| ERROR_FAILED_TO_TAKE_STDOUT.to_string())?;
         let stderr: ChildStderr = child
             .stderr
             .take()
@@ -400,7 +400,9 @@ impl CicdService {
     #[instrument_trace]
     pub async fn query_runs(param: QueryRunsParam) -> Result<PaginatedRunsDto, String> {
         let page_size: u64 = param.try_get_page_size().unwrap_or(50) as u64;
-        let status_str: Option<String> = param.try_get_status().map(|s| s.to_string());
+        let status_str: Option<String> = param
+            .try_get_status()
+            .map(|status: CicdStatus| status.to_string());
         let (models, total, has_more): (Vec<CicdRunModel>, i32, bool) =
             RunRepository::query_with_pagination(
                 param.try_get_pipeline_id(),
@@ -527,7 +529,7 @@ impl CicdService {
                     let step_output: String = step
                         .try_get_output()
                         .clone()
-                        .map(|o| format!("{o}\n\n{error_message}"))
+                        .map(|output: String| format!("{output}{BR}{BR}{error_message}"))
                         .unwrap_or_else(|| error_message.to_string());
                     StepRepository::update_status(step_id, CicdStatus::Failure, Some(step_output))
                         .await?;
@@ -661,23 +663,24 @@ impl StepOutputBuilder {
         let stdout: String = self.stdout.trim().to_string();
         let stderr: String = self.stderr.trim().to_string();
         if !stdout.is_empty() {
-            parts.push(format!("[Stdout]\n{stdout}"));
+            parts.push(format!("[Stdout]{BR}{stdout}"));
         }
         if !stderr.is_empty() {
-            parts.push(format!("[Stderr]\n{stderr}"));
+            parts.push(format!("[Stderr]{BR}{stderr}"));
         }
         if self.is_timeout {
             parts.push(format!(
-                "[Timeout]\nTask was cancelled after {} seconds due to timeout",
+                "[Timeout]{BR}Task was cancelled after {} seconds due to timeout",
                 self.timeout_secs
             ));
         }
         if parts.is_empty() {
             "Command executed successfully (no output)".to_string()
         } else if self.is_timeout {
-            format!("Error: Task timeout\n\n{}", parts.join("\n\n"))
+            let parts_join: String = parts.join(&format!("{BR}{BR}"));
+            format!("Error: Task timeout{BR}{BR}{}", parts_join)
         } else {
-            parts.join("\n\n")
+            parts.join(&format!("{BR}{BR}"))
         }
     }
 }
@@ -774,14 +777,16 @@ impl LogStreamManager {
         let stderr_guard: RwLockReadGuard<'_, String> = output.stderr.read().await;
         let mut result: String = String::new();
         if !stdout_guard.is_empty() {
-            result.push_str("[Stdout]\n");
+            result.push_str("[Stdout]");
+            result.push_str(BR);
             result.push_str(&stdout_guard);
         }
         if !stderr_guard.is_empty() {
             if !result.is_empty() {
-                result.push('\n');
+                result.push_str(BR);
             }
-            result.push_str("[Stderr]\n");
+            result.push_str("[Stderr]");
+            result.push_str(BR);
             result.push_str(&stderr_guard);
         }
         Some(result)
@@ -821,7 +826,7 @@ impl LogStreamManager {
             .read()
             .await
             .get(&run_id)
-            .map(|steps| steps.iter().copied().collect())
+            .map(|steps: &HashSet<i32>| steps.iter().copied().collect())
             .unwrap_or_default()
     }
 

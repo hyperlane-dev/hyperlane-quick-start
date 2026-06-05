@@ -93,8 +93,8 @@ impl RssService {
             .collect();
         let results: Vec<Vec<UploadedFile>> = join_all(tasks).await;
         let mut files: Vec<UploadedFile> = results.into_iter().flatten().collect();
-        files.sort_by(|a: &UploadedFile, b: &UploadedFile| {
-            b.get_upload_time().cmp(a.get_upload_time())
+        files.sort_by(|item_1: &UploadedFile, item_2: &UploadedFile| {
+            item_2.get_upload_time().cmp(item_1.get_upload_time())
         });
         files
     }
@@ -209,10 +209,10 @@ impl RssService {
         let items: Vec<RssItem> = join_all(tasks).await;
         let mut channel: RssChannel = RssChannel::default();
         channel
-            .set_title("Uploaded Resources Feed".to_string())
+            .set_title(RSS_FEED_TITLE.to_string())
             .set_link(base_url.to_string())
-            .set_description("Subscribe to the latest uploaded resource files".to_string())
-            .set_language("en-US".to_string())
+            .set_description(RSS_FEED_DESCRIPTION.to_string())
+            .set_language(RSS_FEED_LANGUAGE.to_string())
             .set_items(items);
         Self::build_rss_xml(&channel)
     }

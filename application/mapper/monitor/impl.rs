@@ -53,7 +53,7 @@ impl PerformanceRingBuffer {
     pub fn get_range(&self, start_timestamp: u64, end_timestamp: u64) -> Vec<PerformanceDataPoint> {
         self.get_all_sorted()
             .into_iter()
-            .filter(|point| {
+            .filter(|point: &PerformanceDataPoint| {
                 let timestamp: u64 = point.get_timestamp();
                 timestamp >= start_timestamp && timestamp <= end_timestamp
             })

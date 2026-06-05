@@ -464,7 +464,7 @@ impl BlogService {
             AuthService::encode_id(model.get_user_id()).unwrap_or_default();
         let username: Option<String> = UserRepository::find_by_id(model.get_user_id())
             .await?
-            .map(|user| user.get_username().clone());
+            .map(|user: AuthUserModel| user.get_username().clone());
         let cover_image: Option<BlogImageResponse> = if model.get_cover_image_id() > 0 {
             match BlogImageRepository::find_by_id(model.get_cover_image_id()).await? {
                 Some(image_model) => {

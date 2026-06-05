@@ -5,7 +5,7 @@ impl DatasetService {
     pub async fn fetch_dataset() -> Result<String, String> {
         let client: reqwest::Client = reqwest::Client::builder()
             .build()
-            .map_err(|error| format!("Failed to build client {error}"))?;
+            .map_err(|error: reqwest::Error| format!("Failed to build client {error}"))?;
         match client.get(DATASET_URL).send().await {
             Ok(response) => {
                 let response_text: String = response.text().await.unwrap_or_default();

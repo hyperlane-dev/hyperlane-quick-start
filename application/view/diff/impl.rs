@@ -8,7 +8,7 @@ impl ServerHook for DiffViewRoute {
     #[prologue_macros(
         methods(get, post),
         response_status_code(302),
-        response_header(LOCATION => "/static/diff/index.html")
+        response_header(LOCATION => DIFF_VIEW_REDIRECT_PATH)
     )]
     #[instrument_trace]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {

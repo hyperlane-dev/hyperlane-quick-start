@@ -23,7 +23,7 @@ impl ChatHistoryRepository {
         active_model
             .insert(&db)
             .await
-            .map_err(|error| format!("PostgreSQL insert error {error}"))?;
+            .map_err(|error: DbErr| format!("PostgreSQL insert error {error}"))?;
         Ok(())
     }
 

@@ -116,7 +116,9 @@ impl MonitorService {
         let mut total_bytes: u64 = 0;
         let networks: RwLockReadGuard<'_, Networks> = Self::get_or_init_networks().read().await;
         for (interface_name, network) in networks.iter() {
-            if interface_name.contains("lo") || interface_name.contains("Loopback") {
+            if interface_name.contains(LOOPBACK_INTERFACE_LO)
+                || interface_name.contains(LOOPBACK_INTERFACE_LOOPBACK)
+            {
                 continue;
             }
             total_packets += network.total_packets_received() + network.total_packets_transmitted();
@@ -212,7 +214,7 @@ impl MonitorService {
         let system: RwLockReadGuard<'_, System> = Self::get_or_init_system().read().await;
         let cpus: &[Cpu] = system.cpus();
         if !cpus.is_empty() {
-            let total_usage: f32 = cpus.iter().map(|cpu| cpu.cpu_usage()).sum();
+            let total_usage: f32 = cpus.iter().map(|cpu: &Cpu| cpu.cpu_usage()).sum();
             return (total_usage / cpus.len() as f32) as f64;
         }
         0.0
@@ -272,7 +274,7 @@ impl MonitorService {
         let system: RwLockReadGuard<'_, System> = Self::get_or_init_system().read().await;
         let cpus: &[Cpu] = system.cpus();
         if !cpus.is_empty() {
-            let total_usage: f32 = cpus.iter().map(|cpu| cpu.cpu_usage()).sum();
+            let total_usage: f32 = cpus.iter().map(|cpu: &Cpu| cpu.cpu_usage()).sum();
             let avg_usage: f64 = (total_usage / cpus.len() as f32) as f64;
             return avg_usage / 100.0;
         }
@@ -291,22 +293,22 @@ impl MonitorService {
 
     #[instrument_trace]
     fn get_hostname() -> String {
-        System::host_name().unwrap_or_else(|| "Unknown".to_string())
+        System::host_name().unwrap_or_else(|| FALLBACK_UNKNOWN.to_string())
     }
 
     #[instrument_trace]
     fn get_os_name() -> String {
-        System::name().unwrap_or_else(|| "Unknown".to_string())
+        System::name().unwrap_or_else(|| FALLBACK_UNKNOWN.to_string())
     }
 
     #[instrument_trace]
     fn get_os_version() -> String {
-        System::os_version().unwrap_or_else(|| "Unknown".to_string())
+        System::os_version().unwrap_or_else(|| FALLBACK_UNKNOWN.to_string())
     }
 
     #[instrument_trace]
     fn get_kernel_version() -> String {
-        System::kernel_version().unwrap_or_else(|| "Unknown".to_string())
+        System::kernel_version().unwrap_or_else(|| FALLBACK_UNKNOWN.to_string())
     }
 
     #[instrument_trace]
@@ -320,7 +322,7 @@ impl MonitorService {
         if let Some(cpu) = system.cpus().first() {
             return cpu.brand().to_string();
         }
-        "Unknown".to_string()
+        FALLBACK_UNKNOWN.to_string()
     }
 
     #[instrument_trace]
@@ -332,6 +334,6 @@ impl MonitorService {
     #[instrument_trace]
     fn get_total_disk() -> u64 {
         let disks: Disks = Disks::new_with_refreshed_list();
-        disks.iter().map(|disk| disk.total_space()).sum()
+        disks.iter().map(|disk: &Disk| disk.total_space()).sum()
     }
 }

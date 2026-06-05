@@ -4,7 +4,7 @@ impl OrderService {
     #[instrument_trace]
     fn generate_bill_no() -> String {
         let timestamp: u64 = timestamp_millis();
-        format!("BILL{}{:04}", timestamp, timestamp % 10000)
+        format!("{BILL_NO_PREFIX}{timestamp}{:04}", timestamp % 10000)
     }
 
     #[instrument_trace]
@@ -183,7 +183,7 @@ impl OrderService {
         let mut response: RecordResponse = RecordResponse::default();
         let created_at: Option<i64> = model
             .try_get_created_at()
-            .map(|dt| dt.and_utc().timestamp_millis());
+            .map(|dt: NaiveDateTime| dt.and_utc().timestamp_millis());
         let bill_date: i64 = model
             .get_bill_date()
             .and_time(chrono::NaiveTime::from_hms_opt(0, 0, 0).unwrap())
@@ -334,7 +334,7 @@ impl OrderService {
             dates.push(current_date.to_string());
             let day_records: Vec<&OrderRecordModel> = records
                 .iter()
-                .filter(|r| *r.get_bill_date() == current_date)
+                .filter(|r| r.get_bill_date() == &current_date)
                 .collect();
             let mut day_income: Decimal = Decimal::ZERO;
             let mut day_expense: Decimal = Decimal::ZERO;
@@ -418,10 +418,10 @@ impl OrderService {
                 item
             })
             .collect();
-        result.sort_by(|a, b| {
-            let a_val: i64 = a.get_value();
-            let b_val: i64 = b.get_value();
-            b_val.cmp(&a_val)
+        result.sort_by(|item_1: &CategoryItem, item_2: &CategoryItem| {
+            let item_1_val: i64 = item_1.get_value();
+            let item_2_val: i64 = item_2.get_value();
+            item_2_val.cmp(&item_1_val)
         });
         Ok(result)
     }
@@ -486,7 +486,7 @@ impl OrderService {
             dates.push(current_date.to_string());
             let day_count: i64 = records
                 .iter()
-                .filter(|r| *r.get_bill_date() == current_date)
+                .filter(|r| r.get_bill_date() == &current_date)
                 .count() as i64;
             counts.push(day_count);
             current_date += chrono::Duration::days(1);
@@ -510,17 +510,17 @@ impl OrderService {
         }
         let mut result: Vec<CategoryAmountItem> = category_map
             .into_iter()
-            .map(|(name, amount)| {
+            .map(|(name, amount): (String, Decimal)| {
                 let mut item: CategoryAmountItem = CategoryAmountItem::default();
                 item.set_name(name);
                 item.set_amount(amount.to_string());
                 item
             })
             .collect();
-        result.sort_by(|a, b| {
-            let a_amt: Decimal = a.get_amount().parse().unwrap_or(Decimal::ZERO);
-            let b_amt: Decimal = b.get_amount().parse().unwrap_or(Decimal::ZERO);
-            b_amt.cmp(&a_amt)
+        result.sort_by(|item_1: &CategoryAmountItem, item_2: &CategoryAmountItem| {
+            let item_1_amount: Decimal = item_1.get_amount().parse().unwrap_or(Decimal::ZERO);
+            let item_2_amount: Decimal = item_2.get_amount().parse().unwrap_or(Decimal::ZERO);
+            item_2_amount.cmp(&item_1_amount)
         });
         Ok(result)
     }
@@ -539,9 +539,12 @@ impl OrderService {
             dates.push(current_date.to_string());
             let day_records: Vec<&OrderRecordModel> = records
                 .iter()
-                .filter(|r| *r.get_bill_date() == current_date)
+                .filter(|r| r.get_bill_date() == &current_date)
                 .collect();
-            let unique_users: HashSet<i32> = day_records.iter().map(|r| r.get_user_id()).collect();
+            let unique_users: HashSet<i32> = day_records
+                .iter()
+                .map(|record_item: &&OrderRecordModel| record_item.get_user_id())
+                .collect();
             active_users.push(unique_users.len() as i64);
             new_records.push(day_records.len() as i64);
             current_date += chrono::Duration::days(1);
@@ -579,7 +582,7 @@ impl OrderService {
         while current_date <= end_date {
             let day_records: Vec<&OrderRecordModel> = records
                 .iter()
-                .filter(|r| *r.get_bill_date() == current_date)
+                .filter(|r| r.get_bill_date() == &current_date)
                 .collect();
             let mut day_income: Decimal = Decimal::ZERO;
             let mut day_expense: Decimal = Decimal::ZERO;
@@ -617,7 +620,7 @@ impl OrderService {
         for record in &records {
             let hour: i32 = record
                 .try_get_created_at()
-                .map(|dt| dt.hour() as i32)
+                .map(|dt: NaiveDateTime| dt.hour() as i32)
                 .unwrap_or(0);
             let entry: &mut (i64, Decimal, Decimal) =
                 hourly_data
@@ -632,7 +635,7 @@ impl OrderService {
             }
         }
         let result: Vec<HourlyDistributionItem> = (0..24)
-            .map(|hour| {
+            .map(|hour: i32| {
                 let (count, income, expense) =
                     hourly_data
                         .get(&hour)
@@ -690,14 +693,14 @@ impl OrderService {
         let mut result: Vec<PeriodOverPeriodItem> = vec![];
         let periods: Vec<(String, NaiveDate, NaiveDate, NaiveDate, NaiveDate)> = vec![
             (
-                "WoW".to_string(),
+                PERIOD_NAME_WOW.to_string(),
                 today - chrono::Duration::days(6),
                 today,
                 today - chrono::Duration::days(13),
                 today - chrono::Duration::days(7),
             ),
             (
-                "MoM".to_string(),
+                PERIOD_NAME_MOM.to_string(),
                 today - chrono::Duration::days(29),
                 today,
                 today - chrono::Duration::days(59),
@@ -781,18 +784,18 @@ impl OrderService {
                 .push((date, amount));
         }
         let dates: Vec<String> = (0..=days)
-            .map(|i| (start_date + chrono::Duration::days(i)).to_string())
+            .map(|i: i64| (start_date + chrono::Duration::days(i)).to_string())
             .collect();
         let result: Vec<CategoryTrendItem> = category_data
             .into_iter()
-            .map(|(category, data)| {
+            .map(|(category, data): (String, Vec<(String, Decimal)>)| {
                 let amounts: Vec<String> = dates
                     .iter()
-                    .map(|date| {
+                    .map(|date: &String| {
                         let total: Decimal = data
                             .iter()
-                            .filter(|(d, _)| d == date)
-                            .map(|(_, amt)| amt)
+                            .filter(|(data_item, _)| data_item == date)
+                            .map(|(_, amount)| amount)
                             .sum();
                         total.to_string()
                     })
@@ -823,18 +826,19 @@ impl OrderService {
             let date: NaiveDate = start_date + chrono::Duration::days(day_offset);
             let new_users: Vec<i32> = users
                 .iter()
-                .filter(|u| u.get_created_at().date() == date)
-                .map(|u| u.get_id())
+                .filter(|user_item: &&AuthUserModel| user_item.get_created_at().date() == date)
+                .map(|user_item: &AuthUserModel| user_item.get_id())
                 .collect();
             let new_users_count: i64 = new_users.len() as i64;
             let retained: i64 = if new_users_count > 0 {
                 let next_day: NaiveDate = date + chrono::Duration::days(1);
                 let retained_users: HashSet<i32> = records
                     .iter()
-                    .filter(|r| {
-                        *r.get_bill_date() == next_day && new_users.contains(&r.get_user_id())
+                    .filter(|record_item: &&OrderRecordModel| {
+                        *record_item.get_bill_date() == next_day
+                            && new_users.contains(&record_item.get_user_id())
                     })
-                    .map(|r| r.get_user_id())
+                    .map(|record_item: &OrderRecordModel| record_item.get_user_id())
                     .collect();
                 retained_users.len() as i64
             } else {
@@ -885,10 +889,10 @@ impl OrderService {
                 .set_total_amount(total.to_string());
             result.push(item);
         }
-        result.sort_by(|a, b| {
-            let a_amt: Decimal = a.get_total_amount().parse().unwrap_or(Decimal::ZERO);
-            let b_amt: Decimal = b.get_total_amount().parse().unwrap_or(Decimal::ZERO);
-            b_amt.cmp(&a_amt)
+        result.sort_by(|item_1: &TopUserItem, item_2: &TopUserItem| {
+            let item_1_amount: Decimal = item_1.get_total_amount().parse().unwrap_or(Decimal::ZERO);
+            let item_2_amount: Decimal = item_2.get_total_amount().parse().unwrap_or(Decimal::ZERO);
+            item_2_amount.cmp(&item_1_amount)
         });
         result.truncate(limit as usize);
         Ok(result)
@@ -1112,7 +1116,7 @@ impl OrderService {
             PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
         let record_model: OrderRecordModel = match RecordRepository::find_by_id(record_id).await? {
             Some(model) => model,
-            None => return Err("Record not found".to_string()),
+            None => return Err(ERROR_RECORD_NOT_FOUND.to_string()),
         };
         let txn: DatabaseTransaction = db.begin().await.map_err(|e: DbErr| e.to_string())?;
         let image_active_model: OrderRecordImageActiveModel = OrderRecordImageActiveModel {
@@ -1186,7 +1190,7 @@ impl OrderService {
     ) -> Result<Option<ImageDataResponse>, String> {
         let user_role: UserRole = match UserRepository::find_by_id(user_id).await? {
             Some(ref model) => UserRole::try_from(model.get_role()).unwrap_or_default(),
-            None => return Err("User not found".to_string()),
+            None => return Err(ERROR_USER_NOT_FOUND.to_string()),
         };
         if !user_role.is_admin() {
             return Err("Only admin can access image data".to_string());
@@ -1252,7 +1256,7 @@ impl OrderService {
     ) -> Result<RecordImageResponse, String> {
         let created_at: i64 = model
             .try_get_created_at()
-            .map(|dt| dt.and_utc().timestamp_millis())
+            .map(|dt: NaiveDateTime| dt.and_utc().timestamp_millis())
             .unwrap_or(0);
         let mut response: RecordImageResponse = RecordImageResponse::default();
         let encoded_id: String = AuthService::encode_id(model.get_id())?;

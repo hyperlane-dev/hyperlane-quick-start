@@ -1,0 +1,12 @@
+pub const ERROR_UNSUPPORTED_MESSAGE_TYPE: &str = "Unsupported message type";
+pub const ERROR_ROOM_ALREADY_EXISTS: &str = "Room already exists";
+pub const ERROR_ROOM_NOT_FOUND: &str = "Room not found";
+pub const ERROR_ALREADY_IN_ROOM: &str = "Already in room";
+pub const ERROR_USER_NOT_IN_ROOM: &str = "User not in room";
+pub const ERROR_INVALID_X: &str = "Invalid x";
+pub const ERROR_INVALID_Y: &str = "Invalid y";
+pub const DEFAULT_BROADCAST_CAPACITY: usize = 128;
+pub const POSITION_X: &str = "x";
+pub const POSITION_Y: &str = "y";
+pub const QUERY_UUID: &str = "uuid";
+pub const QUERY_UID: &str = "uid";

@@ -57,7 +57,7 @@ impl ServerHook for QueryRoute {
             None => {
                 let response: ApiResponse<&str> = ApiResponse::new(
                     ApiResponseStatus::InvalidRequest,
-                    "Shortlink ID parameter is required",
+                    ERROR_SHORTLINK_ID_REQUIRED,
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
@@ -77,8 +77,10 @@ impl ServerHook for QueryRoute {
                 )
             }
             Ok(None) => {
-                let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::ResourceNotFound, "Shortlink not found");
+                let response: ApiResponse<&str> = ApiResponse::new(
+                    ApiResponseStatus::ResourceNotFound,
+                    ERROR_SHORTLINK_NOT_FOUND,
+                );
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {

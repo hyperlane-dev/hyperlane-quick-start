@@ -23,10 +23,11 @@ impl ServerHook for RssFeedRoute {
     #[instrument_trace]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let limit: Option<usize> = limit_opt
-            .and_then(|l| l.parse().ok())
-            .map(|l: usize| l.min(MAX_LIMIT));
-        let offset: Option<usize> = offset_opt.and_then(|o| o.parse().ok());
-        let timezone: Option<Timezone> = timezone_opt.and_then(|tz| tz.parse().ok());
+            .and_then(|limit: String| limit.parse().ok())
+            .map(|limit: usize| limit.min(MAX_LIMIT));
+        let offset: Option<usize> = offset_opt.and_then(|offset: String| offset.parse().ok());
+        let timezone: Option<Timezone> =
+            timezone_opt.and_then(|timezone: String| timezone.parse().ok());
         let host: String = host_opt.unwrap_or_else(|| LOCALHOST.to_string());
         let base_url: String = format!("{HTTP_LOWERCASE}://{host}");
         let rss_xml: String =

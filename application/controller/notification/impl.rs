@@ -89,7 +89,7 @@ impl ServerHook for NotificationListRoute {
         if let Some(limit_str) = limit_opt
             && let Ok(limit) = limit_str.parse::<u64>()
         {
-            query.set_limit(Some(limit.min(100)));
+            query.set_limit(Some(limit.min(MAX_LIST_LIMIT)));
         }
         match NotificationService::list_notifications(current_user_id, query).await {
             Ok(list_response) => {
@@ -127,7 +127,7 @@ impl ServerHook for NotificationGetRoute {
                 Err(_) => {
                     let response: ApiResponse<&str> = ApiResponse::new(
                         ApiResponseStatus::InvalidRequest,
-                        "Invalid notification ID",
+                        ERROR_INVALID_NOTIFICATION_ID,
                     );
                     ctx.get_mut_response().set_body(response.to_json_bytes());
                     return Status::Continue;
@@ -136,7 +136,7 @@ impl ServerHook for NotificationGetRoute {
             None => {
                 let response: ApiResponse<&str> = ApiResponse::new(
                     ApiResponseStatus::InvalidRequest,
-                    "Notification ID is required",
+                    ERROR_NOTIFICATION_ID_REQUIRED,
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
@@ -161,7 +161,7 @@ impl ServerHook for NotificationGetRoute {
             Ok(None) => {
                 let response: ApiResponse<&str> = ApiResponse::new(
                     ApiResponseStatus::ResourceNotFound,
-                    "Notification not found",
+                    ERROR_NOTIFICATION_NOT_FOUND,
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
@@ -195,7 +195,7 @@ impl ServerHook for NotificationReadRoute {
                 Err(_) => {
                     let response: ApiResponse<&str> = ApiResponse::new(
                         ApiResponseStatus::InvalidRequest,
-                        "Invalid notification ID",
+                        ERROR_INVALID_NOTIFICATION_ID,
                     );
                     ctx.get_mut_response().set_body(response.to_json_bytes());
                     return Status::Continue;
@@ -204,7 +204,7 @@ impl ServerHook for NotificationReadRoute {
             None => {
                 let response: ApiResponse<&str> = ApiResponse::new(
                     ApiResponseStatus::InvalidRequest,
-                    "Notification ID is required",
+                    ERROR_NOTIFICATION_ID_REQUIRED,
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
@@ -222,8 +222,10 @@ impl ServerHook for NotificationReadRoute {
         };
         match NotificationService::mark_as_read(notification_id, current_user_id).await {
             Ok(()) => {
-                let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::Success, "Notification marked as read");
+                let response: ApiResponse<&str> = ApiResponse::new(
+                    ApiResponseStatus::Success,
+                    SUCCESS_NOTIFICATION_MARKED_AS_READ,
+                );
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
@@ -260,7 +262,7 @@ impl ServerHook for NotificationReadAllRoute {
             Ok(()) => {
                 let response: ApiResponse<&str> = ApiResponse::new(
                     ApiResponseStatus::Success,
-                    "All notifications marked as read",
+                    SUCCESS_ALL_NOTIFICATIONS_MARKED_AS_READ,
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
@@ -294,7 +296,7 @@ impl ServerHook for NotificationDeleteRoute {
                 Err(_) => {
                     let response: ApiResponse<&str> = ApiResponse::new(
                         ApiResponseStatus::InvalidRequest,
-                        "Invalid notification ID",
+                        ERROR_INVALID_NOTIFICATION_ID,
                     );
                     ctx.get_mut_response().set_body(response.to_json_bytes());
                     return Status::Continue;
@@ -303,7 +305,7 @@ impl ServerHook for NotificationDeleteRoute {
             None => {
                 let response: ApiResponse<&str> = ApiResponse::new(
                     ApiResponseStatus::InvalidRequest,
-                    "Notification ID is required",
+                    ERROR_NOTIFICATION_ID_REQUIRED,
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
@@ -321,10 +323,8 @@ impl ServerHook for NotificationDeleteRoute {
         };
         match NotificationService::delete_notification(notification_id, current_user_id).await {
             Ok(()) => {
-                let response: ApiResponse<&str> = ApiResponse::new(
-                    ApiResponseStatus::Success,
-                    "Notification deleted successfully",
-                );
+                let response: ApiResponse<&str> =
+                    ApiResponse::new(ApiResponseStatus::Success, SUCCESS_NOTIFICATION_DELETED);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {

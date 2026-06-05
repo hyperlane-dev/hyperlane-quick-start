@@ -9,7 +9,7 @@ impl ServerHook for UserViewRoute {
     #[prologue_macros(
         methods(get, post),
         response_status_code(302),
-        response_header(LOCATION => "/static/user/index.html")
+        response_header(LOCATION => USER_VIEW_REDIRECT_PATH)
     )]
     #[instrument_trace]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {

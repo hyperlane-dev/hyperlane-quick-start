@@ -1,0 +1,13 @@
+pub const ERROR_RECORD_NOT_FOUND: &str = "Record not found";
+pub const ERROR_ONLY_ADMIN_CAN_ACCESS_IMAGE_DATA: &str = "Only admin can access image data";
+pub const BILL_NO_PREFIX: &str = "BILL";
+pub const PERIOD_NAME_WOW: &str = "WoW";
+pub const PERIOD_NAME_MOM: &str = "MoM";
+pub const PERIOD_NAME_QOQ: &str = "QoQ";
+pub const DEFAULT_PAGE_NUMBER: i32 = 1;
+pub const DAILY_TREND_DAYS: i64 = 30;
+pub const MONTHLY_COMPARISON_MONTHS: i64 = 6;
+pub const TOP_USERS_LIMIT: i64 = 10;
+pub const HOURLY_DISTRIBUTION_DAYS: i64 = 30;
+pub const WEEKLY_TREND_DAYS: i64 = 90;
+pub const IMAGE_DOWNLOAD_URL_TEMPLATE: &str = "/api/order/image/download/";
