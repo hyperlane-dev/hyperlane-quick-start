@@ -1,1 +1,1 @@
-pub const EUV_VIEW_REDIRECT_PATH: &str = "https://euv-dev.github.io/euv";
+pub const EUV_VIEW_REDIRECT_PATH: &str = "/github/pages/euv-dev/euv/";

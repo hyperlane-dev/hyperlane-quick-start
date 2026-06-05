@@ -5,6 +5,7 @@ pub mod cicd;
 pub mod diff;
 pub mod euv;
 pub mod favicon;
+pub mod github_pages;
 pub mod gomoku;
 pub mod json;
 pub mod monitor;

@@ -3,6 +3,7 @@ pub mod blog;
 pub mod chat;
 pub mod cicd;
 pub mod common;
+pub mod github_pages;
 pub mod gomoku;
 pub mod notification;
 pub mod order;

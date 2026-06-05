@@ -2,7 +2,7 @@
 
 use {
     hyperlane_bootstrap::{
-        application::{cicd::*, db::*, env::*, logger::*, monitor::*},
+        application::{cicd::*, db::*, env::*, github_pages::*, logger::*, monitor::*},
         common::*,
         framework::{runtime::*, server::*},
     },
@@ -20,6 +20,7 @@ fn main() {
     RuntimeBootstrap::init().get_runtime().block_on(async move {
         DbBootstrap::init().await;
         CicdBootstrap::init().await;
+        GithubPagesBootstrap::init().await;
         MonitorBootstrap::init().await;
         ProcessPlugin::create(env_config.get_server_pid_file_path(), || async {
             ServerBootstrap::init().await;

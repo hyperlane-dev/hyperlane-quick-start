@@ -28,6 +28,12 @@ pub const POSTGRESQL_BLOG_FAVORITE_TABLE_SQL: &str =
     include_str!("./postgresql/blog/favorite_table.sql");
 pub const POSTGRESQL_BLOG_IMAGE_TABLE_SQL: &str = include_str!("./postgresql/blog/image_table.sql");
 pub const POSTGRESQL_BLOG_INDEX_SQL: &str = include_str!("./postgresql/blog/index.sql");
+pub const POSTGRESQL_GITHUB_PAGES_TABLE_SQL: &str =
+    include_str!("./postgresql/github_pages/github_pages_table.sql");
+pub const POSTGRESQL_GITHUB_PAGES_INDEX_SQL: &str =
+    include_str!("./postgresql/github_pages/index.sql");
+pub const POSTGRESQL_GITHUB_PAGES_DATA_SQL: &str =
+    include_str!("./postgresql/github_pages/data.sql");
 pub const MYSQL_CICD_PIPELINE_TABLE_SQL: &str = include_str!("./mysql/cicd/pipeline_table.sql");
 pub const MYSQL_CICD_RUN_TABLE_SQL: &str = include_str!("./mysql/cicd/run_table.sql");
 pub const MYSQL_CICD_JOB_TABLE_SQL: &str = include_str!("./mysql/cicd/job_table.sql");

@@ -2,6 +2,7 @@ pub mod auth;
 pub mod blog;
 pub mod chat;
 pub mod cicd;
+pub mod github_pages;
 pub mod gomoku;
 pub mod log;
 pub mod monitor;

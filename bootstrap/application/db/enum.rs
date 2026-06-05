@@ -16,4 +16,5 @@ pub enum PostgresqlTableName {
     BlogLike,
     BlogFavorite,
     BlogImage,
+    GithubPages,
 }
