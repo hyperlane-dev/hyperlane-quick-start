@@ -99,6 +99,7 @@ use super::*;
         view::diff::openapi_diff_view,
         view::euv::openapi_euv_view,
         view::favicon::openapi_favicon,
+        view::github_pages::openapi_github_pages_proxy_root,
         view::github_pages::openapi_github_pages_proxy,
         view::gomoku::openapi_gomoku_view,
         view::json::openapi_json_view,
