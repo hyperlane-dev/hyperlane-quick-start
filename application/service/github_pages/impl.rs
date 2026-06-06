@@ -285,44 +285,17 @@ impl GithubPagesService {
 
     #[instrument_trace]
     pub async fn start_sync_timer() {
-        if let Ok(mut owner_entries) = fs::read_dir(GITHUB_PAGES_CACHE_DIR).await {
-            let mut has_pages: bool = false;
-            while let Ok(Some(owner_entry)) = owner_entries.next_entry().await {
-                let owner_name: String = owner_entry.file_name().to_string_lossy().to_string();
-                if owner_name.starts_with('.') {
-                    continue;
+        for (owner, repository) in GITHUB_PAGES_AUTO_SYNC_REPOSITORIES {
+            match Self::sync_github_pages(owner, repository).await {
+                Ok(()) => {
+                    info!("Synced GitHub Pages {owner}/{repository}");
                 }
-                let owner_path: String = format!("{GITHUB_PAGES_CACHE_DIR}/{owner_name}");
-                if !owner_entry
-                    .file_type()
-                    .await
-                    .map(|ft: std::fs::FileType| ft.is_dir())
-                    .unwrap_or(false)
-                {
-                    continue;
+                Err(error) => {
+                    error!("Failed to sync GitHub Pages {owner}/{repository} {error}");
                 }
-                if let Ok(mut repo_entries) = fs::read_dir(&owner_path).await {
-                    while let Ok(Some(repo_entry)) = repo_entries.next_entry().await {
-                        let repo_name: String =
-                            repo_entry.file_name().to_string_lossy().to_string();
-                        if repo_name.starts_with('.') {
-                            continue;
-                        }
-                        let index_path: String = format!("{owner_path}/{repo_name}/index.html");
-                        if fs::metadata(&index_path).await.is_ok() {
-                            has_pages = true;
-                            break;
-                        }
-                    }
-                }
-                if has_pages {
-                    break;
-                }
-            }
-            if has_pages {
-                Self::sync_all_pages().await;
             }
         }
+        Self::sync_all_pages().await;
         spawn(async {
             loop {
                 sleep(Duration::from_secs(GITHUB_PAGES_SYNC_INTERVAL_SECS)).await;
@@ -337,21 +310,21 @@ impl GithubPagesService {
         repository: &str,
         base_url: &str,
     ) -> Result<Vec<GithubPagesResource>, String> {
-        let client: reqwest::Client = reqwest::Client::builder()
-            .timeout(Duration::from_secs(30))
-            .build()
-            .map_err(|error: reqwest::Error| {
-                format!("{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} {error}")
-            })?;
-        let html_content: String = Self::fetch_url(&client, base_url).await?;
-        let resource_urls: Vec<String> = Self::parse_html_resources(&html_content, base_url);
         let cache_dir: String = format!("{GITHUB_PAGES_CACHE_DIR}/{owner}/{repository}");
         fs::create_dir_all(&cache_dir)
             .await
             .map_err(|error: std::io::Error| {
                 format!("{ERROR_FAILED_TO_CREATE_DIRECTORY} {error}")
             })?;
-        let mut resources: Vec<GithubPagesResource> = vec![];
+        let html_content: String = {
+            let client: reqwest::Client = reqwest::Client::builder()
+                .timeout(Duration::from_secs(30))
+                .build()
+                .map_err(|error: reqwest::Error| {
+                    format!("{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} {error}")
+                })?;
+            Self::fetch_url(&client, base_url).await?
+        };
         let main_html_path: String = format!("{cache_dir}/index.html");
         fs::write(&main_html_path, &html_content)
             .await
@@ -365,60 +338,7 @@ impl GithubPagesService {
             &main_html_path,
             base_url,
         );
-        resources.push(main_resource);
-        let fetch_tasks: Vec<_> = resource_urls
-            .into_iter()
-            .map(|resource_url: String| {
-                let client_clone: reqwest::Client = client.clone();
-                let cache_dir_clone: String = cache_dir.clone();
-                let owner_clone: String = owner.to_string();
-                let repository_clone: String = repository.to_string();
-                let base_url_clone: String = base_url.to_string();
-                async move {
-                    match Self::fetch_url_bytes(&client_clone, &resource_url).await {
-                        Ok(content) => {
-                            let url_path: String =
-                                Self::extract_path_from_url(&resource_url, &base_url_clone);
-                            let file_name: String = url_path
-                                .split('/')
-                                .next_back()
-                                .unwrap_or("unknown")
-                                .to_string();
-                            let local_file_path: String = format!("{cache_dir_clone}/{url_path}");
-                            if let Some(parent) = Path::new(&local_file_path).parent() {
-                                let _ = fs::create_dir_all(parent).await;
-                            }
-                            let file_size: u64 = content.len() as u64;
-                            if let Err(error) = fs::write(&local_file_path, &content).await {
-                                error!("Failed to write resource file {local_file_path} {error}");
-                                return None;
-                            }
-                            let extension: String = FileExtension::get_extension_name(&file_name);
-                            let content_type: &'static str =
-                                FileExtension::parse(&extension).get_content_type();
-                            Some(Self::build_resource(
-                                &owner_clone,
-                                &repository_clone,
-                                &url_path,
-                                content_type,
-                                file_size,
-                                &local_file_path,
-                                &resource_url,
-                            ))
-                        }
-                        Err(error) => {
-                            error!("Failed to fetch resource {resource_url} {error}");
-                            None
-                        }
-                    }
-                }
-            })
-            .collect();
-        let fetch_results: Vec<Option<GithubPagesResource>> = join_all(fetch_tasks).await;
-        for resource in fetch_results.into_iter().flatten() {
-            resources.push(resource);
-        }
-        Ok(resources)
+        Ok(vec![main_resource])
     }
 
     #[instrument_trace]
@@ -475,148 +395,6 @@ impl GithubPagesService {
                 }
             }
         }
-    }
-
-    #[instrument_trace]
-    async fn fetch_url_bytes(client: &reqwest::Client, url: &str) -> Result<Vec<u8>, String> {
-        let mut attempt: u32 = 0;
-        loop {
-            attempt += 1;
-            match client
-                .get(url)
-                .header(CACHE_CONTROL, NO_CACHE)
-                .header(PRAGMA, NO_CACHE)
-                .send()
-                .await
-            {
-                Ok(response) => {
-                    let status: reqwest::StatusCode = response.status();
-                    if !status.is_success() {
-                        if attempt >= GITHUB_PAGES_FETCH_MAX_RETRIES {
-                            return Err(format!(
-                                "{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} HTTP {status}"
-                            ));
-                        }
-                        warn!(
-                            "Fetch attempt {attempt}/{GITHUB_PAGES_FETCH_MAX_RETRIES} failed for {url} HTTP {status}, retrying"
-                        );
-                        sleep(Duration::from_secs(2)).await;
-                        continue;
-                    }
-                    match response.bytes().await {
-                        Ok(bytes) => return Ok(bytes.to_vec()),
-                        Err(error) => {
-                            if attempt >= GITHUB_PAGES_FETCH_MAX_RETRIES {
-                                return Err(format!(
-                                    "{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} {error}"
-                                ));
-                            }
-                            warn!(
-                                "Fetch attempt {attempt}/{GITHUB_PAGES_FETCH_MAX_RETRIES} failed to read body for {url} {error}, retrying"
-                            );
-                            sleep(Duration::from_secs(2)).await;
-                            continue;
-                        }
-                    }
-                }
-                Err(error) => {
-                    if attempt >= GITHUB_PAGES_FETCH_MAX_RETRIES {
-                        return Err(format!("{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} {error}"));
-                    }
-                    warn!(
-                        "Fetch attempt {attempt}/{GITHUB_PAGES_FETCH_MAX_RETRIES} failed for {url} {error}, retrying"
-                    );
-                    sleep(Duration::from_secs(2)).await;
-                    continue;
-                }
-            }
-        }
-    }
-
-    #[instrument_trace]
-    fn parse_html_resources(html: &str, base_url: &str) -> Vec<String> {
-        let document: Html = Html::parse_document(html);
-        let mut resource_urls: Vec<String> = Vec::new();
-        let mut seen: HashSet<String> = HashSet::new();
-        for (selector_str, attr_name) in GITHUB_PAGES_RESOURCE_ATTR_CONFIGS {
-            let Ok(selector) = Selector::parse(selector_str) else {
-                continue;
-            };
-            for element in document.select(&selector) {
-                let Some(raw_url) = element.value().attr(attr_name) else {
-                    continue;
-                };
-                if raw_url.starts_with("data:")
-                    || raw_url.starts_with("javascript:")
-                    || raw_url.starts_with('#')
-                    || raw_url.is_empty()
-                {
-                    continue;
-                }
-                let full_url: String = Self::resolve_url(raw_url, base_url);
-                let is_cacheable: bool = Self::is_cacheable_url(&full_url);
-                if is_cacheable && seen.insert(full_url.clone()) {
-                    resource_urls.push(full_url);
-                }
-            }
-        }
-        resource_urls
-    }
-
-    #[instrument_trace]
-    fn resolve_url(url: &str, base_url: &str) -> String {
-        if url.starts_with("http://") || url.starts_with("https://") {
-            return url.to_string();
-        }
-        if url.starts_with("//") {
-            return format!("https:{url}");
-        }
-        let base: &str = base_url.trim_end_matches('/');
-        if url.starts_with('/') {
-            let origin: String = base.split('/').take(3).collect::<Vec<&str>>().join("/");
-            return format!("{origin}{url}");
-        }
-        format!("{base}/{url}")
-    }
-
-    #[instrument_trace]
-    fn is_cacheable_url(url: &str) -> bool {
-        let url_without_query: &str = url.split('?').next().unwrap_or(url);
-        let path: &str = url_without_query
-            .rsplit('/')
-            .next()
-            .unwrap_or(url_without_query);
-        if path.is_empty() || path.ends_with('/') {
-            return true;
-        }
-        let lowercase_path: String = path.to_lowercase();
-        GITHUB_PAGES_HTML_EXTENSIONS
-            .iter()
-            .any(|ext: &&str| lowercase_path.ends_with(ext))
-            || GITHUB_PAGES_STATIC_EXTENSIONS
-                .iter()
-                .any(|ext: &&str| lowercase_path.ends_with(ext))
-    }
-
-    #[instrument_trace]
-    fn extract_path_from_url(url: &str, base_url: &str) -> String {
-        let url_without_query: &str = url.split('?').next().unwrap_or(url);
-        let base: &str = base_url.trim_end_matches('/');
-        if let Some(path) = url_without_query.strip_prefix(base) {
-            return path.trim_start_matches('/').to_string();
-        }
-        if let Some(after_scheme) = url_without_query
-            .strip_prefix("https://")
-            .or_else(|| url_without_query.strip_prefix("http://"))
-            && let Some(slash_pos) = after_scheme.find('/')
-        {
-            return after_scheme[slash_pos + 1..].to_string();
-        }
-        url_without_query
-            .rsplit('/')
-            .next()
-            .unwrap_or("unknown")
-            .to_string()
     }
 
     #[instrument_trace]

@@ -13,15 +13,10 @@ use {
 
 use hyperlane_config::application::github_pages::*;
 
-use std::{
-    collections::{HashMap, HashSet},
-    path::Path,
-    sync::OnceLock,
-};
+use std::{collections::HashMap, path::Path, sync::OnceLock};
 
 use {
     futures::future::join_all,
-    scraper::{Html, Selector},
     tokio::{
         fs, spawn,
         sync::{RwLock, RwLockReadGuard, RwLockWriteGuard},

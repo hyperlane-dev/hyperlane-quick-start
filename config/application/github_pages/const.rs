@@ -8,3 +8,4 @@ pub const GITHUB_PAGES_CACHE_DIR: &str = "./data/dev/github_pages";
 pub const GITHUB_PAGES_CACHE_DIR: &str = "./data/release/github_pages";
 
 pub const GITHUB_PAGES_SYNC_INTERVAL_SECS: u64 = 600;
+pub const GITHUB_PAGES_AUTO_SYNC_REPOSITORIES: &[(&str, &str)] = &[("euv-dev", "euv")];
