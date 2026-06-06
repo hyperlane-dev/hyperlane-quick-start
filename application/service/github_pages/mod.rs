@@ -21,6 +21,7 @@ use std::{
 
 use {
     futures::future::join_all,
+    scraper::{Html, Selector},
     tokio::{
         fs, spawn,
         sync::{RwLock, RwLockReadGuard, RwLockWriteGuard},

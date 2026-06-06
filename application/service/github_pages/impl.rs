@@ -535,68 +535,67 @@ impl GithubPagesService {
 
     #[instrument_trace]
     fn parse_html_resources(html: &str, base_url: &str) -> Vec<String> {
+        let document: Html = Html::parse_document(html);
         let mut resource_urls: Vec<String> = Vec::new();
         let mut seen: HashSet<String> = HashSet::new();
-        let patterns: &[&str] = &["src=\"", "href=\"", "data-src=\""];
-        for pattern in patterns {
-            let mut search_start: usize = 0;
-            while let Some(pos) = html[search_start..].find(pattern) {
-                let attr_start: usize = search_start + pos + pattern.len();
-                if let Some(end_pos) = html[attr_start..].find('"') {
-                    let url: &str = &html[attr_start..attr_start + end_pos];
-                    if !url.starts_with("data:")
-                        && !url.starts_with("javascript:")
-                        && !url.starts_with("#")
-                        && !url.is_empty()
-                    {
-                        let full_url: String =
-                            if url.starts_with("http://") || url.starts_with("https://") {
-                                url.to_string()
-                            } else if url.starts_with("//") {
-                                format!("https:{url}")
-                            } else if url.starts_with('/') {
-                                let base: &str = base_url.trim_end_matches('/');
-                                let base_without_path: &str = base
-                                    .split('/')
-                                    .take(3)
-                                    .collect::<Vec<&str>>()
-                                    .join("/")
-                                    .leak();
-                                format!("{base_without_path}{url}")
-                            } else {
-                                let base: &str = base_url.trim_end_matches('/');
-                                format!("{base}/{url}")
-                            };
-                        let is_html_page: bool = full_url.ends_with('/')
-                            || full_url.ends_with(".html")
-                            || full_url.ends_with(".htm");
-                        let is_static_resource: bool = full_url.ends_with(".css")
-                            || full_url.ends_with(".js")
-                            || full_url.ends_with(".png")
-                            || full_url.ends_with(".jpg")
-                            || full_url.ends_with(".jpeg")
-                            || full_url.ends_with(".gif")
-                            || full_url.ends_with(".svg")
-                            || full_url.ends_with(".ico")
-                            || full_url.ends_with(".woff")
-                            || full_url.ends_with(".woff2")
-                            || full_url.ends_with(".ttf")
-                            || full_url.ends_with(".eot")
-                            || full_url.ends_with(".json")
-                            || full_url.ends_with(".webp")
-                            || full_url.ends_with(".webmanifest")
-                            || full_url.ends_with(".wasm");
-                        if (is_static_resource || is_html_page) && seen.insert(full_url.clone()) {
-                            resource_urls.push(full_url);
-                        }
-                    }
-                    search_start = attr_start + end_pos + 1;
-                } else {
-                    break;
+        for (selector_str, attr_name) in GITHUB_PAGES_RESOURCE_ATTR_CONFIGS {
+            let Ok(selector) = Selector::parse(selector_str) else {
+                continue;
+            };
+            for element in document.select(&selector) {
+                let Some(raw_url) = element.value().attr(attr_name) else {
+                    continue;
+                };
+                if raw_url.starts_with("data:")
+                    || raw_url.starts_with("javascript:")
+                    || raw_url.starts_with('#')
+                    || raw_url.is_empty()
+                {
+                    continue;
+                }
+                let full_url: String = Self::resolve_url(raw_url, base_url);
+                let is_cacheable: bool = Self::is_cacheable_url(&full_url);
+                if is_cacheable && seen.insert(full_url.clone()) {
+                    resource_urls.push(full_url);
                 }
             }
         }
         resource_urls
+    }
+
+    #[instrument_trace]
+    fn resolve_url(url: &str, base_url: &str) -> String {
+        if url.starts_with("http://") || url.starts_with("https://") {
+            return url.to_string();
+        }
+        if url.starts_with("//") {
+            return format!("https:{url}");
+        }
+        let base: &str = base_url.trim_end_matches('/');
+        if url.starts_with('/') {
+            let origin: String = base.split('/').take(3).collect::<Vec<&str>>().join("/");
+            return format!("{origin}{url}");
+        }
+        format!("{base}/{url}")
+    }
+
+    #[instrument_trace]
+    fn is_cacheable_url(url: &str) -> bool {
+        let url_without_query: &str = url.split('?').next().unwrap_or(url);
+        let path: &str = url_without_query
+            .rsplit('/')
+            .next()
+            .unwrap_or(url_without_query);
+        if path.is_empty() || path.ends_with('/') {
+            return true;
+        }
+        let lowercase_path: String = path.to_lowercase();
+        GITHUB_PAGES_HTML_EXTENSIONS
+            .iter()
+            .any(|ext: &&str| lowercase_path.ends_with(ext))
+            || GITHUB_PAGES_STATIC_EXTENSIONS
+                .iter()
+                .any(|ext: &&str| lowercase_path.ends_with(ext))
     }
 
     #[instrument_trace]
