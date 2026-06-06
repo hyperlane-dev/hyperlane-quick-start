@@ -2,6 +2,11 @@ use super::*;
 
 /// Implementation of `BootstrapAsyncInit` for `ConfigBootstrap`, loading server and request configuration from the environment.
 impl BootstrapAsyncInit for ConfigBootstrap {
+    /// Initializes the configuration bootstrap by loading server and request configuration from the environment.
+    ///
+    /// # Returns
+    ///
+    /// - `Self`: The initialized `ConfigBootstrap` instance containing server and request configs.
     #[hyperlane(server_config: ServerConfig)]
     async fn init() -> Self {
         let env_config: &EnvConfig = EnvPlugin::get_or_init();

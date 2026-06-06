@@ -4,6 +4,11 @@ use super::*;
 impl GetOrInit for RedisPlugin {
     type Instance = RwLock<RedisConnectionMap>;
 
+    /// Lazily initializes and returns a static reference to the global Redis connection cache.
+    ///
+    /// # Returns
+    ///
+    /// - `&'static RwLock<RedisConnectionMap>`: The static reference to the global Redis connection map.
     #[instrument_trace]
     fn get_or_init() -> &'static Self::Instance {
         REDIS_CONNECTIONS.get_or_init(|| RwLock::new(HashMap::new()))
@@ -20,6 +25,11 @@ impl DatabaseConnectionPlugin for RedisPlugin {
 
     type ConnectionCache = RwLock<RedisConnectionMap>;
 
+    /// Returns the plugin type identifier for Redis.
+    ///
+    /// # Returns
+    ///
+    /// - `PluginType::Redis`: The Redis plugin type.
     #[instrument_trace]
     fn plugin_type() -> PluginType {
         PluginType::Redis
@@ -283,6 +293,11 @@ impl DatabaseConnectionPlugin for RedisPlugin {
 
 /// Implementation of `Default` for `RedisAutoCreation`, using the default Redis instance from the environment configuration.
 impl Default for RedisAutoCreation {
+    /// Returns the default `RedisAutoCreation` instance, using the first configured Redis instance or a default configuration.
+    ///
+    /// # Returns
+    ///
+    /// - `RedisAutoCreation`: The default auto-creation handler.
     #[instrument_trace]
     fn default() -> Self {
         if let Some(instance) = EnvPlugin::get_or_init().get_default_redis_instance() {

@@ -2,6 +2,15 @@ use super::*;
 
 /// Implementation of `From<ApiResponseStatus>` for `i32`, converting response status to its numeric HTTP code.
 impl From<ApiResponseStatus> for i32 {
+    /// Converts an `ApiResponseStatus` into its corresponding numeric HTTP status code.
+    ///
+    /// # Arguments
+    ///
+    /// - `ApiResponseStatus`: The response status to convert.
+    ///
+    /// # Returns
+    ///
+    /// - `i32`: The numeric HTTP status code.
     fn from(status: ApiResponseStatus) -> Self {
         match status {
             ApiResponseStatus::Success => 200,
@@ -21,6 +30,16 @@ impl From<ApiResponseStatus> for i32 {
 
 /// Implementation of `Display` for `ApiResponseStatus`, providing a human-readable status message.
 impl Display for ApiResponseStatus {
+    /// Formats the `ApiResponseStatus` as a human-readable status message string.
+    ///
+    /// # Arguments
+    ///
+    /// - `&self`: The response status instance.
+    /// - `&mut Formatter<'_>`: The formatter.
+    ///
+    /// # Returns
+    ///
+    /// - `fmt::Result`: The result of the formatting operation.
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let message: &str = match self {
             Self::Success => "Success",

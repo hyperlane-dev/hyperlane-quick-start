@@ -4,6 +4,11 @@ use super::*;
 impl GetOrInit for LoggerPlugin {
     type Instance = RwLock<FileLogger>;
 
+    /// Lazily initializes and returns a static reference to the global file logger.
+    ///
+    /// # Returns
+    ///
+    /// - `&'static RwLock<FileLogger>`: The static reference to the global file logger.
     fn get_or_init() -> &'static Self::Instance {
         FILE_LOGGER.get_or_init(|| RwLock::new(FileLogger::default()))
     }
@@ -11,10 +16,24 @@ impl GetOrInit for LoggerPlugin {
 
 /// Implementation of the `Log` trait for `Logger`, providing colored console output and file logging.
 impl Log for Logger {
+    /// Checks whether the given log metadata is enabled based on the current maximum log level.
+    ///
+    /// # Arguments
+    ///
+    /// - `&Metadata`: The log metadata to check.
+    ///
+    /// # Returns
+    ///
+    /// - `bool`: True if the metadata level is at or below the maximum level.
     fn enabled(&self, metadata: &Metadata) -> bool {
         metadata.level() <= max_level()
     }
 
+    /// Logs a record by outputting colored console output and writing to the file logger.
+    ///
+    /// # Arguments
+    ///
+    /// - `&Record`: The log record to output.
     fn log(&self, record: &Record) {
         if !self.enabled(record.metadata()) {
             return;
@@ -81,6 +100,7 @@ impl Log for Logger {
         }
     }
 
+    /// Flushes the standard output and standard error streams.
     fn flush(&self) {
         Server::flush_stdout_and_stderr();
     }

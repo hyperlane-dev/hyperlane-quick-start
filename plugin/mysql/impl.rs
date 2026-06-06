@@ -4,6 +4,11 @@ use super::*;
 impl GetOrInit for MySqlPlugin {
     type Instance = RwLock<HashMap<String, ConnectionCache<DatabaseConnection>>>;
 
+    /// Lazily initializes and returns a static reference to the global MySQL connection cache.
+    ///
+    /// # Returns
+    ///
+    /// - `&'static RwLock<HashMap<String, ConnectionCache<DatabaseConnection>>>`: The static reference to the global MySQL connection map.
     #[instrument_trace]
     fn get_or_init() -> &'static Self::Instance {
         MYSQL_CONNECTIONS.get_or_init(|| RwLock::new(HashMap::new()))
@@ -20,6 +25,11 @@ impl DatabaseConnectionPlugin for MySqlPlugin {
 
     type ConnectionCache = RwLock<HashMap<String, ConnectionCache<Self::Connection>>>;
 
+    /// Returns the plugin type identifier for MySQL.
+    ///
+    /// # Returns
+    ///
+    /// - `PluginType::MySQL`: The MySQL plugin type.
     #[instrument_trace]
     fn plugin_type() -> PluginType {
         PluginType::MySQL
@@ -255,6 +265,11 @@ impl DatabaseConnectionPlugin for MySqlPlugin {
 
 /// Implementation of `Default` for `MySqlAutoCreation`, using the default MySQL instance from the environment configuration.
 impl Default for MySqlAutoCreation {
+    /// Returns the default `MySqlAutoCreation` instance, using the first configured MySQL instance or a default configuration.
+    ///
+    /// # Returns
+    ///
+    /// - `MySqlAutoCreation`: The default auto-creation handler.
     #[instrument_trace]
     fn default() -> Self {
         let env: &'static EnvConfig = EnvPlugin::get_or_init();

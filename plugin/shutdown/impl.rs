@@ -4,6 +4,11 @@ use super::*;
 impl GetOrInit for ShutdownPlugin {
     type Instance = ServerControlHookHandler<()>;
 
+    /// Lazily initializes and returns a static reference to the global shutdown hook handler.
+    ///
+    /// # Returns
+    ///
+    /// - `&'static ServerControlHookHandler<()>`: The static reference to the shutdown hook handler.
     fn get_or_init() -> &'static Self::Instance {
         SHUTDOWN.get_or_init(Self::get_init)
     }

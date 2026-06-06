@@ -2,6 +2,16 @@ use super::*;
 
 /// Implementation of `Display` for `PluginType`, converting the plugin type to its display name.
 impl fmt::Display for PluginType {
+    /// Formats the `PluginType` as its display name string.
+    ///
+    /// # Arguments
+    ///
+    /// - `&self`: The plugin type instance.
+    /// - `&mut fmt::Formatter<'_>`: The formatter.
+    ///
+    /// # Returns
+    ///
+    /// - `fmt::Result`: The result of the formatting operation.
     #[instrument_trace]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -16,6 +26,15 @@ impl fmt::Display for PluginType {
 impl FromStr for PluginType {
     type Err = ();
 
+    /// Parses a display name string into a `PluginType`.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The string to parse.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Self, ()>`: The parsed plugin type, or an error if the string is not recognized.
     #[instrument_trace]
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -29,6 +48,16 @@ impl FromStr for PluginType {
 
 /// Implementation of `Display` for `AutoCreationError`, providing a human-readable error message.
 impl std::fmt::Display for AutoCreationError {
+    /// Formats the `AutoCreationError` as a human-readable error message string.
+    ///
+    /// # Arguments
+    ///
+    /// - `&self`: The error instance.
+    /// - `&mut std::fmt::Formatter<'_>`: The formatter.
+    ///
+    /// # Returns
+    ///
+    /// - `std::fmt::Result`: The result of the formatting operation.
     #[instrument_trace]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

@@ -2,6 +2,12 @@ use super::*;
 
 /// Implementation of `BootstrapAsyncInit` for `DbBootstrap`, establishing database connections and running auto-creation on initialization.
 impl BootstrapAsyncInit for DbBootstrap {
+    /// Initializes the database bootstrap by establishing connections to MySQL, PostgreSQL, and Redis instances,
+    /// then running the auto-creation process for all configured databases.
+    ///
+    /// # Returns
+    ///
+    /// - `Self`: The initialized `DbBootstrap` instance.
     async fn init() -> Self {
         let _: Result<DatabaseConnection, String> =
             MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await;

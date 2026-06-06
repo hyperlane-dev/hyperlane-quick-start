@@ -2,6 +2,16 @@ use super::*;
 
 /// Implementation of `ServerHook` for `TaskPanicHook`, handling task panic events by returning a 500 error response.
 impl ServerHook for TaskPanicHook {
+    /// Creates a new `TaskPanicHook` instance from the incoming stream and context, capturing panic data.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream`: The incoming connection stream.
+    /// - `&mut Context`: The request context.
+    ///
+    /// # Returns
+    ///
+    /// - `TaskPanicHook`: The newly created task panic hook handler.
     #[task_panic_data(task_panic_data)]
     #[instrument_trace]
     async fn new(_stream: &mut Stream, ctx: &mut Context) -> Self {
@@ -11,6 +21,17 @@ impl ServerHook for TaskPanicHook {
         }
     }
 
+    /// Handles the task panic event by returning a 500 Internal Server Error response with the panic details.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self`: The task panic hook handler.
+    /// - `&mut Stream`: The incoming connection stream.
+    /// - `&mut Context`: The request context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status::Continue`: Always returns continue after sending the error response.
     #[prologue_macros(
         response_version(HttpVersion::Http1_1),
         response_status_code(500),
@@ -34,6 +55,16 @@ impl ServerHook for TaskPanicHook {
 
 /// Implementation of `ServerHook` for `RequestErrorHook`, handling request error events by returning an appropriate error response.
 impl ServerHook for RequestErrorHook {
+    /// Creates a new `RequestErrorHook` instance from the incoming stream and context, capturing request error data.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream`: The incoming connection stream.
+    /// - `&mut Context`: The request context.
+    ///
+    /// # Returns
+    ///
+    /// - `RequestErrorHook`: The newly created request error hook handler.
     #[request_error_data(request_error_data)]
     #[instrument_trace]
     async fn new(_stream: &mut Stream, ctx: &mut Context) -> Self {
@@ -44,6 +75,17 @@ impl ServerHook for RequestErrorHook {
         }
     }
 
+    /// Handles the request error event by returning an appropriate error response based on the HTTP status code.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self`: The request error hook handler.
+    /// - `&mut Stream`: The incoming connection stream.
+    /// - `&mut Context`: The request context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status`: Returns `Reject` for bad requests, otherwise `Continue` after sending the error response.
     #[prologue_macros(
         response_version(HttpVersion::Http1_1),
         response_status_code(self.get_response_status_code()),

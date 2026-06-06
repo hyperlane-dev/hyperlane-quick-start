@@ -29,6 +29,12 @@ impl ServerBootstrap {
 
 /// Implementation of `BootstrapAsyncInit` for `ServerBootstrap`, configuring and starting the HTTP server.
 impl BootstrapAsyncInit for ServerBootstrap {
+    /// Initializes the server bootstrap by loading configuration, starting the HTTP server,
+    /// registering the shutdown hook, and printing registered routes.
+    ///
+    /// # Returns
+    ///
+    /// - `Self`: The initialized `ServerBootstrap` instance.
     #[hyperlane(server: Server)]
     async fn init() -> Self {
         let config: ConfigBootstrap = ConfigBootstrap::init().await;
