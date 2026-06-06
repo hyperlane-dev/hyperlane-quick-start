@@ -5,3 +5,4 @@ pub const ERROR_FAILED_TO_FETCH_GITHUB_PAGES: &str = "Failed to fetch GitHub Pag
 pub const ERROR_FAILED_TO_PARSE_HTML: &str = "Failed to parse HTML";
 pub const ERROR_FAILED_TO_CREATE_DIRECTORY: &str = "Failed to create directory";
 pub const ERROR_FAILED_TO_WRITE_FILE: &str = "Failed to write file";
+pub const GITHUB_PAGES_FETCH_MAX_RETRIES: u32 = 8;

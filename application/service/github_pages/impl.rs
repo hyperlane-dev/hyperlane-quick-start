@@ -193,14 +193,15 @@ impl GithubPagesService {
                     .map_err(|error: reqwest::Error| {
                         format!("{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} {error}")
                     })?;
-                let response: reqwest::Response =
-                    client
-                        .get(target_url)
-                        .send()
-                        .await
-                        .map_err(|error: reqwest::Error| {
-                            format!("{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} {error}")
-                        })?;
+                let response: reqwest::Response = client
+                    .get(target_url)
+                    .header(CACHE_CONTROL, NO_CACHE)
+                    .header(PRAGMA, NO_CACHE)
+                    .send()
+                    .await
+                    .map_err(|error: reqwest::Error| {
+                        format!("{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} {error}")
+                    })?;
                 let status: reqwest::StatusCode = response.status();
                 if !status.is_success() {
                     return Err(format!(
@@ -422,50 +423,114 @@ impl GithubPagesService {
 
     #[instrument_trace]
     async fn fetch_url(client: &reqwest::Client, url: &str) -> Result<String, String> {
-        let response: reqwest::Response =
-            client
+        let mut attempt: u32 = 0;
+        loop {
+            attempt += 1;
+            match client
                 .get(url)
+                .header(CACHE_CONTROL, NO_CACHE)
+                .header(PRAGMA, NO_CACHE)
                 .send()
                 .await
-                .map_err(|error: reqwest::Error| {
-                    format!("{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} {error}")
-                })?;
-        let status: reqwest::StatusCode = response.status();
-        if !status.is_success() {
-            return Err(format!(
-                "{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} HTTP {status}"
-            ));
+            {
+                Ok(response) => {
+                    let status: reqwest::StatusCode = response.status();
+                    if !status.is_success() {
+                        if attempt >= GITHUB_PAGES_FETCH_MAX_RETRIES {
+                            return Err(format!(
+                                "{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} HTTP {status}"
+                            ));
+                        }
+                        warn!(
+                            "Fetch attempt {attempt}/{GITHUB_PAGES_FETCH_MAX_RETRIES} failed for {url} HTTP {status}, retrying"
+                        );
+                        sleep(Duration::from_secs(2)).await;
+                        continue;
+                    }
+                    match response.text().await {
+                        Ok(text) => return Ok(text),
+                        Err(error) => {
+                            if attempt >= GITHUB_PAGES_FETCH_MAX_RETRIES {
+                                return Err(format!(
+                                    "{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} {error}"
+                                ));
+                            }
+                            warn!(
+                                "Fetch attempt {attempt}/{GITHUB_PAGES_FETCH_MAX_RETRIES} failed to read body for {url} {error}, retrying"
+                            );
+                            sleep(Duration::from_secs(2)).await;
+                            continue;
+                        }
+                    }
+                }
+                Err(error) => {
+                    if attempt >= GITHUB_PAGES_FETCH_MAX_RETRIES {
+                        return Err(format!("{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} {error}"));
+                    }
+                    warn!(
+                        "Fetch attempt {attempt}/{GITHUB_PAGES_FETCH_MAX_RETRIES} failed for {url} {error}, retrying"
+                    );
+                    sleep(Duration::from_secs(2)).await;
+                    continue;
+                }
+            }
         }
-        let text: String = response.text().await.map_err(|error: reqwest::Error| {
-            format!("{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} {error}")
-        })?;
-        Ok(text)
     }
 
     #[instrument_trace]
     async fn fetch_url_bytes(client: &reqwest::Client, url: &str) -> Result<Vec<u8>, String> {
-        let response: reqwest::Response =
-            client
+        let mut attempt: u32 = 0;
+        loop {
+            attempt += 1;
+            match client
                 .get(url)
+                .header(CACHE_CONTROL, NO_CACHE)
+                .header(PRAGMA, NO_CACHE)
                 .send()
                 .await
-                .map_err(|error: reqwest::Error| {
-                    format!("{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} {error}")
-                })?;
-        let status: reqwest::StatusCode = response.status();
-        if !status.is_success() {
-            return Err(format!(
-                "{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} HTTP {status}"
-            ));
+            {
+                Ok(response) => {
+                    let status: reqwest::StatusCode = response.status();
+                    if !status.is_success() {
+                        if attempt >= GITHUB_PAGES_FETCH_MAX_RETRIES {
+                            return Err(format!(
+                                "{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} HTTP {status}"
+                            ));
+                        }
+                        warn!(
+                            "Fetch attempt {attempt}/{GITHUB_PAGES_FETCH_MAX_RETRIES} failed for {url} HTTP {status}, retrying"
+                        );
+                        sleep(Duration::from_secs(2)).await;
+                        continue;
+                    }
+                    match response.bytes().await {
+                        Ok(bytes) => return Ok(bytes.to_vec()),
+                        Err(error) => {
+                            if attempt >= GITHUB_PAGES_FETCH_MAX_RETRIES {
+                                return Err(format!(
+                                    "{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} {error}"
+                                ));
+                            }
+                            warn!(
+                                "Fetch attempt {attempt}/{GITHUB_PAGES_FETCH_MAX_RETRIES} failed to read body for {url} {error}, retrying"
+                            );
+                            sleep(Duration::from_secs(2)).await;
+                            continue;
+                        }
+                    }
+                }
+                Err(error) => {
+                    if attempt >= GITHUB_PAGES_FETCH_MAX_RETRIES {
+                        return Err(format!("{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} {error}"));
+                    }
+                    warn!(
+                        "Fetch attempt {attempt}/{GITHUB_PAGES_FETCH_MAX_RETRIES} failed for {url} {error}, retrying"
+                    );
+                    sleep(Duration::from_secs(2)).await;
+                    continue;
+                }
+            }
         }
-        let bytes: Vec<u8> = response
-            .bytes()
-            .await
-            .map_err(|error: reqwest::Error| {
-                format!("{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} {error}")
-            })?
-            .to_vec();
-        Ok(bytes)
     }
 
     #[instrument_trace]
