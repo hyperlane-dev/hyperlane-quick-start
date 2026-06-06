@@ -11,6 +11,10 @@ use {
 
 use hyperlane_utils::log::*;
 
+/// Entry point for the Hyperlane server application.
+///
+/// Initializes the environment configuration, logger, runtime, database connections,
+/// and starts the server with process management.
 fn main() {
     EnvBootstrap::init();
     LoggerBootstrap::init();

@@ -1,3 +1,7 @@
+//! Hyperlane resources
+//!
+//! Resource module containing static assets, SQL scripts, Docker configurations, environment files, and templates used by the Hyperlane framework.
+
 #![recursion_limit = "1024"]
 
 pub mod docker;

@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `GetOrInit` for `ShutdownPlugin`, providing lazy initialization of the shutdown hook handler.
 impl GetOrInit for ShutdownPlugin {
     type Instance = ServerControlHookHandler<()>;
 
@@ -8,7 +9,13 @@ impl GetOrInit for ShutdownPlugin {
     }
 }
 
+/// Implementation of shutdown hook management methods for `ShutdownPlugin`.
 impl ShutdownPlugin {
+    /// Returns the default shutdown hook handler that logs a warning when no custom shutdown is configured.
+    ///
+    /// # Returns
+    ///
+    /// - `ServerControlHookHandler<()>`: The default shutdown hook handler.
     #[instrument_trace]
     pub fn get_init() -> ServerControlHookHandler<()> {
         Arc::new(|| {
@@ -18,6 +25,11 @@ impl ShutdownPlugin {
         })
     }
 
+    /// Sets the global shutdown hook handler to the provided handler.
+    ///
+    /// # Arguments
+    ///
+    /// - `&ServerControlHookHandler<()>`: The shutdown hook handler to set.
     #[instrument_trace]
     pub fn set(shutdown: &ServerControlHookHandler<()>) {
         drop(SHUTDOWN.set(shutdown.clone()));

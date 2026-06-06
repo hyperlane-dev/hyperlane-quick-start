@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `ServerHook` for `HttpRequestMiddleware`, rejecting non-HTTP protocol requests.
 impl ServerHook for HttpRequestMiddleware {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -17,6 +18,7 @@ impl ServerHook for HttpRequestMiddleware {
     }
 }
 
+/// Implementation of `ServerHook` for `CrossMiddleware`, adding CORS cross-origin headers to the response.
 impl ServerHook for CrossMiddleware {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -33,6 +35,7 @@ impl ServerHook for CrossMiddleware {
     }
 }
 
+/// Implementation of `ServerHook` for `ResponseHeaderMiddleware`, setting default response headers.
 impl ServerHook for ResponseHeaderMiddleware {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -51,6 +54,7 @@ impl ServerHook for ResponseHeaderMiddleware {
     }
 }
 
+/// Implementation of `ServerHook` for `ResponseStatusCodeMiddleware`, setting the default response status code.
 impl ServerHook for ResponseStatusCodeMiddleware {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -64,6 +68,7 @@ impl ServerHook for ResponseStatusCodeMiddleware {
     }
 }
 
+/// Implementation of `ServerHook` for `OptionMethodMiddleware`, rejecting HTTP OPTIONS preflight requests.
 impl ServerHook for OptionMethodMiddleware {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -80,6 +85,7 @@ impl ServerHook for OptionMethodMiddleware {
     }
 }
 
+/// Implementation of `ServerHook` for `UpgradeMiddleware`, handling WebSocket upgrade handshakes.
 impl ServerHook for UpgradeMiddleware {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `ServerHook` for `SendMiddleware`, sending the response body to the client.
 impl ServerHook for SendMiddleware {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -16,6 +17,7 @@ impl ServerHook for SendMiddleware {
     }
 }
 
+/// Implementation of `ServerHook` for `LogMiddleware`, logging request and response details.
 impl ServerHook for LogMiddleware {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

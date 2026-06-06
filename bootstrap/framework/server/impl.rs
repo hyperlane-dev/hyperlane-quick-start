@@ -2,7 +2,13 @@ use hyperlane_plugin::{common::GetOrInit, env::EnvPlugin};
 
 use super::*;
 
+/// Implementation of route printing and server startup methods for `ServerBootstrap`.
 impl ServerBootstrap {
+    /// Prints all registered static, dynamic, and regex routes to the log.
+    ///
+    /// # Arguments
+    ///
+    /// - `&Server`: The server instance whose route matcher to inspect.
     async fn print_route_matcher(server: &Server) {
         let route_matcher: &RouteMatcher = server.get_route_matcher();
         for key in route_matcher.get_static_route().keys() {
@@ -21,6 +27,7 @@ impl ServerBootstrap {
     }
 }
 
+/// Implementation of `BootstrapAsyncInit` for `ServerBootstrap`, configuring and starting the HTTP server.
 impl BootstrapAsyncInit for ServerBootstrap {
     #[hyperlane(server: Server)]
     async fn init() -> Self {

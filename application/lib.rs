@@ -1,3 +1,7 @@
+//! Hyperlane application
+//!
+//! Application layer containing controllers, services, repositories, mappers, models, middleware, views, and utilities for the Hyperlane framework.
+
 #![recursion_limit = "1024"]
 
 pub mod controller;

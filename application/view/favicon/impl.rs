@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `ServerHook` for `FaviconRoute`, redirecting favicon requests to the logo image URL.
 impl ServerHook for FaviconRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `BootstrapAsyncInit` for `DbBootstrap`, establishing database connections and running auto-creation on initialization.
 impl BootstrapAsyncInit for DbBootstrap {
     async fn init() -> Self {
         let _: Result<DatabaseConnection, String> =

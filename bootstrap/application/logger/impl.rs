@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `BootstrapSyncInit` for `LoggerBootstrap`, configuring and initializing the logger on startup.
 impl BootstrapSyncInit for LoggerBootstrap {
     fn init() -> Self {
         let env_config: &EnvConfig = EnvPlugin::get_or_init();

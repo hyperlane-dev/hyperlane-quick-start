@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `Display` for `PluginType`, converting the plugin type to its display name.
 impl fmt::Display for PluginType {
     #[instrument_trace]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -11,6 +12,7 @@ impl fmt::Display for PluginType {
     }
 }
 
+/// Implementation of `FromStr` for `PluginType`, parsing a display name string into a plugin type.
 impl FromStr for PluginType {
     type Err = ();
 
@@ -25,6 +27,7 @@ impl FromStr for PluginType {
     }
 }
 
+/// Implementation of `Display` for `AutoCreationError`, providing a human-readable error message.
 impl std::fmt::Display for AutoCreationError {
     #[instrument_trace]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -40,9 +43,16 @@ impl std::fmt::Display for AutoCreationError {
     }
 }
 
+/// Implementation of `std::error::Error` for `AutoCreationError`, enabling use with the standard error trait.
 impl std::error::Error for AutoCreationError {}
 
+/// Implementation of utility methods for `AutoCreationError`.
 impl AutoCreationError {
+    /// Determines whether the auto-creation process should continue after this error.
+    ///
+    /// # Returns
+    ///
+    /// - `bool`: True if the process should continue, false if it should abort.
     #[instrument_trace]
     pub fn should_continue(&self) -> bool {
         match self {
@@ -54,6 +64,11 @@ impl AutoCreationError {
         }
     }
 
+    /// Returns the user-facing error message from this error.
+    ///
+    /// # Returns
+    ///
+    /// - `&str`: The error message string.
     #[instrument_trace]
     pub fn user_message(&self) -> &str {
         match self {
@@ -66,7 +81,17 @@ impl AutoCreationError {
     }
 }
 
+/// Implementation of builder methods for `TableSchema`.
 impl TableSchema {
+    /// Adds a dependency table name to this table schema.
+    ///
+    /// # Arguments
+    ///
+    /// - `String`: The name of the dependency table.
+    ///
+    /// # Returns
+    ///
+    /// - `Self`: The updated table schema with the added dependency.
     #[instrument_trace]
     pub fn with_dependency(mut self, dependency: String) -> Self {
         self.get_mut_dependencies().push(dependency);
@@ -74,7 +99,17 @@ impl TableSchema {
     }
 }
 
+/// Implementation of database connection timeout and auto-creation methods for `DatabasePlugin`.
 impl DatabasePlugin {
+    /// Returns the connection timeout duration from the environment variable.
+    ///
+    /// # Returns
+    ///
+    /// - `Duration`: The connection timeout duration.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the `DB_CONNECTION_TIMEOUT_MILLIS` environment variable is not set or invalid.
     #[instrument_trace]
     pub fn get_connection_timeout_duration() -> Duration {
         let timeout_millis: u64 = var(ENV_KEY_DB_CONNECTION_TIMEOUT_MILLIS)
@@ -89,6 +124,15 @@ impl DatabasePlugin {
         Duration::from_millis(timeout_millis)
     }
 
+    /// Returns the retry interval duration from the environment variable.
+    ///
+    /// # Returns
+    ///
+    /// - `Duration`: The retry interval duration.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the `DB_RETRY_INTERVAL_MILLIS` environment variable is not set or invalid.
     #[instrument_trace]
     pub fn get_retry_duration() -> Duration {
         let millis: u64 = var(ENV_KEY_DB_RETRY_INTERVAL_MILLIS)
@@ -103,11 +147,27 @@ impl DatabasePlugin {
         Duration::from_millis(millis)
     }
 
+    /// Initializes auto-creation for all configured database plugins without a custom schema.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), String>`: Ok on success, or an error message on failure.
     #[instrument_trace]
     pub async fn initialize_auto_creation() -> Result<(), String> {
         Self::initialize_auto_creation_with_schema(None, None, None).await
     }
 
+    /// Initializes auto-creation for all configured database plugins with optional schemas.
+    ///
+    /// # Arguments
+    ///
+    /// - `Option<DatabaseSchema>`: The optional MySQL schema for table creation.
+    /// - `Option<DatabaseSchema>`: The optional PostgreSQL schema for table creation.
+    /// - `Option<()>`: The optional Redis schema (currently unused).
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), String>`: Ok on success, or an error message on failure.
     #[instrument_trace]
     pub async fn initialize_auto_creation_with_schema(
         mysql_schema: Option<DatabaseSchema>,
@@ -213,7 +273,17 @@ impl DatabasePlugin {
     }
 }
 
+/// Implementation of `ConnectionCache` methods for managing cached connection results.
 impl<T: Clone> ConnectionCache<T> {
+    /// Creates a new connection cache entry with the given result and current timestamp.
+    ///
+    /// # Arguments
+    ///
+    /// - `Result<T, String>`: The connection result to cache.
+    ///
+    /// # Returns
+    ///
+    /// - `Self`: A new connection cache entry.
     #[instrument_trace]
     pub fn new(result: Result<T, String>) -> Self {
         Self {
@@ -222,54 +292,128 @@ impl<T: Clone> ConnectionCache<T> {
         }
     }
 
+    /// Checks whether the cached connection result has expired based on the given duration.
+    ///
+    /// # Arguments
+    ///
+    /// - `Duration`: The maximum age of the cached result before it is considered expired.
+    ///
+    /// # Returns
+    ///
+    /// - `bool`: True if the cache entry has expired.
     #[instrument_trace]
     pub fn is_expired(&self, duration: Duration) -> bool {
         self.get_last_attempt().elapsed() >= duration
     }
 
+    /// Determines whether a failed connection attempt should be retried based on the retry duration.
+    ///
+    /// # Arguments
+    ///
+    /// - `Duration`: The minimum time to wait before retrying.
+    ///
+    /// # Returns
+    ///
+    /// - `bool`: True if the connection should be retried (failed and expired).
     #[instrument_trace]
     pub fn should_retry(&self, duration: Duration) -> bool {
         self.try_get_result().is_err() && self.is_expired(duration)
     }
 }
 
+/// Implementation of result inspection methods for `AutoCreationResult`.
 impl AutoCreationResult {
+    /// Checks whether any changes were made during the auto-creation process.
+    ///
+    /// # Returns
+    ///
+    /// - `bool`: True if a database was created or tables were created.
     #[instrument_trace]
     pub fn has_changes(&self) -> bool {
         self.get_database_created() || !self.get_tables_created().is_empty()
     }
 
+    /// Checks whether any errors occurred during the auto-creation process.
+    ///
+    /// # Returns
+    ///
+    /// - `bool`: True if there are errors in the result.
     #[instrument_trace]
     pub fn has_errors(&self) -> bool {
         !self.get_errors().is_empty()
     }
 }
 
+/// Implementation of builder methods for `DatabaseSchema`.
 impl DatabaseSchema {
+    /// Adds a table schema to the database schema.
+    ///
+    /// # Arguments
+    ///
+    /// - `TableSchema`: The table schema to add.
+    ///
+    /// # Returns
+    ///
+    /// - `Self`: The updated database schema with the added table.
     #[instrument_trace]
     pub fn add_table(mut self, table: TableSchema) -> Self {
         self.get_mut_tables().push(table);
         self
     }
 
+    /// Adds an index SQL statement to the database schema.
+    ///
+    /// # Arguments
+    ///
+    /// - `String`: The index SQL statement to add.
+    ///
+    /// # Returns
+    ///
+    /// - `Self`: The updated database schema with the added index.
     #[instrument_trace]
     pub fn add_index(mut self, index: String) -> Self {
         self.get_mut_indexes().push(index);
         self
     }
 
+    /// Adds a constraint SQL statement to the database schema.
+    ///
+    /// # Arguments
+    ///
+    /// - `String`: The constraint SQL statement to add.
+    ///
+    /// # Returns
+    ///
+    /// - `Self`: The updated database schema with the added constraint.
     #[instrument_trace]
     pub fn add_constraint(mut self, constraint: String) -> Self {
         self.get_mut_constraints().push(constraint);
         self
     }
 
+    /// Adds an initialization data SQL statement to the database schema.
+    ///
+    /// # Arguments
+    ///
+    /// - `String`: The init data SQL statement to add.
+    ///
+    /// # Returns
+    ///
+    /// - `Self`: The updated database schema with the added init data.
     #[instrument_trace]
     pub fn add_init_data(mut self, init_data: String) -> Self {
         self.get_mut_init_data().push(init_data);
         self
     }
 
+    /// Returns the tables in topological order based on their dependencies.
+    ///
+    /// Tables with satisfied dependencies are ordered first. If a circular dependency is detected,
+    /// the remaining tables are appended in their current order.
+    ///
+    /// # Returns
+    ///
+    /// - `Vec<&TableSchema>`: The ordered list of table schema references.
     #[instrument_trace]
     pub fn ordered_tables(&self) -> Vec<&TableSchema> {
         let mut ordered: Vec<&TableSchema> = Vec::new();
@@ -302,7 +446,13 @@ impl DatabaseSchema {
     }
 }
 
+/// Implementation of validation and factory methods for `AutoCreationConfig`.
 impl AutoCreationConfig {
+    /// Validates that at least one instance of each required database plugin is configured.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), String>`: Ok if validation passes, or an error message identifying the missing plugin.
     #[instrument_trace]
     pub fn validate() -> Result<(), String> {
         let env: &'static EnvConfig = EnvPlugin::get_or_init();
@@ -318,6 +468,15 @@ impl AutoCreationConfig {
         Ok(())
     }
 
+    /// Creates a `PluginAutoCreationConfig` for the specified plugin name.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The name of the plugin.
+    ///
+    /// # Returns
+    ///
+    /// - `PluginAutoCreationConfig`: The configuration for the specified plugin.
     #[instrument_trace]
     pub fn for_plugin(plugin_name: &str) -> PluginAutoCreationConfig {
         PluginAutoCreationConfig {
@@ -326,12 +485,23 @@ impl AutoCreationConfig {
     }
 }
 
+/// Implementation of inspection methods for `PluginAutoCreationConfig`.
 impl PluginAutoCreationConfig {
+    /// Checks whether the plugin identified by this configuration is enabled and recognized.
+    ///
+    /// # Returns
+    ///
+    /// - `bool`: True if the plugin name maps to a valid `PluginType`.
     #[instrument_trace]
     pub fn is_plugin_enabled(&self) -> bool {
         PluginType::from_str(self.get_plugin_name()).is_ok()
     }
 
+    /// Returns the database name associated with this plugin's default instance.
+    ///
+    /// # Returns
+    ///
+    /// - `String`: The database name, or "unknown" if no default instance is found.
     #[instrument_trace]
     pub fn get_database_name(&self) -> String {
         let env: &'static EnvConfig = EnvPlugin::get_or_init();
@@ -358,6 +528,11 @@ impl PluginAutoCreationConfig {
         }
     }
 
+    /// Returns the connection information (host:port:database) for this plugin's default instance.
+    ///
+    /// # Returns
+    ///
+    /// - `String`: The connection information string, or "unknown" if no default instance is found.
     #[instrument_trace]
     pub fn get_connection_info(&self) -> String {
         let env: &'static EnvConfig = EnvPlugin::get_or_init();
@@ -401,7 +576,14 @@ impl PluginAutoCreationConfig {
     }
 }
 
+/// Implementation of logging methods for `AutoCreationLogger`, providing standardized log output for auto-creation events.
 impl AutoCreationLogger {
+    /// Logs the start of an auto-creation operation for a specific plugin and database.
+    ///
+    /// # Arguments
+    ///
+    /// - `PluginType`: The type of the database plugin.
+    /// - `&str`: The name of the database being created.
     #[instrument_trace]
     pub async fn log_auto_creation_start(plugin_type: PluginType, database_name: &str) {
         info!(
@@ -409,6 +591,12 @@ impl AutoCreationLogger {
         );
     }
 
+    /// Logs the completion of an auto-creation operation, including any warnings.
+    ///
+    /// # Arguments
+    ///
+    /// - `PluginType`: The type of the database plugin.
+    /// - `&AutoCreationResult`: The result of the auto-creation operation.
     #[instrument_trace]
     pub async fn log_auto_creation_complete(plugin_type: PluginType, result: &AutoCreationResult) {
         if result.has_errors() {
@@ -421,6 +609,14 @@ impl AutoCreationLogger {
         }
     }
 
+    /// Logs an error that occurred during an auto-creation operation.
+    ///
+    /// # Arguments
+    ///
+    /// - `&AutoCreationError`: The error that occurred.
+    /// - `&str`: The operation that failed.
+    /// - `PluginType`: The type of the database plugin.
+    /// - `Option<&str>`: The optional database name.
     #[instrument_trace]
     pub async fn log_auto_creation_error(
         error: &AutoCreationError,
@@ -434,6 +630,14 @@ impl AutoCreationLogger {
         );
     }
 
+    /// Logs the result of a connection verification for a specific plugin and database.
+    ///
+    /// # Arguments
+    ///
+    /// - `PluginType`: The type of the database plugin.
+    /// - `&str`: The name of the database.
+    /// - `bool`: Whether the verification was successful.
+    /// - `Option<&str>`: The optional error message if verification failed.
     #[instrument_trace]
     pub async fn log_connection_verification(
         plugin_type: PluginType,
@@ -453,6 +657,12 @@ impl AutoCreationLogger {
         };
     }
 
+    /// Logs that a new database was successfully created for a specific plugin.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The name of the database that was created.
+    /// - `PluginType`: The type of the database plugin.
     #[instrument_trace]
     pub async fn log_database_created(database_name: &str, plugin_type: PluginType) {
         info!(
@@ -460,11 +670,24 @@ impl AutoCreationLogger {
         );
     }
 
+    /// Logs that the specified database already exists for a specific plugin.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The name of the database.
+    /// - `PluginType`: The type of the database plugin.
     #[instrument_trace]
     pub async fn log_database_exists(database_name: &str, plugin_type: PluginType) {
         info!("[AUTO-CREATION] Database '{database_name}' already exists for {plugin_type} plugin");
     }
 
+    /// Logs that a new table was successfully created in the database for a specific plugin.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The name of the table that was created.
+    /// - `&str`: The name of the database.
+    /// - `PluginType`: The type of the database plugin.
     #[instrument_trace]
     pub async fn log_table_created(table_name: &str, database_name: &str, plugin_type: PluginType) {
         info!(
@@ -472,6 +695,13 @@ impl AutoCreationLogger {
         );
     }
 
+    /// Logs that the specified table already exists in the database for a specific plugin.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The name of the table.
+    /// - `&str`: The name of the database.
+    /// - `PluginType`: The type of the database plugin.
     #[instrument_trace]
     pub async fn log_table_exists(table_name: &str, database_name: &str, plugin_type: PluginType) {
         info!(
@@ -479,6 +709,13 @@ impl AutoCreationLogger {
         );
     }
 
+    /// Logs a summary of all tables created during the auto-creation process.
+    ///
+    /// # Arguments
+    ///
+    /// - `&[String]`: The list of table names that were created.
+    /// - `&str`: The name of the database.
+    /// - `PluginType`: The type of the database plugin.
     #[instrument_trace]
     pub async fn log_tables_created(
         tables: &[String],

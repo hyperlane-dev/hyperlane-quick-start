@@ -1,6 +1,20 @@
 use super::*;
 
+/// Implementation of process lifecycle management for `ProcessPlugin`.
 impl ProcessPlugin {
+    /// Creates and manages the server process based on command-line arguments.
+    ///
+    /// Supports `stop`, `restart` commands and a `-d` flag for daemon mode.
+    /// If no command is provided, the server starts in foreground mode by default.
+    ///
+    /// # Arguments
+    ///
+    /// - `P`: The PID file path for process management.
+    /// - `F`: The server hook function that returns a future to run the server.
+    ///
+    /// # Panics
+    ///
+    /// This function does not explicitly panic, but the underlying `ServerManager` operations may panic on critical failures.
     #[instrument_trace]
     pub async fn create<P, F, Fut>(pid_path: P, server_hook: F)
     where
