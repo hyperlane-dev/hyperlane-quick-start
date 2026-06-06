@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `GetOrInit` for `PostgreSqlPlugin`, providing lazy initialization of the global PostgreSQL connection cache.
 impl GetOrInit for PostgreSqlPlugin {
     type Instance = RwLock<HashMap<String, ConnectionCache<DatabaseConnection>>>;
 
@@ -9,6 +10,7 @@ impl GetOrInit for PostgreSqlPlugin {
     }
 }
 
+/// Implementation of `DatabaseConnectionPlugin` for `PostgreSqlPlugin`, managing PostgreSQL connections and auto-creation.
 impl DatabaseConnectionPlugin for PostgreSqlPlugin {
     type InstanceConfig = PostgreSqlInstanceConfig;
 
@@ -23,6 +25,16 @@ impl DatabaseConnectionPlugin for PostgreSqlPlugin {
         PluginType::PostgreSQL
     }
 
+    /// Creates a new PostgreSQL database connection for the specified instance, performing auto-creation if needed.
+    ///
+    /// # Arguments
+    ///
+    /// - `I`: The instance name identifier.
+    /// - `Option<DatabaseSchema>`: The optional database schema for auto-creation.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Self::Connection, String>`: The connection on success, or an error message on failure.
     #[instrument_trace]
     async fn connection_db<I>(
         instance_name: I,
@@ -83,6 +95,16 @@ impl DatabaseConnectionPlugin for PostgreSqlPlugin {
         })
     }
 
+    /// Retrieves an existing cached PostgreSQL connection or creates a new one for the specified instance.
+    ///
+    /// # Arguments
+    ///
+    /// - `I`: The instance name identifier.
+    /// - `Option<DatabaseSchema>`: The optional database schema for auto-creation.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Self::Connection, String>`: The connection on success, or an error message on failure.
     #[instrument_trace]
     async fn get_connection<I>(
         instance_name: I,
@@ -134,6 +156,16 @@ impl DatabaseConnectionPlugin for PostgreSqlPlugin {
         new_connection
     }
 
+    /// Performs the full auto-creation process for a PostgreSQL instance, including database, tables, indexes, and data initialization.
+    ///
+    /// # Arguments
+    ///
+    /// - `&Self::InstanceConfig`: The PostgreSQL instance configuration.
+    /// - `Option<DatabaseSchema>`: The optional database schema for table creation.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<AutoCreationResult, AutoCreationError>`: The auto-creation result on success, or an error on failure.
     #[instrument_trace]
     async fn perform_auto_creation(
         instance: &Self::InstanceConfig,
@@ -224,6 +256,7 @@ impl DatabaseConnectionPlugin for PostgreSqlPlugin {
     }
 }
 
+/// Implementation of `Default` for `PostgreSqlAutoCreation`, using the default PostgreSQL instance from the environment configuration.
 impl Default for PostgreSqlAutoCreation {
     #[instrument_trace]
     fn default() -> Self {
@@ -237,7 +270,13 @@ impl Default for PostgreSqlAutoCreation {
     }
 }
 
+/// Implementation of database and table creation methods for `PostgreSqlAutoCreation`.
 impl PostgreSqlAutoCreation {
+    /// Creates an admin connection to the PostgreSQL server connecting to the default `postgres` database.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<DatabaseConnection, AutoCreationError>`: The admin connection on success, or an error on failure.
     #[instrument_trace]
     async fn create_admin_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
         let admin_url: String = self.instance.get_admin_url();
@@ -268,6 +307,11 @@ impl PostgreSqlAutoCreation {
         })
     }
 
+    /// Creates a connection to the target PostgreSQL database.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<DatabaseConnection, AutoCreationError>`: The database connection on success, or an error on failure.
     #[instrument_trace]
     async fn create_target_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
         let db_url: String = self.instance.get_connection_url();
@@ -291,6 +335,15 @@ impl PostgreSqlAutoCreation {
         })
     }
 
+    /// Checks whether the target database already exists on the PostgreSQL server.
+    ///
+    /// # Arguments
+    ///
+    /// - `&DatabaseConnection`: The admin connection to the PostgreSQL server.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<bool, AutoCreationError>`: True if the database exists, false otherwise.
     #[instrument_trace]
     async fn database_exists(
         &self,
@@ -309,6 +362,15 @@ impl PostgreSqlAutoCreation {
         }
     }
 
+    /// Creates the target database if it does not already exist.
+    ///
+    /// # Arguments
+    ///
+    /// - `&DatabaseConnection`: The admin connection to the PostgreSQL server.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<bool, AutoCreationError>`: True if the database was created, false if it already existed.
     #[instrument_trace]
     async fn create_database(
         &self,
@@ -362,6 +424,16 @@ impl PostgreSqlAutoCreation {
         }
     }
 
+    /// Checks whether a table already exists in the target PostgreSQL database.
+    ///
+    /// # Arguments
+    ///
+    /// - `&DatabaseConnection`: The connection to the target database.
+    /// - `T`: The table name to check.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<bool, AutoCreationError>`: True if the table exists, false otherwise.
     #[instrument_trace]
     async fn table_exists<T>(
         &self,
@@ -384,6 +456,16 @@ impl PostgreSqlAutoCreation {
         }
     }
 
+    /// Creates a single table in the target PostgreSQL database using the provided table schema.
+    ///
+    /// # Arguments
+    ///
+    /// - `&DatabaseConnection`: The connection to the target database.
+    /// - `&TableSchema`: The table schema containing the creation SQL.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), AutoCreationError>`: Ok on success, or an error on failure.
     #[instrument_trace]
     async fn create_table(
         &self,
@@ -413,6 +495,16 @@ impl PostgreSqlAutoCreation {
         }
     }
 
+    /// Executes a raw SQL statement on the target PostgreSQL database.
+    ///
+    /// # Arguments
+    ///
+    /// - `&DatabaseConnection`: The connection to the target database.
+    /// - `S`: The SQL statement to execute.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), AutoCreationError>`: Ok on success, or an error on failure.
     #[instrument_trace]
     async fn execute_sql<S>(
         &self,
@@ -431,11 +523,21 @@ impl PostgreSqlAutoCreation {
         }
     }
 
+    /// Returns a reference to the database schema associated with this auto-creation handler.
+    ///
+    /// # Returns
+    ///
+    /// - `&DatabaseSchema`: The database schema reference.
     #[instrument_trace]
     fn get_database_schema(&self) -> &DatabaseSchema {
         &self.schema
     }
 
+    /// Creates indexes and constraints defined in the database schema on the target PostgreSQL database.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), AutoCreationError>`: Ok on success, or an error on failure.
     #[instrument_trace]
     async fn create_indexes(&self) -> Result<(), AutoCreationError> {
         let connection: DatabaseConnection = self.create_target_connection().await?;
@@ -467,9 +569,15 @@ impl PostgreSqlAutoCreation {
     }
 }
 
+/// Implementation of `DatabaseAutoCreation` for `PostgreSqlAutoCreation`, providing the trait methods for PostgreSQL database lifecycle management.
 impl DatabaseAutoCreation for PostgreSqlAutoCreation {
     type InstanceConfig = PostgreSqlInstanceConfig;
 
+    /// Creates a new `PostgreSqlAutoCreation` handler from the given PostgreSQL instance configuration.
+    ///
+    /// # Arguments
+    ///
+    /// - `PostgreSqlInstanceConfig`: The PostgreSQL instance configuration.
     #[instrument_trace]
     fn new(instance: Self::InstanceConfig) -> Self {
         Self {
@@ -478,6 +586,12 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
         }
     }
 
+    /// Creates a new `PostgreSqlAutoCreation` handler with an explicit database schema.
+    ///
+    /// # Arguments
+    ///
+    /// - `PostgreSqlInstanceConfig`: The PostgreSQL instance configuration.
+    /// - `DatabaseSchema`: The database schema containing table definitions.
     #[instrument_trace]
     fn with_schema(instance: Self::InstanceConfig, schema: DatabaseSchema) -> Self
     where
@@ -486,6 +600,11 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
         Self { instance, schema }
     }
 
+    /// Creates the PostgreSQL database if it does not already exist.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<bool, AutoCreationError>`: True if the database was created, false if it already existed.
     #[instrument_trace]
     async fn create_database_if_not_exists(&self) -> Result<bool, AutoCreationError> {
         let admin_connection: DatabaseConnection = self.create_admin_connection().await?;
@@ -494,6 +613,11 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
         result
     }
 
+    /// Creates all tables defined in the schema that do not already exist, in topological order.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Vec<String>, AutoCreationError>`: A list of table names that were created.
     #[instrument_trace]
     async fn create_tables_if_not_exist(&self) -> Result<Vec<String>, AutoCreationError> {
         let connection: DatabaseConnection = self.create_target_connection().await?;
@@ -528,6 +652,11 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
         Ok(created_tables)
     }
 
+    /// Initializes data in the PostgreSQL database using the init data SQL statements from the schema.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), AutoCreationError>`: Ok on success, or an error on failure.
     #[instrument_trace]
     async fn init_data(&self) -> Result<(), AutoCreationError> {
         let connection: DatabaseConnection = self.create_target_connection().await?;
@@ -547,6 +676,11 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
         Ok(())
     }
 
+    /// Verifies the PostgreSQL database connection is working by executing a simple SELECT query.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), AutoCreationError>`: Ok if the connection is valid, or an error on failure.
     #[instrument_trace]
     async fn verify_connection(&self) -> Result<(), AutoCreationError> {
         let connection: DatabaseConnection = self.create_target_connection().await?;

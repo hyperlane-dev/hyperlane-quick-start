@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `BootstrapAsyncInit` for `ConfigBootstrap`, loading server and request configuration from the environment.
 impl BootstrapAsyncInit for ConfigBootstrap {
     #[hyperlane(server_config: ServerConfig)]
     async fn init() -> Self {

@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `GetOrInit` for `LoggerPlugin`, providing lazy initialization of the global file logger.
 impl GetOrInit for LoggerPlugin {
     type Instance = RwLock<FileLogger>;
 
@@ -8,6 +9,7 @@ impl GetOrInit for LoggerPlugin {
     }
 }
 
+/// Implementation of the `Log` trait for `Logger`, providing colored console output and file logging.
 impl Log for Logger {
     fn enabled(&self, metadata: &Metadata) -> bool {
         metadata.level() <= max_level()
@@ -84,21 +86,43 @@ impl Log for Logger {
     }
 }
 
+/// Implementation of initialization and logging methods for `Logger`.
 impl Logger {
+    /// Acquires a read lock on the global file logger.
+    ///
+    /// # Returns
+    ///
+    /// - `RwLockReadGuard<'static, FileLogger>`: The read guard for the file logger.
     fn read() -> RwLockReadGuard<'static, FileLogger> {
         LoggerPlugin::get_or_init().try_read().unwrap()
     }
 
+    /// Acquires a write lock on the global file logger.
+    ///
+    /// # Returns
+    ///
+    /// - `RwLockWriteGuard<'static, FileLogger>`: The write guard for the file logger.
     fn write() -> RwLockWriteGuard<'static, FileLogger> {
         LoggerPlugin::get_or_init().try_write().unwrap()
     }
 
+    /// Initializes the global logger with the specified log level and file logger configuration.
+    ///
+    /// # Arguments
+    ///
+    /// - `LevelFilter`: The maximum log level to enable.
+    /// - `FileLogger`: The file logger configuration for writing logs to files.
     pub fn init(level: LevelFilter, file_logger: FileLogger) {
         set_logger(&LOGGER).unwrap();
         set_max_level(level);
         *Self::write() = file_logger;
     }
 
+    /// Logs a trace-level message to the file logger.
+    ///
+    /// # Arguments
+    ///
+    /// - `T`: The data to log, which must implement `AsRef<str>`.
     pub fn log_trace<T>(data: T)
     where
         T: AsRef<str>,
@@ -106,6 +130,11 @@ impl Logger {
         Self::read().trace(data, log_handler);
     }
 
+    /// Logs a debug-level message to the file logger.
+    ///
+    /// # Arguments
+    ///
+    /// - `T`: The data to log, which must implement `AsRef<str>`.
     #[instrument_trace]
     pub fn log_debug<T>(data: T)
     where
@@ -114,6 +143,11 @@ impl Logger {
         Self::read().debug(data, log_handler);
     }
 
+    /// Logs an info-level message to the file logger.
+    ///
+    /// # Arguments
+    ///
+    /// - `T`: The data to log, which must implement `AsRef<str>`.
     #[instrument_trace]
     pub fn log_info<T>(data: T)
     where
@@ -122,6 +156,11 @@ impl Logger {
         Self::read().info(data, log_handler);
     }
 
+    /// Logs a warning-level message to the file logger.
+    ///
+    /// # Arguments
+    ///
+    /// - `T`: The data to log, which must implement `AsRef<str>`.
     #[instrument_trace]
     pub fn log_warn<T>(data: T)
     where
@@ -130,6 +169,11 @@ impl Logger {
         Self::read().warn(data, log_handler);
     }
 
+    /// Logs an error-level message to the file logger.
+    ///
+    /// # Arguments
+    ///
+    /// - `T`: The data to log, which must implement `AsRef<str>`.
     #[instrument_trace]
     pub fn log_error<T>(data: T)
     where

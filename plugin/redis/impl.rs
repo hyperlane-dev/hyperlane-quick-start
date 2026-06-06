@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `GetOrInit` for `RedisPlugin`, providing lazy initialization of the global Redis connection cache.
 impl GetOrInit for RedisPlugin {
     type Instance = RwLock<RedisConnectionMap>;
 
@@ -9,6 +10,7 @@ impl GetOrInit for RedisPlugin {
     }
 }
 
+/// Implementation of `DatabaseConnectionPlugin` for `RedisPlugin`, managing Redis connections and auto-creation.
 impl DatabaseConnectionPlugin for RedisPlugin {
     type InstanceConfig = RedisInstanceConfig;
 
@@ -23,6 +25,16 @@ impl DatabaseConnectionPlugin for RedisPlugin {
         PluginType::Redis
     }
 
+    /// Creates a new Redis connection for the specified instance, performing auto-creation if needed.
+    ///
+    /// # Arguments
+    ///
+    /// - `I`: The instance name identifier.
+    /// - `Option<DatabaseSchema>`: The optional database schema (unused for Redis).
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Self::Connection, String>`: The connection on success, or an error message on failure.
     #[instrument_trace]
     async fn connection_db<I>(
         instance_name: I,
@@ -132,6 +144,16 @@ impl DatabaseConnectionPlugin for RedisPlugin {
         Ok(arc_rwlock(connection))
     }
 
+    /// Retrieves an existing cached Redis connection or creates a new one for the specified instance.
+    ///
+    /// # Arguments
+    ///
+    /// - `I`: The instance name identifier.
+    /// - `Option<DatabaseSchema>`: The optional database schema (unused for Redis).
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Self::Connection, String>`: The connection on success, or an error message on failure.
     #[instrument_trace]
     async fn get_connection<I>(
         instance_name: I,
@@ -179,6 +201,16 @@ impl DatabaseConnectionPlugin for RedisPlugin {
         new_connection
     }
 
+    /// Performs the full auto-creation process for a Redis instance, including server validation, namespace setup, and connection verification.
+    ///
+    /// # Arguments
+    ///
+    /// - `&Self::InstanceConfig`: The Redis instance configuration.
+    /// - `Option<DatabaseSchema>`: The optional database schema (unused for Redis).
+    ///
+    /// # Returns
+    ///
+    /// - `Result<AutoCreationResult, AutoCreationError>`: The auto-creation result on success, or an error on failure.
     #[instrument_trace]
     async fn perform_auto_creation(
         instance: &Self::InstanceConfig,
@@ -249,6 +281,7 @@ impl DatabaseConnectionPlugin for RedisPlugin {
     }
 }
 
+/// Implementation of `Default` for `RedisAutoCreation`, using the default Redis instance from the environment configuration.
 impl Default for RedisAutoCreation {
     #[instrument_trace]
     fn default() -> Self {
@@ -261,7 +294,13 @@ impl Default for RedisAutoCreation {
     }
 }
 
+/// Implementation of Redis-specific auto-creation methods for `RedisAutoCreation`.
 impl RedisAutoCreation {
+    /// Creates a mutable connection to the Redis server for this instance.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Connection, AutoCreationError>`: The Redis connection on success, or an error on failure.
     #[instrument_trace]
     async fn create_mutable_connection(&self) -> Result<Connection, AutoCreationError> {
         let db_url: String = self.instance.get_connection_url();
@@ -318,6 +357,11 @@ impl RedisAutoCreation {
         Ok(connection)
     }
 
+    /// Validates the Redis server by sending a PING command and checking the server info.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), AutoCreationError>`: Ok if the server is valid, or an error on failure.
     #[instrument_trace]
     async fn validate_redis_server(&self) -> Result<(), AutoCreationError> {
         let mut conn: Connection = self.create_mutable_connection().await?;
@@ -352,6 +396,11 @@ impl RedisAutoCreation {
         Ok(())
     }
 
+    /// Sets up the Redis namespace by initializing application keys if they do not already exist.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Vec<String>, AutoCreationError>`: A list of keys that were set up.
     #[instrument_trace]
     async fn setup_redis_namespace(&self) -> Result<Vec<String>, AutoCreationError> {
         let mut setup_operations: Vec<String> = vec![];
@@ -392,9 +441,15 @@ impl RedisAutoCreation {
     }
 }
 
+/// Implementation of `DatabaseAutoCreation` for `RedisAutoCreation`, providing the trait methods for Redis lifecycle management.
 impl DatabaseAutoCreation for RedisAutoCreation {
     type InstanceConfig = RedisInstanceConfig;
 
+    /// Creates a new `RedisAutoCreation` handler from the given Redis instance configuration.
+    ///
+    /// # Arguments
+    ///
+    /// - `RedisInstanceConfig`: The Redis instance configuration.
     #[instrument_trace]
     fn new(instance: Self::InstanceConfig) -> Self {
         Self {
@@ -403,6 +458,12 @@ impl DatabaseAutoCreation for RedisAutoCreation {
         }
     }
 
+    /// Creates a new `RedisAutoCreation` handler with an explicit database schema.
+    ///
+    /// # Arguments
+    ///
+    /// - `RedisInstanceConfig`: The Redis instance configuration.
+    /// - `DatabaseSchema`: The database schema (unused for Redis).
     #[instrument_trace]
     fn with_schema(instance: Self::InstanceConfig, schema: DatabaseSchema) -> Self
     where
@@ -411,6 +472,11 @@ impl DatabaseAutoCreation for RedisAutoCreation {
         Self { instance, schema }
     }
 
+    /// Validates the Redis server connectivity as the "database creation" step.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<bool, AutoCreationError>`: Always returns false, as Redis does not require database creation.
     #[instrument_trace]
     async fn create_database_if_not_exists(&self) -> Result<bool, AutoCreationError> {
         self.validate_redis_server().await?;
@@ -422,6 +488,11 @@ impl DatabaseAutoCreation for RedisAutoCreation {
         Ok(false)
     }
 
+    /// Sets up the Redis namespace as the "table creation" step.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Vec<String>, AutoCreationError>`: A list of keys that were set up.
     #[instrument_trace]
     async fn create_tables_if_not_exist(&self) -> Result<Vec<String>, AutoCreationError> {
         let setup_operations: Vec<String> = self.setup_redis_namespace().await?;
@@ -443,11 +514,21 @@ impl DatabaseAutoCreation for RedisAutoCreation {
         Ok(setup_operations)
     }
 
+    /// No-op for Redis, as data initialization is not applicable.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), AutoCreationError>`: Always returns Ok.
     #[instrument_trace]
     async fn init_data(&self) -> Result<(), AutoCreationError> {
         Ok(())
     }
 
+    /// Verifies the Redis server connection by validating server connectivity.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), AutoCreationError>`: Ok if the connection is valid, or an error on failure.
     #[instrument_trace]
     async fn verify_connection(&self) -> Result<(), AutoCreationError> {
         match self.validate_redis_server().await {

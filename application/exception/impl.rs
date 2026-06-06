@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `ServerHook` for `TaskPanicHook`, handling task panic events by returning a 500 error response.
 impl ServerHook for TaskPanicHook {
     #[task_panic_data(task_panic_data)]
     #[instrument_trace]
@@ -31,6 +32,7 @@ impl ServerHook for TaskPanicHook {
     }
 }
 
+/// Implementation of `ServerHook` for `RequestErrorHook`, handling request error events by returning an appropriate error response.
 impl ServerHook for RequestErrorHook {
     #[request_error_data(request_error_data)]
     #[instrument_trace]

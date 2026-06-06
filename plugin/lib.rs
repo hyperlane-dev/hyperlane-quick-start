@@ -1,3 +1,7 @@
+//! Hyperlane plugin
+//!
+//! Plugin layer providing environment configuration, database connections, logging, process management, and shutdown handling for the Hyperlane framework.
+
 #![recursion_limit = "1024"]
 
 pub mod common;

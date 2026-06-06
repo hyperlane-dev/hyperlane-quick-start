@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `BootstrapSyncInit` for `RuntimeBootstrap`, creating a multi-threaded Tokio runtime on initialization.
 impl BootstrapSyncInit for RuntimeBootstrap {
     fn init() -> Self {
         let runtime: Runtime = Builder::new_multi_thread()

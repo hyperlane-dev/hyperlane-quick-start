@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `Display` for `MysqlTableName`, converting MySQL table name variants to their string representations.
 impl std::fmt::Display for MysqlTableName {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -11,6 +12,7 @@ impl std::fmt::Display for MysqlTableName {
     }
 }
 
+/// Implementation of `Display` for `PostgresqlTableName`, converting PostgreSQL table name variants to their string representations.
 impl std::fmt::Display for PostgresqlTableName {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -28,7 +30,13 @@ impl std::fmt::Display for PostgresqlTableName {
     }
 }
 
+/// Implementation of database schema building methods for `DbBootstrap`.
 impl DbBootstrap {
+    /// Builds the MySQL database schema containing all CICD-related tables.
+    ///
+    /// # Returns
+    ///
+    /// - `DatabaseSchema`: The MySQL database schema with pipeline, run, job, and step tables.
     #[instrument_trace]
     pub fn build_mysql_schema() -> DatabaseSchema {
         DatabaseSchema::default()
@@ -54,6 +62,11 @@ impl DbBootstrap {
             ))
     }
 
+    /// Builds the PostgreSQL database schema containing all application tables.
+    ///
+    /// # Returns
+    ///
+    /// - `DatabaseSchema`: The PostgreSQL database schema with chat, tracking, shortlink, auth, order, notification, and blog tables.
     #[instrument_trace]
     pub fn build_postgresql_schema() -> DatabaseSchema {
         DatabaseSchema::default()
@@ -128,6 +141,7 @@ impl DbBootstrap {
     }
 }
 
+/// Implementation of `BootstrapAsyncInit` for `DbBootstrap`, establishing database connections and running auto-creation on initialization.
 impl BootstrapAsyncInit for DbBootstrap {
     async fn init() -> Self {
         let mysql_schema: DatabaseSchema = Self::build_mysql_schema();

@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `GetOrInit` for `EnvPlugin`, providing lazy initialization of the global `EnvConfig`.
 impl GetOrInit for EnvPlugin {
     type Instance = EnvConfig;
 
@@ -9,7 +10,13 @@ impl GetOrInit for EnvPlugin {
     }
 }
 
+/// Implementation of configuration loading methods for `EnvPlugin`.
 impl EnvPlugin {
+    /// Attempts to load the environment configuration from the env file and store it globally.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), String>`: Ok if the configuration was loaded successfully, or an error message on failure.
     #[instrument_trace]
     pub fn try_load_config() -> Result<(), String> {
         let config: EnvConfig = EnvConfig::load()?;
@@ -22,7 +29,13 @@ impl EnvPlugin {
     }
 }
 
+/// Implementation of connection URL generation methods for `MySqlInstanceConfig`.
 impl MySqlInstanceConfig {
+    /// Returns the MySQL connection URL for this instance, including the database name.
+    ///
+    /// # Returns
+    ///
+    /// - `String`: The MySQL connection URL in the format `mysql://user:password@host:port/database`.
     pub(crate) fn get_connection_url(&self) -> String {
         format!(
             "mysql://{}:{}@{}:{}/{}",
@@ -33,6 +46,12 @@ impl MySqlInstanceConfig {
             self.get_database()
         )
     }
+
+    /// Returns the MySQL admin connection URL for this instance, without a specific database.
+    ///
+    /// # Returns
+    ///
+    /// - `String`: The MySQL admin URL in the format `mysql://user:password@host:port`.
     pub(crate) fn get_admin_url(&self) -> String {
         format!(
             "mysql://{}:{}@{}:{}",
@@ -44,7 +63,13 @@ impl MySqlInstanceConfig {
     }
 }
 
+/// Implementation of connection URL generation methods for `PostgreSqlInstanceConfig`.
 impl PostgreSqlInstanceConfig {
+    /// Returns the PostgreSQL connection URL for this instance, including the database name.
+    ///
+    /// # Returns
+    ///
+    /// - `String`: The PostgreSQL connection URL in the format `postgres://user:password@host:port/database`.
     pub(crate) fn get_connection_url(&self) -> String {
         format!(
             "postgres://{}:{}@{}:{}/{}",
@@ -55,6 +80,12 @@ impl PostgreSqlInstanceConfig {
             self.get_database()
         )
     }
+
+    /// Returns the PostgreSQL admin connection URL for this instance, connecting to the default `postgres` database.
+    ///
+    /// # Returns
+    ///
+    /// - `String`: The PostgreSQL admin URL in the format `postgres://user:password@host:port/postgres`.
     pub(crate) fn get_admin_url(&self) -> String {
         format!(
             "postgres://{}:{}@{}:{}/postgres",
@@ -66,7 +97,13 @@ impl PostgreSqlInstanceConfig {
     }
 }
 
+/// Implementation of connection URL generation methods for `RedisInstanceConfig`.
 impl RedisInstanceConfig {
+    /// Returns the Redis connection URL for this instance, with or without a username.
+    ///
+    /// # Returns
+    ///
+    /// - `String`: The Redis connection URL in the format `redis://user:password@host:port` or `redis://:password@host:port`.
     pub(crate) fn get_connection_url(&self) -> String {
         if self.get_username().is_empty() {
             format!(
@@ -87,32 +124,85 @@ impl RedisInstanceConfig {
     }
 }
 
+/// Implementation of instance lookup, configuration loading, and logging methods for `EnvConfig`.
 impl EnvConfig {
+    /// Returns the MySQL instance configuration with the specified name.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The name of the MySQL instance to find.
+    ///
+    /// # Returns
+    ///
+    /// - `Option<&MySqlInstanceConfig>`: The instance configuration if found, or None.
     pub(crate) fn get_mysql_instance(&self, name: &str) -> Option<&MySqlInstanceConfig> {
         self.get_mysql_instances()
             .iter()
             .find(|instance: &&MySqlInstanceConfig| instance.get_name() == name)
     }
+
+    /// Returns the PostgreSQL instance configuration with the specified name.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The name of the PostgreSQL instance to find.
+    ///
+    /// # Returns
+    ///
+    /// - `Option<&PostgreSqlInstanceConfig>`: The instance configuration if found, or None.
     pub(crate) fn get_postgresql_instance(&self, name: &str) -> Option<&PostgreSqlInstanceConfig> {
         self.get_postgresql_instances()
             .iter()
             .find(|instance: &&PostgreSqlInstanceConfig| instance.get_name() == name)
     }
+
+    /// Returns the first MySQL instance configuration as the default instance.
+    ///
+    /// # Returns
+    ///
+    /// - `Option<&MySqlInstanceConfig>`: The default MySQL instance if any exist, or None.
     pub(crate) fn get_default_mysql_instance(&self) -> Option<&MySqlInstanceConfig> {
         self.get_mysql_instances().first()
     }
+
+    /// Returns the first PostgreSQL instance configuration as the default instance.
+    ///
+    /// # Returns
+    ///
+    /// - `Option<&PostgreSqlInstanceConfig>`: The default PostgreSQL instance if any exist, or None.
     pub(crate) fn get_default_postgresql_instance(&self) -> Option<&PostgreSqlInstanceConfig> {
         self.get_postgresql_instances().first()
     }
+
+    /// Returns the Redis instance configuration with the specified name.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The name of the Redis instance to find.
+    ///
+    /// # Returns
+    ///
+    /// - `Option<&RedisInstanceConfig>`: The instance configuration if found, or None.
     pub(crate) fn get_redis_instance(&self, name: &str) -> Option<&RedisInstanceConfig> {
         self.get_redis_instances()
             .iter()
             .find(|instance: &&RedisInstanceConfig| instance.get_name() == name)
     }
+
+    /// Returns the first Redis instance configuration as the default instance.
+    ///
+    /// # Returns
+    ///
+    /// - `Option<&RedisInstanceConfig>`: The default Redis instance if any exist, or None.
     pub(crate) fn get_default_redis_instance(&self) -> Option<&RedisInstanceConfig> {
         self.get_redis_instances().first()
     }
 
+    /// Loads the environment configuration from the env file and Docker Compose configuration.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Self, String>`: The loaded configuration on success, or an error message on failure.
     #[instrument_trace]
     pub(crate) fn load() -> Result<Self, String> {
         dotenvy::from_path(SERVER_ENV_FILE_PATH)
@@ -201,6 +291,15 @@ impl EnvConfig {
         Ok(config)
     }
 
+    /// Parses MySQL instance configurations from the environment variable and merges with Docker Compose defaults.
+    ///
+    /// # Arguments
+    ///
+    /// - `&DockerComposeConfig`: The Docker Compose configuration providing default port values.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Vec<MySqlInstanceConfig>, String>`: The parsed MySQL instances on success, or an error message on failure.
     fn parse_mysql_instances(
         docker_config: &DockerComposeConfig,
     ) -> Result<Vec<MySqlInstanceConfig>, String> {
@@ -220,6 +319,15 @@ impl EnvConfig {
         Ok(instances)
     }
 
+    /// Parses PostgreSQL instance configurations from the environment variable and merges with Docker Compose defaults.
+    ///
+    /// # Arguments
+    ///
+    /// - `&DockerComposeConfig`: The Docker Compose configuration providing default port values.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Vec<PostgreSqlInstanceConfig>, String>`: The parsed PostgreSQL instances on success, or an error message on failure.
     fn parse_postgresql_instances(
         docker_config: &DockerComposeConfig,
     ) -> Result<Vec<PostgreSqlInstanceConfig>, String> {
@@ -243,6 +351,15 @@ impl EnvConfig {
         Ok(instances)
     }
 
+    /// Parses Redis instance configurations from the environment variable and merges with Docker Compose defaults.
+    ///
+    /// # Arguments
+    ///
+    /// - `&DockerComposeConfig`: The Docker Compose configuration providing default port values.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Vec<RedisInstanceConfig>, String>`: The parsed Redis instances on success, or an error message on failure.
     fn parse_redis_instances(
         docker_config: &DockerComposeConfig,
     ) -> Result<Vec<RedisInstanceConfig>, String> {
@@ -262,6 +379,15 @@ impl EnvConfig {
         Ok(instances)
     }
 
+    /// Loads the Docker Compose configuration from the specified file path and extracts service connection details.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The file path to the Docker Compose YAML file.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<DockerComposeConfig, String>`: The parsed Docker Compose configuration on success, or an error message on failure.
     #[instrument_trace]
     fn load_from_docker_compose(file_path: &str) -> Result<DockerComposeConfig, String> {
         let docker_compose_content: Vec<u8> =
@@ -376,6 +502,7 @@ impl EnvConfig {
         Ok(config)
     }
 
+    /// Logs the current environment configuration, with full details in debug mode and masked passwords in release mode.
     #[instrument_trace]
     pub fn log_config() {
         #[cfg(debug_assertions)]

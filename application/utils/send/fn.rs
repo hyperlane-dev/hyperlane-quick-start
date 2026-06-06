@@ -1,5 +1,15 @@
 use super::*;
 
+/// Attempts to send the response body to the client stream, handling both WebSocket and HTTP responses.
+///
+/// # Arguments
+///
+/// - `&mut Stream`: The client stream to send the response to.
+/// - `&mut Context`: The request/response context containing the response data.
+///
+/// # Returns
+///
+/// - `Result<(), ResponseError>`: Ok if the response was sent successfully, or an error if sending failed.
 #[instrument_trace]
 pub async fn try_send_body_hook(
     stream: &mut Stream,
@@ -19,6 +29,16 @@ pub async fn try_send_body_hook(
     send_result
 }
 
+/// Sends the response body to the client stream, panicking if the send fails.
+///
+/// # Arguments
+///
+/// - `&mut Stream`: The client stream to send the response to.
+/// - `&mut Context`: The request/response context containing the response data.
+///
+/// # Panics
+///
+/// Panics if the underlying `try_send_body_hook` returns an error.
 #[instrument_trace]
 pub async fn send_body_hook(stream: &mut Stream, ctx: &mut Context) {
     try_send_body_hook(stream, ctx).await.unwrap()

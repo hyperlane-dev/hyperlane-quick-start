@@ -1,3 +1,7 @@
+//! Hyperlane bootstrap
+//!
+//! Bootstrap layer providing initialization logic for environment, database, logger, server configuration, runtime, and server startup.
+
 #![recursion_limit = "1024"]
 
 pub mod application;
