@@ -24,7 +24,6 @@ impl std::fmt::Display for PostgresqlTableName {
             PostgresqlTableName::BlogLike => write!(f, "blog_like"),
             PostgresqlTableName::BlogFavorite => write!(f, "blog_favorite"),
             PostgresqlTableName::BlogImage => write!(f, "blog_image"),
-            PostgresqlTableName::GithubPages => write!(f, "github_pages"),
         }
     }
 }
@@ -126,13 +125,6 @@ impl DbBootstrap {
                 POSTGRESQL_BLOG_IMAGE_TABLE_SQL.to_string(),
             ))
             .add_index(POSTGRESQL_BLOG_INDEX_SQL.to_string())
-            .add_table(TableSchema::new(
-                vec![],
-                "github_pages".to_string(),
-                POSTGRESQL_GITHUB_PAGES_TABLE_SQL.to_string(),
-            ))
-            .add_index(POSTGRESQL_GITHUB_PAGES_INDEX_SQL.to_string())
-            .add_init_data(POSTGRESQL_GITHUB_PAGES_DATA_SQL.to_string())
     }
 }
 

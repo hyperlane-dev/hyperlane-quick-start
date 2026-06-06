@@ -15,5 +15,3 @@ use {
 };
 
 use hyperlane_config::application::github_pages::*;
-
-use model::application::user::*;

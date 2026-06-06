@@ -1,6 +1,6 @@
 use super::*;
 
-impl ServerHook for AddGithubPagesRoute {
+impl ServerHook for SyncGithubPagesRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
@@ -8,12 +8,12 @@ impl ServerHook for AddGithubPagesRoute {
 
     #[prologue_macros(
         is_post_method,
-        request_body_json_result(request_opt: AddGithubPagesRequest),
+        request_body_json_result(request_opt: SyncGithubPagesRequest),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
-        let request: AddGithubPagesRequest = match request_opt {
+        let request: SyncGithubPagesRequest = match request_opt {
             Ok(data) => data,
             Err(error) => {
                 let response: ApiResponse<String> =
@@ -22,10 +22,29 @@ impl ServerHook for AddGithubPagesRoute {
                 return Status::Continue;
             }
         };
-        match GithubPagesService::add_github_pages(request).await {
-            Ok(info) => {
-                let response: ApiResponse<GithubPagesInfo> =
-                    ApiResponse::new(ApiResponseStatus::Success, info);
+        let parts: Vec<&str> = request.repository.split('/').collect();
+        if parts.len() != 2 {
+            let response: ApiResponse<&str> = ApiResponse::new(
+                ApiResponseStatus::InvalidRequest,
+                ERROR_INVALID_OWNER_REPOSITORY_FORMAT,
+            );
+            ctx.get_mut_response().set_body(response.to_json_bytes());
+            return Status::Continue;
+        }
+        let owner: &str = parts[0];
+        let repository: &str = parts[1];
+        if owner.is_empty() || repository.is_empty() {
+            let response: ApiResponse<&str> = ApiResponse::new(
+                ApiResponseStatus::InvalidRequest,
+                ERROR_INVALID_OWNER_REPOSITORY_FORMAT,
+            );
+            ctx.get_mut_response().set_body(response.to_json_bytes());
+            return Status::Continue;
+        }
+        match GithubPagesService::sync_github_pages(owner, repository).await {
+            Ok(()) => {
+                let response: ApiResponse<&str> =
+                    ApiResponse::new(ApiResponseStatus::Success, "Synced");
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {
@@ -129,23 +148,35 @@ impl ServerHook for DeleteGithubPagesRoute {
 
     #[prologue_macros(
         is_post_method,
-        try_get_route_param(ID_KEY => id_opt),
+        try_get_route_param(GITHUB_PAGES_OWNER_KEY => owner_opt),
+        try_get_route_param(GITHUB_PAGES_REPOSITORY_KEY => repository_opt),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
-        let id: i32 = match id_opt.and_then(|id_str: String| id_str.parse().ok()) {
-            Some(parsed_id) => parsed_id,
+        let owner: String = match owner_opt {
+            Some(owner_str) => owner_str,
             None => {
                 let response: ApiResponse<&str> = ApiResponse::new(
                     ApiResponseStatus::InvalidRequest,
-                    ERROR_GITHUB_PAGES_NOT_FOUND,
+                    ERROR_OWNER_CANNOT_BE_EMPTY,
                 );
                 ctx.get_mut_response().set_body(response.to_json_bytes());
                 return Status::Continue;
             }
         };
-        match GithubPagesService::delete_github_pages(id).await {
+        let repository: String = match repository_opt {
+            Some(repository_str) => repository_str,
+            None => {
+                let response: ApiResponse<&str> = ApiResponse::new(
+                    ApiResponseStatus::InvalidRequest,
+                    ERROR_REPOSITORY_CANNOT_BE_EMPTY,
+                );
+                ctx.get_mut_response().set_body(response.to_json_bytes());
+                return Status::Continue;
+            }
+        };
+        match GithubPagesService::delete_github_pages(&owner, &repository).await {
             Ok(()) => {
                 let response: ApiResponse<&str> =
                     ApiResponse::new(ApiResponseStatus::Success, "Deleted");
@@ -158,28 +189,6 @@ impl ServerHook for DeleteGithubPagesRoute {
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
         };
-        Status::Continue
-    }
-}
-
-impl ServerHook for SyncGithubPagesRoute {
-    #[instrument_trace]
-    async fn new(_: &mut Stream, _: &mut Context) -> Self {
-        Self
-    }
-
-    #[prologue_macros(
-        is_post_method,
-        response_header(CONTENT_TYPE => APPLICATION_JSON)
-    )]
-    #[instrument_trace]
-    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
-        spawn(async {
-            GithubPagesService::sync_all_pages().await;
-        });
-        let response: ApiResponse<&str> =
-            ApiResponse::new(ApiResponseStatus::Success, "Sync started");
-        ctx.get_mut_response().set_body(response.to_json_bytes());
         Status::Continue
     }
 }

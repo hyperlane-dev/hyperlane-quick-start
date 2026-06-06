@@ -7,9 +7,7 @@ pub use {r#const::*, r#struct::*};
 
 use {
     super::*,
-    mapper::github_pages::*,
-    model::{application::github_pages::*, request::github_pages::*, response::github_pages::*},
-    repository::github_pages::*,
+    model::{application::github_pages::*, response::github_pages::*},
     r#static::*,
 };
 

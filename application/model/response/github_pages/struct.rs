@@ -14,8 +14,6 @@ pub struct GithubPagesListResponse {
 
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct GithubPagesInfo {
-    #[get(type(copy))]
-    pub(super) id: i32,
     pub(super) owner: String,
     pub(super) repository: String,
     pub(super) base_url: String,

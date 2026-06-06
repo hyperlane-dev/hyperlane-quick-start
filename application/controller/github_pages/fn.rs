@@ -2,8 +2,8 @@ use super::*;
 
 #[utoipa::path(
     post,
-    path = "/api/github/pages/add",
-    request_body = AddGithubPagesRequest,
+    path = "/api/github/pages/sync",
+    request_body = SyncGithubPagesRequest,
     responses(
         (status = 200, description = "Success"),
         (status = 400, description = "Bad Request"),
@@ -12,7 +12,7 @@ use super::*;
     )
 )]
 #[instrument_trace]
-pub fn openapi_github_pages_add() {}
+pub fn openapi_github_pages_sync() {}
 
 #[utoipa::path(
     get,
@@ -46,9 +46,10 @@ pub fn openapi_github_pages_resources() {}
 
 #[utoipa::path(
     post,
-    path = "/api/github/pages/delete/{id}",
+    path = "/api/github/pages/delete/{owner}/{repository}",
     params(
-        ("id" = String, Path, description = "GitHub Pages record ID")
+        ("owner" = String, Path, description = "GitHub owner or organization name"),
+        ("repository" = String, Path, description = "GitHub repository name")
     ),
     responses(
         (status = 200, description = "Success"),
@@ -59,16 +60,3 @@ pub fn openapi_github_pages_resources() {}
 )]
 #[instrument_trace]
 pub fn openapi_github_pages_delete() {}
-
-#[utoipa::path(
-    post,
-    path = "/api/github/pages/sync",
-    responses(
-        (status = 200, description = "Success"),
-        (status = 400, description = "Bad Request"),
-        (status = 404, description = "Not Found"),
-        (status = 500, description = "Internal Server Error")
-    )
-)]
-#[instrument_trace]
-pub fn openapi_github_pages_sync() {}

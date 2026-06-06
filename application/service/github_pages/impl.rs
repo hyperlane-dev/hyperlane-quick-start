@@ -15,92 +15,116 @@ impl GithubPagesService {
     }
 
     #[instrument_trace]
-    pub async fn add_github_pages(
-        request: AddGithubPagesRequest,
-    ) -> Result<GithubPagesInfo, String> {
-        if request.get_owner().is_empty() {
+    pub async fn sync_github_pages(owner: &str, repository: &str) -> Result<(), String> {
+        if owner.is_empty() {
             return Err(ERROR_OWNER_CANNOT_BE_EMPTY.to_string());
         }
-        if request.get_repository().is_empty() {
+        if repository.is_empty() {
             return Err(ERROR_REPOSITORY_CANNOT_BE_EMPTY.to_string());
         }
-        let existing: Option<GithubPagesModel> =
-            GithubPagesRepository::find_by_owner_and_repository(
-                request.get_owner(),
-                request.get_repository(),
-            )
-            .await?;
-        if existing.is_some() {
-            return Err(ERROR_GITHUB_PAGES_ALREADY_EXISTS.to_string());
-        }
         let base_url: String = GITHUB_PAGES_BASE_URL_TEMPLATE
-            .replace("{owner}", request.get_owner())
-            .replace("{repository}", request.get_repository());
-        let model: GithubPagesModel =
-            GithubPagesRepository::insert(request.get_owner(), request.get_repository(), &base_url)
-                .await?;
-        let mut info: GithubPagesInfo = GithubPagesInfo::default();
-        info.set_id(model.get_id())
-            .set_owner(model.get_owner().clone())
-            .set_repository(model.get_repository().clone())
-            .set_base_url(model.get_base_url().clone())
-            .set_last_synced_at(
-                model
-                    .try_get_last_synced_at()
-                    .map(|dt: NaiveDateTime| dt.format("%Y-%m-%d %H:%M:%S").to_string())
-                    .unwrap_or_default(),
-            )
-            .set_resource_count(0);
-        Ok(info)
+            .replace("{owner}", owner)
+            .replace("{repository}", repository);
+        let resources: Vec<GithubPagesResource> =
+            Self::fetch_and_cache_page(owner, repository, &base_url).await?;
+        let cache_key: String = format!("{owner}/{repository}");
+        let mut resources_map: RwLockWriteGuard<'_, HashMap<String, Vec<GithubPagesResource>>> =
+            Self::get_or_init_resources().write().await;
+        resources_map.insert(cache_key, resources);
+        Ok(())
     }
 
     #[instrument_trace]
     pub async fn list_github_pages() -> Result<GithubPagesListResponse, String> {
-        let models: Vec<GithubPagesModel> = GithubPagesRepository::find_all().await?;
-        let resources_map: RwLockReadGuard<'_, HashMap<String, Vec<GithubPagesResource>>> =
-            Self::get_or_init_resources().read().await;
-        let pages: Vec<GithubPagesInfo> = models
-            .into_iter()
-            .map(|model: GithubPagesModel| {
-                let cache_key: String = format!("{}/{}", model.get_owner(), model.get_repository());
-                let resource_count: usize = resources_map
-                    .get(&cache_key)
-                    .map(|r: &Vec<GithubPagesResource>| r.len())
-                    .unwrap_or(0);
+        let mut pages: Vec<GithubPagesInfo> = Vec::new();
+        let cache_dir: String = GITHUB_PAGES_CACHE_DIR.to_string();
+        let mut owner_entries: fs::ReadDir = fs::read_dir(&cache_dir)
+            .await
+            .map_err(|error: std::io::Error| error.to_string())?;
+        while let Some(owner_entry) = owner_entries
+            .next_entry()
+            .await
+            .map_err(|error: std::io::Error| error.to_string())?
+        {
+            let owner_name: String = owner_entry.file_name().to_string_lossy().to_string();
+            if owner_name.starts_with('.') {
+                continue;
+            }
+            let owner_path: String = format!("{cache_dir}/{owner_name}");
+            if !owner_entry
+                .file_type()
+                .await
+                .map(|ft: std::fs::FileType| ft.is_dir())
+                .unwrap_or(false)
+            {
+                continue;
+            }
+            let mut repo_entries: fs::ReadDir = fs::read_dir(&owner_path)
+                .await
+                .map_err(|error: std::io::Error| error.to_string())?;
+            while let Some(repo_entry) = repo_entries
+                .next_entry()
+                .await
+                .map_err(|error: std::io::Error| error.to_string())?
+            {
+                let repo_name: String = repo_entry.file_name().to_string_lossy().to_string();
+                if repo_name.starts_with('.') {
+                    continue;
+                }
+                let repo_path: String = format!("{owner_path}/{repo_name}");
+                let index_path: String = format!("{repo_path}/index.html");
+                let last_synced_at: String = if fs::metadata(&index_path).await.is_ok() {
+                    fs::metadata(&index_path)
+                        .await
+                        .ok()
+                        .and_then(|meta: std::fs::Metadata| meta.modified().ok())
+                        .and_then(|time: std::time::SystemTime| {
+                            time.duration_since(std::time::UNIX_EPOCH).ok()
+                        })
+                        .map(|duration: std::time::Duration| {
+                            let datetime: chrono::DateTime<chrono::Utc> =
+                                chrono::DateTime::from(std::time::UNIX_EPOCH + duration);
+                            datetime.format("%Y-%m-%d %H:%M:%S").to_string()
+                        })
+                        .unwrap_or_default()
+                } else {
+                    String::new()
+                };
+                let cache_key: String = format!("{owner_name}/{repo_name}");
+                let resource_count: usize = {
+                    let resources: RwLockReadGuard<'_, HashMap<String, Vec<GithubPagesResource>>> =
+                        Self::get_or_init_resources().read().await;
+                    resources
+                        .get(&cache_key)
+                        .map(|r: &Vec<GithubPagesResource>| r.len())
+                        .unwrap_or(0)
+                };
+                let base_url: String = GITHUB_PAGES_BASE_URL_TEMPLATE
+                    .replace("{owner}", &owner_name)
+                    .replace("{repository}", &repo_name);
                 let mut info: GithubPagesInfo = GithubPagesInfo::default();
-                info.set_id(model.get_id())
-                    .set_owner(model.get_owner().clone())
-                    .set_repository(model.get_repository().clone())
-                    .set_base_url(model.get_base_url().clone())
-                    .set_last_synced_at(
-                        model
-                            .try_get_last_synced_at()
-                            .map(|dt: NaiveDateTime| dt.format("%Y-%m-%d %H:%M:%S").to_string())
-                            .unwrap_or_default(),
-                    )
+                info.set_owner(owner_name.clone())
+                    .set_repository(repo_name)
+                    .set_base_url(base_url)
+                    .set_last_synced_at(last_synced_at)
                     .set_resource_count(resource_count);
-                info
-            })
-            .collect();
+                pages.push(info);
+            }
+        }
         let mut response: GithubPagesListResponse = GithubPagesListResponse::default();
         response.set_pages(pages);
         Ok(response)
     }
 
     #[instrument_trace]
-    pub async fn delete_github_pages(id: i32) -> Result<(), String> {
-        let models: Vec<GithubPagesModel> = GithubPagesRepository::find_all().await?;
-        let target: Option<&GithubPagesModel> =
-            models.iter().find(|m: &&GithubPagesModel| m.get_id() == id);
-        if let Some(model) = target {
-            let cache_key: String = format!("{}/{}", model.get_owner(), model.get_repository());
-            let cache_dir: String = format!("{GITHUB_PAGES_CACHE_DIR}/{cache_key}");
-            let _ = fs::remove_dir_all(&cache_dir).await;
-            let mut resources: RwLockWriteGuard<'_, HashMap<String, Vec<GithubPagesResource>>> =
-                Self::get_or_init_resources().write().await;
-            resources.remove(&cache_key);
-        }
-        GithubPagesRepository::delete_by_id(id).await
+    pub async fn delete_github_pages(owner: &str, repository: &str) -> Result<(), String> {
+        let cache_key: String = format!("{owner}/{repository}");
+        let cache_dir: String = format!("{GITHUB_PAGES_CACHE_DIR}/{cache_key}");
+        let _ = fs::remove_dir_all(&cache_dir).await;
+        let mut resources: RwLockWriteGuard<'_, HashMap<String, Vec<GithubPagesResource>>> =
+            Self::get_or_init_resources().write().await;
+        resources.remove(&cache_key);
+        Ok(())
     }
 
     #[instrument_trace]
@@ -130,11 +154,6 @@ impl GithubPagesService {
         if fs::metadata(&index_path).await.is_ok() {
             return Ok(());
         }
-        let model: Option<GithubPagesModel> =
-            GithubPagesRepository::find_by_owner_and_repository(owner, repository).await?;
-        if model.is_none() {
-            GithubPagesRepository::insert(owner, repository, base_url).await?;
-        }
         Self::fetch_and_cache_page(owner, repository, base_url).await?;
         Ok(())
     }
@@ -151,11 +170,6 @@ impl GithubPagesService {
         let cache_dir: String = format!("{GITHUB_PAGES_CACHE_DIR}/{cache_key}");
         let index_path: String = format!("{cache_dir}/index.html");
         if fs::metadata(&index_path).await.is_err() {
-            let model: Option<GithubPagesModel> =
-                GithubPagesRepository::find_by_owner_and_repository(owner, repository).await?;
-            if model.is_none() {
-                GithubPagesRepository::insert(owner, repository, base_url).await?;
-            }
             Self::fetch_and_cache_page(owner, repository, base_url).await?;
         }
         let resource_path: String = if path.is_empty() || path == "/" {
@@ -200,6 +214,12 @@ impl GithubPagesService {
                         format!("{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} {error}")
                     })?
                     .to_vec();
+                if let Some(parent) = Path::new(&resource_path).parent() {
+                    let _ = fs::create_dir_all(parent).await;
+                }
+                if let Err(error) = fs::write(&resource_path, &content).await {
+                    error!("Failed to cache resource file {resource_path} {error}");
+                }
                 let extension: String = FileExtension::get_extension_name(target_url);
                 let content_type: String = FileExtension::parse(&extension)
                     .get_content_type()
@@ -211,61 +231,97 @@ impl GithubPagesService {
 
     #[instrument_trace]
     pub async fn sync_all_pages() {
-        let models: Vec<GithubPagesModel> = match GithubPagesRepository::find_all().await {
-            Ok(models) => models,
-            Err(error) => {
-                error!("Failed to fetch github pages list for sync {error}");
-                return;
-            }
+        let cache_dir: String = GITHUB_PAGES_CACHE_DIR.to_string();
+        let Ok(mut owner_entries) = fs::read_dir(&cache_dir).await else {
+            return;
         };
-        if models.is_empty() {
+        let mut pages_to_sync: Vec<(String, String)> = Vec::new();
+        while let Ok(Some(owner_entry)) = owner_entries.next_entry().await {
+            let owner_name: String = owner_entry.file_name().to_string_lossy().to_string();
+            if owner_name.starts_with('.') {
+                continue;
+            }
+            let owner_path: String = format!("{cache_dir}/{owner_name}");
+            if !owner_entry
+                .file_type()
+                .await
+                .map(|ft: std::fs::FileType| ft.is_dir())
+                .unwrap_or(false)
+            {
+                continue;
+            }
+            let Ok(mut repo_entries) = fs::read_dir(&owner_path).await else {
+                continue;
+            };
+            while let Ok(Some(repo_entry)) = repo_entries.next_entry().await {
+                let repo_name: String = repo_entry.file_name().to_string_lossy().to_string();
+                if repo_name.starts_with('.') {
+                    continue;
+                }
+                let _repo_path: String = format!("{owner_path}/{repo_name}/index.html");
+                pages_to_sync.push((owner_name.clone(), repo_name));
+            }
+        }
+        if pages_to_sync.is_empty() {
             return;
         }
-        let tasks: Vec<_> = models
+        let tasks: Vec<_> = pages_to_sync
             .into_iter()
-            .map(|model: GithubPagesModel| {
-                let id: i32 = model.get_id();
-                let owner: String = model.get_owner().clone();
-                let repository: String = model.get_repository().clone();
-                let base_url: String = model.get_base_url().clone();
-                async move {
-                    info!("Syncing GitHub Pages {owner}/{repository}");
-                    match Self::fetch_and_cache_page(&owner, &repository, &base_url).await {
-                        Ok(resources) => {
-                            if let Err(error) = GithubPagesRepository::update_last_synced_at(id).await {
-                                error!("Failed to update last_synced_at for {owner}/{repository} {error}");
-                            }
-                            let resource_count: usize = resources.len();
-                            info!("Synced GitHub Pages {owner}/{repository} with {resource_count} resources");
-                            Some(resources)
-                        }
-                        Err(error) => {
-                            error!("Failed to sync GitHub Pages {owner}/{repository} {error}");
-                            None
-                        }
+            .map(|(owner, repository)| async move {
+                info!("Syncing GitHub Pages {owner}/{repository}");
+                match Self::sync_github_pages(&owner, &repository).await {
+                    Ok(()) => {
+                        info!("Synced GitHub Pages {owner}/{repository}");
+                    }
+                    Err(error) => {
+                        error!("Failed to sync GitHub Pages {owner}/{repository} {error}");
                     }
                 }
             })
             .collect();
-        let results: Vec<Option<Vec<GithubPagesResource>>> = join_all(tasks).await;
-        let mut resources_map: RwLockWriteGuard<'_, HashMap<String, Vec<GithubPagesResource>>> =
-            Self::get_or_init_resources().write().await;
-        for (model, result) in GithubPagesRepository::find_all()
-            .await
-            .unwrap_or_default()
-            .into_iter()
-            .zip(results.into_iter())
-        {
-            let cache_key: String = format!("{}/{}", model.get_owner(), model.get_repository());
-            if let Some(resources) = result {
-                resources_map.insert(cache_key, resources);
-            }
-        }
+        join_all(tasks).await;
     }
 
     #[instrument_trace]
     pub async fn start_sync_timer() {
-        Self::sync_all_pages().await;
+        if let Ok(mut owner_entries) = fs::read_dir(GITHUB_PAGES_CACHE_DIR).await {
+            let mut has_pages: bool = false;
+            while let Ok(Some(owner_entry)) = owner_entries.next_entry().await {
+                let owner_name: String = owner_entry.file_name().to_string_lossy().to_string();
+                if owner_name.starts_with('.') {
+                    continue;
+                }
+                let owner_path: String = format!("{GITHUB_PAGES_CACHE_DIR}/{owner_name}");
+                if !owner_entry
+                    .file_type()
+                    .await
+                    .map(|ft: std::fs::FileType| ft.is_dir())
+                    .unwrap_or(false)
+                {
+                    continue;
+                }
+                if let Ok(mut repo_entries) = fs::read_dir(&owner_path).await {
+                    while let Ok(Some(repo_entry)) = repo_entries.next_entry().await {
+                        let repo_name: String =
+                            repo_entry.file_name().to_string_lossy().to_string();
+                        if repo_name.starts_with('.') {
+                            continue;
+                        }
+                        let index_path: String = format!("{owner_path}/{repo_name}/index.html");
+                        if fs::metadata(&index_path).await.is_ok() {
+                            has_pages = true;
+                            break;
+                        }
+                    }
+                }
+                if has_pages {
+                    break;
+                }
+            }
+            if has_pages {
+                Self::sync_all_pages().await;
+            }
+        }
         spawn(async {
             loop {
                 sleep(Duration::from_secs(GITHUB_PAGES_SYNC_INTERVAL_SECS)).await;
@@ -463,7 +519,8 @@ impl GithubPagesService {
                             || full_url.ends_with(".eot")
                             || full_url.ends_with(".json")
                             || full_url.ends_with(".webp")
-                            || full_url.ends_with(".webmanifest");
+                            || full_url.ends_with(".webmanifest")
+                            || full_url.ends_with(".wasm");
                         if (is_static_resource || is_html_page) && seen.insert(full_url.clone()) {
                             resource_urls.push(full_url);
                         }
