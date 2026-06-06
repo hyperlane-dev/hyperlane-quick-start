@@ -1,11 +1,24 @@
 use super::*;
 
+/// Implements GitHub Pages caching, syncing, and resource management operations.
 impl GithubPagesService {
+    /// Initializes or retrieves the static resource cache map.
+    ///
+    /// Returns a static reference to the `RwLock`-protected `HashMap` that stores
+    /// cached GitHub Pages resources keyed by `"owner/repository"`.
     #[instrument_trace]
     fn get_or_init_resources() -> &'static RwLock<HashMap<String, Vec<GithubPagesResource>>> {
         GITHUB_PAGES_RESOURCES.get_or_init(|| RwLock::new(HashMap::new()))
     }
 
+    /// Retrieves cached resources for the specified owner and repository.
+    ///
+    /// # Arguments
+    /// - `&str`: The GitHub owner name.
+    /// - `&str`: The GitHub repository name.
+    ///
+    /// # Returns
+    /// - `Vec<GithubPagesResource>`: The cached resource list, or an empty vector if not found.
     #[instrument_trace]
     pub async fn get_cached_resources(owner: &str, repository: &str) -> Vec<GithubPagesResource> {
         let cache_key: String = format!("{owner}/{repository}");
@@ -14,6 +27,22 @@ impl GithubPagesService {
         resources.get(&cache_key).cloned().unwrap_or_default()
     }
 
+    /// Synchronizes GitHub Pages content for the specified owner and repository.
+    ///
+    /// Fetches the latest page content from GitHub, caches it to the local filesystem,
+    /// and updates the in-memory resource cache.
+    ///
+    /// # Arguments
+    /// - `&str`: The GitHub owner name.
+    /// - `&str`: The GitHub repository name.
+    ///
+    /// # Returns
+    /// - `Result<(), String>`: Ok on success, or an error message if the owner or repository is empty,
+    ///   or if fetching/caching fails.
+    ///
+    /// # Panics
+    ///
+    /// Does not panic; all error conditions are returned as `Err`.
     #[instrument_trace]
     pub async fn sync_github_pages(owner: &str, repository: &str) -> Result<(), String> {
         if owner.is_empty() {
@@ -34,6 +63,14 @@ impl GithubPagesService {
         Ok(())
     }
 
+    /// Lists all cached GitHub Pages by scanning the cache directory.
+    ///
+    /// Reads the filesystem cache directory structure (`owner/repository/index.html`)
+    /// and combines it with the in-memory resource cache to produce a complete listing.
+    ///
+    /// # Returns
+    /// - `Result<GithubPagesListResponse, String>`: A response containing all cached pages info,
+    ///   or an error if the cache directory cannot be read.
     #[instrument_trace]
     pub async fn list_github_pages() -> Result<GithubPagesListResponse, String> {
         let mut pages: Vec<GithubPagesInfo> = Vec::new();
@@ -116,6 +153,16 @@ impl GithubPagesService {
         Ok(response)
     }
 
+    /// Deletes the cached GitHub Pages for the specified owner and repository.
+    ///
+    /// Removes both the filesystem cache directory and the in-memory resource entry.
+    ///
+    /// # Arguments
+    /// - `&str`: The GitHub owner name.
+    /// - `&str`: The GitHub repository name.
+    ///
+    /// # Returns
+    /// - `Result<(), String>`: Ok on success.
     #[instrument_trace]
     pub async fn delete_github_pages(owner: &str, repository: &str) -> Result<(), String> {
         let cache_key: String = format!("{owner}/{repository}");
@@ -127,6 +174,15 @@ impl GithubPagesService {
         Ok(())
     }
 
+    /// Retrieves cached resources for the specified owner and repository as a response.
+    ///
+    /// # Arguments
+    /// - `&str`: The GitHub owner name.
+    /// - `&str`: The GitHub repository name.
+    ///
+    /// # Returns
+    /// - `Result<GithubPagesResourceResponse, String>`: A response containing owner, repository,
+    ///   and the cached resource list.
     #[instrument_trace]
     pub async fn get_github_pages_resources(
         owner: &str,
@@ -142,6 +198,18 @@ impl GithubPagesService {
         Ok(response)
     }
 
+    /// Ensures the page is cached before fetching by checking for the index.html file.
+    ///
+    /// If the cached index.html already exists, returns immediately. Otherwise,
+    /// fetches and caches the page from the remote URL.
+    ///
+    /// # Arguments
+    /// - `&str`: The GitHub owner name.
+    /// - `&str`: The GitHub repository name.
+    /// - `&str`: The base URL of the GitHub Pages site.
+    ///
+    /// # Returns
+    /// - `Result<(), String>`: Ok on success, or an error if fetching/caching fails.
     #[instrument_trace]
     pub async fn ensure_cached_and_fetch(
         owner: &str,
@@ -158,6 +226,22 @@ impl GithubPagesService {
         Ok(())
     }
 
+    /// Fetches a specific resource directly, reading from the local cache if available,
+    /// or downloading from the remote URL if not.
+    ///
+    /// When the resource is not found locally, it is fetched from `target_url` and
+    /// cached to the filesystem for future access.
+    ///
+    /// # Arguments
+    /// - `&str`: The GitHub owner name.
+    /// - `&str`: The GitHub repository name.
+    /// - `&str`: The resource path relative to the repository root.
+    /// - `&str`: The base URL of the GitHub Pages site.
+    /// - `&str`: The full target URL to download the resource from.
+    ///
+    /// # Returns
+    /// - `Result<(Vec<u8>, String), String>`: A tuple of (content bytes, content type) on success,
+    ///   or an error message if fetching fails.
     #[instrument_trace]
     pub async fn fetch_resource_directly(
         owner: &str,
@@ -230,6 +314,10 @@ impl GithubPagesService {
         }
     }
 
+    /// Synchronizes all previously cached GitHub Pages concurrently.
+    ///
+    /// Scans the cache directory for all owner/repository pairs and triggers
+    /// a re-sync for each one using `sync_github_pages`.
     #[instrument_trace]
     pub async fn sync_all_pages() {
         let cache_dir: String = GITHUB_PAGES_CACHE_DIR.to_string();
@@ -283,6 +371,11 @@ impl GithubPagesService {
         join_all(tasks).await;
     }
 
+    /// Starts the periodic GitHub Pages synchronization timer.
+    ///
+    /// First syncs the preconfigured auto-sync repositories, then all cached pages,
+    /// and finally spawns a background task that periodically re-syncs all pages
+    /// at the interval defined by `GITHUB_PAGES_SYNC_INTERVAL_SECS`.
     #[instrument_trace]
     pub async fn start_sync_timer() {
         for (owner, repository) in GITHUB_PAGES_AUTO_SYNC_REPOSITORIES {
@@ -304,6 +397,19 @@ impl GithubPagesService {
         });
     }
 
+    /// Fetches the main page HTML from the remote URL and caches it to the local filesystem.
+    ///
+    /// Creates the cache directory structure, downloads the index page, writes it to disk,
+    /// and returns a `Vec` containing the single `GithubPagesResource` representing the index.
+    ///
+    /// # Arguments
+    /// - `&str`: The GitHub owner name.
+    /// - `&str`: The GitHub repository name.
+    /// - `&str`: The base URL of the GitHub Pages site.
+    ///
+    /// # Returns
+    /// - `Result<Vec<GithubPagesResource>, String>`: The cached resource list on success,
+    ///   or an error if directory creation, fetching, or file writing fails.
     #[instrument_trace]
     async fn fetch_and_cache_page(
         owner: &str,
@@ -341,6 +447,18 @@ impl GithubPagesService {
         Ok(vec![main_resource])
     }
 
+    /// Fetches the content of a URL with retry logic.
+    ///
+    /// Retries the request up to `GITHUB_PAGES_FETCH_MAX_RETRIES` times on failure,
+    /// with a 2-second delay between attempts.
+    ///
+    /// # Arguments
+    /// - `&reqwest::Client`: The HTTP client to use for the request.
+    /// - `&str`: The URL to fetch.
+    ///
+    /// # Returns
+    /// - `Result<String, String>`: The response body text on success,
+    ///   or an error message if all retry attempts are exhausted.
     #[instrument_trace]
     async fn fetch_url(client: &reqwest::Client, url: &str) -> Result<String, String> {
         let mut attempt: u32 = 0;
@@ -397,6 +515,19 @@ impl GithubPagesService {
         }
     }
 
+    /// Builds a `GithubPagesResource` from the provided metadata.
+    ///
+    /// # Arguments
+    /// - `&str`: The GitHub owner name.
+    /// - `&str`: The GitHub repository name.
+    /// - `&str`: The resource path relative to the repository root.
+    /// - `&str`: The MIME content type of the resource.
+    /// - `u64`: The file size in bytes.
+    /// - `&str`: The local filesystem path where the resource is cached.
+    /// - `&str`: The remote URL of the resource.
+    ///
+    /// # Returns
+    /// - `GithubPagesResource`: The constructed resource object.
     #[instrument_trace]
     fn build_resource(
         owner: &str,
