@@ -11,7 +11,7 @@ async fn handle_github_pages_request(
         return Status::Continue;
     }
     let cache_path: String = if path.is_empty() || path == "/" {
-        format!("{GITHUB_PAGES_CACHE_DIR}/{owner}/{repository}/index.html")
+        format!("{GITHUB_PAGES_CACHE_DIR}/{owner}/{repository}/{INDEX_HTML_FILE}")
     } else {
         let normalized_path: String = path.trim_start_matches('/').to_string();
         format!("{GITHUB_PAGES_CACHE_DIR}/{owner}/{repository}/{normalized_path}")
@@ -43,7 +43,6 @@ async fn handle_github_pages_request(
                 &owner,
                 &repository,
                 &path,
-                &base_url,
                 &target_url,
             )
             .await

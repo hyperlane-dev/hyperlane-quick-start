@@ -96,7 +96,7 @@ impl GithubPagesService {
             if !owner_entry
                 .file_type()
                 .await
-                .map(|ft: std::fs::FileType| ft.is_dir())
+                .map(|ft: FileType| ft.is_dir())
                 .unwrap_or(false)
             {
                 continue;
@@ -114,18 +114,16 @@ impl GithubPagesService {
                     continue;
                 }
                 let repo_path: String = format!("{owner_path}/{repo_name}");
-                let index_path: String = format!("{repo_path}/index.html");
+                let index_path: String = format!("{repo_path}/{INDEX_HTML_FILE}");
                 let last_synced_at: String = if fs::metadata(&index_path).await.is_ok() {
                     fs::metadata(&index_path)
                         .await
                         .ok()
-                        .and_then(|meta: std::fs::Metadata| meta.modified().ok())
-                        .and_then(|time: std::time::SystemTime| {
-                            time.duration_since(std::time::UNIX_EPOCH).ok()
-                        })
-                        .map(|duration: std::time::Duration| {
+                        .and_then(|meta: Metadata| meta.modified().ok())
+                        .and_then(|time: SystemTime| time.duration_since(UNIX_EPOCH).ok())
+                        .map(|duration: Duration| {
                             let datetime: chrono::DateTime<chrono::Utc> =
-                                chrono::DateTime::from(std::time::UNIX_EPOCH + duration);
+                                chrono::DateTime::from(UNIX_EPOCH + duration);
                             datetime.format("%Y-%m-%d %H:%M:%S").to_string()
                         })
                         .unwrap_or_default()
@@ -207,49 +205,20 @@ impl GithubPagesService {
         Ok(response)
     }
 
-    /// Ensures the page is cached before fetching by checking for the index.html file.
+    /// Fetches a specific resource, reading from the local cache if available,
+    /// or triggering a full sync (which downloads all resources recursively)
+    /// and then reading from the cache.
     ///
-    /// If the cached index.html already exists, returns immediately. Otherwise,
-    /// fetches and caches the page from the remote URL.
-    ///
-    /// # Arguments
-    ///
-    /// - `&str`: The GitHub owner name.
-    /// - `&str`: The GitHub repository name.
-    /// - `&str`: The base URL of the GitHub Pages site.
-    ///
-    /// # Returns
-    ///
-    /// - `Result<(), String>`: Ok on success, or an error if fetching/caching fails.
-    #[instrument_trace]
-    pub async fn ensure_cached_and_fetch(
-        owner: &str,
-        repository: &str,
-        base_url: &str,
-    ) -> Result<(), String> {
-        let cache_key: String = format!("{owner}/{repository}");
-        let cache_dir: String = format!("{GITHUB_PAGES_CACHE_DIR}/{cache_key}");
-        let index_path: String = format!("{cache_dir}/index.html");
-        if fs::metadata(&index_path).await.is_ok() {
-            return Ok(());
-        }
-        Self::fetch_and_cache_page(owner, repository, base_url).await?;
-        Ok(())
-    }
-
-    /// Fetches a specific resource directly, reading from the local cache if available,
-    /// or downloading from the remote URL if not.
-    ///
-    /// When the resource is not found locally, it is fetched from `target_url` and
-    /// cached to the filesystem for future access.
+    /// When the resource is not found locally, a full `sync_github_pages` is performed
+    /// to ensure all resources are cached and the in-memory resource map is updated,
+    /// then the requested resource is read from the local cache.
     ///
     /// # Arguments
     ///
     /// - `&str`: The GitHub owner name.
     /// - `&str`: The GitHub repository name.
     /// - `&str`: The resource path relative to the repository root.
-    /// - `&str`: The base URL of the GitHub Pages site.
-    /// - `&str`: The full target URL to download the resource from.
+    /// - `&str`: The full target URL to download the resource from (used as fallback).
     ///
     /// # Returns
     ///
@@ -260,21 +229,27 @@ impl GithubPagesService {
         owner: &str,
         repository: &str,
         path: &str,
-        base_url: &str,
         target_url: &str,
     ) -> Result<(Vec<u8>, String), String> {
         let cache_key: String = format!("{owner}/{repository}");
         let cache_dir: String = format!("{GITHUB_PAGES_CACHE_DIR}/{cache_key}");
-        let index_path: String = format!("{cache_dir}/index.html");
-        if fs::metadata(&index_path).await.is_err() {
-            Self::fetch_and_cache_page(owner, repository, base_url).await?;
-        }
         let resource_path: String = if path.is_empty() || path == "/" {
-            index_path
+            format!("{cache_dir}/{INDEX_HTML_FILE}")
         } else {
             let normalized_path: String = path.trim_start_matches('/').to_string();
             format!("{cache_dir}/{normalized_path}")
         };
+        if fs::metadata(&resource_path).await.is_ok() {
+            let content: Vec<u8> = fs::read(&resource_path)
+                .await
+                .map_err(|error: std::io::Error| error.to_string())?;
+            let extension: String = FileExtension::get_extension_name(&resource_path);
+            let content_type: String = FileExtension::parse(&extension)
+                .get_content_type()
+                .to_string();
+            return Ok((content, content_type));
+        }
+        Self::sync_github_pages(owner, repository).await?;
         match fs::read(&resource_path).await {
             Ok(content) => {
                 let extension: String = FileExtension::get_extension_name(&resource_path);
@@ -284,34 +259,13 @@ impl GithubPagesService {
                 Ok((content, content_type))
             }
             Err(_) => {
-                let client: reqwest::Client = reqwest::Client::builder()
+                let client: Client = Client::builder()
                     .timeout(Duration::from_secs(30))
                     .build()
                     .map_err(|error: reqwest::Error| {
                         format!("{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} {error}")
                     })?;
-                let response: reqwest::Response = client
-                    .get(target_url)
-                    .header(CACHE_CONTROL, NO_CACHE)
-                    .header(PRAGMA, NO_CACHE)
-                    .send()
-                    .await
-                    .map_err(|error: reqwest::Error| {
-                        format!("{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} {error}")
-                    })?;
-                let status: reqwest::StatusCode = response.status();
-                if !status.is_success() {
-                    return Err(format!(
-                        "{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} HTTP {status}"
-                    ));
-                }
-                let content: Vec<u8> = response
-                    .bytes()
-                    .await
-                    .map_err(|error: reqwest::Error| {
-                        format!("{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} {error}")
-                    })?
-                    .to_vec();
+                let content: Vec<u8> = Self::fetch_resource_bytes(&client, target_url).await?;
                 if let Some(parent) = Path::new(&resource_path).parent() {
                     let _ = fs::create_dir_all(parent).await;
                 }
@@ -360,7 +314,7 @@ impl GithubPagesService {
                 if repo_name.starts_with('.') {
                     continue;
                 }
-                let _repo_path: String = format!("{owner_path}/{repo_name}/index.html");
+                let _repo_path: String = format!("{owner_path}/{repo_name}/{INDEX_HTML_FILE}");
                 pages_to_sync.push((owner_name.clone(), repo_name));
             }
         }
@@ -413,8 +367,9 @@ impl GithubPagesService {
     /// Fetches the main page HTML from the remote URL and caches it to the local filesystem.
     ///
     /// Creates the cache directory structure, downloads the index page, writes it to disk,
-    /// extracts all relative resource paths from the HTML, and returns a `Vec` containing
-    /// the index resource followed by one entry per discovered resource path.
+    /// extracts all relative resource paths from the HTML, recursively downloads every
+    /// discovered resource (including imports nested inside JS files), and returns a `Vec`
+    /// containing the index resource followed by one entry per cached resource file.
     ///
     /// # Arguments
     ///
@@ -438,16 +393,14 @@ impl GithubPagesService {
             .map_err(|error: std::io::Error| {
                 format!("{ERROR_FAILED_TO_CREATE_DIRECTORY} {error}")
             })?;
-        let html_content: String = {
-            let client: reqwest::Client = reqwest::Client::builder()
-                .timeout(Duration::from_secs(30))
-                .build()
-                .map_err(|error: reqwest::Error| {
-                    format!("{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} {error}")
-                })?;
-            Self::fetch_url(&client, base_url).await?
-        };
-        let main_html_path: String = format!("{cache_dir}/index.html");
+        let client: Client = Client::builder()
+            .timeout(Duration::from_secs(30))
+            .build()
+            .map_err(|error: reqwest::Error| {
+                format!("{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} {error}")
+            })?;
+        let html_content: String = Self::fetch_url(&client, base_url).await?;
+        let main_html_path: String = format!("{cache_dir}/{INDEX_HTML_FILE}");
         fs::write(&main_html_path, &html_content)
             .await
             .map_err(|error: std::io::Error| format!("{ERROR_FAILED_TO_WRITE_FILE} {error}"))?;
@@ -455,38 +408,177 @@ impl GithubPagesService {
         let main_resource: GithubPagesResource = Self::build_resource(
             owner,
             repository,
-            "index.html",
-            "text/html",
+            INDEX_HTML_FILE,
+            TEXT_HTML,
             html_content.len() as u64,
             &main_html_path,
             base_url,
         );
         resources.push(main_resource);
-        let resource_paths: Vec<String> = extract_resource_paths(&html_content);
-        for resource_path in resource_paths {
+        let mut visited: HashSet<String> = HashSet::new();
+        let mut queue: Vec<String> = extract_resource_paths(&html_content);
+        while let Some(resource_path) = queue.pop() {
             let normalized_path: String = resource_path.trim_start_matches('/').to_string();
-            let local_path: String = format!("{cache_dir}/{normalized_path}");
+            if !visited.insert(normalized_path.clone()) {
+                continue;
+            }
             let url: String = format!("{base_url}{normalized_path}");
-            let extension: String = FileExtension::get_extension_name(&normalized_path);
-            let content_type: String = FileExtension::parse(&extension)
-                .get_content_type()
-                .to_string();
-            let file_size: u64 = fs::metadata(&local_path)
-                .await
-                .map(|meta: std::fs::Metadata| meta.len())
-                .unwrap_or(0);
-            let resource: GithubPagesResource = Self::build_resource(
-                owner,
-                repository,
-                &normalized_path,
-                &content_type,
-                file_size,
-                &local_path,
-                &url,
-            );
-            resources.push(resource);
+            match Self::fetch_resource_bytes(&client, &url).await {
+                Ok(content) => {
+                    let local_path: String = format!("{cache_dir}/{normalized_path}");
+                    if let Some(parent) = Path::new(&local_path).parent() {
+                        let _ = fs::create_dir_all(parent).await;
+                    }
+                    if let Err(error) = fs::write(&local_path, &content).await {
+                        error!("Failed to cache resource file {local_path} {error}");
+                    }
+                    let extension: String = FileExtension::get_extension_name(&normalized_path);
+                    let content_type: String = FileExtension::parse(&extension)
+                        .get_content_type()
+                        .to_string();
+                    let file_size: u64 = content.len() as u64;
+                    let resource: GithubPagesResource = Self::build_resource(
+                        owner,
+                        repository,
+                        &normalized_path,
+                        &content_type,
+                        file_size,
+                        &local_path,
+                        &url,
+                    );
+                    resources.push(resource);
+                    if Self::is_text_content(&extension)
+                        && let Ok(text_content) = String::from_utf8(content.clone())
+                    {
+                        let nested_paths: Vec<String> = extract_resource_paths(&text_content);
+                        for nested in nested_paths {
+                            let resolved: String =
+                                Self::resolve_relative_path(&normalized_path, &nested);
+                            if !visited.contains(&resolved) {
+                                queue.push(resolved);
+                            }
+                        }
+                    }
+                }
+                Err(error) => {
+                    warn!("Failed to fetch resource {url} {error}");
+                }
+            }
         }
         Ok(resources)
+    }
+
+    /// Fetches raw bytes from a URL with retry logic.
+    ///
+    /// Retries the request up to `GITHUB_PAGES_FETCH_MAX_RETRIES` times on failure,
+    /// with a 2-second delay between attempts.
+    ///
+    /// # Arguments
+    ///
+    /// - `&Client`: The HTTP client to use for the request.
+    /// - `&str`: The URL to fetch.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Vec<u8>, String>`: The response body bytes on success,
+    ///   or an error message if all retry attempts are exhausted.
+    #[instrument_trace]
+    async fn fetch_resource_bytes(client: &Client, url: &str) -> Result<Vec<u8>, String> {
+        let mut attempt: u32 = 0;
+        loop {
+            attempt += 1;
+            match client
+                .get(url)
+                .header(CACHE_CONTROL, NO_CACHE)
+                .header(PRAGMA, NO_CACHE)
+                .send()
+                .await
+            {
+                Ok(response) => {
+                    let status: reqwest::StatusCode = response.status();
+                    if !status.is_success() {
+                        if attempt >= GITHUB_PAGES_FETCH_MAX_RETRIES {
+                            return Err(format!(
+                                "{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} HTTP {status}"
+                            ));
+                        }
+                        warn!(
+                            "Fetch attempt {attempt}/{GITHUB_PAGES_FETCH_MAX_RETRIES} failed for {url} HTTP {status}, retrying"
+                        );
+                        sleep(Duration::from_secs(2)).await;
+                        continue;
+                    }
+                    match response.bytes().await {
+                        Ok(bytes) => return Ok(bytes.to_vec()),
+                        Err(error) => {
+                            if attempt >= GITHUB_PAGES_FETCH_MAX_RETRIES {
+                                return Err(format!(
+                                    "{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} {error}"
+                                ));
+                            }
+                            warn!(
+                                "Fetch attempt {attempt}/{GITHUB_PAGES_FETCH_MAX_RETRIES} failed to read body for {url} {error}, retrying"
+                            );
+                            sleep(Duration::from_secs(2)).await;
+                            continue;
+                        }
+                    }
+                }
+                Err(error) => {
+                    if attempt >= GITHUB_PAGES_FETCH_MAX_RETRIES {
+                        return Err(format!("{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} {error}"));
+                    }
+                    warn!(
+                        "Fetch attempt {attempt}/{GITHUB_PAGES_FETCH_MAX_RETRIES} failed for {url} {error}, retrying"
+                    );
+                    sleep(Duration::from_secs(2)).await;
+                    continue;
+                }
+            }
+        }
+    }
+
+    /// Resolves a relative import path against the base path of the importing file.
+    ///
+    /// For example, given `from_path = "pkg/euv.js"` and `import_path = "./euv_bg.wasm"`,
+    /// returns `"pkg/euv_bg.wasm"`.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The path of the file that contains the import (e.g. `"pkg/euv.js"`).
+    /// - `&str`: The relative import path (e.g. `"./euv_bg.wasm"`).
+    ///
+    /// # Returns
+    ///
+    /// - `String`: The resolved path relative to the repository root.
+    #[instrument_trace]
+    fn resolve_relative_path(from_path: &str, import_path: &str) -> String {
+        let cleaned: String = import_path
+            .strip_prefix("./")
+            .or_else(|| import_path.strip_prefix('/'))
+            .unwrap_or(import_path)
+            .to_string();
+        if let Some(parent) = from_path.rfind('/') {
+            let base: &str = &from_path[..parent + 1];
+            format!("{base}{cleaned}")
+        } else {
+            cleaned
+        }
+    }
+
+    /// Checks whether the given file extension corresponds to a text-based content type
+    /// that may contain references to other resources (e.g. imports, url()).
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The file extension (without leading dot).
+    ///
+    /// # Returns
+    ///
+    /// - `bool`: `true` if the extension indicates text content that may reference other resources.
+    #[instrument_trace]
+    fn is_text_content(extension: &str) -> bool {
+        TEXT_CONTENT_EXTENSIONS.contains(&extension)
     }
 
     /// Fetches the content of a URL with retry logic.
@@ -496,7 +588,7 @@ impl GithubPagesService {
     ///
     /// # Arguments
     ///
-    /// - `&reqwest::Client`: The HTTP client to use for the request.
+    /// - `&Client`: The HTTP client to use for the request.
     /// - `&str`: The URL to fetch.
     ///
     /// # Returns
@@ -504,7 +596,7 @@ impl GithubPagesService {
     /// - `Result<String, String>`: The response body text on success,
     ///   or an error message if all retry attempts are exhausted.
     #[instrument_trace]
-    async fn fetch_url(client: &reqwest::Client, url: &str) -> Result<String, String> {
+    async fn fetch_url(client: &Client, url: &str) -> Result<String, String> {
         let mut attempt: u32 = 0;
         loop {
             attempt += 1;

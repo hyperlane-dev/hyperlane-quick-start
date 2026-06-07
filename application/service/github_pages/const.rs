@@ -18,3 +18,12 @@ pub const ERROR_FAILED_TO_WRITE_FILE: &str = "Failed to write file";
 
 /// Maximum number of retry attempts when fetching a GitHub Pages URL.
 pub const GITHUB_PAGES_FETCH_MAX_RETRIES: u32 = 8;
+
+/// File name for the cached index page.
+pub const INDEX_HTML_FILE: &str = "index.html";
+
+/// File extensions considered as text content that may contain references to other resources.
+pub const TEXT_CONTENT_EXTENSIONS: &[&str] = &[
+    "html", "htm", "js", "mjs", "cjs", "css", "scss", "less", "sass", "svg", "xml", "json", "map",
+    "wasm",
+];

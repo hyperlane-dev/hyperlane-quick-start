@@ -1,24 +1,138 @@
 use super::*;
 
-/// Extracts relative resource paths from HTML content.
+/// Extracts relative resource paths from HTML, JS, or CSS content.
 ///
-/// Parses the HTML for `<script src>`, `<link href>`, `<img src>` attributes
-/// and ES module `import ... from '...'` statements, returning only relative
-/// paths (excluding `http://`, `https://`, `//`, and `data:` URIs).
+/// Parses the content for `<script src>`, `<link href>`, `<img src>` attributes,
+/// ES module `import ... from '...'` statements, `new URL('...', import.meta.url)` patterns,
+/// and CSS `url()` / `@import` references,
+/// returning only relative paths (excluding `http://`, `https://`, `//`, and `data:` URIs).
 /// Duplicates are removed and the result is sorted for deterministic output.
 ///
 /// # Arguments
-/// - `&str`: The HTML content to parse.
+/// - `&str`: The content to parse (HTML, JS, or CSS).
 ///
 /// # Returns
 /// - `Vec<String>`: A sorted, deduplicated list of relative resource paths.
-pub fn extract_resource_paths(html: &str) -> Vec<String> {
+pub fn extract_resource_paths(content: &str) -> Vec<String> {
     let mut paths: HashSet<String> = HashSet::new();
-    extract_tag_src_paths(html, &mut paths);
-    extract_es_module_import_paths(html, &mut paths);
+    extract_tag_src_paths(content, &mut paths);
+    extract_es_module_import_paths(content, &mut paths);
+    extract_new_url_paths(content, &mut paths);
+    extract_css_url_paths(content, &mut paths);
     let mut result: Vec<String> = paths.into_iter().collect();
     result.sort();
     result
+}
+
+/// Extracts resource paths from CSS `url()` and `@import` statements.
+///
+/// Matches patterns such as `url('./path')`, `url("./path")`, `url(./path)`,
+/// and `@import './path'` or `@import url('./path')`. Only relative paths
+/// are kept (excluding `http://`, `https://`, `//`, and `data:` URIs).
+///
+/// # Arguments
+/// - `&str`: The content to scan (CSS or any text containing CSS-like constructs).
+/// - `&mut HashSet<String>`: The set into which discovered paths are inserted.
+fn extract_css_url_paths(content: &str, paths: &mut HashSet<String>) {
+    let bytes: &[u8] = content.as_bytes();
+    let len: usize = bytes.len();
+    let mut position: usize = 0;
+    while position < len {
+        let remaining: &[u8] = &bytes[position..];
+        let url_idx: Option<usize> = find_substring(remaining, b"url(", 0);
+        let import_idx: Option<usize> = find_substring(remaining, b"@import", 0);
+        let next_url: Option<usize> = url_idx.map(|i: usize| position + i);
+        let next_import: Option<usize> = import_idx.map(|i: usize| position + i);
+        let target: Option<usize> = match (next_url, next_import) {
+            (Some(u), Some(i)) => Some(std::cmp::min(u, i)),
+            (Some(u), None) => Some(u),
+            (None, Some(i)) => Some(i),
+            (None, None) => None,
+        };
+        let target_pos: usize = match target {
+            Some(pos) => pos,
+            None => break,
+        };
+        if next_url == Some(target_pos) {
+            let url_start: usize = target_pos + 4;
+            let after_url: usize = skip_whitespace(bytes, url_start);
+            if after_url >= len {
+                position = url_start;
+                continue;
+            }
+            let quote: u8 = bytes[after_url];
+            if (quote == b'"' || quote == b'\'')
+                && let Some(value) = read_string_literal(bytes, after_url)
+                && !is_absolute_url(&value)
+            {
+                paths.insert(value);
+                position = after_url + 1;
+            } else {
+                let mut end: usize = after_url;
+                while end < len && bytes[end] != b')' && !bytes[end].is_ascii_whitespace() {
+                    end += 1;
+                }
+                if end > after_url {
+                    let value: String = String::from_utf8_lossy(&bytes[after_url..end]).to_string();
+                    if !is_absolute_url(&value) {
+                        paths.insert(value);
+                    }
+                }
+                position = end + 1;
+            }
+        } else {
+            let import_start: usize = target_pos + 7;
+            let after_import: usize = skip_whitespace(bytes, import_start);
+            if after_import >= len {
+                position = import_start;
+                continue;
+            }
+            if bytes[after_import..].starts_with(b"url(") {
+                position = after_import;
+                continue;
+            }
+            let quote: u8 = bytes[after_import];
+            if (quote == b'"' || quote == b'\'')
+                && let Some(value) = read_string_literal(bytes, after_import)
+                && !is_absolute_url(&value)
+            {
+                paths.insert(value);
+                position = after_import + 1;
+            } else {
+                position = import_start + 7;
+            }
+        }
+    }
+}
+
+/// Extracts resource paths from `new URL('...', import.meta.url)` patterns in JS modules.
+///
+/// This is the standard wasm-bindgen pattern for locating WASM files:
+/// `new URL('xxx_bg.wasm', import.meta.url)`. Only relative paths are kept.
+///
+/// # Arguments
+/// - `&str`: The content to scan (typically JS module source).
+/// - `&mut HashSet<String>`: The set into which discovered paths are inserted.
+fn extract_new_url_paths(content: &str, paths: &mut HashSet<String>) {
+    let bytes: &[u8] = content.as_bytes();
+    let len: usize = bytes.len();
+    let mut position: usize = 0;
+    while position < len {
+        position = match find_substring(bytes, b"new URL(", position) {
+            Some(pos) => pos,
+            None => break,
+        };
+        let url_start: usize = position + 8;
+        let after_url: usize = skip_whitespace(bytes, url_start);
+        if after_url < len
+            && (bytes[after_url] == b'"' || bytes[after_url] == b'\'')
+            && let Some(value) = read_string_literal(bytes, after_url)
+            && !is_absolute_url(&value)
+        {
+            paths.insert(value);
+        }
+        position = url_start;
+    }
 }
 
 /// Extracts `src` and `href` attribute values from HTML tags (`<script>`, `<link>`, `<img>`).
