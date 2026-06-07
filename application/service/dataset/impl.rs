@@ -1,6 +1,11 @@
 use super::*;
 
+/// Implementation of methods for `DatasetService`.
 impl DatasetService {
+    /// Fetches the dataset content from the configured remote URL.
+    ///
+    /// # Returns
+    /// - `Result<String, String>`: The dataset text content on success, or an error message on failure.
     #[instrument_trace]
     pub async fn fetch_dataset() -> Result<String, String> {
         let client: reqwest::Client = reqwest::Client::builder()

@@ -1,7 +1,9 @@
 use super::*;
 
+/// Implementation of `ActiveModel` for `ActiveModelBehavior`.
 impl ActiveModelBehavior for ActiveModel {}
 
+/// Implementation of methods for `From`.
 impl From<Model> for ChatHistory {
     fn from(model: Model) -> Self {
         let mut history: ChatHistory = ChatHistory::default();

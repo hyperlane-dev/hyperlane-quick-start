@@ -1,5 +1,6 @@
 use super::*;
 
+/// OpenAPI documentation endpoint for the root index route.
 #[utoipa::path(
     get,
     path = "/",

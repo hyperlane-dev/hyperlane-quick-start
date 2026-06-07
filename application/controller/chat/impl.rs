@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `OnlineUsersRoute` for `ServerHook`.
 impl ServerHook for OnlineUsersRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -20,6 +21,7 @@ impl ServerHook for OnlineUsersRoute {
     }
 }
 
+/// Implementation of `ChatRoute` for `ServerHook`.
 impl ServerHook for ChatRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -43,6 +45,7 @@ impl ServerHook for ChatRoute {
     }
 }
 
+/// Implementation of `ChatHistoryRoute` for `ServerHook`.
 impl ServerHook for ChatHistoryRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

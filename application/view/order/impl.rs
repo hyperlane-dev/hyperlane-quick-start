@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `OrderViewRoute` for `ServerHook`.
 impl ServerHook for OrderViewRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

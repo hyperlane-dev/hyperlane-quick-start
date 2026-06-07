@@ -1,5 +1,6 @@
 use super::*;
 
+/// Renders the RSS feed page and serves as the OpenAPI documentation endpoint for RSS routes.
 #[utoipa::path(
     get,
     path = "/rss",

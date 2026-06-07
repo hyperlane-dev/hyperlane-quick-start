@@ -1,6 +1,18 @@
 use super::*;
 
+/// Constructor for `ActiveModel` of the step entity.
 impl ActiveModel {
+    /// Creates a new `ActiveModel` for a step with the given job, name, and command.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The job identifier to associate the step with.
+    /// - `String`: The name of the step.
+    /// - `Option<String>`: The optional shell command to execute.
+    ///
+    /// # Returns
+    ///
+    /// - `ActiveModel`: A new active model with status "pending" ready for insertion.
     #[instrument_trace]
     pub fn new(job_id: i32, name: String, command: Option<String>) -> Self {
         Self {

@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `OnlineRoute` for `ServerHook`.
 impl ServerHook for OnlineRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

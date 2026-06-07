@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `InsertRoute` for `ServerHook`.
 impl ServerHook for InsertRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -39,6 +40,7 @@ impl ServerHook for InsertRoute {
     }
 }
 
+/// Implementation of `QueryRoute` for `ServerHook`.
 impl ServerHook for QueryRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

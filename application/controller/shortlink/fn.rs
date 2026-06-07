@@ -1,5 +1,6 @@
 use super::*;
 
+/// openapi shortlink query.
 #[utoipa::path(
     get,
     path = "/api/shortlink/query/{id}",
@@ -13,6 +14,7 @@ use super::*;
 #[instrument_trace]
 pub fn openapi_shortlink_query() {}
 
+/// openapi shortlink insert.
 #[utoipa::path(
     post,
     path = "/api/shortlink/insert",

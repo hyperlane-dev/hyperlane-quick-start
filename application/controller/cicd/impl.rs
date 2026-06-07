@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `CreatePipelineRoute` for `ServerHook`.
 impl ServerHook for CreatePipelineRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -38,6 +39,7 @@ impl ServerHook for CreatePipelineRoute {
     }
 }
 
+/// Implementation of `ListPipelinesRoute` for `ServerHook`.
 impl ServerHook for ListPipelinesRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -67,6 +69,7 @@ impl ServerHook for ListPipelinesRoute {
     }
 }
 
+/// Implementation of `GetPipelineRoute` for `ServerHook`.
 impl ServerHook for GetPipelineRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -119,6 +122,7 @@ impl ServerHook for GetPipelineRoute {
     }
 }
 
+/// Implementation of `TriggerRunRoute` for `ServerHook`.
 impl ServerHook for TriggerRunRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -157,6 +161,7 @@ impl ServerHook for TriggerRunRoute {
     }
 }
 
+/// Implementation of `ListRunsRoute` for `ServerHook`.
 impl ServerHook for ListRunsRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -201,6 +206,7 @@ impl ServerHook for ListRunsRoute {
     }
 }
 
+/// Implementation of `GetRunRoute` for `ServerHook`.
 impl ServerHook for GetRunRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -247,6 +253,7 @@ impl ServerHook for GetRunRoute {
     }
 }
 
+/// Implementation of `GetRunDetailRoute` for `ServerHook`.
 impl ServerHook for GetRunDetailRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -297,6 +304,7 @@ impl ServerHook for GetRunDetailRoute {
     }
 }
 
+/// Implementation of `UpdateJobRoute` for `ServerHook`.
 impl ServerHook for UpdateJobRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -336,6 +344,7 @@ impl ServerHook for UpdateJobRoute {
     }
 }
 
+/// Implementation of `UpdateStepRoute` for `ServerHook`.
 impl ServerHook for UpdateStepRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -375,6 +384,7 @@ impl ServerHook for UpdateStepRoute {
     }
 }
 
+/// Implementation of `GetIncrementalRunDetailRoute` for `ServerHook`.
 impl ServerHook for GetIncrementalRunDetailRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -427,6 +437,7 @@ impl ServerHook for GetIncrementalRunDetailRoute {
     }
 }
 
+/// Implementation of `CicdViewRoute` for `ServerHook`.
 impl ServerHook for CicdViewRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -444,6 +455,7 @@ impl ServerHook for CicdViewRoute {
     }
 }
 
+/// Implementation of `RunLogsSseRoute` for `ServerHook`.
 impl ServerHook for RunLogsSseRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -561,6 +573,7 @@ impl ServerHook for RunLogsSseRoute {
     }
 }
 
+/// Implementation of methods for `RunLogsSseRoute`.
 impl RunLogsSseRoute {
     fn escape_json_string(escape: &str) -> String {
         escape

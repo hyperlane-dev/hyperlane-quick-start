@@ -1,5 +1,6 @@
 use super::*;
 
+/// Renders the user management page and serves as the OpenAPI documentation endpoint for user routes.
 #[utoipa::path(
     get,
     path = "/user",

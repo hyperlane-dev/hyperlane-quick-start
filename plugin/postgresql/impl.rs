@@ -4,6 +4,11 @@ use super::*;
 impl GetOrInit for PostgreSqlPlugin {
     type Instance = RwLock<HashMap<String, ConnectionCache<DatabaseConnection>>>;
 
+    /// Lazily initializes and returns a static reference to the global PostgreSQL connection cache.
+    ///
+    /// # Returns
+    ///
+    /// - `&'static RwLock<HashMap<String, ConnectionCache<DatabaseConnection>>>`: The static reference to the global PostgreSQL connection map.
     #[instrument_trace]
     fn get_or_init() -> &'static Self::Instance {
         POSTGRESQL_CONNECTIONS.get_or_init(|| RwLock::new(HashMap::new()))
@@ -20,6 +25,11 @@ impl DatabaseConnectionPlugin for PostgreSqlPlugin {
 
     type ConnectionCache = RwLock<HashMap<String, ConnectionCache<Self::Connection>>>;
 
+    /// Returns the plugin type identifier for PostgreSQL.
+    ///
+    /// # Returns
+    ///
+    /// - `PluginType::PostgreSQL`: The PostgreSQL plugin type.
     #[instrument_trace]
     fn plugin_type() -> PluginType {
         PluginType::PostgreSQL
@@ -258,6 +268,11 @@ impl DatabaseConnectionPlugin for PostgreSqlPlugin {
 
 /// Implementation of `Default` for `PostgreSqlAutoCreation`, using the default PostgreSQL instance from the environment configuration.
 impl Default for PostgreSqlAutoCreation {
+    /// Returns the default `PostgreSqlAutoCreation` instance, using the first configured PostgreSQL instance or a default configuration.
+    ///
+    /// # Returns
+    ///
+    /// - `PostgreSqlAutoCreation`: The default auto-creation handler.
     #[instrument_trace]
     fn default() -> Self {
         let env: &'static EnvConfig = EnvPlugin::get_or_init();

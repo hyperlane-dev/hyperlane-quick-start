@@ -1,5 +1,6 @@
 use super::*;
 
+/// openapi tracking report.
 #[utoipa::path(
     post,
     path = "/api/tracking/report",
@@ -13,6 +14,7 @@ use super::*;
 #[instrument_trace]
 pub fn openapi_tracking_report() {}
 
+/// openapi tracking query.
 #[utoipa::path(
     get,
     path = "/api/tracking/query",

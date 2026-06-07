@@ -1,5 +1,6 @@
 use super::*;
 
+/// Enumeration of message type.
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize, ToSchema)]
 pub enum MessageType {
     OnlineCount,

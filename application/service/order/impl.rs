@@ -1,12 +1,28 @@
 use super::*;
 
+/// Implementation of methods for `OrderService`.
 impl OrderService {
+    /// Generates a unique bill number using a prefix and current timestamp.
+    ///
+    /// # Returns
+    ///
+    /// - `String`: The generated bill number string.
     #[instrument_trace]
     fn generate_bill_no() -> String {
         let timestamp: u64 = timestamp_millis();
         format!("{BILL_NO_PREFIX}{timestamp}{:04}", timestamp % 10000)
     }
 
+    /// Creates a new order record with associated images, generating a bill number and binding provided image IDs.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The user ID of the record owner.
+    /// - `CreateRecordRequest`: The request containing amount, category, transaction type, description, bill date, and image IDs.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<CreateRecordWithImagesResponse, String>`: The created record with its images, or an error.
     #[instrument_trace]
     pub async fn create_record(
         user_id: i32,
@@ -48,6 +64,15 @@ impl OrderService {
         Ok(response)
     }
 
+    /// Lists order records with pagination and optional filters for user, date range, category, and transaction type.
+    ///
+    /// # Arguments
+    ///
+    /// - `RecordQueryRequest`: The query parameters including user ID, date range, category, transaction type, page, and limit.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<RecordListResponse, String>`: The paginated list of records with statistics.
     #[instrument_trace]
     pub async fn list_records(query: RecordQueryRequest) -> Result<RecordListResponse, String> {
         let page: i32 = query.get_page().unwrap_or(1);
@@ -101,6 +126,15 @@ impl OrderService {
         Ok(response)
     }
 
+    /// Retrieves a single order record by ID with its associated images.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The record ID.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Option<RecordWithImagesResponse>, String>`: The record with images if found, or `None`.
     #[instrument_trace]
     pub async fn get_record(record_id: i32) -> Result<Option<RecordResponse>, String> {
         match RecordRepository::find_by_id(record_id).await? {
@@ -204,6 +238,11 @@ impl OrderService {
         Ok(response)
     }
 
+    /// Aggregates and returns comprehensive overview statistics including today's totals, daily trends, monthly comparisons, and category distributions.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<OverviewStatisticsResponse, String>`: The aggregated statistics on success, or an error message on failure.
     #[instrument_trace]
     pub async fn get_overview_statistics() -> Result<OverviewStatisticsResponse, String> {
         let today: NaiveDate = Local::now().naive_local().date();
@@ -557,6 +596,7 @@ impl OrderService {
     }
 }
 
+/// Implementation of methods for `OrderService`.
 impl OrderService {
     #[instrument_trace]
     fn calculate_change_percentage(current: f64, previous: f64) -> Option<f64> {
@@ -981,7 +1021,9 @@ impl OrderService {
     }
 }
 
+/// Implementation of methods for `OrderService`.
 impl OrderService {
+    /// create record with images.
     #[instrument_trace]
     pub async fn create_record_with_images(
         user_id: i32,
@@ -1047,6 +1089,7 @@ impl OrderService {
         Ok(response)
     }
 
+    /// create record with single image.
     #[instrument_trace]
     pub async fn create_record_with_single_image(
         user_id: i32,
@@ -1106,6 +1149,16 @@ impl OrderService {
         Ok(response)
     }
 
+    /// Adds an image to an order record by updating the image's record_id association.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The record ID to associate the image with.
+    /// - `i32`: The image ID to bind.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), String>`: Ok on success, or an error if the image is not found.
     #[instrument_trace]
     pub async fn add_image_to_record(
         record_id: i32,
@@ -1150,6 +1203,15 @@ impl OrderService {
         Ok(response)
     }
 
+    /// Retrieves all images associated with an order record.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The record ID.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<RecordImageListResponse, String>`: The list of images for the record.
     #[instrument_trace]
     pub async fn get_record_images(record_id: i32) -> Result<RecordImageListResponse, String> {
         let images: Vec<OrderRecordImageModel> =
@@ -1183,6 +1245,15 @@ impl OrderService {
         Ok(response)
     }
 
+    /// Retrieves image binary data by image ID for download.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The image ID.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Option<OrderImageDataResponse>, String>`: The image data response if found, or `None`.
     #[instrument_trace]
     pub async fn get_image_data(
         image_id: i32,
@@ -1213,6 +1284,19 @@ impl OrderService {
         }
     }
 
+    /// Uploads an image for an order record, storing the binary data in the database.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The user ID of the uploader.
+    /// - `String`: The stored file name.
+    /// - `Option<String>`: The original file name.
+    /// - `String`: The MIME type of the image.
+    /// - `Vec<u8>`: The binary image data.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<RecordImageResponse, String>`: The uploaded image response with download URL.
     #[instrument_trace]
     pub async fn upload_image(
         user_id: i32,
@@ -1237,6 +1321,7 @@ impl OrderService {
         Self::model_to_image_response(&result, 0)
     }
 
+    /// bind images to record.
     #[instrument_trace]
     pub async fn bind_images_to_record(record_id: i32, image_ids: Vec<i32>) -> Result<(), String> {
         for image_id in image_ids {

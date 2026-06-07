@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `ChatConnectedHook` for `ServerHook`.
 impl ServerHook for ChatConnectedHook {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -25,6 +26,7 @@ impl ServerHook for ChatConnectedHook {
     }
 }
 
+/// Implementation of `ChatRequestHook` for `ServerHook`.
 impl ServerHook for ChatRequestHook {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -75,6 +77,7 @@ impl ServerHook for ChatRequestHook {
     }
 }
 
+/// Implementation of `ChatSendedHook` for `ServerHook`.
 impl ServerHook for ChatSendedHook {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -103,6 +106,7 @@ impl ServerHook for ChatSendedHook {
     }
 }
 
+/// Implementation of `ChatClosedHook` for `ServerHook`.
 impl ServerHook for ChatClosedHook {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -125,7 +129,9 @@ impl ServerHook for ChatClosedHook {
     }
 }
 
+/// Implementation of methods for `ChatService`.
 impl ChatService {
+    /// Pre-processes a WebSocket upgrade request, registering the user in the online users map.
     #[instrument_trace]
     pub async fn pre_ws_upgrade(stream: &mut Stream, ctx: &mut Context) {
         let socket_addr: String = stream
@@ -138,6 +144,7 @@ impl ChatService {
             .set_header(HEADER_X_CLIENT_ADDR, &encode_addr);
     }
 
+    /// Creates an online count response message payload.
     #[instrument_trace]
     pub async fn create_online_count_message(
         stream: &mut Stream,
@@ -150,6 +157,7 @@ impl ChatService {
             .unwrap()
     }
 
+    /// Broadcasts the current online user count to all connected WebSocket clients.
     #[instrument_trace]
     pub fn broadcast_online_count(key: BroadcastType<String>, message: ResponseBody) {
         let websocket: &WebSocket = get_global_websocket();
@@ -164,6 +172,7 @@ impl ChatService {
             .join(SPACE)
     }
 
+    /// handle ping request.
     #[instrument_trace]
     pub async fn handle_ping_request(
         stream: &mut Stream,
@@ -180,6 +189,7 @@ impl ChatService {
         false
     }
 
+    /// is gpt mentioned.
     #[instrument_trace]
     pub fn is_gpt_mentioned(message: &str) -> bool {
         message.contains(GPT_MENTION_UPPER)
@@ -187,6 +197,13 @@ impl ChatService {
             || message.contains(GPT_MENTION_LOWER)
     }
 
+    /// Processes a GPT-related request by sending the conversation history to the GPT API and streaming the response.
+    ///
+    /// # Arguments
+    ///
+    /// - `String`: The session UUID for the conversation.
+    /// - `String`: The incoming message content from the user.
+    /// - `&mut Context`: The Hyperlane request context.
     #[instrument_trace]
     pub async fn process_gpt_request(uuid: String, message: String, ctx: &mut Context) {
         let path: String = ctx.get_request().get_path().clone();
@@ -384,6 +401,7 @@ impl ChatService {
         }
     }
 
+    /// Saves a message to the database from a structured response in a background task.
     #[instrument_trace]
     pub async fn save_message_from_response(session_id: &str, response_body: &ResponseBody) {
         let response_body_string: String = String::from_utf8_lossy(response_body).into_owned();
@@ -433,6 +451,18 @@ impl ChatService {
         }
     }
 
+    /// Persists a chat message to the database via the repository layer.
+    ///
+    /// # Arguments
+    /// - `&str`: The session ID grouping the conversation.
+    /// - `&str`: The display name of the message sender.
+    /// - `&str`: The type of the sender (e.g., "user", "assistant").
+    /// - `&str`: The type of the message (e.g., "text", "image").
+    /// - `&str`: The textual content of the message.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), String>`: Ok on success, or an error message on failure.
     #[instrument_trace]
     pub async fn save_message(
         session_id: &str,
@@ -451,6 +481,7 @@ impl ChatService {
         .await
     }
 
+    /// get chat history.
     #[instrument_trace]
     pub async fn get_chat_history(
         before_id: Option<i64>,

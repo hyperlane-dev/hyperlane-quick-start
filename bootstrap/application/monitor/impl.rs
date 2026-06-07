@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `MonitorBootstrap` for `BootstrapAsyncInit`.
 impl BootstrapAsyncInit for MonitorBootstrap {
     #[instrument_trace]
     async fn init() -> Self {

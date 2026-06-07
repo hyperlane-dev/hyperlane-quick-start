@@ -1,6 +1,16 @@
 use super::*;
 
+/// Database access and validation methods for `UserRepository` (auth module).
 impl UserRepository {
+    /// Validates whether the given string matches the email regex pattern.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The email string to validate.
+    ///
+    /// # Returns
+    ///
+    /// - `bool`: `true` if the email is valid, `false` otherwise.
     #[instrument_trace]
     fn validate_email(email: &str) -> bool {
         match EMAIL_REGEX.as_ref() {
@@ -9,6 +19,15 @@ impl UserRepository {
         }
     }
 
+    /// Validates whether the given string matches the phone regex pattern.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The phone string to validate.
+    ///
+    /// # Returns
+    ///
+    /// - `bool`: `true` if the phone is valid, `false` otherwise.
     #[instrument_trace]
     fn validate_phone(phone: &str) -> bool {
         match PHONE_REGEX_OPT.as_ref() {
@@ -17,6 +36,15 @@ impl UserRepository {
         }
     }
 
+    /// Validates the email and phone fields of an `AuthUserActiveModel`.
+    ///
+    /// # Arguments
+    ///
+    /// - `&AuthUserActiveModel`: The active model to validate.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), String>`: Ok if valid, or an error message describing the invalid field.
     #[instrument_trace]
     fn validate_active_model(active_model: &AuthUserActiveModel) -> Result<(), String> {
         if let ActiveValue::Set(Some(ref email)) = active_model.email
@@ -33,6 +61,16 @@ impl UserRepository {
         }
         Ok(())
     }
+
+    /// Finds an auth user by their unique identifier.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The user identifier.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Option<AuthUserModel>, String>`: The user model if found, or `None`.
     #[instrument_trace]
     pub async fn find_by_id(user_id: i32) -> Result<Option<AuthUserModel>, String> {
         let db: DatabaseConnection =
@@ -44,6 +82,15 @@ impl UserRepository {
         Ok(result)
     }
 
+    /// Finds an auth user by their username.
+    ///
+    /// # Arguments
+    ///
+    /// - `String`: The username to search for.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Option<AuthUserModel>, String>`: The user model if found, or `None`.
     #[instrument_trace]
     pub async fn find_by_username(username: String) -> Result<Option<AuthUserModel>, String> {
         let db: DatabaseConnection =
@@ -56,6 +103,15 @@ impl UserRepository {
         Ok(result)
     }
 
+    /// Finds multiple auth users by their identifiers.
+    ///
+    /// # Arguments
+    ///
+    /// - `Vec<i32>`: The list of user identifiers.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Vec<AuthUserModel>, String>`: The list of found user models.
     #[instrument_trace]
     pub async fn find_by_ids(user_ids: Vec<i32>) -> Result<Vec<AuthUserModel>, String> {
         let db: DatabaseConnection =
@@ -68,6 +124,15 @@ impl UserRepository {
         Ok(result)
     }
 
+    /// Inserts a new auth user after validating email and phone format.
+    ///
+    /// # Arguments
+    ///
+    /// - `AuthUserActiveModel`: The active model containing the user data to insert.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<AuthUserModel, String>`: The inserted user model with generated fields.
     #[instrument_trace]
     pub async fn insert(active_model: AuthUserActiveModel) -> Result<AuthUserModel, String> {
         Self::validate_active_model(&active_model)?;
@@ -80,6 +145,15 @@ impl UserRepository {
         Ok(result)
     }
 
+    /// Updates an existing auth user after validating email and phone format.
+    ///
+    /// # Arguments
+    ///
+    /// - `AuthUserActiveModel`: The active model containing the updated user data.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<AuthUserModel, String>`: The updated user model.
     #[instrument_trace]
     pub async fn update(active_model: AuthUserActiveModel) -> Result<AuthUserModel, String> {
         Self::validate_active_model(&active_model)?;
@@ -92,6 +166,17 @@ impl UserRepository {
         Ok(result)
     }
 
+    /// Queries auth users with keyword search and cursor-based pagination.
+    ///
+    /// # Arguments
+    ///
+    /// - `Option<String>`: Optional keyword to search across username, email, phone, and ID.
+    /// - `Option<i32>`: Optional last ID for cursor-based pagination.
+    /// - `u64`: The page size limit.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(Vec<AuthUserModel>, i64, bool), String>`: The users, total count, and has-more flag.
     #[instrument_trace]
     pub async fn query_with_pagination(
         keyword: Option<String>,
@@ -135,6 +220,16 @@ impl UserRepository {
         Ok((paged_users, total_count, has_more))
     }
 
+    /// Counts the number of auth users created within the specified date range.
+    ///
+    /// # Arguments
+    ///
+    /// - `NaiveDateTime`: The start of the date range.
+    /// - `NaiveDateTime`: The end of the date range.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<i64, String>`: The count of users created in the range.
     #[instrument_trace]
     pub async fn count_by_created_at_range(
         start: NaiveDateTime,
@@ -151,6 +246,16 @@ impl UserRepository {
         Ok(count_u64 as i64)
     }
 
+    /// Finds all auth users created within the specified date range.
+    ///
+    /// # Arguments
+    ///
+    /// - `NaiveDateTime`: The start of the date range.
+    /// - `NaiveDateTime`: The end of the date range.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Vec<AuthUserModel>, String>`: The list of users created in the range.
     #[instrument_trace]
     pub async fn find_by_created_at_range(
         start: NaiveDateTime,
@@ -167,6 +272,15 @@ impl UserRepository {
         Ok(result)
     }
 
+    /// Deletes an auth user by their unique identifier.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The user identifier to delete.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), String>`: Ok on success, or an error message.
     #[instrument_trace]
     pub async fn delete_by_id(user_id: i32) -> Result<(), String> {
         let db: DatabaseConnection =

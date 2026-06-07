@@ -1,5 +1,7 @@
 use super::*;
 
+/// Root OpenAPI documentation structure that aggregates all API paths and schema components
+/// for the Hyperlane application, auto-generated via the `utoipa` crate.
 #[derive(utoipa::OpenApi)]
 #[openapi(
     paths(

@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `ShortlinkViewRoute` for `ServerHook`.
 impl ServerHook for ShortlinkViewRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

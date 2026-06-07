@@ -1,6 +1,16 @@
 use super::*;
 
+/// Implementation of methods for `LogService`.
 impl LogService {
+    /// Returns a sorted list of directory names under the given log directory path.
+    ///
+    /// # Arguments
+    ///
+    /// - `&Path`: The log directory path to scan.
+    ///
+    /// # Returns
+    ///
+    /// - `Vec<String>`: The sorted directory names.
     #[instrument_trace]
     pub fn get_sorted_dirs(path: &Path) -> Vec<String> {
         fs::read_dir(path)
@@ -21,6 +31,7 @@ impl LogService {
             .unwrap_or_default()
     }
 
+    /// get sorted log files.
     #[instrument_trace]
     pub fn get_sorted_log_files(path: &Path) -> Vec<String> {
         fs::read_dir(path)
@@ -42,6 +53,7 @@ impl LogService {
             .unwrap_or_default()
     }
 
+    /// read and reverse log file.
     #[instrument_trace]
     pub async fn read_and_reverse_log_file(full_path: &Path) -> Result<String, String> {
         async_read_from_file::<Vec<u8>>(full_path.to_str().unwrap_or_default())
@@ -62,6 +74,16 @@ impl LogService {
             })
     }
 
+    /// Processes a single date directory, reading up to the maximum allowed log files per date.
+    ///
+    /// # Arguments
+    ///
+    /// - `&Path`: The parent log directory path.
+    /// - `&str`: The date subdirectory name.
+    ///
+    /// # Returns
+    ///
+    /// - `Vec<String>`: A list of log file content strings read from the date directory.
     #[instrument_trace]
     pub async fn process_date_directory(log_dir: &Path, date_dir: &str) -> Vec<String> {
         let date_path: PathBuf = log_dir.join(date_dir);
@@ -78,6 +100,15 @@ impl LogService {
         logs
     }
 
+    /// Reads a log file and returns its content as a string.
+    ///
+    /// # Arguments
+    ///
+    /// - `&Path`: The log file path to read.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<String, String>`: The file content, or an error if reading fails.
     #[instrument_trace]
     pub async fn read_log_file(level: Level) -> String {
         let env_config: &EnvConfig = EnvPlugin::get_or_init();

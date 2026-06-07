@@ -1,6 +1,20 @@
 use super::*;
 
+/// Constructor for `ActiveModel` of the run entity.
 impl ActiveModel {
+    /// Creates a new `ActiveModel` for a run with the given pipeline, run number, and commit info.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The pipeline identifier.
+    /// - `i32`: The sequential run number.
+    /// - `Option<String>`: The user who triggered the run.
+    /// - `Option<String>`: The commit hash.
+    /// - `Option<String>`: The commit message.
+    ///
+    /// # Returns
+    ///
+    /// - `ActiveModel`: A new active model with status "pending" ready for insertion.
     #[instrument_trace]
     pub fn new(
         pipeline_id: i32,

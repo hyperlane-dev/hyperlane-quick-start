@@ -1,5 +1,6 @@
 use super::*;
 
+/// openapi notification view.
 #[utoipa::path(
     get,
     path = "/notification",

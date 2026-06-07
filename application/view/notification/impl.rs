@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `NotificationViewRoute` for `ServerHook`.
 impl ServerHook for NotificationViewRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

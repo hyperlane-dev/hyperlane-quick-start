@@ -1,5 +1,6 @@
 use super::*;
 
+/// openapi shortlink view.
 #[utoipa::path(
     get,
     path = "/shortlink",

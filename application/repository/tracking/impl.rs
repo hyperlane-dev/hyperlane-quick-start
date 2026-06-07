@@ -1,6 +1,12 @@
 use super::*;
 
+/// Database access methods for `TrackingRepository`.
 impl TrackingRepository {
+    /// Returns a static reference to the tracking database connection, initializing it lazily.
+    ///
+    /// # Returns
+    ///
+    /// - `&'static DatabaseConnection`: A reference to the initialized database connection.
     #[instrument_trace]
     pub fn get_db_connection() -> &'static DatabaseConnection {
         TRACKING_DB_CONNECTION.get_or_init(|| {
@@ -16,6 +22,15 @@ impl TrackingRepository {
         })
     }
 
+    /// Inserts a tracking record asynchronously into the database.
+    ///
+    /// # Arguments
+    ///
+    /// - `TrackingRecord`: The tracking record to insert.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), DbErr>`: Ok on success, or a database error.
     #[instrument_trace]
     pub async fn insert(record: TrackingRecord) -> Result<(), DbErr> {
         let headers_json: String =
@@ -35,6 +50,15 @@ impl TrackingRepository {
         Ok(())
     }
 
+    /// Queries tracking records with time range and cursor-based pagination.
+    ///
+    /// # Arguments
+    ///
+    /// - `&TrackingQuery`: The query parameters including time range, page, and cache ID.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(Vec<Model>, i64), DbErr>`: The paginated records and total count.
     #[instrument_trace]
     pub async fn query(query: &TrackingQuery) -> Result<(Vec<Model>, i64), DbErr> {
         let db: &DatabaseConnection = Self::get_db_connection();
@@ -58,6 +82,15 @@ impl TrackingRepository {
         Ok((records, total))
     }
 
+    /// Queries tracking records filtered by HTTP header key-value pairs with in-memory filtering.
+    ///
+    /// # Arguments
+    ///
+    /// - `&TrackingHeaderQuery`: The query parameters including header key, value, and time range.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(Vec<Model>, i64), DbErr>`: The filtered and paginated records and total count.
     #[instrument_trace]
     pub async fn query_by_header(query: &TrackingHeaderQuery) -> Result<(Vec<Model>, i64), DbErr> {
         let db: &DatabaseConnection = Self::get_db_connection();
@@ -132,6 +165,15 @@ impl TrackingRepository {
         Ok((paginated_records, total))
     }
 
+    /// Queries tracking records filtered by body content substring with in-memory filtering.
+    ///
+    /// # Arguments
+    ///
+    /// - `&TrackingBodyQuery`: The query parameters including body content and time range.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(Vec<Model>, i64), DbErr>`: The filtered and paginated records and total count.
     #[instrument_trace]
     pub async fn query_by_body_content(
         query: &TrackingBodyQuery,

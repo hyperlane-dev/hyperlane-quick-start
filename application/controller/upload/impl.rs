@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `RegisterRoute` for `ServerHook`.
 impl ServerHook for RegisterRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -21,6 +22,7 @@ impl ServerHook for RegisterRoute {
     }
 }
 
+/// Implementation of `SaveRoute` for `ServerHook`.
 impl ServerHook for SaveRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -53,6 +55,7 @@ impl ServerHook for SaveRoute {
     }
 }
 
+/// Implementation of `MergeRoute` for `ServerHook`.
 impl ServerHook for MergeRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

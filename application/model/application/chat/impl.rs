@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `ChatSession` for `Default`.
 impl Default for ChatSession {
     #[instrument_trace]
     fn default() -> Self {
@@ -11,7 +12,14 @@ impl Default for ChatSession {
     }
 }
 
+/// Implementation of methods for `ChatSession`.
 impl ChatSession {
+    /// Appends a new message to the session, trimming history to the last 20 messages.
+    ///
+    /// # Arguments
+    ///
+    /// - `R`: The role of the message sender (implements `AsRef<str>`).
+    /// - `C`: The content of the message (implements `AsRef<str>`).
     #[instrument_trace]
     pub fn add_message<R, C>(&mut self, role: R, content: C)
     where

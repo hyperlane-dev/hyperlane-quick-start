@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `NotificationCreateRoute` for `ServerHook`.
 impl ServerHook for NotificationCreateRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -49,6 +50,7 @@ impl ServerHook for NotificationCreateRoute {
     }
 }
 
+/// Implementation of `NotificationListRoute` for `ServerHook`.
 impl ServerHook for NotificationListRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -108,6 +110,7 @@ impl ServerHook for NotificationListRoute {
     }
 }
 
+/// Implementation of `NotificationGetRoute` for `ServerHook`.
 impl ServerHook for NotificationGetRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -176,6 +179,7 @@ impl ServerHook for NotificationGetRoute {
     }
 }
 
+/// Implementation of `NotificationReadRoute` for `ServerHook`.
 impl ServerHook for NotificationReadRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -239,6 +243,7 @@ impl ServerHook for NotificationReadRoute {
     }
 }
 
+/// Implementation of `NotificationReadAllRoute` for `ServerHook`.
 impl ServerHook for NotificationReadAllRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -277,6 +282,7 @@ impl ServerHook for NotificationReadAllRoute {
     }
 }
 
+/// Implementation of `NotificationDeleteRoute` for `ServerHook`.
 impl ServerHook for NotificationDeleteRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -338,6 +344,7 @@ impl ServerHook for NotificationDeleteRoute {
     }
 }
 
+/// Implementation of `NotificationUnreadCountRoute` for `ServerHook`.
 impl ServerHook for NotificationUnreadCountRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

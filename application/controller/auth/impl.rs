@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `RsaPublicKeyRoute` for `ServerHook`.
 impl ServerHook for RsaPublicKeyRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -30,6 +31,7 @@ impl ServerHook for RsaPublicKeyRoute {
     }
 }
 
+/// Implementation of `UserRegisterRoute` for `ServerHook`.
 impl ServerHook for UserRegisterRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -65,6 +67,7 @@ impl ServerHook for UserRegisterRoute {
     }
 }
 
+/// Implementation of `UserLoginRoute` for `ServerHook`.
 impl ServerHook for UserLoginRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -127,6 +130,7 @@ impl ServerHook for UserLoginRoute {
     }
 }
 
+/// Implementation of `UserUpdateRoute` for `ServerHook`.
 impl ServerHook for UserUpdateRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -215,6 +219,7 @@ impl ServerHook for UserUpdateRoute {
     }
 }
 
+/// Implementation of `UserChangePasswordRoute` for `ServerHook`.
 impl ServerHook for UserChangePasswordRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -269,6 +274,7 @@ impl ServerHook for UserChangePasswordRoute {
     }
 }
 
+/// Implementation of `UserUpdateStatusRoute` for `ServerHook`.
 impl ServerHook for UserUpdateStatusRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -321,6 +327,7 @@ impl ServerHook for UserUpdateStatusRoute {
     }
 }
 
+/// Implementation of `UserListRoute` for `ServerHook`.
 impl ServerHook for UserListRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -388,6 +395,7 @@ impl ServerHook for UserListRoute {
     }
 }
 
+/// Implementation of `UserGetRoute` for `ServerHook`.
 impl ServerHook for UserGetRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -436,6 +444,7 @@ impl ServerHook for UserGetRoute {
     }
 }
 
+/// Implementation of `UserDeleteRoute` for `ServerHook`.
 impl ServerHook for UserDeleteRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -518,6 +527,7 @@ impl ServerHook for UserDeleteRoute {
     }
 }
 
+/// Implementation of `UserLogoutRoute` for `ServerHook`.
 impl ServerHook for UserLogoutRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -536,6 +546,7 @@ impl ServerHook for UserLogoutRoute {
     }
 }
 
+/// Implementation of `UserInfoRoute` for `ServerHook`.
 impl ServerHook for UserInfoRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

@@ -14,10 +14,12 @@ impl GithubPagesService {
     /// Retrieves cached resources for the specified owner and repository.
     ///
     /// # Arguments
+    ///
     /// - `&str`: The GitHub owner name.
     /// - `&str`: The GitHub repository name.
     ///
     /// # Returns
+    ///
     /// - `Vec<GithubPagesResource>`: The cached resource list, or an empty vector if not found.
     #[instrument_trace]
     pub async fn get_cached_resources(owner: &str, repository: &str) -> Vec<GithubPagesResource> {
@@ -33,10 +35,12 @@ impl GithubPagesService {
     /// and updates the in-memory resource cache.
     ///
     /// # Arguments
+    ///
     /// - `&str`: The GitHub owner name.
     /// - `&str`: The GitHub repository name.
     ///
     /// # Returns
+    ///
     /// - `Result<(), String>`: Ok on success, or an error message if the owner or repository is empty,
     ///   or if fetching/caching fails.
     ///
@@ -69,6 +73,7 @@ impl GithubPagesService {
     /// and combines it with the in-memory resource cache to produce a complete listing.
     ///
     /// # Returns
+    ///
     /// - `Result<GithubPagesListResponse, String>`: A response containing all cached pages info,
     ///   or an error if the cache directory cannot be read.
     #[instrument_trace]
@@ -158,10 +163,12 @@ impl GithubPagesService {
     /// Removes both the filesystem cache directory and the in-memory resource entry.
     ///
     /// # Arguments
+    ///
     /// - `&str`: The GitHub owner name.
     /// - `&str`: The GitHub repository name.
     ///
     /// # Returns
+    ///
     /// - `Result<(), String>`: Ok on success.
     #[instrument_trace]
     pub async fn delete_github_pages(owner: &str, repository: &str) -> Result<(), String> {
@@ -177,10 +184,12 @@ impl GithubPagesService {
     /// Retrieves cached resources for the specified owner and repository as a response.
     ///
     /// # Arguments
+    ///
     /// - `&str`: The GitHub owner name.
     /// - `&str`: The GitHub repository name.
     ///
     /// # Returns
+    ///
     /// - `Result<GithubPagesResourceResponse, String>`: A response containing owner, repository,
     ///   and the cached resource list.
     #[instrument_trace]
@@ -204,11 +213,13 @@ impl GithubPagesService {
     /// fetches and caches the page from the remote URL.
     ///
     /// # Arguments
+    ///
     /// - `&str`: The GitHub owner name.
     /// - `&str`: The GitHub repository name.
     /// - `&str`: The base URL of the GitHub Pages site.
     ///
     /// # Returns
+    ///
     /// - `Result<(), String>`: Ok on success, or an error if fetching/caching fails.
     #[instrument_trace]
     pub async fn ensure_cached_and_fetch(
@@ -233,6 +244,7 @@ impl GithubPagesService {
     /// cached to the filesystem for future access.
     ///
     /// # Arguments
+    ///
     /// - `&str`: The GitHub owner name.
     /// - `&str`: The GitHub repository name.
     /// - `&str`: The resource path relative to the repository root.
@@ -240,6 +252,7 @@ impl GithubPagesService {
     /// - `&str`: The full target URL to download the resource from.
     ///
     /// # Returns
+    ///
     /// - `Result<(Vec<u8>, String), String>`: A tuple of (content bytes, content type) on success,
     ///   or an error message if fetching fails.
     #[instrument_trace]
@@ -400,14 +413,17 @@ impl GithubPagesService {
     /// Fetches the main page HTML from the remote URL and caches it to the local filesystem.
     ///
     /// Creates the cache directory structure, downloads the index page, writes it to disk,
-    /// and returns a `Vec` containing the single `GithubPagesResource` representing the index.
+    /// extracts all relative resource paths from the HTML, and returns a `Vec` containing
+    /// the index resource followed by one entry per discovered resource path.
     ///
     /// # Arguments
+    ///
     /// - `&str`: The GitHub owner name.
     /// - `&str`: The GitHub repository name.
     /// - `&str`: The base URL of the GitHub Pages site.
     ///
     /// # Returns
+    ///
     /// - `Result<Vec<GithubPagesResource>, String>`: The cached resource list on success,
     ///   or an error if directory creation, fetching, or file writing fails.
     #[instrument_trace]
@@ -435,6 +451,7 @@ impl GithubPagesService {
         fs::write(&main_html_path, &html_content)
             .await
             .map_err(|error: std::io::Error| format!("{ERROR_FAILED_TO_WRITE_FILE} {error}"))?;
+        let mut resources: Vec<GithubPagesResource> = Vec::new();
         let main_resource: GithubPagesResource = Self::build_resource(
             owner,
             repository,
@@ -444,7 +461,32 @@ impl GithubPagesService {
             &main_html_path,
             base_url,
         );
-        Ok(vec![main_resource])
+        resources.push(main_resource);
+        let resource_paths: Vec<String> = extract_resource_paths(&html_content);
+        for resource_path in resource_paths {
+            let normalized_path: String = resource_path.trim_start_matches('/').to_string();
+            let local_path: String = format!("{cache_dir}/{normalized_path}");
+            let url: String = format!("{base_url}{normalized_path}");
+            let extension: String = FileExtension::get_extension_name(&normalized_path);
+            let content_type: String = FileExtension::parse(&extension)
+                .get_content_type()
+                .to_string();
+            let file_size: u64 = fs::metadata(&local_path)
+                .await
+                .map(|meta: std::fs::Metadata| meta.len())
+                .unwrap_or(0);
+            let resource: GithubPagesResource = Self::build_resource(
+                owner,
+                repository,
+                &normalized_path,
+                &content_type,
+                file_size,
+                &local_path,
+                &url,
+            );
+            resources.push(resource);
+        }
+        Ok(resources)
     }
 
     /// Fetches the content of a URL with retry logic.
@@ -453,10 +495,12 @@ impl GithubPagesService {
     /// with a 2-second delay between attempts.
     ///
     /// # Arguments
+    ///
     /// - `&reqwest::Client`: The HTTP client to use for the request.
     /// - `&str`: The URL to fetch.
     ///
     /// # Returns
+    ///
     /// - `Result<String, String>`: The response body text on success,
     ///   or an error message if all retry attempts are exhausted.
     #[instrument_trace]
@@ -518,6 +562,7 @@ impl GithubPagesService {
     /// Builds a `GithubPagesResource` from the provided metadata.
     ///
     /// # Arguments
+    ///
     /// - `&str`: The GitHub owner name.
     /// - `&str`: The GitHub repository name.
     /// - `&str`: The resource path relative to the repository root.
@@ -527,6 +572,7 @@ impl GithubPagesService {
     /// - `&str`: The remote URL of the resource.
     ///
     /// # Returns
+    ///
     /// - `GithubPagesResource`: The constructed resource object.
     #[instrument_trace]
     fn build_resource(

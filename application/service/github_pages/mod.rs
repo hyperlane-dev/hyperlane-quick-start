@@ -1,9 +1,10 @@
 mod r#const;
+mod r#fn;
 mod r#impl;
 mod r#static;
 mod r#struct;
 
-pub use {r#const::*, r#struct::*};
+pub use {r#const::*, r#fn::*, r#struct::*};
 
 use {
     super::*,
@@ -13,7 +14,11 @@ use {
 
 use hyperlane_config::application::github_pages::*;
 
-use std::{collections::HashMap, path::Path, sync::OnceLock};
+use std::{
+    collections::{HashMap, HashSet},
+    path::Path,
+    sync::OnceLock,
+};
 
 use {
     futures::future::join_all,

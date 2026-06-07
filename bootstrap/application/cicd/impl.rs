@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `CicdBootstrap` for `BootstrapAsyncInit`.
 impl BootstrapAsyncInit for CicdBootstrap {
     #[instrument_trace]
     async fn init() -> Self {

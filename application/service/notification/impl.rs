@@ -1,6 +1,17 @@
 use super::*;
 
+/// Implementation of methods for `NotificationService`.
 impl NotificationService {
+    /// Creates a new notification for the specified user.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The user ID who will receive the notification.
+    /// - `CreateNotificationRequest`: The request containing title, content, and notification type.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<NotificationResponse, String>`: The created notification response.
     #[instrument_trace]
     pub async fn create_notification(
         user_id: i32,
@@ -22,6 +33,16 @@ impl NotificationService {
         Ok(response)
     }
 
+    /// Lists notifications for a user with pagination and optional filters.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The user ID.
+    /// - `NotificationListQueryRequest`: The query parameters including notification type and read status filters.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<NotificationListResponse, String>`: The paginated notification list response.
     #[instrument_trace]
     pub async fn list_notifications(
         user_id: i32,
@@ -57,6 +78,16 @@ impl NotificationService {
         Ok(response)
     }
 
+    /// Retrieves a single notification by ID, verifying ownership by the user.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The notification ID.
+    /// - `i32`: The user ID for ownership verification.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Option<NotificationResponse>, String>`: The notification response if found and owned, or `None`.
     #[instrument_trace]
     pub async fn get_notification(
         notification_id: i32,
@@ -76,6 +107,16 @@ impl NotificationService {
         }
     }
 
+    /// Marks a specific notification as read after verifying ownership.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The notification ID.
+    /// - `i32`: The user ID for ownership verification.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), String>`: Ok on success, or an error if the notification is not found or not owned by the user.
     #[instrument_trace]
     pub async fn mark_as_read(notification_id: i32, user_id: i32) -> Result<(), String> {
         let model: Option<NotificationModel> =
@@ -91,6 +132,15 @@ impl NotificationService {
         }
     }
 
+    /// Marks all unread notifications as read for a given user, processing in batches.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The user ID whose notifications should be marked as read.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), String>`: Ok on success, or an error if any update fails.
     #[instrument_trace]
     pub async fn mark_all_as_read(user_id: i32) -> Result<(), String> {
         let mut query: NotificationQuery = NotificationQuery::default();
@@ -107,6 +157,16 @@ impl NotificationService {
         Ok(())
     }
 
+    /// Soft-deletes a notification after verifying ownership.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The notification ID.
+    /// - `i32`: The user ID for ownership verification.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), String>`: Ok on success, or an error if the notification is not found or not owned.
     #[instrument_trace]
     pub async fn delete_notification(notification_id: i32, user_id: i32) -> Result<(), String> {
         let model: Option<NotificationModel> =
@@ -122,11 +182,29 @@ impl NotificationService {
         }
     }
 
+    /// Returns the count of unread notifications for a given user.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The user ID.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<i64, String>`: The count of unread notifications.
     #[instrument_trace]
     pub async fn get_unread_count(user_id: i32) -> Result<i64, String> {
         NotificationRepository::count_unread(user_id).await
     }
 
+    /// Converts a `NotificationModel` to a `NotificationResponse` with encoded IDs.
+    ///
+    /// # Arguments
+    ///
+    /// - `&NotificationModel`: The database model to convert.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<NotificationResponse, String>`: The converted notification response.
     #[instrument_trace]
     fn model_to_response(model: &NotificationModel) -> Result<NotificationResponse, String> {
         let mut response: NotificationResponse = NotificationResponse::default();

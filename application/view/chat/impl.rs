@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `ChatViewRoute` for `ServerHook`.
 impl ServerHook for ChatViewRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

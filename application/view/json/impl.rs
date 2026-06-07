@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `JsonEditorViewRoute` for `ServerHook`.
 impl ServerHook for JsonEditorViewRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

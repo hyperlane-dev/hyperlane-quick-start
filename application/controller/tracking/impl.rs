@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `TrackingReportRoute` for `ServerHook`.
 impl ServerHook for TrackingReportRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -29,6 +30,7 @@ impl ServerHook for TrackingReportRoute {
     }
 }
 
+/// Implementation of `TrackingQueryRoute` for `ServerHook`.
 impl ServerHook for TrackingQueryRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

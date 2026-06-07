@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `UploadViewRoute` for `ServerHook`.
 impl ServerHook for UploadViewRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -17,6 +18,7 @@ impl ServerHook for UploadViewRoute {
     }
 }
 
+/// Implementation of `UploadFileRoute` for `ServerHook`.
 impl ServerHook for UploadFileRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

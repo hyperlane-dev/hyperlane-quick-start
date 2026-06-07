@@ -1,5 +1,6 @@
 use super::*;
 
+/// openapi github pages proxy root.
 #[utoipa::path(
     get,
     path = "/github/pages/{owner}/{repository}",
@@ -17,6 +18,7 @@ use super::*;
 #[instrument_trace]
 pub fn openapi_github_pages_proxy_root() {}
 
+/// openapi github pages proxy.
 #[utoipa::path(
     get,
     path = "/github/pages/{owner}/{repository}/{path:.*}",

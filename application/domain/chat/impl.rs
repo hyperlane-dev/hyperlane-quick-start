@@ -1,5 +1,6 @@
 use super::*;
 
+/// Default implementation for `MessageType`, defaulting to `Text`.
 impl Default for MessageType {
     #[instrument_trace]
     fn default() -> Self {
@@ -7,19 +8,41 @@ impl Default for MessageType {
     }
 }
 
+/// Type-checking methods for `MessageType`.
 impl MessageType {
+    /// Checks whether this message type is a ping.
+    ///
+    /// # Returns
+    ///
+    /// - `bool`: `true` if the type is `Ping`.
     #[instrument_trace]
     fn is_ping(&self) -> bool {
         matches!(self, MessageType::Ping)
     }
 }
 
+/// Request data transformation methods for `WebSocketReqData`.
 impl WebSocketReqData {
+    /// Checks whether this request is a ping message.
+    ///
+    /// # Returns
+    ///
+    /// - `bool`: `true` if the request type is `Ping`.
     #[instrument_trace]
     pub fn is_ping(&self) -> bool {
         self.get_type().is_ping()
     }
 
+    /// Converts this request data into a response by extracting the user UUID from the context.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream`: The WebSocket stream (unused).
+    /// - `&mut Context`: The request context used to extract the UUID query parameter.
+    ///
+    /// # Returns
+    ///
+    /// - `WebSocketRespData`: The constructed response data.
     #[instrument_trace]
     pub async fn into_resp(&self, _stream: &mut Stream, ctx: &mut Context) -> WebSocketRespData {
         let uuid_opt: Option<RequestQuerysValue> = ctx.get_request().try_get_query("uuid");
@@ -33,7 +56,20 @@ impl WebSocketReqData {
     }
 }
 
+/// Response data construction methods for `WebSocketRespData`.
 impl WebSocketRespData {
+    /// Creates a `WebSocketRespData` from a message type, context, and serializable data.
+    ///
+    /// # Arguments
+    ///
+    /// - `MessageType`: The type of the response message.
+    /// - `&mut Stream`: The WebSocket stream (unused).
+    /// - `&mut Context`: The request context used to extract the UUID.
+    /// - `T`: The data to include, implementing `ToString`.
+    ///
+    /// # Returns
+    ///
+    /// - `WebSocketRespData`: The constructed response data.
     #[instrument_trace]
     pub async fn from<T: ToString>(
         msg_type: MessageType,
@@ -56,6 +92,18 @@ impl WebSocketRespData {
         resp_data
     }
 
+    /// Serializes a `WebSocketRespData` into a JSON response body.
+    ///
+    /// # Arguments
+    ///
+    /// - `MessageType`: The type of the response message.
+    /// - `&mut Stream`: The WebSocket stream.
+    /// - `&mut Context`: The request context.
+    /// - `T`: The data to serialize, implementing `ToString`.
+    ///
+    /// # Returns
+    ///
+    /// - `serde_json::Result<ResponseBody>`: The serialized response body, or a serialization error.
     #[instrument_trace]
     pub async fn get_json_data<T: ToString>(
         msg_type: MessageType,
@@ -67,19 +115,45 @@ impl WebSocketRespData {
     }
 }
 
+/// Session expiry check for `ChatSession`.
 impl ChatSession {
+    /// Checks whether this session has expired based on the given timeout.
+    ///
+    /// # Arguments
+    ///
+    /// - `u64`: The timeout duration in minutes.
+    ///
+    /// # Returns
+    ///
+    /// - `bool`: `true` if the session has been inactive longer than the timeout.
     #[instrument_trace]
     pub fn is_expired(&self, timeout_minutes: u64) -> bool {
         self.get_last_activity().elapsed().as_secs() > timeout_minutes * 60
     }
 }
 
+/// Chat domain management methods for `ChatDomain`.
 impl ChatDomain {
+    /// Returns a static reference to the global chat sessions map, initializing it lazily.
+    ///
+    /// # Returns
+    ///
+    /// - `&'static ArcRwLock<HashMap<String, ChatSession>>`: The global sessions map.
     #[instrument_trace]
     pub fn get_global_chat_sessions() -> &'static ArcRwLock<HashMap<String, ChatSession>> {
         GLOBAL_CHAT_SESSIONS.get_or_init(|| arc_rwlock(HashMap::new()))
     }
 
+    /// Retrieves an existing session or creates a new one for the given session ID,
+    /// cleaning up expired sessions (30-minute timeout) in the process.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The session identifier.
+    ///
+    /// # Returns
+    ///
+    /// - `ChatSession`: The existing or newly created session.
     #[instrument_trace]
     pub async fn get_or_create_session(session_id: &str) -> ChatSession {
         let sessions: &ArcRwLock<HashMap<String, ChatSession>> = Self::get_global_chat_sessions();
@@ -99,6 +173,11 @@ impl ChatDomain {
             .clone()
     }
 
+    /// Updates or inserts a chat session into the global sessions map.
+    ///
+    /// # Arguments
+    ///
+    /// - `ChatSession`: The session to update.
     #[instrument_trace]
     pub async fn update_session(session: ChatSession) {
         Self::get_global_chat_sessions()
@@ -107,11 +186,21 @@ impl ChatDomain {
             .insert(session.get_session_id().clone(), session);
     }
 
+    /// Returns a static reference to the global online users map, initializing it lazily.
+    ///
+    /// # Returns
+    ///
+    /// - `&'static ArcRwLock<HashMap<String, OnlineUser>>`: The global online users map.
     #[instrument_trace]
     pub fn get_global_online_users() -> &'static ArcRwLock<HashMap<String, OnlineUser>> {
         GLOBAL_ONLINE_USERS.get_or_init(|| arc_rwlock(HashMap::new()))
     }
 
+    /// Adds a user to the global online users map.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The username of the user to add.
     #[instrument_trace]
     pub async fn add_online_user(username: &str) {
         let mut online_user: OnlineUser = OnlineUser::default();
@@ -124,6 +213,11 @@ impl ChatDomain {
             .insert(username.to_string(), online_user);
     }
 
+    /// Removes a user from the global online users map.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The username of the user to remove.
     #[instrument_trace]
     pub async fn remove_online_user(username: &str) {
         Self::get_global_online_users()
@@ -132,6 +226,11 @@ impl ChatDomain {
             .remove(username);
     }
 
+    /// Returns the list of all online users, including the GPT system user.
+    ///
+    /// # Returns
+    ///
+    /// - `UserListResponse`: The response containing the user list and total count.
     #[instrument_trace]
     pub async fn get_online_users_list() -> UserListResponse {
         let mut users_vec: Vec<OnlineUser> = Self::get_global_online_users()

@@ -1,5 +1,6 @@
 use super::*;
 
+/// Renders the JSON viewer page and serves as the OpenAPI documentation endpoint for JSON routes.
 #[utoipa::path(
     get,
     path = "/json",

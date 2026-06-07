@@ -1,11 +1,30 @@
 use super::*;
 
+/// Executes a command inside a default Docker container.
+///
+/// Uses the default `DockerConfig` with security restrictions applied.
+///
+/// # Arguments
+/// - `&str`: The shell command to execute inside the container.
+///
+/// # Returns
+/// - `DockerResult`: The result of the command execution including stdout, stderr, and exit code.
 #[instrument_trace]
 pub async fn execute(command: &str) -> DockerResult {
     let config: DockerConfig = DockerConfig::new();
     execute_with_config(command, &config).await
 }
 
+/// Executes a command inside a Docker container with the specified configuration.
+///
+/// Returns an error result if the command string is empty or if Docker execution fails.
+///
+/// # Arguments
+/// - `&str`: The shell command to execute inside the container.
+/// - `&DockerConfig`: The Docker configuration controlling resource limits and container settings.
+///
+/// # Returns
+/// - `DockerResult`: The result of the command execution including stdout, stderr, and exit code.
 #[instrument_trace]
 pub async fn execute_with_config(command: &str, config: &DockerConfig) -> DockerResult {
     if command.is_empty() {
@@ -30,6 +49,17 @@ pub async fn execute_with_config(command: &str, config: &DockerConfig) -> Docker
     }
 }
 
+/// Builds the complete list of Docker CLI arguments from the given configuration and command.
+///
+/// Constructs arguments for `docker run` including resource limits, volume mounts,
+/// environment variables, and the command to execute.
+///
+/// # Arguments
+/// - `&DockerConfig`: The Docker configuration to convert into CLI arguments.
+/// - `&str`: The shell command to append as the final argument.
+///
+/// # Returns
+/// - `Vec<String>`: The ordered list of arguments for the `docker` command.
 #[instrument_trace]
 fn build_docker_args(config: &DockerConfig, command: &str) -> Vec<String> {
     let mut args: Vec<String> = vec!["run".to_string(), "--rm".to_string()];
@@ -67,6 +97,10 @@ fn build_docker_args(config: &DockerConfig, command: &str) -> Vec<String> {
     args
 }
 
+/// Checks whether Docker is available on the host system by running `docker --version`.
+///
+/// # Returns
+/// - `bool`: `true` if Docker is installed and accessible, `false` otherwise.
 #[instrument_trace]
 pub async fn is_docker_available() -> bool {
     match Command::new("docker").arg("--version").output().await {

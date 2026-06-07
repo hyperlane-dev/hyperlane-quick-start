@@ -1,5 +1,6 @@
 use super::*;
 
+/// Enumeration of network protocol.
 #[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize, ToSchema)]
 pub enum NetworkProtocol {
     TCP,
@@ -14,6 +15,7 @@ pub enum NetworkProtocol {
     Unknown(String),
 }
 
+/// Enumeration of packet direction.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize, ToSchema)]
 pub enum PacketDirection {
     Inbound,
@@ -21,6 +23,7 @@ pub enum PacketDirection {
     Local,
 }
 
+/// Enumeration of capture status.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize, ToSchema)]
 pub enum CaptureStatus {
     Stopped,
@@ -29,6 +32,7 @@ pub enum CaptureStatus {
     Error(String),
 }
 
+/// Enumeration of network interface.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize, ToSchema)]
 pub enum NetworkInterface {
     Ethernet,

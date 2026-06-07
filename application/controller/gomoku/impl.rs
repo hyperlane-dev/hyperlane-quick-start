@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `GomokuRoute` for `ServerHook`.
 impl ServerHook for GomokuRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

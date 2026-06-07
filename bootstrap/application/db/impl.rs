@@ -143,6 +143,12 @@ impl DbBootstrap {
 
 /// Implementation of `BootstrapAsyncInit` for `DbBootstrap`, establishing database connections and running auto-creation on initialization.
 impl BootstrapAsyncInit for DbBootstrap {
+    /// Initializes the database bootstrap by establishing connections to MySQL, PostgreSQL, and Redis instances,
+    /// then running the auto-creation process for all configured databases.
+    ///
+    /// # Returns
+    ///
+    /// - `Self`: The initialized `DbBootstrap` instance.
     async fn init() -> Self {
         let mysql_schema: DatabaseSchema = Self::build_mysql_schema();
         let postgresql_schema: DatabaseSchema = Self::build_postgresql_schema();

@@ -1,6 +1,16 @@
 use super::*;
 
+/// Implementation of methods for `RssService`.
 impl RssService {
+    /// Converts a `Timezone` enum variant to its corresponding `FixedOffset`.
+    ///
+    /// # Arguments
+    ///
+    /// - `Timezone`: The timezone variant.
+    ///
+    /// # Returns
+    ///
+    /// - `FixedOffset`: The UTC offset for the timezone.
     fn timezone_to_offset(timezone: Timezone) -> FixedOffset {
         match timezone {
             Timezone::Utc => FixedOffset::east_opt(0).unwrap_or(FixedOffset::east_opt(0).unwrap()),
@@ -52,6 +62,16 @@ impl RssService {
         }
     }
 
+    /// Formats a timestamp string as an RFC 822 date in the specified timezone.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The timestamp string in "%Y-%m-%d %H:%M:%S%.3f" format.
+    /// - `Timezone`: The timezone for the output date.
+    ///
+    /// # Returns
+    ///
+    /// - `String`: The formatted RFC 822 date string, or the original string if parsing fails.
     fn format_rfc822_date_with_timezone(timestamp: &str, timezone: Timezone) -> String {
         if timestamp.is_empty() {
             return String::new();
@@ -68,6 +88,11 @@ impl RssService {
         }
     }
 
+    /// Scans the upload directory recursively and returns a list of all uploaded files sorted by upload time descending.
+    ///
+    /// # Returns
+    ///
+    /// - `Vec<UploadedFile>`: The list of uploaded file information objects.
     #[instrument_trace]
     pub async fn get_uploaded_files() -> Vec<UploadedFile> {
         let entries: Vec<DirEntry> = match read_dir(UPLOAD_DIR).await {
@@ -99,6 +124,12 @@ impl RssService {
         files
     }
 
+    /// Recursively scans a directory path and collects uploaded file information.
+    ///
+    /// # Arguments
+    ///
+    /// - `&Path`: The directory path to scan.
+    /// - `&mut Vec<UploadedFile>`: The collection to append found files to.
     fn scan_directory_recursive_sync<'a>(
         path: &'a Path,
         files: &'a mut Vec<UploadedFile>,
@@ -121,6 +152,15 @@ impl RssService {
         })
     }
 
+    /// Creates an `UploadedFile` object from a file path, extracting metadata and generating a URL.
+    ///
+    /// # Arguments
+    ///
+    /// - `&Path`: The file path.
+    ///
+    /// # Returns
+    ///
+    /// - `Option<UploadedFile>`: The file information object, or `None` if metadata cannot be read.
     #[instrument_trace]
     fn create_uploaded_file_sync(path: &Path) -> Option<UploadedFile> {
         let meta_data: std::fs::Metadata = metadata(path).ok()?;
@@ -183,6 +223,18 @@ impl RssService {
         Some(file_info)
     }
 
+    /// Generates an RSS 2.0 XML feed from uploaded files with pagination and timezone support.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The base URL for the feed and item links.
+    /// - `Option<usize>`: The maximum number of items to include.
+    /// - `Option<usize>`: The number of items to skip.
+    /// - `Option<Timezone>`: The timezone for publication dates.
+    ///
+    /// # Returns
+    ///
+    /// - `String`: The complete RSS 2.0 XML feed string.
     #[instrument_trace]
     pub async fn generate_rss_feed(
         base_url: &str,
@@ -217,6 +269,17 @@ impl RssService {
         Self::build_rss_xml(&channel)
     }
 
+    /// Converts an uploaded file into an RSS item with enclosure metadata.
+    ///
+    /// # Arguments
+    ///
+    /// - `UploadedFile`: The uploaded file information.
+    /// - `&str`: The base URL for constructing the full file URL.
+    /// - `Timezone`: The timezone for the publication date.
+    ///
+    /// # Returns
+    ///
+    /// - `RssItem`: The RSS item with title, link, description, enclosure, and publication date.
     #[instrument_trace]
     async fn convert_file_to_rss_item(file: UploadedFile, base_url: &str, tz: Timezone) -> RssItem {
         let full_url: String = format!("{base_url}{}", file.get_file_url());
@@ -248,6 +311,15 @@ impl RssService {
         item
     }
 
+    /// Builds the RSS 2.0 XML string from the channel and its items.
+    ///
+    /// # Arguments
+    ///
+    /// - `&RssChannel`: The RSS channel data.
+    ///
+    /// # Returns
+    ///
+    /// - `String`: The complete RSS XML document string.
     #[instrument_trace]
     fn build_rss_xml(channel: &RssChannel) -> String {
         let mut xml: String = String::from(r#"<?xml version="1.0" encoding="UTF-8"?>"#);
@@ -308,6 +380,15 @@ impl RssService {
         xml
     }
 
+    /// Escapes special XML characters in a text string.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The text to escape.
+    ///
+    /// # Returns
+    ///
+    /// - `String`: The XML-escaped text.
     #[instrument_trace]
     fn escape_xml(text: &str) -> String {
         text.replace('&', "&amp;")

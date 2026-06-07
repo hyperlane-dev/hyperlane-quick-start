@@ -1,5 +1,6 @@
 use super::*;
 
+/// Renders the Redis management page and serves as the OpenAPI documentation endpoint for Redis routes.
 #[utoipa::path(
     get,
     path = "/redis",

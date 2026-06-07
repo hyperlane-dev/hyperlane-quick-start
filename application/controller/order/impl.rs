@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `RecordCreateRoute` for `ServerHook`.
 impl ServerHook for RecordCreateRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -93,6 +94,7 @@ impl ServerHook for RecordCreateRoute {
     }
 }
 
+/// Implementation of `RecordListRoute` for `ServerHook`.
 impl ServerHook for RecordListRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -195,6 +197,7 @@ impl ServerHook for RecordListRoute {
     }
 }
 
+/// Implementation of `RecordGetRoute` for `ServerHook`.
 impl ServerHook for RecordGetRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -245,6 +248,7 @@ impl ServerHook for RecordGetRoute {
     }
 }
 
+/// Implementation of `OverviewStatisticsRoute` for `ServerHook`.
 impl ServerHook for OverviewStatisticsRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -304,6 +308,7 @@ impl ServerHook for OverviewStatisticsRoute {
     }
 }
 
+/// Implementation of `ImageUploadRoute` for `ServerHook`.
 impl ServerHook for ImageUploadRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -371,6 +376,7 @@ impl ServerHook for ImageUploadRoute {
     }
 }
 
+/// Implementation of `ImageListRoute` for `ServerHook`.
 impl ServerHook for ImageListRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -416,6 +422,7 @@ impl ServerHook for ImageListRoute {
     }
 }
 
+/// Implementation of `ImageDownloadRoute` for `ServerHook`.
 impl ServerHook for ImageDownloadRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

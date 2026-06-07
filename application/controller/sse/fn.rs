@@ -1,5 +1,6 @@
 use super::*;
 
+/// OpenAPI documentation endpoint for the Server-Sent Events (SSE) streaming route.
 #[utoipa::path(
     get,
     path = "/sse",

@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `AuthViewRoute` for `ServerHook`.
 impl ServerHook for AuthViewRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

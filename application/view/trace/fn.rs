@@ -1,5 +1,6 @@
 use super::*;
 
+/// Renders the trace search page and serves as the OpenAPI documentation endpoint for trace routes.
 #[utoipa::path(
     get,
     path = "/trace",

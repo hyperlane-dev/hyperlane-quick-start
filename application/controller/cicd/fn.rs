@@ -1,5 +1,6 @@
 use super::*;
 
+/// openapi create pipeline.
 #[utoipa::path(
     post,
     path = "/api/cicd/pipeline/create",
@@ -12,6 +13,7 @@ use super::*;
 #[instrument_trace]
 pub fn openapi_create_pipeline() {}
 
+/// openapi list pipelines.
 #[utoipa::path(
     get,
     path = "/api/cicd/pipeline/list",
@@ -23,6 +25,7 @@ pub fn openapi_create_pipeline() {}
 #[instrument_trace]
 pub fn openapi_list_pipelines() {}
 
+/// openapi get pipeline.
 #[utoipa::path(
     get,
     path = "/api/cicd/pipeline/get",
@@ -38,6 +41,7 @@ pub fn openapi_list_pipelines() {}
 #[instrument_trace]
 pub fn openapi_get_pipeline() {}
 
+/// openapi trigger run.
 #[utoipa::path(
     post,
     path = "/api/cicd/run/trigger",
@@ -50,6 +54,7 @@ pub fn openapi_get_pipeline() {}
 #[instrument_trace]
 pub fn openapi_trigger_run() {}
 
+/// openapi list runs.
 #[utoipa::path(
     get,
     path = "/api/cicd/run/list",
@@ -61,6 +66,7 @@ pub fn openapi_trigger_run() {}
 #[instrument_trace]
 pub fn openapi_list_runs() {}
 
+/// openapi get run.
 #[utoipa::path(
     get,
     path = "/api/cicd/run/get",
@@ -73,6 +79,7 @@ pub fn openapi_list_runs() {}
 #[instrument_trace]
 pub fn openapi_get_run() {}
 
+/// openapi get run detail.
 #[utoipa::path(
     get,
     path = "/api/cicd/run/detail",
@@ -85,6 +92,7 @@ pub fn openapi_get_run() {}
 #[instrument_trace]
 pub fn openapi_get_run_detail() {}
 
+/// openapi update job.
 #[utoipa::path(
     post,
     path = "/api/cicd/job/update",
@@ -97,6 +105,7 @@ pub fn openapi_get_run_detail() {}
 #[instrument_trace]
 pub fn openapi_update_job() {}
 
+/// openapi update step.
 #[utoipa::path(
     post,
     path = "/api/cicd/step/update",
@@ -109,6 +118,7 @@ pub fn openapi_update_job() {}
 #[instrument_trace]
 pub fn openapi_update_step() {}
 
+/// openapi cicd view.
 #[utoipa::path(
     get,
     path = "/cicd",

@@ -1,6 +1,16 @@
 use super::*;
 
+/// Database access methods for `ShortlinkRepository`.
 impl ShortlinkRepository {
+    /// Finds a shortlink by its original URL.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The URL to search for.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Option<ShortlinkModel>, String>`: The shortlink model if found, or `None`.
     #[instrument_trace]
     pub async fn find_by_url(url: &str) -> Result<Option<ShortlinkModel>, String> {
         let db: DatabaseConnection =
@@ -13,6 +23,15 @@ impl ShortlinkRepository {
         Ok(result)
     }
 
+    /// Finds a shortlink by its unique identifier.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The shortlink identifier.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Option<ShortlinkModel>, String>`: The shortlink model if found, or `None`.
     #[instrument_trace]
     pub async fn find_by_id(id: i32) -> Result<Option<ShortlinkModel>, String> {
         let db: DatabaseConnection =
@@ -24,6 +43,15 @@ impl ShortlinkRepository {
         Ok(result)
     }
 
+    /// Inserts a new shortlink record with the given URL.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The original URL to create a shortlink for.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<ShortlinkModel, String>`: The inserted shortlink model with generated ID.
     #[instrument_trace]
     pub async fn insert(url: &str) -> Result<ShortlinkModel, String> {
         let db: DatabaseConnection =

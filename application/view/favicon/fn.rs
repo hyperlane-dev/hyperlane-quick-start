@@ -1,5 +1,6 @@
 use super::*;
 
+/// Serves the favicon and serves as the OpenAPI documentation endpoint for favicon routes.
 #[utoipa::path(
     get,
     path = "/favicon.ico",

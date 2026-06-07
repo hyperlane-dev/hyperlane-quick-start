@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `Timezone` for `std::str::FromStr`.
 impl std::str::FromStr for Timezone {
     type Err = String;
 

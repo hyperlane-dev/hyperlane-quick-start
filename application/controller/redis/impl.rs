@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `ListRecordsRoute` for `ServerHook`.
 impl ServerHook for ListRecordsRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -28,6 +29,7 @@ impl ServerHook for ListRecordsRoute {
     }
 }
 
+/// Implementation of `CreateRecordRoute` for `ServerHook`.
 impl ServerHook for CreateRecordRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -66,6 +68,7 @@ impl ServerHook for CreateRecordRoute {
     }
 }
 
+/// Implementation of `UpdateRecordRoute` for `ServerHook`.
 impl ServerHook for UpdateRecordRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -104,6 +107,7 @@ impl ServerHook for UpdateRecordRoute {
     }
 }
 
+/// Implementation of `DeleteRecordRoute` for `ServerHook`.
 impl ServerHook for DeleteRecordRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

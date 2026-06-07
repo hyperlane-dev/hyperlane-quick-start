@@ -1,5 +1,6 @@
 use super::*;
 
+/// openapi tracking view.
 #[utoipa::path(
     get,
     path = "/tracking",

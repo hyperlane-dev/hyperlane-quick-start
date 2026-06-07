@@ -1,5 +1,6 @@
 use super::*;
 
+/// openapi get online users.
 #[utoipa::path(
     get,
     path = "/chat/users/online",

@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `WebSocketRoute` for `ServerHook`.
 impl ServerHook for WebSocketRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

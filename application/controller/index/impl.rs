@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `IndexRoute` for `ServerHook`.
 impl ServerHook for IndexRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

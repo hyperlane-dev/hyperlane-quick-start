@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `MonitorViewRoute` for `ServerHook`.
 impl ServerHook for MonitorViewRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

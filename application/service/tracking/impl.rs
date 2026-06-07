@@ -1,6 +1,8 @@
 use super::*;
 
+/// Implementation of methods for `TrackingService`.
 impl TrackingService {
+    /// save tracking record.
     #[instrument_trace]
     pub async fn save_tracking_record(
         ctx: &mut Context,
@@ -18,6 +20,15 @@ impl TrackingService {
         result.map_err(|error: DbErr| format!("Failed to insert tracking record {error}"))
     }
 
+    /// Queries tracking records based on the request filters (time range, header key/value, body content) with pagination.
+    ///
+    /// # Arguments
+    ///
+    /// - `TrackingQueryRequest`: The query parameters including time range, header/body filters, and pagination.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<TrackingQueryResponse, String>`: The paginated query results on success, or an error message on failure.
     #[instrument_trace]
     pub async fn query_tracking_records(
         request: TrackingQueryRequest,

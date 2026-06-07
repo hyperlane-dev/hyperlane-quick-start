@@ -1,5 +1,6 @@
 use super::*;
 
+/// openapi github pages sync.
 #[utoipa::path(
     post,
     path = "/api/github/pages/sync",
@@ -14,6 +15,7 @@ use super::*;
 #[instrument_trace]
 pub fn openapi_github_pages_sync() {}
 
+/// openapi github pages list.
 #[utoipa::path(
     get,
     path = "/api/github/pages/list",
@@ -27,6 +29,7 @@ pub fn openapi_github_pages_sync() {}
 #[instrument_trace]
 pub fn openapi_github_pages_list() {}
 
+/// openapi github pages resources.
 #[utoipa::path(
     get,
     path = "/api/github/pages/{owner}/{repository}",
@@ -44,6 +47,7 @@ pub fn openapi_github_pages_list() {}
 #[instrument_trace]
 pub fn openapi_github_pages_resources() {}
 
+/// openapi github pages delete.
 #[utoipa::path(
     post,
     path = "/api/github/pages/delete/{owner}/{repository}",

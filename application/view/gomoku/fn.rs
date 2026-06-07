@@ -1,5 +1,6 @@
 use super::*;
 
+/// Renders the gomoku game page and serves as the OpenAPI documentation endpoint for gomoku routes.
 #[utoipa::path(
     get,
     path = "/gomoku",

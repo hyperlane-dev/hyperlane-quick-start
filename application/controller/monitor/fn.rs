@@ -1,5 +1,6 @@
 use super::*;
 
+/// openapi monitor status sse.
 #[utoipa::path(
     get,
     path = "/api/server/status",
@@ -13,6 +14,7 @@ use super::*;
 #[instrument_trace]
 pub fn openapi_monitor_status_sse() {}
 
+/// openapi monitor system info.
 #[utoipa::path(
     get,
     path = "/api/server/info",
@@ -26,6 +28,7 @@ pub fn openapi_monitor_status_sse() {}
 #[instrument_trace]
 pub fn openapi_monitor_system_info() {}
 
+/// openapi monitor network capture data.
 #[utoipa::path(
     get,
     path = "/api/network/capture",
@@ -39,6 +42,7 @@ pub fn openapi_monitor_system_info() {}
 #[instrument_trace]
 pub fn openapi_monitor_network_capture_data() {}
 
+/// openapi monitor network capture stream.
 #[utoipa::path(
     get,
     path = "/api/network/capture/stream",
@@ -52,6 +56,7 @@ pub fn openapi_monitor_network_capture_data() {}
 #[instrument_trace]
 pub fn openapi_monitor_network_capture_stream() {}
 
+/// openapi monitor performance history.
 #[utoipa::path(
     get,
     path = "/api/server/performance/history",

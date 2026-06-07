@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `HealthCheckRoute` for `ServerHook`.
 impl ServerHook for HealthCheckRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

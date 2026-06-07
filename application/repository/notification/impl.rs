@@ -1,6 +1,16 @@
 use super::*;
 
+/// Database access methods for `NotificationRepository`.
 impl NotificationRepository {
+    /// Inserts a new notification record into the database.
+    ///
+    /// # Arguments
+    ///
+    /// - `NotificationActiveModel`: The active model containing the notification data to insert.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<NotificationModel, String>`: The inserted notification model.
     #[instrument_trace]
     pub async fn insert(
         active_model: NotificationActiveModel,
@@ -14,6 +24,15 @@ impl NotificationRepository {
         Ok(result)
     }
 
+    /// Finds a non-deleted notification by its unique identifier.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The notification identifier.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Option<NotificationModel>, String>`: The notification model if found and not deleted, or `None`.
     #[instrument_trace]
     pub async fn find_by_id(id: i32) -> Result<Option<NotificationModel>, String> {
         let db: DatabaseConnection =
@@ -26,6 +45,15 @@ impl NotificationRepository {
         Ok(result)
     }
 
+    /// Queries non-deleted notifications with pagination, filtering by user, type, and read status.
+    ///
+    /// # Arguments
+    ///
+    /// - `NotificationQuery`: The query parameters including user, type, read status, and pagination.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(Vec<NotificationModel>, i64), String>`: The paginated notifications and total count.
     #[instrument_trace]
     pub async fn query_with_pagination(
         query: NotificationQuery,
@@ -59,6 +87,16 @@ impl NotificationRepository {
         Ok((records, total))
     }
 
+    /// Updates the read status of a notification by its identifier.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The notification identifier.
+    /// - `bool`: The new read status.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), String>`: Ok on success, or an error if the notification is not found.
     #[instrument_trace]
     pub async fn update_read_status(id: i32, is_read: bool) -> Result<(), String> {
         let db: DatabaseConnection =
@@ -77,6 +115,15 @@ impl NotificationRepository {
         Ok(())
     }
 
+    /// Soft-deletes a notification by setting its `is_deleted` flag to true.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The notification identifier.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), String>`: Ok on success, or an error if the notification is not found.
     #[instrument_trace]
     pub async fn soft_delete_by_id(id: i32) -> Result<(), String> {
         let db: DatabaseConnection =
@@ -96,6 +143,15 @@ impl NotificationRepository {
         Ok(())
     }
 
+    /// Counts the number of unread and non-deleted notifications for a user.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The user identifier.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<i64, String>`: The count of unread notifications.
     #[instrument_trace]
     pub async fn count_unread(user_id: i32) -> Result<i64, String> {
         let db: DatabaseConnection =

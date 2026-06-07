@@ -4,6 +4,11 @@ use super::*;
 impl GetOrInit for EnvPlugin {
     type Instance = EnvConfig;
 
+    /// Lazily initializes and returns a static reference to the global `EnvConfig` singleton.
+    ///
+    /// # Returns
+    ///
+    /// - `&'static EnvConfig`: The static reference to the global environment configuration.
     #[instrument_trace]
     fn get_or_init() -> &'static Self::Instance {
         GLOBAL_ENV_CONFIG.get_or_init(EnvConfig::default)

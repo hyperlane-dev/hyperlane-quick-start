@@ -1,5 +1,6 @@
 use super::*;
 
+/// Renders the chat page and serves as the OpenAPI documentation endpoint for chat routes.
 #[utoipa::path(
     get,
     path = "/chat",

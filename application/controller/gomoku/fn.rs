@@ -1,5 +1,6 @@
 use super::*;
 
+/// openapi gomoku websocket.
 #[utoipa::path(
     get,
     path = "/api/gomoku",

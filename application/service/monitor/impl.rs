@@ -1,36 +1,52 @@
 use super::*;
 
+/// Implementation of methods for `MonitorService`.
 impl MonitorService {
+    /// Returns the lazily-initialized static system information instance.
+    ///
+    /// # Returns
+    ///
+    /// - `&'static RwLock<System>`: The static reference to the system information.
     #[instrument_trace]
     fn get_or_init_system() -> &'static RwLock<System> {
         SYSTEM.get_or_init(|| RwLock::new(System::new_all()))
     }
 
+    /// Returns the lazily-initialized static network information instance.
+    ///
+    /// # Returns
+    ///
+    /// - `&'static RwLock<Networks>`: The static reference to the network information.
     #[instrument_trace]
     fn get_or_init_networks() -> &'static RwLock<Networks> {
         NETWORKS.get_or_init(|| RwLock::new(Networks::new_with_refreshed_list()))
     }
 
+    /// Refreshes all system information including CPU, memory, and processes.
     #[instrument_trace]
     async fn refresh_system() {
         Self::get_or_init_system().write().await.refresh_all();
     }
 
+    /// Refreshes network interface information.
     #[instrument_trace]
     async fn refresh_networks() {
         Self::get_or_init_networks().write().await.refresh(true);
     }
 
+    /// Refreshes CPU usage information only.
     #[instrument_trace]
     async fn refresh_cpu() {
         Self::get_or_init_system().write().await.refresh_cpu_all();
     }
 
+    /// Refreshes memory information only.
     #[instrument_trace]
     async fn refresh_memory() {
         Self::get_or_init_system().write().await.refresh_memory();
     }
 
+    /// Starts a background task that periodically captures network statistics.
     #[instrument_trace]
     pub async fn start_network_capture() {
         init_network_capture_globals();
@@ -45,6 +61,7 @@ impl MonitorService {
         });
     }
 
+    /// Starts a background task that periodically collects performance data points.
     #[instrument_trace]
     pub async fn start_performance_data_collection() {
         spawn(async {
@@ -56,6 +73,11 @@ impl MonitorService {
         });
     }
 
+    /// Collects a single performance data point by refreshing system and network information.
+    ///
+    /// # Returns
+    ///
+    /// - `PerformanceDataPoint`: The collected data point containing CPU, memory, disk, network, and process metrics.
     #[instrument_trace]
     async fn collect_performance_data_point() -> PerformanceDataPoint {
         Self::refresh_system().await;
@@ -84,6 +106,11 @@ impl MonitorService {
         data_point
     }
 
+    /// Builds a performance history response from the collected data points.
+    ///
+    /// # Returns
+    ///
+    /// - `PerformanceHistoryResponse`: The response containing all data points, total count, and time range.
     #[instrument_trace]
     pub async fn get_performance_history_response() -> PerformanceHistoryResponse {
         let data_points: Vec<PerformanceDataPoint> = get_performance_history().await;
@@ -109,6 +136,11 @@ impl MonitorService {
         response
     }
 
+    /// Captures current network data by summing packets and bytes across non-loopback interfaces.
+    ///
+    /// # Returns
+    ///
+    /// - `Option<NetworkStats>`: The captured network statistics, or `None` if refresh fails.
     async fn capture_network_data() -> Option<NetworkStats> {
         Self::refresh_networks().await;
         let mut stats: NetworkStats = NetworkStats::default();
@@ -131,6 +163,11 @@ impl MonitorService {
         Some(stats)
     }
 
+    /// Writes the current network capture data as JSON to the response body.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Context`: The request context to write the response to.
     #[instrument_trace]
     pub async fn get_network_capture_data(ctx: &mut Context) {
         let response_data: NetworkStats = get_network_stats().await.unwrap_or_default();
@@ -139,6 +176,11 @@ impl MonitorService {
         }
     }
 
+    /// Writes the current network capture data as an SSE event to the response body.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Context`: The request context to write the SSE response to.
     #[instrument_trace]
     pub async fn get_network_capture_stream(ctx: &mut Context) {
         let response_data: NetworkStats = get_network_stats().await.unwrap_or_default();
@@ -148,6 +190,11 @@ impl MonitorService {
         }
     }
 
+    /// Collects the current server status including system info, resource usage, and the latest performance data.
+    ///
+    /// # Returns
+    ///
+    /// - `ServerStatus`: The comprehensive server status object.
     #[instrument_trace]
     pub async fn get_server_status() -> ServerStatus {
         let recent_data: Vec<PerformanceDataPoint> = get_recent_performance_data(1).await;
@@ -186,6 +233,11 @@ impl MonitorService {
         status
     }
 
+    /// Collects static system information including hostname, OS, CPU, and memory details.
+    ///
+    /// # Returns
+    ///
+    /// - `SystemInfo`: The system information object.
     #[instrument_trace]
     pub async fn get_system_info() -> SystemInfo {
         let hostname: String = Self::get_hostname();
@@ -208,6 +260,11 @@ impl MonitorService {
         info
     }
 
+    /// Refreshes CPU data and returns the average CPU usage percentage across all cores.
+    ///
+    /// # Returns
+    ///
+    /// - `f64`: The average CPU usage percentage (0.0 to 100.0).
     #[instrument_trace]
     async fn get_cpu_usage() -> f64 {
         Self::refresh_cpu().await;
@@ -220,6 +277,11 @@ impl MonitorService {
         0.0
     }
 
+    /// Refreshes memory data and returns memory usage information.
+    ///
+    /// # Returns
+    ///
+    /// - `(u64, u64, f64)`: A tuple of (used bytes, total bytes, usage percentage).
     #[instrument_trace]
     async fn get_memory_info() -> (u64, u64, f64) {
         Self::refresh_memory().await;
@@ -234,6 +296,11 @@ impl MonitorService {
         (used, total, usage)
     }
 
+    /// Returns disk usage information by summing all disk spaces.
+    ///
+    /// # Returns
+    ///
+    /// - `(u64, u64, f64)`: A tuple of (used bytes, total bytes, usage percentage).
     #[instrument_trace]
     fn get_disk_info() -> (u64, u64, f64) {
         let disks: Disks = Disks::new_with_refreshed_list();
@@ -251,6 +318,11 @@ impl MonitorService {
         (used, total, usage)
     }
 
+    /// Returns total network bytes received and transmitted across all interfaces.
+    ///
+    /// # Returns
+    ///
+    /// - `(u64, u64)`: A tuple of (received bytes, transmitted bytes).
     #[instrument_trace]
     async fn get_network_info() -> (u64, u64) {
         Self::refresh_networks().await;
@@ -264,11 +336,21 @@ impl MonitorService {
         (rx_bytes, tx_bytes)
     }
 
+    /// Returns the system uptime in seconds.
+    ///
+    /// # Returns
+    ///
+    /// - `u64`: The number of seconds since boot.
     #[instrument_trace]
     fn get_uptime() -> u64 {
         System::uptime()
     }
 
+    /// Calculates the system load average based on CPU usage.
+    ///
+    /// # Returns
+    ///
+    /// - `f64`: The load average value (0.0 to ~number_of_cpus).
     #[instrument_trace]
     async fn get_load_average() -> f64 {
         let system: RwLockReadGuard<'_, System> = Self::get_or_init_system().read().await;
@@ -281,41 +363,81 @@ impl MonitorService {
         0.0
     }
 
+    /// Returns the number of active connections based on the process count.
+    ///
+    /// # Returns
+    ///
+    /// - `u32`: The number of active connections.
     #[instrument_trace]
     async fn get_active_connections() -> u32 {
         Self::get_or_init_system().read().await.processes().len() as u32
     }
 
+    /// Returns the total number of running processes.
+    ///
+    /// # Returns
+    ///
+    /// - `u32`: The process count.
     #[instrument_trace]
     async fn get_process_count() -> u32 {
         Self::get_or_init_system().read().await.processes().len() as u32
     }
 
+    /// Returns the system hostname, or a fallback value if unavailable.
+    ///
+    /// # Returns
+    ///
+    /// - `String`: The hostname string.
     #[instrument_trace]
     fn get_hostname() -> String {
         System::host_name().unwrap_or_else(|| FALLBACK_UNKNOWN.to_string())
     }
 
+    /// Returns the operating system name, or a fallback value if unavailable.
+    ///
+    /// # Returns
+    ///
+    /// - `String`: The OS name string.
     #[instrument_trace]
     fn get_os_name() -> String {
         System::name().unwrap_or_else(|| FALLBACK_UNKNOWN.to_string())
     }
 
+    /// Returns the operating system version, or a fallback value if unavailable.
+    ///
+    /// # Returns
+    ///
+    /// - `String`: The OS version string.
     #[instrument_trace]
     fn get_os_version() -> String {
         System::os_version().unwrap_or_else(|| FALLBACK_UNKNOWN.to_string())
     }
 
+    /// Returns the kernel version, or a fallback value if unavailable.
+    ///
+    /// # Returns
+    ///
+    /// - `String`: The kernel version string.
     #[instrument_trace]
     fn get_kernel_version() -> String {
         System::kernel_version().unwrap_or_else(|| FALLBACK_UNKNOWN.to_string())
     }
 
+    /// Returns the number of CPU cores.
+    ///
+    /// # Returns
+    ///
+    /// - `u32`: The CPU core count.
     #[instrument_trace]
     async fn get_cpu_cores() -> u32 {
         Self::get_or_init_system().read().await.cpus().len() as u32
     }
 
+    /// Returns the CPU model name of the first CPU.
+    ///
+    /// # Returns
+    ///
+    /// - `String`: The CPU brand/model string.
     #[instrument_trace]
     async fn get_cpu_model() -> String {
         let system: RwLockReadGuard<'_, System> = Self::get_or_init_system().read().await;
@@ -325,12 +447,22 @@ impl MonitorService {
         FALLBACK_UNKNOWN.to_string()
     }
 
+    /// Refreshes memory data and returns the total physical memory in bytes.
+    ///
+    /// # Returns
+    ///
+    /// - `u64`: The total memory in bytes.
     #[instrument_trace]
     async fn get_total_memory() -> u64 {
         Self::refresh_memory().await;
         Self::get_or_init_system().read().await.total_memory()
     }
 
+    /// Returns the total disk space across all disks in bytes.
+    ///
+    /// # Returns
+    ///
+    /// - `u64`: The total disk space in bytes.
     #[instrument_trace]
     fn get_total_disk() -> u64 {
         let disks: Disks = Disks::new_with_refreshed_list();

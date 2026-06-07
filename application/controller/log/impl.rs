@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `TraceLogRoute` for `ServerHook`.
 impl ServerHook for TraceLogRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -19,6 +20,7 @@ impl ServerHook for TraceLogRoute {
     }
 }
 
+/// Implementation of `DebugLogRoute` for `ServerHook`.
 impl ServerHook for DebugLogRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -38,6 +40,7 @@ impl ServerHook for DebugLogRoute {
     }
 }
 
+/// Implementation of `InfoLogRoute` for `ServerHook`.
 impl ServerHook for InfoLogRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -57,6 +60,7 @@ impl ServerHook for InfoLogRoute {
     }
 }
 
+/// Implementation of `WarnLogRoute` for `ServerHook`.
 impl ServerHook for WarnLogRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -76,6 +80,7 @@ impl ServerHook for WarnLogRoute {
     }
 }
 
+/// Implementation of `ErrorLogRoute` for `ServerHook`.
 impl ServerHook for ErrorLogRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

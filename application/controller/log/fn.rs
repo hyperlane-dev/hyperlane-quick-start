@@ -1,5 +1,6 @@
 use super::*;
 
+/// openapi log trace.
 #[utoipa::path(
     get,
     path = "/log/trace",
@@ -13,6 +14,7 @@ use super::*;
 #[instrument_trace]
 pub fn openapi_log_trace() {}
 
+/// openapi log debug.
 #[utoipa::path(
     get,
     path = "/log/debug",
@@ -26,6 +28,7 @@ pub fn openapi_log_trace() {}
 #[instrument_trace]
 pub fn openapi_log_debug() {}
 
+/// openapi log info.
 #[utoipa::path(
     get,
     path = "/log/info",
@@ -39,6 +42,7 @@ pub fn openapi_log_debug() {}
 #[instrument_trace]
 pub fn openapi_log_info() {}
 
+/// openapi log warn.
 #[utoipa::path(
     get,
     path = "/log/warn",
@@ -52,6 +56,7 @@ pub fn openapi_log_info() {}
 #[instrument_trace]
 pub fn openapi_log_warn() {}
 
+/// openapi log error.
 #[utoipa::path(
     get,
     path = "/log/error",

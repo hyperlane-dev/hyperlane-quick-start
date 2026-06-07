@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `GomokuViewRoute` for `ServerHook`.
 impl ServerHook for GomokuViewRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

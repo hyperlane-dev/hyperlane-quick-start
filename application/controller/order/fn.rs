@@ -1,5 +1,6 @@
 use super::*;
 
+/// openapi record create.
 #[utoipa::path(
     post,
     path = "/api/order/record/create",
@@ -12,6 +13,7 @@ use super::*;
 #[instrument_trace]
 pub fn openapi_record_create() {}
 
+/// openapi record list.
 #[utoipa::path(
     get,
     path = "/api/order/record/list",
@@ -23,6 +25,7 @@ pub fn openapi_record_create() {}
 #[instrument_trace]
 pub fn openapi_record_list() {}
 
+/// openapi record get.
 #[utoipa::path(
     get,
     path = "/api/order/record/get/{id}",
@@ -39,6 +42,7 @@ pub fn openapi_record_list() {}
 #[instrument_trace]
 pub fn openapi_record_get() {}
 
+/// openapi overview statistics.
 #[utoipa::path(
     get,
     path = "/api/order/overview/statistics",
@@ -52,6 +56,7 @@ pub fn openapi_record_get() {}
 #[instrument_trace]
 pub fn openapi_overview_statistics() {}
 
+/// openapi image upload.
 #[utoipa::path(
     post,
     path = "/api/order/image/upload",
@@ -65,6 +70,7 @@ pub fn openapi_overview_statistics() {}
 #[instrument_trace]
 pub fn openapi_image_upload() {}
 
+/// openapi image list.
 #[utoipa::path(
     get,
     path = "/api/order/image/list/{record_id}",
@@ -80,6 +86,7 @@ pub fn openapi_image_upload() {}
 #[instrument_trace]
 pub fn openapi_image_list() {}
 
+/// openapi image download.
 #[utoipa::path(
     get,
     path = "/api/order/image/download/{id}",

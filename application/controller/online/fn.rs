@@ -1,5 +1,6 @@
 use super::*;
 
+/// openapi online docs.
 #[utoipa::path(
     get,
     path = "/docs/online",

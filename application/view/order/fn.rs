@@ -1,5 +1,6 @@
 use super::*;
 
+/// Renders the order management page and serves as the OpenAPI documentation endpoint for order routes.
 #[utoipa::path(
     get,
     path = "/order",

@@ -1,5 +1,6 @@
 use super::*;
 
+/// OpenAPI documentation endpoint for the health check route.
 #[utoipa::path(
     get,
     path = "/health",

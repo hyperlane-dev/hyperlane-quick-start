@@ -1,6 +1,19 @@
 use super::*;
 
+/// Implementation of methods for `TraceService`.
 impl TraceService {
+    /// Searches for a trace identifier across server log files.
+    ///
+    /// Scans log directories in reverse chronological order, looking for lines containing
+    /// the trace identifier. Returns the matching log line with its preceding context line.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The trace identifier value to search for.
+    ///
+    /// # Returns
+    ///
+    /// - `String`: The matching log line with context, or a not-found message.
     #[instrument_trace]
     pub async fn search_trace(trace: &str) -> String {
         let env_config: &EnvConfig = EnvPlugin::get_or_init();

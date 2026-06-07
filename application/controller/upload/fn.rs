@@ -1,5 +1,6 @@
 use super::*;
 
+/// openapi upload register.
 #[utoipa::path(
     post,
     path = "/api/upload/register",
@@ -14,6 +15,7 @@ use super::*;
 #[instrument_trace]
 pub fn openapi_upload_register() {}
 
+/// openapi upload save.
 #[utoipa::path(
     post,
     path = "/api/upload/save",
@@ -28,6 +30,7 @@ pub fn openapi_upload_register() {}
 #[instrument_trace]
 pub fn openapi_upload_save() {}
 
+/// openapi upload merge.
 #[utoipa::path(
     post,
     path = "/api/upload/merge",

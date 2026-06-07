@@ -1,5 +1,6 @@
 use super::*;
 
+/// Renders the upload page and serves as the OpenAPI documentation endpoint for upload routes.
 #[utoipa::path(
     get,
     path = "/upload",
@@ -13,6 +14,7 @@ use super::*;
 #[instrument_trace]
 pub fn openapi_upload_view() {}
 
+/// Serves the file upload endpoint and serves as the OpenAPI documentation endpoint for file upload routes.
 #[utoipa::path(
     get,
     path = "/upload/file/{upload_dir}/{upload_file}",

@@ -1,5 +1,6 @@
 use super::*;
 
+/// Renders the EUV page and serves as the OpenAPI documentation endpoint for EUV routes.
 #[utoipa::path(
     get,
     path = "/euv",

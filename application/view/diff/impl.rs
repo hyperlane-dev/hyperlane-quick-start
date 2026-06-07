@@ -1,4 +1,5 @@
 use super::*;
+/// Implementation of `DiffViewRoute` for `ServerHook`.
 impl ServerHook for DiffViewRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `TemplatesRoute` for `ServerHook`.
 impl ServerHook for TemplatesRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

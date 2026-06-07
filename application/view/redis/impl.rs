@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `RedisViewRoute` for `ServerHook`.
 impl ServerHook for RedisViewRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

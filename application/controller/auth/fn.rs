@@ -1,5 +1,6 @@
 use super::*;
 
+/// openapi auth rsa public key.
 #[utoipa::path(
     get,
     path = "/api/auth/rsa/public-key",
@@ -11,6 +12,7 @@ use super::*;
 #[instrument_trace]
 pub fn openapi_auth_rsa_public_key() {}
 
+/// openapi auth register.
 #[utoipa::path(
     post,
     path = "/api/auth/register",
@@ -23,6 +25,7 @@ pub fn openapi_auth_rsa_public_key() {}
 #[instrument_trace]
 pub fn openapi_auth_register() {}
 
+/// openapi auth login.
 #[utoipa::path(
     post,
     path = "/api/auth/login",
@@ -36,6 +39,7 @@ pub fn openapi_auth_register() {}
 #[instrument_trace]
 pub fn openapi_auth_login() {}
 
+/// openapi auth user update.
 #[utoipa::path(
     post,
     path = "/api/auth/user/update/{id}",
@@ -53,6 +57,7 @@ pub fn openapi_auth_login() {}
 #[instrument_trace]
 pub fn openapi_auth_user_update() {}
 
+/// openapi auth user change password.
 #[utoipa::path(
     post,
     path = "/api/auth/user/change_password/{id}",
@@ -69,6 +74,7 @@ pub fn openapi_auth_user_update() {}
 #[instrument_trace]
 pub fn openapi_auth_user_change_password() {}
 
+/// openapi auth user update status.
 #[utoipa::path(
     post,
     path = "/api/auth/user/update_status/{id}",
@@ -84,6 +90,7 @@ pub fn openapi_auth_user_change_password() {}
 #[instrument_trace]
 pub fn openapi_auth_user_update_status() {}
 
+/// openapi auth user list.
 #[utoipa::path(
     get,
     path = "/api/auth/user/list",
@@ -96,6 +103,7 @@ pub fn openapi_auth_user_update_status() {}
 #[instrument_trace]
 pub fn openapi_auth_user_list() {}
 
+/// openapi auth user get.
 #[utoipa::path(
     get,
     path = "/api/auth/user/get/{id}",
@@ -112,6 +120,7 @@ pub fn openapi_auth_user_list() {}
 #[instrument_trace]
 pub fn openapi_auth_user_get() {}
 
+/// openapi auth user delete.
 #[utoipa::path(
     post,
     path = "/api/auth/user/delete/{id}",

@@ -1,5 +1,6 @@
 use super::*;
 
+/// openapi notification create.
 #[utoipa::path(
     post,
     path = "/api/notification/create",
@@ -13,6 +14,7 @@ use super::*;
 #[instrument_trace]
 pub fn openapi_notification_create() {}
 
+/// openapi notification list.
 #[utoipa::path(
     get,
     path = "/api/notification/list",
@@ -25,6 +27,7 @@ pub fn openapi_notification_create() {}
 #[instrument_trace]
 pub fn openapi_notification_list() {}
 
+/// openapi notification get.
 #[utoipa::path(
     get,
     path = "/api/notification/get/{id}",
@@ -41,6 +44,7 @@ pub fn openapi_notification_list() {}
 #[instrument_trace]
 pub fn openapi_notification_get() {}
 
+/// openapi notification read.
 #[utoipa::path(
     post,
     path = "/api/notification/read/{id}",
@@ -57,6 +61,7 @@ pub fn openapi_notification_get() {}
 #[instrument_trace]
 pub fn openapi_notification_read() {}
 
+/// openapi notification read all.
 #[utoipa::path(
     post,
     path = "/api/notification/read-all",
@@ -69,6 +74,7 @@ pub fn openapi_notification_read() {}
 #[instrument_trace]
 pub fn openapi_notification_read_all() {}
 
+/// openapi notification delete.
 #[utoipa::path(
     post,
     path = "/api/notification/delete/{id}",
@@ -85,6 +91,7 @@ pub fn openapi_notification_read_all() {}
 #[instrument_trace]
 pub fn openapi_notification_delete() {}
 
+/// openapi notification unread count.
 #[utoipa::path(
     get,
     path = "/api/notification/unread-count",

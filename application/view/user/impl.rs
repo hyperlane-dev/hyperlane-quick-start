@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `UserViewRoute` for `ServerHook`.
 impl ServerHook for UserViewRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

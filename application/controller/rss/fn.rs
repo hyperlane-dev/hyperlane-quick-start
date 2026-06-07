@@ -1,5 +1,6 @@
 use super::*;
 
+/// openapi rss feed.
 #[utoipa::path(
     get,
     path = "/api/rss/feed",

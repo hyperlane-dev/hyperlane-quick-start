@@ -1,6 +1,12 @@
 use super::*;
 
+/// Implementation of methods for `UploadService`.
 impl UploadService {
+    /// Generates a date-time based directory path for file storage (year/month/day/hour/minute).
+    ///
+    /// # Returns
+    ///
+    /// - `String`: The formatted directory path string.
     #[instrument_trace]
     pub fn get_base_file_dir() -> String {
         let (year, month, day, hour, minute, _, _, _) = calculate_time();
@@ -8,6 +14,16 @@ impl UploadService {
         full_dir
     }
 
+    /// Validates that a file ID is present, setting an error response if missing.
+    ///
+    /// # Arguments
+    ///
+    /// - `Option<String>`: The optional file ID from the request header.
+    /// - `&mut Context`: The request context for setting error responses.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<String, ()>`: The file ID if present, or an error.
     #[instrument_trace]
     async fn validate_file_id(
         file_id_opt: Option<String>,
@@ -26,6 +42,16 @@ impl UploadService {
         }
     }
 
+    /// Validates that the total chunks header is present and parseable, setting an error response if invalid.
+    ///
+    /// # Arguments
+    ///
+    /// - `Option<String>`: The optional total chunks value from the request header.
+    /// - `&mut Context`: The request context for setting error responses.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<usize, ()>`: The parsed total chunks count, or an error.
     #[instrument_trace]
     async fn validate_total_chunks(
         total_chunks_opt: Option<String>,
@@ -54,6 +80,16 @@ impl UploadService {
         }
     }
 
+    /// Validates that the file name header is present, URL-decoding it, setting an error response if missing.
+    ///
+    /// # Arguments
+    ///
+    /// - `Option<String>`: The optional file name from the request header.
+    /// - `&mut Context`: The request context for setting error responses.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<String, ()>`: The decoded file name, or an error.
     #[instrument_trace]
     async fn validate_file_name(
         file_name_opt: Option<String>,
@@ -72,6 +108,15 @@ impl UploadService {
         }
     }
 
+    /// Validates and URL-decodes a directory header, falling back to the base file dir if invalid or missing.
+    ///
+    /// # Arguments
+    ///
+    /// - `Option<String>`: The optional URL-encoded directory from the request header.
+    ///
+    /// # Returns
+    ///
+    /// - `String`: The decoded directory path, or the default base file dir.
     #[instrument_trace]
     fn validate_and_decode_directory(base_file_dir_opt: Option<String>) -> String {
         match base_file_dir_opt {
@@ -89,6 +134,15 @@ impl UploadService {
         }
     }
 
+    /// Checks if a directory path is valid (non-empty, no path traversal, digits and slashes only).
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The directory path to validate.
+    ///
+    /// # Returns
+    ///
+    /// - `bool`: `true` if the path is valid, `false` otherwise.
     #[instrument_trace]
     fn is_valid_directory_path(path: &str) -> bool {
         !path.is_empty()
@@ -96,6 +150,11 @@ impl UploadService {
             && path.chars().all(|c: char| c.is_ascii_digit() || c == '/')
     }
 
+    /// Extracts and validates file chunk data from request headers for a chunk upload registration.
+    ///
+    /// # Returns
+    ///
+    /// - `Option<FileChunkData>`: The validated file chunk data, or `None` if validation fails.
     #[try_get_request_header(HEADER_X_FILE_ID => file_id_opt)]
     #[try_get_request_header(HEADER_X_TOTAL_CHUNKS => total_chunks_opt)]
     #[try_get_request_header(HEADER_X_FILE_NAME => file_name_opt)]
@@ -120,6 +179,17 @@ impl UploadService {
         Some(data)
     }
 
+    /// Extracts and validates file chunk data for saving a chunk, including the chunk index.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Context`: The request context for setting error responses.
+    /// - `Option<String>`: The optional file ID.
+    /// - `Option<String>`: The optional chunk index.
+    ///
+    /// # Returns
+    ///
+    /// - `Option<FileChunkData>`: The validated file chunk data with chunk index, or `None`.
     #[instrument_trace]
     pub async fn get_save_file_chunk_data(
         ctx: &mut Context,
@@ -152,16 +222,36 @@ impl UploadService {
         Some(data)
     }
 
+    /// Adds a file chunk data entry to the in-memory file ID map via the repository.
+    ///
+    /// # Arguments
+    ///
+    /// - `&FileChunkData`: The file chunk data to register.
     #[instrument_trace]
     pub async fn add_file_id_map(data: &FileChunkData) {
         let _: () = FileChunkRepository::add_file_id_map(data).await;
     }
 
+    /// Removes a file chunk data entry from the in-memory file ID map via the repository.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The file ID to unregister.
     #[instrument_trace]
     pub async fn remove_file_id_map(file_id: &str) {
         let _: () = FileChunkRepository::remove_file_id_map(file_id).await;
     }
 
+    /// Retrieves file chunk data for merging by file ID from the in-memory map.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Context`: The request context for setting error responses.
+    /// - `Option<String>`: The optional file ID.
+    ///
+    /// # Returns
+    ///
+    /// - `Option<FileChunkData>`: The file chunk data if found, or `None`.
     #[instrument_trace]
     pub async fn get_merge_file_chunk_data(
         ctx: &mut Context,
@@ -183,6 +273,12 @@ impl UploadService {
         result
     }
 
+    /// Sets a common success response with status 200, the uploaded file URL, and a JSON body.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Context`: The request context to set the response on.
+    /// - `&str`: The URL of the uploaded file.
     #[instrument_trace]
     pub async fn set_common_success_response_body(ctx: &mut Context, url: &str) {
         ctx.get_mut_response().set_status_code(200);
@@ -192,6 +288,12 @@ impl UploadService {
         ctx.get_mut_response().set_body(&data_json);
     }
 
+    /// Sets a common error response with status 200 and the error message in a JSON body.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Context`: The request context to set the response on.
+    /// - `String`: The error message.
     #[instrument_trace]
     pub async fn set_common_error_response_body(ctx: &mut Context, error: String) {
         ctx.get_mut_response().set_status_code(200);
@@ -201,6 +303,16 @@ impl UploadService {
         ctx.get_mut_response().set_body(&data_json);
     }
 
+    /// Serves a static file by decoding the directory and file name, reading the file from disk.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The encoded directory path.
+    /// - `&str`: The encoded file name.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(Vec<u8>, String), String>`: The file data bytes and content type, or an error.
     #[instrument_trace]
     pub async fn serve_static_file(dir: &str, file: &str) -> Result<(Vec<u8>, String), String> {
         let decode_dir: String = Decode::execute(CHARSETS, dir).unwrap_or_default();
@@ -219,6 +331,16 @@ impl UploadService {
         Ok((data, content_type))
     }
 
+    /// Parses an HTTP Range header into a `RangeRequest` specifying start and optional end positions.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The raw Range header value (e.g., "bytes=0-1023").
+    /// - `u64`: The total file size in bytes.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<RangeRequest, String>`: The parsed range request, or an error if the format is invalid.
     #[instrument_trace]
     pub fn parse_range_header(range_header: &str, file_size: u64) -> Result<RangeRequest, String> {
         if !range_header.starts_with(RANGE_HEADER_PREFIX) {
@@ -261,6 +383,17 @@ impl UploadService {
         Ok(range_request)
     }
 
+    /// Reads a specific range of bytes from a file on disk.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The file path.
+    /// - `u64`: The starting byte offset.
+    /// - `u64`: The number of bytes to read.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Vec<u8>, String>`: The read byte buffer, or an error if the file cannot be opened or read.
     #[instrument_trace]
     pub async fn read_file_range(path: &str, start: u64, length: u64) -> Result<Vec<u8>, String> {
         use std::io::{Read, Seek, SeekFrom};
@@ -276,6 +409,16 @@ impl UploadService {
         Ok(buffer)
     }
 
+    /// Validates and URL-decodes the directory and file name from encoded parameters.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The encoded directory path.
+    /// - `&str`: The encoded file name.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(String, String), String>`: The decoded (directory, file name) tuple, or an error.
     #[instrument_trace]
     fn validate_file_paths(dir: &str, file: &str) -> Result<(String, String), String> {
         let decode_dir: String = Decode::execute(CHARSETS, dir).unwrap_or_default();
@@ -286,6 +429,16 @@ impl UploadService {
         Ok((decode_dir, decode_file))
     }
 
+    /// Retrieves file metadata and determines the content type based on the file extension.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The file path on disk.
+    /// - `&str`: The decoded file name for extension parsing.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(std::fs::Metadata, String), String>`: The file metadata and content type, or an error.
     #[instrument_trace]
     fn get_file_metadata_and_content_type(
         path: &str,
@@ -305,6 +458,18 @@ impl UploadService {
         Ok((file_metadata, content_type))
     }
 
+    /// Handles a range request by reading the specified byte range and building a partial content response.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The file path.
+    /// - `RangeRequest`: The range specification.
+    /// - `u64`: The total file size.
+    /// - `String`: The content type.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(PartialContent, String), String>`: The partial content and content type.
     #[instrument_trace]
     async fn handle_range_request(
         path: &str,
@@ -332,6 +497,17 @@ impl UploadService {
         Ok((partial_content, content_type))
     }
 
+    /// Handles a full file request by reading the entire file and building a partial content response.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The file path.
+    /// - `u64`: The total file size.
+    /// - `String`: The content type.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(PartialContent, String), String>`: The full file content and content type.
     #[instrument_trace]
     async fn handle_full_file_request(
         path: &str,
@@ -352,6 +528,17 @@ impl UploadService {
         Ok((partial_content, content_type))
     }
 
+    /// Serves a static file with optional range request support for partial content delivery.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The encoded directory path.
+    /// - `&str`: The encoded file name.
+    /// - `Option<RangeRequest>`: The optional range request for partial content.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(PartialContent, String), String>`: The file content (partial or full) and content type.
     #[instrument_trace]
     pub async fn serve_static_file_with_range(
         dir: &str,
@@ -369,6 +556,16 @@ impl UploadService {
         }
     }
 
+    /// Saves a file chunk to disk using the configured chunk strategy.
+    ///
+    /// # Arguments
+    ///
+    /// - `&FileChunkData`: The file chunk metadata.
+    /// - `Vec<u8>`: The chunk data bytes.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<String, String>`: The save directory path on success, or an error message.
     #[instrument_trace]
     pub async fn save_file_chunk(
         file_chunk_data: &FileChunkData,
@@ -399,6 +596,15 @@ impl UploadService {
         Ok(save_upload_dir.clone())
     }
 
+    /// Merges all file chunks into the final file and returns the file URL.
+    ///
+    /// # Arguments
+    ///
+    /// - `&FileChunkData`: The file chunk metadata containing file ID, name, and total chunks.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(String, String), String>`: A tuple of (save directory path, URL) on success, or an error.
     #[instrument_trace]
     pub async fn merge_file_chunks(
         file_chunk_data: &FileChunkData,

@@ -1,5 +1,6 @@
 use super::*;
 
+/// Renders the OpenAPI specification viewer page.
 #[utoipa::path(
     get,
     path = "/openapi",

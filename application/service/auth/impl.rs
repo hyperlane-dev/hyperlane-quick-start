@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `AuthService` for `Default`.
 impl Default for AuthService {
     fn default() -> Self {
         Self {
@@ -9,24 +10,58 @@ impl Default for AuthService {
     }
 }
 
+/// Implementation of methods for `PasswordUtil`.
 impl PasswordUtil {
+    /// Hashes a password using the compute digest algorithm and returns a hexadecimal string.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The plaintext password to hash.
+    ///
+    /// # Returns
+    ///
+    /// - `String`: The hexadecimal hash string of the password.
     #[instrument_trace]
     pub fn hash_password(password: &str) -> String {
         format!("{:x}", compute(password.as_bytes()))
     }
 
+    /// Verifies a plaintext password against a stored hash by comparing their hash values.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The plaintext password to verify.
+    /// - `&str`: The stored hash to compare against.
+    ///
+    /// # Returns
+    ///
+    /// - `bool`: `true` if the password matches the hash, `false` otherwise.
     #[instrument_trace]
     pub fn verify_password(password: &str, hash: &str) -> bool {
         Self::hash_password(password) == hash
     }
 }
 
+/// Implementation of methods for `AuthService`.
 impl AuthService {
+    /// Returns the singleton `AuthService` instance, initializing it on first access.
+    ///
+    /// # Returns
+    ///
+    /// - `&'static AuthService`: The static reference to the global auth service instance.
     #[instrument_trace]
     pub fn get_auth_service() -> &'static AuthService {
         AUTH_SERVICE.get_or_init(AuthService::default)
     }
 
+    /// Generates an RSA key pair and returns the public key in JWK format, caching the result.
+    ///
+    /// If a cached key pair exists and has not expired, returns the cached response.
+    /// Otherwise, generates a new key pair, stores the private key in memory, and caches the response.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<RsaPublicKeyResponse, String>`: The public key response with modulus and exponent, or an error message.
     #[instrument_trace]
     pub async fn generate_rsa_key_pair(&self) -> Result<RsaPublicKeyResponse, String> {
         if let Some(ref cache) = *self.rsa_key_cache.read().await
@@ -57,6 +92,15 @@ impl AuthService {
         Ok(response)
     }
 
+    /// Decrypts an RSA-encrypted field using the stored private key.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The base64-encoded encrypted text to decrypt.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<String, String>`: The decrypted plaintext, or an error if the private key is not initialized.
     #[instrument_trace]
     async fn decrypt_rsa_field(&self, encrypted_text: &str) -> Result<String, String> {
         let key_guard: RwLockReadGuard<'_, Option<RsaPrivateKey>> =
@@ -69,12 +113,30 @@ impl AuthService {
         Ok(decrypted)
     }
 
+    /// Encodes a numeric ID into an obfuscated string using the configured character set.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The numeric ID to encode.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<String, String>`: The encoded string, or an error if encoding fails.
     #[instrument_trace]
     pub fn encode_id(id: i32) -> Result<String, String> {
         Encode::execute(CHARSETS, &id.to_string())
             .map_err(|_: EncodeError| ERROR_FAILED_TO_ENCODE_ID.to_string())
     }
 
+    /// Decodes an obfuscated string back to the original numeric ID.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The encoded ID string.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<i32, String>`: The decoded numeric ID, or an error if the format is invalid.
     #[instrument_trace]
     pub fn decode_id(encoded_id: &str) -> Result<i32, String> {
         Decode::execute(CHARSETS, encoded_id)
@@ -83,6 +145,15 @@ impl AuthService {
             .map_err(|_: std::num::ParseIntError| ERROR_INVALID_ID_FORMAT.to_string())
     }
 
+    /// Extracts the user ID from the authentication token stored in the request cookie.
+    ///
+    /// # Arguments
+    ///
+    /// - `&Context`: The request context containing the cookie.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<i32, String>`: The extracted user ID, or an error if the token is missing or invalid.
     #[instrument_trace]
     pub fn extract_user_from_cookie(ctx: &Context) -> Result<i32, String> {
         let token: String = match ctx.get_request().try_get_cookie(TOKEN) {
@@ -108,6 +179,15 @@ impl AuthService {
         Ok(user_id)
     }
 
+    /// Validates the format of an email address using a compiled regex.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The email address to validate.
+    ///
+    /// # Returns
+    ///
+    /// - `bool`: `true` if the email matches the pattern, `false` otherwise or if the regex is not available.
     #[instrument_trace]
     fn validate_email(email: &str) -> bool {
         match EMAIL_REGEX.as_ref() {
@@ -116,6 +196,15 @@ impl AuthService {
         }
     }
 
+    /// Validates the format of a phone number using a compiled regex.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The phone number to validate.
+    ///
+    /// # Returns
+    ///
+    /// - `bool`: `true` if the phone matches the pattern, `false` otherwise or if the regex is not available.
     #[instrument_trace]
     fn validate_phone(phone: &str) -> bool {
         match PHONE_REGEX_OPT.as_ref() {
@@ -124,6 +213,15 @@ impl AuthService {
         }
     }
 
+    /// Registers a new user by decrypting RSA-encrypted credentials, validating them, and persisting to the database.
+    ///
+    /// # Arguments
+    ///
+    /// - `RegisterRequest`: The registration request containing encrypted username, password, email, and phone.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<UserResponse, String>`: The created user response, or an error if validation or persistence fails.
     #[instrument_trace]
     pub async fn register_user(&self, request: RegisterRequest) -> Result<UserResponse, String> {
         let decrypted_password: String = self.decrypt_rsa_field(request.get_password()).await?;
@@ -170,6 +268,15 @@ impl AuthService {
         Self::model_to_user_response(&result)
     }
 
+    /// Authenticates a user by decrypting RSA-encrypted credentials and verifying against the database.
+    ///
+    /// # Arguments
+    ///
+    /// - `LoginRequest`: The login request containing encrypted username and password.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(UserResponse, i32, i16), String>`: A tuple of (user response, user ID, role) on success, or an error.
     #[instrument_trace]
     pub async fn login_user(
         &self,
@@ -198,6 +305,16 @@ impl AuthService {
         }
     }
 
+    /// Updates a user's email and phone after decrypting RSA-encrypted fields and validating formats.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The user ID.
+    /// - `UpdateUserRequest`: The update request containing encrypted email and phone.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<UserResponse, String>`: The updated user response, or an error if the user is not found or validation fails.
     #[instrument_trace]
     pub async fn update_user(
         &self,
@@ -240,6 +357,16 @@ impl AuthService {
         }
     }
 
+    /// Changes a user's password after verifying the old password.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The user ID.
+    /// - `ChangePasswordRequest`: The request containing encrypted old and new passwords.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), String>`: Ok on success, or an error if the old password is incorrect or user is not found.
     #[instrument_trace]
     pub async fn change_password(
         &self,
@@ -270,6 +397,16 @@ impl AuthService {
         }
     }
 
+    /// Updates a user's status to approved or rejected based on the `approved` flag.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The user ID.
+    /// - `bool`: `true` to approve, `false` to reject.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<UserResponse, String>`: The updated user response, or an error if the user is not found.
     #[instrument_trace]
     pub async fn update_user_status(user_id: i32, approved: bool) -> Result<UserResponse, String> {
         match UserRepository::find_by_id(user_id).await? {
@@ -288,6 +425,15 @@ impl AuthService {
         }
     }
 
+    /// Lists users with cursor-based pagination and optional keyword filtering.
+    ///
+    /// # Arguments
+    ///
+    /// - `UserListQueryRequest`: The query parameters including keyword, last ID, and limit.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<UserListResponse, String>`: The paginated user list response with encoded IDs.
     #[instrument_trace]
     pub async fn list_users(query: UserListQueryRequest) -> Result<UserListResponse, String> {
         let limit: u64 = query.get_limit().unwrap_or(DEFAULT_PAGE_LIMIT);
@@ -316,6 +462,15 @@ impl AuthService {
         Ok(response)
     }
 
+    /// Retrieves a single user by ID and returns the user response.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The user ID.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Option<UserResponse>, String>`: The user response if found, or `None`.
     #[instrument_trace]
     pub async fn get_user(user_id: i32) -> Result<Option<UserResponse>, String> {
         match UserRepository::find_by_id(user_id).await? {
@@ -324,6 +479,15 @@ impl AuthService {
         }
     }
 
+    /// Deletes a user by ID after verifying the user exists.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The user ID.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), String>`: Ok on success, or an error if the user is not found.
     #[instrument_trace]
     pub async fn delete_user(user_id: i32) -> Result<(), String> {
         match UserRepository::find_by_id(user_id).await? {
@@ -335,6 +499,15 @@ impl AuthService {
         }
     }
 
+    /// Converts an `AuthUserModel` to a `UserResponse` with encoded ID and formatted fields.
+    ///
+    /// # Arguments
+    ///
+    /// - `&AuthUserModel`: The database model to convert.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<UserResponse, String>`: The converted user response, or an error if ID encoding fails.
     #[instrument_trace]
     fn model_to_user_response(model: &AuthUserModel) -> Result<UserResponse, String> {
         let mut response: UserResponse = UserResponse::default();

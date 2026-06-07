@@ -1,5 +1,6 @@
 use super::*;
 
+/// build auth redirect url.
 #[instrument_trace]
 pub fn build_auth_redirect_url(ctx: &Context) -> String {
     let current_path: String = ctx.get_request().get_path().clone();

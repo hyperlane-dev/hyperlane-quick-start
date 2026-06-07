@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `OpenApiViewRoute` for `ServerHook`.
 impl ServerHook for OpenApiViewRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

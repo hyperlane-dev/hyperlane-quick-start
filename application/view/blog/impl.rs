@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `BlogViewRoute` for `ServerHook`.
 impl ServerHook for BlogViewRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

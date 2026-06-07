@@ -1,5 +1,6 @@
 use super::*;
 
+/// OpenAPI documentation endpoint for the dataset fetching route.
 #[utoipa::path(
     get,
     path = "/dataset",

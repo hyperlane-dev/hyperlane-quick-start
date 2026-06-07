@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `EuvViewRoute` for `ServerHook`.
 impl ServerHook for EuvViewRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

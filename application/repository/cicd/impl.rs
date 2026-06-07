@@ -1,6 +1,18 @@
 use super::*;
 
+/// Database access methods for `PipelineRepository` using MySQL.
 impl PipelineRepository {
+    /// Creates a new pipeline record with the given name, description, and configuration content.
+    ///
+    /// # Arguments
+    ///
+    /// - `String`: The pipeline name.
+    /// - `Option<String>`: An optional description of the pipeline.
+    /// - `Option<String>`: An optional YAML configuration content.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<i32, String>`: The newly created pipeline identifier, or an error message.
     #[instrument_trace]
     pub async fn create(
         name: String,
@@ -18,6 +30,15 @@ impl PipelineRepository {
         Ok(result.get_id())
     }
 
+    /// Finds a pipeline by its unique identifier.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The pipeline identifier.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Option<CicdPipelineModel>, String>`: The pipeline model if found, or `None`.
     #[instrument_trace]
     pub async fn find_by_id(id: i32) -> Result<Option<CicdPipelineModel>, String> {
         let db: DatabaseConnection =
@@ -29,6 +50,11 @@ impl PipelineRepository {
         Ok(result)
     }
 
+    /// Retrieves all pipelines ordered by creation date descending.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Vec<CicdPipelineModel>, String>`: The list of all pipeline models.
     #[instrument_trace]
     pub async fn find_all() -> Result<Vec<CicdPipelineModel>, String> {
         let db: DatabaseConnection =
@@ -42,7 +68,21 @@ impl PipelineRepository {
     }
 }
 
+/// Database access methods for `RunRepository` using MySQL.
 impl RunRepository {
+    /// Creates a new run record for the given pipeline.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The pipeline identifier.
+    /// - `i32`: The sequential run number.
+    /// - `Option<String>`: The user who triggered the run.
+    /// - `Option<String>`: The commit hash associated with the run.
+    /// - `Option<String>`: The commit message associated with the run.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<CicdRunModel, String>`: The created run model, or an error message.
     #[instrument_trace]
     pub async fn create(
         pipeline_id: i32,
@@ -67,6 +107,15 @@ impl RunRepository {
         Ok(result)
     }
 
+    /// Finds a run by its unique identifier.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The run identifier.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Option<CicdRunModel>, String>`: The run model if found, or `None`.
     #[instrument_trace]
     pub async fn find_by_id(id: i32) -> Result<Option<CicdRunModel>, String> {
         let db: DatabaseConnection =
@@ -78,6 +127,15 @@ impl RunRepository {
         Ok(result)
     }
 
+    /// Finds all runs for the given pipeline ordered by creation date descending.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The pipeline identifier.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Vec<CicdRunModel>, String>`: The list of run models for the pipeline.
     #[instrument_trace]
     pub async fn find_by_pipeline(pipeline_id: i32) -> Result<Vec<CicdRunModel>, String> {
         let db: DatabaseConnection =
@@ -91,6 +149,18 @@ impl RunRepository {
         Ok(models)
     }
 
+    /// Queries runs with cursor-based pagination, filtering by pipeline and status.
+    ///
+    /// # Arguments
+    ///
+    /// - `Option<i32>`: Optional pipeline identifier filter.
+    /// - `Option<String>`: Optional status filter string.
+    /// - `Option<i32>`: Optional last ID for cursor-based pagination.
+    /// - `u64`: The page size.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(Vec<CicdRunModel>, i32, bool), String>`: The runs, total count, and has-more flag.
     #[instrument_trace]
     pub async fn query_with_pagination(
         pipeline_id: Option<i32>,
@@ -129,6 +199,15 @@ impl RunRepository {
         Ok((result, total, has_more))
     }
 
+    /// Retrieves the next sequential run number for the given pipeline.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The pipeline identifier.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<i32, String>`: The next run number (max existing + 1).
     #[instrument_trace]
     pub async fn get_next_run_number(pipeline_id: i32) -> Result<i32, String> {
         let db: DatabaseConnection =
@@ -145,6 +224,15 @@ impl RunRepository {
         Ok(max_number + 1)
     }
 
+    /// Marks a run as started by setting its status to Running and recording the start timestamp.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The run identifier.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), String>`: Ok on success, or an error message.
     #[instrument_trace]
     pub async fn start(id: i32) -> Result<(), String> {
         let db: DatabaseConnection =
@@ -163,6 +251,16 @@ impl RunRepository {
         Ok(())
     }
 
+    /// Marks a run as completed with the given status, recording the completion timestamp and duration.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The run identifier.
+    /// - `CicdStatus`: The final status (Success or Failure).
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), String>`: Ok on success, or an error message.
     #[instrument_trace]
     pub async fn complete(id: i32, status: CicdStatus) -> Result<(), String> {
         let db: DatabaseConnection =
@@ -188,6 +286,16 @@ impl RunRepository {
         Ok(())
     }
 
+    /// Updates only the status of a run by its identifier.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The run identifier.
+    /// - `CicdStatus`: The new status to set.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), String>`: Ok on success, or an error message.
     #[instrument_trace]
     pub async fn update_status(id: i32, status: CicdStatus) -> Result<(), String> {
         let db: DatabaseConnection =
@@ -201,6 +309,15 @@ impl RunRepository {
         Ok(())
     }
 
+    /// Finds all runs with the specified status.
+    ///
+    /// # Arguments
+    ///
+    /// - `CicdStatus`: The status to filter by.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Vec<CicdRunModel>, String>`: The list of runs matching the status.
     #[instrument_trace]
     pub async fn find_by_status(status: CicdStatus) -> Result<Vec<CicdRunModel>, String> {
         let db: DatabaseConnection =
@@ -214,7 +331,18 @@ impl RunRepository {
     }
 }
 
+/// Database access methods for `JobRepository` using MySQL.
 impl JobRepository {
+    /// Creates a new job associated with the given run.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The run identifier to associate the job with.
+    /// - `String`: The name of the job.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<CicdJobModel, String>`: The created job model, or an error message.
     #[instrument_trace]
     pub async fn create(run_id: i32, name: String) -> Result<CicdJobModel, String> {
         let db: DatabaseConnection =
@@ -227,6 +355,15 @@ impl JobRepository {
         Ok(result)
     }
 
+    /// Finds a job by its unique identifier.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The job identifier.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Option<CicdJobModel>, String>`: The job model if found, or `None`.
     #[instrument_trace]
     pub async fn find_by_id(id: i32) -> Result<Option<CicdJobModel>, String> {
         let db: DatabaseConnection =
@@ -238,6 +375,15 @@ impl JobRepository {
         Ok(result)
     }
 
+    /// Finds all jobs belonging to the specified run, ordered by creation time.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The run identifier.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Vec<CicdJobModel>, String>`: The list of jobs for the run.
     #[instrument_trace]
     pub async fn find_by_run(run_id: i32) -> Result<Vec<CicdJobModel>, String> {
         let db: DatabaseConnection =
@@ -251,6 +397,17 @@ impl JobRepository {
         Ok(models)
     }
 
+    /// Updates the status of a job, setting timestamps and runner info based on the status.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The job identifier.
+    /// - `CicdStatus`: The new status to set.
+    /// - `Option<String>`: The optional runner identifier.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), String>`: Ok on success, or an error message.
     #[instrument_trace]
     pub async fn update_status(
         id: i32,
@@ -300,6 +457,16 @@ impl JobRepository {
         Ok(())
     }
 
+    /// Finds all jobs for a given run that match the specified status.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The run identifier.
+    /// - `CicdStatus`: The status to filter by.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Vec<CicdJobModel>, String>`: The list of matching jobs.
     #[instrument_trace]
     pub async fn find_by_run_and_status(
         run_id: i32,
@@ -317,7 +484,19 @@ impl JobRepository {
     }
 }
 
+/// Database access methods for `StepRepository` using MySQL.
 impl StepRepository {
+    /// Creates a new step associated with the given job.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The job identifier to associate the step with.
+    /// - `String`: The name of the step.
+    /// - `Option<String>`: The optional shell command to execute.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<CicdStepModel, String>`: The created step model, or an error message.
     #[instrument_trace]
     pub async fn create(
         job_id: i32,
@@ -334,6 +513,15 @@ impl StepRepository {
         Ok(result)
     }
 
+    /// Finds a step by its unique identifier.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The step identifier.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Option<CicdStepModel>, String>`: The step model if found, or `None`.
     #[instrument_trace]
     pub async fn find_by_id(id: i32) -> Result<Option<CicdStepModel>, String> {
         let db: DatabaseConnection =
@@ -345,6 +533,15 @@ impl StepRepository {
         Ok(result)
     }
 
+    /// Finds all steps belonging to the specified job, ordered by creation time.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The job identifier.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Vec<CicdStepModel>, String>`: The list of steps for the job.
     #[instrument_trace]
     pub async fn find_by_job(job_id: i32) -> Result<Vec<CicdStepModel>, String> {
         let db: DatabaseConnection =
@@ -358,6 +555,17 @@ impl StepRepository {
         Ok(models)
     }
 
+    /// Updates the status of a step, setting timestamps and output based on the status.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The step identifier.
+    /// - `CicdStatus`: The new status to set.
+    /// - `Option<String>`: The optional step output content.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), String>`: Ok on success, or an error message.
     #[instrument_trace]
     pub async fn update_status(
         id: i32,
@@ -408,6 +616,16 @@ impl StepRepository {
         Ok(())
     }
 
+    /// Finds all steps for a given job that match the specified status.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32`: The job identifier.
+    /// - `CicdStatus`: The status to filter by.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Vec<CicdStepModel>, String>`: The list of matching steps.
     #[instrument_trace]
     pub async fn find_by_job_and_status(
         job_id: i32,

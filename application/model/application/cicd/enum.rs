@@ -1,5 +1,6 @@
 use super::*;
 
+/// Enumeration of cicd status.
 #[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize, ToSchema)]
 pub enum CicdStatus {
     #[default]
@@ -17,6 +18,7 @@ pub enum CicdStatus {
     Skipped,
 }
 
+/// Enumeration of trigger type.
 #[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize, ToSchema)]
 pub enum TriggerType {
     #[serde(rename = "push")]

@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `RssViewRoute` for `ServerHook`.
 impl ServerHook for RssViewRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

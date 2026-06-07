@@ -1,5 +1,6 @@
 use super::*;
 
+/// openapi monitor view.
 #[utoipa::path(
     get,
     path = "/monitor",

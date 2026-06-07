@@ -1,5 +1,6 @@
 use super::*;
 
+/// Enumeration of timezone.
 #[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub enum Timezone {
     #[default]

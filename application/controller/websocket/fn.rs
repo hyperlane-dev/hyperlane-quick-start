@@ -1,5 +1,6 @@
 use super::*;
 
+/// OpenAPI documentation endpoint for the WebSocket route.
 #[utoipa::path(
     get,
     path = "/websocket",

@@ -1,6 +1,12 @@
 use super::*;
 
+/// Room subscription and message broadcasting management for `RoomBroadcastManager`.
 impl RoomBroadcastManager {
+    /// Creates a new `RoomBroadcastManager` with empty broadcast channels and user subscriptions.
+    ///
+    /// # Returns
+    ///
+    /// - `RoomBroadcastManager`: A new instance with no active rooms or subscribers.
     #[instrument_trace]
     pub fn new() -> Self {
         Self {
@@ -9,6 +15,12 @@ impl RoomBroadcastManager {
         }
     }
 
+    /// Subscribes a user to a room's broadcast channel, switching from their previous room if any.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The unique identifier of the user.
+    /// - `&str`: The identifier of the room to subscribe to.
     #[instrument_trace]
     pub async fn subscribe_to_room(&self, user_id: &str, room_id: &str) {
         let mut subs: RwLockWriteGuard<'_, HashMap<String, String>> =
@@ -27,6 +39,11 @@ impl RoomBroadcastManager {
         trace!("User {user_id} subscribed to room {room_id}");
     }
 
+    /// Removes a user from their subscribed room's broadcast channel.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The unique identifier of the user to unsubscribe.
     #[instrument_trace]
     pub async fn unsubscribe_user(&self, user_id: &str) {
         let mut subs: RwLockWriteGuard<'_, HashMap<String, String>> =
@@ -36,6 +53,12 @@ impl RoomBroadcastManager {
         }
     }
 
+    /// Sends a message to all subscribers of the specified room.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The identifier of the target room.
+    /// - `&str`: The message content to broadcast.
     #[instrument_trace]
     pub fn broadcast_to_room(&self, room_id: &str, message: &str) {
         if self
@@ -49,6 +72,15 @@ impl RoomBroadcastManager {
         }
     }
 
+    /// Returns the room identifier that the user is currently subscribed to.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The unique identifier of the user.
+    ///
+    /// # Returns
+    ///
+    /// - `Option<String>`: The room identifier if the user is subscribed, or `None`.
     #[instrument_trace]
     pub async fn get_user_room(&self, user_id: &str) -> Option<String> {
         let subs: RwLockReadGuard<'_, HashMap<String, String>> =
@@ -57,6 +89,7 @@ impl RoomBroadcastManager {
     }
 }
 
+/// Default implementation for `RoomBroadcastManager`, delegating to `new`.
 impl Default for RoomBroadcastManager {
     #[instrument_trace]
     fn default() -> Self {
@@ -64,12 +97,15 @@ impl Default for RoomBroadcastManager {
     }
 }
 
+/// WebSocket connection hook that re-subscribes users to their rooms on reconnect.
 impl ServerHook for GomokuConnectedHook {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
+    /// Handles a WebSocket connection by looking up the user's room and subscribing them
+    /// to receive room state updates upon reconnection.
     #[try_get_request_query("uuid" => uuid_opt)]
     #[instrument_trace]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
@@ -96,12 +132,15 @@ impl ServerHook for GomokuConnectedHook {
     }
 }
 
+/// WebSocket request hook that processes Gomoku game actions and broadcasts updates.
 impl ServerHook for GomokuRequestHook {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
+    /// Handles incoming WebSocket messages by dispatching to `GomokuWebSocketService`
+    /// and broadcasting room state changes to all subscribers.
     #[try_get_request_query("uid" => uid_opt)]
     #[request_body_json_result(req_data_res: GomokuWsRequest)]
     #[instrument_trace]
@@ -128,6 +167,7 @@ impl ServerHook for GomokuRequestHook {
     }
 }
 
+/// Post-send hook for Gomoku WebSocket messages (no-op).
 impl ServerHook for GomokuSendedHook {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -140,12 +180,14 @@ impl ServerHook for GomokuSendedHook {
     }
 }
 
+/// WebSocket disconnection hook that unsubscribes users from their rooms.
 impl ServerHook for GomokuClosedHook {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
+    /// Handles a WebSocket disconnection by removing the user from their subscribed room.
     #[try_get_request_query("uid" => uid_opt)]
     #[instrument_trace]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
@@ -160,7 +202,19 @@ impl ServerHook for GomokuClosedHook {
     }
 }
 
+/// Game logic handlers and message building for `GomokuWebSocketService`.
 impl GomokuWebSocketService {
+    /// Handles a ping message by responding with a pong, keeping the WebSocket connection alive.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream`: The WebSocket stream (unused).
+    /// - `&mut Context`: The request context used to set the response body.
+    /// - `&GomokuWsRequest`: The incoming ping request.
+    ///
+    /// # Returns
+    ///
+    /// - `bool`: `true` if the request was a ping and was handled, `false` otherwise.
     #[try_get_request_query("uid" => uid_opt)]
     #[instrument_trace]
     pub async fn handle_ping_request(
@@ -183,6 +237,17 @@ impl GomokuWebSocketService {
         false
     }
 
+    /// Dispatches a Gomoku WebSocket request to the appropriate handler based on message type.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Context`: The request context.
+    /// - `&GomokuWsRequest`: The incoming game request.
+    /// - `&str`: The sender's user identifier.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(ResponseBody, String), String>`: The response body and room identifier on success, or an error message.
     #[instrument_trace]
     pub async fn handle_request(
         _: &mut Context,
@@ -200,6 +265,16 @@ impl GomokuWebSocketService {
         }
     }
 
+    /// Creates a new Gomoku game room with the sender as the first player.
+    ///
+    /// # Arguments
+    ///
+    /// - `&GomokuWsRequest`: The request containing the optional room identifier.
+    /// - `&str`: The creator's user identifier.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(ResponseBody, String), String>`: The room state response and room identifier, or an error if the room already exists.
     #[instrument_trace]
     async fn handle_create_room(
         req_data: &GomokuWsRequest,
@@ -226,6 +301,16 @@ impl GomokuWebSocketService {
         Ok((resp_body, room_id))
     }
 
+    /// Joins an existing Gomoku room as the second player and starts the game if both players are present.
+    ///
+    /// # Arguments
+    ///
+    /// - `&GomokuWsRequest`: The request containing the room identifier.
+    /// - `&str`: The joining player's user identifier.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(ResponseBody, String), String>`: The room state response and room identifier, or an error if the room is not found or full.
     #[instrument_trace]
     async fn handle_join_room(
         req_data: &GomokuWsRequest,
@@ -252,6 +337,16 @@ impl GomokuWebSocketService {
         Ok((resp_body, room_id))
     }
 
+    /// Joins a Gomoku room as a spectator to observe the game without participating.
+    ///
+    /// # Arguments
+    ///
+    /// - `&GomokuWsRequest`: The request containing the room identifier.
+    /// - `&str`: The spectator's user identifier.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(ResponseBody, String), String>`: The room state response and room identifier, or an error if the room is not found or already joined.
     #[instrument_trace]
     async fn handle_spectate(
         req_data: &GomokuWsRequest,
@@ -278,6 +373,16 @@ impl GomokuWebSocketService {
         Ok((resp_body, room_id))
     }
 
+    /// Removes a user from a Gomoku room, cleaning up the room if it becomes empty.
+    ///
+    /// # Arguments
+    ///
+    /// - `&GomokuWsRequest`: The request containing the room identifier.
+    /// - `&str`: The leaving user's identifier.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(ResponseBody, String), String>`: The updated room state response and room identifier, or an error if the room or user is not found.
     #[instrument_trace]
     async fn handle_leave(
         req_data: &GomokuWsRequest,
@@ -317,6 +422,16 @@ impl GomokuWebSocketService {
         Ok((resp_body, room_id))
     }
 
+    /// Places a stone on the Gomoku board at the specified position and checks for a win.
+    ///
+    /// # Arguments
+    ///
+    /// - `&GomokuWsRequest`: The request containing the room identifier and position payload.
+    /// - `&str`: The player's user identifier.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(ResponseBody, String), String>`: The move result and room state response, or an error if the move is invalid.
     #[instrument_trace]
     async fn handle_place_stone(
         req_data: &GomokuWsRequest,
@@ -338,6 +453,16 @@ impl GomokuWebSocketService {
         Ok((resp_body, room_id))
     }
 
+    /// Synchronizes the client with the current room state, ensuring the board is initialized.
+    ///
+    /// # Arguments
+    ///
+    /// - `&GomokuWsRequest`: The request containing the room identifier.
+    /// - `&str`: The user's identifier.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(ResponseBody, String), String>`: The current room state response and room identifier, or an error if the room is not found.
     #[instrument_trace]
     async fn handle_sync(
         req_data: &GomokuWsRequest,
@@ -364,6 +489,15 @@ impl GomokuWebSocketService {
         Ok((resp_body, room_id))
     }
 
+    /// Extracts the (x, y) board position from the JSON payload of a place-stone request.
+    ///
+    /// # Arguments
+    ///
+    /// - `&serde_json::Value`: The payload containing "x" and "y" fields.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(usize, usize), String>`: The parsed coordinates on success, or an error message if values are missing or invalid.
     #[instrument_trace]
     fn parse_position(payload: &serde_json::Value) -> Result<(usize, usize), String> {
         let x: usize = payload
@@ -377,6 +511,18 @@ impl GomokuWebSocketService {
         Ok((x, y))
     }
 
+    /// Constructs a serialized WebSocket response body with the given message type, room, sender, and payload.
+    ///
+    /// # Arguments
+    ///
+    /// - `GomokuMessageType`: The type of the response message.
+    /// - `&str`: The room identifier.
+    /// - `&str`: The sender's user identifier.
+    /// - `serde_json::Value`: The JSON payload to include in the response.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<ResponseBody, String>`: The serialized response body on success, or a serialization error message.
     #[instrument_trace]
     fn build_response_body(
         msg_type: GomokuMessageType,
@@ -393,6 +539,17 @@ impl GomokuWebSocketService {
         serde_json::to_vec(&resp).map_err(|error: serde_json::Error| error.to_string())
     }
 
+    /// Builds an error response body for a failed Gomoku WebSocket request.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The sender's user identifier.
+    /// - `&GomokuWsRequest`: The original request that caused the error.
+    /// - `String`: The error message to include in the response.
+    ///
+    /// # Returns
+    ///
+    /// - `ResponseBody`: The serialized error response body.
     #[instrument_trace]
     pub fn error_response(
         sender_id: &str,
@@ -409,6 +566,13 @@ impl GomokuWebSocketService {
         .unwrap_or_default()
     }
 
+    /// Broadcasts a response to all users in a Gomoku room via WebSocket.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The identifier of the room to broadcast to.
+    /// - `&str`: The sender's user identifier (for logging only).
+    /// - `&ResponseBody`: The response body to send to each room member.
     #[instrument_trace]
     pub async fn broadcast_room(room_id: &str, sender_id: &str, resp_body: &ResponseBody) {
         let user_ids: Vec<String> = GomokuRoomMapper::get_room_user_ids(room_id).await;
@@ -421,6 +585,15 @@ impl GomokuWebSocketService {
         trace!("Broadcasted message to room {room_id} from {sender_id}");
     }
 
+    /// Generates a unique room identifier by combining the sender's identifier with the current timestamp.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The creator's user identifier.
+    ///
+    /// # Returns
+    ///
+    /// - `String`: A unique room identifier in the format "{sender_id}_{timestamp_millis}".
     #[instrument_trace]
     fn generate_room_id(sender_id: &str) -> String {
         let timestamp: i64 = Utc::now().timestamp_millis();

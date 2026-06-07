@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `BlogPostCreateRoute` for `ServerHook`.
 impl ServerHook for BlogPostCreateRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -49,6 +50,7 @@ impl ServerHook for BlogPostCreateRoute {
     }
 }
 
+/// Implementation of `BlogPostUpdateRoute` for `ServerHook`.
 impl ServerHook for BlogPostUpdateRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -116,6 +118,7 @@ impl ServerHook for BlogPostUpdateRoute {
     }
 }
 
+/// Implementation of `BlogPostDeleteRoute` for `ServerHook`.
 impl ServerHook for BlogPostDeleteRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -173,6 +176,7 @@ impl ServerHook for BlogPostDeleteRoute {
     }
 }
 
+/// Implementation of `BlogPostGetRoute` for `ServerHook`.
 impl ServerHook for BlogPostGetRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -226,6 +230,7 @@ impl ServerHook for BlogPostGetRoute {
     }
 }
 
+/// Implementation of `BlogPostListRoute` for `ServerHook`.
 impl ServerHook for BlogPostListRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -276,6 +281,7 @@ impl ServerHook for BlogPostListRoute {
     }
 }
 
+/// Implementation of `BlogPostMyListRoute` for `ServerHook`.
 impl ServerHook for BlogPostMyListRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -329,6 +335,7 @@ impl ServerHook for BlogPostMyListRoute {
     }
 }
 
+/// Implementation of `BlogPostLikeRoute` for `ServerHook`.
 impl ServerHook for BlogPostLikeRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -386,6 +393,7 @@ impl ServerHook for BlogPostLikeRoute {
     }
 }
 
+/// Implementation of `BlogPostFavoriteRoute` for `ServerHook`.
 impl ServerHook for BlogPostFavoriteRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -443,6 +451,7 @@ impl ServerHook for BlogPostFavoriteRoute {
     }
 }
 
+/// Implementation of `BlogPostFavoriteListRoute` for `ServerHook`.
 impl ServerHook for BlogPostFavoriteListRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -492,6 +501,7 @@ impl ServerHook for BlogPostFavoriteListRoute {
     }
 }
 
+/// Implementation of `BlogCommentCreateRoute` for `ServerHook`.
 impl ServerHook for BlogCommentCreateRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -541,6 +551,7 @@ impl ServerHook for BlogCommentCreateRoute {
     }
 }
 
+/// Implementation of `BlogCommentDeleteRoute` for `ServerHook`.
 impl ServerHook for BlogCommentDeleteRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -600,6 +611,7 @@ impl ServerHook for BlogCommentDeleteRoute {
     }
 }
 
+/// Implementation of `BlogCommentListRoute` for `ServerHook`.
 impl ServerHook for BlogCommentListRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -649,6 +661,7 @@ impl ServerHook for BlogCommentListRoute {
     }
 }
 
+/// Implementation of `BlogImageUploadRoute` for `ServerHook`.
 impl ServerHook for BlogImageUploadRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -716,6 +729,7 @@ impl ServerHook for BlogImageUploadRoute {
     }
 }
 
+/// Implementation of `BlogImageDownloadRoute` for `ServerHook`.
 impl ServerHook for BlogImageDownloadRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

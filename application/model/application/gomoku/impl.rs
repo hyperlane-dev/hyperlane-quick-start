@@ -1,5 +1,6 @@
 use super::*;
 
+/// Default implementation for `GameStatus`, defaulting to `Waiting`.
 impl Default for GameStatus {
     #[instrument_trace]
     fn default() -> Self {
@@ -7,6 +8,7 @@ impl Default for GameStatus {
     }
 }
 
+/// Default implementation for `StoneColor`, defaulting to `Black`.
 impl Default for StoneColor {
     #[instrument_trace]
     fn default() -> Self {
@@ -14,7 +16,13 @@ impl Default for StoneColor {
     }
 }
 
+/// Color conversion and manipulation methods for `StoneColor`.
 impl StoneColor {
+    /// Returns the opposite stone color (Black ↔ White).
+    ///
+    /// # Returns
+    ///
+    /// - `StoneColor`: The opposite color.
     #[instrument_trace]
     pub fn opposite(&self) -> Self {
         match self {
@@ -23,6 +31,11 @@ impl StoneColor {
         }
     }
 
+    /// Converts the stone color to its numeric board representation.
+    ///
+    /// # Returns
+    ///
+    /// - `u8`: `1` for Black, `2` for White.
     #[instrument_trace]
     pub fn to_value(&self) -> u8 {
         match self {
@@ -32,6 +45,7 @@ impl StoneColor {
     }
 }
 
+/// Default implementation for `GomokuMessageType`, defaulting to `Unknown`.
 impl Default for GomokuMessageType {
     #[instrument_trace]
     fn default() -> Self {
@@ -39,6 +53,7 @@ impl Default for GomokuMessageType {
     }
 }
 
+/// Default implementation for `GomokuRoom`, creating an empty room with default settings.
 impl Default for GomokuRoom {
     #[instrument_trace]
     fn default() -> Self {

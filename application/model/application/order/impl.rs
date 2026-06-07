@@ -1,6 +1,8 @@
 use super::*;
 
+/// Implementation of methods for `JwtConfigEnum`.
 impl JwtConfigEnum {
+    /// expiration as u64.
     #[instrument_trace]
     pub fn expiration_as_u64(&self) -> u64 {
         match self {
@@ -10,6 +12,7 @@ impl JwtConfigEnum {
     }
 }
 
+/// Implementation of `JwtConfigEnum` for `std::fmt::Display`.
 impl std::fmt::Display for JwtConfigEnum {
     #[instrument_trace]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -21,6 +24,7 @@ impl std::fmt::Display for JwtConfigEnum {
     }
 }
 
+/// Implementation of `TransactionType` for `std::fmt::Display`.
 impl std::fmt::Display for TransactionType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -30,7 +34,13 @@ impl std::fmt::Display for TransactionType {
     }
 }
 
+/// Implementation of methods for `TransactionType`.
 impl TransactionType {
+    /// Returns the string representation of the transaction type or weekday.
+    ///
+    /// # Returns
+    ///
+    /// - `&'static str`: The static string slice representing the variant.
     pub fn as_str(&self) -> &'static str {
         match self {
             TransactionType::Income => "income",
@@ -39,6 +49,7 @@ impl TransactionType {
     }
 }
 
+/// Implementation of methods for `From`.
 impl From<&str> for TransactionType {
     fn from(s: &str) -> Self {
         match s {
@@ -48,13 +59,20 @@ impl From<&str> for TransactionType {
     }
 }
 
+/// Implementation of `WeekDay` for `std::fmt::Display`.
 impl std::fmt::Display for WeekDay {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
+/// Implementation of methods for `WeekDay`.
 impl WeekDay {
+    /// Returns the string representation of the transaction type or weekday.
+    ///
+    /// # Returns
+    ///
+    /// - `&'static str`: The static string slice representing the variant.
     pub fn as_str(&self) -> &'static str {
         match self {
             WeekDay::Monday => WEEK_DAYS[0],
@@ -68,6 +86,7 @@ impl WeekDay {
     }
 }
 
+/// Implementation of methods for `From`.
 impl From<u32> for WeekDay {
     fn from(num: u32) -> Self {
         match num % 7 {

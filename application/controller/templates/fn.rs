@@ -1,5 +1,6 @@
 use super::*;
 
+/// OpenAPI documentation endpoint for the templates rendering route.
 #[utoipa::path(
     get,
     path = "/templates",

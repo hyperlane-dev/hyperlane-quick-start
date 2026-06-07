@@ -2,6 +2,11 @@ use super::*;
 
 /// Implementation of `BootstrapSyncInit` for `LoggerBootstrap`, configuring and initializing the logger on startup.
 impl BootstrapSyncInit for LoggerBootstrap {
+    /// Initializes the logger bootstrap by loading environment configuration and configuring the file logger.
+    ///
+    /// # Returns
+    ///
+    /// - `Self`: The initialized `LoggerBootstrap` instance.
     fn init() -> Self {
         let env_config: &EnvConfig = EnvPlugin::get_or_init();
         let mut file_logger: FileLogger = FileLogger::default();

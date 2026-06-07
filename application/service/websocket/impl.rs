@@ -1,6 +1,16 @@
 use super::*;
 
+/// Implementation of methods for `WebSocketService`.
 impl WebSocketService {
+    /// Serializes a `WebSocketMessage` into a JSON response body with a timestamp.
+    ///
+    /// # Arguments
+    ///
+    /// - `&WebSocketMessage`: The message to serialize.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<String, String>`: The JSON string of the response, or an error if serialization fails or the message is invalid.
     #[instrument_trace]
     pub fn get_response_body(body: &WebSocketMessage) -> Result<String, String> {
         if body.is_valid() {

@@ -1,5 +1,6 @@
 use super::*;
 
+/// Renders the diff comparison page and serves as the OpenAPI documentation endpoint for diff routes.
 #[utoipa::path(
     get,
     path = "/diff",

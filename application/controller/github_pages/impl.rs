@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `SyncGithubPagesRoute` for `ServerHook`.
 impl ServerHook for SyncGithubPagesRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -58,6 +59,7 @@ impl ServerHook for SyncGithubPagesRoute {
     }
 }
 
+/// Implementation of `ListGithubPagesRoute` for `ServerHook`.
 impl ServerHook for ListGithubPagesRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -87,6 +89,7 @@ impl ServerHook for ListGithubPagesRoute {
     }
 }
 
+/// Implementation of `GetGithubPagesResourcesRoute` for `ServerHook`.
 impl ServerHook for GetGithubPagesResourcesRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -140,6 +143,7 @@ impl ServerHook for GetGithubPagesResourcesRoute {
     }
 }
 
+/// Implementation of `DeleteGithubPagesRoute` for `ServerHook`.
 impl ServerHook for DeleteGithubPagesRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

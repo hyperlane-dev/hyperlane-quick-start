@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `OnlineConnectedHook` for `ServerHook`.
 impl ServerHook for OnlineConnectedHook {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -17,6 +18,7 @@ impl ServerHook for OnlineConnectedHook {
     }
 }
 
+/// Implementation of `OnlineClosedHook` for `ServerHook`.
 impl ServerHook for OnlineClosedHook {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -34,6 +36,7 @@ impl ServerHook for OnlineClosedHook {
     }
 }
 
+/// Implementation of methods for `OnlineService`.
 impl OnlineService {
     #[instrument_trace]
     async fn broadcast_online_count(key: BroadcastType<String>, count: ReceiverCount) {

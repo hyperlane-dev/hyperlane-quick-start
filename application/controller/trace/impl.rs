@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `TraceRoute` for `ServerHook`.
 impl ServerHook for TraceRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

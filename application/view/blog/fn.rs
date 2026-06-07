@@ -1,5 +1,6 @@
 use super::*;
 
+/// Renders the blog page and serves as the OpenAPI documentation endpoint for blog routes.
 #[utoipa::path(
     get,
     path = "/blog",

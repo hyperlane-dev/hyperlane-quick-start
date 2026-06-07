@@ -1,5 +1,6 @@
 use super::*;
 
+/// Renders the CI/CD page and serves as the OpenAPI documentation endpoint for CI/CD routes.
 #[utoipa::path(
     get,
     path = "/cicd",

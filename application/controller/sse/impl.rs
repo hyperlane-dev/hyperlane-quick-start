@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `SseRoute` for `ServerHook`.
 impl ServerHook for SseRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

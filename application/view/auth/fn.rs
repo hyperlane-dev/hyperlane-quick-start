@@ -1,5 +1,6 @@
 use super::*;
 
+/// Renders the authentication page and serves as the OpenAPI documentation endpoint for auth routes.
 #[utoipa::path(
     get,
     path = "/auth",

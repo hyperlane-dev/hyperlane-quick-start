@@ -1,5 +1,6 @@
 use super::*;
 
+/// openapi openapi json.
 #[utoipa::path(
     get,
     path = "/openapi/openapi.json",

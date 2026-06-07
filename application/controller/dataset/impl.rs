@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `DatasetRoute` for `ServerHook`.
 impl ServerHook for DatasetRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

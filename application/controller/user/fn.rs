@@ -1,5 +1,6 @@
 use super::*;
 
+/// openapi user list.
 #[utoipa::path(
     get,
     path = "/api/user/list",
@@ -12,6 +13,7 @@ use super::*;
 #[instrument_trace]
 pub fn openapi_user_list() {}
 
+/// openapi user get.
 #[utoipa::path(
     get,
     path = "/api/user/get/{id}",
@@ -28,6 +30,7 @@ pub fn openapi_user_list() {}
 #[instrument_trace]
 pub fn openapi_user_get() {}
 
+/// openapi user update.
 #[utoipa::path(
     post,
     path = "/api/user/update/{id}",
@@ -45,6 +48,7 @@ pub fn openapi_user_get() {}
 #[instrument_trace]
 pub fn openapi_user_update() {}
 
+/// openapi user change password.
 #[utoipa::path(
     post,
     path = "/api/user/change_password/{id}",
@@ -61,6 +65,7 @@ pub fn openapi_user_update() {}
 #[instrument_trace]
 pub fn openapi_user_change_password() {}
 
+/// openapi user update status.
 #[utoipa::path(
     post,
     path = "/api/user/update_status/{id}",
@@ -76,6 +81,7 @@ pub fn openapi_user_change_password() {}
 #[instrument_trace]
 pub fn openapi_user_update_status() {}
 
+/// openapi user delete.
 #[utoipa::path(
     post,
     path = "/api/user/delete/{id}",

@@ -1,5 +1,6 @@
 use super::*;
 
+/// openapi blog post create.
 #[utoipa::path(
     post,
     path = "/api/blog/post/create",
@@ -13,6 +14,7 @@ use super::*;
 #[instrument_trace]
 pub fn openapi_blog_post_create() {}
 
+/// openapi blog post update.
 #[utoipa::path(
     post,
     path = "/api/blog/post/update/{id}",
@@ -30,6 +32,7 @@ pub fn openapi_blog_post_create() {}
 #[instrument_trace]
 pub fn openapi_blog_post_update() {}
 
+/// openapi blog post delete.
 #[utoipa::path(
     post,
     path = "/api/blog/post/delete/{id}",
@@ -47,6 +50,7 @@ pub fn openapi_blog_post_update() {}
 #[instrument_trace]
 pub fn openapi_blog_post_delete() {}
 
+/// openapi blog post get.
 #[utoipa::path(
     get,
     path = "/api/blog/post/get/{id}",
@@ -63,6 +67,7 @@ pub fn openapi_blog_post_delete() {}
 #[instrument_trace]
 pub fn openapi_blog_post_get() {}
 
+/// openapi blog post list.
 #[utoipa::path(
     get,
     path = "/api/blog/post/list",
@@ -74,6 +79,7 @@ pub fn openapi_blog_post_get() {}
 #[instrument_trace]
 pub fn openapi_blog_post_list() {}
 
+/// openapi blog post my list.
 #[utoipa::path(
     get,
     path = "/api/blog/post/my-list",
@@ -86,6 +92,7 @@ pub fn openapi_blog_post_list() {}
 #[instrument_trace]
 pub fn openapi_blog_post_my_list() {}
 
+/// openapi blog post like.
 #[utoipa::path(
     post,
     path = "/api/blog/post/like/{id}",
@@ -103,6 +110,7 @@ pub fn openapi_blog_post_my_list() {}
 #[instrument_trace]
 pub fn openapi_blog_post_like() {}
 
+/// openapi blog post favorite.
 #[utoipa::path(
     post,
     path = "/api/blog/post/favorite/{id}",
@@ -120,6 +128,7 @@ pub fn openapi_blog_post_like() {}
 #[instrument_trace]
 pub fn openapi_blog_post_favorite() {}
 
+/// openapi blog post favorite list.
 #[utoipa::path(
     get,
     path = "/api/blog/post/favorite-list",
@@ -132,6 +141,7 @@ pub fn openapi_blog_post_favorite() {}
 #[instrument_trace]
 pub fn openapi_blog_post_favorite_list() {}
 
+/// openapi blog comment create.
 #[utoipa::path(
     post,
     path = "/api/blog/comment/create",
@@ -145,6 +155,7 @@ pub fn openapi_blog_post_favorite_list() {}
 #[instrument_trace]
 pub fn openapi_blog_comment_create() {}
 
+/// openapi blog comment delete.
 #[utoipa::path(
     post,
     path = "/api/blog/comment/delete/{id}",
@@ -162,6 +173,7 @@ pub fn openapi_blog_comment_create() {}
 #[instrument_trace]
 pub fn openapi_blog_comment_delete() {}
 
+/// openapi blog comment list.
 #[utoipa::path(
     get,
     path = "/api/blog/comment/list",
@@ -174,6 +186,7 @@ pub fn openapi_blog_comment_delete() {}
 #[instrument_trace]
 pub fn openapi_blog_comment_list() {}
 
+/// openapi blog image upload.
 #[utoipa::path(
     post,
     path = "/api/blog/image/upload",
@@ -187,6 +200,7 @@ pub fn openapi_blog_comment_list() {}
 #[instrument_trace]
 pub fn openapi_blog_image_upload() {}
 
+/// openapi blog image download.
 #[utoipa::path(
     get,
     path = "/api/blog/image/download/{id}",

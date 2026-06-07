@@ -66,6 +66,7 @@ async fn handle_github_pages_request(
     Status::Continue
 }
 
+/// Implementation of `GithubPagesProxyRootRoute` for `ServerHook`.
 impl ServerHook for GithubPagesProxyRootRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -85,6 +86,7 @@ impl ServerHook for GithubPagesProxyRootRoute {
     }
 }
 
+/// Implementation of `GithubPagesProxyRoute` for `ServerHook`.
 impl ServerHook for GithubPagesProxyRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

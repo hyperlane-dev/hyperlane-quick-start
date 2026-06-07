@@ -1,5 +1,6 @@
 use super::*;
 
+/// openapi trace search.
 #[utoipa::path(
     get,
     path = "/api/trace/{trace}",

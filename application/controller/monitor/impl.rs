@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `ServerStatusRoute` for `ServerHook`.
 impl ServerHook for ServerStatusRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -33,6 +34,7 @@ impl ServerHook for ServerStatusRoute {
     }
 }
 
+/// Implementation of `SystemInfoRoute` for `ServerHook`.
 impl ServerHook for SystemInfoRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -53,6 +55,7 @@ impl ServerHook for SystemInfoRoute {
     }
 }
 
+/// Implementation of `NetworkCaptureRoute` for `ServerHook`.
 impl ServerHook for NetworkCaptureRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -67,6 +70,7 @@ impl ServerHook for NetworkCaptureRoute {
     }
 }
 
+/// Implementation of `NetworkCaptureStreamRoute` for `ServerHook`.
 impl ServerHook for NetworkCaptureStreamRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -86,6 +90,7 @@ impl ServerHook for NetworkCaptureStreamRoute {
     }
 }
 
+/// Implementation of `PerformanceHistoryRoute` for `ServerHook`.
 impl ServerHook for PerformanceHistoryRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

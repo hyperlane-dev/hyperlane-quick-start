@@ -1,5 +1,6 @@
 use super::*;
 
+/// Implementation of `UserListRoute` for `ServerHook`.
 impl ServerHook for UserListRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -68,6 +69,7 @@ impl ServerHook for UserListRoute {
     }
 }
 
+/// Implementation of `UserGetRoute` for `ServerHook`.
 impl ServerHook for UserGetRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -116,6 +118,7 @@ impl ServerHook for UserGetRoute {
     }
 }
 
+/// Implementation of `UserUpdateRoute` for `ServerHook`.
 impl ServerHook for UserUpdateRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -202,6 +205,7 @@ impl ServerHook for UserUpdateRoute {
     }
 }
 
+/// Implementation of `UserChangePasswordRoute` for `ServerHook`.
 impl ServerHook for UserChangePasswordRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -253,6 +257,7 @@ impl ServerHook for UserChangePasswordRoute {
     }
 }
 
+/// Implementation of `UserUpdateStatusRoute` for `ServerHook`.
 impl ServerHook for UserUpdateStatusRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
@@ -305,6 +310,7 @@ impl ServerHook for UserUpdateStatusRoute {
     }
 }
 
+/// Implementation of `UserDeleteRoute` for `ServerHook`.
 impl ServerHook for UserDeleteRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {

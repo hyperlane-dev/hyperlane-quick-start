@@ -1,7 +1,16 @@
+/// Prompt message instructing the GPT to re-evaluate task completion status.
 pub const USER_PROMPT: &str = "Please re-evaluate whether the user's latest task has been completed. Continue only if the task is not finished.";
+
+/// Task has completed.
 pub const TASK_HAS_COMPLETED: &str = "task completed.";
+
+/// Task is running.
 pub const TASK_IS_RUNNING: &str = "task is running.";
+
+/// Name constant for system name.
 pub const SYSTEM_NAME: &str = "System";
+
+/// Gpt response schema.
 pub const GPT_RESPONSE_SCHEMA: &str = r#"{
   "type": "object",
   "properties": {

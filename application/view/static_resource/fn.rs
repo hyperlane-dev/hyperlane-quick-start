@@ -1,5 +1,6 @@
 use super::*;
 
+/// openapi static resource view.
 #[utoipa::path(
     get,
     path = "/static/{path}",

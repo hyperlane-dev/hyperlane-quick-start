@@ -1,6 +1,17 @@
 use super::*;
 
+/// Implementation of methods for `GomokuDomain`.
 impl GomokuDomain {
+    /// Creates a new gomoku game room with the specified owner as the black player.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The room identifier.
+    /// - `&str`: The owner's user identifier.
+    ///
+    /// # Returns
+    ///
+    /// - `GomokuRoom`: The newly created room with initialized board and waiting status.
     #[instrument_trace]
     pub fn create_room(room_id: &str, owner_id: &str) -> GomokuRoom {
         let mut room: GomokuRoom = GomokuRoom::default();
@@ -19,6 +30,16 @@ impl GomokuDomain {
         room
     }
 
+    /// Adds a player to the room, assigning the opposite color of existing players.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut GomokuRoom`: The room to add the player to.
+    /// - `&str`: The user identifier of the player to add.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<StoneColor, String>`: The assigned stone color, or an error if the room is full.
     #[instrument_trace]
     pub fn add_player(room: &mut GomokuRoom, user_id: &str) -> Result<StoneColor, String> {
         if let Some(color) = Self::get_player_color(room, user_id) {
@@ -38,6 +59,16 @@ impl GomokuDomain {
         Ok(color)
     }
 
+    /// Adds a spectator to the room if they are not already a player or spectator.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut GomokuRoom`: The room to add the spectator to.
+    /// - `&str`: The user identifier of the spectator.
+    ///
+    /// # Returns
+    ///
+    /// - `bool`: `true` if the spectator was added, `false` if they are already in the room.
     #[instrument_trace]
     pub fn add_spectator(room: &mut GomokuRoom, user_id: &str) -> bool {
         if Self::get_player_color(room, user_id).is_some() {
@@ -54,6 +85,16 @@ impl GomokuDomain {
         true
     }
 
+    /// Removes a user from the room (as player or spectator), ending the game if a player leaves during play.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut GomokuRoom`: The room to remove the user from.
+    /// - `&str`: The user identifier to remove.
+    ///
+    /// # Returns
+    ///
+    /// - `bool`: `true` if the user was found and removed, `false` otherwise.
     #[instrument_trace]
     pub fn remove_user(room: &mut GomokuRoom, user_id: &str) -> bool {
         let mut removed: bool = false;
@@ -84,6 +125,15 @@ impl GomokuDomain {
         removed
     }
 
+    /// Starts the game if exactly two players are present, initializing the game board.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut GomokuRoom`: The room to start the game in.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), String>`: Ok on success, or an error if waiting for the second player.
     #[instrument_trace]
     pub fn start_game(room: &mut GomokuRoom) -> Result<(), String> {
         if room.get_players().len() != 2 {
@@ -94,6 +144,11 @@ impl GomokuDomain {
         Ok(())
     }
 
+    /// Ensures the game board is a valid 15x15 grid, replacing it with an empty board if invalid.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut GomokuRoom`: The room whose board should be validated.
     #[instrument_trace]
     pub fn ensure_board(room: &mut GomokuRoom) {
         let size: usize = 15;
@@ -117,6 +172,15 @@ impl GomokuDomain {
         *room.get_mut_board() = new_board;
     }
 
+    /// Builds an empty square board of the given size filled with zeros.
+    ///
+    /// # Arguments
+    ///
+    /// - `usize`: The size of the board (width and height).
+    ///
+    /// # Returns
+    ///
+    /// - `Vec<Vec<u8>>`: The empty board.
     #[instrument_trace]
     fn build_empty_board(size: usize) -> Vec<Vec<u8>> {
         let mut board: Vec<Vec<u8>> = vec![];
@@ -129,6 +193,21 @@ impl GomokuDomain {
         board
     }
 
+    /// Places a stone on the board for the specified player at the given position.
+    ///
+    /// Validates the game state, turn order, and position before placing the stone.
+    /// Checks for a win condition (five in a row) or a draw after each placement.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut GomokuRoom`: The room where the stone is placed.
+    /// - `&str`: The user identifier of the player placing the stone.
+    /// - `usize`: The x-coordinate (column) of the position.
+    /// - `usize`: The y-coordinate (row) of the position.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<GomokuPlaceResult, String>`: The result of the placement including game status and winner, or an error.
     #[instrument_trace]
     pub fn place_stone(
         room: &mut GomokuRoom,
@@ -198,6 +277,16 @@ impl GomokuDomain {
         Ok(result)
     }
 
+    /// Returns the stone color assigned to a specific user in the room.
+    ///
+    /// # Arguments
+    ///
+    /// - `&GomokuRoom`: The room to search.
+    /// - `&str`: The user identifier.
+    ///
+    /// # Returns
+    ///
+    /// - `Option<StoneColor>`: The stone color if the user is a player, or `None`.
     #[instrument_trace]
     fn get_player_color(room: &GomokuRoom, user_id: &str) -> Option<StoneColor> {
         for player in room.get_players().iter() {
@@ -208,6 +297,15 @@ impl GomokuDomain {
         None
     }
 
+    /// Checks if the board is completely filled with no empty positions.
+    ///
+    /// # Arguments
+    ///
+    /// - `&[Vec<u8>]`: The game board.
+    ///
+    /// # Returns
+    ///
+    /// - `bool`: `true` if the board is full, `false` otherwise.
     #[instrument_trace]
     fn is_board_full(board: &[Vec<u8>]) -> bool {
         for row in board.iter() {
@@ -218,6 +316,20 @@ impl GomokuDomain {
         true
     }
 
+    /// Checks if placing a stone at the given position creates five in a row.
+    ///
+    /// Examines four directions (horizontal, vertical, and two diagonals) from the position.
+    ///
+    /// # Arguments
+    ///
+    /// - `&[Vec<u8>]`: The game board.
+    /// - `usize`: The x-coordinate of the position.
+    /// - `usize`: The y-coordinate of the position.
+    /// - `u8`: The stone value to check.
+    ///
+    /// # Returns
+    ///
+    /// - `bool`: `true` if five in a row is detected, `false` otherwise.
     #[instrument_trace]
     fn check_five(board: &[Vec<u8>], x: usize, y: usize, value: u8) -> bool {
         let directions: [(isize, isize); 4] = [(1, 0), (0, 1), (1, 1), (1, -1)];
@@ -232,6 +344,20 @@ impl GomokuDomain {
         false
     }
 
+    /// Counts consecutive stones of the same value in a single direction from a starting position.
+    ///
+    /// # Arguments
+    ///
+    /// - `&[Vec<u8>]`: The game board.
+    /// - `usize`: The x-coordinate of the starting position.
+    /// - `usize`: The y-coordinate of the starting position.
+    /// - `isize`: The x-direction step.
+    /// - `isize`: The y-direction step.
+    /// - `u8`: The stone value to match.
+    ///
+    /// # Returns
+    ///
+    /// - `usize`: The count of consecutive matching stones in that direction.
     #[instrument_trace]
     fn count_direction(
         board: &[Vec<u8>],
