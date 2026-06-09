@@ -42,14 +42,17 @@ impl ServerHook for StaticResourceRoute {
                 let extension: String = FileExtension::get_extension_name(&path);
                 let content_type: &'static str =
                     FileExtension::parse(&extension).get_content_type();
-                ctx.get_mut_response()
+                let response: &mut Response = ctx
+                    .get_mut_response()
                     .set_body(&content)
                     .set_status_code(200)
                     .set_header(CONTENT_TYPE, content_type)
-                    .set_header(CONTENT_ENCODING, GZIP)
                     .set_header(CACHE_CONTROL, NO_CACHE_NO_STORE_MUST_REVALIDATE)
                     .set_header(PRAGMA, NO_CACHE)
                     .set_header(EXPIRES, EXPIRES_DISABLED);
+                if is_gzip_compressible(&extension) {
+                    response.set_header(CONTENT_ENCODING, GZIP);
+                }
             }
             Err(_) => {
                 ctx.get_mut_response().set_status_code(404);

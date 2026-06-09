@@ -24,14 +24,17 @@ async fn handle_github_pages_request(
         Ok(content) => {
             let extension: String = FileExtension::get_extension_name(&cache_path);
             let content_type: &'static str = FileExtension::parse(&extension).get_content_type();
-            ctx.get_mut_response()
+            let response: &mut Response = ctx
+                .get_mut_response()
                 .set_body(&content)
                 .set_status_code(200)
                 .set_header(CONTENT_TYPE, content_type)
-                .set_header(CONTENT_ENCODING, GZIP)
                 .set_header(CACHE_CONTROL, NO_CACHE_NO_STORE_MUST_REVALIDATE)
                 .set_header(PRAGMA, NO_CACHE)
                 .set_header(EXPIRES, EXPIRES_DISABLED);
+            if is_gzip_compressible(&extension) {
+                response.set_header(CONTENT_ENCODING, GZIP);
+            }
         }
         Err(_) => {
             let base_url: String = GITHUB_PAGES_BASE_URL_TEMPLATE
@@ -52,14 +55,18 @@ async fn handle_github_pages_request(
             .await
             {
                 Ok((content, content_type)) => {
-                    ctx.get_mut_response()
+                    let extension: String = FileExtension::get_extension_name(&cache_path);
+                    let response: &mut Response = ctx
+                        .get_mut_response()
                         .set_body(&content)
                         .set_status_code(200)
                         .set_header(CONTENT_TYPE, content_type)
-                        .set_header(CONTENT_ENCODING, GZIP)
                         .set_header(CACHE_CONTROL, NO_CACHE_NO_STORE_MUST_REVALIDATE)
                         .set_header(PRAGMA, NO_CACHE)
                         .set_header(EXPIRES, EXPIRES_DISABLED);
+                    if is_gzip_compressible(&extension) {
+                        response.set_header(CONTENT_ENCODING, GZIP);
+                    }
                 }
                 Err(error) => {
                     error!("Failed to fetch resource directly {owner}/{repository}/{path} {error}");
