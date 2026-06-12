@@ -6,10 +6,7 @@ pub use r#fn::*;
 
 use {
     super::*,
-    model::{
-        request::github_pages::*,
-        response::{common::*, github_pages::*},
-    },
+    model::response::{common::*, github_pages::*},
     service::github_pages::*,
     r#struct::*,
 };

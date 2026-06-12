@@ -19,16 +19,55 @@ pub fn extract_resource_paths(content: &str) -> Vec<String> {
     extract_es_module_import_paths(content, &mut paths);
     extract_new_url_paths(content, &mut paths);
     extract_css_url_paths(content, &mut paths);
-    let mut result: Vec<String> = paths.into_iter().collect();
+    let mut result: Vec<String> = paths
+        .into_iter()
+        .filter(|path: &String| !path.contains("${"))
+        .collect();
+    result.sort();
+    result
+}
+
+/// Extracts relative resource paths from content based on the file extension.
+///
+/// Selectively calls only the relevant extraction functions for the given file type:
+/// - **HTML** (`html`, `htm`, `svg`, `xml`): All extractors (tags, imports, new URL, CSS url).
+/// - **JS** (`js`, `mjs`, `cjs`): Only ES module imports and `new URL()` patterns.
+/// - **CSS** (`css`, `scss`, `less`, `sass`): Only `url()` and `@import` patterns.
+/// - **Other text** (`json`, `map`, `wasm`): No extraction (returns empty).
+///
+/// # Arguments
+/// - `&str`: The content to parse.
+/// - `&str`: The file extension (without leading dot), e.g. `"js"`, `"css"`, `"html"`.
+///
+/// # Returns
+/// - `Vec<String>`: A sorted, deduplicated list of relative resource paths.
+pub fn extract_resource_paths_by_extension(content: &str, extension: &str) -> Vec<String> {
+    let mut paths: HashSet<String> = HashSet::new();
+    match extension {
+        "html" | "htm" | "svg" | "xml" => {
+            extract_tag_src_paths(content, &mut paths);
+            extract_es_module_import_paths(content, &mut paths);
+            extract_new_url_paths(content, &mut paths);
+            extract_css_url_paths(content, &mut paths);
+        }
+        "js" | "mjs" | "cjs" => {
+            extract_es_module_import_paths(content, &mut paths);
+            extract_new_url_paths(content, &mut paths);
+        }
+        "css" | "scss" | "less" | "sass" => {
+            extract_css_url_paths(content, &mut paths);
+        }
+        _ => {}
+    }
+    let mut result: Vec<String> = paths
+        .into_iter()
+        .filter(|path: &String| !path.contains("${"))
+        .collect();
     result.sort();
     result
 }
 
 /// Extracts resource paths from CSS `url()` and `@import` statements.
-///
-/// Matches patterns such as `url('./path')`, `url("./path")`, `url(./path)`,
-/// and `@import './path'` or `@import url('./path')`. Only relative paths
-/// are kept (excluding `http://`, `https://`, `//`, and `data:` URIs).
 ///
 /// # Arguments
 /// - `&str`: The content to scan (CSS or any text containing CSS-like constructs).
@@ -60,13 +99,26 @@ fn extract_css_url_paths(content: &str, paths: &mut HashSet<String>) {
                 position = url_start;
                 continue;
             }
+            if bytes[after_url] == b'\\' {
+                position = after_url + 1;
+                continue;
+            }
             let quote: u8 = bytes[after_url];
             if (quote == b'"' || quote == b'\'')
                 && let Some(value) = read_string_literal(bytes, after_url)
-                && !is_absolute_url(&value)
             {
-                paths.insert(value);
-                position = after_url + 1;
+                if !is_absolute_url(&value) {
+                    paths.insert(value);
+                }
+                let mut scan: usize = after_url + 1;
+                while scan < len && bytes[scan] != quote {
+                    scan += 1;
+                }
+                scan += 1;
+                while scan < len && bytes[scan] != b')' {
+                    scan += 1;
+                }
+                position = if scan < len { scan + 1 } else { len };
             } else {
                 let mut end: usize = after_url;
                 while end < len && bytes[end] != b')' && !bytes[end].is_ascii_whitespace() {
@@ -91,13 +143,22 @@ fn extract_css_url_paths(content: &str, paths: &mut HashSet<String>) {
                 position = after_import;
                 continue;
             }
+            if bytes[after_import] == b'\\' {
+                position = after_import + 1;
+                continue;
+            }
             let quote: u8 = bytes[after_import];
             if (quote == b'"' || quote == b'\'')
                 && let Some(value) = read_string_literal(bytes, after_import)
-                && !is_absolute_url(&value)
             {
-                paths.insert(value);
-                position = after_import + 1;
+                if !is_absolute_url(&value) {
+                    paths.insert(value);
+                }
+                let mut scan: usize = after_import + 1;
+                while scan < len && bytes[scan] != quote {
+                    scan += 1;
+                }
+                position = if scan < len { scan + 1 } else { len };
             } else {
                 position = import_start + 7;
             }
@@ -106,9 +167,6 @@ fn extract_css_url_paths(content: &str, paths: &mut HashSet<String>) {
 }
 
 /// Extracts resource paths from `new URL('...', import.meta.url)` patterns in JS modules.
-///
-/// This is the standard wasm-bindgen pattern for locating WASM files:
-/// `new URL('xxx_bg.wasm', import.meta.url)`. Only relative paths are kept.
 ///
 /// # Arguments
 /// - `&str`: The content to scan (typically JS module source).
@@ -124,6 +182,10 @@ fn extract_new_url_paths(content: &str, paths: &mut HashSet<String>) {
         };
         let url_start: usize = position + 8;
         let after_url: usize = skip_whitespace(bytes, url_start);
+        if after_url < len && bytes[after_url] == b'\\' {
+            position = after_url + 1;
+            continue;
+        }
         if after_url < len
             && (bytes[after_url] == b'"' || bytes[after_url] == b'\'')
             && let Some(value) = read_string_literal(bytes, after_url)
@@ -136,10 +198,6 @@ fn extract_new_url_paths(content: &str, paths: &mut HashSet<String>) {
 }
 
 /// Extracts `src` and `href` attribute values from HTML tags (`<script>`, `<link>`, `<img>`).
-///
-/// Scans the raw HTML bytes for opening tags, then extracts the value of the
-/// `src` attribute (for `<script>` and `<img>`) or the `href` attribute
-/// (for `<link>`). Only relative paths are kept.
 ///
 /// # Arguments
 /// - `&str`: The HTML content to scan.
@@ -185,6 +243,9 @@ fn extract_tag_src_paths(html: &str, paths: &mut HashSet<String>) {
             if position < len && bytes[position] == b'=' {
                 position += 1;
                 position = skip_whitespace(bytes, position);
+                if position < len && bytes[position] == b'\\' {
+                    continue;
+                }
                 if eq_ignore_case(attr_name, target_attr)
                     && let Some(value) = read_attr_value(bytes, &mut position)
                 {
@@ -204,9 +265,6 @@ fn extract_tag_src_paths(html: &str, paths: &mut HashSet<String>) {
 }
 
 /// Extracts resource paths from ES module `import ... from '...'` statements.
-///
-/// Matches patterns such as `import X from './path'` and dynamic `import('./path')`.
-/// Only paths starting with `.` are captured (relative imports).
 ///
 /// # Arguments
 /// - `&str`: The HTML content to scan.
@@ -317,8 +375,6 @@ fn read_attr_name<'a>(bytes: &'a [u8], position: &mut usize) -> Option<&'a [u8]>
 
 /// Reads an attribute value (quoted or unquoted) starting at `position`.
 ///
-/// Supports single-quoted, double-quoted, and unquoted values.
-///
 /// # Arguments
 /// - `&[u8]`: The byte slice to scan.
 /// - `&mut usize`: The current position, updated to point after the value.
@@ -422,8 +478,6 @@ fn find_tag_end(bytes: &[u8], mut position: usize) -> usize {
 }
 
 /// Checks whether the given URL string is an absolute URL or data URI.
-///
-/// Returns `true` for strings starting with `http://`, `https://`, `//`, or `data:`.
 ///
 /// # Arguments
 /// - `&str`: The URL string to check.

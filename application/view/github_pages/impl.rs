@@ -10,20 +10,25 @@ async fn handle_github_pages_request(
         ctx.get_mut_response().set_status_code(400);
         return Status::Continue;
     }
+    let repository_prefix: String = format!("{repository}/");
     let cache_path: String = if path.is_empty() || path == "/" {
         format!("{GITHUB_PAGES_CACHE_DIR}/{owner}/{repository}/{INDEX_HTML_FILE}")
     } else {
-        let normalized_path: String = path.trim_start_matches('/').to_string();
+        let trimmed_path: String = path.trim_start_matches('/').to_string();
+        let normalized_path: String = if trimmed_path.starts_with(&repository_prefix) {
+            trimmed_path[repository_prefix.len()..].to_string()
+        } else {
+            trimmed_path
+        };
         format!("{GITHUB_PAGES_CACHE_DIR}/{owner}/{repository}/{normalized_path}")
     };
     if cache_path.contains("..") || cache_path.contains('\\') {
         ctx.get_mut_response().set_status_code(403);
         return Status::Continue;
     }
-    match fs::read(&cache_path).await {
-        Ok(content) => {
+    match GithubPagesService::fetch_resource(&owner, &repository, &path).await {
+        Ok((content, content_type)) => {
             let extension: String = FileExtension::get_extension_name(&cache_path);
-            let content_type: &'static str = FileExtension::parse(&extension).get_content_type();
             let response: &mut Response = ctx
                 .get_mut_response()
                 .set_body(&content)
@@ -36,45 +41,11 @@ async fn handle_github_pages_request(
                 response.set_header(CONTENT_ENCODING, GZIP);
             }
         }
-        Err(_) => {
-            let base_url: String = GITHUB_PAGES_BASE_URL_TEMPLATE
-                .replace("{owner}", &owner)
-                .replace("{repository}", &repository);
-            let target_url: String = if path.is_empty() || path == "/" {
-                base_url.clone()
-            } else {
-                let normalized_path: String = path.trim_start_matches('/').to_string();
-                format!("{base_url}{normalized_path}")
-            };
-            match GithubPagesService::fetch_resource_directly(
-                &owner,
-                &repository,
-                &path,
-                &target_url,
-            )
-            .await
-            {
-                Ok((content, content_type)) => {
-                    let extension: String = FileExtension::get_extension_name(&cache_path);
-                    let response: &mut Response = ctx
-                        .get_mut_response()
-                        .set_body(&content)
-                        .set_status_code(200)
-                        .set_header(CONTENT_TYPE, content_type)
-                        .set_header(CACHE_CONTROL, NO_CACHE_NO_STORE_MUST_REVALIDATE)
-                        .set_header(PRAGMA, NO_CACHE)
-                        .set_header(EXPIRES, EXPIRES_DISABLED);
-                    if is_gzip_compressible(&extension) {
-                        response.set_header(CONTENT_ENCODING, GZIP);
-                    }
-                }
-                Err(error) => {
-                    error!("Failed to fetch resource directly {owner}/{repository}/{path} {error}");
-                    ctx.get_mut_response()
-                        .set_status_code(502)
-                        .set_body(format!("Failed to fetch resource: {error}"));
-                }
-            }
+        Err(error) => {
+            error!("Failed to fetch resource {owner}/{repository}/{path} {error}");
+            ctx.get_mut_response()
+                .set_status_code(502)
+                .set_body(format!("Failed to fetch resource: {error}"));
         }
     }
     Status::Continue
