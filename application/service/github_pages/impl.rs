@@ -212,9 +212,11 @@ impl GithubPagesService {
         Ok(response)
     }
 
-    /// Deletes the cached GitHub Pages for the specified owner and repository.
+    /// Synchronizes all resources for the specified GitHub Pages repository.
     ///
-    /// Removes the filesystem cache directory.
+    /// Clears the existing local cache, fetches the index page from the remote
+    /// GitHub Pages URL, iteratively discovers and fetches all linked resources,
+    /// and saves them to the local cache directory.
     ///
     /// # Arguments
     ///
@@ -223,12 +225,88 @@ impl GithubPagesService {
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success.
+    /// - `Result<(), String>`: Ok on success, or an error if the initial fetch fails.
     #[instrument_trace]
-    pub async fn delete_github_pages(owner: &str, repository: &str) -> Result<(), String> {
+    pub async fn sync_github_pages(owner: &str, repository: &str) -> Result<(), String> {
         let cache_dir: String = format!("{CACHE_DIR}/{owner}/{repository}");
         let _ = fs::remove_dir_all(&cache_dir).await;
+        let base_url: String = BASE_URL_TEMPLATE
+            .replace("{owner}", owner)
+            .replace("{repository}", repository);
+        let client: Client = Client::builder()
+            .timeout(Duration::from_secs(FETCH_TIMEOUT_SECS))
+            .redirect(Policy::limited(MAX_REDIRECTS))
+            .build()
+            .map_err(|error: reqwest::Error| {
+                format!("{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} {error}")
+            })?;
+        let mut visited: HashSet<String> = HashSet::new();
+        let mut queue: Vec<String> = vec![INDEX_HTML_FILE.to_string()];
+        while let Some(path) = queue.pop() {
+            let normalized_path: String = Self::normalize_path(repository, &path);
+            if visited.contains(&normalized_path) {
+                continue;
+            }
+            visited.insert(normalized_path.clone());
+            let remote_url: String = format!("{base_url}{normalized_path}");
+            let content: Vec<u8> = match Self::fetch_resource_bytes(&client, &remote_url).await {
+                Ok(bytes) => bytes,
+                Err(error) => {
+                    warn!("Failed to sync resource {normalized_path} {error}");
+                    continue;
+                }
+            };
+            let local_path: String = format!("{CACHE_DIR}/{owner}/{repository}/{normalized_path}");
+            if let Some(parent) = Path::new(&local_path).parent() {
+                let _ = fs::create_dir_all(parent).await;
+            }
+            if let Err(error) = fs::write(&local_path, &content).await {
+                error!("Failed to cache resource file {local_path} {error}");
+            }
+            let extension: String = FileExtension::get_extension_name(&normalized_path);
+            let linked_paths: Vec<String> =
+                Self::extract_linked_paths(owner, repository, &content, &extension);
+            for linked_path in linked_paths {
+                if !visited.contains(&linked_path) {
+                    queue.push(linked_path);
+                }
+            }
+        }
         Ok(())
+    }
+
+    /// Extracts linked resource paths from content for recursive fetching during sync.
+    ///
+    /// Extracts relative resource paths from text content using the same logic
+    /// as the resource path extractor, filtering out absolute URLs.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The GitHub owner name.
+    /// - `&str`: The GitHub repository name.
+    /// - `&[u8]`: The original content bytes.
+    /// - `&str`: The file extension (without leading dot).
+    ///
+    /// # Returns
+    ///
+    /// - `Vec<String>`: A list of relative resource paths found in the content.
+    #[instrument_trace]
+    fn extract_linked_paths(
+        owner: &str,
+        repository: &str,
+        content: &[u8],
+        extension: &str,
+    ) -> Vec<String> {
+        if !PROXY_REWRITE_EXTENSIONS.contains(&extension) {
+            return Vec::new();
+        }
+        let Ok(text) = String::from_utf8(content.to_vec()) else {
+            return Vec::new();
+        };
+        let proxy_prefix: String = format!("/github/pages/{owner}/{repository}/");
+        let original_prefix: String = format!("/{repository}/");
+        let restored_text: String = text.replace(&proxy_prefix, &original_prefix);
+        extract_resource_paths_by_extension(&restored_text, extension)
     }
 
     /// Fetches raw bytes from a URL with retry logic.

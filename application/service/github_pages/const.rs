@@ -7,6 +7,9 @@ pub const ERROR_REPOSITORY_CANNOT_BE_EMPTY: &str = "Repository cannot be empty";
 /// Error message returned when fetching GitHub Pages content fails.
 pub const ERROR_FAILED_TO_FETCH_GITHUB_PAGES: &str = "Failed to fetch GitHub Pages";
 
+/// Success message returned when GitHub Pages sync completes.
+pub const SUCCESS_GITHUB_PAGES_SYNCED: &str = "Synced";
+
 /// Maximum number of retry attempts when fetching a GitHub Pages URL.
 pub const FETCH_MAX_RETRIES: u32 = 3;
 

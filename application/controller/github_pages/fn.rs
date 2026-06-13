@@ -14,10 +14,10 @@ use super::*;
 #[instrument_trace]
 pub fn openapi_github_pages_list() {}
 
-/// openapi github pages delete.
+/// openapi github pages sync.
 #[utoipa::path(
     post,
-    path = "/api/github/pages/delete/{owner}/{repository}",
+    path = "/api/github/pages/sync/{owner}/{repository}",
     params(
         ("owner" = String, Path, description = "GitHub owner or organization name"),
         ("repository" = String, Path, description = "GitHub repository name")
@@ -30,4 +30,4 @@ pub fn openapi_github_pages_list() {}
     )
 )]
 #[instrument_trace]
-pub fn openapi_github_pages_delete() {}
+pub fn openapi_github_pages_sync() {}

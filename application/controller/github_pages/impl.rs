@@ -30,8 +30,8 @@ impl ServerHook for ListGithubPagesRoute {
     }
 }
 
-/// Implementation of `DeleteGithubPagesRoute` for `ServerHook`.
-impl ServerHook for DeleteGithubPagesRoute {
+/// Implementation of `SyncGithubPagesRoute` for `ServerHook`.
+impl ServerHook for SyncGithubPagesRoute {
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
@@ -67,10 +67,10 @@ impl ServerHook for DeleteGithubPagesRoute {
                 return Status::Continue;
             }
         };
-        match GithubPagesService::delete_github_pages(&owner, &repository).await {
+        match GithubPagesService::sync_github_pages(&owner, &repository).await {
             Ok(()) => {
                 let response: ApiResponse<&str> =
-                    ApiResponse::new(ApiResponseStatus::Success, "Deleted");
+                    ApiResponse::new(ApiResponseStatus::Success, SUCCESS_GITHUB_PAGES_SYNCED);
                 ctx.get_mut_response().set_body(response.to_json_bytes())
             }
             Err(error) => {

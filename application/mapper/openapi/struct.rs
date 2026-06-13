@@ -85,7 +85,7 @@ use super::*;
         controller::notification::openapi_notification_delete,
         controller::notification::openapi_notification_unread_count,
         controller::github_pages::openapi_github_pages_list,
-        controller::github_pages::openapi_github_pages_delete,
+        controller::github_pages::openapi_github_pages_sync,
         controller::tracking::openapi_tracking_query,
         controller::tracking::openapi_tracking_report,
         controller::upload::openapi_upload_merge,
