@@ -214,9 +214,9 @@ impl GithubPagesService {
 
     /// Synchronizes all resources for the specified GitHub Pages repository.
     ///
-    /// Clears the existing local cache, fetches the index page from the remote
-    /// GitHub Pages URL, iteratively discovers and fetches all linked resources,
-    /// and saves them to the local cache directory.
+    /// Fetches the index page from the remote GitHub Pages URL, iteratively
+    /// discovers and fetches all linked resources, and saves them to the local
+    /// cache directory. Existing files are overwritten with the latest version.
     ///
     /// # Arguments
     ///
@@ -228,8 +228,6 @@ impl GithubPagesService {
     /// - `Result<(), String>`: Ok on success, or an error if the initial fetch fails.
     #[instrument_trace]
     pub async fn sync_github_pages(owner: &str, repository: &str) -> Result<(), String> {
-        let cache_dir: String = format!("{CACHE_DIR}/{owner}/{repository}");
-        let _ = fs::remove_dir_all(&cache_dir).await;
         let base_url: String = BASE_URL_TEMPLATE
             .replace("{owner}", owner)
             .replace("{repository}", repository);
