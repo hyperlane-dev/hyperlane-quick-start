@@ -18,12 +18,11 @@ pub const GITHUB_PAGES_FETCH_TIMEOUT_SECS: u64 = 30;
 
 /// File extensions for which proxy path rewriting should be applied.
 ///
-/// These text-based formats may contain resource references that use the
-/// original GitHub Pages path prefix (e.g. `/docs-pages/`) and need to be
-/// rewritten to the proxy path prefix (e.g. `/github/pages/{owner}/{repository}/`).
+/// Only text-based formats that may contain resource references using the
+/// original GitHub Pages path prefix (e.g. `/docs-pages/`) are included.
+/// Binary formats (images, fonts, etc.) are excluded to avoid content corruption.
 pub const PROXY_REWRITE_EXTENSIONS: &[&str] = &[
     "html", "htm", "css", "js", "mjs", "cjs", "json", "xml", "svg", "txt", "md", "csv", "ics",
-    "svgz", "wasm", "map", "scss", "less", "sass", "png", "jpg", "jpeg", "gif", "webp", "bmp",
-    "ico", "avif", "tiff", "tif", "woff", "ttf", "otf", "pdf", "yaml", "yml", "toml", "ini",
-    "conf", "ts", "tsx", "jsx", "rtf", "log", "sh", "bat", "ps1",
+    "map", "scss", "less", "sass", "yaml", "yml", "toml", "ini", "conf", "ts", "tsx", "jsx",
+    "rtf", "log", "sh", "bat", "ps1",
 ];

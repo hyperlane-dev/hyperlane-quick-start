@@ -1,5 +1,10 @@
 use super::*;
 
+/// Handles a GitHub Pages proxy request by delegating to the service layer.
+///
+/// Validates that owner and repository are non-empty, performs path traversal
+/// checks, then delegates to `GithubPagesService::fetch_resource` for fetching
+/// and serving the resource.
 async fn handle_github_pages_request(
     owner: String,
     repository: String,
@@ -10,25 +15,13 @@ async fn handle_github_pages_request(
         ctx.get_mut_response().set_status_code(400);
         return Status::Continue;
     }
-    let repository_prefix: String = format!("{repository}/");
-    let cache_path: String = if path.is_empty() || path == "/" {
-        format!("{GITHUB_PAGES_CACHE_DIR}/{owner}/{repository}/{INDEX_HTML_FILE}")
-    } else {
-        let trimmed_path: String = path.trim_start_matches('/').to_string();
-        let normalized_path: String = if trimmed_path.starts_with(&repository_prefix) {
-            trimmed_path[repository_prefix.len()..].to_string()
-        } else {
-            trimmed_path
-        };
-        format!("{GITHUB_PAGES_CACHE_DIR}/{owner}/{repository}/{normalized_path}")
-    };
-    if cache_path.contains("..") || cache_path.contains('\\') {
+    if path.contains("..") || path.contains('\\') {
         ctx.get_mut_response().set_status_code(403);
         return Status::Continue;
     }
     match GithubPagesService::fetch_resource(&owner, &repository, &path).await {
         Ok((content, content_type)) => {
-            let extension: String = FileExtension::get_extension_name(&cache_path);
+            let extension: String = FileExtension::get_extension_name(&path);
             let response: &mut Response = ctx
                 .get_mut_response()
                 .set_body(&content)

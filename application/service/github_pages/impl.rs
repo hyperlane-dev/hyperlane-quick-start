@@ -24,22 +24,9 @@ impl GithubPagesService {
         repository: &str,
         path: &str,
     ) -> Result<(Vec<u8>, String), String> {
-        let repository_prefix: String = format!("{repository}/");
-        let normalized_path: String = if path.is_empty() || path == "/" {
-            String::new()
-        } else {
-            let trimmed_path: String = path.trim_start_matches('/').to_string();
-            if trimmed_path.starts_with(&repository_prefix) {
-                trimmed_path[repository_prefix.len()..].to_string()
-            } else {
-                trimmed_path
-            }
-        };
-        let local_path: String = if normalized_path.is_empty() {
-            format!("{GITHUB_PAGES_CACHE_DIR}/{owner}/{repository}/{INDEX_HTML_FILE}")
-        } else {
-            format!("{GITHUB_PAGES_CACHE_DIR}/{owner}/{repository}/{normalized_path}")
-        };
+        let normalized_path: String = Self::normalize_path(repository, path);
+        let local_path: String =
+            format!("{GITHUB_PAGES_CACHE_DIR}/{owner}/{repository}/{normalized_path}");
         let extension: String = FileExtension::get_extension_name(&local_path);
         let content_type: String = FileExtension::parse(&extension)
             .get_content_type()
@@ -55,13 +42,10 @@ impl GithubPagesService {
         let base_url: String = GITHUB_PAGES_BASE_URL_TEMPLATE
             .replace("{owner}", owner)
             .replace("{repository}", repository);
-        let remote_url: String = if normalized_path.is_empty() {
-            base_url
-        } else {
-            format!("{base_url}{normalized_path}")
-        };
+        let remote_url: String = format!("{base_url}{normalized_path}");
         let client: Client = Client::builder()
             .timeout(Duration::from_secs(GITHUB_PAGES_FETCH_TIMEOUT_SECS))
+            .redirect(reqwest::redirect::Policy::limited(10))
             .build()
             .map_err(|error: reqwest::Error| {
                 format!("{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} {error}")
@@ -76,6 +60,44 @@ impl GithubPagesService {
         let rewritten_content: Vec<u8> =
             Self::rewrite_proxy_paths(owner, repository, &content, &extension);
         Ok((rewritten_content, content_type))
+    }
+
+    /// Normalizes the request path to a filesystem-friendly path.
+    ///
+    /// Handles:
+    /// - Empty or root paths → `index.html`
+    /// - Paths ending with `/` → appends `index.html`
+    /// - Paths without extension → appends `/index.html`
+    /// - Strips the repository prefix if present
+    #[instrument_trace]
+    fn normalize_path(repository: &str, path: &str) -> String {
+        if path.is_empty() || path == "/" {
+            return INDEX_HTML_FILE.to_string();
+        }
+        let trimmed_path: String = path.trim_start_matches('/').to_string();
+        let repository_prefix: String = format!("{repository}/");
+        let cleaned_path: String = if trimmed_path.starts_with(&repository_prefix) {
+            trimmed_path[repository_prefix.len()..].to_string()
+        } else if trimmed_path == repository {
+            String::new()
+        } else {
+            trimmed_path
+        };
+        if cleaned_path.is_empty() {
+            return INDEX_HTML_FILE.to_string();
+        }
+        if cleaned_path.ends_with('/') {
+            return format!("{cleaned_path}{INDEX_HTML_FILE}");
+        }
+        let last_segment: &str = cleaned_path
+            .rsplit('/')
+            .next()
+            .unwrap_or(&cleaned_path);
+        if !last_segment.contains('.') {
+            format!("{cleaned_path}/{INDEX_HTML_FILE}")
+        } else {
+            cleaned_path
+        }
     }
 
     /// Rewrites resource paths in text content from the original GitHub Pages format
