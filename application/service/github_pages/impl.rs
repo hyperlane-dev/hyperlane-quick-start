@@ -25,8 +25,7 @@ impl GithubPagesService {
         path: &str,
     ) -> Result<(Vec<u8>, String), String> {
         let normalized_path: String = Self::normalize_path(repository, path);
-        let local_path: String =
-            format!("{GITHUB_PAGES_CACHE_DIR}/{owner}/{repository}/{normalized_path}");
+        let local_path: String = format!("{CACHE_DIR}/{owner}/{repository}/{normalized_path}");
         let extension: String = FileExtension::get_extension_name(&local_path);
         let content_type: String = FileExtension::parse(&extension)
             .get_content_type()
@@ -39,13 +38,13 @@ impl GithubPagesService {
                 Self::rewrite_proxy_paths(owner, repository, &content, &extension);
             return Ok((rewritten_content, content_type));
         }
-        let base_url: String = GITHUB_PAGES_BASE_URL_TEMPLATE
+        let base_url: String = BASE_URL_TEMPLATE
             .replace("{owner}", owner)
             .replace("{repository}", repository);
         let remote_url: String = format!("{base_url}{normalized_path}");
         let client: Client = Client::builder()
-            .timeout(Duration::from_secs(GITHUB_PAGES_FETCH_TIMEOUT_SECS))
-            .redirect(reqwest::redirect::Policy::limited(10))
+            .timeout(Duration::from_secs(FETCH_TIMEOUT_SECS))
+            .redirect(Policy::limited(MAX_REDIRECTS))
             .build()
             .map_err(|error: reqwest::Error| {
                 format!("{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} {error}")
@@ -71,10 +70,10 @@ impl GithubPagesService {
     /// - Strips the repository prefix if present
     #[instrument_trace]
     fn normalize_path(repository: &str, path: &str) -> String {
-        if path.is_empty() || path == "/" {
+        if path.is_empty() || path == ROOT_PATH {
             return INDEX_HTML_FILE.to_string();
         }
-        let trimmed_path: String = path.trim_start_matches('/').to_string();
+        let trimmed_path: String = path.trim_start_matches(ROOT_PATH).to_string();
         let repository_prefix: String = format!("{repository}/");
         let cleaned_path: String = if trimmed_path.starts_with(&repository_prefix) {
             trimmed_path[repository_prefix.len()..].to_string()
@@ -86,14 +85,14 @@ impl GithubPagesService {
         if cleaned_path.is_empty() {
             return INDEX_HTML_FILE.to_string();
         }
-        if cleaned_path.ends_with('/') {
+        if cleaned_path.ends_with(ROOT_PATH) {
             return format!("{cleaned_path}{INDEX_HTML_FILE}");
         }
         let last_segment: &str = cleaned_path
-            .rsplit('/')
+            .rsplit(ROOT_PATH)
             .next()
             .unwrap_or(&cleaned_path);
-        if !last_segment.contains('.') {
+        if !last_segment.contains(POINT) {
             format!("{cleaned_path}/{INDEX_HTML_FILE}")
         } else {
             cleaned_path
@@ -149,7 +148,7 @@ impl GithubPagesService {
     #[instrument_trace]
     pub async fn list_github_pages() -> Result<GithubPagesListResponse, String> {
         let mut pages: Vec<GithubPagesInfo> = Vec::new();
-        let cache_dir: String = GITHUB_PAGES_CACHE_DIR.to_string();
+        let cache_dir: String = CACHE_DIR.to_string();
         let mut owner_entries: fs::ReadDir = fs::read_dir(&cache_dir)
             .await
             .map_err(|error: std::io::Error| error.to_string())?;
@@ -197,7 +196,7 @@ impl GithubPagesService {
                         datetime.format("%Y-%m-%d %H:%M:%S").to_string()
                     })
                     .unwrap_or_default();
-                let base_url: String = GITHUB_PAGES_BASE_URL_TEMPLATE
+                let base_url: String = BASE_URL_TEMPLATE
                     .replace("{owner}", &owner_name)
                     .replace("{repository}", &repo_name);
                 let mut info: GithubPagesInfo = GithubPagesInfo::default();
@@ -227,14 +226,14 @@ impl GithubPagesService {
     /// - `Result<(), String>`: Ok on success.
     #[instrument_trace]
     pub async fn delete_github_pages(owner: &str, repository: &str) -> Result<(), String> {
-        let cache_dir: String = format!("{GITHUB_PAGES_CACHE_DIR}/{owner}/{repository}");
+        let cache_dir: String = format!("{CACHE_DIR}/{owner}/{repository}");
         let _ = fs::remove_dir_all(&cache_dir).await;
         Ok(())
     }
 
     /// Fetches raw bytes from a URL with retry logic.
     ///
-    /// Retries the request up to `GITHUB_PAGES_FETCH_MAX_RETRIES` times on failure.
+    /// Retries the request up to `FETCH_MAX_RETRIES` times on failure.
     ///
     /// # Arguments
     ///
@@ -260,37 +259,37 @@ impl GithubPagesService {
                 Ok(response) => {
                     let status: reqwest::StatusCode = response.status();
                     if !status.is_success() {
-                        if attempt >= GITHUB_PAGES_FETCH_MAX_RETRIES {
+                        if attempt >= FETCH_MAX_RETRIES {
                             return Err(format!(
                                 "{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} HTTP {status}"
                             ));
                         }
                         warn!(
-                            "Fetch attempt {attempt}/{GITHUB_PAGES_FETCH_MAX_RETRIES} failed for {url} HTTP {status}, retrying"
+                            "Fetch attempt {attempt}/{FETCH_MAX_RETRIES} failed for {url} HTTP {status}, retrying"
                         );
                         continue;
                     }
                     match response.bytes().await {
                         Ok(bytes) => return Ok(bytes.to_vec()),
                         Err(error) => {
-                            if attempt >= GITHUB_PAGES_FETCH_MAX_RETRIES {
+                            if attempt >= FETCH_MAX_RETRIES {
                                 return Err(format!(
                                     "{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} {error}"
                                 ));
                             }
                             warn!(
-                                "Fetch attempt {attempt}/{GITHUB_PAGES_FETCH_MAX_RETRIES} failed to read body for {url} {error}, retrying"
+                                "Fetch attempt {attempt}/{FETCH_MAX_RETRIES} failed to read body for {url} {error}, retrying"
                             );
                             continue;
                         }
                     }
                 }
                 Err(error) => {
-                    if attempt >= GITHUB_PAGES_FETCH_MAX_RETRIES {
+                    if attempt >= FETCH_MAX_RETRIES {
                         return Err(format!("{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} {error}"));
                     }
                     warn!(
-                        "Fetch attempt {attempt}/{GITHUB_PAGES_FETCH_MAX_RETRIES} failed for {url} {error}, retrying"
+                        "Fetch attempt {attempt}/{FETCH_MAX_RETRIES} failed for {url} {error}, retrying"
                     );
                     continue;
                 }

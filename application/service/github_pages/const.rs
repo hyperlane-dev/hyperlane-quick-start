@@ -8,13 +8,16 @@ pub const ERROR_REPOSITORY_CANNOT_BE_EMPTY: &str = "Repository cannot be empty";
 pub const ERROR_FAILED_TO_FETCH_GITHUB_PAGES: &str = "Failed to fetch GitHub Pages";
 
 /// Maximum number of retry attempts when fetching a GitHub Pages URL.
-pub const GITHUB_PAGES_FETCH_MAX_RETRIES: u32 = 3;
+pub const FETCH_MAX_RETRIES: u32 = 3;
 
 /// File name for the cached index page.
 pub const INDEX_HTML_FILE: &str = "index.html";
 
 /// Request timeout in seconds for fetching remote resources.
-pub const GITHUB_PAGES_FETCH_TIMEOUT_SECS: u64 = 30;
+pub const FETCH_TIMEOUT_SECS: u64 = 30;
+
+/// Maximum number of redirects to follow.
+pub const MAX_REDIRECTS: usize = 8;
 
 /// File extensions for which proxy path rewriting should be applied.
 ///
@@ -23,6 +26,6 @@ pub const GITHUB_PAGES_FETCH_TIMEOUT_SECS: u64 = 30;
 /// Binary formats (images, fonts, etc.) are excluded to avoid content corruption.
 pub const PROXY_REWRITE_EXTENSIONS: &[&str] = &[
     "html", "htm", "css", "js", "mjs", "cjs", "json", "xml", "svg", "txt", "md", "csv", "ics",
-    "map", "scss", "less", "sass", "yaml", "yml", "toml", "ini", "conf", "ts", "tsx", "jsx",
-    "rtf", "log", "sh", "bat", "ps1",
+    "map", "scss", "less", "sass", "yaml", "yml", "toml", "ini", "conf", "ts", "tsx", "jsx", "rtf",
+    "log", "sh", "bat", "ps1",
 ];

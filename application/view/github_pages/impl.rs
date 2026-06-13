@@ -79,8 +79,8 @@ impl ServerHook for GithubPagesProxyRootRoute {
 
     #[prologue_macros(
         methods(get),
-        try_get_route_param(GITHUB_PAGES_OWNER_KEY => owner_opt),
-        try_get_route_param(GITHUB_PAGES_REPOSITORY_KEY => repository_opt)
+        try_get_route_param(OWNER_KEY => owner_opt),
+        try_get_route_param(REPOSITORY_KEY => repository_opt)
     )]
     #[instrument_trace]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
@@ -104,8 +104,8 @@ impl ServerHook for GithubPagesProxyRoute {
 
     #[prologue_macros(
         methods(get),
-        try_get_route_param(GITHUB_PAGES_OWNER_KEY => owner_opt),
-        try_get_route_param(GITHUB_PAGES_REPOSITORY_KEY => repository_opt),
+        try_get_route_param(OWNER_KEY => owner_opt),
+        try_get_route_param(REPOSITORY_KEY => repository_opt),
         try_get_route_param(PATH_KEY => path_opt)
     )]
     #[instrument_trace]

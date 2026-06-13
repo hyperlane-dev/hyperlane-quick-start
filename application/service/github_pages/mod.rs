@@ -11,4 +11,7 @@ use hyperlane_config::application::github_pages::*;
 
 use std::{collections::HashSet, path::Path, time::Duration};
 
-use {reqwest::Client, tokio::fs};
+use {
+    reqwest::{Client, redirect::Policy},
+    tokio::fs,
+};

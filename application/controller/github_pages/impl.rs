@@ -39,8 +39,8 @@ impl ServerHook for DeleteGithubPagesRoute {
 
     #[prologue_macros(
         is_post_method,
-        try_get_route_param(GITHUB_PAGES_OWNER_KEY => owner_opt),
-        try_get_route_param(GITHUB_PAGES_REPOSITORY_KEY => repository_opt),
+        try_get_route_param(OWNER_KEY => owner_opt),
+        try_get_route_param(REPOSITORY_KEY => repository_opt),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
