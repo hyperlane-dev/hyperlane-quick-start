@@ -1,5 +1,19 @@
 use super::*;
 
+/// Checks whether the given path segment is safe from path traversal attacks.
+///
+/// A path is considered unsafe if it contains `..`, backslash characters,
+/// or starts with a forward slash (absolute path).
+///
+/// # Arguments
+/// - `&str`: The path segment to validate.
+///
+/// # Returns
+/// - `bool`: `true` if the path is safe, `false` if it contains traversal patterns.
+pub fn is_safe_path(value: &str) -> bool {
+    !value.contains("..") && !value.contains('\\') && !value.starts_with('/')
+}
+
 /// Extracts relative resource paths from HTML, JS, or CSS content.
 ///
 /// Parses the content for `<script src>`, `<link href>`, `<img src>` attributes,

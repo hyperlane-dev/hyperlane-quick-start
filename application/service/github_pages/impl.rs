@@ -24,8 +24,14 @@ impl GithubPagesService {
         repository: &str,
         path: &str,
     ) -> Result<(Vec<u8>, String), String> {
+        if !is_safe_path(owner) || !is_safe_path(repository) || !is_safe_path(path) {
+            return Err(ERROR_UNSAFE_PATH.to_string());
+        }
         let normalized_path: String = Self::normalize_path(repository, path);
         let local_path: String = format!("{CACHE_DIR}/{owner}/{repository}/{normalized_path}");
+        if !is_safe_path(&local_path) {
+            return Err(ERROR_UNSAFE_PATH.to_string());
+        }
         let extension: String = FileExtension::get_extension_name(&local_path);
         let content_type: String = FileExtension::parse(&extension)
             .get_content_type()
@@ -214,9 +220,9 @@ impl GithubPagesService {
 
     /// Synchronizes all resources for the specified GitHub Pages repository.
     ///
-    /// Fetches the index page from the remote GitHub Pages URL, iteratively
-    /// discovers and fetches all linked resources, and saves them to the local
-    /// cache directory. Existing files are overwritten with the latest version.
+    /// Clears the existing local cache directory, fetches the index page from
+    /// the remote GitHub Pages URL, iteratively discovers and fetches all linked
+    /// resources, and saves them to the local cache directory.
     ///
     /// # Arguments
     ///
@@ -228,6 +234,11 @@ impl GithubPagesService {
     /// - `Result<(), String>`: Ok on success, or an error if the initial fetch fails.
     #[instrument_trace]
     pub async fn sync_github_pages(owner: &str, repository: &str) -> Result<(), String> {
+        if !is_safe_path(owner) || !is_safe_path(repository) {
+            return Err(ERROR_UNSAFE_PATH.to_string());
+        }
+        let cache_dir: String = format!("{CACHE_DIR}/{owner}/{repository}");
+        let _ = fs::remove_dir_all(&cache_dir).await;
         let base_url: String = BASE_URL_TEMPLATE
             .replace("{owner}", owner)
             .replace("{repository}", repository);
@@ -263,7 +274,7 @@ impl GithubPagesService {
             }
             let extension: String = FileExtension::get_extension_name(&normalized_path);
             let linked_paths: Vec<String> =
-                Self::extract_linked_paths(owner, repository, &content, &extension);
+                Self::extract_linked_paths(repository, &content, &extension, &normalized_path);
             for linked_path in linked_paths {
                 if !visited.contains(&linked_path) {
                     queue.push(linked_path);
@@ -275,25 +286,27 @@ impl GithubPagesService {
 
     /// Extracts linked resource paths from content for recursive fetching during sync.
     ///
-    /// Extracts relative resource paths from text content using the same logic
-    /// as the resource path extractor, filtering out absolute URLs.
+    /// Extracts relative resource paths from text content, then resolves them
+    /// relative to the current resource's directory. For example, if the current
+    /// resource is `assets/app.js` and it imports `./vendor.js`, the resolved
+    /// path will be `assets/vendor.js`.
     ///
     /// # Arguments
     ///
-    /// - `&str`: The GitHub owner name.
     /// - `&str`: The GitHub repository name.
     /// - `&[u8]`: The original content bytes.
     /// - `&str`: The file extension (without leading dot).
+    /// - `&str`: The normalized path of the current resource (e.g. `"assets/app.js"`).
     ///
     /// # Returns
     ///
-    /// - `Vec<String>`: A list of relative resource paths found in the content.
+    /// - `Vec<String>`: A list of resolved resource paths relative to the repository root.
     #[instrument_trace]
     fn extract_linked_paths(
-        owner: &str,
         repository: &str,
         content: &[u8],
         extension: &str,
+        current_path: &str,
     ) -> Vec<String> {
         if !PROXY_REWRITE_EXTENSIONS.contains(&extension) {
             return Vec::new();
@@ -301,10 +314,71 @@ impl GithubPagesService {
         let Ok(text) = String::from_utf8(content.to_vec()) else {
             return Vec::new();
         };
-        let proxy_prefix: String = format!("/github/pages/{owner}/{repository}/");
-        let original_prefix: String = format!("/{repository}/");
-        let restored_text: String = text.replace(&proxy_prefix, &original_prefix);
-        extract_resource_paths_by_extension(&restored_text, extension)
+        let repository_prefix: String = format!("/{repository}/");
+        let raw_paths: Vec<String> = extract_resource_paths_by_extension(&text, extension);
+        let current_dir: String = Path::new(current_path)
+            .parent()
+            .map(|p: &std::path::Path| p.to_string_lossy().to_string())
+            .unwrap_or_default();
+        raw_paths
+            .into_iter()
+            .filter_map(|raw_path: String| {
+                if raw_path.starts_with('/') {
+                    let stripped: &str = raw_path.trim_start_matches('/');
+                    if stripped.starts_with(&repository_prefix) {
+                        Some(stripped[repository_prefix.len()..].to_string())
+                    } else {
+                        Some(stripped.to_string())
+                    }
+                } else {
+                    Self::resolve_relative_path(&current_dir, &raw_path)
+                }
+            })
+            .filter(|path: &String| is_safe_path(path))
+            .collect()
+    }
+
+    /// Resolves a relative path against a base directory.
+    ///
+    /// Handles `./` and `../` segments in the relative path by traversing
+    /// the base directory accordingly. Returns `None` if the path would
+    /// traverse above the repository root.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The base directory (e.g. `"assets"` or `""` for root).
+    /// - `&str`: The relative path to resolve (e.g. `"./vendor.js"` or `"../img/logo.png"`).
+    ///
+    /// # Returns
+    ///
+    /// - `Option<String>`: The resolved path, or `None` if it escapes the root.
+    #[instrument_trace]
+    fn resolve_relative_path(base_dir: &str, relative_path: &str) -> Option<String> {
+        let normalized_relative: String = relative_path.trim_start_matches("./").to_string();
+        if normalized_relative.is_empty() {
+            return None;
+        }
+        let mut segments: Vec<&str> = if base_dir.is_empty() {
+            Vec::new()
+        } else {
+            base_dir.split('/').collect()
+        };
+        for part in normalized_relative.split('/') {
+            if part == "." || part.is_empty() {
+                continue;
+            }
+            if part == ".." {
+                segments.pop()?;
+            } else {
+                segments.push(part);
+            }
+        }
+        let resolved: String = segments.join("/");
+        if resolved.is_empty() {
+            None
+        } else {
+            Some(resolved)
+        }
     }
 
     /// Fetches raw bytes from a URL with retry logic.
