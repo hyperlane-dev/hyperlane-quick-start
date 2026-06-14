@@ -11,7 +11,7 @@ pub const REPOSITORY_KEY: &str = "repository";
 ///
 /// Each tuple contains `(owner, repository)` pairs that will be automatically
 /// synced when the server starts, fetching the latest resources from GitHub Pages.
-pub const SYNC_REPOSITORIES: &[(&str, &str)] = &[("euv-dev", "euv"), ("eastspire", "docs-pages")];
+pub const SYNC_REPOSITORIES: &[(&str, &str)] = &[("euv-dev", "euv"), ("docs-pages", "pages")];
 
 /// Directory path for github pages cache dir.
 #[cfg(debug_assertions)]
