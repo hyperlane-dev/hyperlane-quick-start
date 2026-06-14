@@ -28,7 +28,8 @@ class HyperlaneHeader extends HTMLElement {
 
   get logo() {
     return (
-      this.getAttribute('logo') || 'https://docs.ltpp.vip/img/hyperlane.png'
+      this.getAttribute('logo') ||
+      'https://ltpp.vip/github/pages/docs-pages/pages/img/hyperlane.png'
     );
   }
 

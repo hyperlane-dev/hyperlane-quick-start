@@ -2,7 +2,7 @@
 
 ## hyperlane-quick-start
 
-<img src="https://docs.ltpp.vip/img/hyperlane.png" alt="" height="160">
+<img src="https://ltpp.vip/github/pages/docs-pages/pages/img/hyperlane.png" alt="" height="160">
 
 [![](https://img.shields.io/crates/v/hyperlane.svg)](https://crates.io/crates/hyperlane)
 [![](https://img.shields.io/crates/d/hyperlane.svg)](https://img.shields.io/crates/d/hyperlane.svg)
@@ -13,10 +13,6 @@
 </center>
 
 > A lightweight, high-performance, and cross-platform Rust HTTP server library built on Tokio. It simplifies modern web service development by providing built-in support for middleware, WebSocket, Server-Sent Events (SSE), and raw TCP communication. With a unified and ergonomic API across Windows, Linux, and MacOS, it enables developers to build robust, scalable, and event-driven network applications with minimal overhead and maximum flexibility.
-
-## Official Documentation
-
-- [Official Documentation](https://docs.ltpp.vip/hyperlane/)
 
 ## Api Docs
 

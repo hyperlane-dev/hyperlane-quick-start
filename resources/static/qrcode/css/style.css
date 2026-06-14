@@ -1,0 +1,227 @@
+* {
+  padding: 0;
+  margin: 0;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  -khtml-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+}
+
+:root {
+  --scroll_color: #cfcfcf;
+  --scroll_width: 8.88px;
+  --scroll_height: 8.88px;
+  --primary-color: #409eff;
+  --success-color: #67c23a;
+  --warning-color: #e6a23c;
+  --danger-color: #f56c6c;
+  --info-color: #909399;
+  --bg-color: #f5f7fa;
+  --card-bg: rgba(255, 255, 255, 0.95);
+  --text-color: #2c3e50;
+  --text-secondary: #6c757d;
+  --border-color: #e9ecef;
+  --shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  --radius: 16px;
+}
+
+.container {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.main-content {
+  flex: 1;
+  padding: 40px 20px;
+  max-width: 720px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.form-container {
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius);
+  padding: 32px;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.action-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.action-bar hyperlane-button {
+  flex: 1;
+}
+
+.choose-file {
+  display: none !important;
+}
+
+.url-list-container {
+  margin-bottom: 20px;
+}
+
+.url-item {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+}
+
+.url-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.url-item-header {
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+}
+
+.url-item textarea {
+  width: 100%;
+  min-height: 60px;
+  padding: 12px;
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-family:
+    Consolas,
+    Monaco,
+    DejaVu Sans Mono,
+    monospace;
+  resize: none;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+  line-height: 1.5;
+}
+
+.url-item textarea:focus {
+  border-color: var(--primary-color);
+}
+
+.url-item .qrcode-section {
+  margin-top: 12px;
+  text-align: center;
+}
+
+.url-item .qrcode-title {
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+.url-item .qrcode-img-wrapper {
+  position: relative;
+  display: inline-block;
+  will-change: transform;
+}
+
+.url-item .qrcode-img-wrapper img {
+  max-width: 256px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  opacity: 0.3;
+  transition: opacity 0.3s ease;
+}
+
+.url-item .qrcode-img-wrapper:hover img {
+  opacity: 1;
+}
+
+.url-item .qrcode-actions {
+  margin-top: 12px;
+}
+
+.url-item .qrcode-error {
+  color: var(--danger-color);
+  font-size: 0.9rem;
+  margin-top: 8px;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+.url-item .qrcode-actions hyperlane-button {
+  width: 100%;
+}
+
+.main-content hyperlane-loading {
+  margin-top: 24px;
+}
+
+.url-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 16px 0;
+}
+
+::-webkit-scrollbar {
+  z-index: 1000000;
+  width: var(--scroll_width);
+  height: var(--scroll_height);
+  border-radius: 0;
+}
+
+::-webkit-scrollbar-button {
+  background-color: transparent;
+  height: 0;
+  width: 0;
+  display: none;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--scroll_color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner,
+::-webkit-scrollbar-track-piece {
+  background-color: transparent;
+}
+
+::-webkit-resizer {
+  width: 0;
+  height: 0;
+  background: transparent;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 20px 12px;
+  }
+  .form-container {
+    padding: 20px 16px;
+  }
+  .action-bar {
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    padding: 16px 8px;
+  }
+  .form-container {
+    padding: 16px 12px;
+    border-radius: 12px;
+  }
+  .url-item {
+    padding: 14px;
+  }
+}
