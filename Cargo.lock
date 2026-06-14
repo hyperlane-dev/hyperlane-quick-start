@@ -1946,9 +1946,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane"
-version = "21.2.7"
+version = "21.2.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "325ded58d96cd38523dbc5d16903c9a1a9440e82be17e860e3daddba0a289263"
+checksum = "b798784ae5353f64647547d05411ecab63d312dd2379a65bd3febc7c03792bfa"
 dependencies = [
  "http-type",
  "inventory",
@@ -1980,9 +1980,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-macros"
-version = "23.0.10"
+version = "23.0.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c41219c3f4b2545d8eb9aa5f17b09497ef1c1b50e8af5751ab0ac237143de2a3"
+checksum = "e7973c2e9af057d999bdb86f688ee42bb9441b32a10e5c25a28b961bc87d5e66"
 dependencies = [
  "hyperlane",
  "proc-macro2",
@@ -1992,9 +1992,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-plugin-websocket"
-version = "14.0.8"
+version = "14.0.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "287a3de48d9c8ec0d0339476b4396d5164dcc05490fbd626c7ba34ae7f003aa0"
+checksum = "5ce6a566d422f831d03c1889e536546d310dbc23d08854e29c86c0ce25b4feec"
 dependencies = [
  "hyperlane",
  "hyperlane-broadcast",
@@ -2002,7 +2002,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "23.0.14"
+version = "23.0.15"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
@@ -2021,9 +2021,9 @@ checksum = "26c03ea5d9b90cac098eea83b81cd8bc875965288c6395ecc305395f3c1031d3"
 
 [[package]]
 name = "hyperlane-utils"
-version = "33.1.1"
+version = "33.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "588738c764be5555cd863acfe6eb21c65d2fe1bab73bccde582311679f4a8cef"
+checksum = "1e0cf1e7f5d9dddee5fcf00e17070063934f8d8de30cfd5da9d2ebae3d0f6fff"
 dependencies = [
  "aes 0.9.1",
  "ahash 0.8.12",
@@ -3499,9 +3499,9 @@ dependencies = [
 
 [[package]]
 name = "redis"
-version = "1.2.2"
+version = "1.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a12e6b5f4d8ef33944e833e2b1859ad478deab6e431d7337b30ee2efe21f7543"
+checksum = "f9fd510128eda94d1d49b9f81487744d5c451422431cce41238fe2853d29f4cc"
 dependencies = [
  "arcstr",
  "combine",
