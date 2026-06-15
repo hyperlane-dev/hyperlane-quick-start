@@ -158,6 +158,8 @@ jobs:
           # Sync the root package.version itself
           sed -i -E "0,/^(version[[:space:]]*=[[:space:]]*\")([^\"]+)(\")/s|^(version[[:space:]]*=[[:space:]]*\")([^\"]+)(\")|\1${VERSION}\3|" Cargo.toml
           echo "🔧 Cargo.toml package.version -> $VERSION"
+      - name: Update Cargo.lock
+        run: cargo generate-lockfile
       - name: Commit and push
         run: |
           git config user.name "eastspire"
