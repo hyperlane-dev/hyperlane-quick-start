@@ -31,13 +31,22 @@ jobs:
             ~/.cargo/git
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-      - name: Install toml-cli
-        run: cargo install toml-cli
       - name: Cache toml-cli
+        id: cache_toml_cli
         uses: actions/cache@v3
         with:
           path: ~/.cargo/bin/toml
           key: toml-cli-${{ runner.os }}
+      - name: Install toml-cli
+        if: steps.cache_toml_cli.outputs.cache-hit != 'true'
+        run: |
+          for i in 1 2 3 4 5 6 7 8; do
+            if cargo install toml-cli; then
+              break
+            fi
+            echo "⚠️ Attempt $i failed, retrying in 5s..."
+            sleep 5
+          done
       - name: Read cargo metadata
         id: read
         run: |
@@ -59,12 +68,114 @@ jobs:
           echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
           echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
-  check:
+  sync_workspace_version:
+    permissions:
+      contents: write
     needs: setup
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+      - name: Restore toml-cli
+        id: cache_toml_cli
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/bin/toml
+          key: toml-cli-${{ runner.os }}
+      - name: Install toml-cli
+        if: steps.cache_toml_cli.outputs.cache-hit != 'true'
+        run: |
+          for i in 1 2 3 4 5 6 7 8; do
+            if cargo install toml-cli; then
+              break
+            fi
+            echo "⚠️ Attempt $i failed, retrying in 5s..."
+            sleep 5
+          done
+      - name: Sync workspace version
+        run: |
+          VERSION="${{ needs.setup.outputs.version }}"
+          ROOT_DIR=$(pwd)
+          echo "🔧 Syncing all versions to $VERSION"
+
+          # Collect all workspace member directory names
+          MEMBER_PKG_NAMES=""
+          MEMBERS=$(toml get Cargo.toml workspace.members --raw | tr -d '[]"' | sed 's/,/\n/g' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | grep -v '^$')
+          echo "📋 Found workspace members: $MEMBERS"
+          for member in $MEMBERS; do
+            SUB_TOML="${ROOT_DIR}/${member}/Cargo.toml"
+            if [ -f "$SUB_TOML" ]; then
+              PKG_NAME=$(toml get "$SUB_TOML" package.name --raw)
+              MEMBER_PKG_NAMES="$MEMBER_PKG_NAMES $PKG_NAME"
+              echo "📋 Member: $member -> package: $PKG_NAME"
+            else
+              echo "⚠️ $SUB_TOML not found, skipping"
+            fi
+          done
+
+          # Also include the root package itself
+          ROOT_PKG_NAME=$(toml get Cargo.toml package.name --raw)
+          MEMBER_PKG_NAMES="$MEMBER_PKG_NAMES $ROOT_PKG_NAME"
+
+          # Also include all sub-table format workspace.dependencies entries
+          SUB_TABLE_PKGS=$(grep -oP '^\[workspace\.dependencies\.\K[^\]]+' Cargo.toml || true)
+          for pkg_name in $SUB_TABLE_PKGS; do
+            if ! echo "$MEMBER_PKG_NAMES" | grep -qw "$pkg_name"; then
+              MEMBER_PKG_NAMES="$MEMBER_PKG_NAMES $pkg_name"
+            fi
+          done
+
+          echo "📋 All package names to sync:$MEMBER_PKG_NAMES"
+
+          # Sync workspace.dependencies.<pkg_name>.version for all member packages using sed
+          # This handles both inline table format: euv-cli = { path = "cli", version = "0.6.3" }
+          # and sub-table format: [workspace.dependencies.euv-cli] version = "0.6.3"
+          for pkg_name in $MEMBER_PKG_NAMES; do
+            if grep -q "^${pkg_name}[[:space:]]*=" Cargo.toml && grep -q "^${pkg_name}[[:space:]]*=.*version" Cargo.toml; then
+              sed -i -E "s|^(${pkg_name}[[:space:]]*=[[:space:]]*\{.*version[[:space:]]*=[[:space:]]*\")([^\"]+)(\".*)|\1${VERSION}\3|" Cargo.toml
+              echo "🔧 workspace.dependencies.${pkg_name}.version -> $VERSION (inline)"
+            elif grep -q "^\[workspace\.dependencies\.${pkg_name}\]" Cargo.toml; then
+              sed -i -E "/^\[workspace\.dependencies\.${pkg_name}\]/,/^\[/ s|^(version[[:space:]]*=[[:space:]]*\")([^\"]+)(\")|\1${VERSION}\3|" Cargo.toml
+              echo "🔧 workspace.dependencies.${pkg_name}.version -> $VERSION (sub-table)"
+            else
+              echo "⏭️ workspace.dependencies.${pkg_name} not found, skipping"
+            fi
+          done
+
+          # Sync each sub-crate's own package.version
+          for member in $MEMBERS; do
+            SUB_TOML="${ROOT_DIR}/${member}/Cargo.toml"
+            if [ -f "$SUB_TOML" ]; then
+              sed -i -E "s|^(version[[:space:]]*=[[:space:]]*\")([^\"]+)(\")|\1${VERSION}\3|" "$SUB_TOML"
+              echo "🔧 ${member}/Cargo.toml package.version -> $VERSION"
+            else
+              echo "⚠️ ${member}/Cargo.toml not found, skipping"
+            fi
+          done
+
+          # Sync the root package.version itself
+          sed -i -E "0,/^(version[[:space:]]*=[[:space:]]*\")([^\"]+)(\")/s|^(version[[:space:]]*=[[:space:]]*\")([^\"]+)(\")|\1${VERSION}\3|" Cargo.toml
+          echo "🔧 Cargo.toml package.version -> $VERSION"
+      - name: Update Cargo.lock
+        run: cargo generate-lockfile
+      - name: Commit and push
+        run: |
+          git config user.name "eastspire"
+          git config user.email "root@ltpp.vip"
+          git add -A
+          git diff --cached --quiet || git commit -m "chore: sync all package versions to ${{ needs.setup.outputs.version }}"
+          git push
+
+  check:
+    needs: sync_workspace_version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
       - name: Setup rust
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -74,11 +185,13 @@ jobs:
         run: cargo fmt -- --check
 
   tests:
-    needs: setup
+    needs: sync_workspace_version
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
       - name: Prepare environment
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -87,11 +200,13 @@ jobs:
         run: cargo test --all-features -- --nocapture
 
   clippy:
-    needs: setup
+    needs: sync_workspace_version
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
       - name: Load clippy
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -101,11 +216,13 @@ jobs:
         run: cargo clippy --all-features
 
   build:
-    needs: setup
+    needs: sync_workspace_version
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
       - name: Setup build
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -116,7 +233,7 @@ jobs:
   publish:
     permissions:
       contents: write
-    needs: [setup, check, tests, clippy, build]
+    needs: [setup, sync_workspace_version, check, tests, clippy, build]
     if: needs.setup.outputs.tag != ''
     runs-on: ubuntu-latest
     outputs:
@@ -135,6 +252,8 @@ jobs:
       - name: Checkout
         if: steps.check_branch.outputs.skip == 'false'
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
       - name: Restore toml-cli
         if: steps.check_branch.outputs.skip == 'false'
         uses: actions/cache@v3
@@ -143,7 +262,14 @@ jobs:
           key: toml-cli-${{ runner.os }}
       - name: Install cargo-release
         if: steps.check_branch.outputs.skip == 'false'
-        run: cargo install cargo-release
+        run: |
+          for i in 1 2 3 4 5 6 7 8; do
+            if cargo install cargo-release; then
+              break
+            fi
+            echo "⚠️ Attempt $i failed, retrying in 5s..."
+            sleep 5
+          done
       - name: Configure git
         if: steps.check_branch.outputs.skip == 'false'
         run: |
@@ -187,7 +313,7 @@ jobs:
           cargo build --release --all-features
 
   release:
-    needs: [setup, check, tests, clippy, build, publish]
+    needs: [setup, sync_workspace_version, check, tests, clippy, build, publish]
     permissions:
       contents: write
       packages: write
@@ -199,6 +325,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.ref }}
           fetch-depth: 0
       - name: Get package name and branch info
         id: package_info
