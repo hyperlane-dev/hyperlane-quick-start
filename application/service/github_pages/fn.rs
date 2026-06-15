@@ -16,7 +16,8 @@ pub fn is_safe_path(value: &str) -> bool {
 
 /// Extracts relative resource paths from HTML, JS, or CSS content.
 ///
-/// Parses the content for `<script src>`, `<link href>`, `<img src>` attributes,
+/// Parses the content for HTML tag attributes (`<script src>`, `<link href>`, `<img src>`,
+/// `<video src>`, `<audio src>`, `<source src>`, `<track src>`, `<embed src>`, `<object data>`),
 /// ES module `import ... from '...'` statements, `new URL('...', import.meta.url)` patterns,
 /// and CSS `url()` / `@import` references,
 /// returning only relative paths (excluding `http://`, `https://`, `//`, and `data:` URIs).
@@ -211,7 +212,15 @@ fn extract_new_url_paths(content: &str, paths: &mut HashSet<String>) {
     }
 }
 
-/// Extracts `src` and `href` attribute values from HTML tags (`<script>`, `<link>`, `<img>`).
+/// Extracts `src` and `href` attribute values from HTML tags.
+///
+/// Supported tags and their target attributes:
+/// - `<script src>`, `<img src>`, `<link href>` (classic resource references)
+/// - `<video src>`, `<audio src>` (media elements)
+/// - `<source src>` (media source elements inside `<video>`/`<audio>`)
+/// - `<track src>` (text track elements inside `<video>`/`<audio>`)
+/// - `<embed src>` (embedded content)
+/// - `<object data>` (embedded objects)
 ///
 /// # Arguments
 /// - `&str`: The HTML content to scan.
@@ -235,11 +244,32 @@ fn extract_tag_src_paths(html: &str, paths: &mut HashSet<String>) {
         let is_script: bool = eq_ignore_case(tag_name, b"script");
         let is_link: bool = eq_ignore_case(tag_name, b"link");
         let is_img: bool = eq_ignore_case(tag_name, b"img");
-        if !is_script && !is_link && !is_img {
+        let is_video: bool = eq_ignore_case(tag_name, b"video");
+        let is_audio: bool = eq_ignore_case(tag_name, b"audio");
+        let is_source: bool = eq_ignore_case(tag_name, b"source");
+        let is_track: bool = eq_ignore_case(tag_name, b"track");
+        let is_embed: bool = eq_ignore_case(tag_name, b"embed");
+        let is_object: bool = eq_ignore_case(tag_name, b"object");
+        if !is_script
+            && !is_link
+            && !is_img
+            && !is_video
+            && !is_audio
+            && !is_source
+            && !is_track
+            && !is_embed
+            && !is_object
+        {
             position = find_tag_end(bytes, tag_start);
             continue;
         }
-        let target_attr: &[u8] = if is_link { b"href" } else { b"src" };
+        let target_attr: &[u8] = if is_link {
+            b"href"
+        } else if is_object {
+            b"data"
+        } else {
+            b"src"
+        };
         let mut found_attr: bool = false;
         loop {
             position = skip_whitespace(bytes, position);

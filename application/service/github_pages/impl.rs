@@ -286,10 +286,10 @@ impl GithubPagesService {
 
     /// Extracts linked resource paths from content for recursive fetching during sync.
     ///
-    /// Extracts relative resource paths from text content, then resolves them
-    /// relative to the current resource's directory. For example, if the current
-    /// resource is `assets/app.js` and it imports `./vendor.js`, the resolved
-    /// path will be `assets/vendor.js`.
+    /// Extracts relative resource paths from text content (HTML, JS, CSS, etc.),
+    /// then resolves them relative to the current resource's directory.
+    /// Supports media resource paths (mp4, mp3, webm, etc.) discovered from
+    /// HTML tags like `<video>`, `<audio>`, `<source>`, `<embed>`, `<object>`.
     ///
     /// # Arguments
     ///
@@ -308,7 +308,7 @@ impl GithubPagesService {
         extension: &str,
         current_path: &str,
     ) -> Vec<String> {
-        if !PROXY_REWRITE_EXTENSIONS.contains(&extension) {
+        if !RESOURCE_LINK_EXTENSIONS.contains(&extension) {
             return Vec::new();
         }
         let Ok(text) = String::from_utf8(content.to_vec()) else {
