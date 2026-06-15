@@ -162,8 +162,7 @@ jobs:
         run: |
           git config user.name "eastspire"
           git config user.email "root@ltpp.vip"
-          # Stage all Cargo.toml files that may have changed
-          find . -name Cargo.toml -not -path './target/*' | xargs git add
+          git add -A
           git diff --cached --quiet || git commit -m "chore: sync all package versions to ${{ needs.setup.outputs.version }}"
           git push
 
