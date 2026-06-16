@@ -130,7 +130,7 @@ impl GithubPagesService {
         content: &[u8],
         extension: &str,
     ) -> Vec<u8> {
-        if !PROXY_REWRITE_EXTENSIONS.contains(&extension) {
+        if !TEXT_CONTENT_EXTENSIONS.contains(&extension) {
             return content.to_vec();
         }
         let Ok(text) = String::from_utf8(content.to_vec()) else {

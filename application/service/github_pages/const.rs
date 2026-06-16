@@ -43,17 +43,6 @@ pub const FETCH_TIMEOUT_SECS: u64 = 600;
 /// Maximum number of redirects to follow.
 pub const MAX_REDIRECTS: usize = 8;
 
-/// File extensions for which proxy path rewriting should be applied.
-///
-/// Only text-based formats that may contain resource references using the
-/// original GitHub Pages path prefix (e.g. `/docs-pages/`) are included.
-/// Binary formats (images, fonts, media, etc.) are excluded to avoid content corruption.
-pub const PROXY_REWRITE_EXTENSIONS: &[&str] = &[
-    "html", "htm", "css", "js", "mjs", "cjs", "json", "xml", "svg", "txt", "md", "csv", "ics",
-    "map", "scss", "less", "sass", "yaml", "yml", "toml", "ini", "conf", "ts", "tsx", "jsx", "rtf",
-    "log", "sh", "bat", "ps1",
-];
-
 /// File extensions for which linked resource path extraction should be applied.
 ///
 /// Includes all text-based formats that may reference other resources (HTML, JS, CSS)
@@ -65,12 +54,4 @@ pub const RESOURCE_LINK_EXTENSIONS: &[&str] = &[
     "log", "sh", "bat", "ps1", "mp4", "mp3", "webm", "ogg", "wav", "flac", "m4a", "m4v", "avi",
     "mov", "wmv", "webp", "png", "jpg", "jpeg", "gif", "bmp", "ico", "avif", "tiff", "tif", "woff",
     "woff2", "ttf", "otf", "eot", "pdf", "wasm", "swf",
-];
-
-/// File extensions that typically require HTTP Range request support for streaming.
-///
-/// Video and audio formats where browsers send Range requests for seeking/buffering.
-pub const STREAMABLE_EXTENSIONS: &[&str] = &[
-    "mp4", "webm", "ogg", "m4v", "avi", "mov", "wmv", "flv", "mkv", "mp3", "wav", "flac", "m4a",
-    "aac", "oga", "pdf",
 ];

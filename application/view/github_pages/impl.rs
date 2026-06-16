@@ -75,10 +75,12 @@ async fn handle_github_pages_request(
                             Ok((content, _, _, _)) => {
                                 let content_range: String =
                                     format!("bytes {start}-{end}/{file_size}");
+                                let final_content_type: String =
+                                    format_content_type(&content_type, &extension);
                                 ctx.get_mut_response()
                                     .set_body(&content)
                                     .set_status_code(206)
-                                    .set_header(CONTENT_TYPE, &content_type)
+                                    .set_header(CONTENT_TYPE, &final_content_type)
                                     .set_header(ACCEPT_RANGES, BYTES)
                                     .set_header(CONTENT_RANGE, &content_range)
                                     .set_header(CONTENT_LENGTH, content_length.to_string())
@@ -100,10 +102,12 @@ async fn handle_github_pages_request(
                         if let Ok((content, content_type)) =
                             GithubPagesService::fetch_resource(&owner, &repository, &path).await
                         {
+                            let final_content_type: String =
+                                format_content_type(&content_type, &extension);
                             ctx.get_mut_response()
                                 .set_body(&content)
                                 .set_status_code(200)
-                                .set_header(CONTENT_TYPE, content_type)
+                                .set_header(CONTENT_TYPE, &final_content_type)
                                 .set_header(ACCEPT_RANGES, BYTES)
                                 .set_header(CONTENT_LENGTH, file_size.to_string())
                                 .set_header(CACHE_CONTROL, NO_CACHE_NO_STORE_MUST_REVALIDATE)
@@ -124,11 +128,12 @@ async fn handle_github_pages_request(
     }
     match GithubPagesService::fetch_resource(&owner, &repository, &path).await {
         Ok((content, content_type)) => {
+            let final_content_type: String = format_content_type(&content_type, &extension);
             let response: &mut Response = ctx
                 .get_mut_response()
                 .set_body(&content)
                 .set_status_code(200)
-                .set_header(CONTENT_TYPE, content_type)
+                .set_header(CONTENT_TYPE, &final_content_type)
                 .set_header(CACHE_CONTROL, NO_CACHE_NO_STORE_MUST_REVALIDATE)
                 .set_header(PRAGMA, NO_CACHE)
                 .set_header(EXPIRES, EXPIRES_DISABLED);

@@ -6,6 +6,10 @@ pub use {r#fn::*, r#struct::*};
 
 use super::*;
 
-use {crate::utils::gzip::*, hyperlane_config::application::static_resource::*};
+use {
+    hyperlane_config::application::static_resource::*,
+    service::github_pages::*,
+    utils::{content_type::*, gzip::*},
+};
 
 use std::{fs, path::PathBuf};

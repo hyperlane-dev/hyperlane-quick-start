@@ -5,7 +5,7 @@ mod r#struct;
 
 pub use {r#const::*, r#fn::*, r#struct::*};
 
-use {super::*, model::response::github_pages::*};
+use {super::*, model::response::github_pages::*, utils::content_type::*};
 
 use hyperlane_config::application::github_pages::*;
 
