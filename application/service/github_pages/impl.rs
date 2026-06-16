@@ -27,7 +27,7 @@ impl GithubPagesService {
         if !is_safe_path(owner) || !is_safe_path(repository) || !is_safe_path(path) {
             return Err(ERROR_UNSAFE_PATH.to_string());
         }
-        let normalized_path: String = Self::normalize_path(repository, path);
+        let normalized_path: String = Self::normalize_path_static(repository, path);
         let local_path: String = format!("{CACHE_DIR}/{owner}/{repository}/{normalized_path}");
         if !is_safe_path(&local_path) {
             return Err(ERROR_UNSAFE_PATH.to_string());
@@ -75,7 +75,7 @@ impl GithubPagesService {
     /// - Paths without extension → appends `/index.html`
     /// - Strips the repository prefix if present
     #[instrument_trace]
-    fn normalize_path(repository: &str, path: &str) -> String {
+    pub fn normalize_path_static(repository: &str, path: &str) -> String {
         if path.is_empty() || path == ROOT_PATH {
             return INDEX_HTML_FILE.to_string();
         }
@@ -252,7 +252,7 @@ impl GithubPagesService {
         let mut visited: HashSet<String> = HashSet::new();
         let mut queue: Vec<String> = vec![INDEX_HTML_FILE.to_string()];
         while let Some(path) = queue.pop() {
-            let normalized_path: String = Self::normalize_path(repository, &path);
+            let normalized_path: String = Self::normalize_path_static(repository, &path);
             if visited.contains(&normalized_path) {
                 continue;
             }
@@ -379,6 +379,57 @@ impl GithubPagesService {
         } else {
             Some(resolved)
         }
+    }
+
+    /// Fetches a resource range for HTTP Range request support.
+    ///
+    /// First ensures the resource is cached locally (fetching from remote if needed),
+    /// then reads the specified byte range from the cached file.
+    /// This is essential for video/audio streaming where browsers send Range requests
+    /// for seeking and buffered playback.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The GitHub owner name.
+    /// - `&str`: The GitHub repository name.
+    /// - `&str`: The resource path relative to the repository root.
+    /// - `u64`: The starting byte offset (inclusive).
+    /// - `u64`: The ending byte offset (inclusive).
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(Vec<u8>, String, u64, u64), String>`: A tuple of
+    ///   (range content bytes, content type, content length, total file size) on success,
+    ///   or an error message if fetching fails.
+    #[instrument_trace]
+    pub async fn fetch_resource_range(
+        owner: &str,
+        repository: &str,
+        path: &str,
+        start: u64,
+        end: u64,
+    ) -> Result<(Vec<u8>, String, u64, u64), String> {
+        if !is_safe_path(owner) || !is_safe_path(repository) || !is_safe_path(path) {
+            return Err(ERROR_UNSAFE_PATH.to_string());
+        }
+        let normalized_path: String = Self::normalize_path_static(repository, path);
+        let local_path: String = format!("{CACHE_DIR}/{owner}/{repository}/{normalized_path}");
+        if !is_safe_path(&local_path) {
+            return Err(ERROR_UNSAFE_PATH.to_string());
+        }
+        let extension: String = FileExtension::get_extension_name(&local_path);
+        let content_type: String = FileExtension::parse(&extension)
+            .get_content_type()
+            .to_string();
+        if fs::metadata(&local_path).await.is_err() {
+            let _ = Self::fetch_resource(owner, repository, path).await?;
+        }
+        let file_metadata: std::fs::Metadata =
+            std::fs::metadata(&local_path).map_err(|error: std::io::Error| error.to_string())?;
+        let total_size: u64 = file_metadata.len();
+        let content_length: u64 = end - start + 1;
+        let content: Vec<u8> = read_file_range(&local_path, start, content_length).await?;
+        Ok((content, content_type, content_length, total_size))
     }
 
     /// Fetches raw bytes from a URL with retry logic.

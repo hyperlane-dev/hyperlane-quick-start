@@ -613,3 +613,82 @@ fn read_string_literal(bytes: &[u8], position: usize) -> Option<String> {
     }
     Some(String::from_utf8_lossy(&bytes[position + 1..end]).to_string())
 }
+
+/// Parses an HTTP Range header value into a (start, end) byte range.
+///
+/// Supports standard `bytes=start-end`, `bytes=start-`, and `bytes=-suffix` formats.
+/// Returns the resolved (start, end) byte offsets where `end` is inclusive.
+///
+/// # Arguments
+///
+/// - `&str`: The Range header value (e.g. `"bytes=0-1023"`).
+/// - `u64`: The total file size in bytes.
+///
+/// # Returns
+///
+/// - `Result<(u64, u64), String>`: The resolved (start, end) byte range, or an error message.
+pub fn parse_range_header(range_header: &str, file_size: u64) -> Result<(u64, u64), String> {
+    if !range_header.starts_with(RANGE_HEADER_PREFIX) {
+        return Err(ERROR_INVALID_RANGE_HEADER_FORMAT.to_string());
+    }
+    let range_spec: &str = &range_header[RANGE_HEADER_PREFIX.len()..];
+    let parts: Vec<&str> = range_spec.split('-').collect();
+    if parts.len() != 2 {
+        return Err(ERROR_INVALID_RANGE_SPECIFICATION.to_string());
+    }
+    let start_str: &str = parts[0];
+    let end_str: &str = parts[1];
+    if start_str.is_empty() && end_str.is_empty() {
+        return Err(ERROR_INVALID_RANGE_SPECIFICATION.to_string());
+    }
+    let start: u64 = if start_str.is_empty() {
+        let suffix_length: u64 = end_str
+            .parse()
+            .map_err(|_| ERROR_INVALID_RANGE_SPECIFICATION.to_string())?;
+        file_size.saturating_sub(suffix_length)
+    } else {
+        start_str
+            .parse()
+            .map_err(|_| ERROR_INVALID_RANGE_SPECIFICATION.to_string())?
+    };
+    let end: u64 = if end_str.is_empty() {
+        file_size - 1
+    } else {
+        let parsed_end: u64 = end_str
+            .parse()
+            .map_err(|_| ERROR_INVALID_RANGE_SPECIFICATION.to_string())?;
+        parsed_end.min(file_size - 1)
+    };
+    if start >= file_size {
+        return Err(ERROR_RANGE_START_EXCEEDS_FILE_SIZE.to_string());
+    }
+    if start > end {
+        return Err(ERROR_INVALID_RANGE_START_GREATER_THAN_END.to_string());
+    }
+    Ok((start, end))
+}
+
+/// Reads a specific byte range from a local file.
+///
+/// Opens the file, seeks to the start offset, and reads `length` bytes.
+///
+/// # Arguments
+///
+/// - `&str`: The file path on disk.
+/// - `u64`: The starting byte offset.
+/// - `u64`: The number of bytes to read.
+///
+/// # Returns
+///
+/// - `Result<Vec<u8>, String>`: The read byte buffer, or an error if the file cannot be opened or read.
+pub async fn read_file_range(path: &str, start: u64, length: u64) -> Result<Vec<u8>, String> {
+    use std::io::{Read, Seek, SeekFrom};
+    let mut file: std::fs::File = std::fs::File::open(path)
+        .map_err(|error: std::io::Error| format!("Failed to open file {error}"))?;
+    file.seek(SeekFrom::Start(start))
+        .map_err(|error: std::io::Error| format!("Failed to seek file {error}"))?;
+    let mut buffer: Vec<u8> = vec![0u8; length as usize];
+    file.read_exact(&mut buffer)
+        .map_err(|error: std::io::Error| format!("Failed to read file {error}"))?;
+    Ok(buffer)
+}

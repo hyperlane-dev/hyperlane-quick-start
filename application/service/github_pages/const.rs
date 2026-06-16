@@ -1,6 +1,21 @@
 /// Error message returned when the owner parameter is empty.
 pub const ERROR_OWNER_CANNOT_BE_EMPTY: &str = "Owner cannot be empty";
 
+/// Prefix used in HTTP Range request headers (e.g. `Range: bytes=0-1023`).
+pub const RANGE_HEADER_PREFIX: &str = "bytes=";
+
+/// Error message returned when the Range header format is invalid.
+pub const ERROR_INVALID_RANGE_HEADER_FORMAT: &str = "Invalid range header format";
+
+/// Error message returned when the Range header specification is malformed.
+pub const ERROR_INVALID_RANGE_SPECIFICATION: &str = "Invalid range specification";
+
+/// Error message returned when the range start exceeds the file size.
+pub const ERROR_RANGE_START_EXCEEDS_FILE_SIZE: &str = "Range start exceeds file size";
+
+/// Error message returned when the range start is greater than the range end.
+pub const ERROR_INVALID_RANGE_START_GREATER_THAN_END: &str = "Invalid range: start > end";
+
 /// Error message returned when the repository parameter is empty.
 pub const ERROR_REPOSITORY_CANNOT_BE_EMPTY: &str = "Repository cannot be empty";
 
@@ -20,7 +35,10 @@ pub const FETCH_MAX_RETRIES: u32 = 3;
 pub const INDEX_HTML_FILE: &str = "index.html";
 
 /// Request timeout in seconds for fetching remote resources.
-pub const FETCH_TIMEOUT_SECS: u64 = 30;
+///
+/// Set to 600 seconds (10 minutes) to accommodate large files (e.g. video) that may
+/// take longer to download on slower connections.
+pub const FETCH_TIMEOUT_SECS: u64 = 600;
 
 /// Maximum number of redirects to follow.
 pub const MAX_REDIRECTS: usize = 8;
@@ -47,4 +65,12 @@ pub const RESOURCE_LINK_EXTENSIONS: &[&str] = &[
     "log", "sh", "bat", "ps1", "mp4", "mp3", "webm", "ogg", "wav", "flac", "m4a", "m4v", "avi",
     "mov", "wmv", "webp", "png", "jpg", "jpeg", "gif", "bmp", "ico", "avif", "tiff", "tif", "woff",
     "woff2", "ttf", "otf", "eot", "pdf", "wasm", "swf",
+];
+
+/// File extensions that typically require HTTP Range request support for streaming.
+///
+/// Video and audio formats where browsers send Range requests for seeking/buffering.
+pub const STREAMABLE_EXTENSIONS: &[&str] = &[
+    "mp4", "webm", "ogg", "m4v", "avi", "mov", "wmv", "flv", "mkv", "mp3", "wav", "flac", "m4a",
+    "aac", "oga", "pdf",
 ];
