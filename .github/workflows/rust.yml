@@ -326,7 +326,7 @@ jobs:
             done
             PUBLISH_RESULT[$PKG_NAME]=$PKG_PUBLISHED
             if [ "$PKG_PUBLISHED" = "true" ]; then
-              VERIFY_HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -H "User-Agent: hyperlane-cli" "https://crates.io/api/v1/crates/$PKG_NAME/$VERSION")
+              VERIFY_HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -H "User-Agent: hyperlane-quick-start" "https://crates.io/api/v1/crates/$PKG_NAME/$VERSION")
               if [ "$VERIFY_HTTP_CODE" = "200" ]; then
                 echo "✅ $PKG_NAME v$VERSION verified on crates.io (HTTP 200)"
               else
