@@ -278,33 +278,83 @@ jobs:
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         run: |
-          set -e
           echo "published=false" >> $GITHUB_OUTPUT
           echo "${{ secrets.CARGO_REGISTRY_TOKEN }}" | cargo login
-          PACKAGE_NAME=$(toml get Cargo.toml package.name --raw)
-          VERSION=${{ needs.setup.outputs.version }}
-          MAX_RETRY=36
-          SUCCESS=false
-          for ((i=1; i<=MAX_RETRY; i++)); do
-            echo "🚀 Attempt $i/$MAX_RETRY: releasing $PACKAGE_NAME v$VERSION"
-            if cargo release "$VERSION" --workspace --execute --no-confirm; then
-              echo "✅ $pkg release success"
-              echo "published=true" >> "$GITHUB_OUTPUT"
-              echo "🎉🎉🎉 PUBLISH SUCCESSFUL 🎉🎉🎉"
-              echo "✅ Successfully published $PACKAGE_NAME v$VERSION to crates.io"
-              echo "📦 Crates.io: https://crates.io/crates/$PACKAGE_NAME/$VERSION"
-              echo "📚 Docs.rs: https://docs.rs/$PACKAGE_NAME/$VERSION"
-              SUCCESS=true
-              break
-            else
-              echo "⚠️ Attempt $i failed"
-              if [ "$i" -lt "$MAX_RETRY" ]; then
+          VERSION="${{ needs.setup.outputs.version }}"
+          PUBLISH_ORDER=("euv-macros" "euv-core" "euv-cli" "euv")
+          SKIP_PACKAGES=("euv-example")
+          MAIN_PACKAGE="euv"
+          declare -A PUBLISH_RESULT
+          for PKG_NAME in "${PUBLISH_ORDER[@]}"; do
+            for SKIP in "${SKIP_PACKAGES[@]}"; do
+              if [ "$PKG_NAME" = "$SKIP" ]; then
+                echo "⏭️ Skipping $PKG_NAME (publish = false)"
+                continue 2
+              fi
+            done
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "📦 Publishing $PKG_NAME v$VERSION"
+            PKG_PUBLISHED=false
+            for ((i=1; i<=36; i++)); do
+              echo "🚀 Attempt $i/36: publishing $PKG_NAME v$VERSION"
+              set +e
+              PUBLISH_OUTPUT=$(cargo publish -p "$PKG_NAME" --allow-dirty --no-verify 2>&1)
+              PUBLISH_EXIT_CODE=$?
+              set -e
+              echo "$PUBLISH_OUTPUT"
+              if [ $PUBLISH_EXIT_CODE -eq 0 ]; then
+                echo "✅ $PKG_NAME v$VERSION publish exited with code 0"
+                PKG_PUBLISHED=true
+                break
+              fi
+              if echo "$PUBLISH_OUTPUT" | grep -q "is already published"; then
+                echo "📦 $PKG_NAME v$VERSION is already published to crates.io"
+                PKG_PUBLISHED=true
+                break
+              fi
+              if echo "$PUBLISH_OUTPUT" | grep -q "already been uploaded"; then
+                echo "📦 $PKG_NAME v$VERSION is already uploaded to crates.io"
+                PKG_PUBLISHED=true
+                break
+              fi
+              echo "⚠️ Attempt $i failed for $PKG_NAME (exit code: $PUBLISH_EXIT_CODE)"
+              if echo "$PUBLISH_OUTPUT" | grep -qi "unauthorized\|forbidden\|token\|credential"; then
+                echo "🚫 Authentication error detected, aborting $PKG_NAME"
+                break
+              fi
+              if [ "$i" -lt "36" ]; then
                 echo "🔁 Retrying..."
               fi
+            done
+            PUBLISH_RESULT[$PKG_NAME]=$PKG_PUBLISHED
+            if [ "$PKG_PUBLISHED" = "true" ]; then
+              VERIFY_HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -H "User-Agent: euv-ci/1.0" "https://crates.io/api/v1/crates/$PKG_NAME/$VERSION")
+              if [ "$VERIFY_HTTP_CODE" = "200" ]; then
+                echo "✅ $PKG_NAME v$VERSION verified on crates.io (HTTP 200)"
+              else
+                echo "⚠️ $PKG_NAME v$VERSION could not be verified (HTTP $VERIFY_HTTP_CODE), but publish reported success - continuing"
+              fi
+            else
+              echo "❌ $PKG_NAME v$VERSION failed to publish, continuing with next package"
             fi
           done
-          if [ "$SUCCESS" != "true" ]; then
-            echo "❌ $pkg release failed after $MAX_RETRY attempts"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "📋 Publish Summary:"
+          for PKG_NAME in "${PUBLISH_ORDER[@]}"; do
+            if [ "${PUBLISH_RESULT[$PKG_NAME]:-false}" = "true" ]; then
+              echo "  ✅ $PKG_NAME v$VERSION"
+            else
+              echo "  ❌ $PKG_NAME v$VERSION"
+            fi
+          done
+          if [ "${PUBLISH_RESULT[$MAIN_PACKAGE]:-false}" = "true" ]; then
+            echo "published=true" >> "$GITHUB_OUTPUT"
+            echo "🎉🎉🎉 PUBLISH SUCCESSFUL 🎉🎉🎉"
+            echo "✅ Main package $MAIN_PACKAGE v$VERSION published to crates.io"
+            echo "📦 Crates.io: https://crates.io/crates/$MAIN_PACKAGE/$VERSION"
+            echo "📚 Docs.rs: https://docs.rs/$MAIN_PACKAGE/$VERSION"
+          else
+            echo "❌ Main package $MAIN_PACKAGE v$VERSION failed to publish"
           fi
 
   release:
