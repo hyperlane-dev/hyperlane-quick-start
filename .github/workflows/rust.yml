@@ -44,8 +44,7 @@ jobs:
             if cargo install toml-cli; then
               break
             fi
-            echo "⚠️ Attempt $i failed, retrying in 5s..."
-            sleep 5
+            echo "🔁 Retrying..."
           done
       - name: Read cargo metadata
         id: read
@@ -91,8 +90,7 @@ jobs:
             if cargo install toml-cli; then
               break
             fi
-            echo "⚠️ Attempt $i failed, retrying in 5s..."
-            sleep 5
+            echo "🔁 Retrying..."
           done
       - name: Sync workspace version
         run: |
@@ -267,8 +265,7 @@ jobs:
             if cargo install cargo-release; then
               break
             fi
-            echo "⚠️ Attempt $i failed, retrying in 5s..."
-            sleep 5
+            echo "🔁 Retrying..."
           done
       - name: Configure git
         if: steps.check_branch.outputs.skip == 'false'
@@ -303,7 +300,6 @@ jobs:
               echo "⚠️ Attempt $i failed"
               if [ "$i" -lt "$MAX_RETRY" ]; then
                 echo "🔁 Retrying..."
-                sleep 2
               fi
             fi
           done
