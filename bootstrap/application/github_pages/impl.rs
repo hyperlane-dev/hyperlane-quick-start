@@ -4,7 +4,8 @@ use super::*;
 impl BootstrapAsyncInit for GithubPagesBootstrap {
     #[instrument_trace]
     async fn init() -> Self {
-        let handles: Vec<JoinHandle<()>> = SYNC_REPOSITORIES
+        spawn(async move {
+            let handles: Vec<JoinHandle<()>> = SYNC_REPOSITORIES
             .iter()
             .map(|&(owner, repository)| {
                 let owner_owned: String = owner.to_string();
@@ -24,7 +25,8 @@ impl BootstrapAsyncInit for GithubPagesBootstrap {
                 })
             })
             .collect();
-        join_all(handles).await;
+            join_all(handles).await;
+        });
         Self
     }
 }

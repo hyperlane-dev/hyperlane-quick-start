@@ -184,7 +184,6 @@ const QRCodeApp = {
     } catch (err) {
       this.showToast(err.toString(), 'error');
     }
-    this.render();
   },
 
   download(name = '', jsonStr = '') {
@@ -240,6 +239,7 @@ const QRCodeApp = {
         }
         this.tryGetImage(-1);
         this.saveLocal();
+        this.render();
       } catch (err) {
         this.showToast(err.toString(), 'error');
       }
@@ -250,6 +250,7 @@ const QRCodeApp = {
   addNewUrl() {
     this.state.urlList.push(this.createOneUrlObj());
     this.saveLocal();
+    this.render();
   },
 
   async tryGetImage(index) {
