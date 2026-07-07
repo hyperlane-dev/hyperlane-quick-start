@@ -43,6 +43,9 @@ pub const FETCH_TIMEOUT_SECS: u64 = 600;
 /// Maximum number of redirects to follow.
 pub const MAX_REDIRECTS: usize = 8;
 
+/// Maximum number of concurrent resource downloads during sync.
+pub const MAX_CONCURRENT_FETCHES: usize = 16;
+
 /// File extensions for which linked resource path extraction should be applied.
 ///
 /// Includes all text-based formats that may reference other resources (HTML, JS, CSS)

@@ -692,3 +692,32 @@ pub async fn read_file_range(path: &str, start: u64, length: u64) -> Result<Vec<
         .map_err(|error: std::io::Error| format!("Failed to read file {error}"))?;
     Ok(buffer)
 }
+
+/// Returns a reference to the shared HTTP client, creating it on first call.
+///
+/// The client is configured with the module-wide timeout and redirect policy
+/// and is reused across all fetch calls to amortize connection-pool setup.
+pub fn get_http_client() -> &'static Client {
+    SHARED_HTTP_CLIENT.get_or_init(|| {
+        Client::builder()
+            .timeout(Duration::from_secs(FETCH_TIMEOUT_SECS))
+            .redirect(Policy::limited(MAX_REDIRECTS))
+            .build()
+            .expect("Failed to create shared HTTP client")
+    })
+}
+
+/// Awaits the completion of a pending fetch identified by the watch receiver.
+///
+/// Returns the raw fetched bytes on success, or the error the designated
+/// fetcher encountered.
+pub async fn wait_for_pending_fetch(
+    receiver: &mut FetchPendingReceiver,
+) -> Result<Vec<u8>, String> {
+    receiver
+        .wait_for(|opt: &FetchPendingValue| opt.is_some())
+        .await
+        .map_err(|_| "Pending fetch was cancelled".to_string())?;
+    // wait_for guarantees `is_some` when it returns `Ok`
+    receiver.borrow_and_update().clone().unwrap()
+}

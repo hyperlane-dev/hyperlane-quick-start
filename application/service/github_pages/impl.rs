@@ -1,23 +1,40 @@
 use super::*;
 
+/// Implements [`PendingFetch`] construction and the sender accessor.
+impl PendingFetch {
+    /// Creates a new `PendingFetch` and returns the handle together with a
+    /// receiver that waiters can use to observe the completion.
+    pub(crate) fn new() -> (Self, FetchPendingReceiver) {
+        let (tx, rx) = watch::channel(None);
+        (Self { tx }, rx)
+    }
+
+    /// Returns a reference to the sender, allowing other callers to subscribe.
+    pub(crate) fn get_sender(&self) -> &FetchPendingSender {
+        &self.tx
+    }
+}
+
 /// Implements GitHub Pages on-demand caching and resource proxying.
 impl GithubPagesService {
-    /// Fetches a resource by first checking the local cache directory,
-    /// and if not found, fetching from the remote GitHub Pages URL and saving locally.
+    /// Fetches a resource by first checking the local cache directory, and if
+    /// not found, fetching from the remote GitHub Pages URL.
     ///
-    /// The remote URL is constructed from the owner, repository, and resource path
-    /// using the same path structure as the client request, ensuring address consistency.
+    /// Concurrent request dedup: if multiple callers request the same
+    /// uncached resource simultaneously, only one performs the remote fetch;
+    /// all others wait for that single result via a `watch` channel.
+    ///
+    /// Reuses a global shared HTTP client across all calls (connection-pooled).
     ///
     /// # Arguments
     ///
     /// - `&str`: The GitHub owner name.
     /// - `&str`: The GitHub repository name.
-    /// - `&str`: The resource path relative to the repository root (e.g. `"assets/style.css"`).
+    /// - `&str`: The resource path relative to the repository root.
     ///
     /// # Returns
     ///
-    /// - `Result<(Vec<u8>, String), String>`: A tuple of (content bytes, content type) on success,
-    ///   or an error message if fetching fails.
+    /// - `Result<(Vec<u8>, String), String>`: A tuple of (content bytes, content type) on success.
     #[instrument_trace]
     pub async fn fetch_resource(
         owner: &str,
@@ -36,35 +53,82 @@ impl GithubPagesService {
         let content_type: String = FileExtension::parse(&extension)
             .get_content_type()
             .to_string();
-        if fs::metadata(&local_path).await.is_ok() {
-            let content: Vec<u8> = fs::read(&local_path)
-                .await
-                .map_err(|error: std::io::Error| error.to_string())?;
-            let rewritten_content: Vec<u8> =
-                Self::rewrite_proxy_paths(owner, repository, &content, &extension);
-            return Ok((rewritten_content, content_type));
+        // Fast path: already cached on disk (content is pre-rewritten during sync)
+        if let Ok(content) = Self::read_local_cached(&local_path).await {
+            return Ok((content, content_type));
         }
+        // Remote fetch phase — deduplicate concurrent requests for the same resource
+        let resource_key: String = format!("{owner}/{repository}/{normalized_path}");
+        let pending_map: &RwLock<HashMap<String, Arc<PendingFetch>>> =
+            PENDING_FETCHES.get_or_init(Default::default);
+        let (should_fetch, mut waiter_rx) = {
+            let mut map: RwLockWriteGuard<'_, HashMap<String, Arc<PendingFetch>>> =
+                pending_map.write().await;
+            if let Some(existing) = map.get(&resource_key) {
+                // Another coroutine is already fetching this resource — subscribe
+                (false, existing.get_sender().subscribe())
+            } else {
+                // We are the designated fetcher
+                let (pending, rx) = PendingFetch::new();
+                map.insert(resource_key.clone(), Arc::new(pending));
+                (true, rx)
+            }
+        };
+        if !should_fetch {
+            // Wait for the designated fetcher to complete (receives RAW content)
+            let raw_bytes: Vec<u8> = wait_for_pending_fetch(&mut waiter_rx).await?;
+            let rewritten: Vec<u8> =
+                Self::rewrite_proxy_paths(owner, repository, &raw_bytes, &extension);
+            return Ok((rewritten, content_type));
+        }
+        // --- Designated fetcher: do the actual remote fetch ---
         let base_url: String = BASE_URL_TEMPLATE
             .replace("{owner}", owner)
             .replace("{repository}", repository);
         let remote_url: String = format!("{base_url}{normalized_path}");
-        let client: Client = Client::builder()
-            .timeout(Duration::from_secs(FETCH_TIMEOUT_SECS))
-            .redirect(Policy::limited(MAX_REDIRECTS))
-            .build()
-            .map_err(|error: reqwest::Error| {
-                format!("{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} {error}")
-            })?;
-        let content: Vec<u8> = Self::fetch_resource_bytes(&client, &remote_url).await?;
+        let client: &Client = get_http_client();
+        let raw_bytes: Vec<u8> = match Self::fetch_resource_bytes(client, &remote_url).await {
+            Ok(bytes) => bytes,
+            Err(error) => {
+                // Notify any waiters of the failure, then clean up
+                let mut map: RwLockWriteGuard<'_, HashMap<String, Arc<PendingFetch>>> =
+                    pending_map.write().await;
+                if let Some(pending) = map.get(&resource_key) {
+                    pending.get_sender().send(Some(Err(error.clone()))).ok();
+                }
+                map.remove(&resource_key);
+                return Err(error);
+            }
+        };
+        // Pre-rewrite paths before caching so subsequent reads are cheap
+        let rewritten: Vec<u8> =
+            Self::rewrite_proxy_paths(owner, repository, &raw_bytes, &extension);
         if let Some(parent) = Path::new(&local_path).parent() {
             let _ = fs::create_dir_all(parent).await;
         }
-        if let Err(error) = fs::write(&local_path, &content).await {
+        if let Err(error) = fs::write(&local_path, &rewritten).await {
             error!("Failed to cache resource file {local_path} {error}");
         }
-        let rewritten_content: Vec<u8> =
-            Self::rewrite_proxy_paths(owner, repository, &content, &extension);
-        Ok((rewritten_content, content_type))
+        // Notify waiters with the RAW content so they can extract linked paths etc.
+        let mut map: RwLockWriteGuard<'_, HashMap<String, Arc<PendingFetch>>> =
+            pending_map.write().await;
+        if let Some(pending) = map.get(&resource_key) {
+            pending.get_sender().send(Some(Ok(raw_bytes))).ok();
+        }
+        // Remove the entry once broadcast is done.
+        // The watch retains the last value, so the Receiver the waiter
+        // holds remains readable even after the Sender is dropped.
+        map.remove(&resource_key);
+        Ok((rewritten, content_type))
+    }
+
+    /// Reads the full content of a locally cached file.
+    ///
+    /// Returns `Ok(bytes)` if the file exists and is readable, `Err` otherwise.
+    /// Serves as a tiny helper so `fetch_resource` can double-check the cache
+    /// concisely.
+    async fn read_local_cached(local_path: &str) -> Result<Vec<u8>, ()> {
+        fs::read(local_path).await.map_err(|_| ())
     }
 
     /// Normalizes the request path to a filesystem-friendly path.
@@ -105,24 +169,9 @@ impl GithubPagesService {
         }
     }
 
-    /// Rewrites resource paths in text content from the original GitHub Pages format
-    /// to the proxy format, ensuring browsers request resources through the proxy route.
-    ///
-    /// For project-type GitHub Pages (e.g. `/{repository}/`), the original HTML/JS/CSS
-    /// references resources using paths like `/docs-pages/assets/style.css`. This method
-    /// rewrites those paths to `/github/pages/{owner}/{repository}/assets/style.css`
-    /// so the browser requests them through the proxy route.
-    ///
-    /// # Arguments
-    ///
-    /// - `&str`: The GitHub owner name.
-    /// - `&str`: The GitHub repository name.
-    /// - `&[u8]`: The original content bytes.
-    /// - `&str`: The file extension (without leading dot).
-    ///
-    /// # Returns
-    ///
-    /// - `Vec<u8>`: The content with rewritten paths, or the original content if not text.
+    /// Rewrites resource paths in text content from the original GitHub Pages
+    /// format to the proxy format, ensuring browsers request resources through
+    /// the proxy route.
     #[instrument_trace]
     fn rewrite_proxy_paths(
         owner: &str,
@@ -143,14 +192,6 @@ impl GithubPagesService {
     }
 
     /// Lists all cached GitHub Pages by scanning the cache directory.
-    ///
-    /// Reads the filesystem cache directory structure (`owner/repository/`)
-    /// and produces a complete listing of all cached pages.
-    ///
-    /// # Returns
-    ///
-    /// - `Result<GithubPagesListResponse, String>`: A response containing all cached pages info,
-    ///   or an error if the cache directory cannot be read.
     #[instrument_trace]
     pub async fn list_github_pages() -> Result<GithubPagesListResponse, String> {
         let mut pages: Vec<GithubPagesInfo> = Vec::new();
@@ -218,24 +259,15 @@ impl GithubPagesService {
         Ok(response)
     }
 
-    /// Synchronizes all resources for the specified GitHub Pages repository.
+    /// Synchronises all resources for the specified GitHub Pages repository.
     ///
-    /// Downloads all resources to a temporary directory first, then atomically
-    /// moves the completed download to the target cache directory. This ensures
-    /// that an interrupted sync does not corrupt the existing cache.
+    /// Downloads resources using a **concurrent work-stealing** approach
+    /// bounded by `MAX_CONCURRENT_FETCHES`, then atomically moves the completed
+    /// download tree into the target cache directory.
     ///
-    /// Clears the existing local cache directory, fetches the index page from
-    /// the remote GitHub Pages URL, iteratively discovers and fetches all linked
-    /// resources, and saves them to the local cache directory.
-    ///
-    /// # Arguments
-    ///
-    /// - `&str`: The GitHub owner name.
-    /// - `&str`: The GitHub repository name.
-    ///
-    /// # Returns
-    ///
-    /// - `Result<(), String>`: Ok on success, or an error if the initial fetch fails.
+    /// Uses the shared HTTP client and benefits from the fetch-dedup mechanism
+    /// so that concurrent proxy requests that happen to touch the same resource
+    /// during a sync are served from a single remote fetch.
     #[instrument_trace]
     pub async fn sync_github_pages(owner: &str, repository: &str) -> Result<(), String> {
         if !is_safe_path(owner) || !is_safe_path(repository) {
@@ -248,73 +280,222 @@ impl GithubPagesService {
         let base_url: String = BASE_URL_TEMPLATE
             .replace("{owner}", owner)
             .replace("{repository}", repository);
-        let client: Client = Client::builder()
-            .timeout(Duration::from_secs(FETCH_TIMEOUT_SECS))
-            .redirect(Policy::limited(MAX_REDIRECTS))
-            .build()
-            .map_err(|error: reqwest::Error| {
-                format!("{ERROR_FAILED_TO_FETCH_GITHUB_PAGES} {error}")
-            })?;
-        let mut visited: HashSet<String> = HashSet::new();
-        let mut queue: Vec<String> = vec![INDEX_HTML_FILE.to_string()];
-        // Download all resources to the temporary directory first
-        while let Some(path) = queue.pop() {
-            let normalized_path: String = Self::normalize_path_static(repository, &path);
-            if visited.contains(&normalized_path) {
-                continue;
-            }
-            visited.insert(normalized_path.clone());
-            let remote_url: String = format!("{base_url}{normalized_path}");
-            let content: Vec<u8> = match Self::fetch_resource_bytes(&client, &remote_url).await {
-                Ok(bytes) => bytes,
-                Err(error) => {
-                    warn!("Failed to sync resource {normalized_path} {error}");
-                    continue;
+        let client: &Client = get_http_client();
+        let semaphore: Arc<Semaphore> = Arc::new(Semaphore::new(MAX_CONCURRENT_FETCHES));
+        let visited: Arc<RwLock<HashSet<String>>> = Arc::new(RwLock::new(HashSet::new()));
+        let queue: Arc<RwLock<VecDeque<String>>> =
+            Arc::new(RwLock::new(VecDeque::from([INDEX_HTML_FILE.to_string()])));
+        let (result_sender, mut result_receiver) =
+            mpsc::unbounded_channel::<Result<(String, Vec<String>), String>>();
+        let mut active_count: usize = 0;
+        loop {
+            // ----- Spawn new tasks up to the concurrency limit -----
+            loop {
+                if active_count >= MAX_CONCURRENT_FETCHES {
+                    break;
                 }
-            };
-            let local_path: String = format!("{temp_dir}/{normalized_path}");
-            if let Some(parent) = Path::new(&local_path).parent() {
-                let _ = fs::create_dir_all(parent).await;
+                let path: String = {
+                    let mut queue_guard: RwLockWriteGuard<'_, VecDeque<String>> =
+                        queue.write().await;
+                    let Some(entry) = queue_guard.pop_front() else {
+                        break;
+                    };
+                    entry
+                };
+                let normalized_path: String = Self::normalize_path_static(repository, &path);
+                {
+                    let mut visited_guard: RwLockWriteGuard<'_, HashSet<String>> =
+                        visited.write().await;
+                    if visited_guard.contains(&normalized_path) {
+                        continue;
+                    }
+                    visited_guard.insert(normalized_path.clone());
+                }
+                active_count += 1;
+                let permit: OwnedSemaphorePermit = semaphore.clone().acquire_owned().await.unwrap();
+                let sender: mpsc::UnboundedSender<Result<(String, Vec<String>), String>> =
+                    result_sender.clone();
+                let owner: String = owner.to_string();
+                let repository: String = repository.to_string();
+                let base_url: String = base_url.clone();
+                let temp_dir: String = temp_dir.clone();
+                let client: &'static Client = client;
+                spawn(async move {
+                    let _permit: OwnedSemaphorePermit = permit;
+                    // Register this download in PENDING_FETCHES so that user requests
+                    // hitting the same uncached resource wait for us instead of spawning
+                    // a separate remote fetch.
+                    let sync_resource_key: String =
+                        format!("{owner}/{repository}/{normalized_path}");
+                    let pending_map: &RwLock<HashMap<String, Arc<PendingFetch>>> =
+                        PENDING_FETCHES.get_or_init(Default::default);
+                    let (should_fetch, mut waiter_rx) = {
+                        let mut map: RwLockWriteGuard<'_, HashMap<String, Arc<PendingFetch>>> =
+                            pending_map.write().await;
+                        if let Some(existing) = map.get(&sync_resource_key) {
+                            (false, existing.get_sender().subscribe())
+                        } else {
+                            let (pending, rx) = PendingFetch::new();
+                            map.insert(sync_resource_key.clone(), Arc::new(pending));
+                            (true, rx)
+                        }
+                    };
+                    if !should_fetch {
+                        // A concurrent user request is already fetching this resource —
+                        // wait for its result and write to temp_dir.
+                        if let Ok(raw_bytes) = wait_for_pending_fetch(&mut waiter_rx).await {
+                            let extension: String =
+                                FileExtension::get_extension_name(&normalized_path);
+                            // Extract linked paths from RAW content
+                            let linked: Vec<String> = Self::extract_linked_paths(
+                                &repository,
+                                &raw_bytes,
+                                &extension,
+                                &normalized_path,
+                            );
+                            // Pre-rewrite before saving to temp_dir
+                            let rewritten: Vec<u8> = GithubPagesService::rewrite_proxy_paths(
+                                &owner,
+                                &repository,
+                                &raw_bytes,
+                                &extension,
+                            );
+                            let local_path: String = format!("{temp_dir}/{normalized_path}");
+                            if let Some(parent) = Path::new(&local_path).parent() {
+                                let _ = fs::create_dir_all(parent).await;
+                            }
+                            if let Err(error) = fs::write(&local_path, &rewritten).await {
+                                error!("Failed to cache {local_path} {error}");
+                            }
+                            let _ = sender.send(Ok((normalized_path.clone(), linked)));
+                        } else {
+                            let _ = sender.send(Err(normalized_path.clone()));
+                        }
+                        return;
+                    }
+                    // --- Designated fetcher: do the actual remote fetch ---
+                    let remote_url: String = format!("{base_url}{normalized_path}");
+                    match GithubPagesService::fetch_resource_bytes(client, &remote_url).await {
+                        Ok(raw_bytes) => {
+                            // Extract linked paths from RAW content before rewriting
+                            let extension: String =
+                                FileExtension::get_extension_name(&normalized_path);
+                            let linked: Vec<String> = Self::extract_linked_paths(
+                                &repository,
+                                &raw_bytes,
+                                &extension,
+                                &normalized_path,
+                            );
+                            // Pre-rewrite paths so the cache has ready-to-serve content
+                            let rewritten: Vec<u8> = GithubPagesService::rewrite_proxy_paths(
+                                &owner,
+                                &repository,
+                                &raw_bytes,
+                                &extension,
+                            );
+                            // Save rewritten content to temp_dir
+                            let local_path: String = format!("{temp_dir}/{normalized_path}");
+                            if let Some(parent) = Path::new(&local_path).parent() {
+                                let _ = fs::create_dir_all(parent).await;
+                            }
+                            if let Err(error) = fs::write(&local_path, &rewritten).await {
+                                error!("Failed to cache {local_path} {error}");
+                            }
+                            // Notify any waiters (user requests) with the RAW content
+                            // so they can also pre-rewrite for their own cache path.
+                            let mut map: RwLockWriteGuard<'_, HashMap<String, Arc<PendingFetch>>> =
+                                pending_map.write().await;
+                            if let Some(pending) = map.get(&sync_resource_key) {
+                                pending.get_sender().send(Some(Ok(raw_bytes.clone()))).ok();
+                            }
+                            map.remove(&sync_resource_key);
+                            drop(map);
+                            let _ = sender.send(Ok((normalized_path.clone(), linked)));
+                        }
+                        Err(error) => {
+                            // Notify waiters of the failure, then clean up
+                            let mut map: RwLockWriteGuard<'_, HashMap<String, Arc<PendingFetch>>> =
+                                pending_map.write().await;
+                            if let Some(pending) = map.get(&sync_resource_key) {
+                                pending.get_sender().send(Some(Err(error.clone()))).ok();
+                            }
+                            map.remove(&sync_resource_key);
+                            drop(map);
+                            warn!("Failed to sync {normalized_path} {error}");
+                            let _ = sender.send(Err(normalized_path.clone()));
+                        }
+                    }
+                });
             }
-            if let Err(error) = fs::write(&local_path, &content).await {
-                error!("Failed to cache resource file {local_path} {error}");
+            // ----- No active work remaining → done -----
+            if active_count == 0 {
+                break;
             }
-            let extension: String = FileExtension::get_extension_name(&normalized_path);
-            let linked_paths: Vec<String> =
-                Self::extract_linked_paths(repository, &content, &extension, &normalized_path);
-            for linked_path in linked_paths {
-                if !visited.contains(&linked_path) {
-                    queue.push(linked_path);
+            // ----- Await the next completed task -----
+            tokio::select! {
+                Some(result) = result_receiver.recv() => {
+                    active_count = active_count.saturating_sub(1);
+                    if let Ok((_normalized_path, linked_paths)) = result {
+                        let visited_guard: RwLockReadGuard<'_, HashSet<String>> =
+                            visited.read().await;
+                        let mut queue_guard: RwLockWriteGuard<'_, VecDeque<String>> =
+                            queue.write().await;
+                        for link in linked_paths {
+                            if !visited_guard.contains(&link) {
+                                queue_guard.push_back(link);
+                            }
+                        }
+                    }
+                }
+                else => {
+                    // Channel closed (all senders dropped) — shouldn't happen
+                    // while tasks are active, but guard against it.
+                    break;
                 }
             }
         }
-        // All downloads complete — atomically replace the target directory
-        let _ = fs::remove_dir_all(&cache_dir).await;
-        fs::rename(&temp_dir, &cache_dir)
-            .await
-            .map_err(|error: std::io::Error| {
-                format!("Failed to finalize sync by moving temp to cache directory: {error}")
-            })?;
+        // ----- Atomically move the fully-downloaded tree to the cache dir -----
+        if fs::metadata(&temp_dir).await.is_ok() {
+            let _ = fs::remove_dir_all(&cache_dir).await;
+            fs::rename(&temp_dir, &cache_dir)
+                .await
+                .map_err(|error: std::io::Error| {
+                    format!("Failed to finalize sync by moving temp to cache directory: {error}")
+                })?;
+            // Warm OS disk cache: read all files in the new cache directory so that the
+            // first user request hits the OS page cache instead of going to physical disk.
+            // Awaiting (instead of spawning) guarantees the warm-up finishes before
+            // the sync response is sent back to the caller.
+            Self::warm_cache_directory(&cache_dir).await;
+        } else {
+            warn!("Sync produced no files — keeping existing cache directory untouched");
+        }
         Ok(())
     }
 
+    /// Recursively walks `directory` and reads every file to warm the OS disk cache.
+    /// This ensures the first user request after a sync is served from memory, not disk.
+    async fn warm_cache_directory(directory: &str) {
+        let mut entries: fs::ReadDir = match fs::read_dir(directory).await {
+            Ok(entries) => entries,
+            Err(_) => return,
+        };
+        while let Ok(Some(entry)) = entries.next_entry().await {
+            let entry_path: std::path::PathBuf = entry.path();
+            if entry.file_type().await.map(|t| t.is_dir()).unwrap_or(false) {
+                Box::pin(Self::warm_cache_directory(&entry_path.to_string_lossy())).await;
+            } else if entry
+                .file_type()
+                .await
+                .map(|t| t.is_file())
+                .unwrap_or(false)
+            {
+                let _ = fs::read(&entry_path).await;
+            }
+        }
+    }
+
     /// Extracts linked resource paths from content for recursive fetching during sync.
-    ///
-    /// Extracts relative resource paths from text content (HTML, JS, CSS, etc.),
-    /// then resolves them relative to the current resource's directory.
-    /// Supports media resource paths (mp4, mp3, webm, etc.) discovered from
-    /// HTML tags like `<video>`, `<audio>`, `<source>`, `<embed>`, `<object>`.
-    ///
-    /// # Arguments
-    ///
-    /// - `&str`: The GitHub repository name.
-    /// - `&[u8]`: The original content bytes.
-    /// - `&str`: The file extension (without leading dot).
-    /// - `&str`: The normalized path of the current resource (e.g. `"assets/app.js"`).
-    ///
-    /// # Returns
-    ///
-    /// - `Vec<String>`: A list of resolved resource paths relative to the repository root.
     #[instrument_trace]
     fn extract_linked_paths(
         repository: &str,
@@ -353,19 +534,6 @@ impl GithubPagesService {
     }
 
     /// Resolves a relative path against a base directory.
-    ///
-    /// Handles `./` and `../` segments in the relative path by traversing
-    /// the base directory accordingly. Returns `None` if the path would
-    /// traverse above the repository root.
-    ///
-    /// # Arguments
-    ///
-    /// - `&str`: The base directory (e.g. `"assets"` or `""` for root).
-    /// - `&str`: The relative path to resolve (e.g. `"./vendor.js"` or `"../img/logo.png"`).
-    ///
-    /// # Returns
-    ///
-    /// - `Option<String>`: The resolved path, or `None` if it escapes the root.
     #[instrument_trace]
     fn resolve_relative_path(base_dir: &str, relative_path: &str) -> Option<String> {
         let normalized_relative: String = relative_path.trim_start_matches("./").to_string();
@@ -396,25 +564,6 @@ impl GithubPagesService {
     }
 
     /// Fetches a resource range for HTTP Range request support.
-    ///
-    /// First ensures the resource is cached locally (fetching from remote if needed),
-    /// then reads the specified byte range from the cached file.
-    /// This is essential for video/audio streaming where browsers send Range requests
-    /// for seeking and buffered playback.
-    ///
-    /// # Arguments
-    ///
-    /// - `&str`: The GitHub owner name.
-    /// - `&str`: The GitHub repository name.
-    /// - `&str`: The resource path relative to the repository root.
-    /// - `u64`: The starting byte offset (inclusive).
-    /// - `u64`: The ending byte offset (inclusive).
-    ///
-    /// # Returns
-    ///
-    /// - `Result<(Vec<u8>, String, u64, u64), String>`: A tuple of
-    ///   (range content bytes, content type, content length, total file size) on success,
-    ///   or an error message if fetching fails.
     #[instrument_trace]
     pub async fn fetch_resource_range(
         owner: &str,
@@ -447,18 +596,6 @@ impl GithubPagesService {
     }
 
     /// Fetches raw bytes from a URL with retry logic.
-    ///
-    /// Retries the request up to `FETCH_MAX_RETRIES` times on failure.
-    ///
-    /// # Arguments
-    ///
-    /// - `&Client`: The HTTP client to use for the request.
-    /// - `&str`: The URL to fetch.
-    ///
-    /// # Returns
-    ///
-    /// - `Result<Vec<u8>, String>`: The response body bytes on success,
-    ///   or an error message if all retry attempts are exhausted.
     #[instrument_trace]
     async fn fetch_resource_bytes(client: &Client, url: &str) -> Result<Vec<u8>, String> {
         let mut attempt: u32 = 0;
