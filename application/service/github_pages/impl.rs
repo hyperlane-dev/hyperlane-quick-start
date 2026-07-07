@@ -220,6 +220,10 @@ impl GithubPagesService {
 
     /// Synchronizes all resources for the specified GitHub Pages repository.
     ///
+    /// Downloads all resources to a temporary directory first, then atomically
+    /// moves the completed download to the target cache directory. This ensures
+    /// that an interrupted sync does not corrupt the existing cache.
+    ///
     /// Clears the existing local cache directory, fetches the index page from
     /// the remote GitHub Pages URL, iteratively discovers and fetches all linked
     /// resources, and saves them to the local cache directory.
@@ -238,7 +242,9 @@ impl GithubPagesService {
             return Err(ERROR_UNSAFE_PATH.to_string());
         }
         let cache_dir: String = format!("{CACHE_DIR}/{owner}/{repository}");
-        let _ = fs::remove_dir_all(&cache_dir).await;
+        let temp_dir: String = format!("{CACHE_DIR}/{owner}/{repository}.tmp");
+        // Clean up any stale temp directory from a previous interrupted sync
+        let _ = fs::remove_dir_all(&temp_dir).await;
         let base_url: String = BASE_URL_TEMPLATE
             .replace("{owner}", owner)
             .replace("{repository}", repository);
@@ -251,6 +257,7 @@ impl GithubPagesService {
             })?;
         let mut visited: HashSet<String> = HashSet::new();
         let mut queue: Vec<String> = vec![INDEX_HTML_FILE.to_string()];
+        // Download all resources to the temporary directory first
         while let Some(path) = queue.pop() {
             let normalized_path: String = Self::normalize_path_static(repository, &path);
             if visited.contains(&normalized_path) {
@@ -265,7 +272,7 @@ impl GithubPagesService {
                     continue;
                 }
             };
-            let local_path: String = format!("{CACHE_DIR}/{owner}/{repository}/{normalized_path}");
+            let local_path: String = format!("{temp_dir}/{normalized_path}");
             if let Some(parent) = Path::new(&local_path).parent() {
                 let _ = fs::create_dir_all(parent).await;
             }
@@ -281,6 +288,13 @@ impl GithubPagesService {
                 }
             }
         }
+        // All downloads complete — atomically replace the target directory
+        let _ = fs::remove_dir_all(&cache_dir).await;
+        fs::rename(&temp_dir, &cache_dir)
+            .await
+            .map_err(|error: std::io::Error| {
+                format!("Failed to finalize sync by moving temp to cache directory: {error}")
+            })?;
         Ok(())
     }
 
