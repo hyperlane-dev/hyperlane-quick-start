@@ -11,7 +11,7 @@ use {r#static::*, r#type::*};
 
 use {super::*, model::response::github_pages::*, utils::content_type::*};
 
-use hyperlane_config::application::github_pages::*;
+use {hyperlane_config::application::github_pages::*, hyperlane_plugin::message_queue::*};
 
 use std::{
     collections::{HashSet, VecDeque},

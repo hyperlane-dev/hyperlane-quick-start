@@ -9,6 +9,7 @@ pub mod database;
 pub mod docker;
 pub mod env;
 pub mod logger;
+pub mod message_queue;
 pub mod mysql;
 pub mod postgresql;
 pub mod process;

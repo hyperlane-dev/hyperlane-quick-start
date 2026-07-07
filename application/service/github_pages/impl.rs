@@ -648,4 +648,23 @@ impl GithubPagesService {
             }
         }
     }
+
+    /// Publishes a sync task message to the message queue for the given owner
+    /// and repository, allowing a background consumer to perform the actual sync.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The GitHub owner name.
+    /// - `&str`: The GitHub repository name.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), String>`: Ok if the message was published, or an error if the topic does not exist.
+    #[instrument_trace]
+    pub async fn publish_sync_task(owner: &str, repository: &str) -> Result<(), String> {
+        let broker: &MessageQueueBroker = get_message_queue_broker();
+        let payload: MessagePayload =
+            format!("{owner}{SYNC_TASK_SEPARATOR}{repository}").into_bytes();
+        broker.publish(TOPIC_GITHUB_PAGES_SYNC, &payload).await
+    }
 }

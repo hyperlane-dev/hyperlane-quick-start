@@ -67,7 +67,7 @@ impl ServerHook for SyncGithubPagesRoute {
                 return Status::Continue;
             }
         };
-        match GithubPagesService::sync_github_pages(&owner, &repository).await {
+        match GithubPagesService::publish_sync_task(&owner, &repository).await {
             Ok(()) => {
                 let response: ApiResponse<&str> =
                     ApiResponse::new(ApiResponseStatus::Success, SUCCESS_GITHUB_PAGES_SYNCED);

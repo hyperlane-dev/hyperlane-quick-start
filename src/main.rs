@@ -2,7 +2,9 @@
 
 use {
     hyperlane_bootstrap::{
-        application::{cicd::*, db::*, env::*, github_pages::*, logger::*, monitor::*},
+        application::{
+            cicd::*, db::*, env::*, github_pages::*, logger::*, message_queue::*, monitor::*,
+        },
         common::*,
         framework::{runtime::*, server::*},
     },
@@ -23,6 +25,7 @@ fn main() {
     let env_config: &EnvConfig = EnvPlugin::get_or_init();
     RuntimeBootstrap::init().get_runtime().block_on(async move {
         DbBootstrap::init().await;
+        MessageQueueBootstrap::init().await;
         CicdBootstrap::init().await;
         GithubPagesBootstrap::init().await;
         MonitorBootstrap::init().await;
