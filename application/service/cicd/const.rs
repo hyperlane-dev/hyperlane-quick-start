@@ -16,13 +16,22 @@ pub const LOCAL_RUNNER: &str = "local-runner";
 pub const DEFAULT_SHELL_WINDOWS: &str = "cmd.exe";
 
 /// Default shell unix.
-pub const DEFAULT_SHELL_UNIX: &str = "bash";
+pub const DEFAULT_SHELL_UNIX: &str = "sh";
 
 /// Error message when failed to take stdout.
 pub const ERROR_FAILED_TO_TAKE_STDOUT: &str = "Failed to take stdout";
 
 /// Error message when failed to take stderr.
 pub const ERROR_FAILED_TO_TAKE_STDERR: &str = "Failed to take stderr";
+
+/// Error message when failed to read stdout.
+pub const ERROR_FAILED_TO_READ_STDOUT: &str = "Failed to read stdout";
+
+/// Error message when failed to read stderr.
+pub const ERROR_FAILED_TO_READ_STDERR: &str = "Failed to read stderr";
+
+/// Output stream read buffer size.
+pub const OUTPUT_STREAM_BUFFER_SIZE: usize = 8192;
 
 /// Error message when prefix.
 pub const ERROR_PREFIX: &str = "Error:";

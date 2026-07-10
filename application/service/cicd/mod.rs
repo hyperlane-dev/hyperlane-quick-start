@@ -27,7 +27,7 @@ use std::{
 };
 
 use tokio::{
-    io::AsyncReadExt,
+    io::{AsyncRead, AsyncReadExt},
     process::{Child, ChildStderr, ChildStdout, Command},
     spawn,
     sync::{RwLockReadGuard, RwLockWriteGuard},

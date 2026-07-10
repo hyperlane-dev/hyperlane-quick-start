@@ -134,5 +134,6 @@ pub struct StepConfig {
     /// The name.
     pub(super) name: String,
     /// The run.
+    #[serde(alias = "script", alias = "command")]
     pub(super) run: Option<String>,
 }

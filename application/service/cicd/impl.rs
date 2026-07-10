@@ -353,16 +353,19 @@ impl CicdService {
     ) -> Result<String, String> {
         let is_windows: bool = cfg!(target_os = "windows");
         let shell: String = if is_windows {
-            std::env::var("COMSPEC").unwrap_or_else(|_: std::env::VarError| "cmd.exe".to_string())
+            std::env::var("COMSPEC")
+                .unwrap_or_else(|_: std::env::VarError| DEFAULT_SHELL_WINDOWS.to_string())
         } else {
-            std::env::var("SHELL").unwrap_or_else(|_: std::env::VarError| "bash".to_string())
+            std::env::var("SHELL")
+                .unwrap_or_else(|_: std::env::VarError| DEFAULT_SHELL_UNIX.to_string())
         };
         let mut cmd: Command = Command::new(&shell);
         if is_windows {
-            cmd.arg("/C").arg(command);
+            cmd.arg("/D").arg("/S").arg("/C").arg(command);
         } else {
             cmd.arg("-c").arg(command);
         }
+        cmd.kill_on_drop(true);
         let mut child: Child = match cmd.stdout(Stdio::piped()).stderr(Stdio::piped()).spawn() {
             Ok(c) => c,
             Err(error) => return Err(format!("Failed to spawn shell process: {error}")),
@@ -374,7 +377,7 @@ impl CicdService {
         let stderr: ChildStderr = child
             .stderr
             .take()
-            .ok_or_else(|| "Failed to take stderr".to_string())?;
+            .ok_or_else(|| ERROR_FAILED_TO_TAKE_STDERR.to_string())?;
         let stdout_handle: JoinHandle<Result<String, String>> = {
             let log_manager: LogStreamManager = log_manager.clone();
             spawn(
@@ -401,28 +404,34 @@ impl CicdService {
         match timeout_result {
             Ok((stdout_result, stderr_result, exit_status)) => {
                 let stdout: String = stdout_result
-                    .unwrap_or(Ok(String::new()))
-                    .unwrap_or_default();
+                    .map_err(|error: JoinError| format!("Stdout stream task failed: {error}"))??;
                 let stderr: String = stderr_result
-                    .unwrap_or(Ok(String::new()))
-                    .unwrap_or_default();
+                    .map_err(|error: JoinError| format!("Stderr stream task failed: {error}"))??;
                 output_builder.add_stdout(stdout);
                 output_builder.add_stderr(stderr);
-                if let Ok(status) = exit_status
-                    && !status.success()
-                {
+                let output: String = output_builder.build();
+                let status: ExitStatus = exit_status.map_err(|error: std::io::Error| {
+                    format!("Failed to wait shell process: {error}")
+                })?;
+                if !status.success() {
                     let exit_code: i32 = status.code().unwrap_or(-1);
-                    return Err(format!("Command exited with code {exit_code}"));
+                    if output == NO_OUTPUT_MESSAGE {
+                        return Err(format!("Command exited with code {exit_code}"));
+                    }
+                    return Err(format!(
+                        "Command exited with code {exit_code}{BR}{BR}{output}"
+                    ));
                 }
+                Ok(output)
             }
             Err(_) => {
                 output_builder.mark_timeout(TASK_TIMEOUT.as_secs());
+                Ok(output_builder.build())
             }
         }
-        Ok(output_builder.build())
     }
 
-    /// Reads the stdout stream of a child process to completion and appends it to the log manager.
+    /// Reads the stdout stream of a child process incrementally and appends it to the log manager.
     ///
     /// # Arguments
     ///
@@ -441,23 +450,18 @@ impl CicdService {
         step_id: i32,
         log_manager: &LogStreamManager,
     ) -> Result<String, String> {
-        let mut reader: ChildStdout = reader;
-        let mut output_buffer: Vec<u8> = vec![];
-        match reader.read_to_end(&mut output_buffer).await {
-            Ok(_) => {
-                let output: String = String::from_utf8_lossy(&output_buffer).to_string();
-                if !output.is_empty() {
-                    log_manager
-                        .append_log(run_id, step_id, &output, false)
-                        .await;
-                }
-                Ok(output)
-            }
-            Err(error) => Err(format!("Failed to read stdout: {error}")),
-        }
+        Self::read_output_stream(
+            reader,
+            run_id,
+            step_id,
+            log_manager,
+            false,
+            ERROR_FAILED_TO_READ_STDOUT,
+        )
+        .await
     }
 
-    /// Reads the stderr stream of a child process to completion and appends it to the log manager.
+    /// Reads the stderr stream of a child process incrementally and appends it to the log manager.
     ///
     /// # Arguments
     ///
@@ -476,18 +480,60 @@ impl CicdService {
         step_id: i32,
         log_manager: &LogStreamManager,
     ) -> Result<String, String> {
-        let mut reader: ChildStderr = reader;
-        let mut output_buffer: Vec<u8> = vec![];
-        match reader.read_to_end(&mut output_buffer).await {
-            Ok(_) => {
-                let output: String = String::from_utf8_lossy(&output_buffer).to_string();
-                if !output.is_empty() {
-                    log_manager.append_log(run_id, step_id, &output, true).await;
-                }
-                Ok(output)
+        Self::read_output_stream(
+            reader,
+            run_id,
+            step_id,
+            log_manager,
+            true,
+            ERROR_FAILED_TO_READ_STDERR,
+        )
+        .await
+    }
+
+    /// Reads a child process output stream incrementally and broadcasts each captured chunk.
+    ///
+    /// # Arguments
+    ///
+    /// - `R`: The asynchronous stream reader.
+    /// - `i32`: The run identifier.
+    /// - `i32`: The step identifier.
+    /// - `&LogStreamManager`: The manager for streaming output.
+    /// - `bool`: Whether the stream is stderr.
+    /// - `&str`: The prefix used when read errors occur.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<String, String>`: The captured stream content, or a read error message.
+    #[instrument_trace]
+    async fn read_output_stream<R>(
+        mut reader: R,
+        run_id: i32,
+        step_id: i32,
+        log_manager: &LogStreamManager,
+        is_stderr: bool,
+        error_message: &str,
+    ) -> Result<String, String>
+    where
+        R: AsyncRead + Unpin,
+    {
+        let mut output: String = String::new();
+        let mut buffer: Vec<u8> = vec![0; OUTPUT_STREAM_BUFFER_SIZE];
+        loop {
+            let read_size: usize = reader
+                .read(&mut buffer)
+                .await
+                .map_err(|error: std::io::Error| format!("{error_message}: {error}"))?;
+            if read_size == 0 {
+                break;
             }
-            Err(error) => Err(format!("Failed to read stderr: {error}")),
+            let chunk: String = String::from_utf8_lossy(&buffer[..read_size]).to_string();
+            log_manager
+                .append_log(run_id, step_id, &chunk, is_stderr)
+                .await;
+            output.push_str(&chunk);
         }
+        Ok(output)
     }
 
     /// Retrieves the next sequential run number for the given pipeline.
@@ -1051,7 +1097,9 @@ impl LogStreamManager {
             is_stderr,
         };
         let entry_json: String = serde_json::to_string(&entry).unwrap_or_default();
-        let _ = self.broadcast_map.send(key, entry_json);
+        if let Err(error) = self.broadcast_map.try_send(key, entry_json.clone()) {
+            tracing::debug!("CICD log broadcast skipped: {error}");
+        }
         if let Some(output) = self.get_step_outputs().read().await.get(&step_id) {
             if is_stderr {
                 let mut stderr_guard: RwLockWriteGuard<'_, String> = output.stderr.write().await;
