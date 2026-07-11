@@ -1,6 +1,6 @@
 *.log
 *.pid
 /data
-/target
+target
 /.vscode
 node_modules
