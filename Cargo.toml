@@ -32,9 +32,9 @@ hyperlane_plugin = { path = "plugin", version = "23.0.26" }
 hyperlane_resources = { path = "resources", version = "23.0.26" }
 
 tracing = "0.1.44"
-hyperlane = "21.3.2"
-hyperlane-utils = "33.1.8"
-serde = { version = "1.0.228", features = ["derive"] }
+hyperlane = "21.3.3"
+hyperlane-utils = "33.1.9"
+serde = { version = "1.0.229", features = ["derive"] }
 
 [dependencies]
 hyperlane_bootstrap = { workspace = true }
