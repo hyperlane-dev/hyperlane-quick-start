@@ -169,8 +169,12 @@ impl AuthService {
         let user_id_value: serde_json::Value =
             match jwt_service.get_from_token(&token, JWT_CLAIM_USER_ID) {
                 Ok(Some(value)) => value,
-                Ok(None) => return Err(ERROR_USER_ID_NOT_FOUND_IN_TOKEN.to_string()),
-                Err(_) => return Err(ERROR_INVALID_TOKEN.to_string()),
+                Ok(None) => {
+                    return Err(ERROR_USER_ID_NOT_FOUND_IN_TOKEN.to_string());
+                }
+                Err(_e) => {
+                    return Err(ERROR_INVALID_TOKEN.to_string());
+                }
             };
         let user_id: i32 = match user_id_value.as_i64() {
             Some(id) => id as i32,

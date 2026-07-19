@@ -14,6 +14,6 @@ use {
     service::auth::*,
 };
 
-use {chrono::NaiveDateTime, sea_orm::ActiveValue};
-
 use std::collections::HashMap;
+
+use {chrono::NaiveDateTime, sea_orm::ActiveValue};

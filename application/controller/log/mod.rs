@@ -4,6 +4,4 @@ mod r#struct;
 
 pub use r#fn::*;
 
-use {super::*, r#struct::*};
-
-use service::log::*;
+use {super::*, service::log::*, r#struct::*};

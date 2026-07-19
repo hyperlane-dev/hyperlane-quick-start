@@ -13,6 +13,8 @@ pub enum ApiResponseStatus {
     Forbidden,
     /// The requested resource was not found.
     ResourceNotFound,
+    /// A resource conflicts with existing state.
+    Conflict,
     /// A database operation failed.
     DatabaseError,
     /// A business logic constraint was violated.

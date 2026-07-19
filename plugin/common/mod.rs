@@ -2,6 +2,6 @@ mod r#trait;
 
 pub use r#trait::*;
 
-use crate::database::*;
+use {super::*, database::*};
 
 use std::future::Future;

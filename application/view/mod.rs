@@ -6,6 +6,7 @@ pub mod dataset;
 pub mod diff;
 pub mod docs;
 pub mod euv;
+pub mod euv_playground;
 pub mod favicon;
 pub mod github_pages;
 pub mod gomoku;

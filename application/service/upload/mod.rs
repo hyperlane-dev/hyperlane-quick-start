@@ -9,6 +9,6 @@ use {
     repository::upload::*,
 };
 
-use std::num::ParseIntError;
-
 use hyperlane_config::application::{charset::*, upload::*};
+
+use std::num::ParseIntError;

@@ -1,9 +1,6 @@
 window.editor = null;
 window.is_dark_theme = false;
 window.copy_msg = '';
-const ltpp_theme_name = 'ltpp-theme';
-const ltpp_light_bk_color = '#ebeef5';
-const ltpp_dark_bk_color = '#282c34';
 const show_display_css = 'block';
 const hidden_display_css = 'none';
 const app_dom_id = 'app';
@@ -523,137 +520,175 @@ function loadIDE() {
         return;
       }
       window.loadLanguagesConfig(monaco);
-      monaco.editor.defineTheme(ltpp_theme_name, {
-        base: window.is_dark_theme ? 'vs-dark' : 'vs',
-        inherit: true,
-        rules: [
+      if (typeof window.defineIdeTheme === 'function') {
+        window.defineIdeTheme(monaco);
+        window.editor = monaco.editor.create(
+          document.getElementById('ltpp-editor'),
           {
-            background: window.is_dark_theme
+            value: code,
+            language: window.language,
+            theme: window.IDE_THEME_NAME,
+            fontSize: 18,
+            scrollBeyondLastLine: true,
+            smoothScrolling: true,
+            links: true,
+            cursorSmoothCaretAnimation: true,
+            readOnly: false,
+            folding: true,
+            contextmenu: false,
+            suggestOnTriggerCharacters: true,
+            cursorBlinking: 'smooth',
+            cursorWidth: 2,
+            automaticLayout: false,
+            mouseWheelZoom: true,
+            scrollBeyondLastLine: false,
+            wordWrap: 'off',
+            wrappingStrategy: 'advanced',
+            scrollbar: {
+              verticalScrollbarSize: 0,
+              vertical: 'hidden',
+              horizontalSliderSize: 8,
+              horizontal: 'auto',
+            },
+          },
+        );
+        monaco.editor.setTheme(window.IDE_THEME_NAME);
+      } else {
+        const ltpp_theme_name = window.IDE_THEME_NAME || 'ltpp-theme';
+        const ltpp_light_bk_color = window.IDE_LIGHT_BACKGROUND || '#ebeef5';
+        const ltpp_dark_bk_color = window.IDE_DARK_BACKGROUND || '#282c34';
+        monaco.editor.defineTheme(ltpp_theme_name, {
+          base: window.is_dark_theme ? 'vs-dark' : 'vs',
+          inherit: true,
+          rules: [
+            {
+              background: window.is_dark_theme
+                ? ltpp_dark_bk_color
+                : ltpp_light_bk_color,
+            },
+            {
+              token: 'keyword',
+              foreground: window.getCSSVariable('--mtk1'),
+            },
+            {
+              token: 'keyword.main',
+              foreground: window.getCSSVariable('--mtk14'),
+            },
+            {
+              token: 'function',
+              foreground: window.getCSSVariable('--mtk8'),
+            },
+            {
+              token: 'type.keyword',
+              foreground: window.getCSSVariable('--mtk4'),
+            },
+            {
+              token: 'type.identifier',
+              foreground: window.getCSSVariable('--mtk5'),
+            },
+            {
+              token: 'identifier',
+              foreground: window.getCSSVariable('--mtk2'),
+            },
+            {
+              token: 'string',
+              foreground: window.getCSSVariable('--mtk6'),
+            },
+            {
+              token: 'string.quote',
+              foreground: window.getCSSVariable('--mtk22'),
+            },
+            {
+              token: 'string.escape',
+              foreground: window.getCSSVariable('--mtk15'),
+            },
+            {
+              token: 'string.invalid',
+              foreground: window.getCSSVariable('--mtk10'),
+            },
+            {
+              token: 'number',
+              foreground: window.getCSSVariable('--mtk16'),
+            },
+            {
+              token: 'number.float',
+              foreground: window.getCSSVariable('--mtk17'),
+            },
+            {
+              token: 'number.hex',
+              foreground: window.getCSSVariable('--mtk18'),
+            },
+            {
+              token: 'comment',
+              foreground: window.getCSSVariable('--mtk7'),
+              fontStyle: 'italic',
+            },
+            {
+              token: 'operator',
+              foreground: window.getCSSVariable('--mtk21'),
+            },
+            {
+              token: 'delimiter',
+              foreground: window.getCSSVariable('--mtk23'),
+            },
+            {
+              token: 'annotation',
+              foreground: window.getCSSVariable('--mtk9'),
+            },
+            {
+              token: 'preprocessor',
+              foreground: window.getCSSVariable('--mtk11'),
+            },
+            {
+              token: 'number.binary',
+              foreground: window.getCSSVariable('--mtk12'),
+            },
+            {
+              token: 'number.octal',
+              foreground: window.getCSSVariable('--mtk13'),
+            },
+            {
+              token: 'delimiter.bracket',
+              foreground: window.getCSSVariable('--mtk19'),
+            },
+          ],
+          colors: {
+            'editor.background': window.is_dark_theme
               ? ltpp_dark_bk_color
               : ltpp_light_bk_color,
           },
+        });
+        window.editor = monaco.editor.create(
+          document.getElementById('ltpp-editor'),
           {
-            token: 'keyword',
-            foreground: window.getCSSVariable('--mtk1'),
+            value: code,
+            language: window.language,
+            theme: ltpp_theme_name,
+            fontSize: 18,
+            scrollBeyondLastLine: true,
+            smoothScrolling: true,
+            links: true,
+            cursorSmoothCaretAnimation: true,
+            readOnly: false,
+            folding: true,
+            contextmenu: false,
+            suggestOnTriggerCharacters: true,
+            cursorBlinking: 'smooth',
+            cursorWidth: 2,
+            automaticLayout: false,
+            mouseWheelZoom: true,
+            scrollBeyondLastLine: false,
+            wordWrap: 'off',
+            wrappingStrategy: 'advanced',
+            scrollbar: {
+              verticalScrollbarSize: 0,
+              vertical: 'hidden',
+              horizontalSliderSize: 8,
+              horizontal: 'auto',
+            },
           },
-          {
-            token: 'keyword.main',
-            foreground: window.getCSSVariable('--mtk14'),
-          },
-          {
-            token: 'function',
-            foreground: window.getCSSVariable('--mtk8'),
-          },
-          {
-            token: 'type.keyword',
-            foreground: window.getCSSVariable('--mtk4'),
-          },
-          {
-            token: 'type.identifier',
-            foreground: window.getCSSVariable('--mtk5'),
-          },
-          {
-            token: 'identifier',
-            foreground: window.getCSSVariable('--mtk2'),
-          },
-          {
-            token: 'string',
-            foreground: window.getCSSVariable('--mtk6'),
-          },
-          {
-            token: 'string.quote',
-            foreground: window.getCSSVariable('--mtk22'),
-          },
-          {
-            token: 'string.escape',
-            foreground: window.getCSSVariable('--mtk15'),
-          },
-          {
-            token: 'string.invalid',
-            foreground: window.getCSSVariable('--mtk10'),
-          },
-          {
-            token: 'number',
-            foreground: window.getCSSVariable('--mtk16'),
-          },
-          {
-            token: 'number.float',
-            foreground: window.getCSSVariable('--mtk17'),
-          },
-          {
-            token: 'number.hex',
-            foreground: window.getCSSVariable('--mtk18'),
-          },
-          {
-            token: 'comment',
-            foreground: window.getCSSVariable('--mtk7'),
-            fontStyle: 'italic',
-          },
-          {
-            token: 'operator',
-            foreground: window.getCSSVariable('--mtk21'),
-          },
-          {
-            token: 'delimiter',
-            foreground: window.getCSSVariable('--mtk23'),
-          },
-          {
-            token: 'annotation',
-            foreground: window.getCSSVariable('--mtk9'),
-          },
-          {
-            token: 'preprocessor',
-            foreground: window.getCSSVariable('--mtk11'),
-          },
-          {
-            token: 'number.binary',
-            foreground: window.getCSSVariable('--mtk12'),
-          },
-          {
-            token: 'number.octal',
-            foreground: window.getCSSVariable('--mtk13'),
-          },
-          {
-            token: 'delimiter.bracket',
-            foreground: window.getCSSVariable('--mtk19'),
-          },
-        ],
-        colors: {
-          'editor.background': window.is_dark_theme
-            ? ltpp_dark_bk_color
-            : ltpp_light_bk_color,
-        },
-      });
-      const editor = monaco.editor.create(
-        document.getElementById('ltpp-editor'),
-        {
-          value: code,
-          language: window.language,
-          theme: ltpp_theme_name,
-          fontSize: 18,
-          scrollBeyondLastLine: true,
-          smoothScrolling: true,
-          links: true,
-          cursorSmoothCaretAnimation: true,
-          readOnly: false,
-          folding: true,
-          contextmenu: false,
-          suggestOnTriggerCharacters: true,
-          cursorBlinking: 'smooth',
-          cursorWidth: 2,
-          automaticLayout: false,
-          mouseWheelZoom: true,
-          scrollBeyondLastLine: false,
-          wordWrap: 'off',
-          wrappingStrategy: 'advanced',
-          scrollbar: {
-            verticalScrollbarSize: 0,
-            vertical: 'hidden',
-            horizontalSliderSize: 8,
-            horizontal: 'auto',
-          },
-        },
-      );
+        );
+      }
       const new_code_tips = getMdCodeTips();
       monaco.languages.registerCompletionItemProvider(window.language, {
         provideCompletionItems: function (model, position) {
@@ -718,6 +753,11 @@ function init() {
     }
     loadIDE(is_dark_theme);
   } catch (err) {}
+}
+
+const ide_run_lang_label = document.getElementById('ide-run-lang-label');
+if (ide_run_lang_label && window.language) {
+  ide_run_lang_label.textContent = window.language;
 }
 
 errorListener();

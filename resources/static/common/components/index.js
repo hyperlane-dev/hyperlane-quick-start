@@ -10,6 +10,7 @@ const HL_COMPONENTS = [
   'hyperlane-pagination.js',
   'hyperlane-select.js',
   'hyperlane-toast.js',
+  'hyperlane-monaco-editor.js',
 ];
 
 function loadHLComponents(basePath = '../common/components/') {

@@ -11,7 +11,6 @@ class HyperlaneButton extends HTMLElement {
 
   connectedCallback() {
     this.render();
-    this.addEventListeners();
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -30,6 +29,7 @@ class HyperlaneButton extends HTMLElement {
         e.stopPropagation();
         return;
       }
+      e.stopPropagation();
       this.dispatchEvent(
         new CustomEvent('hyperlane-click', {
           bubbles: true,
@@ -101,6 +101,9 @@ class HyperlaneButton extends HTMLElement {
           width: 100%;
           height: 100%;
         }
+        :host([hidden]) {
+          display: none;
+        }
         button {
           position: relative;
           overflow: hidden;
@@ -150,6 +153,7 @@ class HyperlaneButton extends HTMLElement {
         <slot></slot>
       </button>
     `;
+    this.addEventListeners();
   }
 }
 

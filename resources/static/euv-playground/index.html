@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>euv playground</title>
+    <link rel="stylesheet" href="../common/css/ide-theme.css" />
+    <link rel="stylesheet" href="app.css" />
+    <script src="../common/js/ide-theme.js"></script>
+    <script src="/static/common/components/index.js"></script>
+    <script>
+      if (window.loadHLComponents) {
+        window.loadHLComponents('/static/common/components/');
+      }
+    </script>
+  </head>
+  <body>
+    <div id="pg-toolbar">
+      <div class="pg-toolbar-left">
+        <a
+          class="pg-brand"
+          href="https://github.com/hyperlane-dev/hyperlane"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Open Hyperlane on GitHub"
+        >
+          <img
+            class="pg-logo"
+            src="https://ltpp.vip/github/pages/docs-pages/pages/img/hyperlane.png"
+            alt="Hyperlane logo"
+            onerror="this.style.display = 'none'"
+          />
+          <span class="pg-title">euv playground</span>
+        </a>
+        <hyperlane-status id="pg-status" type="success"></hyperlane-status>
+      </div>
+      <div class="pg-toolbar-right">
+        <hyperlane-button
+          id="pg-new"
+          variant="default"
+          size="small"
+          type="button"
+        >
+          <span>+</span><span>New</span>
+        </hyperlane-button>
+        <hyperlane-button
+          id="pg-share"
+          variant="primary"
+          size="small"
+          type="button"
+          hidden
+        >
+          <span>Share</span>
+        </hyperlane-button>
+        <hyperlane-button
+          id="pg-run"
+          variant="success"
+          size="small"
+          type="button"
+        >
+          <span>▶</span><span>Run</span>
+        </hyperlane-button>
+      </div>
+    </div>
+    <div id="pg-body">
+      <aside id="pg-sidebar">
+        <div class="pg-sidebar-header">
+          <span>Projects</span>
+          <button
+            id="pg-new-icon"
+            class="pg-icon-btn"
+            type="button"
+            title="New project"
+          >
+            +
+          </button>
+        </div>
+        <ul id="pg-project-list" class="pg-project-list">
+          <li id="pg-list-loading" class="pg-list-loading" aria-busy="true">
+            <div class="pg-loading-spinner" aria-hidden="true"></div>
+            <span class="pg-loading-text">Loading…</span>
+          </li>
+        </ul>
+        <div id="pg-sidebar-footer" class="pg-sidebar-footer">
+          <span id="pg-user-label"></span>
+          <button
+            id="pg-logout"
+            class="pg-link-btn"
+            type="button"
+            title="Sign out"
+          >
+            Sign out
+          </button>
+        </div>
+      </aside>
+      <div id="pg-main">
+        <div id="pg-editor-pane">
+          <div class="pg-pane-header">
+            <span id="pg-current-name">no project</span>
+            <span class="pg-hint">Ctrl+Enter to run · auto-save</span>
+          </div>
+          <div
+            id="pg-editor-loading"
+            class="pg-pane-loading"
+            aria-busy="true"
+            role="status"
+            aria-live="polite"
+          >
+            <div
+              id="pg-editor-loading-state"
+              class="pg-pane-loading-state"
+              data-state="loading"
+            >
+              <div class="pg-loading-spinner" aria-hidden="true"></div>
+              <span class="pg-loading-text">Loading editor…</span>
+            </div>
+            <div
+              id="pg-editor-loading-error"
+              class="pg-pane-loading-error"
+              hidden
+            >
+              <span class="pg-loading-error-title">Failed to load project</span>
+              <span
+                id="pg-editor-loading-error-msg"
+                class="pg-loading-error-msg"
+              ></span>
+              <button
+                id="pg-editor-loading-retry"
+                class="pg-loading-retry"
+                type="button"
+              >
+                Retry
+              </button>
+            </div>
+          </div>
+          <hyperlane-monaco-editor
+            id="pg-editor"
+            language="rust"
+            tabsize="4"
+            font-size="18"
+            readonly=""
+          ></hyperlane-monaco-editor>
+        </div>
+        <div id="pg-preview-pane">
+          <div class="pg-pane-header">
+            <span>preview</span>
+            <span id="pg-preview-url" class="pg-hint"></span>
+          </div>
+          <div id="pg-preview-wrap">
+            <iframe
+              id="pg-preview"
+              sandbox="allow-scripts allow-same-origin"
+              title="euv preview"
+            ></iframe>
+            <pre id="pg-stderr"></pre>
+            <div
+              id="pg-preview-loading"
+              class="pg-pane-loading is-hidden"
+              aria-busy="true"
+              role="status"
+              aria-live="polite"
+            >
+              <div class="pg-pane-loading-state" data-state="loading">
+                <div class="pg-loading-spinner" aria-hidden="true"></div>
+                <span class="pg-loading-text">Building…</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      id="pg-create-dialog"
+      class="pg-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="pg-create-title"
+      hidden
+    >
+      <form id="pg-create-form" class="pg-dialog-card">
+        <div class="pg-dialog-header">
+          <div>
+            <h2 id="pg-create-title">Create project</h2>
+            <p>Choose a clear name for your playground project.</p>
+          </div>
+          <button
+            id="pg-create-close"
+            class="pg-dialog-close"
+            type="button"
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
+        <label class="pg-dialog-label" for="pg-create-name">Project name</label>
+        <input
+          id="pg-create-name"
+          class="pg-dialog-input"
+          type="text"
+          maxlength="64"
+          autocomplete="off"
+          placeholder="My euv app"
+          required
+        />
+        <p id="pg-create-error" class="pg-dialog-error" aria-live="polite"></p>
+        <div class="pg-dialog-actions">
+          <button id="pg-create-cancel" class="pg-dialog-cancel" type="button">
+            Cancel
+          </button>
+          <button id="pg-create-submit" class="pg-dialog-submit" type="submit">
+            Create project
+          </button>
+        </div>
+      </form>
+    </div>
+    <hyperlane-toast id="pg-toast" type="success"></hyperlane-toast>
+    <script src="app.js"></script>
+  </body>
+</html>
