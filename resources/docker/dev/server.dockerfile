@@ -6,9 +6,11 @@ WORKDIR /hyperlane-quick-start
 
 COPY . .
 
+RUN cargo install wasm-bindgen-cli --locked && \
+    cargo install wasm-pack --locked
+
 RUN cargo build && \
-    cp -f /hyperlane-quick-start/target/debug/hyperlane-quick-start /hyperlane-quick-start/hyperlane-quick-start && \
-    rm -rf /hyperlane-quick-start/target
+    cp -f /hyperlane-quick-start/target/debug/hyperlane-quick-start /hyperlane-quick-start/hyperlane-quick-start
 
 EXPOSE 80
 
