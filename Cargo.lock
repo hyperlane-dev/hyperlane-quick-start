@@ -1994,7 +1994,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "23.0.28"
+version = "23.0.29"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
@@ -2086,7 +2086,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_application"
-version = "23.0.28"
+version = "23.0.29"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
@@ -2099,7 +2099,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_bootstrap"
-version = "23.0.28"
+version = "23.0.29"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
@@ -2113,7 +2113,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_config"
-version = "23.0.28"
+version = "23.0.29"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
@@ -2123,7 +2123,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_plugin"
-version = "23.0.28"
+version = "23.0.29"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
@@ -2134,7 +2134,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_resources"
-version = "23.0.28"
+version = "23.0.29"
 
 [[package]]
 name = "iana-time-zone"
@@ -4913,9 +4913,9 @@ checksum = "1f3ccbac311fea05f86f61904b462b55fb3df8837a366dfc601a0161d0532f20"
 
 [[package]]
 name = "tokio"
-version = "1.53.0"
+version = "1.53.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d988bcd52dbe076d3d46903332f58c912b87a2c49b1428419a5845154762ffee"
+checksum = "202caea871b69668250d242070849eb495be178ed697a3e98aebce5bc81a0bed"
 dependencies = [
  "bytes",
  "libc",
@@ -5905,18 +5905,18 @@ dependencies = [
 
 [[package]]
 name = "zerocopy"
-version = "0.8.54"
+version = "0.8.55"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b7cbbc0a705a0fd05cc3676525980d2bf5a9bc4adac6d6475209a7887cf59d19"
+checksum = "b5a105cd7b140f6eeec8acff2ea38135d3cab283ada58540f629fe51e46696eb"
 dependencies = [
  "zerocopy-derive",
 ]
 
 [[package]]
 name = "zerocopy-derive"
-version = "0.8.54"
+version = "0.8.55"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e2e817b7b52d0c7358d3246da9d69935ebb18116b2b102b4230dac079b4862f5"
+checksum = "0fe976fb70c78cd64cccfe3a6fc142244e8a77b70959b30faf9d0ac37ee228eb"
 dependencies = [
  "proc-macro2",
  "quote",
