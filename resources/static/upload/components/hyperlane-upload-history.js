@@ -75,7 +75,7 @@ class HyperlaneUploadHistory extends HTMLElement {
           }
           .empty-state {
             text-align: center;
-            color: #718096;
+            color: var(--hl-fg-muted);
             padding: 40px 20px;
           }
         </style>
@@ -114,14 +114,14 @@ class HyperlaneUploadHistory extends HTMLElement {
           padding: 0;
         }
         .history-item {
-          background: white;
+          background: var(--hl-surface);
+          border: 1px solid var(--hl-border);
           border-radius: 12px;
           padding: 16px;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          box-shadow: var(--hl-shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.1));
           transition: all 0.2s ease;
         }
         .history-item:hover {
-          transform: translateY(-2px);
           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
         .history-item-header {
@@ -132,7 +132,7 @@ class HyperlaneUploadHistory extends HTMLElement {
         }
         .filename {
           font-weight: 500;
-          color: #2d3748;
+          color: var(--hl-fg);
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
@@ -140,7 +140,7 @@ class HyperlaneUploadHistory extends HTMLElement {
           margin-right: 8px;
         }
         .filesize {
-          color: #718096;
+          color: var(--hl-fg-muted);
           font-size: 0.875rem;
           white-space: nowrap;
         }

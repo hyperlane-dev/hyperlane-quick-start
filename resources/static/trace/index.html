@@ -1,6 +1,11 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script src="../common/js/theme-init.js"></script>
+    <script
+      src="../common/components/hyperlane-theme-toggle.js"
+      type="module"
+    ></script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Hyperlane - Trace Query</title>
@@ -30,6 +35,9 @@
   </head>
 
   <body>
+    <hyperlane-theme-toggle
+      style="position: fixed; top: 16px; right: 16px; z-index: 10002"
+    ></hyperlane-theme-toggle>
     <div class="container">
       <hyperlane-header
         title="Hyperlane Trace Query"

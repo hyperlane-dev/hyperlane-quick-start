@@ -283,7 +283,7 @@ connect();
         const target = event.target;
         const cell = target.closest('.cell');
         if (cell) {
-          cell.style.background = 'rgba(102, 126, 234, 0.3)';
+          cell.style.background = 'rgba(255, 255, 255, 0.3)';
           setTimeout(() => {
             cell.style.background = '';
           }, 150);

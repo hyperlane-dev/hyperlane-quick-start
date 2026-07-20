@@ -67,24 +67,26 @@ class HyperlaneButton extends HTMLElement {
 
     const variantStyles = {
       primary: `
-        background: #667eea;
-        color: white;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        background: var(--hl-gray-900);
+        color: var(--hl-accent-fg);
+        box-shadow: var(--hl-shadow-md, 0 2px 8px rgba(0, 0, 0, 0.08));
       `,
       success: `
-        background: #28a745;
-        color: white;
-        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        background: var(--hl-success-bg);
+        color: var(--hl-success);
+        border: 1px solid var(--hl-border-strong);
+        box-shadow: var(--hl-shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.05));
       `,
       danger: `
-        background: #dc3545;
-        color: white;
-        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+        background: var(--hl-error-bg);
+        color: var(--hl-error);
+        box-shadow: var(--hl-shadow-md, 0 2px 8px rgba(0, 0, 0, 0.08));
       `,
       default: `
-        background: #28a745;
-        color: white;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        background: var(--hl-surface);
+        color: var(--hl-fg);
+        border: 1px solid var(--hl-border);
+        box-shadow: var(--hl-shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.05));
       `,
     };
 
@@ -123,20 +125,15 @@ class HyperlaneButton extends HTMLElement {
           ${variantStyles[variant] || variantStyles.default}
           ${sizeStyles[size] || sizeStyles.medium}
           opacity: ${isDisabled ? '0.7' : '1'};
-          transform: ${isDisabled ? 'none' : 'translateY(0)'};
         }
         button:hover:not(:disabled) {
-          transform: translateY(-2px);
-          filter: brightness(1.1);
-        }
-        button:active:not(:disabled) {
-          transform: translateY(0);
+          opacity: 0.85;
         }
         .spinner {
           width: 16px;
           height: 16px;
-          border: 2px solid rgba(255, 255, 255, 0.3);
-          border-top: 2px solid white;
+          border: 2px solid var(--hl-border-strong, rgba(255, 255, 255, 0.3));
+          border-top: 2px solid currentColor;
           border-radius: 50%;
           animation: spin 1s linear infinite;
         }

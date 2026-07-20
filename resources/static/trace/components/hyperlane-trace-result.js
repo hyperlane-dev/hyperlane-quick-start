@@ -92,22 +92,21 @@ class HyperlaneTraceResult extends HTMLElement {
         .request-url {
           margin-bottom: 16px;
           padding: 12px 16px;
-          background: rgba(102, 126, 234, 0.1);
-          border: 1px solid rgba(102, 126, 234, 0.2);
+          background: var(--hl-bg-muted);
+          border: 1px solid var(--hl-border);
           border-radius: 8px;
           font-family: 'Courier New', monospace;
           font-size: 13px;
           word-break: break-all;
           cursor: pointer;
           transition: all 0.3s ease;
-          color: #667eea;
+          color: var(--hl-accent);
           font-weight: 500;
         }
         .request-url:hover {
-          background: rgba(102, 126, 234, 0.15);
-          border-color: rgba(102, 126, 234, 0.4);
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+          background: var(--hl-surface-hover);
+          border-color: var(--hl-border-strong);
+          box-shadow: var(--hl-shadow-md, 0 4px 12px rgba(0, 0, 0, 0.12));
         }
         .status-message {
           padding: 12px 16px;
@@ -117,18 +116,18 @@ class HyperlaneTraceResult extends HTMLElement {
           animation: fadeIn 0.3s ease;
         }
         .status-message.success {
-          background: #d4edda;
-          color: #155724;
-          border-left: 4px solid #28a745;
+          background: var(--hl-success-bg);
+          color: var(--hl-success);
+          border-left: 4px solid var(--hl-success);
         }
         .status-message.error {
-          background: #f8d7da;
-          color: #721c24;
-          border-left: 4px solid #dc3545;
+          background: var(--hl-error-bg);
+          color: var(--hl-error);
+          border-left: 4px solid var(--hl-border-strong);
         }
         .result-content {
-          background: #f8f9fa;
-          border: 1px solid #e9ecef;
+          background: var(--hl-gray-50);
+          border: 1px solid var(--hl-gray-150);
           border-radius: 8px;
           padding: 16px;
           white-space: pre-wrap;
@@ -140,7 +139,7 @@ class HyperlaneTraceResult extends HTMLElement {
           min-height: 100px;
           max-height: 600px;
           overflow-y: auto;
-          color: #2c3e50;
+          color: var(--hl-fg);
         }
         .result-content::-webkit-scrollbar {
           width: 6px;
@@ -149,11 +148,11 @@ class HyperlaneTraceResult extends HTMLElement {
           background: rgba(0, 0, 0, 0.05);
         }
         .result-content::-webkit-scrollbar-thumb {
-          background: rgba(102, 126, 234, 0.3);
+          background: rgba(255, 255, 255, 0.3);
           border-radius: 3px;
         }
         .empty-result {
-          color: #6c757d;
+          color: var(--hl-fg-muted);
           font-style: italic;
           text-align: center;
           padding: 40px 20px;
@@ -161,13 +160,13 @@ class HyperlaneTraceResult extends HTMLElement {
         .loading-container {
           text-align: center;
           padding: 40px 20px;
-          color: #6c757d;
+          color: var(--hl-fg-muted);
         }
         .spinner {
           width: 40px;
           height: 40px;
-          border: 3px solid rgba(102, 126, 234, 0.3);
-          border-top: 3px solid #667eea;
+          border: 3px solid rgba(255, 255, 255, 0.3);
+          border-top: 3px solid var(--hl-accent);
           border-radius: 50%;
           animation: spin 1s linear infinite;
           margin: 0 auto 20px;

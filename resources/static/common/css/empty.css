@@ -1,7 +1,7 @@
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  color: #666;
+  color: var(--hl-fg-muted);
 }
 
 .empty-state-icon {
@@ -12,7 +12,7 @@
 .empty-state-title {
   font-size: 18px;
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--hl-fg);
   margin-bottom: 8px;
   white-space: nowrap;
   overflow: hidden;

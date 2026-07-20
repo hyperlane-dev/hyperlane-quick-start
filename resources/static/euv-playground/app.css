@@ -2,19 +2,19 @@
   --pg-bg: var(--theme_bk_color);
   --pg-fg: var(--theme_text_color);
   --pg-border: var(--btn_border_color);
-  --pg-success: var(--btn_text_color);
-  --pg-success-strong: #1c7c30;
-  --pg-danger: #d9534f;
-  --pg-warning: #f0ad4e;
-  --pg-info: #5bc0de;
-  --pg-muted: #888888;
-  --pg-surface: #ffffff;
+  --pg-success: var(--hl-accent);
+  --pg-success-strong: var(--hl-fg);
+  --pg-danger: var(--hl-error-bg);
+  --pg-warning: var(--hl-fg);
+  --pg-info: var(--hl-accent);
+  --pg-muted: var(--hl-fg-muted);
+  --pg-surface: var(--hl-surface);
   --pg-surface-alt: var(--btn_bk_color);
-  --pg-active-bg: #e8f4fd;
-  --pg-stderr-bg: #fff7f7;
-  --pg-stderr-fg: #7f1d1d;
-  --pg-stderr-border: #fecaca;
-  --pg-link: #1c7c30;
+  --pg-active-bg: var(--hl-accent);
+  --pg-stderr-bg: var(--hl-error-bg);
+  --pg-stderr-fg: var(--hl-error);
+  --pg-stderr-border: var(--hl-accent);
+  --pg-link: var(--hl-accent);
 }
 
 * {
@@ -327,7 +327,7 @@ body {
 }
 
 .pg-project-item.pg-active {
-  background: var(--pg-active-bg);
+  background: var(--pg-success);
   border-left-color: var(--pg-success);
 }
 
@@ -341,7 +341,7 @@ body {
 }
 
 .pg-project-item.pg-active .pg-project-name {
-  color: var(--pg-success-strong);
+  color: var(--pg-surface);
   font-weight: var(--font_weight_semibold);
 }
 
@@ -353,12 +353,21 @@ body {
   gap: var(--space_2);
 }
 
+.pg-project-item.pg-active .pg-project-meta {
+  color: var(--pg-surface);
+}
+
 .pg-project-item .pg-project-saved {
   color: var(--pg-success);
 }
 
 .pg-project-item .pg-project-dirty {
   color: var(--pg-warning);
+}
+
+.pg-project-item.pg-active .pg-project-saved,
+.pg-project-item.pg-active .pg-project-dirty {
+  color: var(--pg-surface);
 }
 
 .pg-sidebar-footer {
@@ -486,7 +495,7 @@ hyperlane-monaco-editor {
   color: var(--pg-stderr-fg);
   border: 1px solid var(--pg-stderr-border);
   border-radius: var(--radius_lg);
-  box-shadow: 0 4px 12px rgba(217, 83, 79, 0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   font-family: var(--font_family_mono);
   font-size: var(--font_size_xs);
   line-height: 1.55;
@@ -505,7 +514,7 @@ hyperlane-monaco-editor {
 .pg-dialog {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.45);
+  background: rgba(0, 0, 0, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -523,7 +532,7 @@ hyperlane-monaco-editor {
   background: var(--pg-surface);
   border: 1px solid var(--pg-border);
   border-radius: var(--radius_xl);
-  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.18);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
   padding: var(--space_7) var(--font_size_2xl) var(--space_6);
   display: flex;
   flex-direction: column;
@@ -591,12 +600,12 @@ hyperlane-monaco-editor {
 
 .pg-dialog-input:focus {
   border-color: var(--pg-success);
-  box-shadow: 0 0 0 3px rgba(32, 165, 58, 0.12);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.12);
 }
 
 .pg-dialog-input.is-invalid {
   border-color: var(--pg-stderr-fg);
-  box-shadow: 0 0 0 3px rgba(127, 29, 29, 0.1);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
 }
 
 .pg-dialog-error {

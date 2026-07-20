@@ -2697,5 +2697,6 @@ window.loadLanguagesConfig = function (monaco = null) {
 window.getCSSVariable = function (varName) {
   return getComputedStyle(document.documentElement)
     .getPropertyValue(varName)
+    .replace(/!important\s*$/i, '')
     .trim();
 };

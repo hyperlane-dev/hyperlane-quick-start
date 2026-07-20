@@ -1,13 +1,13 @@
 .btn {
   padding: 8px 16px;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
+  border: 1px solid var(--hl-border);
+  border-radius: var(--hl-radius-sm);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
-  background: #f5f7fb;
-  color: #2c3e50;
+  transition: var(--hl-transition);
+  background: var(--hl-surface);
+  color: var(--hl-fg);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -15,8 +15,8 @@
 }
 
 .btn:hover {
-  background: #e8ecf4;
-  border-color: #d0d0d0;
+  background: var(--hl-surface-hover);
+  border-color: var(--hl-border-strong);
 }
 
 .btn:disabled {
@@ -26,36 +26,36 @@
 }
 
 .btn-primary {
-  background: #667eea;
-  border-color: transparent;
-  color: #fff;
+  background: var(--hl-accent);
+  border-color: var(--hl-accent);
+  color: var(--hl-accent-fg);
 }
 
 .btn-primary:hover {
-  background: #5a6fd6;
-  border-color: transparent;
+  background: var(--hl-accent-hover);
+  border-color: var(--hl-accent-hover);
 }
 
 .btn-danger {
-  background: #ef4444;
-  border-color: #ef4444;
-  color: #fff;
+  background: var(--hl-error-bg);
+  border-color: var(--hl-error-bg);
+  color: var(--hl-error);
 }
 
 .btn-danger:hover {
-  background: #dc2626;
-  border-color: #dc2626;
+  opacity: 0.85;
+  background: var(--hl-error-bg);
+  border-color: var(--hl-error-bg);
 }
 
 .btn-success {
-  background: #22c55e;
-  border-color: #22c55e;
-  color: #fff;
+  background: var(--hl-success-bg);
+  border-color: var(--hl-border-strong);
+  color: var(--hl-success);
 }
 
 .btn-success:hover {
-  background: #16a34a;
-  border-color: #16a34a;
+  background: var(--hl-surface-hover);
 }
 
 .btn-sm {

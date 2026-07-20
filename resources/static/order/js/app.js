@@ -57,10 +57,37 @@ async function checkAuth() {
 document.addEventListener('DOMContentLoaded', async () => {
   initEventListeners();
   initHashRouter();
+  initThemeChangeListener();
   await checkAuth();
   initScanFeature();
   initMyQRFeature();
 });
+
+function initThemeChangeListener() {
+  const target = document.documentElement;
+  const observer = new MutationObserver((mutations) => {
+    for (const m of mutations) {
+      if (m.type === 'attributes' && m.attributeName === 'data-theme') {
+        refreshAllCharts();
+        break;
+      }
+    }
+  });
+  observer.observe(target, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+  });
+}
+
+function refreshAllCharts() {
+  const overviewPages = ['dashboard', 'user-records'];
+  if (!overviewPages.includes(currentPage)) return;
+  if (currentPage === 'dashboard') {
+    loadDashboard();
+  } else if (currentPage === 'user-records') {
+    loadUserRecords();
+  }
+}
 
 function initEventListeners() {
   document
@@ -498,12 +525,16 @@ function initTrendChart(dailyTrend) {
     tooltip: {
       trigger: 'axis',
       backgroundColor: 'rgba(255, 255, 255, 0.95)',
-      borderColor: '#e0e0e0',
+      borderColor: 'var(--hl-gray-200)',
       borderWidth: 1,
-      textStyle: { color: '#2c3e50', fontSize: 13 },
+      textStyle: { color: 'var(--hl-fg)', fontSize: 13 },
       axisPointer: {
         type: 'line',
-        lineStyle: { color: '#667eea', width: 1, type: 'dashed' },
+        lineStyle: {
+          color: 'var(--hl-gray-500)',
+          width: 1,
+          type: 'dashed',
+        },
       },
       padding: [12, 16],
       extraCssText:
@@ -511,7 +542,7 @@ function initTrendChart(dailyTrend) {
     },
     legend: {
       data: ['Income', 'Expense'],
-      textStyle: { color: '#666', fontSize: 13 },
+      textStyle: { color: 'var(--hl-gray-500)', fontSize: 13 },
       top: 8,
       itemGap: 20,
       itemWidth: 12,
@@ -527,15 +558,19 @@ function initTrendChart(dailyTrend) {
     xAxis: {
       type: 'category',
       data: dailyTrend.dates,
-      axisLine: { lineStyle: { color: '#e0e0e0', width: 1 } },
-      axisLabel: { color: '#666', fontSize: 11 },
+      axisLine: {
+        lineStyle: { color: 'var(--hl-gray-200)', width: 1 },
+      },
+      axisLabel: { color: 'var(--hl-gray-500)', fontSize: 11 },
       axisTick: { show: false },
     },
     yAxis: {
       type: 'value',
       axisLine: { show: false },
-      axisLabel: { color: '#666', fontSize: 11 },
-      splitLine: { lineStyle: { color: '#f0f0f0', width: 1 } },
+      axisLabel: { color: 'var(--hl-gray-500)', fontSize: 11 },
+      splitLine: {
+        lineStyle: { color: 'var(--hl-gray-150)', width: 1 },
+      },
     },
     series: [
       {
@@ -545,12 +580,12 @@ function initTrendChart(dailyTrend) {
         smooth: true,
         symbol: 'circle',
         symbolSize: 6,
-        itemStyle: { color: '#22c55e' },
-        lineStyle: { width: 2.5, color: '#22c55e' },
+        itemStyle: { color: 'var(--hl-gray-700)' },
+        lineStyle: { width: 2.5, color: 'var(--hl-gray-700)' },
         areaStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(34, 197, 94, 0.2)' },
-            { offset: 1, color: 'rgba(34, 197, 94, 0.02)' },
+            { offset: 0, color: 'rgba(0, 0, 0, 0.18)' },
+            { offset: 1, color: 'rgba(0, 0, 0, 0.02)' },
           ]),
         },
       },
@@ -561,12 +596,12 @@ function initTrendChart(dailyTrend) {
         smooth: true,
         symbol: 'circle',
         symbolSize: 6,
-        itemStyle: { color: '#ef4444' },
-        lineStyle: { width: 2.5, color: '#ef4444' },
+        itemStyle: { color: 'var(--hl-gray-400)' },
+        lineStyle: { width: 2.5, color: 'var(--hl-gray-400)' },
         areaStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(239, 68, 68, 0.2)' },
-            { offset: 1, color: 'rgba(239, 68, 68, 0.02)' },
+            { offset: 0, color: 'rgba(255, 255, 255, 0.25)' },
+            { offset: 1, color: 'rgba(255, 255, 255, 0.02)' },
           ]),
         },
       },
@@ -588,9 +623,9 @@ function initCompareChart(monthlyComparison) {
     tooltip: {
       trigger: 'axis',
       backgroundColor: 'rgba(255, 255, 255, 0.95)',
-      borderColor: '#e0e0e0',
+      borderColor: 'var(--hl-gray-200)',
       borderWidth: 1,
-      textStyle: { color: '#2c3e50', fontSize: 13 },
+      textStyle: { color: 'var(--hl-fg)', fontSize: 13 },
       axisPointer: {
         type: 'shadow',
         shadowStyle: { color: 'rgba(0, 0, 0, 0.05)' },
@@ -601,7 +636,7 @@ function initCompareChart(monthlyComparison) {
     },
     legend: {
       data: ['Income', 'Expense'],
-      textStyle: { color: '#666', fontSize: 13 },
+      textStyle: { color: 'var(--hl-gray-500)', fontSize: 13 },
       top: 8,
       itemGap: 20,
       itemWidth: 12,
@@ -617,15 +652,19 @@ function initCompareChart(monthlyComparison) {
     xAxis: {
       type: 'category',
       data: monthlyComparison.months,
-      axisLine: { lineStyle: { color: '#e0e0e0', width: 1 } },
-      axisLabel: { color: '#666', fontSize: 11 },
+      axisLine: {
+        lineStyle: { color: 'var(--hl-gray-200)', width: 1 },
+      },
+      axisLabel: { color: 'var(--hl-gray-500)', fontSize: 11 },
       axisTick: { show: false },
     },
     yAxis: {
       type: 'value',
       axisLine: { show: false },
-      axisLabel: { color: '#666', fontSize: 11 },
-      splitLine: { lineStyle: { color: '#f0f0f0', width: 1 } },
+      axisLabel: { color: 'var(--hl-gray-500)', fontSize: 11 },
+      splitLine: {
+        lineStyle: { color: 'var(--hl-gray-150)', width: 1 },
+      },
     },
     series: [
       {
@@ -634,8 +673,8 @@ function initCompareChart(monthlyComparison) {
         data: monthlyComparison.income,
         itemStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: '#22c55e' },
-            { offset: 1, color: '#16a34a' },
+            { offset: 0, color: 'var(--hl-gray-600)' },
+            { offset: 1, color: 'var(--hl-gray-800)' },
           ]),
           borderRadius: [4, 4, 0, 0],
         },
@@ -643,8 +682,8 @@ function initCompareChart(monthlyComparison) {
         emphasis: {
           itemStyle: {
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: '#34d399' },
-              { offset: 1, color: '#22c55e' },
+              { offset: 0, color: 'var(--hl-gray-500)' },
+              { offset: 1, color: 'var(--hl-gray-700)' },
             ]),
           },
         },
@@ -655,8 +694,8 @@ function initCompareChart(monthlyComparison) {
         data: monthlyComparison.expense,
         itemStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: '#f87171' },
-            { offset: 1, color: '#ef4444' },
+            { offset: 0, color: 'var(--hl-gray-300)' },
+            { offset: 1, color: 'var(--hl-gray-400)' },
           ]),
           borderRadius: [4, 4, 0, 0],
         },
@@ -664,8 +703,8 @@ function initCompareChart(monthlyComparison) {
         emphasis: {
           itemStyle: {
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: '#fca5a5' },
-              { offset: 1, color: '#f87171' },
+              { offset: 0, color: 'var(--hl-gray-300)' },
+              { offset: 1, color: 'var(--hl-gray-300)' },
             ]),
           },
         },
@@ -685,22 +724,22 @@ function initCategoryChart(categoryDistribution) {
   if (categoryChart) categoryChart.dispose();
   categoryChart = echarts.init(chartDom);
   const colorPalette = [
-    '#667eea',
-    '#764ba2',
-    '#f59e0b',
-    '#10b981',
-    '#ef4444',
-    '#06b6d4',
-    '#8b5cf6',
-    '#f97316',
+    'var(--hl-gray-800)',
+    'var(--hl-gray-600)',
+    'var(--hl-gray-500)',
+    'var(--hl-gray-400)',
+    'var(--hl-gray-400)',
+    'var(--hl-gray-300)',
+    'var(--hl-gray-300)',
+    'var(--hl-gray-700)',
   ];
   const option = {
     tooltip: {
       trigger: 'item',
       backgroundColor: 'rgba(255, 255, 255, 0.95)',
-      borderColor: '#e0e0e0',
+      borderColor: 'var(--hl-gray-200)',
       borderWidth: 1,
-      textStyle: { color: '#2c3e50', fontSize: 13 },
+      textStyle: { color: 'var(--hl-fg)', fontSize: 13 },
       formatter: '{b}: <b>{c}</b> ({d}%)',
       padding: [12, 16],
       extraCssText:
@@ -710,7 +749,7 @@ function initCategoryChart(categoryDistribution) {
       orient: 'vertical',
       left: 12,
       top: 'center',
-      textStyle: { color: '#666', fontSize: 12 },
+      textStyle: { color: 'var(--hl-gray-500)', fontSize: 12 },
       itemGap: 12,
       itemWidth: 10,
       itemHeight: 10,
@@ -724,7 +763,7 @@ function initCategoryChart(categoryDistribution) {
         avoidLabelOverlap: false,
         itemStyle: {
           borderRadius: 6,
-          borderColor: '#ffffff',
+          borderColor: 'var(--hl-gray-0)',
           borderWidth: 2,
         },
         label: {
@@ -743,7 +782,7 @@ function initCategoryChart(categoryDistribution) {
             show: true,
             fontSize: 14,
             fontWeight: 600,
-            color: '#2c3e50',
+            color: 'var(--hl-fg)',
             formatter: '{b}\n{d}%',
           },
         },
@@ -768,12 +807,16 @@ function initUserGrowthChart(userGrowth) {
     tooltip: {
       trigger: 'axis',
       backgroundColor: 'rgba(255, 255, 255, 0.95)',
-      borderColor: '#e0e0e0',
+      borderColor: 'var(--hl-gray-200)',
       borderWidth: 1,
-      textStyle: { color: '#2c3e50', fontSize: 13 },
+      textStyle: { color: 'var(--hl-fg)', fontSize: 13 },
       axisPointer: {
         type: 'line',
-        lineStyle: { color: '#667eea', width: 1, type: 'dashed' },
+        lineStyle: {
+          color: 'var(--hl-gray-500)',
+          width: 1,
+          type: 'dashed',
+        },
       },
       padding: [12, 16],
       extraCssText:
@@ -789,15 +832,19 @@ function initUserGrowthChart(userGrowth) {
     xAxis: {
       type: 'category',
       data: userGrowth.dates,
-      axisLine: { lineStyle: { color: '#e0e0e0', width: 1 } },
-      axisLabel: { color: '#666', fontSize: 11 },
+      axisLine: {
+        lineStyle: { color: 'var(--hl-gray-200)', width: 1 },
+      },
+      axisLabel: { color: 'var(--hl-gray-500)', fontSize: 11 },
       axisTick: { show: false },
     },
     yAxis: {
       type: 'value',
       axisLine: { show: false },
-      axisLabel: { color: '#666', fontSize: 11 },
-      splitLine: { lineStyle: { color: '#f0f0f0', width: 1 } },
+      axisLabel: { color: 'var(--hl-gray-500)', fontSize: 11 },
+      splitLine: {
+        lineStyle: { color: 'var(--hl-gray-150)', width: 1 },
+      },
     },
     series: [
       {
@@ -807,16 +854,16 @@ function initUserGrowthChart(userGrowth) {
         barWidth: '50%',
         itemStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: '#667eea' },
-            { offset: 1, color: '#764ba2' },
+            { offset: 0, color: 'var(--hl-accent)' },
+            { offset: 1, color: 'var(--hl-accent)' },
           ]),
           borderRadius: [6, 6, 0, 0],
         },
         emphasis: {
           itemStyle: {
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: '#7c8cf0' },
-              { offset: 1, color: '#8b5cf6' },
+              { offset: 0, color: 'var(--hl-accent)' },
+              { offset: 1, color: 'var(--hl-accent)' },
             ]),
           },
         },
@@ -839,9 +886,9 @@ function initTypeDistributionChart(distribution) {
     tooltip: {
       trigger: 'item',
       backgroundColor: 'rgba(255, 255, 255, 0.95)',
-      borderColor: '#e0e0e0',
+      borderColor: 'var(--hl-gray-200)',
       borderWidth: 1,
-      textStyle: { color: '#2c3e50', fontSize: 13 },
+      textStyle: { color: 'var(--hl-fg)', fontSize: 13 },
       formatter: '{b}: <b>{c}</b> ({d}%)',
       padding: [12, 16],
       extraCssText:
@@ -851,7 +898,7 @@ function initTypeDistributionChart(distribution) {
       orient: 'vertical',
       left: 12,
       top: 'center',
-      textStyle: { color: '#666', fontSize: 12 },
+      textStyle: { color: 'var(--hl-gray-500)', fontSize: 12 },
       itemGap: 12,
       itemWidth: 10,
       itemHeight: 10,
@@ -866,7 +913,7 @@ function initTypeDistributionChart(distribution) {
         avoidLabelOverlap: false,
         itemStyle: {
           borderRadius: 8,
-          borderColor: '#ffffff',
+          borderColor: 'var(--hl-gray-0)',
           borderWidth: 2,
         },
         label: {
@@ -885,7 +932,7 @@ function initTypeDistributionChart(distribution) {
             show: true,
             fontSize: 16,
             fontWeight: 600,
-            color: '#2c3e50',
+            color: 'var(--hl-fg)',
             formatter: '{b}\n{d}%',
           },
         },
@@ -896,8 +943,8 @@ function initTypeDistributionChart(distribution) {
             name: 'Income',
             itemStyle: {
               color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                { offset: 0, color: '#34d399' },
-                { offset: 1, color: '#22c55e' },
+                { offset: 0, color: 'var(--hl-gray-500)' },
+                { offset: 1, color: 'var(--hl-gray-700)' },
               ]),
             },
           },
@@ -906,8 +953,8 @@ function initTypeDistributionChart(distribution) {
             name: 'Expense',
             itemStyle: {
               color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                { offset: 0, color: '#f87171' },
-                { offset: 1, color: '#ef4444' },
+                { offset: 0, color: 'var(--hl-gray-300)' },
+                { offset: 1, color: 'var(--hl-gray-400)' },
               ]),
             },
           },
@@ -931,12 +978,16 @@ function initCountTrendChart(trend) {
     tooltip: {
       trigger: 'axis',
       backgroundColor: 'rgba(255, 255, 255, 0.95)',
-      borderColor: '#e0e0e0',
+      borderColor: 'var(--hl-gray-200)',
       borderWidth: 1,
-      textStyle: { color: '#2c3e50', fontSize: 13 },
+      textStyle: { color: 'var(--hl-fg)', fontSize: 13 },
       axisPointer: {
         type: 'line',
-        lineStyle: { color: '#f59e0b', width: 1, type: 'dashed' },
+        lineStyle: {
+          color: 'var(--hl-warning)',
+          width: 1,
+          type: 'dashed',
+        },
       },
       padding: [12, 16],
       extraCssText:
@@ -952,15 +1003,19 @@ function initCountTrendChart(trend) {
     xAxis: {
       type: 'category',
       data: trend.dates,
-      axisLine: { lineStyle: { color: '#e0e0e0', width: 1 } },
-      axisLabel: { color: '#666', fontSize: 11 },
+      axisLine: {
+        lineStyle: { color: 'var(--hl-gray-200)', width: 1 },
+      },
+      axisLabel: { color: 'var(--hl-gray-500)', fontSize: 11 },
       axisTick: { show: false },
     },
     yAxis: {
       type: 'value',
       axisLine: { show: false },
-      axisLabel: { color: '#666', fontSize: 11 },
-      splitLine: { lineStyle: { color: '#f0f0f0', width: 1 } },
+      axisLabel: { color: 'var(--hl-gray-500)', fontSize: 11 },
+      splitLine: {
+        lineStyle: { color: 'var(--hl-gray-150)', width: 1 },
+      },
     },
     series: [
       {
@@ -970,12 +1025,12 @@ function initCountTrendChart(trend) {
         symbol: 'circle',
         symbolSize: 6,
         data: trend.counts,
-        itemStyle: { color: '#f59e0b' },
-        lineStyle: { width: 2.5, color: '#f59e0b' },
+        itemStyle: { color: 'var(--hl-warning)' },
+        lineStyle: { width: 2.5, color: 'var(--hl-warning)' },
         areaStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(245, 158, 11, 0.25)' },
-            { offset: 1, color: 'rgba(245, 158, 11, 0.02)' },
+            { offset: 0, color: 'rgba(255, 255, 255, 0.25)' },
+            { offset: 1, color: 'rgba(255, 255, 255, 0.02)' },
           ]),
         },
       },
@@ -999,9 +1054,9 @@ function initCategoryAmountChart(distribution) {
     tooltip: {
       trigger: 'axis',
       backgroundColor: 'rgba(255, 255, 255, 0.95)',
-      borderColor: '#e0e0e0',
+      borderColor: 'var(--hl-gray-200)',
       borderWidth: 1,
-      textStyle: { color: '#2c3e50', fontSize: 13 },
+      textStyle: { color: 'var(--hl-fg)', fontSize: 13 },
       axisPointer: {
         type: 'shadow',
         shadowStyle: { color: 'rgba(0, 0, 0, 0.05)' },
@@ -1021,14 +1076,16 @@ function initCategoryAmountChart(distribution) {
     xAxis: {
       type: 'value',
       axisLine: { show: false },
-      axisLabel: { color: '#666', fontSize: 11 },
-      splitLine: { lineStyle: { color: '#f0f0f0', width: 1 } },
+      axisLabel: { color: 'var(--hl-gray-500)', fontSize: 11 },
+      splitLine: {
+        lineStyle: { color: 'var(--hl-gray-150)', width: 1 },
+      },
     },
     yAxis: {
       type: 'category',
       data: names.slice(0, 10).reverse(),
       axisLine: { show: false },
-      axisLabel: { color: '#666', fontSize: 12 },
+      axisLabel: { color: 'var(--hl-gray-500)', fontSize: 12 },
       axisTick: { show: false },
     },
     series: [
@@ -1039,16 +1096,16 @@ function initCategoryAmountChart(distribution) {
         barWidth: '55%',
         itemStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
-            { offset: 0, color: '#8b5cf6' },
-            { offset: 1, color: '#667eea' },
+            { offset: 0, color: 'var(--hl-accent)' },
+            { offset: 1, color: 'var(--hl-accent)' },
           ]),
           borderRadius: [0, 6, 6, 0],
         },
         emphasis: {
           itemStyle: {
             color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
-              { offset: 0, color: '#a78bfa' },
-              { offset: 1, color: '#8b5cf6' },
+              { offset: 0, color: 'var(--hl-accent)' },
+              { offset: 1, color: 'var(--hl-accent)' },
             ]),
           },
         },
@@ -1071,12 +1128,16 @@ function initUserActivityChart(activity) {
     tooltip: {
       trigger: 'axis',
       backgroundColor: 'rgba(255, 255, 255, 0.95)',
-      borderColor: '#e0e0e0',
+      borderColor: 'var(--hl-gray-200)',
       borderWidth: 1,
-      textStyle: { color: '#2c3e50', fontSize: 13 },
+      textStyle: { color: 'var(--hl-fg)', fontSize: 13 },
       axisPointer: {
         type: 'line',
-        lineStyle: { color: '#667eea', width: 1, type: 'dashed' },
+        lineStyle: {
+          color: 'var(--hl-gray-500)',
+          width: 1,
+          type: 'dashed',
+        },
       },
       padding: [12, 16],
       extraCssText:
@@ -1084,7 +1145,7 @@ function initUserActivityChart(activity) {
     },
     legend: {
       data: ['Active Users', 'New Records'],
-      textStyle: { color: '#666', fontSize: 13 },
+      textStyle: { color: 'var(--hl-gray-500)', fontSize: 13 },
       top: 8,
       itemGap: 20,
       itemWidth: 12,
@@ -1100,15 +1161,19 @@ function initUserActivityChart(activity) {
     xAxis: {
       type: 'category',
       data: activity.dates,
-      axisLine: { lineStyle: { color: '#e0e0e0', width: 1 } },
-      axisLabel: { color: '#666', fontSize: 11 },
+      axisLine: {
+        lineStyle: { color: 'var(--hl-gray-200)', width: 1 },
+      },
+      axisLabel: { color: 'var(--hl-gray-500)', fontSize: 11 },
       axisTick: { show: false },
     },
     yAxis: {
       type: 'value',
       axisLine: { show: false },
-      axisLabel: { color: '#666', fontSize: 11 },
-      splitLine: { lineStyle: { color: '#f0f0f0', width: 1 } },
+      axisLabel: { color: 'var(--hl-gray-500)', fontSize: 11 },
+      splitLine: {
+        lineStyle: { color: 'var(--hl-gray-150)', width: 1 },
+      },
     },
     series: [
       {
@@ -1118,12 +1183,12 @@ function initUserActivityChart(activity) {
         symbol: 'circle',
         symbolSize: 6,
         data: activity.active_users,
-        itemStyle: { color: '#06b6d4' },
-        lineStyle: { width: 2.5, color: '#06b6d4' },
+        itemStyle: { color: 'var(--hl-accent)' },
+        lineStyle: { width: 2.5, color: 'var(--hl-accent)' },
         areaStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(6, 182, 212, 0.2)' },
-            { offset: 1, color: 'rgba(6, 182, 212, 0.02)' },
+            { offset: 0, color: 'rgba(255, 255, 255, 0.2)' },
+            { offset: 1, color: 'rgba(255, 255, 255, 0.02)' },
           ]),
         },
       },
@@ -1134,12 +1199,12 @@ function initUserActivityChart(activity) {
         symbol: 'circle',
         symbolSize: 6,
         data: activity.new_records,
-        itemStyle: { color: '#f97316' },
-        lineStyle: { width: 2.5, color: '#f97316' },
+        itemStyle: { color: 'var(--hl-accent)' },
+        lineStyle: { width: 2.5, color: 'var(--hl-accent)' },
         areaStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(249, 115, 22, 0.2)' },
-            { offset: 1, color: 'rgba(249, 115, 22, 0.02)' },
+            { offset: 0, color: 'rgba(255, 255, 255, 0.2)' },
+            { offset: 1, color: 'rgba(255, 255, 255, 0.02)' },
           ]),
         },
       },
@@ -1163,12 +1228,16 @@ function initRatioTrendChart(ratioTrend) {
     tooltip: {
       trigger: 'axis',
       backgroundColor: 'rgba(255, 255, 255, 0.95)',
-      borderColor: '#e0e0e0',
+      borderColor: 'var(--hl-gray-200)',
       borderWidth: 1,
-      textStyle: { color: '#2c3e50', fontSize: 13 },
+      textStyle: { color: 'var(--hl-fg)', fontSize: 13 },
       axisPointer: {
         type: 'line',
-        lineStyle: { color: '#667eea', width: 1, type: 'dashed' },
+        lineStyle: {
+          color: 'var(--hl-gray-500)',
+          width: 1,
+          type: 'dashed',
+        },
       },
       padding: [12, 16],
       extraCssText:
@@ -1177,9 +1246,9 @@ function initRatioTrendChart(ratioTrend) {
         const idx = params[0].dataIndex;
         const item = ratioTrend[idx];
         return `<div style="font-weight:600;margin-bottom:5px">${item.date}</div>
-                <div>Income/Expense Ratio: <span style="color:#667eea;font-weight:600">${item.ratio.toFixed(2)}</span></div>
-                <div>Income: <span style="color:#22c55e">¥${item.income}</span></div>
-                <div>Expense: <span style="color:#ef4444">¥${item.expense}</span></div>`;
+                <div>Income/Expense Ratio: <span style="color:var(--hl-accent);font-weight:600">${item.ratio.toFixed(2)}</span></div>
+                <div>Income: <span style="color:var(--hl-success)">¥${item.income}</span></div>
+                <div>Expense: <span style="color:var(--hl-error)">¥${item.expense}</span></div>`;
       },
     },
     grid: {
@@ -1192,16 +1261,20 @@ function initRatioTrendChart(ratioTrend) {
     xAxis: {
       type: 'category',
       data: dates,
-      axisLine: { lineStyle: { color: '#e0e0e0', width: 1 } },
-      axisLabel: { color: '#666', fontSize: 11 },
+      axisLine: {
+        lineStyle: { color: 'var(--hl-gray-200)', width: 1 },
+      },
+      axisLabel: { color: 'var(--hl-gray-500)', fontSize: 11 },
       axisTick: { show: false },
     },
     yAxis: {
       type: 'value',
       name: 'Ratio',
       axisLine: { show: false },
-      axisLabel: { color: '#666', fontSize: 11 },
-      splitLine: { lineStyle: { color: '#f0f0f0', width: 1 } },
+      axisLabel: { color: 'var(--hl-gray-500)', fontSize: 11 },
+      splitLine: {
+        lineStyle: { color: 'var(--hl-gray-150)', width: 1 },
+      },
     },
     series: [
       {
@@ -1210,12 +1283,12 @@ function initRatioTrendChart(ratioTrend) {
         symbol: 'circle',
         symbolSize: 6,
         data: ratios,
-        itemStyle: { color: '#667eea' },
-        lineStyle: { width: 2.5, color: '#667eea' },
+        itemStyle: { color: 'var(--hl-accent)' },
+        lineStyle: { width: 2.5, color: 'var(--hl-accent)' },
         areaStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(102, 126, 234, 0.3)' },
-            { offset: 1, color: 'rgba(102, 126, 234, 0.02)' },
+            { offset: 0, color: 'rgba(255, 255, 255, 0.3)' },
+            { offset: 1, color: 'rgba(255, 255, 255, 0.02)' },
           ]),
         },
         markLine: {
@@ -1223,8 +1296,15 @@ function initRatioTrendChart(ratioTrend) {
           data: [
             {
               yAxis: 1,
-              lineStyle: { color: '#22c55e', type: 'dashed', width: 2 },
-              label: { formatter: 'Balance', color: '#22c55e' },
+              lineStyle: {
+                color: 'var(--hl-success)',
+                type: 'dashed',
+                width: 2,
+              },
+              label: {
+                formatter: 'Balance',
+                color: 'var(--hl-success)',
+              },
             },
           ],
         },
@@ -1249,9 +1329,9 @@ function initHourlyDistributionChart(hourlyData) {
     tooltip: {
       trigger: 'axis',
       backgroundColor: 'rgba(255, 255, 255, 0.95)',
-      borderColor: '#e0e0e0',
+      borderColor: 'var(--hl-gray-200)',
       borderWidth: 1,
-      textStyle: { color: '#2c3e50', fontSize: 13 },
+      textStyle: { color: 'var(--hl-fg)', fontSize: 13 },
       padding: [12, 16],
       extraCssText:
         'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
@@ -1266,15 +1346,23 @@ function initHourlyDistributionChart(hourlyData) {
     xAxis: {
       type: 'category',
       data: hours,
-      axisLine: { lineStyle: { color: '#e0e0e0', width: 1 } },
-      axisLabel: { color: '#666', fontSize: 10, interval: 2 },
+      axisLine: {
+        lineStyle: { color: 'var(--hl-gray-200)', width: 1 },
+      },
+      axisLabel: {
+        color: 'var(--hl-gray-500)',
+        fontSize: 10,
+        interval: 2,
+      },
       axisTick: { show: false },
     },
     yAxis: {
       type: 'value',
       axisLine: { show: false },
-      axisLabel: { color: '#666', fontSize: 11 },
-      splitLine: { lineStyle: { color: '#f0f0f0', width: 1 } },
+      axisLabel: { color: 'var(--hl-gray-500)', fontSize: 11 },
+      splitLine: {
+        lineStyle: { color: 'var(--hl-gray-150)', width: 1 },
+      },
     },
     series: [
       {
@@ -1282,16 +1370,16 @@ function initHourlyDistributionChart(hourlyData) {
         data: counts,
         itemStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: '#f093fb' },
-            { offset: 1, color: '#f5576c' },
+            { offset: 0, color: 'var(--hl-accent)' },
+            { offset: 1, color: 'var(--hl-accent)' },
           ]),
           borderRadius: [4, 4, 0, 0],
         },
         emphasis: {
           itemStyle: {
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: '#e84393' },
-              { offset: 1, color: '#fd79a8' },
+              { offset: 0, color: 'var(--hl-accent)' },
+              { offset: 1, color: 'var(--hl-accent)' },
             ]),
           },
         },
@@ -1317,16 +1405,16 @@ function initWeeklyTrendChart(weeklyTrend) {
     tooltip: {
       trigger: 'axis',
       backgroundColor: 'rgba(255, 255, 255, 0.95)',
-      borderColor: '#e0e0e0',
+      borderColor: 'var(--hl-gray-200)',
       borderWidth: 1,
-      textStyle: { color: '#2c3e50', fontSize: 13 },
+      textStyle: { color: 'var(--hl-fg)', fontSize: 13 },
       padding: [12, 16],
       extraCssText:
         'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
     },
     legend: {
       data: ['Income', 'Expense'],
-      textStyle: { color: '#666', fontSize: 13 },
+      textStyle: { color: 'var(--hl-gray-500)', fontSize: 13 },
       top: 8,
     },
     grid: {
@@ -1339,15 +1427,19 @@ function initWeeklyTrendChart(weeklyTrend) {
     xAxis: {
       type: 'category',
       data: days,
-      axisLine: { lineStyle: { color: '#e0e0e0', width: 1 } },
-      axisLabel: { color: '#666', fontSize: 12 },
+      axisLine: {
+        lineStyle: { color: 'var(--hl-gray-200)', width: 1 },
+      },
+      axisLabel: { color: 'var(--hl-gray-500)', fontSize: 12 },
       axisTick: { show: false },
     },
     yAxis: {
       type: 'value',
       axisLine: { show: false },
-      axisLabel: { color: '#666', fontSize: 11 },
-      splitLine: { lineStyle: { color: '#f0f0f0', width: 1 } },
+      axisLabel: { color: 'var(--hl-gray-500)', fontSize: 11 },
+      splitLine: {
+        lineStyle: { color: 'var(--hl-gray-150)', width: 1 },
+      },
     },
     series: [
       {
@@ -1356,8 +1448,8 @@ function initWeeklyTrendChart(weeklyTrend) {
         data: income,
         itemStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: '#4ade80' },
-            { offset: 1, color: '#22c55e' },
+            { offset: 0, color: 'var(--hl-accent)' },
+            { offset: 1, color: 'var(--hl-gray-700)' },
           ]),
           borderRadius: [4, 4, 0, 0],
         },
@@ -1368,8 +1460,8 @@ function initWeeklyTrendChart(weeklyTrend) {
         data: expense,
         itemStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: '#f87171' },
-            { offset: 1, color: '#ef4444' },
+            { offset: 0, color: 'var(--hl-gray-300)' },
+            { offset: 1, color: 'var(--hl-gray-400)' },
           ]),
           borderRadius: [4, 4, 0, 0],
         },
@@ -1398,16 +1490,17 @@ function initPeriodOverPeriodChart(popData) {
     tooltip: {
       trigger: 'axis',
       backgroundColor: 'rgba(255, 255, 255, 0.95)',
-      borderColor: '#e0e0e0',
+      borderColor: 'var(--hl-gray-200)',
       borderWidth: 1,
-      textStyle: { color: '#2c3e50', fontSize: 13 },
+      textStyle: { color: 'var(--hl-fg)', fontSize: 13 },
       padding: [12, 16],
       extraCssText:
         'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
       formatter: function (params) {
         let result = `<div style="font-weight:600;margin-bottom:5px">${params[0].axisValue}</div>`;
         params.forEach((param) => {
-          const color = param.value >= 0 ? '#22c55e' : '#ef4444';
+          const color =
+            param.value >= 0 ? 'var(--hl-success)' : 'var(--hl-error)';
           const icon = param.value >= 0 ? '↑' : '↓';
           result += `<div>${param.marker} ${param.seriesName}: <span style="color:${color};font-weight:600">${icon} ${Math.abs(param.value)}%</span></div>`;
         });
@@ -1416,7 +1509,7 @@ function initPeriodOverPeriodChart(popData) {
     },
     legend: {
       data: ['Income Change', 'Expense Change', 'Transaction Change'],
-      textStyle: { color: '#666', fontSize: 12 },
+      textStyle: { color: 'var(--hl-gray-500)', fontSize: 12 },
       top: 8,
     },
     grid: {
@@ -1429,8 +1522,10 @@ function initPeriodOverPeriodChart(popData) {
     xAxis: {
       type: 'category',
       data: periods,
-      axisLine: { lineStyle: { color: '#e0e0e0', width: 1 } },
-      axisLabel: { color: '#666', fontSize: 12 },
+      axisLine: {
+        lineStyle: { color: 'var(--hl-gray-200)', width: 1 },
+      },
+      axisLabel: { color: 'var(--hl-gray-500)', fontSize: 12 },
       axisTick: { show: false },
     },
     yAxis: {
@@ -1438,30 +1533,32 @@ function initPeriodOverPeriodChart(popData) {
       name: 'Change %',
       axisLine: { show: false },
       axisLabel: {
-        color: '#666',
+        color: 'var(--hl-gray-500)',
         fontSize: 11,
         formatter: '{value}%',
       },
-      splitLine: { lineStyle: { color: '#f0f0f0', width: 1 } },
+      splitLine: {
+        lineStyle: { color: 'var(--hl-gray-150)', width: 1 },
+      },
     },
     series: [
       {
         name: 'Income Change',
         type: 'bar',
         data: incomeChanges,
-        itemStyle: { color: '#22c55e' },
+        itemStyle: { color: 'var(--hl-gray-700)' },
       },
       {
         name: 'Expense Change',
         type: 'bar',
         data: expenseChanges,
-        itemStyle: { color: '#ef4444' },
+        itemStyle: { color: 'var(--hl-gray-400)' },
       },
       {
         name: 'Transaction Change',
         type: 'line',
         data: transactionChanges,
-        itemStyle: { color: '#667eea' },
+        itemStyle: { color: 'var(--hl-accent)' },
         lineStyle: { width: 2.5 },
         symbol: 'circle',
         symbolSize: 8,
@@ -1481,14 +1578,14 @@ function initCategoryTrendChart(categoryTrends) {
   if (categoryTrendChart) categoryTrendChart.dispose();
   categoryTrendChart = echarts.init(chartDom);
   const colors = [
-    '#22c55e',
-    '#3b82f6',
-    '#f59e0b',
-    '#ef4444',
-    '#8b5cf6',
-    '#06b6d4',
-    '#f97316',
-    '#ec4899',
+    'var(--hl-success)',
+    'var(--hl-accent)',
+    'var(--hl-warning)',
+    'var(--hl-error)',
+    'var(--hl-accent)',
+    'var(--hl-accent)',
+    'var(--hl-accent)',
+    'var(--hl-accent)',
   ];
   const series = categoryTrends.slice(0, 6).map((item, idx) => ({
     name: item.category,
@@ -1504,16 +1601,16 @@ function initCategoryTrendChart(categoryTrends) {
     tooltip: {
       trigger: 'axis',
       backgroundColor: 'rgba(255, 255, 255, 0.95)',
-      borderColor: '#e0e0e0',
+      borderColor: 'var(--hl-gray-200)',
       borderWidth: 1,
-      textStyle: { color: '#2c3e50', fontSize: 13 },
+      textStyle: { color: 'var(--hl-fg)', fontSize: 13 },
       padding: [12, 16],
       extraCssText:
         'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
     },
     legend: {
       data: categoryTrends.slice(0, 6).map((item) => item.category),
-      textStyle: { color: '#666', fontSize: 11 },
+      textStyle: { color: 'var(--hl-gray-500)', fontSize: 11 },
       top: 8,
       type: 'scroll',
     },
@@ -1527,15 +1624,19 @@ function initCategoryTrendChart(categoryTrends) {
     xAxis: {
       type: 'category',
       data: categoryTrends[0]?.dates || [],
-      axisLine: { lineStyle: { color: '#e0e0e0', width: 1 } },
-      axisLabel: { color: '#666', fontSize: 10 },
+      axisLine: {
+        lineStyle: { color: 'var(--hl-gray-200)', width: 1 },
+      },
+      axisLabel: { color: 'var(--hl-gray-500)', fontSize: 10 },
       axisTick: { show: false },
     },
     yAxis: {
       type: 'value',
       axisLine: { show: false },
-      axisLabel: { color: '#666', fontSize: 11 },
-      splitLine: { lineStyle: { color: '#f0f0f0', width: 1 } },
+      axisLabel: { color: 'var(--hl-gray-500)', fontSize: 11 },
+      splitLine: {
+        lineStyle: { color: 'var(--hl-gray-150)', width: 1 },
+      },
     },
     series: series,
   };
@@ -1559,9 +1660,9 @@ function initUserRetentionChart(retentionData) {
     tooltip: {
       trigger: 'axis',
       backgroundColor: 'rgba(255, 255, 255, 0.95)',
-      borderColor: '#e0e0e0',
+      borderColor: 'var(--hl-gray-200)',
       borderWidth: 1,
-      textStyle: { color: '#2c3e50', fontSize: 13 },
+      textStyle: { color: 'var(--hl-fg)', fontSize: 13 },
       padding: [12, 16],
       extraCssText:
         'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
@@ -1569,9 +1670,9 @@ function initUserRetentionChart(retentionData) {
         const idx = params[0].dataIndex;
         const item = retentionData[idx];
         return `<div style="font-weight:600;margin-bottom:5px">${item.date}</div>
-                <div>New Users: <span style="color:#3b82f6;font-weight:600">${item.new_users}</span></div>
-                <div>Retained Users: <span style="color:#22c55e;font-weight:600">${item.retained_users}</span></div>
-                <div>Retention Rate: <span style="color:#f59e0b;font-weight:600">${item.retention_rate.toFixed(1)}%</span></div>`;
+                <div>New Users: <span style="color:var(--hl-accent);font-weight:600">${item.new_users}</span></div>
+                <div>Retained Users: <span style="color:var(--hl-success);font-weight:600">${item.retained_users}</span></div>
+                <div>Retention Rate: <span style="color:var(--hl-warning);font-weight:600">${item.retention_rate.toFixed(1)}%</span></div>`;
       },
     },
     grid: {
@@ -1584,8 +1685,10 @@ function initUserRetentionChart(retentionData) {
     xAxis: {
       type: 'category',
       data: dates,
-      axisLine: { lineStyle: { color: '#e0e0e0', width: 1 } },
-      axisLabel: { color: '#666', fontSize: 10 },
+      axisLine: {
+        lineStyle: { color: 'var(--hl-gray-200)', width: 1 },
+      },
+      axisLabel: { color: 'var(--hl-gray-500)', fontSize: 10 },
       axisTick: { show: false },
     },
     yAxis: {
@@ -1594,11 +1697,13 @@ function initUserRetentionChart(retentionData) {
       max: 100,
       axisLine: { show: false },
       axisLabel: {
-        color: '#666',
+        color: 'var(--hl-gray-500)',
         fontSize: 11,
         formatter: '{value}%',
       },
-      splitLine: { lineStyle: { color: '#f0f0f0', width: 1 } },
+      splitLine: {
+        lineStyle: { color: 'var(--hl-gray-150)', width: 1 },
+      },
     },
     series: [
       {
@@ -1607,12 +1712,12 @@ function initUserRetentionChart(retentionData) {
         symbol: 'circle',
         symbolSize: 6,
         data: retentionRates,
-        itemStyle: { color: '#f59e0b' },
-        lineStyle: { width: 2.5, color: '#f59e0b' },
+        itemStyle: { color: 'var(--hl-warning)' },
+        lineStyle: { width: 2.5, color: 'var(--hl-warning)' },
         areaStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(245, 158, 11, 0.3)' },
-            { offset: 1, color: 'rgba(245, 158, 11, 0.02)' },
+            { offset: 0, color: 'rgba(255, 255, 255, 0.3)' },
+            { offset: 1, color: 'rgba(255, 255, 255, 0.02)' },
           ]),
         },
       },
@@ -1637,9 +1742,9 @@ function initTopUsersChart(topUsers) {
     tooltip: {
       trigger: 'axis',
       backgroundColor: 'rgba(255, 255, 255, 0.95)',
-      borderColor: '#e0e0e0',
+      borderColor: 'var(--hl-gray-200)',
       borderWidth: 1,
-      textStyle: { color: '#2c3e50', fontSize: 13 },
+      textStyle: { color: 'var(--hl-fg)', fontSize: 13 },
       padding: [12, 16],
       extraCssText:
         'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
@@ -1647,8 +1752,8 @@ function initTopUsersChart(topUsers) {
         const idx = params[0].dataIndex;
         const item = topUsers[idx];
         return `<div style="font-weight:600;margin-bottom:5px">${item.username}</div>
-                <div>Transaction Amount: <span style="color:#667eea;font-weight:600">¥${item.total_amount}</span></div>
-                <div>Transaction Count: <span style="color:#3b82f6;font-weight:600">${item.transaction_count}</span></div>`;
+                <div>Transaction Amount: <span style="color:var(--hl-accent);font-weight:600">¥${item.total_amount}</span></div>
+                <div>Transaction Count: <span style="color:var(--hl-accent);font-weight:600">${item.transaction_count}</span></div>`;
       },
     },
     grid: {
@@ -1661,15 +1766,19 @@ function initTopUsersChart(topUsers) {
     xAxis: {
       type: 'category',
       data: usernames,
-      axisLine: { lineStyle: { color: '#e0e0e0', width: 1 } },
-      axisLabel: { color: '#666', fontSize: 11 },
+      axisLine: {
+        lineStyle: { color: 'var(--hl-gray-200)', width: 1 },
+      },
+      axisLabel: { color: 'var(--hl-gray-500)', fontSize: 11 },
       axisTick: { show: false },
     },
     yAxis: {
       type: 'value',
       axisLine: { show: false },
-      axisLabel: { color: '#666', fontSize: 11 },
-      splitLine: { lineStyle: { color: '#f0f0f0', width: 1 } },
+      axisLabel: { color: 'var(--hl-gray-500)', fontSize: 11 },
+      splitLine: {
+        lineStyle: { color: 'var(--hl-gray-150)', width: 1 },
+      },
     },
     series: [
       {
@@ -1677,8 +1786,8 @@ function initTopUsersChart(topUsers) {
         data: amounts,
         itemStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: '#667eea' },
-            { offset: 1, color: '#764ba2' },
+            { offset: 0, color: 'var(--hl-accent)' },
+            { offset: 1, color: 'var(--hl-accent)' },
           ]),
           borderRadius: [4, 4, 0, 0],
         },
@@ -1992,7 +2101,7 @@ function renderAllRecords(records) {
         <div class="record-meta-row">
           <span class="record-meta-item"><span class="record-meta-label">ID:</span> <span class="record-meta-value">${r.id}</span></span>
           <span class="record-meta-item"><span class="record-meta-label">Category:</span> <span class="record-meta-value">${escapeHtml(r.category)}</span></span>
-          <span class="record-meta-item" onclick="event.stopPropagation(); viewUserRecords('${r.user_id}', '${escapeHtml(displayName)}');" style="cursor: pointer;"><span class="record-meta-label">User:</span> <span class="record-meta-value" style="color: #58a6ff;">${escapeHtml(displayName)}</span></span>
+          <span class="record-meta-item" onclick="event.stopPropagation(); viewUserRecords('${r.user_id}', '${escapeHtml(displayName)}');" style="cursor: pointer;"><span class="record-meta-label">User:</span> <span class="record-meta-value" style="color: var(--hl-accent);">${escapeHtml(displayName)}</span></span>
         </div>
         <div class="record-date-row">
           <span class="record-date-item"><span class="record-date-label">Date:</span> <span class="record-date-value">${formatDate(r.bill_date)}</span></span>
@@ -2162,31 +2271,35 @@ function printRecordData(record) {
   const amountClass =
     record.transaction_type === 'income' ? 'income' : 'expense';
   const amountPrefix = record.transaction_type === 'income' ? '+' : '-';
-  const htmlContent = `
-<!DOCTYPE html>
+  const root = document.documentElement;
+  const dark = root.getAttribute('data-theme') === 'dark';
+  const styles = getComputedStyle(root);
+  const css = (name, fallback) =>
+    styles.getPropertyValue(name).trim() || fallback;
+  const htmlContent = `<!DOCTYPE html>
 <html>
 <head>
   <title>Record Receipt - ${record.bill_no}</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; padding: 20px; }
-    .receipt-container { max-width: 600px; margin: 0 auto; background: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden; }
-    .receipt-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 30px; text-align: center; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--hl-gray-100); padding: 20px; }
+    .receipt-container { max-width: 600px; margin: 0 auto; background: var(--hl-gray-0); border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden; }
+    .receipt-header { background: var(--hl-gray-900); color: var(--hl-gray-0); padding: 30px; text-align: center; }
     .receipt-header h1 { font-size: 24px; margin-bottom: 8px; }
     .bill-no { font-size: 14px; opacity: 0.9; }
     .receipt-body { padding: 30px; }
-    .field-row { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #eee; }
+    .field-row { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid var(--hl-gray-150); }
     .field-row:last-child { border-bottom: none; }
-    .field-label { color: #666; font-weight: 500; }
-    .field-value { color: #333; font-weight: 600; text-align: right; }
-    .amount-display { font-size: 32px; font-weight: bold; text-align: center; padding: 30px; margin: 20px 0; background: #f8f9fa; border-radius: 8px; }
-    .amount-display.income { color: #10b981; }
-    .amount-display.expense { color: #ef4444; }
-    .receipt-footer { background: #f8f9fa; padding: 20px; text-align: center; color: #666; font-size: 12px; }
+    .field-label { color: var(--hl-gray-500); font-weight: 500; }
+    .field-value { color: var(--hl-gray-700); font-weight: 600; text-align: right; }
+    .amount-display { font-size: 32px; font-weight: bold; text-align: center; padding: 30px; margin: 20px 0; background: var(--hl-gray-50); border-radius: 8px; }
+    .amount-display.income { color: var(--hl-success); }
+    .amount-display.expense { color: var(--hl-error); }
+    .receipt-footer { background: var(--hl-gray-50); padding: 20px; text-align: center; color: var(--hl-gray-500); font-size: 12px; }
     .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: uppercase; }
-    .status-completed { background: #d1fae5; color: #065f46; }
+    .status-completed { background: var(--hl-success-bg); color: var(--hl-accent); }
     @media print {
-      body { background: #fff; padding: 0; }
+      body { background: var(--hl-gray-0); padding: 0; }
       .receipt-container { box-shadow: none; max-width: 100%; }
       .no-print { display: none; }
     }
@@ -2396,7 +2509,7 @@ function renderUsers(users) {
     <div class="user-item" onclick="viewUserRecords('${u.id}', '${escapeHtml(u.username)}')" style="cursor: pointer;">
       <div class="user-avatar ${avatarClass}">${u.username.charAt(0).toUpperCase()}</div>
       <div class="user-info-details">
-        <div class="user-name">${escapeHtml(u.username)} <span style="color: #8b949e; font-size: 12px;">(${roleText})</span></div>
+        <div class="user-name">${escapeHtml(u.username)} <span style="color: var(--hl-gray-400); font-size: 12px;">(${roleText})</span></div>
         <div class="user-meta">ID: ${u.id}${contactInfo ? ' • ' + escapeHtml(contactInfo) : ''}</div>
       </div>
       <div class="user-status ${statusClass}">${statusText}</div>
@@ -3319,8 +3432,8 @@ function generateMyQRCode(userId) {
     text: userId,
     width: 512,
     height: 512,
-    colorDark: '#000000',
-    colorLight: '#ffffff',
+    colorDark: 'var(--hl-gray-950)',
+    colorLight: 'var(--hl-gray-0)',
     correctLevel: QRCode.CorrectLevel.M,
   });
   const img = container.querySelector('img');

@@ -1,6 +1,6 @@
 class HyperlaneHeader extends HTMLElement {
   static get observedAttributes() {
-    return ['title', 'subtitle', 'logo', 'href', 'shimmer', 'light'];
+    return ['title', 'subtitle', 'logo', 'href', 'shimmer', 'light', 'dark'];
   }
 
   constructor() {
@@ -47,13 +47,18 @@ class HyperlaneHeader extends HTMLElement {
     return this.hasAttribute('light');
   }
 
+  get dark() {
+    return this.hasAttribute('dark');
+  }
+
   render() {
     const title = this.title;
     const subtitle = this.subtitle;
     const logo = this.logo;
     const href = this.href;
     const shimmer = this.shimmer;
-    const light = this.light;
+    const light = this.light || !this.dark;
+    const dark = this.dark;
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -62,7 +67,7 @@ class HyperlaneHeader extends HTMLElement {
         }
         .app-header {
           text-align: center;
-          color: ${light ? '#2c3e50' : 'white'};
+          color: ${light ? 'var(--hl-fg)' : 'var(--hl-accent-fg)'};
           padding: 40px 20px;
           animation: fadeInDown 0.6s ease;
         }
@@ -84,21 +89,12 @@ class HyperlaneHeader extends HTMLElement {
           object-fit: contain;
           vertical-align: middle;
           margin-right: 12px;
-          filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
         }
         .text {
-          color: ${light ? '#667eea' : '#ffd700'};
+          color: ${light ? 'var(--hl-gray-900)' : 'var(--hl-accent-fg)'};
         }
         .text.shimmer {
-          background: linear-gradient(90deg, ${light ? '#667eea, #764ba2, #667eea, #764ba2' : '#fff, #ffd700, #fff, #ffd700'});
-          background-size: 200% auto;
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          animation: shimmer 3s linear infinite;
-        }
-        .shimmer-header h1 a::after {
-          background: linear-gradient(90deg, ${light ? '#667eea, #764ba2, #667eea' : '#ffd700, #fff, #ffd700'});
+          color: inherit;
         }
         h1 a::after {
           content: '';
@@ -107,7 +103,7 @@ class HyperlaneHeader extends HTMLElement {
           bottom: -2px;
           width: 0;
           height: 2px;
-          background: ${light ? '#667eea' : '#ffd700'};
+          background: currentColor;
           transition: width 0.4s ease;
         }
         h1 a:hover::after {
@@ -117,14 +113,13 @@ class HyperlaneHeader extends HTMLElement {
           font-size: 2.5rem;
           font-weight: 700;
           margin-bottom: 10px;
-          ${light ? '' : 'text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);'}
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
         }
         .app-subtitle {
           font-size: 1.1rem;
-          color: ${light ? '#5a6c7d' : 'rgba(255, 255, 255, 0.9)'};
+          color: ${light ? 'var(--hl-fg-muted)' : 'var(--hl-fg-muted, rgba(255, 255, 255, 0.9))'};
           font-weight: 400;
           margin-top: 8px;
           white-space: nowrap;
@@ -134,11 +129,9 @@ class HyperlaneHeader extends HTMLElement {
         @keyframes fadeInDown {
           from {
             opacity: 0;
-            transform: translateY(-20px);
           }
           to {
             opacity: 1;
-            transform: translateY(0);
           }
         }
         @keyframes shimmer {

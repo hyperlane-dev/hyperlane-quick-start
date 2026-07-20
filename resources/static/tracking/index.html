@@ -2,6 +2,7 @@
 
 <html lang="en">
   <head>
+    <script src="../common/js/theme-init.js"></script>
     <meta charset="UTF-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Hyperlane - Event Tracking</title>
@@ -14,10 +15,8 @@
     <script src="../common/js/common.js"></script>
     <script src="../common/js/error-handler.js"></script>
     <style>
-      @import url('./css/css2');
-
       body {
-        background: #667eea;
+        background: var(--hl-bg);
         padding: 20px;
       }
 
@@ -39,7 +38,7 @@
         border-radius: 12px;
         padding: 30px;
         margin-bottom: 30px;
-        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.15);
+        box-shadow: 0 4px 20px rgba(255, 255, 255, 0.15);
         position: relative;
       }
 
@@ -50,7 +49,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        border: 2px solid rgba(102, 126, 234, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.2);
         border-radius: 12px;
         pointer-events: none;
       }
@@ -62,7 +61,7 @@
         left: 0;
         right: 0;
         height: 3px;
-        background: #667eea;
+        background: var(--hl-accent);
         border-radius: 12px 12px 0 0;
       }
 
@@ -79,7 +78,7 @@
 
       .search-title {
         font-size: 1.3rem;
-        color: #2c3e50;
+        color: var(--hl-fg);
         margin-bottom: 20px;
         font-weight: 600;
         letter-spacing: 1px;
@@ -98,18 +97,18 @@
       }
 
       .form-label {
-        color: #6c757d;
+        color: var(--hl-fg-muted);
         margin-bottom: 8px;
         font-size: 0.9rem;
         font-weight: 500;
       }
 
       .form-input {
-        background: white;
-        border: 2px solid #e9ecef;
+        background: var(--hl-surface);
+        border: 2px solid var(--hl-border-strong);
         border-radius: 8px;
         padding: 12px;
-        color: #6c757d;
+        color: var(--hl-fg);
         font-size: 1rem;
         transition: all 0.3s ease;
         font-family:
@@ -117,13 +116,13 @@
       }
 
       .form-input::placeholder {
-        color: #adb5bd;
+        color: var(--hl-fg-subtle);
       }
 
       .form-input:focus {
         outline: none;
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        border-color: var(--hl-accent);
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
       }
 
       .form-input[type='datetime-local']::-webkit-calendar-picker-indicator {
@@ -141,15 +140,15 @@
       }
 
       .form-input[type='datetime-local']::-webkit-datetime-edit {
-        color: #6c757d;
+        color: var(--hl-fg-muted);
       }
 
       .form-input[type='datetime-local']::-webkit-datetime-edit-fields-wrapper {
-        color: #6c757d;
+        color: var(--hl-fg-muted);
       }
 
       .form-input[type='datetime-local']::-webkit-datetime-edit-text {
-        color: #adb5bd;
+        color: var(--hl-fg-subtle);
       }
 
       .form-input[type='datetime-local']::-webkit-datetime-edit-month-field,
@@ -157,7 +156,7 @@
       .form-input[type='datetime-local']::-webkit-datetime-edit-year-field,
       .form-input[type='datetime-local']::-webkit-datetime-edit-hour-field,
       .form-input[type='datetime-local']::-webkit-datetime-edit-minute-field {
-        color: #6c757d;
+        color: var(--hl-fg-muted);
       }
 
       .datetime-picker-wrapper {
@@ -169,10 +168,10 @@
       .datetime-picker-input {
         width: 100%;
         padding: 12px 35px 12px 12px;
-        background: white;
-        border: 2px solid #e9ecef;
+        background: var(--hl-surface);
+        border: 2px solid var(--hl-border-strong);
         border-radius: 8px;
-        color: #6c757d;
+        color: var(--hl-fg);
         font-size: 1rem;
         font-family: inherit;
         cursor: pointer;
@@ -180,21 +179,20 @@
       }
 
       .datetime-picker-input:hover {
-        border-color: #667eea;
+        border-color: var(--hl-accent);
       }
 
       .datetime-picker-input:focus {
         outline: none;
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        border-color: var(--hl-accent);
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
       }
 
       .datetime-picker-icon {
         position: absolute;
         right: 12px;
         top: 50%;
-        transform: translateY(-50%);
-        color: #667eea;
+        color: var(--hl-accent);
         font-size: 16px;
         pointer-events: none;
       }
@@ -204,12 +202,12 @@
         top: 100%;
         left: 0;
         margin-top: 8px;
-        background: white;
-        border: 2px solid #e9ecef;
+        background: var(--hl-surface);
+        border: 2px solid var(--hl-border-strong);
         border-radius: 12px;
         padding: 16px;
         z-index: 1000;
-        box-shadow: 0 8px 30px rgba(102, 126, 234, 0.2);
+        box-shadow: var(--hl-shadow-lg, 0 8px 30px rgba(0, 0, 0, 0.2));
         min-width: 320px;
         display: none;
       }
@@ -224,14 +222,14 @@
         align-items: center;
         margin-bottom: 16px;
         padding-bottom: 12px;
-        border-bottom: 2px solid #e9ecef;
+        border-bottom: 2px solid var(--hl-gray-150);
       }
 
       .datetime-picker-nav {
-        background: #667eea;
+        background: var(--hl-accent);
         border: none;
         border-radius: 6px;
-        color: white;
+        color: var(--hl-accent-fg);
         width: 32px;
         height: 32px;
         cursor: pointer;
@@ -243,14 +241,13 @@
       }
 
       .datetime-picker-nav:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
       }
 
       .datetime-picker-month-year {
         font-size: 16px;
         font-weight: 600;
-        color: #2c3e50;
+        color: var(--hl-fg);
       }
 
       .datetime-picker-weekdays {
@@ -263,7 +260,7 @@
       .datetime-picker-weekday {
         text-align: center;
         font-size: 12px;
-        color: #6c757d;
+        color: var(--hl-fg-muted);
         padding: 8px;
         text-transform: uppercase;
         font-weight: 600;
@@ -282,7 +279,7 @@
         align-items: center;
         justify-content: center;
         font-size: 14px;
-        color: #2c3e50;
+        color: var(--hl-fg);
         background: transparent;
         border: 2px solid transparent;
         border-radius: 8px;
@@ -291,23 +288,23 @@
       }
 
       .datetime-picker-day:hover:not(.disabled):not(.selected) {
-        background: #f0f4ff;
-        border-color: #667eea;
+        background: var(--hl-info-bg);
+        border-color: var(--hl-accent);
       }
 
       .datetime-picker-day.selected {
-        background: #667eea;
-        border-color: #667eea;
-        color: white;
+        background: var(--hl-accent);
+        border-color: var(--hl-accent);
+        color: var(--hl-accent-fg);
       }
 
       .datetime-picker-day.disabled {
-        color: #adb5bd;
+        color: var(--hl-fg-subtle);
         cursor: not-allowed;
       }
 
       .datetime-picker-day.other-month {
-        color: #adb5bd;
+        color: var(--hl-fg-subtle);
       }
 
       .datetime-picker-time {
@@ -316,29 +313,29 @@
         justify-content: center;
         gap: 8px;
         padding: 12px;
-        border-top: 2px solid #e9ecef;
+        border-top: 2px solid var(--hl-gray-150);
         margin-bottom: 12px;
       }
 
       .datetime-picker-time-label {
         font-size: 14px;
-        color: #6c757d;
+        color: var(--hl-fg-muted);
         font-weight: 500;
       }
 
       .datetime-picker-time-input {
         width: 60px;
         padding: 6px;
-        border: 2px solid #e9ecef;
+        border: 2px solid var(--hl-gray-150);
         border-radius: 6px;
         text-align: center;
         font-size: 14px;
-        color: #2c3e50;
+        color: var(--hl-fg);
       }
 
       .datetime-picker-time-input:focus {
         outline: none;
-        border-color: #667eea;
+        border-color: var(--hl-accent);
       }
 
       .datetime-picker-footer {
@@ -349,10 +346,10 @@
 
       .datetime-picker-btn {
         padding: 8px 16px;
-        background: #e9ecef;
+        background: var(--hl-bg-muted);
         border: none;
         border-radius: 6px;
-        color: #6c757d;
+        color: var(--hl-fg-muted);
         font-size: 14px;
         cursor: pointer;
         transition: all 0.3s ease;
@@ -360,17 +357,16 @@
       }
 
       .datetime-picker-btn:hover {
-        background: #dee2e6;
+        background: var(--hl-gray-200);
       }
 
       .datetime-picker-btn.primary {
-        background: #667eea;
-        color: white;
+        background: var(--hl-accent);
+        color: var(--hl-accent-fg);
       }
 
       .datetime-picker-btn.primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
       }
 
       .button-group {
@@ -393,23 +389,21 @@
       }
 
       .btn-primary {
-        background: #667eea;
-        color: white;
+        background: var(--hl-accent);
+        color: var(--hl-accent-fg);
       }
 
       .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 6px 16px rgba(255, 255, 255, 0.4);
       }
 
       .btn-secondary {
-        background: #6c757d;
-        color: white;
+        background: var(--hl-fg-muted);
+        color: var(--hl-accent-fg);
       }
 
       .btn-secondary:hover {
-        background: #5a6268;
-        transform: translateY(-2px);
+        background: var(--hl-fg-muted);
       }
 
       .stats-panel {
@@ -420,13 +414,13 @@
       }
 
       .stat-card {
-        background: #ffffff;
-        border: 2px solid rgba(118, 75, 162, 0.2);
+        background: var(--hl-surface);
+        border: 2px solid rgba(0, 0, 0, 0.2);
         border-radius: 12px;
         padding: 20px;
         text-align: center;
         transition: all 0.3s ease;
-        box-shadow: 0 3px 12px rgba(118, 75, 162, 0.12);
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
         position: relative;
         overflow: hidden;
       }
@@ -438,24 +432,18 @@
         left: 0;
         right: 0;
         height: 3px;
-        background: #667eea;
-        transform: scaleX(0);
+        background: var(--hl-accent);
         transition: transform 0.3s ease;
       }
 
       .stat-card:hover {
-        transform: translateY(-4px);
-        border-color: #764ba2;
-        box-shadow: 0 8px 24px rgba(118, 75, 162, 0.25);
-        background: #ffffff;
-      }
-
-      .stat-card:hover::after {
-        transform: scaleX(1);
+        border-color: var(--hl-accent);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+        background: var(--hl-surface);
       }
 
       .stat-label {
-        color: #6c757d;
+        color: var(--hl-fg-muted);
         font-size: 0.9rem;
         margin-bottom: 10px;
         font-weight: 500;
@@ -464,14 +452,14 @@
       .stat-value {
         font-size: 2rem;
         font-weight: 700;
-        color: #2c3e50;
+        color: var(--hl-fg);
       }
 
       .results-panel {
         background: rgba(255, 255, 255, 0.98);
         border-radius: 12px;
         padding: 30px;
-        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.15);
+        box-shadow: 0 4px 20px rgba(255, 255, 255, 0.15);
         position: relative;
       }
 
@@ -482,7 +470,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        border: 2px solid rgba(102, 126, 234, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.2);
         border-radius: 12px;
         pointer-events: none;
       }
@@ -494,13 +482,13 @@
         left: 0;
         width: 4px;
         height: 100%;
-        background: #667eea;
+        background: var(--hl-accent);
         border-radius: 12px 0 0 12px;
       }
 
       .results-title {
         font-size: 1.3rem;
-        color: #2c3e50;
+        color: var(--hl-fg);
         margin-bottom: 20px;
         font-weight: 600;
         letter-spacing: 1px;
@@ -519,17 +507,17 @@
       }
 
       thead {
-        background: #f0f4ff;
-        border-bottom: 3px solid rgba(102, 126, 234, 0.3);
+        background: var(--hl-info-bg);
+        border-bottom: 3px solid rgba(255, 255, 255, 0.3);
       }
 
       th {
         padding: 15px;
         text-align: left;
-        color: #2c3e50;
+        color: var(--hl-fg);
         font-weight: 600;
         font-size: 0.9rem;
-        border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+        border-bottom: 2px solid rgba(255, 255, 255, 0.2);
         position: relative;
       }
 
@@ -560,7 +548,7 @@
         left: 0;
         right: 0;
         height: 2px;
-        background: #667eea;
+        background: var(--hl-accent);
         opacity: 0;
         transition: opacity 0.3s ease;
       }
@@ -571,8 +559,8 @@
 
       td {
         padding: 15px;
-        border-bottom: 1px solid rgba(102, 126, 234, 0.1);
-        color: #2c3e50;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--hl-fg);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -592,29 +580,27 @@
       }
 
       tbody tr:nth-child(even) {
-        background: rgba(248, 250, 255, 0.5);
+        background: rgba(255, 255, 255, 0.5);
       }
 
       tbody tr:hover {
-        background: rgba(102, 126, 234, 0.08);
-        transform: scale(1.01);
-        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+        background: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 2px 8px rgba(255, 255, 255, 0.15);
       }
 
       .detail-btn {
         padding: 6px 12px;
-        background: #667eea;
+        background: var(--hl-accent);
         border: none;
         border-radius: 6px;
-        color: white;
+        color: var(--hl-accent-fg);
         font-weight: 600;
         cursor: pointer;
         transition: all 0.3s ease;
       }
 
       .detail-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
       }
 
       .pagination {
@@ -627,18 +613,17 @@
 
       .page-btn {
         padding: 8px 16px;
-        background: white;
-        border: 1px solid #e9ecef;
+        background: var(--hl-surface);
+        border: 1px solid var(--hl-border-strong);
         border-radius: 6px;
-        color: #667eea;
+        color: var(--hl-fg);
         cursor: pointer;
         transition: all 0.3s ease;
       }
 
       .page-btn:hover:not(:disabled) {
-        background: #667eea;
-        color: white;
-        transform: translateY(-2px);
+        background: var(--hl-accent);
+        color: var(--hl-accent-fg);
       }
 
       .page-btn:disabled {
@@ -647,13 +632,13 @@
       }
 
       .page-btn.active {
-        background: #667eea;
-        color: white;
+        background: var(--hl-accent);
+        color: var(--hl-accent-fg);
         font-weight: 600;
       }
 
       .page-info {
-        color: #2c3e50;
+        color: var(--hl-fg);
         font-size: 1rem;
         font-weight: 600;
       }
@@ -676,7 +661,7 @@
       }
 
       .modal-content {
-        background: #ffffff;
+        background: var(--hl-surface);
         border-radius: 12px;
         padding: 30px;
         max-width: 1200px;
@@ -684,7 +669,7 @@
         max-height: 80vh;
         overflow-y: auto;
         position: relative;
-        box-shadow: 0 8px 40px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 8px 40px rgba(255, 255, 255, 0.3);
         user-select: text !important;
         -webkit-user-select: text !important;
         -moz-user-select: text !important;
@@ -698,7 +683,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        border: 2px solid rgba(102, 126, 234, 0.3);
+        border: 2px solid rgba(255, 255, 255, 0.3);
         border-radius: 12px;
         pointer-events: none;
       }
@@ -710,7 +695,7 @@
         left: 0;
         right: 0;
         height: 4px;
-        background: #667eea;
+        background: var(--hl-accent);
         border-radius: 12px 12px 0 0;
       }
 
@@ -718,8 +703,8 @@
         position: absolute;
         top: 15px;
         right: 15px;
-        background: #f8f9fa;
-        border: 1px solid #e9ecef;
+        background: var(--hl-bg-subtle);
+        border: 1px solid var(--hl-gray-150);
         border-radius: 50%;
         width: 35px;
         height: 35px;
@@ -727,21 +712,21 @@
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        color: #6c757d;
+        color: var(--hl-fg-muted);
         font-size: 1.5rem;
         transition: all 0.3s ease;
       }
 
       .modal-close:hover {
-        background: #dc3545;
-        color: white;
-        border-color: #dc3545;
+        background: var(--hl-error-bg);
+        color: var(--hl-error);
+        border-color: var(--hl-error-bg);
         transform: rotate(90deg);
       }
 
       .modal-title {
         font-size: 1.5rem;
-        color: #2c3e50;
+        color: var(--hl-fg);
         margin-bottom: 20px;
         font-weight: 600;
         user-select: text !important;
@@ -755,7 +740,7 @@
       }
 
       .detail-label {
-        color: #6c757d;
+        color: var(--hl-fg-muted);
         font-weight: 600;
         margin-bottom: 10px;
         font-size: 0.9rem;
@@ -766,14 +751,14 @@
       }
 
       .detail-value {
-        background: linear-gradient(135deg, #f8f9fa 0%, #f0f4ff 100%);
+        background: var(--hl-bg-subtle);
         border-radius: 8px;
         padding: 15px;
-        color: #2c3e50;
+        color: var(--hl-fg);
         font-family: 'Courier New', monospace;
         white-space: pre-wrap;
         word-break: break-all;
-        box-shadow: inset 0 2px 4px rgba(102, 126, 234, 0.05);
+        box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.05);
         position: relative;
         user-select: text !important;
         -webkit-user-select: text !important;
@@ -788,7 +773,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        border: 2px solid rgba(102, 126, 234, 0.15);
+        border: 2px solid rgba(255, 255, 255, 0.15);
         border-radius: 8px;
         pointer-events: none;
       }
@@ -796,7 +781,7 @@
       .loading {
         text-align: center;
         padding: 40px;
-        color: #667eea;
+        color: var(--hl-accent);
         font-size: 1.2rem;
       }
 
@@ -824,7 +809,7 @@
       .no-data {
         text-align: center;
         padding: 40px;
-        color: #6c757d;
+        color: var(--hl-fg-muted);
         font-size: 1.2rem;
       }
 
@@ -1055,10 +1040,6 @@
     <script>
       class DateTimePicker {
         constructor(inputId, options = {}) {
-          this.inputId = inputId;
-          this.input = document.getElementById(inputId);
-          if (!this.input) return;
-          this.onChange = options.onChange || (() => {});
           this.currentDate = new Date();
           this.selectedDate = null;
           this.selectedHour = 0;
@@ -1092,33 +1073,33 @@
           this.calendar = document.createElement('div');
           this.calendar.className = 'datetime-picker-calendar';
           this.calendar.innerHTML = `
-            <div class="datetime-picker-header">
-              <button class="datetime-picker-nav" data-nav="prev">‹</button>
-              <span class="datetime-picker-month-year"></span>
-              <button class="datetime-picker-nav" data-nav="next">›</button>
-            </div>
-            <div class="datetime-picker-weekdays">
-              <div class="datetime-picker-weekday">Su</div>
-              <div class="datetime-picker-weekday">Mo</div>
-              <div class="datetime-picker-weekday">Tu</div>
-              <div class="datetime-picker-weekday">We</div>
-              <div class="datetime-picker-weekday">Th</div>
-              <div class="datetime-picker-weekday">Fr</div>
-              <div class="datetime-picker-weekday">Sa</div>
-            </div>
-            <div class="datetime-picker-days"></div>
-            <div class="datetime-picker-time">
-              <span class="datetime-picker-time-label">Time:</span>
-              <input type="number" class="datetime-picker-time-input" id="${this.inputId}-hour" min="0" max="23" value="00" />
-              <span>:</span>
-              <input type="number" class="datetime-picker-time-input" id="${this.inputId}-minute" min="0" max="59" value="00" />
-            </div>
-            <div class="datetime-picker-footer">
-              <button class="datetime-picker-btn" data-action="now">Now</button>
-              <button class="datetime-picker-btn primary" data-action="confirm">Confirm</button>
-              <button class="datetime-picker-btn" data-action="clear">Clear</button>
-            </div>
-          `;
+                  <div class="datetime-picker-header">
+                    <button class="datetime-picker-nav" data-nav="prev">‹</button>
+                    <span class="datetime-picker-month-year"></span>
+                    <button class="datetime-picker-nav" data-nav="next">›</button>
+                  </div>
+                  <div class="datetime-picker-weekdays">
+                    <div class="datetime-picker-weekday">Su</div>
+                    <div class="datetime-picker-weekday">Mo</div>
+                    <div class="datetime-picker-weekday">Tu</div>
+                    <div class="datetime-picker-weekday">We</div>
+                    <div class="datetime-picker-weekday">Th</div>
+                    <div class="datetime-picker-weekday">Fr</div>
+                    <div class="datetime-picker-weekday">Sa</div>
+                  </div>
+                  <div class="datetime-picker-days"></div>
+                  <div class="datetime-picker-time">
+                    <span class="datetime-picker-time-label">Time:</span>
+                    <input type="number" class="datetime-picker-time-input" id="${this.inputId}-hour" min="0" max="23" value="00" />
+                    <span>:</span>
+                    <input type="number" class="datetime-picker-time-input" id="${this.inputId}-minute" min="0" max="59" value="00" />
+                  </div>
+                  <div class="datetime-picker-footer">
+                    <button class="datetime-picker-btn" data-action="now">Now</button>
+                    <button class="datetime-picker-btn primary" data-action="confirm">Confirm</button>
+                    <button class="datetime-picker-btn" data-action="clear">Clear</button>
+                  </div>
+                `;
           this.wrapper.appendChild(this.calendar);
           this.daysContainer = this.calendar.querySelector(
             '.datetime-picker-days',
@@ -1429,41 +1410,41 @@
           }
 
           let html = `
-            <div class="table-container">
-              <table>
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Timestamp</th>
-                    <th>Created At</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-          `;
+                  <div class="table-container">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>ID</th>
+                          <th>Timestamp</th>
+                          <th>Created At</th>
+                          <th>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                `;
 
           data.records.forEach((record) => {
             html += `
-              <tr>
-                <td>${record.id}</td>
-                <td>${new Date(record.timestamp).toLocaleString()}</td>
-                <td>${new Date(record.created_at).toLocaleString()}</td>
-                <td>
-                  <button class="detail-btn" onclick="app.showDetail(${
-                    record.id
-                  })">
-                    View Details
-                  </button>
-                </td>
-              </tr>
-            `;
+                    <tr>
+                      <td>${record.id}</td>
+                      <td>${new Date(record.timestamp).toLocaleString()}</td>
+                      <td>${new Date(record.created_at).toLocaleString()}</td>
+                      <td>
+                        <button class="detail-btn" onclick="app.showDetail(${
+                          record.id
+                        })">
+                          View Details
+                        </button>
+                      </td>
+                    </tr>
+                  `;
           });
 
           html += `
-                </tbody>
-              </table>
-            </div>
-          `;
+                      </tbody>
+                    </table>
+                  </div>
+                `;
 
           html += this.renderPagination(data.page, totalPages);
 
@@ -1486,11 +1467,11 @@
           let html = '<div class="pagination" style="display: none;">';
 
           html += `
-            <button class="page-btn" ${currentPage === 1 ? 'disabled' : ''}
-                    onclick="app.goToPrevPage()">
-              Previous
-            </button>
-          `;
+                  <button class="page-btn" ${currentPage === 1 ? 'disabled' : ''}
+                          onclick="app.goToPrevPage()">
+                    Previous
+                  </button>
+                `;
 
           const maxButtons = 5;
           let startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2));
@@ -1509,11 +1490,11 @@
 
           for (let i = startPage; i <= endPage; i++) {
             html += `
-              <button class="page-btn ${i === currentPage ? 'active' : ''}"
-                      onclick="app.goToPage(${i})">
-                ${i}
-              </button>
-            `;
+                    <button class="page-btn ${i === currentPage ? 'active' : ''}"
+                            onclick="app.goToPage(${i})">
+                      ${i}
+                    </button>
+                  `;
           }
 
           if (endPage < totalPages) {
@@ -1524,13 +1505,13 @@
           }
 
           html += `
-            <button class="page-btn" ${
-              currentPage === totalPages ? 'disabled' : ''
-            }
-                    onclick="app.goToNextPage()">
-              Next
-            </button>
-          `;
+                  <button class="page-btn" ${
+                    currentPage === totalPages ? 'disabled' : ''
+                  }
+                          onclick="app.goToNextPage()">
+                    Next
+                  </button>
+                `;
 
           html += '</div>';
           return html;
@@ -1556,33 +1537,33 @@
           document.body.style.overflow = 'hidden';
 
           let html = `
-            <div class="detail-section">
-              <div class="detail-label">ID</div>
-              <div class="detail-value">${record.id}</div>
-            </div>
-            <div class="detail-section">
-              <div class="detail-label">Timestamp</div>
-              <div class="detail-value">${record.timestamp} (${new Date(
-                record.timestamp,
-              ).toLocaleString()})</div>
-            </div>
-            <div class="detail-section">
-              <div class="detail-label">Created At</div>
-              <div class="detail-value">${this.utcToLocalDateTimeStr(record.created_at)}</div>
-            </div>
-            <div class="detail-section">
-              <div class="detail-label">Headers</div>
-              <div class="detail-value">${JSON.stringify(
-                record.headers,
-                null,
-                2,
-              )}</div>
-            </div>
-            <div class="detail-section">
-              <div class="detail-label">Body</div>
-              <div class="detail-value">${this.formatJson(record.body)}</div>
-            </div>
-          `;
+                  <div class="detail-section">
+                    <div class="detail-label">ID</div>
+                    <div class="detail-value">${record.id}</div>
+                  </div>
+                  <div class="detail-section">
+                    <div class="detail-label">Timestamp</div>
+                    <div class="detail-value">${record.timestamp} (${new Date(
+                      record.timestamp,
+                    ).toLocaleString()})</div>
+                  </div>
+                  <div class="detail-section">
+                    <div class="detail-label">Created At</div>
+                    <div class="detail-value">${this.utcToLocalDateTimeStr(record.created_at)}</div>
+                  </div>
+                  <div class="detail-section">
+                    <div class="detail-label">Headers</div>
+                    <div class="detail-value">${JSON.stringify(
+                      record.headers,
+                      null,
+                      2,
+                    )}</div>
+                  </div>
+                  <div class="detail-section">
+                    <div class="detail-label">Body</div>
+                    <div class="detail-value">${this.formatJson(record.body)}</div>
+                  </div>
+                `;
 
           document.getElementById('modalContent').innerHTML = html;
           document.getElementById('detailModal').classList.add('active');

@@ -7,7 +7,7 @@
 }
 
 body {
-  background: #667eea;
+  background: var(--hl-bg);
   padding: 20px;
 }
 
@@ -25,29 +25,31 @@ body {
 .app-subtitle {
   font-size: 1.1rem;
   opacity: 0.95;
+  color: var(--hl-fg-muted);
 }
 
 .subscribe-link {
-  color: white;
+  color: var(--hl-accent);
   text-decoration: none;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+  border-bottom: 2px solid var(--hl-accent);
   transition: border-color 0.3s;
+  opacity: 0.95;
 }
-
 .subscribe-link:hover {
-  border-color: white;
+  border-color: var(--hl-accent-hover);
+  color: var(--hl-accent-hover);
 }
 
 .loading {
   text-align: center;
-  color: white;
+  color: var(--hl-fg-muted);
   font-size: 1.2rem;
   padding: 40px;
 }
 
 .spinner {
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  border-top: 3px solid white;
+  border: 3px solid rgba(10, 10, 10, 0.15);
+  border-top: 3px solid var(--hl-accent);
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -57,12 +59,20 @@ body {
 
 .feed-items {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 20px;
   margin-bottom: 20px;
 }
 
+hyperlane-feed-item {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
 .feed-item {
-  background: white;
+  background: var(--hl-surface);
   border-radius: 12px;
   padding: 24px;
   margin-bottom: 20px;
@@ -76,12 +86,11 @@ body {
 }
 
 .feed-item:hover {
-  transform: translateY(-4px);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
 }
 
 .feed-item h3 {
-  color: #2c3e50;
+  color: var(--hl-fg);
   font-size: 1.3rem;
   margin-bottom: 12px;
   white-space: nowrap;
@@ -90,13 +99,13 @@ body {
 }
 
 .feed-item h3 a {
-  color: #007bff;
+  color: var(--hl-accent);
   text-decoration: none;
   transition: color 0.3s ease;
 }
 
 .feed-item h3 a:hover {
-  color: #0056b3;
+  color: var(--hl-accent);
 }
 
 .feed-meta {
@@ -110,7 +119,7 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #6c757d;
+  color: var(--hl-fg-muted);
   font-size: 0.9rem;
 }
 
@@ -119,30 +128,31 @@ body {
 }
 
 .feed-description {
-  color: #495057;
+  color: var(--hl-fg);
   line-height: 1.6;
   margin-bottom: 16px;
 }
 
 .file-preview {
-  background: #f8f9fa;
-  border: 1px solid #dee2e6;
+  background: var(--hl-bg-subtle);
+  border: 1px solid var(--hl-border-strong);
   border-radius: 8px;
   padding: 12px;
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .file-icon {
   width: 48px;
   height: 48px;
-  background: #667eea;
+  background: var(--hl-accent);
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--hl-accent-fg);
   font-size: 1.5rem;
   flex-shrink: 0;
 }
@@ -154,20 +164,20 @@ body {
 
 .file-name {
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--hl-fg);
   margin-bottom: 4px;
   word-break: break-all;
 }
 
 .file-size {
-  color: #6c757d;
+  color: var(--hl-fg-muted);
   font-size: 0.85rem;
 }
 
 .download-btn {
-  background: #28a745;
-  color: white;
-  border: none;
+  background: var(--hl-success);
+  color: var(--hl-accent-fg);
+  border: 1px solid var(--hl-border-strong);
   padding: 8px 16px;
   border-radius: 6px;
   cursor: pointer;
@@ -175,16 +185,16 @@ body {
   text-decoration: none;
   display: inline-block;
   transition: all 0.3s ease;
+  flex-shrink: 0;
 }
 
 .download-btn:hover {
-  background: #218838;
-  transform: translateY(-1px);
+  background: var(--hl-success);
 }
 
 .empty-state {
   text-align: center;
-  color: white;
+  color: var(--hl-fg-muted);
   padding: 60px 20px;
   animation: fadeIn 0.6s ease;
 }
@@ -203,11 +213,11 @@ body {
 }
 
 .error-message {
-  background: #fff3cd;
-  border: 1px solid #ffc107;
+  background: var(--hl-warning-bg);
+  border: 1px solid var(--hl-warning);
   border-radius: 8px;
   padding: 16px;
-  color: #856404;
+  color: var(--hl-warning);
   text-align: center;
   animation: fadeIn 0.6s ease;
 }
@@ -225,24 +235,20 @@ body {
 @keyframes fadeInDown {
   from {
     opacity: 0;
-    transform: translateY(-20px);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -266,9 +272,9 @@ body {
 }
 
 .pagination-btn {
-  background: white;
-  color: #667eea;
-  border: none;
+  background: var(--hl-surface);
+  color: var(--hl-accent);
+  border: 1px solid var(--hl-border);
   padding: 10px 20px;
   border-radius: 8px;
   cursor: pointer;
@@ -279,9 +285,8 @@ body {
 }
 
 .pagination-btn:hover:not(:disabled) {
-  background: #667eea;
-  color: white;
-  transform: translateY(-2px);
+  background: var(--hl-accent);
+  color: var(--hl-accent-fg);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
@@ -291,7 +296,7 @@ body {
 }
 
 .pagination-info {
-  color: white;
+  color: var(--hl-fg);
   font-weight: 600;
   font-size: 1rem;
   padding: 0 12px;
@@ -301,14 +306,14 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: white;
+  color: var(--hl-fg);
   font-weight: 600;
 }
 
 .page-size-selector select {
-  background: white;
-  color: #667eea;
-  border: none;
+  background: var(--hl-surface);
+  color: var(--hl-accent);
+  border: 1px solid var(--hl-border);
   padding: 8px 32px 8px 12px;
   border-radius: 6px;
   cursor: pointer;
@@ -318,7 +323,7 @@ body {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23667eea' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230a0a0a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
   background-repeat: no-repeat;
   background-position: right 8px center;
   background-size: 16px;
@@ -331,6 +336,8 @@ body {
   gap: 20px;
   margin-bottom: 20px;
   flex-wrap: wrap;
+  min-height: 60px;
+  overflow: visible;
 }
 
 .title-short {

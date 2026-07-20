@@ -1,0 +1,73 @@
+/*
+ * Hyperlane design tokens — high-end monochrome (light theme only).
+ * Single source of truth. Every color resolves to black or white:
+ *   fg/accent = black, bg/surface/accent-fg = white.
+ * Switch theme via `data-theme="light"` on <html>. Dark mode is intentionally
+ * removed; the site renders identically regardless of OS prefers-color-scheme.
+ * `var(--hl-*)` pierces Shadow DOM, so Web Components read these too.
+ */
+
+:root,
+[data-theme='light'],
+[data-theme='dark'] {
+  /* Binary scale: dark tones collapse to black, light to white */
+  --hl-gray-0: #ffffff;
+  --hl-gray-50: #ffffff;
+  --hl-gray-100: #ffffff;
+  --hl-gray-150: #f4f4f5;
+  --hl-gray-200: #e4e4e7;
+  --hl-gray-300: #d4d4d8;
+  --hl-gray-400: #a1a1aa;
+  --hl-gray-500: #71717a;
+  --hl-gray-600: #52525b;
+  --hl-gray-700: #3f3f46;
+  --hl-gray-800: #27272a;
+  --hl-gray-900: #18181b;
+  --hl-gray-950: #0a0a0a;
+
+  /* Semantic surface / text */
+  --hl-bg: #ffffff;
+  --hl-bg-subtle: #f0f0f0;
+  --hl-bg-muted: #e4e4e7;
+  --hl-surface: #ffffff;
+  --hl-surface-hover: #f0f0f0;
+  --hl-fg: #0a0a0a;
+  --hl-fg-muted: #3f3f46;
+  --hl-fg-subtle: #71717a;
+  --hl-border: #a1a1aa;
+  --hl-border-strong: #0a0a0a;
+
+  /* Accent = pure foreground; accent-fg = its inverse */
+  --hl-accent: #000000;
+  --hl-accent-fg: #ffffff;
+  --hl-accent-hover: #1f1f1f;
+  --hl-focus-ring: rgba(10, 10, 10, 0.18);
+
+  /* Status — monochrome variants use readable foreground/surface pairs */
+  --hl-success: #0a0a0a;
+  --hl-success-bg: #f0f0f0;
+  --hl-error: #ffffff;
+  --hl-error-bg: #0a0a0a;
+  --hl-warning: #0a0a0a;
+  --hl-warning-bg: #f0f0f0;
+  --hl-info: #0a0a0a;
+  --hl-info-bg: #f0f0f0;
+
+  /* Overlay */
+  --hl-overlay: rgba(10, 10, 10, 0.5);
+
+  /* Radius */
+  --hl-radius-sm: 6px;
+  --hl-radius-md: 10px;
+  --hl-radius-lg: 14px;
+
+  /* Shadow (neutral black) */
+  --hl-shadow-sm: 0 1px 2px rgba(10, 10, 10, 0.06);
+  --hl-shadow-md: 0 2px 8px rgba(10, 10, 10, 0.1);
+  --hl-shadow-lg: 0 8px 24px rgba(10, 10, 10, 0.14);
+
+  /* Transition (no transform/motion — opacity & color only) */
+  --hl-transition:
+    opacity 0.15s ease, color 0.15s ease, background-color 0.15s ease,
+    border-color 0.15s ease;
+}

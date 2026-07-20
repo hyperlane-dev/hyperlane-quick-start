@@ -1,15 +1,15 @@
 .card {
-  background: #ffffff;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
+  background: var(--hl-surface);
+  border: 1px solid var(--hl-border);
+  border-radius: var(--hl-radius-md);
   overflow: hidden;
   margin-bottom: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--hl-shadow-sm);
 }
 
 .card-header {
   padding: 16px 20px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--hl-border);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -18,7 +18,7 @@
 .card-title {
   font-size: 16px;
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--hl-fg);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

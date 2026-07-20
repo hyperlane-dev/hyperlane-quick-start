@@ -1,6 +1,11 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script src="../common/js/theme-init.js"></script>
+    <script
+      src="../common/components/hyperlane-theme-toggle.js"
+      type="module"
+    ></script>
     <meta charset="UTF-8" />
     <meta content="IE=edge" http-equiv="X-UA-Compatible" />
     <meta
@@ -41,6 +46,9 @@
     <script src="./js/app.js" defer></script>
   </head>
   <body>
+    <hyperlane-theme-toggle
+      style="position: fixed; top: 16px; right: 16px; z-index: 10002"
+    ></hyperlane-theme-toggle>
     <div class="container">
       <hyperlane-header
         title="Shortlink Generator"

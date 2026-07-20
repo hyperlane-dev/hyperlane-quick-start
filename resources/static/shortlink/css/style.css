@@ -2,7 +2,7 @@
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  background: #667eea;
+  background: var(--hl-bg);
   margin-bottom: 20px;
 }
 
@@ -53,7 +53,7 @@ button,
   align-items: center;
   margin-bottom: 10px;
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--hl-fg);
 }
 
 .label-text {
@@ -61,7 +61,7 @@ button,
 }
 
 .required {
-  color: #dc3545;
+  color: var(--hl-error-bg);
   font-weight: 700;
 }
 
@@ -74,29 +74,28 @@ button,
 .url-input {
   width: 100%;
   padding: 16px 20px 16px 50px;
-  border: 2px solid #e9ecef;
+  border: 2px solid var(--hl-gray-150);
   border-radius: 12px;
   font-size: 1rem;
   transition: all 0.3s ease;
-  background: white;
+  background: var(--hl-surface);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .url-input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.25);
-  transform: translateY(-1px);
+  border-color: var(--hl-accent);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.25);
 }
 
 .url-input:valid {
-  border-color: #28a745;
+  border-color: var(--hl-success);
 }
 
 .input-hint {
   display: block;
   margin-top: 8px;
-  color: #6c757d;
+  color: var(--hl-fg-muted);
   font-size: 0.9rem;
   font-style: italic;
 }
@@ -109,15 +108,15 @@ button,
   position: relative;
   overflow: hidden;
   padding: 16px 32px;
-  background: #667eea;
-  color: white;
+  background: var(--hl-accent);
+  color: var(--hl-accent-fg);
   border: none;
   border-radius: 12px;
   font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -136,16 +135,11 @@ button,
 }
 
 .generate-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.4);
 }
 
 .generate-btn:hover:not(:disabled)::before {
   left: 100%;
-}
-
-.generate-btn:active:not(:disabled) {
-  transform: translateY(0);
 }
 
 .generate-btn:disabled {
@@ -180,7 +174,7 @@ button,
 .result-title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #2c3e50;
+  color: var(--hl-fg);
   margin-bottom: 8px;
   white-space: nowrap;
   overflow: hidden;
@@ -188,21 +182,21 @@ button,
 }
 
 .result-subtitle {
-  color: #6c757d;
+  color: var(--hl-fg-muted);
   font-size: 1rem;
 }
 
 .shortlink-display {
-  background: #f8f9fa;
+  background: var(--hl-bg-subtle);
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 30px;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--hl-gray-150);
 }
 
 .shortlink-label {
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--hl-fg);
   margin-bottom: 10px;
   font-size: 0.9rem;
   text-transform: uppercase;
@@ -233,19 +227,19 @@ button,
   flex: 1;
   font-family: 'Monaco', 'Consolas', monospace;
   font-size: 1.1rem;
-  color: #667eea;
+  color: var(--hl-accent);
   font-weight: 600;
   word-break: break-all;
   padding: 10px 16px;
-  background: white;
+  background: var(--hl-surface);
   border-radius: 8px;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--hl-gray-150);
 }
 
 .copy-btn {
   padding: 10px 16px;
-  background: #28a745;
-  color: white;
+  background: var(--hl-success);
+  color: var(--hl-accent-fg);
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -259,12 +253,7 @@ button,
 }
 
 .copy-btn:hover {
-  background: #218838;
-  transform: translateY(-1px);
-}
-
-.copy-btn:active {
-  transform: translateY(0);
+  background: var(--hl-success);
 }
 
 .actions {
@@ -292,25 +281,23 @@ button,
 }
 
 .open-btn {
-  background: #28a745;
-  color: white;
-  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+  background: var(--hl-success);
+  color: var(--hl-accent-fg);
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
 }
 
 .open-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.4);
 }
 
 .new-link-btn {
-  background: #007bff;
-  color: white;
-  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+  background: var(--hl-accent);
+  color: var(--hl-accent-fg);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 .new-link-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
 .loading-container {
@@ -326,15 +313,15 @@ button,
 .loading-container .loading-spinner {
   width: 50px;
   height: 50px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #667eea;
+  border: 4px solid var(--hl-gray-100);
+  border-top: 4px solid var(--hl-accent);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 20px;
 }
 
 .loading-container .loading-text {
-  color: #6c757d;
+  color: var(--hl-fg-muted);
   font-size: 1.1rem;
   font-weight: 500;
 }
@@ -362,7 +349,7 @@ button,
 .error-title {
   font-size: 1.3rem;
   font-weight: 700;
-  color: #dc3545;
+  color: var(--hl-error-bg);
   margin-bottom: 10px;
   white-space: nowrap;
   overflow: hidden;
@@ -370,7 +357,7 @@ button,
 }
 
 .error-message {
-  color: #6c757d;
+  color: var(--hl-fg-muted);
   font-size: 1rem;
   line-height: 1.5;
 }
@@ -379,8 +366,8 @@ button,
   position: relative;
   overflow: hidden;
   padding: 14px 28px;
-  background: #dc3545;
-  color: white;
+  background: var(--hl-error-bg);
+  color: var(--hl-accent-fg);
   border: none;
   border-radius: 10px;
   font-size: 1rem;
@@ -390,12 +377,11 @@ button,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 .retry-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
 .info-section {
@@ -430,7 +416,7 @@ button,
 .info-title {
   font-size: 1.2rem;
   font-weight: 700;
-  color: #2c3e50;
+  color: var(--hl-fg);
   margin-bottom: 15px;
   white-space: nowrap;
   overflow: hidden;
@@ -447,7 +433,7 @@ button,
   position: relative;
   padding-left: 20px;
   margin-bottom: 10px;
-  color: #6c757d;
+  color: var(--hl-fg-muted);
   line-height: 1.6;
 }
 
@@ -455,7 +441,7 @@ button,
   content: '✓';
   position: absolute;
   left: 0;
-  color: #28a745;
+  color: var(--hl-success);
   font-weight: bold;
 }
 

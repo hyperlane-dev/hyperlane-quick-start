@@ -41,10 +41,11 @@ class HyperlaneCard extends HTMLElement {
           display: block;
         }
         .card {
-          background: white;
-          border-radius: 12px;
+          background: var(--hl-surface);
+          border: 1px solid var(--hl-border);
+          border-radius: var(--hl-radius-md);
           padding: var(--hyperlane-card-padding, ${padding});
-          ${shadow ? 'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);' : ''}
+          ${shadow ? 'box-shadow: var(--hl-shadow-lg, 0 4px 20px rgba(0, 0, 0, 0.1));' : ''}
           animation: fadeInUp 0.6s ease;
         }
         .card-header {
@@ -53,20 +54,18 @@ class HyperlaneCard extends HTMLElement {
         .card-title {
           font-size: 1.1rem;
           font-weight: 600;
-          color: #2c3e50;
+          color: var(--hl-fg);
           margin: 0;
         }
         .card-body {
-          color: #495057;
+          color: var(--hl-fg-muted);
         }
         @keyframes fadeInUp {
           from {
             opacity: 0;
-            transform: translateY(20px);
           }
           to {
             opacity: 1;
-            transform: translateY(0);
           }
         }
       </style>

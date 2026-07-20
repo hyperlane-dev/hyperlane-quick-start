@@ -128,12 +128,12 @@ async function loadRecords() {
       return;
     } else {
       document.getElementById('records-list').innerHTML =
-        '<p style="text-align: center; color: #6c757d;">Failed to load records</p>';
+        '<p style="text-align: center; color: var(--hl-fg-muted);">Failed to load records</p>';
     }
   } catch (error) {
     console.error('Load records error:', error);
     document.getElementById('records-list').innerHTML =
-      '<p style="text-align: center; color: #6c757d;">Failed to load records</p>';
+      '<p style="text-align: center; color: var(--hl-fg-muted);">Failed to load records</p>';
   }
 }
 
@@ -141,7 +141,7 @@ function renderRecords(records) {
   const container = document.getElementById('records-list');
   if (!records || records.length === 0) {
     container.innerHTML =
-      '<p style="text-align: center; color: #6c757d;">No records found</p>';
+      '<p style="text-align: center; color: var(--hl-fg-muted);">No records found</p>';
     return;
   }
   container.innerHTML = records
@@ -169,7 +169,7 @@ function escapeHtml(text) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+    .replace(/'/g, '&var(--hl-accent);');
 }
 
 loadRecords();

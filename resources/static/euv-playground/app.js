@@ -60,6 +60,15 @@
     if (el) el.textContent = name || 'no project';
   }
 
+  function setProjectActionsEnabled(enabled) {
+    ['pg-new', 'pg-run'].forEach(function (id) {
+      const button = $(id);
+      if (!button) return;
+      if (enabled) button.removeAttribute('disabled');
+      else button.setAttribute('disabled', '');
+    });
+  }
+
   function setPreviewUrl(text) {
     const el = $('pg-preview-url');
     if (el) el.textContent = text || '';
@@ -349,6 +358,8 @@
     if (state.dirty && state.current) {
       await flushSaveNow();
     }
+    hideShareButton();
+    resetPreviewPane();
     showEditorLoading('Loading project…');
     const detail = await loadProject(id);
     if (!detail) {
@@ -365,9 +376,15 @@
     const editor = $('pg-editor');
     if (editor) {
       editor.removeAttribute('readonly');
-      editor.value = detail.code;
+      if (typeof editor.reset === 'function') {
+        editor.reset(detail.code);
+      } else {
+        editor.value = detail.code;
+      }
     }
     setCurrentName(detail.name);
+    setProjectActionsEnabled(true);
+    hideEditorLoading();
     updateProjectInList(id, {
       id: detail.id,
       name: detail.name,
@@ -376,7 +393,6 @@
     });
     setStatus('Loaded ' + detail.name, '');
     persistLastId(id);
-    hideEditorLoading();
   }
 
   async function createAndOpen() {
@@ -458,6 +474,9 @@
   }
 
   async function loadDetailAndOpen(id, nameHint) {
+    hideShareButton();
+    resetPreviewPane();
+    showEditorLoading('Loading project…');
     const detail = await loadProject(id);
     if (!detail) {
       const code = cachedDefaultCode || (await fetchDefaultCode());
@@ -471,9 +490,15 @@
       const editor = $('pg-editor');
       if (editor) {
         editor.removeAttribute('readonly');
-        editor.value = code;
+        if (typeof editor.reset === 'function') {
+          editor.reset(code);
+        } else {
+          editor.value = code;
+        }
       }
       setCurrentName(state.current.name);
+      setProjectActionsEnabled(true);
+      hideEditorLoading();
       updateProjectInList(id, {
         id: id,
         name: state.current.name,
@@ -482,8 +507,6 @@
       });
       persistLastId(id);
       scheduleSave();
-      hideShareButton();
-      resetPreviewPane();
       return;
     }
     state.current = {
@@ -496,9 +519,15 @@
     const editor = $('pg-editor');
     if (editor) {
       editor.removeAttribute('readonly');
-      editor.value = detail.code;
+      if (typeof editor.reset === 'function') {
+        editor.reset(detail.code);
+      } else {
+        editor.value = detail.code;
+      }
     }
     setCurrentName(detail.name);
+    setProjectActionsEnabled(true);
+    hideEditorLoading();
     updateProjectInList(id, {
       id: detail.id,
       name: detail.name,
@@ -506,8 +535,6 @@
       code_size: detail.code.length,
     });
     persistLastId(id);
-    hideShareButton();
-    resetPreviewPane();
   }
 
   async function deleteCurrent() {
@@ -527,7 +554,11 @@
     state.current = null;
     const editor = $('pg-editor');
     if (editor) {
-      editor.value = '';
+      if (typeof editor.reset === 'function') {
+        editor.reset('');
+      } else {
+        editor.value = '';
+      }
       editor.setAttribute('readonly', '');
     }
     setCurrentName('no project');
@@ -535,10 +566,7 @@
     if (state.projects.length > 0) {
       switchToProject(state.projects[0].id);
     } else {
-      const newBtn = $('pg-new');
-      if (newBtn) newBtn.setAttribute('disabled', '');
-      const runBtn = $('pg-run');
-      if (runBtn) runBtn.setAttribute('disabled', '');
+      setProjectActionsEnabled(false);
     }
   }
 
@@ -827,10 +855,7 @@
       setCurrentName('no project');
       const editor = $('pg-editor');
       if (editor) editor.setAttribute('readonly', '');
-      const newBtn = $('pg-new');
-      if (newBtn) newBtn.setAttribute('disabled', '');
-      const runBtn = $('pg-run');
-      if (runBtn) runBtn.setAttribute('disabled', '');
+      setProjectActionsEnabled(false);
       setStatus('Click + to create your first project', '');
     }
     const userLabel = $('pg-user-label');
@@ -939,6 +964,8 @@
   async function retryLoadCurrentProject() {
     if (!state.current || !state.current.id) return;
     const id = state.current.id;
+    hideShareButton();
+    resetPreviewPane();
     showEditorLoading('Retrying project…');
     const detail = await loadProject(id);
     if (!detail) {
@@ -955,8 +982,16 @@
     state.dirty = false;
     state.lastSavedCode = detail.code;
     const editor = $('pg-editor');
-    if (editor) editor.value = detail.code;
+    if (editor) {
+      if (typeof editor.reset === 'function') {
+        editor.reset(detail.code);
+      } else {
+        editor.value = detail.code;
+      }
+    }
     setCurrentName(detail.name);
+    setProjectActionsEnabled(true);
+    hideEditorLoading();
     updateProjectInList(id, {
       id: detail.id,
       name: detail.name,
@@ -965,7 +1000,6 @@
     });
     setStatus('Loaded ' + detail.name, '');
     persistLastId(id);
-    hideEditorLoading();
   }
 
   if (document.readyState === 'loading') {

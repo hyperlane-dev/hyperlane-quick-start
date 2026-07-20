@@ -256,35 +256,35 @@ class HyperlaneSelect extends HTMLElement {
           align-items: center;
           justify-content: space-between;
           padding: 10px 15px;
-          border: 2px solid #e9ecef;
-          border-radius: 8px;
-          background: white;
+          border: 2px solid var(--hl-border-strong);
+          border-radius: var(--hl-radius-sm);
+          background: var(--hl-surface);
           cursor: pointer;
           transition: all 0.3s ease;
           user-select: none;
           min-height: 20px;
         }
         .select-trigger:hover:not(.disabled) {
-          border-color: #667eea;
+          border-color: var(--hl-gray-900);
         }
         .select-trigger.open {
-          border-color: #667eea;
-          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+          border-color: var(--hl-gray-900);
+          box-shadow: 0 0 0 3px var(--hl-focus-ring, rgba(0, 0, 0, 0.12));
         }
         .select-trigger.disabled {
           opacity: 0.7;
           cursor: not-allowed;
-          background: #f8f9fa;
+          background: var(--hl-bg-muted);
         }
         .select-trigger-text {
-          color: #2c3e50;
+          color: var(--hl-fg);
           font-size: 0.95rem;
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
         }
         .select-trigger-text.placeholder {
-          color: #adb5bd;
+          color: var(--hl-fg-subtle);
         }
         .select-trigger-arrow {
           width: 16px;
@@ -292,7 +292,7 @@ class HyperlaneSelect extends HTMLElement {
           flex-shrink: 0;
           margin-left: 8px;
           transition: transform 0.3s ease;
-          color: #667eea;
+          color: var(--hl-fg-muted);
         }
         .select-trigger.open .select-trigger-arrow {
           transform: rotate(180deg);
@@ -302,21 +302,19 @@ class HyperlaneSelect extends HTMLElement {
           top: calc(100% + 4px);
           left: 0;
           right: 0;
-          background: white;
-          border: 2px solid #e9ecef;
-          border-radius: 8px;
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+          background: var(--hl-surface);
+          border: 2px solid var(--hl-border-strong);
+          border-radius: var(--hl-radius-sm);
+          box-shadow: var(--hl-shadow-lg, 0 8px 24px rgba(0, 0, 0, 0.12));
           z-index: 1000;
           opacity: 0;
           visibility: hidden;
-          transform: translateY(-8px);
           transition: all 0.2s ease;
           overflow: hidden;
         }
         .select-dropdown.open {
           opacity: 1;
           visibility: visible;
-          transform: translateY(0);
         }
         .options-list {
           max-height: ${maxHeight};
@@ -330,11 +328,11 @@ class HyperlaneSelect extends HTMLElement {
           background: transparent;
         }
         .options-list::-webkit-scrollbar-thumb {
-          background: #dee2e6;
+          background: var(--hl-border);
           border-radius: 3px;
         }
         .options-list::-webkit-scrollbar-thumb:hover {
-          background: #adb5bd;
+          background: var(--hl-border-strong);
         }
         .option-item {
           padding: 8px 12px;
@@ -342,7 +340,7 @@ class HyperlaneSelect extends HTMLElement {
           border-radius: 6px;
           cursor: pointer;
           font-size: 0.95rem;
-          color: #2c3e50;
+          color: var(--hl-fg);
           transition: all 0.2s ease;
           white-space: nowrap;
           overflow: hidden;
@@ -355,25 +353,25 @@ class HyperlaneSelect extends HTMLElement {
           margin-bottom: 0;
         }
         .option-item:hover {
-          background: #f0f4ff;
-          color: #667eea;
+          background: var(--hl-surface-hover);
+          color: var(--hl-fg);
         }
         .option-item.selected {
-          background: #667eea;
-          color: white;
+          background: var(--hl-gray-900);
+          color: var(--hl-accent-fg);
         }
         .option-item.highlighted {
-          background: #f0f4ff;
-          color: #667eea;
+          background: var(--hl-surface-hover);
+          color: var(--hl-fg);
         }
         .option-item.selected.highlighted {
-          background: #5a6fd6;
-          color: white;
+          background: var(--hl-accent-hover);
+          color: var(--hl-accent-fg);
         }
         .no-options {
           padding: 16px;
           text-align: center;
-          color: #adb5bd;
+          color: var(--hl-fg-subtle);
           font-size: 0.9rem;
         }
       </style>

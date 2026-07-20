@@ -116,31 +116,36 @@ class HyperlaneInput extends HTMLElement {
         input {
           width: 100%;
           padding: 12px 16px;
-          border: 2px solid #e9ecef;
-          border-radius: 8px;
+          border: 2px solid var(--hl-border-strong);
+          border-radius: var(--hl-radius-sm);
           font-size: 16px;
           transition: all 0.3s ease;
-          background: white;
+          background: var(--hl-surface);
+          color: var(--hl-fg);
           box-sizing: border-box;
           font-family: inherit;
         }
         input:focus {
           outline: none;
-          border-color: #667eea;
-          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+          border-color: var(--hl-accent);
+          box-shadow: 0 0 0 3px var(--hl-focus-ring, rgba(0, 0, 0, 0.12));
+        }
+        input::placeholder {
+          color: var(--hl-fg-subtle);
+          opacity: 1;
         }
         input:disabled {
-          background: #e9ecef;
+          background: var(--hl-bg-muted);
           cursor: not-allowed;
         }
         input[type="url"]:valid:not(:placeholder-shown) {
-          border-color: #28a745;
+          border-color: var(--hl-border-strong);
         }
         ::slotted([slot="icon"]) {
           position: absolute;
           left: 16px;
           font-size: 1.2rem;
-          color: #6c757d;
+          color: var(--hl-fg-muted);
           pointer-events: none;
         }
         input.has-icon {

@@ -10,6 +10,7 @@ const HL_COMPONENTS = [
   'hyperlane-pagination.js',
   'hyperlane-select.js',
   'hyperlane-toast.js',
+  'hyperlane-theme-toggle.js',
   'hyperlane-monaco-editor.js',
 ];
 

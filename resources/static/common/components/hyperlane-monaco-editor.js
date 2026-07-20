@@ -1,5 +1,5 @@
 const IDE_EDITOR_OPTIONS_BASE = {
-  fontSize: 18,
+  fontSize: 16,
   scrollBeyondLastLine: false,
   smoothScrolling: true,
   links: true,
@@ -55,6 +55,12 @@ class HyperlaneMonacoEditor extends HTMLElement {
       this._mediaQuery = null;
       this._mediaListener = null;
     }
+    if (this._themeObserver) {
+      try {
+        this._themeObserver.disconnect();
+      } catch (err) {}
+      this._themeObserver = null;
+    }
     if (this._editor) {
       this._editor.dispose();
       this._editor = null;
@@ -79,7 +85,7 @@ class HyperlaneMonacoEditor extends HTMLElement {
       this._editor.updateOptions({ tabSize: parseInt(newValue) || 4 });
     } else if (name === 'font-size') {
       const v = parseInt(newValue);
-      this._editor.updateOptions({ fontSize: isNaN(v) ? 18 : v });
+      this._editor.updateOptions({ fontSize: isNaN(v) ? 16 : v });
     } else if (name === 'dark') {
       this._applyTheme(newValue !== 'false');
     }
@@ -127,31 +133,61 @@ class HyperlaneMonacoEditor extends HTMLElement {
     if (this._editor) this._editor.focus();
   }
 
-  _systemPrefersDark() {
-    if (typeof window.matchMediaDark === 'function') {
+  reset(value) {
+    const next = value == null ? '' : String(value);
+    if (!this._editor) {
+      // Editor not mounted yet (Monaco loader still resolving). Park the value
+      // on the attribute; _mount() will pick it up via the constructor's
+      // `value: this.getAttribute('value') || ''` option.
+      this.setAttribute('value', next);
+      return;
+    }
+    const lang = this.language || 'plaintext';
+    let switched = false;
+    try {
+      if (
+        window.monaco &&
+        window.monaco.editor &&
+        typeof window.monaco.editor.createModel === 'function' &&
+        typeof this._editor.setModel === 'function'
+      ) {
+        // monaco.editor.createModel returns a fresh text model that does
+        // NOT carry over the previous editor's undo stack or markers;
+        // assigning it to this._editor mirrors what the IDE does on every
+        // fresh monaco.editor.create() call.
+        const m = window.monaco.editor.createModel(next, lang);
+        this._editor.setModel(m);
+        switched = true;
+      }
+    } catch (err) {}
+    if (!switched) {
       try {
-        return window.matchMediaDark();
+        this._editor.setValue(next);
       } catch (err) {}
     }
     try {
-      return window.matchMedia('(prefers-color-scheme: dark)').matches;
-    } catch (err) {
-      return false;
-    }
+      this._editor.setPosition({ lineNumber: 1, column: 1 });
+      this._editor.revealPosition({ lineNumber: 1, column: 1 });
+    } catch (err) {}
+    this.setAttribute('value', next);
+  }
+
+  _systemPrefersDark() {
+    return false;
   }
 
   _setupSystemThemeListener() {
     if (typeof window.matchMedia !== 'function') return;
-    if (this._mediaQuery) return;
+    if (this._mediaListener) return;
     this._mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    this._mediaListener = () => {
-      if (!this.hasAttribute('dark') || this.getAttribute('dark') === 'auto') {
-        this._applyTheme(this._systemPrefersDark());
-      }
-    };
+    this._mediaListener = () => {};
     try {
       this._mediaQuery.addEventListener('change', this._mediaListener);
     } catch (err) {}
+  }
+
+  _resolveTheme() {
+    return false;
   }
 
   _applyTheme(dark) {
@@ -160,10 +196,42 @@ class HyperlaneMonacoEditor extends HTMLElement {
       try {
         window.defineIdeTheme(window.monaco);
       } catch (err) {}
+      // If the euv language was loaded, also append the euv-specific token
+      // rules (tag, attribute.name, class.helper, function.call, keyword.macro,
+      // etc.) so euv source gets distinct colors per category.
+      try {
+        if (typeof window.addEuvThemeRules === 'function') {
+          window.addEuvThemeRules(window.monaco);
+        }
+      } catch (err) {}
       window.monaco.editor.setTheme(window.IDE_THEME_NAME || 'ltpp-theme');
+      // Monaco's tokenStyleMap generation injects hardcoded `.mtkN` rules at
+      // the end of <head>; those override `ide-theme.css`'s rules. Re-emit
+      // them at the end of <body> using `var(--mtkNN)` so the page variables
+      // win (later same-specificity `!important` rules beat earlier ones).
+      this._reinjectMtkCss();
       return;
     }
     window.monaco.editor.setTheme(dark ? 'vs-dark' : 'vs');
+  }
+
+  // Emit `<style>` for `.mtk1..100 { color: var(--mtkN) !important }` after
+  // Monaco has injected its hardcoded tokens. Re-runs on every theme change
+  // because Monaco wipes its own <style> on setTheme and adds new ones.
+  _reinjectMtkCss() {
+    if (!this._editor) return;
+    if (!window.__mtkCssInjected) {
+      const style = document.createElement('style');
+      style.id = 'hyperlane-monaco-mtk-overrides';
+      const MAX = 100;
+      let css = '';
+      for (let i = 1; i <= MAX; i++) {
+        css += `.mtk${i} { color: var(--mtk${i}) !important; }\n`;
+      }
+      style.textContent = css;
+      document.body.appendChild(style);
+      window.__mtkCssInjected = true;
+    }
   }
 
   _ensureLoader() {

@@ -1,15 +1,17 @@
 mod r#const;
 mod r#impl;
+mod r#static;
 mod r#struct;
 
-pub use {r#const::*, r#struct::*};
+pub use {r#const::*, r#static::*, r#struct::*};
 
 use super::*;
 
 use hyperlane_config::application::charset::*;
 
 use std::{
-    env::temp_dir,
+    env::{split_paths, temp_dir, var_os},
+    ffi::{OsStr, OsString},
     fs::{
         DirEntry, ReadDir, copy, create_dir_all, read_dir, read_to_string, remove_dir_all, rename,
         write,

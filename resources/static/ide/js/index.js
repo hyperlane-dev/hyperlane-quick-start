@@ -122,6 +122,10 @@ function languageToMd(param_language = '') {
   return sign;
 }
 
+function getThemeLabel() {
+  return 'light';
+}
+
 function isMobileDevice() {
   return (
     /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
@@ -528,7 +532,7 @@ function loadIDE() {
             value: code,
             language: window.language,
             theme: window.IDE_THEME_NAME,
-            fontSize: 18,
+            fontSize: 16,
             scrollBeyondLastLine: true,
             smoothScrolling: true,
             links: true,
@@ -664,7 +668,7 @@ function loadIDE() {
             value: code,
             language: window.language,
             theme: ltpp_theme_name,
-            fontSize: 18,
+            fontSize: 16,
             scrollBeyondLastLine: true,
             smoothScrolling: true,
             links: true,
@@ -747,11 +751,8 @@ function loadIDE() {
 
 function init() {
   try {
-    const match_media_obj = window.matchMedia('(prefers-color-scheme: dark)');
-    if (match_media_obj.matches) {
-      window.is_dark_theme = true;
-    }
-    loadIDE(is_dark_theme);
+    window.is_dark_theme = false;
+    loadIDE(window.is_dark_theme);
   } catch (err) {}
 }
 

@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script src="../common/js/theme-init.js"></script>
     <meta charset="UTF-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Hyperlane - CICD Management</title>
@@ -15,7 +16,7 @@
     <style>
       * {
         scrollbar-width: thin;
-        scrollbar-color: #c1c1c1 #f1f1f1;
+        scrollbar-color: var(--hl-gray-300) var(--hl-gray-150);
       }
 
       *::-webkit-scrollbar {
@@ -24,25 +25,25 @@
       }
 
       *::-webkit-scrollbar-track {
-        background: #f1f1f1;
+        background: var(--hl-bg-muted);
       }
 
       *::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
+        background: var(--hl-gray-300);
         border-radius: 4px;
       }
 
       *::-webkit-scrollbar-thumb:hover {
-        background: #a8a8a8;
+        background: var(--hl-gray-400);
       }
 
       body {
-        background: #667eea;
+        background: var(--hl-bg);
       }
 
       .header {
-        background: #ffffff;
-        border-bottom: 1px solid #e0e0e0;
+        background: var(--hl-surface);
+        border-bottom: 1px solid var(--hl-gray-200);
         padding: 16px 24px;
         display: flex;
         align-items: center;
@@ -61,7 +62,7 @@
       .header h1 {
         font-size: 1.25rem;
         font-weight: 600;
-        color: #2c3e50;
+        color: var(--hl-fg);
         display: flex;
         align-items: center;
         gap: 8px;
@@ -84,49 +85,49 @@
 
       .btn {
         padding: 6px 16px;
-        border: 1px solid #e0e0e0;
+        border: 1px solid var(--hl-border-strong);
         border-radius: 6px;
         font-size: 14px;
         font-weight: 500;
         cursor: pointer;
         transition: all 0.2s;
-        background: #f5f7fb;
-        color: #2c3e50;
+        background: var(--hl-bg-muted);
+        color: var(--hl-fg);
         display: inline-flex;
         align-items: center;
         gap: 6px;
       }
 
       .btn:hover {
-        background: #e8ecf4;
-        border-color: #d0d0d0;
+        background: var(--hl-bg-muted);
+        border-color: var(--hl-border);
       }
 
       .btn-primary {
-        background: #667eea;
+        background: var(--hl-accent);
         border-color: transparent;
-        color: #fff;
+        color: var(--hl-accent-fg);
       }
 
       .btn-primary:hover {
-        background: #5a6fd6;
+        background: var(--hl-accent);
       }
 
       .btn-danger {
-        background: #ef4444;
-        border-color: #ef4444;
-        color: #fff;
+        background: var(--hl-error-bg);
+        border-color: var(--hl-error-bg);
+        color: var(--hl-error);
       }
 
       .btn-danger:hover {
-        background: #dc2626;
-        border-color: #dc2626;
+        background: var(--hl-error-bg);
+        border-color: var(--hl-error-bg);
       }
 
       .container {
         margin: 24px 12px;
         padding: 24px;
-        background: #ffffff;
+        background: var(--hl-surface);
         border-radius: 12px;
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
         margin-bottom: 44px;
@@ -135,7 +136,7 @@
       .tabs {
         display: flex;
         gap: 4px;
-        border-bottom: 1px solid #e0e0e0;
+        border-bottom: 1px solid var(--hl-gray-200);
         margin-bottom: 24px;
       }
 
@@ -143,7 +144,7 @@
         padding: 12px 16px;
         cursor: pointer;
         border-bottom: 2px solid transparent;
-        color: #4a5568;
+        color: var(--hl-fg-muted);
         font-size: 14px;
         font-weight: 700;
         transition: all 0.2s;
@@ -153,26 +154,26 @@
       }
 
       .tab:hover {
-        color: #2d3748;
+        color: var(--hl-fg);
       }
 
       .tab.active {
-        color: #5a67d8;
-        border-bottom-color: #5a67d8;
+        color: var(--hl-accent);
+        border-bottom-color: var(--hl-accent);
       }
 
       .tab .count {
-        background: #e2e8f0;
+        background: var(--hl-bg-muted);
         padding: 2px 8px;
         border-radius: 10px;
         font-size: 12px;
         font-weight: 700;
-        color: #2d3748;
+        color: var(--hl-fg);
       }
 
       .card {
-        background: #ffffff;
-        border: 1px solid #e0e0e0;
+        background: var(--hl-surface);
+        border: 1px solid var(--hl-border-strong);
         border-radius: 12px;
         overflow: hidden;
         margin-bottom: 16px;
@@ -181,7 +182,7 @@
 
       .card-header {
         padding: 16px 20px;
-        border-bottom: 1px solid #e0e0e0;
+        border-bottom: 1px solid var(--hl-gray-200);
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -190,7 +191,7 @@
       .card-title {
         font-size: 18px;
         font-weight: 700;
-        color: #1a202c;
+        color: var(--hl-accent);
       }
 
       .card-body {
@@ -204,8 +205,8 @@
       }
 
       .pipeline-item {
-        background: #f8f9fa;
-        border: 1px solid #e0e0e0;
+        background: var(--hl-bg-subtle);
+        border: 1px solid var(--hl-border-strong);
         border-radius: 8px;
         padding: 16px;
         display: flex;
@@ -216,8 +217,8 @@
       }
 
       .pipeline-item:hover {
-        border-color: #667eea;
-        background: #f0f4ff;
+        border-color: var(--hl-accent);
+        background: var(--hl-info-bg);
       }
 
       .pipeline-status {
@@ -228,12 +229,12 @@
       }
 
       .pipeline-status.active {
-        background: #22c55e;
-        box-shadow: 0 0 8px #22c55e;
+        background: var(--hl-success);
+        box-shadow: 0 0 8px var(--hl-success);
       }
 
       .pipeline-status.inactive {
-        background: #9ca3af;
+        background: var(--hl-fg-subtle);
       }
 
       .pipeline-info {
@@ -244,7 +245,7 @@
       .pipeline-name {
         font-size: 17px;
         font-weight: 700;
-        color: #4c51bf;
+        color: var(--hl-accent);
         margin-bottom: 4px;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -253,7 +254,7 @@
 
       .pipeline-meta {
         font-size: 13px;
-        color: #4a5568;
+        color: var(--hl-fg-muted);
         display: flex;
         gap: 12px;
         flex-wrap: wrap;
@@ -273,8 +274,8 @@
       }
 
       .run-item {
-        background: #f8f9fa;
-        border: 1px solid #e0e0e0;
+        background: var(--hl-bg-subtle);
+        border: 1px solid var(--hl-border-strong);
         border-radius: 8px;
         padding: 12px 16px;
         display: flex;
@@ -285,8 +286,8 @@
       }
 
       .run-item:hover {
-        background: #f0f4ff;
-        border-color: #667eea;
+        background: var(--hl-info-bg);
+        border-color: var(--hl-accent);
       }
 
       .run-status {
@@ -302,20 +303,20 @@
       }
 
       .run-status.success {
-        background: #22c55e;
-        color: #fff;
+        background: var(--hl-success);
+        color: var(--hl-accent-fg);
       }
 
       .run-status.failure {
-        background: #ef4444;
-        color: #fff;
+        background: var(--hl-error);
+        color: var(--hl-accent-fg);
         padding-bottom: 3px;
       }
 
       .loading-more {
         text-align: center;
         padding: 20px;
-        color: #666;
+        color: var(--hl-fg-muted);
         font-size: 14px;
         display: flex;
         align-items: center;
@@ -330,8 +331,8 @@
       .loading-spinner {
         width: 16px;
         height: 16px;
-        border: 2px solid #e0e0e0;
-        border-top-color: #667eea;
+        border: 2px solid var(--hl-gray-200);
+        border-top-color: var(--hl-accent);
         border-radius: 50%;
         animation: spin 0.8s linear infinite;
       }
@@ -343,19 +344,19 @@
       }
 
       .run-status.pending {
-        background: #9ca3af;
-        color: #fff;
+        background: var(--hl-fg-subtle);
+        color: var(--hl-accent-fg);
       }
 
       .run-status.running {
-        background: #667eea;
-        color: #fff;
+        background: var(--hl-accent);
+        color: var(--hl-accent-fg);
         animation: pulse 1.5s infinite;
       }
 
       .run-status.cancelled {
-        background: #6b7280;
-        color: #fff;
+        background: var(--hl-gray-500);
+        color: var(--hl-accent-fg);
       }
 
       @keyframes pulse {
@@ -376,19 +377,19 @@
       .run-title {
         font-size: 15px;
         font-weight: 700;
-        color: #2d3748;
+        color: var(--hl-fg);
         margin-bottom: 2px;
       }
 
       .run-meta {
         font-size: 13px;
-        color: #4a5568;
+        color: var(--hl-fg-muted);
         font-weight: 600;
       }
 
       .run-time {
         font-size: 13px;
-        color: #4a5568;
+        color: var(--hl-fg-muted);
         text-align: right;
         flex-shrink: 0;
         font-weight: 600;
@@ -402,7 +403,7 @@
         display: block;
         font-size: 14px;
         font-weight: 700;
-        color: #2d3748;
+        color: var(--hl-fg);
         margin-bottom: 8px;
       }
 
@@ -411,10 +412,10 @@
       .form-select {
         width: 100%;
         padding: 8px 12px;
-        background: #f8f9fa;
-        border: 1px solid #e0e0e0;
+        background: var(--hl-bg-subtle);
+        border: 1px solid var(--hl-border-strong);
         border-radius: 6px;
-        color: #2c3e50;
+        color: var(--hl-fg);
         font-size: 14px;
         transition: all 0.2s;
       }
@@ -423,9 +424,9 @@
       .form-textarea:focus,
       .form-select:focus {
         outline: none;
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
-        background: #fff;
+        border-color: var(--hl-accent);
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
+        background: var(--hl-surface);
       }
 
       .form-textarea {
@@ -456,8 +457,8 @@
       }
 
       .modal-content {
-        background: #ffffff;
-        border: 1px solid #e0e0e0;
+        background: var(--hl-surface);
+        border: 1px solid var(--hl-border-strong);
         border-radius: 12px;
         max-width: 700px;
         width: 100%;
@@ -468,7 +469,7 @@
 
       .modal-header {
         padding: 20px;
-        border-bottom: 1px solid #e0e0e0;
+        border-bottom: 1px solid var(--hl-gray-200);
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -477,13 +478,13 @@
       .modal-title {
         font-size: 18px;
         font-weight: 600;
-        color: #2c3e50;
+        color: var(--hl-fg);
       }
 
       .modal-close {
         background: none;
         border: none;
-        color: #666;
+        color: var(--hl-fg-muted);
         font-size: 24px;
         cursor: pointer;
         padding: 0;
@@ -497,8 +498,8 @@
       }
 
       .modal-close:hover {
-        background: #f5f7fb;
-        color: #2c3e50;
+        background: var(--hl-bg-muted);
+        color: var(--hl-fg);
       }
 
       .modal-body {
@@ -507,7 +508,7 @@
 
       .modal-footer {
         padding: 16px 20px;
-        border-top: 1px solid #e0e0e0;
+        border-top: 1px solid var(--hl-gray-200);
         display: flex;
         justify-content: flex-end;
         gap: 12px;
@@ -516,7 +517,7 @@
       .empty-state {
         text-align: center;
         padding: 60px 20px;
-        color: #666;
+        color: var(--hl-fg-muted);
       }
 
       .empty-state-icon {
@@ -527,7 +528,7 @@
       .empty-state-title {
         font-size: 20px;
         font-weight: 600;
-        color: #2c3e50;
+        color: var(--hl-fg);
         margin-bottom: 8px;
       }
 
@@ -539,16 +540,16 @@
       }
 
       .job-item {
-        background: #f8f9fa;
-        border: 1px solid #e0e0e0;
+        background: var(--hl-bg-subtle);
+        border: 1px solid var(--hl-border-strong);
         border-radius: 8px;
         overflow: hidden;
       }
 
       .job-header {
         padding: 12px 16px;
-        background: #ffffff;
-        border-bottom: 1px solid #e0e0e0;
+        background: var(--hl-surface);
+        border-bottom: 1px solid var(--hl-gray-200);
         display: flex;
         align-items: center;
         gap: 12px;
@@ -556,7 +557,7 @@
 
       .job-name {
         font-weight: 600;
-        color: #2c3e50;
+        color: var(--hl-fg);
         flex: 1;
       }
 
@@ -581,7 +582,7 @@
       }
 
       .step-header-row:hover {
-        background: #f0f4ff;
+        background: var(--hl-info-bg);
       }
 
       .step-status {
@@ -596,43 +597,43 @@
       }
 
       .step-status.success {
-        background: #22c55e;
-        color: #fff;
+        background: var(--hl-success);
+        color: var(--hl-accent-fg);
       }
       .step-status.failure {
-        background: #ef4444;
-        color: #fff;
+        background: var(--hl-error);
+        color: var(--hl-accent-fg);
       }
       .step-status.pending {
-        background: #9ca3af;
-        color: #fff;
+        background: var(--hl-fg-subtle);
+        color: var(--hl-accent-fg);
       }
       .step-status.running {
-        background: #667eea;
-        color: #fff;
+        background: var(--hl-accent);
+        color: var(--hl-accent-fg);
         animation: pulse 1.5s infinite;
       }
       .step-status.skipped {
-        background: #6b7280;
-        color: #fff;
+        background: var(--hl-gray-500);
+        color: var(--hl-accent-fg);
       }
 
       .step-name {
         flex: 1;
         font-size: 14px;
-        color: #2d3748;
+        color: var(--hl-fg);
         font-weight: 600;
       }
 
       .step-time {
         font-size: 13px;
-        color: #4a5568;
+        color: var(--hl-fg-muted);
         font-weight: 600;
       }
 
       .log-output {
-        background: #f8f9fa;
-        border: 1px solid #e0e0e0;
+        background: var(--hl-bg-subtle);
+        border: 1px solid var(--hl-border-strong);
         border-radius: 6px;
         padding: 16px;
         font-family:
@@ -640,7 +641,7 @@
           'Courier New', monospace;
         font-size: 12px;
         line-height: 1.6;
-        color: #2c3e50;
+        color: var(--hl-fg);
         max-height: 400px;
         overflow-y: auto;
         white-space: pre-wrap;
@@ -652,67 +653,67 @@
       }
 
       .log-timestamp {
-        color: #999;
+        color: var(--hl-fg-subtle);
         margin-right: 8px;
         user-select: none;
       }
 
       .log-section {
-        color: #667eea;
+        color: var(--hl-accent);
         font-weight: 600;
         margin-top: 8px;
         margin-bottom: 4px;
       }
 
       .log-error {
-        color: #ef4444;
-        background: rgba(239, 68, 68, 0.1);
+        color: var(--hl-error);
+        background: rgba(0, 0, 0, 0.1);
         padding: 0 4px;
         border-radius: 3px;
       }
 
       .log-warning {
-        color: #f59e0b;
-        background: rgba(245, 158, 11, 0.1);
+        color: var(--hl-warning);
+        background: rgba(255, 255, 255, 0.1);
         padding: 0 4px;
         border-radius: 3px;
       }
 
       .log-success {
-        color: #22c55e;
-        background: rgba(34, 197, 94, 0.1);
+        color: var(--hl-success);
+        background: rgba(255, 255, 255, 0.1);
         padding: 0 4px;
         border-radius: 3px;
       }
 
       .log-info {
-        color: #667eea;
+        color: var(--hl-accent);
       }
 
       .log-command {
-        color: #8b5cf6;
+        color: var(--hl-accent);
         font-weight: 500;
       }
 
       .log-hash {
-        color: #3b82f6;
+        color: var(--hl-accent);
       }
 
       .log-url {
-        color: #667eea;
+        color: var(--hl-accent);
         text-decoration: underline;
         cursor: pointer;
       }
 
       .step-log-container {
-        background: #f8f9fa;
-        border-top: 1px solid #e0e0e0;
+        background: var(--hl-bg-subtle);
+        border-top: 1px solid var(--hl-gray-200);
         overflow: hidden;
       }
 
       .step-log-header {
         padding: 8px 16px;
-        background: #ffffff;
+        background: var(--hl-surface);
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -721,14 +722,14 @@
       }
 
       .step-log-header:hover {
-        background: #f0f4ff;
+        background: var(--hl-info-bg);
       }
 
       .step-log-toggle {
         display: flex;
         align-items: center;
         gap: 8px;
-        color: #666;
+        color: var(--hl-fg-muted);
         font-size: 12px;
       }
 
@@ -748,7 +749,7 @@
           'Courier New', monospace;
         font-size: 12px;
         line-height: 1.6;
-        color: #2c3e50;
+        color: var(--hl-fg);
       }
 
       .step-log-content.collapsed {
@@ -770,8 +771,8 @@
       }
 
       .toast {
-        background: #ffffff;
-        border: 1px solid #e0e0e0;
+        background: var(--hl-surface);
+        border: 1px solid var(--hl-border-strong);
         border-radius: 8px;
         padding: 12px 16px;
         min-width: 280px;
@@ -790,22 +791,18 @@
 
       @keyframes slideIn {
         from {
-          transform: translateX(100%);
           opacity: 0;
         }
         to {
-          transform: translateX(0);
           opacity: 1;
         }
       }
 
       @keyframes slideOut {
         from {
-          transform: translateX(0);
           opacity: 1;
         }
         to {
-          transform: translateX(100%);
           opacity: 0;
         }
       }
@@ -816,21 +813,21 @@
       }
 
       .toast-icon.success {
-        color: #22c55e;
+        color: var(--hl-success);
       }
 
       .toast-icon.error {
-        color: #ef4444;
+        color: var(--hl-error);
       }
 
       .toast-icon.info {
-        color: #667eea;
+        color: var(--hl-accent);
       }
 
       .toast-content {
         flex: 1;
         font-size: 14px;
-        color: #2c3e50;
+        color: var(--hl-fg);
       }
 
       .detail-header {
@@ -840,14 +837,14 @@
       .detail-title {
         font-size: 24px;
         font-weight: 600;
-        color: #2c3e50;
+        color: var(--hl-fg);
         margin-bottom: 8px;
       }
 
       .detail-meta {
         display: flex;
         gap: 16px;
-        color: #666;
+        color: var(--hl-fg-muted);
         font-size: 14px;
       }
 
@@ -1046,7 +1043,7 @@
         .card-title {
           font-size: 15px;
           font-weight: 700;
-          color: #1a202c;
+          color: var(--hl-accent);
         }
 
         .card-body {
@@ -1213,7 +1210,20 @@
           <div class="card-body">
             <div class="run-list" id="run-list">
               <div class="empty-state">
-                <div class="empty-state-icon">▶️</div>
+                <div class="empty-state-icon" aria-hidden="true">
+                  <svg
+                    width="48"
+                    height="48"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <polygon points="6 4 20 12 6 20 6 4"></polygon>
+                  </svg>
+                </div>
                 <div class="empty-state-title">No runs yet</div>
                 <p>Trigger a pipeline to see runs here</p>
               </div>
@@ -1308,8 +1318,8 @@ jobs:
               class="form-input"
               id="run-config-pipeline-name"
               style="
-                background: #e2e8f0;
-                color: #2d3748;
+                background: var(--hl-accent);
+                color: var(--hl-fg);
                 cursor: default;
                 font-weight: 600;
               "
@@ -1321,9 +1331,9 @@ jobs:
               class="form-textarea"
               id="run-config-content"
               style="
-                background: #f8f9fa;
-                color: #2d3748;
-                border: 1px solid #e2e8f0;
+                background: var(--hl-bg-subtle);
+                color: var(--hl-fg);
+                border: 1px solid var(--hl-accent);
                 overflow: auto;
                 min-height: 300px;
                 cursor: default;
@@ -1703,7 +1713,9 @@ jobs:
         if (runs.length === 0) {
           container.innerHTML = `
             <div class="empty-state">
-              <div class="empty-state-icon">▶️</div>
+              <div class="empty-state-icon" aria-hidden="true">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
+              </div>
               <div class="empty-state-title">No runs yet</div>
               <p>Trigger a pipeline to see runs here</p>
             </div>
@@ -2110,7 +2122,7 @@ jobs:
                 ${j.job.status === 'success' ? '✓' : j.job.status === 'failure' ? '✗' : j.job.status === 'running' ? '◐' : '○'}
               </div>
               <span class="job-name">${escapeHtml(j.job.name)}</span>
-              <span style="color: #8b949e; font-size: 12px;">
+              <span style="color: var(--hl-fg-subtle); font-size: 12px;">
                 ${j.job.duration_ms > 0 ? formatDuration(j.job.duration_ms) : j.job.status === 'running' ? 'Running...' : ''}
               </span>
             </div>
@@ -2140,7 +2152,7 @@ jobs:
                   <span class="step-log-toggle-icon ${isExpanded ? '' : 'collapsed'}">▼</span>
                   <span>Logs</span>
                 </span>
-                <span style="color: #8b949e; font-size: 12px;">${s.output ? s.output.split('\n').length : 0} lines</span>
+                <span style="color: var(--hl-fg-subtle); font-size: 12px;">${s.output ? s.output.split('\n').length : 0} lines</span>
               </div>
               <div class="step-log-content ${isExpanded ? '' : 'collapsed'}" id="step-log-content-${s.id}">
                 ${formatLogOutput(s.output, s.started_at)}
@@ -2293,21 +2305,21 @@ jobs:
 
       function parseAnsiCodes(text) {
         const ansiColorMap = {
-          30: '#24292f',
-          31: '#f85149',
-          32: '#3fb950',
-          33: '#d29922',
-          34: '#58a6ff',
-          35: '#d2a8ff',
-          36: '#39c5cf',
-          37: '#f0f6fc',
-          90: '#6e7681',
-          91: '#ff7b72',
-          92: '#7ee787',
-          93: '#f0883e',
-          94: '#79c0ff',
-          95: '#d2a8ff',
-          96: '#56d4dd',
+          30: '#000000',
+          31: '#000000',
+          32: '#ffffff',
+          33: '#ffffff',
+          34: '#ffffff',
+          35: '#ffffff',
+          36: '#ffffff',
+          37: '#ffffff',
+          90: '#000000',
+          91: '#ffffff',
+          92: '#ffffff',
+          93: '#ffffff',
+          94: '#ffffff',
+          95: '#ffffff',
+          96: '#ffffff',
           97: '#ffffff',
         };
 

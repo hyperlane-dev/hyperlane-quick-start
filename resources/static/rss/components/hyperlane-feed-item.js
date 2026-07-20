@@ -143,11 +143,12 @@ class HyperlaneFeedItem extends HTMLElement {
           display: block;
         }
         .feed-item {
-          background: white;
+          background: var(--hl-surface);
+          border: 1px solid var(--hl-border);
           border-radius: 12px;
           padding: 24px;
           margin-bottom: 20px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+          box-shadow: var(--hl-shadow-md, 0 4px 20px rgba(0, 0, 0, 0.1));
           transition: all 0.3s ease;
           animation: fadeInUp 0.6s ease both;
           animation-delay: ${index * 0.1}s;
@@ -156,11 +157,10 @@ class HyperlaneFeedItem extends HTMLElement {
           margin-bottom: 0;
         }
         .feed-item:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+          box-shadow: var(--hl-shadow-lg, 0 8px 30px rgba(0, 0, 0, 0.15));
         }
         h3 {
-          color: #2c3e50;
+          color: var(--hl-fg);
           font-size: 1.3rem;
           margin-bottom: 12px;
           white-space: nowrap;
@@ -168,12 +168,12 @@ class HyperlaneFeedItem extends HTMLElement {
           text-overflow: ellipsis;
         }
         h3 a {
-          color: #007bff;
+          color: var(--hl-accent);
           text-decoration: none;
           transition: color 0.3s ease;
         }
         h3 a:hover {
-          color: #0056b3;
+          color: var(--hl-accent);
         }
         .feed-meta {
           display: flex;
@@ -185,20 +185,20 @@ class HyperlaneFeedItem extends HTMLElement {
           display: flex;
           align-items: center;
           gap: 6px;
-          color: #6c757d;
+          color: var(--hl-fg-muted);
           font-size: 0.9rem;
         }
         .meta-icon {
           font-size: 1rem;
         }
         .feed-description {
-          color: #495057;
+          color: var(--hl-fg);
           line-height: 1.6;
           margin-bottom: 16px;
         }
         .file-preview {
-          background: #f8f9fa;
-          border: 1px solid #dee2e6;
+          background: var(--hl-gray-50);
+          border: 1px solid var(--hl-gray-200);
           border-radius: 8px;
           padding: 12px;
           display: flex;
@@ -208,12 +208,12 @@ class HyperlaneFeedItem extends HTMLElement {
         .file-icon {
           width: 48px;
           height: 48px;
-          background: #667eea;
+          background: var(--hl-accent);
           border-radius: 8px;
           display: flex;
           align-items: center;
           justify-content: center;
-          color: white;
+          color: var(--hl-accent-fg);
           font-size: 1.5rem;
           flex-shrink: 0;
         }
@@ -223,17 +223,17 @@ class HyperlaneFeedItem extends HTMLElement {
         }
         .file-name {
           font-weight: 600;
-          color: #2c3e50;
+          color: var(--hl-fg);
           margin-bottom: 4px;
           word-break: break-all;
         }
         .file-size {
-          color: #6c757d;
+          color: var(--hl-fg-muted);
           font-size: 0.85rem;
         }
         .download-btn {
-          background: #28a745;
-          color: white;
+          background: var(--hl-success);
+          color: var(--hl-accent-fg);
           border: none;
           padding: 8px 16px;
           border-radius: 6px;
@@ -245,17 +245,14 @@ class HyperlaneFeedItem extends HTMLElement {
           flex-shrink: 0;
         }
         .download-btn:hover {
-          background: #218838;
-          transform: translateY(-1px);
+          background: var(--hl-success);
         }
         @keyframes fadeInUp {
           from {
             opacity: 0;
-            transform: translateY(20px);
           }
           to {
             opacity: 1;
-            transform: translateY(0);
           }
         }
         @media (max-width: 768px) {

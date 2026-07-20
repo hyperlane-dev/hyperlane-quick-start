@@ -1,4 +1,31 @@
-use super::*;
+/// Directory under a user home that contains Cargo-managed tools.
+pub const EUV_PLAYGROUND_CARGO_HOME_DIR: &str = ".cargo";
+
+/// Cargo subdirectory that contains installed executable binaries.
+pub const EUV_PLAYGROUND_CARGO_BIN_DIR: &str = "bin";
+
+/// Environment variable that provides executable search directories.
+pub const EUV_PLAYGROUND_PATH_ENV: &str = "PATH";
+
+/// Environment variable that explicitly overrides the wasm-pack executable.
+pub const EUV_PLAYGROUND_WASM_PACK_ENV: &str = "EUV_PLAYGROUND_WASM_PACK";
+
+/// Environment variable that points to Cargo's installation root.
+pub const EUV_PLAYGROUND_CARGO_HOME_ENV: &str = "CARGO_HOME";
+
+/// Environment variable that points to the current user's home directory.
+pub const EUV_PLAYGROUND_HOME_ENV: &str = "HOME";
+
+/// Environment variable that points to the current Windows user's profile.
+pub const EUV_PLAYGROUND_USERPROFILE_ENV: &str = "USERPROFILE";
+
+/// Executable filename used for wasm-pack on Windows.
+#[cfg(windows)]
+pub const EUV_PLAYGROUND_WASM_PACK_BINARY_NAME: &str = "wasm-pack.exe";
+
+/// Executable filename used for wasm-pack on Unix-like systems.
+#[cfg(not(windows))]
+pub const EUV_PLAYGROUND_WASM_PACK_BINARY_NAME: &str = "wasm-pack";
 
 /// Prefix for the temporary directory created per
 /// `POST /api/euv-playground/run` request. The pid + counter + epoch second
@@ -20,13 +47,6 @@ pub const EUV_PLAYGROUND_MAX_LIST_ITEMS: usize = 200;
 /// can take ~30s while euv + wasm-bindgen are compiled from scratch;
 /// subsequent runs are typically <2s once the cargo target dir is warm.
 pub const EUV_PLAYGROUND_BUILD_TIMEOUT_SECS: u64 = 180;
-
-/// Shared cargo target directory for all `wasm-pack build` invocations.
-/// Persisted across requests so cargo only has to compile the euv +
-/// wasm-bindgen + web-sys dependency tree once; subsequent builds
-/// reuse cached artifacts and complete in 1-3s instead of 20s+.
-pub static EUV_PLAYGROUND_SHARED_TARGET_DIR: LazyLock<PathBuf> =
-    LazyLock::new(|| temp_dir().join("euv-playground-target"));
 
 /// Root directory under `data/` where all per-user playground projects
 /// are persisted. Layout:
@@ -143,7 +163,7 @@ version = "0.0.0"
 edition = "2024"
 
 [lib]
-crate-type = ["cdylib", "rlib"]
+crate-type = ["cdylib"]
 
 [dependencies]
 euv = "*"

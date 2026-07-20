@@ -83,6 +83,79 @@ impl EuvPlaygroundService {
             .unwrap_or(0)
     }
 
+    /// Resolves the wasm-pack executable from an explicit override, PATH,
+    /// Cargo home, or user home in that order.
+    ///
+    /// # Arguments
+    ///
+    /// - `override_path: Option<&OsStr>` - Explicit executable override.
+    /// - `path: Option<&OsStr>` - Process PATH value to inspect.
+    /// - `cargo_home: Option<&OsStr>` - Cargo installation root.
+    /// - `home: Option<&OsStr>` - User home used for the default `.cargo` root.
+    ///
+    /// # Returns
+    ///
+    /// - `PathBuf`: Existing executable path when found, otherwise the bare
+    ///   wasm-pack filename so process spawning preserves the normal OS lookup.
+    #[instrument_trace]
+    pub fn resolve_wasm_pack_binary_from(
+        override_path: Option<&OsStr>,
+        path: Option<&OsStr>,
+        cargo_home: Option<&OsStr>,
+        home: Option<&OsStr>,
+    ) -> PathBuf {
+        if let Some(explicit_path) = override_path.filter(|value: &&OsStr| !value.is_empty()) {
+            return PathBuf::from(explicit_path);
+        }
+        if let Some(path_binary) = path
+            .into_iter()
+            .flat_map(split_paths)
+            .map(|directory: PathBuf| directory.join(EUV_PLAYGROUND_WASM_PACK_BINARY_NAME))
+            .find(|candidate: &PathBuf| candidate.is_file())
+        {
+            return path_binary;
+        }
+        let cargo_home_binary: Option<PathBuf> =
+            cargo_home.map(PathBuf::from).map(|directory: PathBuf| {
+                directory
+                    .join(EUV_PLAYGROUND_CARGO_BIN_DIR)
+                    .join(EUV_PLAYGROUND_WASM_PACK_BINARY_NAME)
+            });
+        if let Some(candidate) = cargo_home_binary.filter(|candidate: &PathBuf| candidate.is_file())
+        {
+            return candidate;
+        }
+        let home_binary: Option<PathBuf> = home.map(PathBuf::from).map(|directory: PathBuf| {
+            directory
+                .join(EUV_PLAYGROUND_CARGO_HOME_DIR)
+                .join(EUV_PLAYGROUND_CARGO_BIN_DIR)
+                .join(EUV_PLAYGROUND_WASM_PACK_BINARY_NAME)
+        });
+        home_binary
+            .filter(|candidate: &PathBuf| candidate.is_file())
+            .unwrap_or_else(|| PathBuf::from(EUV_PLAYGROUND_WASM_PACK_BINARY_NAME))
+    }
+
+    /// Resolves wasm-pack using the current process environment.
+    ///
+    /// # Returns
+    ///
+    /// - `PathBuf`: The executable path used for playground builds.
+    #[instrument_trace]
+    pub fn resolve_wasm_pack_binary() -> PathBuf {
+        let override_path: Option<OsString> = var_os(EUV_PLAYGROUND_WASM_PACK_ENV);
+        let path: Option<OsString> = var_os(EUV_PLAYGROUND_PATH_ENV);
+        let cargo_home: Option<OsString> = var_os(EUV_PLAYGROUND_CARGO_HOME_ENV);
+        let home: Option<OsString> =
+            var_os(EUV_PLAYGROUND_HOME_ENV).or_else(|| var_os(EUV_PLAYGROUND_USERPROFILE_ENV));
+        Self::resolve_wasm_pack_binary_from(
+            override_path.as_deref(),
+            path.as_deref(),
+            cargo_home.as_deref(),
+            home.as_deref(),
+        )
+    }
+
     /// Drains a spawned `wasm-pack` child's stdout and stderr into two
     /// owned `Vec<u8>`s and joins them with the child's exit-status wait.
     /// All three future is awaited concurrently.
@@ -175,7 +248,9 @@ impl EuvPlaygroundService {
             .map_err(|e: std::io::Error| format!("Failed to write src/lib.rs: {e}"))?;
         write(&index_html_path, EUV_PLAYGROUND_BUILD_INDEX_HTML)
             .map_err(|e: std::io::Error| format!("Failed to write www/index.html: {e}"))?;
-        let mut cmd: Command = Command::new("wasm-pack");
+        let wasm_pack_binary: PathBuf = Self::resolve_wasm_pack_binary();
+        let wasm_pack_display: String = wasm_pack_binary.display().to_string();
+        let mut cmd: Command = Command::new(&wasm_pack_binary);
         cmd.current_dir(&dir_path)
             .arg("build")
             .arg("--target")
@@ -195,7 +270,7 @@ impl EuvPlaygroundService {
             Err(e) => {
                 let _ = remove_dir_all(&dir_path);
                 return Err(format!(
-                    "Failed to spawn wasm-pack (is it installed and on PATH?): {e}"
+                    "Failed to spawn wasm-pack at {wasm_pack_display}. Install it with `cargo install wasm-pack`, add Cargo's bin directory to PATH, or set {EUV_PLAYGROUND_WASM_PACK_ENV}: {e}"
                 ));
             }
         };

@@ -71,49 +71,48 @@ class HyperlaneToast extends HTMLElement {
     }
 
     const typeStyles = {
-      success: 'background: #28a745; color: white;',
-      error: 'background: #dc3545; color: white;',
-      warning: 'background: #ffc107; color: #212529;',
-      info: 'background: #17a2b8; color: white;',
+      success: 'background: var(--hl-gray-900); color: var(--hl-accent-fg);',
+      error: 'background: var(--hl-error-bg); color: var(--hl-error);',
+      warning:
+        'background: var(--hl-warning-bg); color: var(--hl-warning); border: 1px solid var(--hl-border-strong);',
+      info: 'background: var(--hl-info-bg); color: var(--hl-info); border: 1px solid var(--hl-border);',
     };
 
     this.shadowRoot.innerHTML = `
       <style>
         :host {
-          position: fixed;
-          top: 20px;
-          right: 20px;
-          z-index: 10000;
+          display: block;
+          position: static;
+          width: 100%;
+          pointer-events: auto;
         }
         .toast {
           padding: 12px 24px;
-          border-radius: 8px;
+          border-radius: var(--hl-radius-sm);
+          border: 1px solid var(--hl-border);
           font-weight: 500;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          box-shadow: var(--hl-shadow-lg, 0 4px 12px rgba(0, 0, 0, 0.15));
           animation: slideIn 0.3s ease;
           min-width: 200px;
           max-width: 400px;
           word-wrap: break-word;
+          box-sizing: border-box;
           ${typeStyles[type] || typeStyles.success}
         }
         @keyframes slideIn {
           from {
             opacity: 0;
-            transform: translateX(100%);
           }
           to {
             opacity: 1;
-            transform: translateX(0);
           }
         }
         @keyframes slideOut {
           from {
             opacity: 1;
-            transform: translateX(0);
           }
           to {
             opacity: 0;
-            transform: translateX(100%);
           }
         }
       </style>
@@ -138,8 +137,7 @@ window.HLToast = {
     if (!this.container) {
       this.container = document.createElement('div');
       this.container.id = 'hyperlane-toast-container';
-      this.container.style.cssText =
-        'position:fixed;top:20px;right:20px;z-index:10000;';
+      this.container.className = 'toast-container';
       document.body.appendChild(this.container);
     }
   },

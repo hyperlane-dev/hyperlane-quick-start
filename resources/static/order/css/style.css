@@ -1,5 +1,5 @@
 body {
-  background: #667eea;
+  background: var(--hl-bg);
 }
 
 .app-title,
@@ -18,7 +18,7 @@ button,
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  background: #667eea;
+  background: var(--hl-bg);
   padding: 20px;
   overflow-y: auto;
   scrollbar-width: auto;
@@ -65,7 +65,7 @@ button,
 }
 
 .login-header .app-subtitle {
-  color: #666;
+  color: var(--hl-fg-muted);
   font-size: 14px;
   white-space: nowrap;
   overflow: hidden;
@@ -78,12 +78,12 @@ button,
 
 .login-footer {
   text-align: center;
-  color: #666;
+  color: var(--hl-fg-muted);
   font-size: 14px;
 }
 
 .login-footer a {
-  color: #667eea;
+  color: var(--hl-accent);
   text-decoration: none;
 }
 
@@ -99,8 +99,8 @@ button,
 
 .sidebar {
   width: 260px;
-  background: #ffffff;
-  border-right: 1px solid #e0e0e0;
+  background: var(--hl-surface);
+  border-right: 1px solid var(--hl-gray-200);
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -112,13 +112,13 @@ button,
 
 .sidebar-header {
   padding: 20px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--hl-gray-200);
 }
 
 .sidebar-header h2 {
   font-size: 18px;
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--hl-fg);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -163,7 +163,7 @@ button,
   gap: 12px;
   padding: 12px 20px;
   cursor: pointer;
-  color: #4a5568;
+  color: var(--hl-fg-muted);
   font-size: 14px;
   font-weight: 600;
   transition: all 0.2s;
@@ -171,14 +171,14 @@ button,
 }
 
 .nav-item:hover {
-  background: #f5f7fb;
-  color: #2d3748;
+  background: var(--hl-bg-muted);
+  color: var(--hl-fg);
 }
 
 .nav-item.active {
-  background: #d4e0ff;
-  color: #5a67d8;
-  border-left-color: #5a67d8;
+  background: var(--hl-accent);
+  color: var(--hl-accent-fg);
+  border-left-color: var(--hl-accent);
   font-weight: 700;
 }
 
@@ -190,7 +190,7 @@ button,
 
 .sidebar-footer {
   padding: 16px 20px;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--hl-gray-200);
 }
 
 #logout-btn {
@@ -203,13 +203,13 @@ button,
   gap: 8px;
   margin-bottom: 12px;
   font-size: 14px;
-  color: #2d3748;
+  color: var(--hl-fg);
   font-weight: 700;
 }
 
 .role-badge {
-  background: #16a34a;
-  color: #fff;
+  background: var(--hl-success);
+  color: var(--hl-accent-fg);
   padding: 2px 8px;
   border-radius: 10px;
   font-size: 11px;
@@ -218,7 +218,7 @@ button,
 }
 
 .role-badge.admin {
-  background: #5a67d8;
+  background: var(--hl-accent);
 }
 
 .main-content {
@@ -241,7 +241,7 @@ button,
 .content-header h1 {
   font-size: 20px;
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--hl-fg);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -249,14 +249,14 @@ button,
 
 .btn {
   padding: 8px 16px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--hl-border-strong);
   border-radius: 6px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
-  background: #f5f7fb;
-  color: #2c3e50;
+  background: var(--hl-bg-muted);
+  color: var(--hl-fg);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -264,8 +264,8 @@ button,
 }
 
 .btn:hover {
-  background: #e8ecf4;
-  border-color: #d0d0d0;
+  background: var(--hl-bg-muted);
+  border-color: var(--hl-border);
 }
 
 .btn:disabled {
@@ -275,25 +275,25 @@ button,
 }
 
 .btn-primary {
-  background: #667eea;
+  background: var(--hl-accent);
   border-color: transparent;
-  color: #fff;
+  color: var(--hl-accent-fg);
 }
 
 .btn-primary:hover {
-  background: #5a6fd6;
+  background: var(--hl-accent);
   border-color: transparent;
 }
 
 .btn-danger {
-  background: #ef4444;
-  border-color: #ef4444;
-  color: #fff;
+  background: var(--hl-error-bg);
+  border-color: var(--hl-error-bg);
+  color: var(--hl-error);
 }
 
 .btn-danger:hover {
-  background: #dc2626;
-  border-color: #dc2626;
+  background: var(--hl-error-bg);
+  border-color: var(--hl-error-bg);
 }
 
 .btn-sm {
@@ -314,17 +314,17 @@ button,
   display: block;
   font-size: 14px;
   font-weight: 500;
-  color: #2c3e50;
+  color: var(--hl-fg);
   margin-bottom: 8px;
 }
 
 .form-input {
   width: 100%;
   padding: 10px 12px;
-  background: #f8f9fa;
-  border: 1px solid #e0e0e0;
+  background: var(--hl-bg-subtle);
+  border: 1px solid var(--hl-border-strong);
   border-radius: 6px;
-  color: #2c3e50;
+  color: var(--hl-fg);
   font-size: 14px;
   transition: all 0.2s;
 }
@@ -332,10 +332,10 @@ button,
 .form-select {
   width: 100%;
   padding: 10px 36px 10px 12px;
-  background: #f8f9fa;
-  border: 1px solid #e0e0e0;
+  background: var(--hl-bg-subtle);
+  border: 1px solid var(--hl-border-strong);
   border-radius: 6px;
-  color: #2c3e50;
+  color: var(--hl-fg);
   font-size: 14px;
   transition: all 0.2s;
   appearance: none;
@@ -352,29 +352,29 @@ button,
 
 .form-input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
-  background: #fff;
+  border-color: var(--hl-accent);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
+  background: var(--hl-surface);
 }
 
 .form-select:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
-  background: #fff;
+  border-color: var(--hl-accent);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
+  background: var(--hl-surface);
 }
 
 .form-input::placeholder {
-  color: #999;
+  color: var(--hl-fg-subtle);
 }
 
 .form-display {
   display: block;
   padding: 10px 12px;
-  background: #f8f9fa;
-  border: 1px solid #e0e0e0;
+  background: var(--hl-bg-subtle);
+  border: 1px solid var(--hl-border-strong);
   border-radius: 6px;
-  color: #666;
+  color: var(--hl-fg-muted);
   font-size: 14px;
 }
 
@@ -402,26 +402,26 @@ hyperlane-select {
 
 hyperlane-select .select-trigger {
   padding: 10px 36px 10px 12px;
-  background: #f8f9fa;
-  border: 1px solid #e0e0e0;
+  background: var(--hl-bg-subtle);
+  border: 1px solid var(--hl-border-strong);
   border-radius: 6px;
-  color: #2c3e50;
+  color: var(--hl-fg);
   font-size: 14px;
   transition: all 0.2s;
 }
 
 hyperlane-select .select-trigger:hover:not(.disabled) {
-  border-color: #667eea;
+  border-color: var(--hl-accent);
 }
 
 hyperlane-select .select-trigger.open {
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
-  background: #fff;
+  border-color: var(--hl-accent);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
+  background: var(--hl-surface);
 }
 
 hyperlane-select .select-dropdown {
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--hl-border-strong);
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
@@ -432,25 +432,25 @@ hyperlane-select .option-item {
 }
 
 hyperlane-select .option-item.selected {
-  background: #667eea;
-  color: white;
+  background: var(--hl-accent);
+  color: var(--hl-accent-fg);
 }
 
 hyperlane-select .option-item:hover {
-  background: #f0f4ff;
-  color: #667eea;
+  background: var(--hl-info-bg);
+  color: var(--hl-accent);
 }
 
 hyperlane-select .option-item.selected:hover {
-  background: #5a6fd6;
-  color: white;
+  background: var(--hl-accent);
+  color: var(--hl-accent-fg);
 }
 
 input[type='date'].form-input {
   appearance: none;
   -webkit-appearance: none;
-  background-color: #f8f9fa;
-  color: #2c3e50;
+  background-color: var(--hl-bg-subtle);
+  color: var(--hl-fg);
   font-family: inherit;
   cursor: pointer;
 }
@@ -466,25 +466,25 @@ input[type='date'].form-input::-webkit-calendar-picker-indicator:hover {
 }
 
 input[type='date'].form-input::-webkit-datetime-edit {
-  color: #2c3e50;
+  color: var(--hl-fg);
 }
 
 input[type='date'].form-input::-webkit-datetime-edit-fields-wrapper {
-  color: #2c3e50;
+  color: var(--hl-fg);
 }
 
 input[type='date'].form-input::-webkit-datetime-edit-text {
-  color: #666;
+  color: var(--hl-fg-muted);
 }
 
 input[type='date'].form-input::-webkit-datetime-edit-month-field,
 input[type='date'].form-input::-webkit-datetime-edit-day-field,
 input[type='date'].form-input::-webkit-datetime-edit-year-field {
-  color: #2c3e50;
+  color: var(--hl-fg);
 }
 
 input[type='date'].form-input::placeholder {
-  color: #999;
+  color: var(--hl-fg-subtle);
 }
 
 input[type='number'].form-input::-webkit-outer-spin-button,
@@ -494,8 +494,8 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .card {
-  background: #ffffff;
-  border: 1px solid #e0e0e0;
+  background: var(--hl-surface);
+  border: 1px solid var(--hl-border-strong);
   border-radius: 12px;
   overflow: hidden;
   margin-bottom: 16px;
@@ -504,7 +504,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 
 .card-header {
   padding: 16px 20px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--hl-gray-200);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -513,7 +513,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 .card-title {
   font-size: 16px;
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--hl-fg);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -587,7 +587,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   flex-shrink: 0;
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--hl-gray-200);
 }
 
 #records-page .card-body,
@@ -662,8 +662,8 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .stat-card {
-  background: #ffffff;
-  border: 1px solid #e0e0e0;
+  background: var(--hl-surface);
+  border: 1px solid var(--hl-border-strong);
   border-radius: 12px;
   padding: 20px;
   text-align: center;
@@ -673,20 +673,20 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .stat-card.income {
-  border-left: 4px solid #22c55e;
+  border-left: 4px solid var(--hl-success);
 }
 
 .stat-card.expense {
-  border-left: 4px solid #ef4444;
+  border-left: 4px solid var(--hl-error);
 }
 
 .stat-card.balance {
-  border-left: 4px solid #f59e0b;
+  border-left: 4px solid var(--hl-warning);
 }
 
 .stat-label {
   font-size: 12px;
-  color: #666;
+  color: var(--hl-fg-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 8px;
@@ -698,18 +698,18 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 .stat-value {
   font-size: 24px;
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--hl-fg);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .stat-card.income .stat-value {
-  color: #22c55e;
+  color: var(--hl-success);
 }
 
 .stat-card.expense .stat-value {
-  color: #ef4444;
+  color: var(--hl-error);
 }
 
 .filter-bar {
@@ -718,7 +718,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   gap: 12px;
   margin-bottom: 20px;
   padding-bottom: 20px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--hl-gray-200);
 }
 
 .filter-row {
@@ -752,7 +752,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 
 .filter-group span {
   flex-shrink: 0;
-  color: #666;
+  color: var(--hl-fg-muted);
 }
 
 .filter-actions {
@@ -769,7 +769,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 
 .filter-label {
   font-size: 12px;
-  color: #666;
+  color: var(--hl-fg-muted);
 }
 
 .record-list {
@@ -785,8 +785,8 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   display: flex;
   gap: 24px;
   padding: 12px 16px;
-  background: #ffffff;
-  border: 1px solid #e0e0e0;
+  background: var(--hl-surface);
+  border: 1px solid var(--hl-border-strong);
   border-radius: 8px;
   margin-bottom: 16px;
   flex-wrap: wrap;
@@ -800,17 +800,17 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .summary-item.income .summary-value {
-  color: #22c55e;
+  color: var(--hl-success);
   font-weight: 600;
 }
 
 .summary-item.expense .summary-value {
-  color: #ef4444;
+  color: var(--hl-error);
   font-weight: 600;
 }
 
 .summary-label {
-  color: #666;
+  color: var(--hl-fg-muted);
 }
 
 .record-item {
@@ -818,19 +818,15 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   align-items: center;
   gap: 16px;
   padding: 16px;
-  background: #f8f9fa;
-  border: 1px solid #e0e0e0;
+  background: var(--hl-bg-subtle);
+  border: 1px solid var(--hl-border-strong);
   border-radius: 8px;
   transition: all 0.2s;
 }
 
 .record-item:hover {
-  border-color: #667eea;
-  background: #f0f4ff;
-}
-
-.record-item:active {
-  transform: scale(0.995);
+  border-color: var(--hl-accent);
+  background: var(--hl-info-bg);
 }
 
 .loading-more {
@@ -839,15 +835,15 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   justify-content: center;
   gap: 12px;
   padding: 20px;
-  color: #666;
+  color: var(--hl-fg-muted);
   font-size: 14px;
 }
 
 .loading-spinner {
   width: 20px;
   height: 20px;
-  border: 2px solid #e0e0e0;
-  border-top-color: #667eea;
+  border: 2px solid var(--hl-gray-200);
+  border-top-color: var(--hl-accent);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -864,13 +860,13 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .record-type.income {
-  background: rgba(34, 197, 94, 0.15);
-  color: #22c55e;
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--hl-success);
 }
 
 .record-type.expense {
-  background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
+  background: rgba(0, 0, 0, 0.15);
+  color: var(--hl-error);
 }
 
 .record-info {
@@ -881,7 +877,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 .record-category {
   font-size: 14px;
   font-weight: 700;
-  color: #2c3e50;
+  color: var(--hl-fg);
   margin-bottom: 4px;
 }
 
@@ -895,7 +891,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 .record-bill-no {
   font-size: 14px;
   font-weight: 700;
-  color: #2c3e50;
+  color: var(--hl-fg);
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -912,16 +908,16 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .record-amount-inline.income {
-  color: #16a34a;
+  color: var(--hl-success);
 }
 
 .record-amount-inline.expense {
-  color: #dc2626;
+  color: var(--hl-error-bg);
 }
 
 .record-description {
   font-size: 13px;
-  color: #4a5568;
+  color: var(--hl-fg-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -930,7 +926,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 
 .record-user-id {
   font-size: 12px;
-  color: #718096;
+  color: var(--hl-fg-muted);
   margin-top: 4px;
   font-family: monospace;
   font-weight: 400;
@@ -946,7 +942,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 
 .record-meta-item {
   font-size: 12px;
-  color: #718096;
+  color: var(--hl-fg-muted);
   font-family: monospace;
   white-space: nowrap;
   position: relative;
@@ -961,12 +957,12 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .record-meta-label {
-  color: #4a5568;
+  color: var(--hl-fg-muted);
   font-weight: 400;
 }
 
 .record-meta-value {
-  color: #2d3748;
+  color: var(--hl-fg);
   font-weight: 400;
 }
 
@@ -979,18 +975,18 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 
 .record-date-item {
   font-size: 12px;
-  color: #718096;
+  color: var(--hl-fg-muted);
   font-family: monospace;
   font-weight: 400;
 }
 
 .record-date-label {
-  color: #4a5568;
+  color: var(--hl-fg-muted);
   font-weight: 400;
 }
 
 .record-date-value {
-  color: #2d3748;
+  color: var(--hl-fg);
   font-weight: 400;
 }
 
@@ -1003,16 +999,16 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .record-amount.income {
-  color: #16a34a;
+  color: var(--hl-success);
 }
 
 .record-amount.expense {
-  color: #dc2626;
+  color: var(--hl-error-bg);
 }
 
 .record-date {
   font-size: 13px;
-  color: #4a5568;
+  color: var(--hl-fg-muted);
   text-align: right;
   font-weight: 400;
 }
@@ -1029,10 +1025,10 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 .btn-print {
   margin-top: 8px;
   padding: 4px 12px;
-  background: #e2e8f0;
-  border: 1px solid #cbd5e0;
+  background: var(--hl-surface-hover);
+  border: 1px solid var(--hl-border-strong);
   border-radius: 6px;
-  color: #2d3748;
+  color: var(--hl-fg);
   font-size: 13px;
   cursor: pointer;
   transition: all 0.2s;
@@ -1040,8 +1036,8 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .btn-print:hover {
-  background: #cbd5e0;
-  border-color: #5a67d8;
+  background: var(--hl-bg-muted);
+  border-color: var(--hl-border-strong);
 }
 
 .record-actions {
@@ -1063,15 +1059,15 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   align-items: center;
   gap: 16px;
   padding: 16px;
-  background: #f8f9fa;
-  border: 1px solid #e0e0e0;
+  background: var(--hl-bg-subtle);
+  border: 1px solid var(--hl-border-strong);
   border-radius: 8px;
   transition: all 0.2s;
 }
 
 .user-item:hover {
-  border-color: #667eea;
-  background: #f0f4ff;
+  border-color: var(--hl-accent);
+  background: var(--hl-info-bg);
 }
 
 .user-avatar {
@@ -1083,16 +1079,16 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   justify-content: center;
   font-size: 16px;
   font-weight: 600;
-  color: #fff;
+  color: var(--hl-accent-fg);
   flex-shrink: 0;
 }
 
 .user-avatar-admin {
-  background: #8b5cf6;
+  background: var(--hl-accent);
 }
 
 .user-avatar-user {
-  background: #667eea;
+  background: var(--hl-accent);
 }
 
 .user-info-details {
@@ -1103,13 +1099,13 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 .user-name {
   font-size: 14px;
   font-weight: 500;
-  color: #2c3e50;
+  color: var(--hl-fg);
   margin-bottom: 4px;
 }
 
 .user-meta {
   font-size: 12px;
-  color: #666;
+  color: var(--hl-fg-muted);
 }
 
 .user-status {
@@ -1121,18 +1117,18 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .user-status.approved {
-  background: rgba(34, 197, 94, 0.15);
-  color: #22c55e;
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--hl-success);
 }
 
 .user-status.pending {
-  background: rgba(245, 158, 11, 0.15);
-  color: #d97706;
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--hl-warning);
 }
 
 .user-status.rejected {
-  background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
+  background: rgba(0, 0, 0, 0.15);
+  color: var(--hl-error);
 }
 
 .user-actions {
@@ -1190,16 +1186,16 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   left: calc(50% - 20px);
   width: 40px;
   height: 40px;
-  border: 3px solid #e0e0e0;
-  border-top-color: #667eea;
+  border: 3px solid var(--hl-gray-200);
+  border-top-color: var(--hl-accent);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   z-index: 101;
 }
 
 .modal-content {
-  background: #ffffff;
-  border: 1px solid #e0e0e0;
+  background: var(--hl-surface);
+  border: 1px solid var(--hl-border-strong);
   border-radius: 0;
   max-width: 100%;
   width: 100%;
@@ -1213,11 +1209,11 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 
 .modal-header {
   padding: 20px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--hl-gray-200);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #f8f9fa;
+  background: var(--hl-bg-subtle);
 }
 
 .modal-body {
@@ -1230,7 +1226,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 .modal-title {
   font-size: 18px;
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--hl-fg);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1239,7 +1235,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 .modal-close {
   background: none;
   border: none;
-  color: #666;
+  color: var(--hl-fg-muted);
   font-size: 24px;
   cursor: pointer;
   padding: 0;
@@ -1253,8 +1249,8 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .modal-close:hover {
-  background: #f5f7fb;
-  color: #2c3e50;
+  background: var(--hl-bg-muted);
+  color: var(--hl-fg);
 }
 
 .modal-close:disabled {
@@ -1265,7 +1261,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 
 .modal-footer {
   padding: 20px;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--hl-gray-200);
   display: flex;
   justify-content: flex-end;
   gap: 12px;
@@ -1275,7 +1271,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  color: #666;
+  color: var(--hl-fg-muted);
 }
 
 .loading-state {
@@ -1290,14 +1286,14 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 .loading-state .loading-spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid #e0e0e0;
-  border-top-color: #667eea;
+  border: 3px solid var(--hl-gray-200);
+  border-top-color: var(--hl-accent);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
 
 .loading-text {
-  color: #666;
+  color: var(--hl-fg-muted);
   font-size: 14px;
 }
 
@@ -1309,7 +1305,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 .empty-state-title {
   font-size: 18px;
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--hl-fg);
   margin-bottom: 8px;
   white-space: nowrap;
   overflow: hidden;
@@ -1327,8 +1323,8 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .toast {
-  background: #ffffff;
-  border: 1px solid #e0e0e0;
+  background: var(--hl-surface);
+  border: 1px solid var(--hl-border-strong);
   border-radius: 8px;
   padding: 12px 16px;
   min-width: 280px;
@@ -1347,22 +1343,18 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 
 @keyframes slideIn {
   from {
-    transform: translateX(100%);
     opacity: 0;
   }
   to {
-    transform: translateX(0);
     opacity: 1;
   }
 }
 
 @keyframes slideOut {
   from {
-    transform: translateX(0);
     opacity: 1;
   }
   to {
-    transform: translateX(100%);
     opacity: 0;
   }
 }
@@ -1373,21 +1365,21 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .toast-icon.success {
-  color: #22c55e;
+  color: var(--hl-success);
 }
 
 .toast-icon.error {
-  color: #ef4444;
+  color: var(--hl-error);
 }
 
 .toast-icon.info {
-  color: #667eea;
+  color: var(--hl-accent);
 }
 
 .toast-content {
   flex: 1;
   font-size: 14px;
-  color: #2c3e50;
+  color: var(--hl-fg);
 }
 
 .mobile-menu-btn {
@@ -1430,12 +1422,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 @media (max-width: 768px) {
   .sidebar {
     width: 100%;
-    transform: translateX(-100%);
     transition: transform 0.3s;
-  }
-
-  .sidebar.open {
-    transform: translateX(0);
   }
 
   .main-content {
@@ -1454,10 +1441,10 @@ input[type='number'].form-input::-webkit-inner-spin-button {
     justify-content: center;
     width: 32px;
     height: 32px;
-    background: #f5f7fb;
-    border: 1px solid #e0e0e0;
+    background: var(--hl-bg-muted);
+    border: 1px solid var(--hl-border-strong);
     border-radius: 6px;
-    color: #2c3e50;
+    color: var(--hl-fg);
     font-size: 16px;
     cursor: pointer;
     margin-right: 8px;
@@ -1577,7 +1564,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
     justify-content: flex-end;
     align-items: center;
     padding-top: 12px;
-    border-top: 1px solid #e0e0e0;
+    border-top: 1px solid var(--hl-gray-200);
     margin-top: 4px;
     gap: 12px;
   }
@@ -1800,7 +1787,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
     flex-shrink: 0;
     margin-top: 12px;
     padding-top: 12px;
-    border-top: 1px solid #e0e0e0;
+    border-top: 1px solid var(--hl-gray-200);
   }
 
   .record-meta-row {
@@ -1842,8 +1829,8 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   align-items: center;
   padding: 16px;
   margin-top: 16px;
-  background: #ffffff;
-  border: 1px solid #e0e0e0;
+  background: var(--hl-surface);
+  border: 1px solid var(--hl-border-strong);
   border-radius: 12px;
   flex-wrap: wrap;
   gap: 12px;
@@ -1853,7 +1840,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   display: flex;
   gap: 16px;
   font-size: 14px;
-  color: #666;
+  color: var(--hl-fg-muted);
 }
 
 .pagination-controls {
@@ -1883,26 +1870,26 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 
 .pagination-controls > button {
   min-width: 80px;
-  background: #f5f7fb;
-  border: 1px solid #e0e0e0;
+  background: var(--hl-bg-muted);
+  border: 1px solid var(--hl-border-strong);
   border-radius: 6px;
   padding: 6px 12px;
   font-size: 14px;
   font-weight: 500;
-  color: #2c3e50;
+  color: var(--hl-fg);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .pagination-controls > button:hover:not(:disabled) {
-  background: #e8ecf4;
-  border-color: #d0d0d0;
+  background: var(--hl-bg-muted);
+  border-color: var(--hl-border);
 }
 
 .pagination-controls > button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  background: #f5f7fb;
+  background: var(--hl-bg-muted);
 }
 
 .page-numbers {
@@ -1914,32 +1901,32 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 
 .page-btn {
   padding: 6px 12px;
-  background: #f5f7fb;
-  border: 1px solid #e0e0e0;
+  background: var(--hl-bg-muted);
+  border: 1px solid var(--hl-border-strong);
   border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  color: #2c3e50;
+  color: var(--hl-fg);
   transition: all 0.2s ease;
   min-width: 36px;
   text-align: center;
 }
 
 .page-btn:hover:not(.active):not(:disabled) {
-  background: #e8ecf4;
-  border-color: #d0d0d0;
+  background: var(--hl-bg-muted);
+  border-color: var(--hl-border);
 }
 
 .page-btn.active {
-  background: #667eea;
+  background: var(--hl-accent);
   border-color: transparent;
-  color: #ffffff;
+  color: var(--hl-accent-fg);
   font-weight: 600;
 }
 
 .page-ellipsis {
-  color: #999;
+  color: var(--hl-fg-subtle);
   padding: 0 4px;
   font-size: 14px;
 }
@@ -1996,15 +1983,15 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 .stat-change {
   font-size: 12px;
   margin-top: 4px;
-  color: #666;
+  color: var(--hl-fg-muted);
 }
 
 .stat-change.up {
-  color: #22c55e;
+  color: var(--hl-success);
 }
 
 .stat-change.down {
-  color: #ef4444;
+  color: var(--hl-error);
 }
 
 .charts-grid {
@@ -2030,8 +2017,8 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .stats-row .stat-card {
-  background: #ffffff;
-  border: 1px solid #e0e0e0;
+  background: var(--hl-surface);
+  border: 1px solid var(--hl-border-strong);
   border-radius: 12px;
   padding: 20px;
   text-align: center;
@@ -2039,20 +2026,20 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .stats-row .stat-card.income {
-  border-left: 4px solid #22c55e;
+  border-left: 4px solid var(--hl-success);
 }
 
 .stats-row .stat-card.expense {
-  border-left: 4px solid #ef4444;
+  border-left: 4px solid var(--hl-error);
 }
 
 .stats-row .stat-card.balance {
-  border-left: 4px solid #667eea;
+  border-left: 4px solid var(--hl-accent);
 }
 
 .stats-row .stat-label {
   font-size: 12px;
-  color: #666;
+  color: var(--hl-fg-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 8px;
@@ -2061,15 +2048,15 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 .stats-row .stat-value {
   font-size: 24px;
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--hl-fg);
 }
 
 .stats-row .stat-card.income .stat-value {
-  color: #22c55e;
+  color: var(--hl-success);
 }
 
 .stats-row .stat-card.expense .stat-value {
-  color: #ef4444;
+  color: var(--hl-error);
 }
 
 .chart-container {
@@ -2089,9 +2076,9 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   align-items: center;
   justify-content: center;
   gap: 16px;
-  color: #666;
+  color: var(--hl-fg-muted);
   font-size: 14px;
-  background: #f8f9fa;
+  background: var(--hl-bg-subtle);
   z-index: 1;
 }
 
@@ -2099,8 +2086,8 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   content: '';
   width: 40px;
   height: 40px;
-  border: 3px solid #e0e0e0;
-  border-top-color: #667eea;
+  border: 3px solid var(--hl-gray-200);
+  border-top-color: var(--hl-accent);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -2150,10 +2137,10 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   width: 100%;
   padding: 6px 8px;
   padding-right: 30px;
-  background: #ffffff;
-  border: 1px solid #e0e0e0;
+  background: var(--hl-surface);
+  border: 1px solid var(--hl-border-strong);
   border-radius: 6px;
-  color: #2c3e50;
+  color: var(--hl-fg);
   font-size: 13px;
   font-family: inherit;
   cursor: pointer;
@@ -2162,21 +2149,20 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .date-picker-input:hover {
-  border-color: #d0d0d0;
+  border-color: var(--hl-border);
 }
 
 .date-picker-input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+  border-color: var(--hl-accent);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
 }
 
 .date-picker-icon {
   position: absolute;
   right: 8px;
   top: 50%;
-  transform: translateY(-50%);
-  color: #666;
+  color: var(--hl-fg-muted);
   font-size: 14px;
   pointer-events: none;
 }
@@ -2184,8 +2170,8 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 .date-picker-calendar {
   position: fixed;
   margin-top: 4px;
-  background: #ffffff;
-  border: 1px solid #e0e0e0;
+  background: var(--hl-surface);
+  border: 1px solid var(--hl-border-strong);
   border-radius: 8px;
   padding: 12px;
   z-index: 99999;
@@ -2204,14 +2190,14 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   align-items: center;
   margin-bottom: 12px;
   padding-bottom: 8px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--hl-gray-200);
 }
 
 .date-picker-nav {
-  background: #f5f7fb;
-  border: 1px solid #e0e0e0;
+  background: var(--hl-bg-muted);
+  border: 1px solid var(--hl-border-strong);
   border-radius: 4px;
-  color: #2c3e50;
+  color: var(--hl-fg);
   width: 28px;
   height: 28px;
   cursor: pointer;
@@ -2223,14 +2209,14 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .date-picker-nav:hover {
-  background: #e8ecf4;
-  border-color: #d0d0d0;
+  background: var(--hl-bg-muted);
+  border-color: var(--hl-border);
 }
 
 .date-picker-month-year {
   font-size: 14px;
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--hl-fg);
 }
 
 .date-picker-weekdays {
@@ -2243,7 +2229,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 .date-picker-weekday {
   text-align: center;
   font-size: 11px;
-  color: #666;
+  color: var(--hl-fg-muted);
   padding: 4px;
   text-transform: uppercase;
 }
@@ -2260,7 +2246,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   align-items: center;
   justify-content: center;
   font-size: 13px;
-  color: #2c3e50;
+  color: var(--hl-fg);
   background: transparent;
   border: 1px solid transparent;
   border-radius: 4px;
@@ -2269,23 +2255,23 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .date-picker-day:hover:not(.disabled):not(.selected) {
-  background: #f5f7fb;
-  border-color: #e0e0e0;
+  background: var(--hl-bg-muted);
+  border-color: var(--hl-border);
 }
 
 .date-picker-day.selected {
-  background: #667eea;
-  border-color: #667eea;
-  color: #fff;
+  background: var(--hl-accent);
+  border-color: var(--hl-accent);
+  color: var(--hl-accent-fg);
 }
 
 .date-picker-day.disabled {
-  color: #ccc;
+  color: var(--hl-border);
   cursor: not-allowed;
 }
 
 .date-picker-day.other-month {
-  color: #999;
+  color: var(--hl-fg-subtle);
 }
 
 .date-picker-today {
@@ -2297,10 +2283,9 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   position: absolute;
   bottom: 2px;
   left: 50%;
-  transform: translateX(-50%);
   width: 4px;
   height: 4px;
-  background: #667eea;
+  background: var(--hl-accent);
   border-radius: 50%;
 }
 
@@ -2309,33 +2294,33 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   justify-content: space-between;
   margin-top: 12px;
   padding-top: 8px;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--hl-gray-200);
 }
 
 .date-picker-btn {
   padding: 4px 12px;
-  background: #f5f7fb;
-  border: 1px solid #e0e0e0;
+  background: var(--hl-bg-muted);
+  border: 1px solid var(--hl-border-strong);
   border-radius: 4px;
-  color: #2c3e50;
+  color: var(--hl-fg);
   font-size: 12px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .date-picker-btn:hover {
-  background: #e8ecf4;
-  border-color: #d0d0e0;
+  background: var(--hl-bg-muted);
+  border-color: var(--hl-accent);
 }
 
 .date-picker-btn.primary {
-  background: #667eea;
+  background: var(--hl-accent);
   border-color: transparent;
-  color: #fff;
+  color: var(--hl-accent-fg);
 }
 
 .date-picker-btn.primary:hover {
-  background: #5a6fd6;
+  background: var(--hl-accent);
 }
 
 .scan-modal-content {
@@ -2355,7 +2340,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   position: relative;
   width: 100%;
   margin: 0 auto 20px;
-  background: #f8f9fa;
+  background: var(--hl-bg-subtle);
   border-radius: 12px;
   overflow: hidden;
   display: flex;
@@ -2396,7 +2381,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 .scan-frame {
   width: 200px;
   height: 200px;
-  border: 2px solid rgba(102, 126, 234, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.5);
   border-radius: 12px;
   position: relative;
 }
@@ -2407,7 +2392,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   position: absolute;
   width: 20px;
   height: 20px;
-  border-color: #667eea;
+  border-color: var(--hl-accent);
   border-style: solid;
 }
 
@@ -2427,28 +2412,16 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   position: absolute;
   width: 180px;
   height: 2px;
-  background: #667eea;
+  background: var(--hl-accent);
   animation: scanMove 2s linear infinite;
-}
-
-@keyframes scanMove {
-  0% {
-    transform: translateY(-100px);
-  }
-  50% {
-    transform: translateY(100px);
-  }
-  100% {
-    transform: translateY(-100px);
-  }
 }
 
 .scan-error {
   text-align: center;
-  color: #ef4444;
+  color: var(--hl-error);
   padding: 12px;
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.3);
   border-radius: 8px;
   margin-bottom: 16px;
 }
@@ -2481,7 +2454,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 
 .qr-code-container {
   flex: 1;
-  background: #fff;
+  background: var(--hl-surface);
   padding: 20px;
   border-radius: 12px;
   margin-bottom: 20px;
@@ -2513,13 +2486,13 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .qr-code-info p {
-  color: #2c3e50;
+  color: var(--hl-fg);
   font-size: 14px;
   margin-bottom: 8px;
 }
 
 .qr-code-info .qr-code-hint {
-  color: #666;
+  color: var(--hl-fg-muted);
   font-size: 12px;
   margin-top: 8px;
 }
@@ -2530,18 +2503,18 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .image-upload-area {
-  border: 2px dashed #d1d5db;
+  border: 2px dashed var(--hl-gray-300);
   border-radius: 8px;
   padding: 20px;
   text-align: center;
   cursor: pointer;
   transition: all 0.2s;
-  background: #f9fafb;
+  background: var(--hl-bg-subtle);
 }
 
 .image-upload-area:hover {
-  border-color: #667eea;
-  background: #f3f4f6;
+  border-color: var(--hl-accent);
+  background: var(--hl-bg-muted);
 }
 
 .image-upload-placeholder {
@@ -2557,13 +2530,13 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 
 .upload-text {
   font-size: 14px;
-  color: #374151;
+  color: var(--hl-fg);
   font-weight: 500;
 }
 
 .upload-hint {
   font-size: 12px;
-  color: #9ca3af;
+  color: var(--hl-fg-subtle);
 }
 
 .image-input {
@@ -2583,7 +2556,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   height: 80px;
   border-radius: 6px;
   overflow: hidden;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--hl-border-strong);
   cursor: pointer;
 }
 
@@ -2594,10 +2567,6 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   transition: transform 0.2s;
 }
 
-.image-preview-item:hover img {
-  transform: scale(1.05);
-}
-
 .image-remove-btn {
   position: absolute;
   top: 2px;
@@ -2605,8 +2574,8 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: rgba(239, 68, 68, 0.9);
-  color: white;
+  background: var(--hl-overlay, rgba(0, 0, 0, 0.9));
+  color: var(--hl-accent-fg);
   border: none;
   font-size: 14px;
   line-height: 1;
@@ -2618,7 +2587,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .image-remove-btn:hover {
-  background: rgba(220, 38, 38, 1);
+  background: rgba(0, 0, 0, 1);
 }
 
 .modal-content-large,
@@ -2654,7 +2623,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   align-items: center;
   justify-content: center;
   overflow: auto;
-  background: #1f2937;
+  background: var(--hl-fg);
   padding: 20px;
 }
 
@@ -2679,8 +2648,8 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   justify-content: center;
   gap: 8px;
   padding: 12px 8px;
-  background: #fff;
-  border-top: 1px solid #e5e7eb;
+  background: var(--hl-surface);
+  border-top: 1px solid var(--hl-gray-200);
   flex-wrap: nowrap;
   overflow-x: auto;
   scrollbar-width: none;
@@ -2707,7 +2676,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   gap: 8px;
   margin-top: 10px;
   padding-top: 10px;
-  border-top: 1px dashed #e5e7eb;
+  border-top: 1px dashed var(--hl-gray-200);
 }
 
 .record-image-thumbnail {
@@ -2715,14 +2684,13 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   height: 60px;
   border-radius: 6px;
   overflow: hidden;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--hl-border-strong);
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .record-image-thumbnail:hover {
-  border-color: #667eea;
-  transform: translateY(-2px);
+  border-color: var(--hl-accent);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
@@ -2733,30 +2701,30 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .theme-adaptive {
-  background: rgba(102, 126, 234, 0.15);
+  background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
 
 .theme-adaptive {
-  background: rgba(102, 126, 234, 0.1);
-  border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .theme-adaptive .modal-title {
-  color: #667eea;
+  color: var(--hl-accent);
   font-weight: 600;
 }
 
 .image-preview-uploader {
   margin-right: auto;
   font-size: 14px;
-  color: #4c1d95;
+  color: var(--hl-accent);
   font-weight: 600;
 }
 
 .image-preview-container {
-  background: #667eea;
+  background: var(--hl-accent);
   cursor: grab;
 }
 
@@ -2766,7 +2734,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 
 .image-preview-controls {
   background: rgba(255, 255, 255, 0.95);
-  border-top: 1px solid rgba(102, 126, 234, 0.15);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .preview-image {

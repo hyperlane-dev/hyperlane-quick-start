@@ -26,17 +26,31 @@ select {
   -webkit-user-select: text !important;
   -moz-user-select: text !important;
   -ms-user-select: text !important;
+  color: var(--hl-fg);
+  background-color: var(--hl-surface);
+  border: 1px solid var(--hl-border);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--hl-fg-subtle);
+  opacity: 1;
 }
 
 body {
   font-family:
     -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  color: #2c3e50;
+  color: var(--hl-fg);
+  background: var(--hl-bg);
   line-height: 1.6;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 a {
   text-decoration: none;
+  color: var(--hl-fg);
 }
 
 h1,
@@ -45,9 +59,8 @@ h3,
 h4,
 h5,
 h6 {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .hidden {

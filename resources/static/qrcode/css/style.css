@@ -10,19 +10,19 @@
 }
 
 :root {
-  --scroll_color: #cfcfcf;
+  --scroll_color: var(--hl-border);
   --scroll_width: 8.88px;
   --scroll_height: 8.88px;
-  --primary-color: #409eff;
-  --success-color: #67c23a;
-  --warning-color: #e6a23c;
-  --danger-color: #f56c6c;
-  --info-color: #909399;
-  --bg-color: #f5f7fa;
+  --primary-color: var(--hl-accent);
+  --success-color: var(--hl-success);
+  --warning-color: var(--hl-warning);
+  --danger-color: var(--hl-error);
+  --info-color: var(--hl-fg-muted);
+  --bg-color: var(--hl-gray-100);
   --card-bg: rgba(255, 255, 255, 0.95);
-  --text-color: #2c3e50;
-  --text-secondary: #6c757d;
-  --border-color: #e9ecef;
+  --text-color: var(--hl-fg);
+  --text-secondary: var(--hl-fg-muted);
+  --border-color: var(--hl-border);
   --shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   --radius: 16px;
 }
@@ -31,7 +31,7 @@
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--hl-gray-900);
 }
 
 .main-content {
@@ -72,7 +72,7 @@
 }
 
 .url-item {
-  background: #f8f9fa;
+  background: var(--hl-bg-subtle);
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 16px;

@@ -3,12 +3,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--hl-gray-900);
   padding: 20px;
 }
 
 .auth-container {
-  background: white;
+  background: var(--hl-surface);
   border-radius: 16px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   width: 100%;
@@ -17,8 +17,8 @@
 }
 
 .auth-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-  color: white;
+  background: var(--hl-accent);
+  color: var(--hl-accent-fg);
   padding: 40px 30px;
   text-align: center;
   transition: all 0.3s ease;
@@ -26,151 +26,7 @@
   overflow: hidden;
 }
 
-.auth-header::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 0.15) 0%,
-    transparent 60%
-  );
-  animation: pulse-glow 4s ease-in-out infinite;
-}
-
-.auth-header::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.2),
-    transparent
-  );
-  animation: shimmer-sweep 3s ease-in-out infinite;
-}
-
-@keyframes pulse-glow {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.5;
-  }
-  50% {
-    transform: scale(1.1);
-    opacity: 0.8;
-  }
-}
-
-@keyframes shimmer-sweep {
-  0% {
-    left: -100%;
-  }
-  100% {
-    left: 100%;
-  }
-}
-
-.auth-header.shimmer-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%);
-  background-size: 200% 200%;
-  animation: shimmer-bg 3s ease infinite;
-}
-
-.auth-header.light-bg {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  color: #2c3e50;
-}
-
-.auth-header.light-bg h1 {
-  color: #2c3e50;
-}
-
-.auth-header.light-bg .text {
-  color: #667eea;
-}
-
-.auth-header.light-bg .text.shimmer {
-  background: linear-gradient(90deg, #667eea, #764ba2, #667eea, #764ba2);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: shimmer 3s linear infinite;
-}
-
-.auth-header.light-bg.shimmer-header {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #f8f9fa 100%);
-  background-size: 200% 200%;
-  animation: shimmer-bg-light 3s ease infinite;
-}
-
-.auth-header.light-bg .app-subtitle {
-  color: #5a6c7d;
-}
-
-.auth-header.shimmer-header h1 a {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  text-decoration: none;
-}
-
-.auth-header.shimmer-header h1 a::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  bottom: -2px;
-  width: 0;
-  height: 2px;
-  background: linear-gradient(90deg, #ffd700, #fff, #ffd700);
-  transition: width 0.4s ease;
-}
-
-.auth-header.shimmer-header h1 a:hover::after {
-  width: 100%;
-}
-
-.auth-header.light-bg.shimmer-header h1 a::after {
-  background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
-}
-
-@keyframes shimmer-bg {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-@keyframes shimmer-bg-light {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-@keyframes shimmer {
-  to {
-    background-position: 200% center;
-  }
-}
+/* Decorative overlays removed — they hid header text on light theme. */
 
 .auth-header h1 {
   margin: 0 0 10px 0;
@@ -196,49 +52,48 @@
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
-  color: #333;
+  color: var(--hl-gray-700);
   font-size: 14px;
 }
 
 .form-input {
   width: 100%;
   padding: 14px 18px;
-  border: 2px solid #e8e8e8;
+  border: 2px solid var(--hl-gray-200);
   border-radius: 12px;
   font-size: 15px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-sizing: border-box;
-  background: linear-gradient(145deg, #fafafa, #ffffff);
+  background: var(--hl-bg-subtle);
   box-shadow:
     inset 0 2px 4px rgba(0, 0, 0, 0.02),
     0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .form-input:hover {
-  border-color: #c5c5c5;
+  border-color: var(--hl-border);
   box-shadow:
     inset 0 2px 4px rgba(0, 0, 0, 0.02),
-    0 2px 8px rgba(102, 126, 234, 0.1);
+    0 2px 8px rgba(255, 255, 255, 0.1);
 }
 
 .form-input:focus {
   outline: none;
-  border-color: #667eea;
-  background: linear-gradient(145deg, #ffffff, #fafafa);
+  border-color: var(--hl-accent);
+  background: var(--hl-surface);
   box-shadow:
     inset 0 2px 4px rgba(0, 0, 0, 0.02),
-    0 0 0 4px rgba(102, 126, 234, 0.15),
-    0 4px 12px rgba(102, 126, 234, 0.2);
-  transform: translateY(-1px);
+    0 0 0 4px rgba(255, 255, 255, 0.15),
+    0 4px 12px rgba(255, 255, 255, 0.2);
 }
 
 .form-input::placeholder {
-  color: #aaa;
+  color: var(--hl-fg-subtle);
   transition: color 0.3s ease;
 }
 
 .form-input:focus::placeholder {
-  color: #ccc;
+  color: var(--hl-border);
 }
 
 .btn-block {
@@ -251,25 +106,25 @@
 .auth-footer {
   padding: 20px 30px;
   text-align: center;
-  border-top: 1px solid #f0f0f0;
-  background: #fafafa;
+  border-top: 1px solid var(--hl-gray-150);
+  background: var(--hl-bg-subtle);
 }
 
 .auth-footer p {
   margin: 0;
-  color: #666;
+  color: var(--hl-fg-muted);
   font-size: 14px;
 }
 
 .auth-footer a {
-  color: #667eea;
+  color: var(--hl-accent);
   text-decoration: none;
   font-weight: 500;
   transition: color 0.3s ease;
 }
 
 .auth-footer a:hover {
-  color: #764ba2;
+  color: var(--hl-accent);
 }
 
 .hidden {
@@ -277,7 +132,7 @@
 }
 
 .app-title a {
-  color: white;
+  color: var(--hl-accent-fg);
   text-decoration: none;
   display: flex;
   align-items: center;

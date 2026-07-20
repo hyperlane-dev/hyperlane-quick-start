@@ -91,30 +91,30 @@ class HyperlanePagination extends HTMLElement {
           width: 100%;
         }
         .pagination-btn {
-          background: white;
-          color: #667eea;
-          border: none;
+          background: var(--hl-surface);
+          color: var(--hl-fg);
+          border: 1px solid var(--hl-border);
           padding: 10px 20px;
-          border-radius: 8px;
+          border-radius: var(--hl-radius-sm);
           cursor: pointer;
           font-weight: 600;
           font-size: 0.95rem;
           transition: all 0.3s ease;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          box-shadow: var(--hl-shadow-sm, 0 2px 8px rgba(0, 0, 0, 0.1));
           white-space: nowrap;
         }
         .pagination-btn:hover:not(:disabled) {
-          background: #667eea;
-          color: white;
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          background: var(--hl-gray-900);
+          color: var(--hl-accent-fg);
+          border-color: var(--hl-gray-900);
+          box-shadow: var(--hl-shadow-md, 0 4px 12px rgba(0, 0, 0, 0.15));
         }
         .pagination-btn:disabled {
           opacity: 0.5;
           cursor: not-allowed;
         }
         .pagination-info {
-          color: white;
+          color: var(--hl-fg);
           font-weight: 600;
           font-size: 1rem;
           padding: 0 12px;

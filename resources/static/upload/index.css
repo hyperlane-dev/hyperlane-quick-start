@@ -1,5 +1,5 @@
 :root {
-  --primary-gradient: #667eea;
+  --primary-gradient: var(--hl-accent);
   --primary-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   --hover-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
   --border-radius: 12px;
@@ -28,7 +28,7 @@ button,
 }
 
 body {
-  background: #667eea;
+  background: var(--hl-bg);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -58,17 +58,15 @@ body {
 @keyframes fadeInDown {
   from {
     opacity: 0;
-    transform: translateY(-20px);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
 .upload-container {
-  background-color: white;
+  background-color: var(--hl-surface);
   border-radius: var(--border-radius);
   padding: var(--spacing-lg);
   box-shadow: var(--primary-shadow);
@@ -95,7 +93,7 @@ body {
 }
 
 .history-container::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--hl-bg-muted);
   border-radius: 3px;
 }
 
@@ -112,7 +110,7 @@ body {
 }
 
 .history-item {
-  background: white;
+  background: var(--hl-surface);
   border-radius: var(--border-radius);
   padding: var(--spacing-md);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -120,7 +118,6 @@ body {
 }
 
 .history-item:hover {
-  transform: translateY(-2px);
   box-shadow: var(--primary-shadow);
 }
 
@@ -133,7 +130,7 @@ body {
 
 .filename {
   font-weight: 500;
-  color: #2d3748;
+  color: var(--hl-fg);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -142,14 +139,14 @@ body {
 }
 
 .filesize {
-  color: #718096;
+  color: var(--hl-fg-muted);
   font-size: var(--font-size-sm);
   white-space: nowrap;
 }
 
 .progress-bar {
   height: 6px;
-  background: #e2e8f0;
+  background: var(--hl-accent);
   border-radius: 3px;
   overflow: hidden;
 }
@@ -189,8 +186,8 @@ body {
   transition: all 0.3s ease;
   text-align: center;
   font-size: var(--font-size-md);
-  background: #28a745;
-  color: white;
+  background: var(--hl-success);
+  color: var(--hl-accent-fg);
   box-shadow: var(--primary-shadow);
   display: flex;
   align-items: center;
@@ -199,17 +196,12 @@ body {
 }
 
 .btn:hover {
-  background: #218838;
-  transform: translateY(-1px);
+  background: var(--hl-success);
   box-shadow: var(--hover-shadow);
 }
 
-.btn:active {
-  transform: translateY(0);
-}
-
 .btn:disabled {
-  background: #e2e8f0;
+  background: var(--hl-accent);
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
@@ -232,20 +224,20 @@ body {
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
-  background: white;
+  background: var(--hl-surface);
   margin-bottom: var(--spacing-md);
 }
 
 .status.success {
-  background-color: #f0fff4;
-  color: #2f855a;
-  border-left: 4px solid #2f855a;
+  background-color: var(--hl-success-bg);
+  color: var(--hl-success);
+  border-left: 4px solid var(--hl-success);
 }
 
 .status.error {
-  background-color: #fff5f5;
-  color: #c53030;
-  border-left: 4px solid #c53030;
+  background-color: var(--hl-error);
+  color: var(--hl-error);
+  border-left: 4px solid var(--hl-error);
 }
 
 .status::before {
@@ -268,12 +260,10 @@ body {
 @keyframes slideIn {
   from {
     opacity: 0;
-    transform: translateY(-10px);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 

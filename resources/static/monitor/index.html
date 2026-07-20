@@ -2,6 +2,7 @@
 
 <html lang="en">
   <head>
+    <script src="../common/js/theme-init.js"></script>
     <meta charset="UTF-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Hyperlane - Monitor</title>
@@ -14,10 +15,8 @@
     <script src="../common/js/chart.js"></script>
     <script src="../common/js/common.js"></script>
     <style>
-      @import url('./css/css2');
-
       body {
-        background: #667eea;
+        background: var(--hl-bg);
         overflow-x: hidden;
         padding: 20px;
       }
@@ -49,7 +48,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 255, 255, 0.05);
+        background: rgba(255, 255, 255, 0.05);
         pointer-events: none;
         z-index: 1;
         transition: all 0.3s ease;
@@ -95,7 +94,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        border: 2px solid rgba(102, 126, 234, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.2);
         border-radius: 12px;
         pointer-events: none;
       }
@@ -103,12 +102,12 @@
       .system-info-item {
         text-align: center;
         padding: 20px;
-        background: #ffffff;
+        background: var(--hl-surface);
         border-radius: 8px;
         transition: all 0.3s ease;
         position: relative;
         overflow: hidden;
-        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.08);
+        box-shadow: 0 2px 8px rgba(255, 255, 255, 0.08);
       }
 
       .system-info-item::before {
@@ -118,7 +117,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        border: 2px solid rgba(102, 126, 234, 0.15);
+        border: 2px solid rgba(255, 255, 255, 0.15);
         border-radius: 8px;
         pointer-events: none;
         transition: border-color 0.3s ease;
@@ -131,20 +130,19 @@
         left: 0;
         width: 100%;
         height: 3px;
-        background: #667eea;
+        background: var(--hl-accent);
         opacity: 0;
         transition: opacity 0.3s ease;
         border-radius: 8px 8px 0 0;
       }
 
       .system-info-item:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(102, 126, 234, 0.25);
-        background: #ffffff;
+        box-shadow: 0 6px 16px rgba(255, 255, 255, 0.25);
+        background: var(--hl-surface);
       }
 
       .system-info-item:hover::before {
-        border-color: #667eea;
+        border-color: var(--hl-accent);
       }
 
       .system-info-item:hover::after {
@@ -153,7 +151,7 @@
 
       .system-info-label {
         font-size: 0.9rem;
-        color: #6c757d;
+        color: var(--hl-fg-muted);
         margin-bottom: 8px;
         text-transform: uppercase;
         letter-spacing: 1px;
@@ -162,7 +160,7 @@
 
       .system-info-value {
         font-size: 1.8rem;
-        color: #2c3e50;
+        color: var(--hl-fg);
         font-weight: 700;
       }
 
@@ -174,14 +172,14 @@
       }
 
       .metric-card {
-        background: #ffffff;
-        border: 2px solid rgba(118, 75, 162, 0.15);
+        background: var(--hl-surface);
+        border: 2px solid rgba(0, 0, 0, 0.15);
         border-radius: 12px;
         padding: 20px;
         position: relative;
         overflow: hidden;
         transition: all 0.3s ease;
-        box-shadow: 0 3px 12px rgba(118, 75, 162, 0.1);
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -189,15 +187,14 @@
       }
 
       .metric-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(118, 75, 162, 0.25);
-        border-color: #764ba2;
-        background: #ffffff;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+        border-color: var(--hl-accent);
+        background: var(--hl-surface);
       }
 
       .metric-title {
         font-size: 0.9rem;
-        color: #6c757d;
+        color: var(--hl-fg-muted);
         margin-bottom: 0;
         display: flex;
         align-items: center;
@@ -215,13 +212,13 @@
         font-size: 2.2rem;
         font-weight: 700;
         margin-bottom: 0;
-        color: #2c3e50;
+        color: var(--hl-fg);
         line-height: 1.2;
       }
 
       .metric-unit {
         font-size: 1.2rem;
-        color: #888;
+        color: var(--hl-gray-500);
         margin-left: 8px;
       }
 
@@ -237,7 +234,7 @@
 
       .progress-bar {
         height: 100%;
-        background: #667eea;
+        background: var(--hl-accent);
         border-radius: inherit;
         transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         position: relative;
@@ -256,16 +253,6 @@
         animation: progressShimmer 2s infinite;
       }
 
-      @keyframes progressShimmer {
-        0% {
-          transform: translateX(-100%);
-        }
-
-        100% {
-          transform: translateX(100%);
-        }
-      }
-
       .charts-section {
         margin-bottom: 40px;
       }
@@ -277,14 +264,14 @@
       }
 
       .chart-card {
-        background: #ffffff;
+        background: var(--hl-surface);
         border-radius: 12px;
         padding: 24px;
         position: relative;
         overflow: hidden;
         height: 400px;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 16px rgba(102, 126, 234, 0.12);
+        box-shadow: 0 4px 16px rgba(255, 255, 255, 0.12);
       }
 
       .chart-card::before {
@@ -294,7 +281,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        border: 2px solid rgba(102, 126, 234, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.2);
         border-radius: 12px;
         pointer-events: none;
         transition: border-color 0.3s ease;
@@ -307,7 +294,7 @@
         left: 0;
         right: 0;
         height: 4px;
-        background: #667eea;
+        background: var(--hl-accent);
         border-radius: 12px 12px 0 0;
       }
 
@@ -322,18 +309,17 @@
       }
 
       .chart-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 28px rgba(102, 126, 234, 0.25);
-        background: #ffffff;
+        box-shadow: 0 8px 28px rgba(255, 255, 255, 0.25);
+        background: var(--hl-surface);
       }
 
       .chart-card:hover::before {
-        border-color: #667eea;
+        border-color: var(--hl-accent);
       }
 
       .chart-title {
         font-size: 1.2rem;
-        color: #2c3e50;
+        color: var(--hl-fg);
         margin-bottom: 20px;
         text-align: center;
         font-weight: 600;
@@ -351,22 +337,22 @@
         right: 20px;
         padding: 12px 20px;
         border-radius: 8px;
-        background: white;
-        border: 1px solid #28a745;
-        color: #28a745;
+        background: var(--hl-surface);
+        border: 1px solid var(--hl-success);
+        color: var(--hl-success);
         font-size: 0.9rem;
         display: flex;
         align-items: center;
         gap: 8px;
         z-index: 1000;
         font-weight: 600;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: var(--hl-shadow-md, 0 2px 8px rgba(0, 0, 0, 0.1));
       }
 
       .connection-status.disconnected {
-        background: white;
-        border-color: #dc3545;
-        color: #dc3545;
+        background: var(--hl-surface);
+        border-color: var(--hl-error-bg);
+        color: var(--hl-error-bg);
       }
 
       .status-indicator {
@@ -374,7 +360,7 @@
         width: 10px;
         height: 10px;
         border-radius: 50%;
-        background: #28a745;
+        background: var(--hl-success);
         animation: statusPulse 2s infinite;
       }
 
@@ -382,12 +368,10 @@
         0%,
         100% {
           opacity: 1;
-          transform: scale(1);
         }
 
         50% {
           opacity: 0.6;
-          transform: scale(1.1);
         }
       }
 
@@ -676,8 +660,6 @@
             networkTx: [],
             timestamps: [],
           };
-
-          this.charts = {};
           this.isHistoryLoaded = false;
           this.networkToggleTimer = null;
           this.showingUpload = false;
@@ -839,7 +821,7 @@
               legend: {
                 display: true,
                 labels: {
-                  color: '#2c3e50',
+                  color: '#000000',
                   font: {
                     size: 13,
                     family:
@@ -853,10 +835,10 @@
               x: {
                 display: true,
                 grid: {
-                  color: 'rgba(102, 126, 234, 0.1)',
+                  color: 'rgba(0, 0, 0, 0.1)',
                 },
                 ticks: {
-                  color: '#6c757d',
+                  color: '#000000',
                   maxTicksLimit: 10,
                   font: {
                     family:
@@ -868,10 +850,10 @@
               y: {
                 display: true,
                 grid: {
-                  color: 'rgba(102, 126, 234, 0.1)',
+                  color: 'rgba(0, 0, 0, 0.1)',
                 },
                 ticks: {
-                  color: '#6c757d',
+                  color: '#000000',
                   font: {
                     family:
                       '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif',
@@ -902,8 +884,8 @@
                 {
                   label: 'CPU Usage (%)',
                   data: [],
-                  borderColor: '#667eea',
-                  backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                  borderColor: '#000000',
+                  backgroundColor: 'rgba(0, 0, 0, 0.08)',
                   fill: true,
                   borderWidth: 2,
                 },
@@ -932,8 +914,8 @@
                   {
                     label: 'Memory Usage (%)',
                     data: [],
-                    borderColor: '#764ba2',
-                    backgroundColor: 'rgba(118, 75, 162, 0.1)',
+                    borderColor: '#000000',
+                    backgroundColor: 'rgba(0, 0, 0, 0.05)',
                     fill: true,
                     borderWidth: 2,
                   },
@@ -961,8 +943,8 @@
                 {
                   label: 'Disk Usage (%)',
                   data: [],
-                  borderColor: '#f59e0b',
-                  backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                  borderColor: '#000000',
+                  backgroundColor: 'rgba(0, 0, 0, 0.04)',
                   fill: true,
                   borderWidth: 2,
                 },
@@ -991,16 +973,16 @@
                   {
                     label: 'Download (MB)',
                     data: [],
-                    borderColor: '#10b981',
-                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderColor: '#ffffff',
+                    backgroundColor: 'rgba(0, 0, 0, 0.03)',
                     fill: false,
                     borderWidth: 2,
                   },
                   {
                     label: 'Upload (MB)',
                     data: [],
-                    borderColor: '#ef4444',
-                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    borderColor: '#ffffff',
+                    backgroundColor: 'rgba(0, 0, 0, 0.02)',
                     fill: false,
                     borderWidth: 2,
                   },

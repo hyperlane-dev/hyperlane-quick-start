@@ -2,6 +2,7 @@
 
 <html lang="en">
   <head>
+    <script src="../common/js/theme-init.js"></script>
     <meta charset="UTF-8" />
     <meta content="IE=edge" http-equiv="X-UA-Compatible" />
     <meta
@@ -24,8 +25,8 @@
       .btn-upload {
         padding: 8px 16px;
         height: 40px;
-        background: #007bff;
-        color: white;
+        background: var(--hl-accent);
+        color: var(--hl-accent-fg);
         border: none;
         border-radius: 50%;
         cursor: pointer;
@@ -36,7 +37,7 @@
         align-items: center;
         justify-content: center;
         font-size: 0.9375rem;
-        box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         position: relative;
         overflow: hidden;
         width: 40px;
@@ -44,7 +45,7 @@
       }
 
       .btn-upload.disabled {
-        background: #6c757d;
+        background: var(--hl-fg-muted);
         cursor: not-allowed;
         opacity: 0.6;
         box-shadow: none;
@@ -74,9 +75,8 @@
       }
 
       .btn-upload:hover:not(:disabled) {
-        background: #218838;
-        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
-        transform: translateY(-1px);
+        background: var(--hl-success);
+        box-shadow: 0 4px 12px rgba(255, 255, 255, 0.4);
       }
 
       .btn-upload:hover:not(:disabled)::before {
@@ -84,9 +84,8 @@
       }
 
       .btn-upload:active:not(:disabled) {
-        background: #004085;
-        transform: translateY(0);
-        box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
+        background: var(--hl-accent);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
       }
 
       .file-input {
@@ -129,20 +128,20 @@
         flex-direction: column;
         height: 100%;
         width: 100%;
-        background: #667eea;
-        color: #2c3e50;
+        background: var(--hl-bg);
+        color: var(--hl-fg);
       }
 
       .nav-bar {
         height: 48px;
-        background-color: #ffffff;
+        background-color: var(--hl-surface);
         display: flex;
         align-items: center;
         justify-content: space-between;
         padding: 0 20px;
         box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
         flex-shrink: 0;
-        border-bottom: 1px solid #e9ecef;
+        border-bottom: 1px solid var(--hl-gray-150);
       }
 
       .nav-left {
@@ -166,7 +165,7 @@
       }
 
       .nav-title a {
-        color: #2c3e50;
+        color: var(--hl-fg);
         text-decoration: none;
         position: relative;
         display: inline-block;
@@ -179,7 +178,7 @@
         bottom: -2px;
         width: 0;
         height: 2px;
-        background: #667eea;
+        background: var(--hl-accent);
         transition: width 0.4s ease;
       }
 
@@ -212,27 +211,27 @@
       }
 
       .connection-indicator.connected {
-        color: #28a745;
+        color: var(--hl-success);
       }
 
       .connection-indicator.connected .status-dot {
-        background-color: #28a745;
+        background-color: var(--hl-success);
       }
 
       .connection-indicator.disconnected {
-        color: #dc3545;
+        color: var(--hl-error-bg);
       }
 
       .connection-indicator.disconnected .status-dot {
-        background-color: #dc3545;
+        background-color: var(--hl-error-bg);
       }
 
       .connection-indicator.connecting {
-        color: #ffc107;
+        color: var(--hl-warning);
       }
 
       .connection-indicator.connecting .status-dot {
-        background-color: #ffc107;
+        background-color: var(--hl-warning);
         animation: pulse 2s infinite;
       }
 
@@ -289,12 +288,10 @@
       @keyframes fadeIn {
         0% {
           opacity: 0;
-          transform: translateY(10px);
         }
 
         100% {
           opacity: 1;
-          transform: translateY(0);
         }
       }
 
@@ -315,7 +312,7 @@
         justify-content: center;
         font-weight: 700;
         font-size: 1rem;
-        color: white;
+        color: var(--hl-accent-fg);
         margin: 0 8px;
         flex-shrink: 0;
         box-shadow:
@@ -329,7 +326,6 @@
       }
 
       .message-avatar:hover {
-        transform: scale(1.1);
         box-shadow:
           0 4px 12px rgba(0, 0, 0, 0.25),
           0 0 0 1.5px rgba(255, 255, 255, 0.9);
@@ -367,7 +363,7 @@
       .message-name {
         font-weight: 600;
         font-size: 0.875rem;
-        color: #f5f7fb;
+        color: var(--hl-fg);
         cursor: pointer;
         max-width: 200px;
         white-space: nowrap;
@@ -379,27 +375,27 @@
         padding: 10px 14px;
         border-radius: 12px;
         word-break: break-word;
-        background: #f8f9fa;
-        color: #2c3e50;
+        background: var(--hl-bg-subtle);
+        color: var(--hl-fg);
         font-size: 0.9375rem;
         line-height: 1.4;
-        border: 1px solid #dee2e6;
+        border: 1px solid var(--hl-border-strong);
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       }
 
       .message-content.self {
-        background: #e3f2fd;
-        border: 1px solid #bbdefb;
+        background: var(--hl-info-bg);
+        border: 1px solid var(--hl-accent);
       }
 
       .message-content.gpt-response {
-        background: #f0f8ff;
-        border-left: 4px solid #007bff;
-        border: 1px solid #cce7ff;
+        background: var(--hl-bg-muted);
+        border-left: 4px solid var(--hl-accent);
+        border: 1px solid var(--hl-border);
       }
 
       .message-time {
-        color: #f5f7fb;
+        color: var(--hl-fg-subtle);
         font-size: 0.75rem;
         margin-top: 4px;
       }
@@ -413,8 +409,8 @@
         flex-wrap: wrap;
         padding: 0 12px;
         margin: 0 12px 12px;
-        background-color: #ffffff;
-        border: 1px solid #dee2e6;
+        background-color: var(--hl-surface);
+        border: 1px solid var(--hl-border);
         border-radius: 8px;
         position: sticky;
         bottom: 0;
@@ -436,13 +432,13 @@
         flex: 1;
         min-width: 200px;
         padding: 8px 10px;
-        border: none;
+        border: 1px solid var(--hl-border);
         border-radius: 4px;
         outline: none;
         margin: 8px 0;
         font-size: 0.9375rem;
         background-color: transparent;
-        color: #2c3e50;
+        color: var(--hl-fg);
         line-height: 1.4;
         resize: none;
         overflow: hidden;
@@ -459,6 +455,11 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+      }
+
+      .chat-input textarea:focus {
+        border-color: var(--hl-accent);
+        box-shadow: 0 0 0 3px var(--hl-focus-ring, rgba(0, 0, 0, 0.18));
       }
 
       @media (max-width: 768px) {
@@ -480,7 +481,7 @@
       }
 
       .chat-input textarea::placeholder {
-        color: #6c757d;
+        color: var(--hl-fg-subtle);
       }
 
       .chat-input textarea:disabled {
@@ -491,8 +492,8 @@
       .chat-input button {
         padding: 8px 16px;
         height: 40px;
-        background: #007bff;
-        color: white;
+        background: var(--hl-accent);
+        color: var(--hl-accent-fg);
         border: none;
         border-radius: 8px;
         cursor: pointer;
@@ -503,7 +504,7 @@
         align-items: center;
         justify-content: center;
         font-size: 0.9375rem;
-        box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         position: relative;
         overflow: hidden;
       }
@@ -524,9 +525,8 @@
       }
 
       .chat-input button:hover:not(:disabled) {
-        background: #0056b3;
-        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
-        transform: translateY(-1px);
+        background: var(--hl-accent);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
       }
 
       .chat-input button:hover:not(:disabled)::before {
@@ -534,13 +534,12 @@
       }
 
       .chat-input button:active:not(:disabled) {
-        background: #004085;
-        transform: translateY(0);
-        box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
+        background: var(--hl-accent);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
       }
 
       .chat-input button:disabled {
-        background: #6c757d;
+        background: var(--hl-fg-muted);
         cursor: not-allowed;
         opacity: 0.6;
         box-shadow: none;
@@ -559,18 +558,14 @@
         margin-top: -4px;
       }
 
-      .chat-input button:hover:not(:disabled) .send-icon {
-        transform: translateX(2px);
-      }
-
       .scroll-to-bottom {
         position: absolute;
         bottom: 80px;
         right: 20px;
         width: 48px;
         height: 48px;
-        background: #007bff;
-        color: white;
+        background: var(--hl-accent);
+        color: var(--hl-accent-fg);
         border: none;
         border-radius: 50%;
         cursor: pointer;
@@ -582,15 +577,15 @@
       }
 
       .scroll-to-bottom:hover {
-        background: #0056b3;
+        background: var(--hl-accent);
       }
 
       .unread-badge {
         position: absolute;
         top: -8px;
         right: -8px;
-        background: #dc3545;
-        color: white;
+        background: var(--hl-error-bg);
+        color: var(--hl-accent-fg);
         border-radius: 50%;
         width: 20px;
         height: 20px;
@@ -607,7 +602,7 @@
         left: 50%;
         transform: translate(-50%, -50%);
         background: rgba(0, 0, 0, 0.8);
-        color: white;
+        color: var(--hl-accent-fg);
         padding: 16px 24px;
         border-radius: 8px;
         text-align: center;
@@ -621,7 +616,7 @@
         z-index: 9999;
         min-width: 300px;
         max-width: 500px;
-        background: #ffffff;
+        background: var(--hl-surface);
         border-radius: 8px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
         border-left: 4px solid;
@@ -632,15 +627,15 @@
       }
 
       .upload-status.success {
-        border-left-color: #2f855a;
-        background-color: #f0fff4;
-        color: #2f855a;
+        border-left-color: var(--hl-success);
+        background-color: var(--hl-success-bg);
+        color: var(--hl-success);
       }
 
       .upload-status.error {
-        border-left-color: #c53030;
-        background-color: #fff5f5;
-        color: #c53030;
+        border-left-color: var(--hl-error);
+        background-color: var(--hl-error);
+        color: var(--hl-error);
       }
 
       .upload-status-content {
@@ -654,19 +649,17 @@
         flex: 1;
         font-size: 14px;
         line-height: 1.4;
-        color: #2c3e50;
+        color: var(--hl-fg);
         font-weight: 500;
       }
 
       @keyframes slideIn {
         from {
           opacity: 0;
-          transform: translateY(-10px);
         }
 
         to {
           opacity: 1;
-          transform: translateY(0);
         }
       }
 
@@ -685,7 +678,7 @@
         z-index: 9999;
         min-width: 300px;
         max-width: 500px;
-        background: #ffffff;
+        background: var(--hl-surface);
         border-radius: 8px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
         border-left: 4px solid;
@@ -695,7 +688,7 @@
       }
 
       .toast-warning {
-        border-left-color: #ffc107;
+        border-left-color: var(--hl-warning);
       }
 
       .toast-content {
@@ -709,7 +702,7 @@
         flex: 1;
         font-size: 14px;
         line-height: 1.4;
-        color: #2c3e50;
+        color: var(--hl-fg);
         font-weight: 500;
       }
 
@@ -739,8 +732,8 @@
       }
 
       .message-text pre {
-        background-color: #f6f8fa;
-        border: 1px solid #e1e4e8;
+        background-color: var(--hl-bg-subtle);
+        border: 1px solid var(--hl-border-strong);
         border-radius: 6px;
         padding: 16px;
         margin: 12px 0;
@@ -757,7 +750,7 @@
       }
 
       .message-text a {
-        color: #007bff;
+        color: var(--hl-accent);
         text-decoration: none;
         font-weight: 500;
         position: relative;
@@ -767,12 +760,12 @@
       }
 
       .message-text a:hover {
-        color: #0056b3;
-        border-bottom-color: #0056b3;
+        color: var(--hl-accent);
+        border-bottom-color: var(--hl-accent);
       }
 
       .message-text a:active {
-        color: #004085;
+        color: var(--hl-accent);
       }
 
       .message-text a::before {
@@ -783,37 +776,37 @@
       }
 
       .message-content.gpt-response a {
-        color: #0066cc;
+        color: var(--hl-accent);
         font-weight: 600;
       }
 
       .message-content.gpt-response a:hover {
-        color: #004999;
-        border-bottom-color: #004999;
+        color: var(--hl-accent);
+        border-bottom-color: var(--hl-accent);
       }
 
       .message-content.self a {
-        color: #1976d2;
+        color: var(--hl-accent);
       }
 
       .message-content.self a:hover {
-        color: #115293;
-        border-bottom-color: #115293;
+        color: var(--hl-accent);
+        border-bottom-color: var(--hl-accent);
       }
 
       .link-preview {
         margin-top: 12px;
         border-radius: 8px;
         overflow: hidden;
-        background: #f8f9fa;
-        border: 1px solid #dee2e6;
+        background: var(--hl-bg-subtle);
+        border: 1px solid var(--hl-border-strong);
         max-width: 100%;
       }
 
       .link-preview.loading {
         padding: 16px;
         text-align: center;
-        color: #6c757d;
+        color: var(--hl-fg-muted);
       }
 
       .link-preview-image {
@@ -821,7 +814,7 @@
         max-height: 400px;
         object-fit: contain;
         display: block;
-        background: #000;
+        background: var(--hl-gray-950);
         cursor: pointer;
         transition: opacity 0.3s ease;
       }
@@ -834,12 +827,12 @@
         width: 100%;
         max-height: 400px;
         display: block;
-        background: #000;
+        background: var(--hl-gray-950);
       }
 
       .link-preview-markdown {
         padding: 16px;
-        background: #ffffff;
+        background: var(--hl-surface);
         max-height: 500px;
         overflow-y: auto;
       }
@@ -862,7 +855,7 @@
         display: flex;
         align-items: center;
         gap: 12px;
-        background: #ffffff;
+        background: var(--hl-surface);
       }
 
       .link-preview-file-icon {
@@ -877,19 +870,19 @@
 
       .link-preview-name {
         font-weight: 600;
-        color: #2c3e50;
+        color: var(--hl-fg);
         word-break: break-all;
         margin-bottom: 4px;
       }
 
       .link-preview-file-meta {
         font-size: 0.875rem;
-        color: #6c757d;
+        color: var(--hl-fg-muted);
       }
 
       .link-preview-error {
         padding: 12px 16px;
-        color: #dc3545;
+        color: var(--hl-error-bg);
         font-size: 0.875rem;
         text-align: center;
       }
@@ -925,7 +918,7 @@
         background: rgba(255, 255, 255, 0.2);
         border: none;
         border-radius: 50%;
-        color: white;
+        color: var(--hl-accent-fg);
         font-size: 24px;
         cursor: pointer;
         display: flex;
@@ -941,7 +934,7 @@
       .link-preview-audio {
         width: 100%;
         padding: 12px;
-        background: #ffffff;
+        background: var(--hl-surface);
       }
 
       .link-preview-audio audio {
@@ -950,7 +943,7 @@
 
       .link-preview-pdf {
         padding: 12px 16px;
-        background: #ffffff;
+        background: var(--hl-surface);
         display: flex;
         align-items: center;
         gap: 12px;
@@ -959,7 +952,7 @@
       }
 
       .link-preview-pdf:hover {
-        background: #f8f9fa;
+        background: var(--hl-bg-subtle);
       }
 
       .link-preview-pdf-icon {
@@ -973,22 +966,22 @@
 
       .link-preview-pdf-title {
         font-weight: 600;
-        color: #2c3e50;
+        color: var(--hl-fg);
         margin-bottom: 4px;
       }
 
       .link-preview-pdf-action {
         font-size: 0.875rem;
-        color: #007bff;
+        color: var(--hl-accent);
       }
 
       .link-preview-spinner {
         display: inline-block;
         width: 20px;
         height: 20px;
-        border: 3px solid rgba(0, 123, 255, 0.3);
+        border: 3px solid rgba(0, 0, 0, 0.3);
         border-radius: 50%;
-        border-top-color: #007bff;
+        border-top-color: var(--hl-accent);
         animation: spin 1s ease-in-out infinite;
       }
 
@@ -1000,7 +993,7 @@
 
       .link-preview-image-wrapper {
         position: relative;
-        background: #000;
+        background: var(--hl-gray-950);
       }
 
       .link-preview-image-loading {
@@ -1015,7 +1008,7 @@
         top: 8px;
         right: 8px;
         background: rgba(0, 0, 0, 0.7);
-        color: white;
+        color: var(--hl-accent-fg);
         padding: 4px 8px;
         border-radius: 4px;
         font-size: 0.75rem;
@@ -1030,29 +1023,29 @@
       }
 
       .mention-other {
-        background-color: rgba(0, 123, 255, 0.15);
-        color: #0056b3;
-        border: 1px solid rgba(0, 123, 255, 0.3);
+        background-color: rgba(0, 0, 0, 0.15);
+        color: var(--hl-accent);
+        border: 1px solid rgba(0, 0, 0, 0.3);
       }
 
       .mention-self {
-        background-color: rgba(255, 193, 7, 0.2);
-        color: #e67e22;
-        border: 1px solid rgba(255, 193, 7, 0.4);
+        background-color: rgba(255, 255, 255, 0.2);
+        color: var(--hl-accent);
+        border: 1px solid rgba(255, 255, 255, 0.4);
         animation: mentionPulse 2s ease-in-out;
       }
 
       @keyframes mentionPulse {
         0% {
-          background-color: rgba(255, 193, 7, 0.3);
+          background-color: rgba(255, 255, 255, 0.3);
         }
 
         50% {
-          background-color: rgba(255, 193, 7, 0.1);
+          background-color: rgba(255, 255, 255, 0.1);
         }
 
         100% {
-          background-color: rgba(255, 193, 7, 0.2);
+          background-color: rgba(255, 255, 255, 0.2);
         }
       }
 
@@ -1062,8 +1055,8 @@
 
       .mention-dropdown {
         position: absolute;
-        background: #ffffff;
-        border: 1px solid #dee2e6;
+        background: var(--hl-surface);
+        border: 1px solid var(--hl-border-strong);
         border-radius: 8px;
         box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.15);
         z-index: 1000;
@@ -1078,12 +1071,12 @@
 
       .mention-header {
         padding: 8px 12px;
-        background: #f8f9fa;
-        color: #6c757d;
+        background: var(--hl-bg-subtle);
+        color: var(--hl-fg-muted);
         font-size: 0.75rem;
         font-weight: 600;
         text-transform: uppercase;
-        border-bottom: 1px solid #dee2e6;
+        border-bottom: 1px solid var(--hl-gray-200);
       }
 
       .mention-list {
@@ -1102,15 +1095,15 @@
 
       .mention-item:hover,
       .mention-item.active {
-        background: #007bff;
+        background: var(--hl-accent);
       }
 
       .user-avatar {
         width: 36px;
         height: 36px;
         border-radius: 50%;
-        background: #5b21b6;
-        color: white;
+        background: var(--hl-accent);
+        color: var(--hl-accent-fg);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -1118,7 +1111,7 @@
         font-weight: 700;
         margin-right: 12px;
         flex-shrink: 0;
-        box-shadow: 0 2px 10px rgba(91, 33, 182, 0.4);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
         border: 1px solid rgba(255, 255, 255, 0.5);
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         line-height: 1;
@@ -1127,8 +1120,7 @@
       }
 
       .mention-item:hover .user-avatar {
-        transform: scale(1.05);
-        box-shadow: 0 3px 12px rgba(91, 33, 182, 0.5);
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.5);
       }
 
       .user-info {
@@ -1137,7 +1129,7 @@
       }
 
       .user-name {
-        color: #2c3e50;
+        color: var(--hl-fg);
         font-size: 0.875rem;
         font-weight: 500;
         white-space: nowrap;
@@ -1146,44 +1138,44 @@
       }
 
       .mention-item.active .user-name {
-        color: white;
+        color: var(--hl-accent-fg);
       }
 
       .mention-item.gpt-user {
-        background: rgba(0, 123, 255, 0.05);
-        border-left: 3px solid #007bff;
+        background: rgba(0, 0, 0, 0.05);
+        border-left: 3px solid var(--hl-accent);
       }
 
       .mention-item.gpt-user.active {
-        background: #007bff;
+        background: var(--hl-accent);
       }
 
       .user-avatar.gpt-avatar {
-        background: #5b21b6;
+        background: var(--hl-accent);
         font-size: 1.125rem;
-        box-shadow: 0 3px 12px rgba(91, 33, 182, 0.5);
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.5);
         border: 1px solid rgba(255, 255, 255, 0.6);
       }
 
       .user-avatar.other-user-avatar {
-        background: #5b21b6;
-        box-shadow: 0 2px 10px rgba(91, 33, 182, 0.4);
+        background: var(--hl-accent);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
         border: 1px solid rgba(255, 255, 255, 0.5);
       }
 
       .user-name.gpt-name {
-        color: #007bff;
+        color: var(--hl-accent);
         font-weight: 600;
       }
 
       .mention-item.gpt-user.active .user-name.gpt-name {
-        color: white;
+        color: var(--hl-accent-fg);
       }
 
       .no-users {
         padding: 16px 12px;
         text-align: center;
-        color: #6c757d;
+        color: var(--hl-fg-muted);
         font-size: 0.875rem;
       }
 
@@ -1199,14 +1191,14 @@
       .loading-spinner {
         width: 20px;
         height: 20px;
-        border: 2px solid #e9ecef;
-        border-top: 2px solid #007bff;
+        border: 2px solid var(--hl-gray-150);
+        border-top: 2px solid var(--hl-accent);
         border-radius: 50%;
         animation: spin 1s linear infinite;
       }
 
       .loading-text {
-        color: #6c757d;
+        color: var(--hl-fg-muted);
         font-size: 0.875rem;
         font-weight: 500;
       }
@@ -1230,12 +1222,12 @@
       }
 
       .mention-list::-webkit-scrollbar-thumb {
-        background: #dee2e6;
+        background: var(--hl-gray-200);
         border-radius: 2px;
       }
 
       .mention-list::-webkit-scrollbar-thumb:hover {
-        background: #adb5bd;
+        background: var(--hl-fg-subtle);
       }
 
       @media (max-width: 768px) {
@@ -1656,16 +1648,16 @@
 
       function getAvatarColor(name) {
         const colors = [
-          '#E53935',
-          '#00ACC1',
-          '#1E88E5',
-          '#43A047',
-          '#FB8C00',
-          '#8E24AA',
-          '#039BE5',
-          '#FDD835',
-          '#D81B60',
-          '#3949AB',
+          '#000000',
+          '#000000',
+          '#000000',
+          '#000000',
+          '#000000',
+          '#000000',
+          '#ffffff',
+          '#ffffff',
+          '#000000',
+          '#000000',
         ];
         let hash = 0;
         for (let i = 0; i < name.length; i++) {
@@ -1676,16 +1668,16 @@
 
       function getAvatarGradient(name) {
         const colors = [
-          '#E53935',
-          '#00ACC1',
-          '#1E88E5',
-          '#43A047',
-          '#FB8C00',
-          '#8E24AA',
-          '#039BE5',
-          '#FDD835',
-          '#D81B60',
-          '#3949AB',
+          '#000000',
+          '#000000',
+          '#000000',
+          '#000000',
+          '#000000',
+          '#000000',
+          '#ffffff',
+          '#ffffff',
+          '#000000',
+          '#000000',
         ];
         let hash = 0;
         for (let i = 0; i < name.length; i++) {
@@ -1710,10 +1702,10 @@
           const toastEl = document.createElement('div');
           toastEl.className = `toast toast-${type}`;
           toastEl.innerHTML = `
-                    <div class="toast-content">
-                        <span class="toast-message">${message}</span>
-                    </div>
-                `;
+                          <div class="toast-content">
+                              <span class="toast-message">${message}</span>
+                          </div>
+                      `;
 
           container.appendChild(toastEl);
 
@@ -1990,7 +1982,7 @@
           };
           img.onerror = () => {
             spinner.innerHTML =
-              '<div style="color: #dc3545;">Failed to load image</div>';
+              '<div style="color: var(--hl-error-bg);">Failed to load image</div>';
           };
 
           wrapper.appendChild(img);
@@ -2262,45 +2254,45 @@
         const localTime = formatLocalTime(message.time);
 
         if (isGptResponse) {
-          const avatarColor = '#8E24AA';
+          const avatarColor = '#000000';
           const avatarText = getAvatarText('gpt');
           avatarHtml = `<div class="message-avatar" style="background: ${avatarColor};">${avatarText}</div>`;
 
           messageEl.innerHTML = `
-                    ${avatarHtml}
-                    <div class="${messageInfoClass}">
-                        <div class="message-header">
-                            <span class="message-name" onclick="handleMentionUser('gpt')">GPT</span>
-                        </div>
-                        <div class="message-content gpt-response">
-                            <div class="message-text">${formatMessageText(
-                              message.data,
-                            )}</div>
-                        </div>
-                        <div class="message-time">${localTime}</div>
-                    </div>
-                `;
+                          ${avatarHtml}
+                          <div class="${messageInfoClass}">
+                              <div class="message-header">
+                                  <span class="message-name" onclick="handleMentionUser('gpt')">GPT</span>
+                              </div>
+                              <div class="message-content gpt-response">
+                                  <div class="message-text">${formatMessageText(
+                                    message.data,
+                                  )}</div>
+                              </div>
+                              <div class="message-time">${localTime}</div>
+                          </div>
+                      `;
         } else if (!isSelf) {
           const avatarColor = getAvatarColor(message.name);
           const avatarText = getAvatarText(message.name);
           avatarHtml = `<div class="message-avatar" style="background: ${avatarColor};">${avatarText}</div>`;
 
           messageEl.innerHTML = `
-                    ${avatarHtml}
-                    <div class="${messageInfoClass}">
-                        <div class="message-header">
-                            <span class="message-name" onclick="handleMentionUser('${
-                              message.name
-                            }')">${message.name}</span>
-                        </div>
-                        <div class="message-content">
-                            <div class="message-text">${formatMessageText(
-                              message.data,
-                            )}</div>
-                        </div>
-                        <div class="message-time">${localTime}</div>
-                    </div>
-                `;
+                          ${avatarHtml}
+                          <div class="${messageInfoClass}">
+                              <div class="message-header">
+                                  <span class="message-name" onclick="handleMentionUser('${
+                                    message.name
+                                  }')">${message.name}</span>
+                              </div>
+                              <div class="message-content">
+                                  <div class="message-text">${formatMessageText(
+                                    message.data,
+                                  )}</div>
+                              </div>
+                              <div class="message-time">${localTime}</div>
+                          </div>
+                      `;
         } else {
           messageInfoClass += ' self';
           const avatarColor = getAvatarColor(message.name);
@@ -2308,21 +2300,21 @@
           avatarHtml = `<div class="message-avatar" style="background: ${avatarColor};">${avatarText}</div>`;
 
           messageEl.innerHTML = `
-                    <div class="${messageInfoClass}">
-                        <div class="message-header">
-                            <span class="message-name" onclick="handleMentionUser('${
-                              message.name
-                            }')">${message.name}</span>
-                        </div>
-                        <div class="message-content self">
-                            <div class="message-text">${formatMessageText(
-                              message.data,
-                            )}</div>
-                        </div>
-                        <div class="message-time">${localTime}</div>
-                    </div>
-                    ${avatarHtml}
-                `;
+                          <div class="${messageInfoClass}">
+                              <div class="message-header">
+                                  <span class="message-name" onclick="handleMentionUser('${
+                                    message.name
+                                  }')">${message.name}</span>
+                              </div>
+                              <div class="message-content self">
+                                  <div class="message-text">${formatMessageText(
+                                    message.data,
+                                  )}</div>
+                              </div>
+                              <div class="message-time">${localTime}</div>
+                          </div>
+                          ${avatarHtml}
+                      `;
         }
 
         return messageEl;
@@ -2756,11 +2748,11 @@
 
         if (loadingUsers) {
           mentionList.innerHTML = `
-      <div class="loading-container">
-        <div class="loading-spinner"></div>
-        <div class="loading-text">Loading users...</div>
-      </div>
-    `;
+            <div class="loading-container">
+              <div class="loading-spinner"></div>
+              <div class="loading-text">Loading users...</div>
+            </div>
+          `;
           return;
         }
 
@@ -2773,8 +2765,8 @@
 
         if (filteredUsers.length === 0) {
           mentionList.innerHTML = `
-            <div class="no-users">No matching users found</div>
-          `;
+                  <div class="no-users">No matching users found</div>
+                `;
           return;
         }
 
@@ -2803,11 +2795,11 @@
           item.dataset.index = index;
           item.dataset.username = user.username;
           item.innerHTML = `
-            <div class="${avatarClass}">${avatarText}</div>
-            <div class="user-info">
-              <div class="${nameClass}">${user.username}</div>
-            </div>
-          `;
+                  <div class="${avatarClass}">${avatarText}</div>
+                  <div class="user-info">
+                    <div class="${nameClass}">${user.username}</div>
+                  </div>
+                `;
 
           item.addEventListener(
             'mousedown',
@@ -3021,10 +3013,10 @@
         const statusEl = document.createElement('div');
         statusEl.className = `upload-status upload-status-${type}`;
         statusEl.innerHTML = `
-          <div class="upload-status-content">
-            <span class="upload-status-message">${message}</span>
-          </div>
-        `;
+                <div class="upload-status-content">
+                  <span class="upload-status-message">${message}</span>
+                </div>
+              `;
         container.appendChild(statusEl);
         setTimeout(() => {
           if (statusEl.parentNode) {

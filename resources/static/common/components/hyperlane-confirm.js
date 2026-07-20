@@ -68,26 +68,27 @@ class HyperlaneConfirm extends HTMLElement {
           left: 0;
           width: 100%;
           height: 100%;
-          background: rgba(0, 0, 0, 0.6);
+          background: var(--hl-overlay, rgba(0, 0, 0, 0.6));
           z-index: 10001;
           justify-content: center;
           align-items: center;
         }
         .confirm-box {
-          background: #ffffff;
-          border-radius: 12px;
+          background: var(--hl-surface);
+          border: 1px solid var(--hl-border);
+          border-radius: var(--hl-radius-md);
           padding: 28px 32px;
           max-width: 400px;
           width: 90%;
-          box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
+          box-shadow: var(--hl-shadow-lg, 0 8px 40px rgba(0, 0, 0, 0.2));
           animation: scaleIn 0.2s ease;
         }
         @keyframes scaleIn {
-          from { opacity: 0; transform: scale(0.9); }
-          to { opacity: 1; transform: scale(1); }
+          from { opacity: 0; }
+          to { opacity: 1; }
         }
         .confirm-message {
-          color: #2c3e50;
+          color: var(--hl-fg);
           font-size: 1rem;
           line-height: 1.5;
           margin-bottom: 24px;
@@ -101,27 +102,27 @@ class HyperlaneConfirm extends HTMLElement {
         .btn {
           padding: 10px 24px;
           border: none;
-          border-radius: 8px;
+          border-radius: var(--hl-radius-sm);
           font-size: 0.95rem;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.25s ease;
         }
         .btn-cancel {
-          background: #f1f3f5;
-          color: #495057;
-          border: 1px solid #dee2e6;
+          background: var(--hl-bg-muted);
+          color: var(--hl-fg-muted);
+          border: 1px solid var(--hl-border);
         }
         .btn-cancel:hover {
-          background: #e9ecef;
+          background: var(--hl-surface-hover);
         }
         .btn-confirm {
-          background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-          color: white;
-          box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+          background: var(--hl-gray-900);
+          color: var(--hl-accent-fg);
+          box-shadow: var(--hl-shadow-md, 0 2px 8px rgba(0, 0, 0, 0.1));
         }
         .btn-confirm:hover {
-          box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+          background: var(--hl-accent-hover);
         }
       </style>
       <div class="confirm-box">

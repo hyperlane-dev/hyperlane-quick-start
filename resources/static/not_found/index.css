@@ -1,5 +1,5 @@
 body {
-  background: #667eea;
+  background: var(--hl-bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -14,14 +14,14 @@ body {
 .error-code {
   font-size: 8rem;
   font-weight: 900;
-  color: white;
-  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  color: var(--hl-fg);
+  text-shadow: var(--hl-shadow-lg, 0 4px 20px rgba(0, 0, 0, 0.3));
   margin-bottom: 20px;
   animation: bounce 2s ease-in-out infinite;
 }
 
 .error-message {
-  background: white;
+  background: var(--hl-surface);
   border-radius: 12px;
   padding: 40px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
@@ -29,11 +29,13 @@ body {
   margin: 0 auto;
 }
 
-h1 {
-  font-size: 2rem;
-  color: #2c3e50;
+h1.app-title {
+  font-size: 1.75rem;
+  color: var(--hl-fg);
   margin-bottom: 16px;
   font-weight: 700;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 h1 a {
@@ -44,7 +46,7 @@ h1 a {
 }
 
 h1 a .text {
-  color: #667eea;
+  color: var(--hl-accent);
 }
 
 h1 a::after {
@@ -54,7 +56,7 @@ h1 a::after {
   bottom: -2px;
   width: 0;
   height: 2px;
-  background: #667eea;
+  background: var(--hl-accent);
   transition: width 0.4s ease;
 }
 
@@ -73,7 +75,7 @@ h1 a:hover::after {
 }
 
 p {
-  color: #6c757d;
+  color: var(--hl-fg-muted);
   font-size: 1.1rem;
   margin-bottom: 24px;
   line-height: 1.6;
@@ -81,13 +83,13 @@ p {
 
 .server-info {
   padding: 16px;
-  background: rgba(102, 126, 234, 0.1);
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   margin-bottom: 24px;
 }
 
 .server-info a {
-  color: #667eea;
+  color: var(--hl-accent);
   text-decoration: none;
   font-weight: 600;
   position: relative;
@@ -95,7 +97,7 @@ p {
 }
 
 .server-info a .text {
-  color: #667eea;
+  color: var(--hl-accent);
 }
 
 .server-info a::after {
@@ -105,7 +107,7 @@ p {
   bottom: -2px;
   width: 0;
   height: 2px;
-  background: #667eea;
+  background: var(--hl-accent);
   transition: width 0.4s ease;
 }
 
@@ -116,8 +118,9 @@ p {
 .btn-home {
   display: inline-block;
   padding: 12px 32px;
-  background: #667eea;
-  color: white;
+  background: var(--hl-accent);
+  color: var(--hl-accent-fg);
+  border: 1px solid var(--hl-accent);
   text-decoration: none;
   transition:
     color 0.3s,
@@ -127,23 +130,10 @@ p {
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(30px);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes bounce {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-20px);
   }
 }
 

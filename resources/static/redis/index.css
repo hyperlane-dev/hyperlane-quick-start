@@ -1,5 +1,5 @@
 body {
-  background: #667eea;
+  background: var(--hl-bg);
   padding: 20px;
 }
 
@@ -15,7 +15,7 @@ body {
 }
 
 .card {
-  background: white;
+  background: var(--hl-surface);
   border-radius: 12px;
   padding: 24px;
   margin-bottom: 20px;
@@ -25,7 +25,7 @@ body {
 
 .card h2 {
   font-size: 1.5rem;
-  color: #2c3e50;
+  color: var(--hl-fg);
   margin-bottom: 20px;
   font-weight: 600;
 }
@@ -37,7 +37,7 @@ body {
 .form-group input {
   width: 100%;
   padding: 12px 16px;
-  border: 2px solid #e9ecef;
+  border: 2px solid var(--hl-gray-150);
   border-radius: 8px;
   font-size: 16px;
   transition: all 0.3s ease;
@@ -45,8 +45,8 @@ body {
 
 .form-group input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: var(--hl-accent);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
 }
 
 .form-row {
@@ -82,46 +82,44 @@ body {
 }
 
 .btn-primary {
-  background: #667eea;
-  color: white;
+  background: var(--hl-accent);
+  color: var(--hl-accent-fg);
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.4);
 }
 
 .btn-warning {
-  background: #ffc107;
-  color: #000;
+  background: var(--hl-warning-bg);
+  color: var(--hl-warning);
+  border: 1px solid var(--hl-border-strong);
 }
 
 .btn-warning:hover {
-  background: #e0a800;
-  transform: translateY(-2px);
+  background: var(--hl-surface-hover);
 }
 
 .btn-danger {
-  background: #dc3545;
-  color: white;
+  background: var(--hl-error-bg);
+  color: var(--hl-accent-fg);
 }
 
 .btn-danger:hover {
-  background: #c82333;
-  transform: translateY(-2px);
+  background: var(--hl-error-bg);
 }
 
 .btn-secondary {
-  background: #6c757d;
-  color: white;
+  background: var(--hl-fg-muted);
+  color: var(--hl-accent-fg);
 }
 
 .btn-secondary:hover {
-  background: #5a6268;
+  background: var(--hl-fg-muted);
 }
 
 .record-item {
-  background: #f8f9fa;
+  background: var(--hl-bg-subtle);
   border-radius: 8px;
   padding: 16px;
   margin-bottom: 12px;
@@ -129,13 +127,12 @@ body {
   justify-content: space-between;
   align-items: center;
   transition: all 0.3s ease;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--hl-gray-150);
 }
 
 .record-item:hover {
-  transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-color: #667eea;
+  border-color: var(--hl-accent);
 }
 
 .record-info {
@@ -144,12 +141,12 @@ body {
 
 .record-key {
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--hl-fg);
   margin-bottom: 4px;
 }
 
 .record-value {
-  color: #6c757d;
+  color: var(--hl-fg-muted);
   font-size: 0.95rem;
 }
 
@@ -181,7 +178,7 @@ body {
 }
 
 .modal-content {
-  background: white;
+  background: var(--hl-surface);
   border-radius: 12px;
   padding: 30px;
   max-width: 500px;
@@ -192,7 +189,7 @@ body {
 
 .modal-content h3 {
   font-size: 1.5rem;
-  color: #2c3e50;
+  color: var(--hl-fg);
   margin-bottom: 20px;
 }
 
@@ -216,7 +213,8 @@ body {
 .toast {
   padding: 16px 24px;
   border-radius: 8px;
-  color: white;
+  background: var(--hl-accent);
+  color: var(--hl-accent-fg);
   font-weight: 500;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   animation: slideInRight 0.3s ease;
@@ -226,26 +224,24 @@ body {
 }
 
 .toast.success {
-  background: #28a745;
+  background: var(--hl-success);
 }
 
 .toast.error {
-  background: #dc3545;
+  background: var(--hl-error-bg);
 }
 
 .toast.warning {
-  background: #ffc107;
-  color: #000;
+  background: var(--hl-warning-bg);
+  color: var(--hl-warning);
 }
 
 @keyframes slideInRight {
   from {
     opacity: 0;
-    transform: translateX(100%);
   }
   to {
     opacity: 1;
-    transform: translateX(0);
   }
 }
 
@@ -265,36 +261,30 @@ body {
 @keyframes fadeInDown {
   from {
     opacity: 0;
-    transform: translateY(-20px);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
 @keyframes modalSlideIn {
   from {
     opacity: 0;
-    transform: scale(0.9);
   }
 
   to {
     opacity: 1;
-    transform: scale(1);
   }
 }
 

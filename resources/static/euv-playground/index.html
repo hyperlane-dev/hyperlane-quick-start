@@ -1,18 +1,36 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script src="../common/js/theme-init.js"></script>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>euv playground</title>
+    <link rel="stylesheet" href="../common/css/common.css" />
     <link rel="stylesheet" href="../common/css/ide-theme.css" />
     <link rel="stylesheet" href="app.css" />
     <script src="../common/js/ide-theme.js"></script>
     <script src="/static/common/components/index.js"></script>
+    <script src="/static/ide/js/euv_language.js"></script>
     <script>
       if (window.loadHLComponents) {
         window.loadHLComponents('/static/common/components/');
       }
+      (function waitForMonacoAndApplyEuv() {
+        var tries = 0;
+        var maxTries = 200;
+        function tick() {
+          tries++;
+          if (window.monaco && window.loadEuvLanguage) {
+            window.loadEuvLanguage(window.monaco);
+            return;
+          }
+          if (tries < maxTries) {
+            setTimeout(tick, 50);
+          }
+        }
+        tick();
+      })();
     </script>
   </head>
   <body>
@@ -136,9 +154,9 @@
           </div>
           <hyperlane-monaco-editor
             id="pg-editor"
-            language="rust"
+            language="euv"
             tabsize="4"
-            font-size="18"
+            font-size="16"
             readonly=""
           ></hyperlane-monaco-editor>
         </div>

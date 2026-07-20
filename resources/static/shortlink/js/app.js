@@ -134,7 +134,7 @@ const ShortlinkApp = {
     this.showToast(message, 'error');
     const inputEl = input.shadowRoot?.querySelector('input');
     if (inputEl) {
-      inputEl.style.borderColor = '#dc3545';
+      inputEl.style.borderColor = 'var(--hl-error-bg)';
       inputEl.style.animation = 'shake 0.5s ease';
       setTimeout(() => {
         inputEl.style.animation = '';

@@ -47,24 +47,24 @@ class HyperlaneStatus extends HTMLElement {
 
     const typeStyles = {
       success: `
-        background-color: #f0fff4;
-        color: #2f855a;
-        border-left: 4px solid #2f855a;
+        background-color: var(--hl-success-bg);
+        color: var(--hl-success);
+        border-left: 4px solid var(--hl-success);
       `,
       error: `
-        background-color: #fff5f5;
-        color: #c53030;
-        border-left: 4px solid #c53030;
+        background-color: var(--hl-error-bg);
+        color: var(--hl-error);
+        border-left: 4px solid var(--hl-border-strong);
       `,
       warning: `
-        background-color: #fffbeb;
-        color: #d97706;
-        border-left: 4px solid #d97706;
+        background-color: var(--hl-warning-bg);
+        color: var(--hl-warning);
+        border-left: 4px solid var(--hl-warning);
       `,
       info: `
-        background-color: #eff6ff;
-        color: #2563eb;
-        border-left: 4px solid #2563eb;
+        background-color: var(--hl-info-bg);
+        color: var(--hl-info);
+        border-left: 4px solid var(--hl-info);
       `,
     };
 
@@ -87,24 +87,22 @@ class HyperlaneStatus extends HTMLElement {
           font-size: 0.875rem;
           animation: slideIn 0.3s ease;
           z-index: 1000;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+          box-shadow: var(--hl-shadow-lg, 0 4px 20px rgba(0, 0, 0, 0.1));
           width: 100%;
           display: flex;
           align-items: center;
           justify-content: center;
           gap: 8px;
-          background: white;
+          background: var(--hl-surface);
           margin-bottom: 16px;
           ${typeStyles[type] || typeStyles.info}
         }
         @keyframes slideIn {
           from {
             opacity: 0;
-            transform: translateY(-10px);
           }
           to {
             opacity: 1;
-            transform: translateY(0);
           }
         }
       </style>

@@ -6,45 +6,45 @@
   display: block;
   font-size: 14px;
   font-weight: 500;
-  color: #2c3e50;
+  color: var(--hl-fg);
   margin-bottom: 8px;
 }
 
 .form-input {
   width: 100%;
   padding: 10px 12px;
-  background: #f8f9fa;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  color: #2c3e50;
+  background: var(--hl-surface);
+  border: 1px solid var(--hl-border);
+  border-radius: var(--hl-radius-sm);
+  color: var(--hl-fg);
   font-size: 14px;
-  transition: all 0.2s;
+  transition: var(--hl-transition);
 }
 
 .form-input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
-  background: #fff;
+  border-color: var(--hl-border-strong);
+  box-shadow: 0 0 0 3px var(--hl-focus-ring);
+  background: var(--hl-surface);
 }
 
 .form-input::placeholder {
-  color: #999;
+  color: var(--hl-fg-subtle);
 }
 
 .form-select {
   width: 100%;
   padding: 10px 36px 10px 12px;
-  background: #f8f9fa;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  color: #2c3e50;
+  background-color: var(--hl-surface);
+  border: 1px solid var(--hl-border);
+  border-radius: var(--hl-radius-sm);
+  color: var(--hl-fg);
   font-size: 14px;
-  transition: all 0.2s;
+  transition: var(--hl-transition);
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230a0a0a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
   background-size: 12px;
@@ -52,9 +52,9 @@
 
 .form-select:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
-  background: #fff;
+  border-color: var(--hl-border-strong);
+  box-shadow: 0 0 0 3px var(--hl-focus-ring);
+  background-color: var(--hl-surface);
 }
 
 @media (max-width: 768px) {

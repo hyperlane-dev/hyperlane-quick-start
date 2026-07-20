@@ -59,25 +59,25 @@ class HyperlaneLoading extends HTMLElement {
         }
         .loading-container {
           text-align: center;
-          background: rgba(255, 255, 255, 0.95);
+          background: var(--hl-surface);
           backdrop-filter: blur(10px);
-          border-radius: 20px;
+          border-radius: var(--hl-radius-lg);
           padding: 60px 40px;
-          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-          border: 1px solid rgba(255, 255, 255, 0.2);
+          box-shadow: var(--hl-shadow-lg, 0 10px 40px rgba(0, 0, 0, 0.1));
+          border: 1px solid var(--hl-border);
           animation: fadeIn 0.3s ease;
         }
         .spinner {
           width: ${styles.spinner};
           height: ${styles.spinner};
-          border: 4px solid #f3f3f3;
-          border-top: 4px solid #667eea;
+          border: 4px solid var(--hl-border);
+          border-top: 4px solid var(--hl-gray-900);
           border-radius: 50%;
           animation: spin 1s linear infinite;
           margin: 0 auto 20px;
         }
         .loading-text {
-          color: #6c757d;
+          color: var(--hl-fg-muted);
           font-size: ${styles.fontSize};
           font-weight: 500;
         }

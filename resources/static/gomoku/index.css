@@ -1,19 +1,19 @@
 :root {
-  --bg-dark: #f5f7fb;
-  --bg-card: #ffffff;
-  --border: rgba(100, 116, 139, 0.18);
-  --accent: #667eea;
-  --accent-2: #764ba2;
-  --text: #1e293b;
-  --text-muted: #64748b;
-  --success: #22c55e;
-  --warning: #f59e0b;
-  --error: #ef4444;
-  --board-bg: #f4e7b6;
-  --cell-border: rgba(148, 163, 184, 0.55);
-  --stone-black: #111827;
-  --stone-white: #f8fafc;
-  --stone-white-border: rgba(100, 116, 139, 0.6);
+  --bg-dark: var(--hl-bg-subtle);
+  --bg-card: var(--hl-surface);
+  --border: var(--hl-border);
+  --accent: var(--hl-accent);
+  --accent-2: var(--hl-accent);
+  --text: var(--hl-fg);
+  --text-muted: var(--hl-fg-muted);
+  --success: var(--hl-success);
+  --warning: var(--hl-warning);
+  --error: var(--hl-error);
+  --board-bg: var(--hl-bg-subtle);
+  --cell-border: var(--hl-border);
+  --stone-black: var(--hl-fg);
+  --stone-white: var(--hl-surface);
+  --stone-white-border: var(--hl-border-strong);
 }
 
 body {
@@ -23,7 +23,7 @@ body {
     BlinkMacSystemFont,
     'Segoe UI',
     sans-serif;
-  background: #f8fafc;
+  background: var(--hl-bg-subtle);
   color: var(--text);
 }
 
@@ -63,7 +63,7 @@ body {
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  box-shadow: 0 0 15px rgba(124, 58, 237, 0.4);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
 }
 
 .status {
@@ -95,9 +95,9 @@ button,
 .main {
   flex: 1;
   display: grid;
-  grid-template-columns: 320px 1fr 320px;
-  gap: 24px;
-  padding: 24px 32px 32px;
+  grid-template-columns: 260px 1fr 260px;
+  gap: 20px;
+  padding: 20px 24px 24px;
   min-height: 0;
 }
 
@@ -106,7 +106,7 @@ button,
   border: 1px solid var(--border);
   border-radius: 20px;
   padding: 20px;
-  box-shadow: 0 16px 32px rgba(148, 163, 184, 0.25);
+  box-shadow: 0 16px 32px rgba(255, 255, 255, 0.25);
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -135,7 +135,7 @@ button,
 }
 
 .field input {
-  background: #f8fafc;
+  background: var(--hl-bg-subtle);
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 10px 12px;
@@ -150,19 +150,25 @@ button,
 }
 
 button {
-  border: none;
+  border: 1px solid var(--hl-accent);
   border-radius: 10px;
   padding: 10px 12px;
   font-weight: 600;
   cursor: pointer;
   transition: 0.2s ease;
-  color: #fff;
-  background: var(--accent);
+  color: var(--hl-accent-fg);
+  background: var(--hl-accent);
 }
 
 button.secondary {
-  background: rgba(148, 163, 184, 0.15);
+  background: transparent;
   color: var(--text);
+  border: 1px solid var(--hl-border-strong);
+}
+
+button.secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--hl-fg-muted);
 }
 
 button:disabled {
@@ -191,13 +197,14 @@ button:disabled {
 }
 
 .board {
-  width: min(70vw, 680px);
+  width: min(60vw, 600px);
   aspect-ratio: 1;
   background: var(--board-bg);
   border-radius: 18px;
   display: grid;
   grid-template-columns: repeat(15, 1fr);
-  border: 1px solid rgba(148, 163, 184, 0.4);
+  border: 1px solid var(--hl-border-strong);
+  box-shadow: var(--hl-shadow-md);
   overflow: hidden;
 }
 
@@ -216,7 +223,7 @@ button:disabled {
   width: 70%;
   height: 70%;
   border-radius: 50%;
-  border: 2px dashed rgba(148, 163, 184, 0.6);
+  border: 2px dashed rgba(255, 255, 255, 0.6);
   position: absolute;
 }
 
@@ -236,8 +243,8 @@ button:disabled {
   background: var(--stone-white);
   border: 2px solid var(--stone-white-border);
   box-shadow:
-    0 6px 14px rgba(15, 23, 42, 0.2),
-    inset 0 -4px 8px rgba(148, 163, 184, 0.3);
+    0 6px 14px rgba(0, 0, 0, 0.2),
+    inset 0 -4px 8px rgba(255, 255, 255, 0.3);
 }
 
 .sidebar-list {
@@ -270,13 +277,13 @@ button:disabled {
 }
 
 .move-log::-webkit-scrollbar-track {
-  background: rgba(148, 163, 184, 0.2);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .move-item {
   padding: 8px 10px;
   border-radius: 10px;
-  background: rgba(148, 163, 184, 0.1);
+  background: rgba(255, 255, 255, 0.1);
   font-size: 13px;
 }
 
@@ -476,8 +483,8 @@ button:disabled {
 
   .stone.white {
     box-shadow:
-      0 3px 8px rgba(15, 23, 42, 0.2),
-      inset 0 -2px 4px rgba(148, 163, 184, 0.3);
+      0 3px 8px rgba(0, 0, 0, 0.2),
+      inset 0 -2px 4px rgba(255, 255, 255, 0.3);
   }
 
   .move-log {
@@ -556,11 +563,10 @@ button:disabled {
 
 @media (hover: none) and (pointer: coarse) {
   .cell:active {
-    background: rgba(102, 126, 234, 0.2);
+    background: rgba(255, 255, 255, 0.2);
   }
 
   button:active {
-    transform: scale(0.97);
     opacity: 0.9;
   }
 }
