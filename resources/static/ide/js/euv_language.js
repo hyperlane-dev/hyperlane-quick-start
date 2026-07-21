@@ -673,14 +673,16 @@
           { include: '@whitespace' },
           // brackets
           [/[{}()[\]]/, '@brackets'],
-          // ===== path / snake_case identifier (App::use_signal, c_root) =====
-          // Treats a `Xxx` / `xxx_yyy` identifier followed by `::xxx_yyy`
-          // (and any further segments) as a single identifier-colored token.
-          // This makes `App::use_signal` render with one color instead of
-          // splitting on `::` (so `App` and `use_signal` don't look like
-          // two unrelated things).
-          [/[A-Z][a-zA-Z0-9_]*(::[a-zA-Z_][a-zA-Z0-9_]*)+/, 'identifier'],
-          [/[a-z][a-zA-Z0-9]*_[a-zA-Z0-9_]+/, 'identifier'],
+          // Keep path segments together and color the whole qualified name
+          // consistently, including `App::mount` and `wasm_bindgen`. Written
+          // WITHOUT a `(?:...)+` group because the bundled Monaco's Monarch
+          // wraps every rule in `^(?:...)` and mishandles the nested
+          // non-capturing group around `::`, splitting `App::mount` into
+          // `App` / `::` / `mount` (and even `A` / `pp`). A flat alternation
+          // of one-or-more `::segment` suffixes avoids that and matches the
+          // whole path as a single token in every Monarch version.
+          [/[A-Za-z_][A-Za-z0-9_]*(::[A-Za-z_][A-Za-z0-9_]*)+/, 'identifier'],
+          [/[A-Za-z_][A-Za-z0-9_]*_[A-Za-z0-9_]+/, 'identifier'],
           // identifiers (keywords vs types vs plain)
           [
             /[a-zA-Z_][\w$]*/,
@@ -834,13 +836,10 @@
           [/c_[a-zA-Z0-9_]*\(\s*\)/, 'class.helper'],
           [/c_[a-zA-Z0-9_]+\s*\(/, 'class.helper'],
           [/c_[a-zA-Z0-9_]+/, 'class.helper'],
-          // 0b. Snake_case identifier (`add_event`, `use_signal`, `count_set`)
-          //     emitted as a single `identifier` token. Without this rule the
-          //     bare-identifier regex `[/[a-z][a-zA-Z0-9-]*/]` only consumes
-          //     up to the first `_` (which is not in its character class) and
-          //     the underscore falls through to the default `''` token, so
-          //     `add_event` renders as three separate colors.
-          [/[a-z][a-zA-Z0-9]*_[a-zA-Z0-9_]+/, 'identifier'],
+          // Keep complete snake_case identifiers intact. This must run before
+          // the shorter tag/keyword matcher, otherwise `wasm_bindgen` is
+          // split at `_` and the separator receives the editor default color.
+          [/[a-zA-Z_][a-zA-Z0-9_]*_[a-zA-Z0-9_]+/, 'identifier'],
           [
             /[a-z][a-zA-Z0-9-]*/,
             {
@@ -1085,6 +1084,15 @@
           fontStyle: 'bold',
         },
         { token: 'keyword.html', foreground: fg('--mtk24', '0d47a1') },
+        // NOTE: identifier / type.keyword intentionally NOT overridden here.
+        // ide-theme.css locks every `.mtkN` to `var(--mtkN) !important`, and
+        // Monaco assigns the mtkN index by color *dedup* — so a hex that isn't
+        // already in the palette lands on an unrelated slot (e.g. blue on
+        // .mtk37) and gets recolored by that slot's variable. The base theme
+        // (ide-theme.js) already maps identifier → --mtk2 and type.keyword →
+        // --mtk4, both of which render correctly. A qualified path
+        // (`App::mount`) is a single identifier token, so it and a bare `App`
+        // share the base identifier color consistently.
         { token: 'keyword.rawidentifier', foreground: fg('--mtk15', '9c27b0') },
         { token: 'keyword.pseudo', foreground: fg('--mtk21', '455a64') },
         // CSS helper name (c_xxx) inside html! body. Distinct color from the
@@ -1102,6 +1110,9 @@
         { token: 'tag', foreground: fg('--mtk25', 'c62828') },
         { token: 'attribute.name', foreground: fg('--mtk26', '6d4c41') },
       ];
+      // Theme-trie insert overwrites an existing token, so the LAST rule for a
+      // given token wins. Putting euvRules after baseRules lets the euv
+      // identifier/type.keyword colors override the base theme's --mtk2 mapping.
       var rules = baseRules.concat(euvRules);
       var bg = dark
         ? window.IDE_DARK_BACKGROUND || '#282c34'
