@@ -118,11 +118,8 @@ class HyperlaneUploadHistory extends HTMLElement {
           border: 1px solid var(--hl-border);
           border-radius: 12px;
           padding: 16px;
-          box-shadow: var(--hl-shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.1));
+          box-shadow: var(--hl-shadow-sm);
           transition: all 0.2s ease;
-        }
-        .history-item:hover {
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
         .history-item-header {
           display: flex;

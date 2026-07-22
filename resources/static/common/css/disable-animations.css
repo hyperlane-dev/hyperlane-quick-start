@@ -1,0 +1,27 @@
+/* Global reset — kill every mouse-driven animation, transition, and hover/focus visual effect.
+ * Elements still work (click, type, submit); they simply stop animating.
+ * Loaded early in common.css so page-level spinners (loading, progress) still animate;
+ * only interaction-driven motion is suppressed here. */
+* {
+  transition: none !important;
+}
+
+*:hover,
+*:focus,
+*:focus-visible,
+*:active {
+  box-shadow: none !important;
+}
+
+*:focus,
+*:focus-visible {
+  outline: none !important;
+}
+
+/* Any animation triggered by mouse state is removed. */
+*:hover,
+*:focus,
+*:focus-visible,
+*:active {
+  animation: none !important;
+}

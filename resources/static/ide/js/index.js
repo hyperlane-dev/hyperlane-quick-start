@@ -155,29 +155,28 @@ function showCopyTip(message = '复制成功') {
   tip.appendChild(icon);
   tip.appendChild(text);
   const backgroundColor = isSuccess
-    ? 'linear-gradient(135deg, rgba(76, 175, 80, 0.9) 0%, rgba(69, 160, 73, 0.9) 100%)'
-    : 'linear-gradient(135deg, rgba(244, 67, 54, 0.9) 0%, rgba(211, 47, 47, 0.9) 100%)';
+    ? 'var(--hl-success-bg)'
+    : 'var(--hl-error-bg)';
   const shadowColor = isSuccess
-    ? 'rgba(76, 175, 80, 0.2)'
-    : 'rgba(244, 67, 54, 0.2)';
+    ? 'var(--hl-overlay-muted)'
+    : 'var(--hl-overlay-muted)';
   tip.style.cssText = `
     position: fixed;
     top: 32px;
     left: 50%;
     transform: translateX(-50%);
     background: ${backgroundColor};
-    color: white;
+    color: var(--hl-accent-fg);
     padding: 8px 12px;
-    border-radius: 6px;
+    border-radius: var(--hl-radius-sm);
     font-size: 14px;
     font-weight: 400;
     z-index: 10000;
     pointer-events: none;
     opacity: 0;
     transition: all 0.25s ease-out;
-    box-shadow: 0 3px 12px ${shadowColor},
-                0 1px 4px rgba(0, 0, 0, 0.08),
-                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    box-shadow: var(--hl-shadow-md), var(--hl-shadow-sm),
+                inset 0 1px 0 var(--hl-overlay-fade);
     white-space: nowrap;
     user-select: none;
     -webkit-user-select: none;
@@ -187,7 +186,7 @@ function showCopyTip(message = '复制成功') {
     -webkit-tap-highlight-color: transparent;
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--hl-overlay-fade);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   `;
   document.body.appendChild(tip);

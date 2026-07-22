@@ -103,11 +103,6 @@ class HyperlaneTraceResult extends HTMLElement {
           color: var(--hl-accent);
           font-weight: 500;
         }
-        .request-url:hover {
-          background: var(--hl-surface-hover);
-          border-color: var(--hl-border-strong);
-          box-shadow: var(--hl-shadow-md, 0 4px 12px rgba(0, 0, 0, 0.12));
-        }
         .status-message {
           padding: 12px 16px;
           border-radius: 8px;
@@ -145,10 +140,10 @@ class HyperlaneTraceResult extends HTMLElement {
           width: 6px;
         }
         .result-content::-webkit-scrollbar-track {
-          background: rgba(0, 0, 0, 0.05);
+          background: var(--hl-overlay-muted);
         }
         .result-content::-webkit-scrollbar-thumb {
-          background: rgba(255, 255, 255, 0.3);
+          background: var(--hl-overlay-fade);
           border-radius: 3px;
         }
         .empty-result {
@@ -165,7 +160,7 @@ class HyperlaneTraceResult extends HTMLElement {
         .spinner {
           width: 40px;
           height: 40px;
-          border: 3px solid rgba(255, 255, 255, 0.3);
+          border: 3px solid var(--hl-overlay-fade);
           border-top: 3px solid var(--hl-accent);
           border-radius: 50%;
           animation: spin 1s linear infinite;

@@ -1,7 +1,8 @@
 :root {
-  --pg-bg: var(--theme_bk_color);
-  --pg-fg: var(--theme_text_color);
-  --pg-border: var(--btn_border_color);
+  --pg-bg: var(--hl-bg);
+  --pg-fg: var(--hl-fg);
+  --pg-border: var(--hl-border-strong);
+  --pg-border-strong: var(--hl-border-strong);
   --pg-success: var(--hl-accent);
   --pg-success-strong: var(--hl-fg);
   --pg-danger: var(--hl-error-bg);
@@ -9,12 +10,64 @@
   --pg-info: var(--hl-accent);
   --pg-muted: var(--hl-fg-muted);
   --pg-surface: var(--hl-surface);
-  --pg-surface-alt: var(--btn_bk_color);
+  --pg-surface-alt: var(--hl-bg);
   --pg-active-bg: var(--hl-accent);
   --pg-stderr-bg: var(--hl-error-bg);
   --pg-stderr-fg: var(--hl-error);
   --pg-stderr-border: var(--hl-accent);
   --pg-link: var(--hl-accent);
+
+  /* Theme tokens (no longer referenced — kept for backward compat) */
+  --theme_bk_color: var(--hl-bg);
+  --theme_text_color: var(--hl-fg);
+  --btn_bk_color: var(--hl-bg);
+  --btn_border_color: var(--hl-border-strong);
+  --btn_hover_bk_color: var(--hl-bg);
+
+  /* Radius scale (map euv --radius_* to --hl-radius-*) */
+  --radius_xs: var(--hl-radius-xs);
+  --radius_sm: var(--hl-radius-sm);
+  --radius_md: var(--hl-radius-md);
+  --radius_lg: var(--hl-radius-lg);
+  --radius_xl: var(--hl-radius-xl);
+  --radius_2xl: var(--hl-radius-xl);
+  --radius_full: var(--hl-radius-circle);
+
+  /* Layout primitives */
+  --space_0_5: 2px;
+  --space_1: 4px;
+  --space_2: 8px;
+  --space_2_5: 10px;
+  --space_3: 12px;
+  --space_4: 16px;
+  --space_5: 20px;
+  --space_6: 24px;
+  --space_7: 28px;
+  --space_8: 32px;
+
+  /* Typography */
+  --font_family_sans:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font_family_mono: 'SF Mono', Monaco, Consolas, monospace;
+  --font_size_xs: 11px;
+  --font_size_meta: 12px;
+  --font_size_sm: 13px;
+  --font_size_base: 14px;
+  --font_size_md: 15px;
+  --font_size_lg: 16px;
+  --font_size_2xl: 20px;
+  --font_weight_normal: 400;
+  --font_weight_medium: 500;
+  --font_weight_semibold: 600;
+  --font_weight_bold: 700;
+  --letter_spacing_tight: -0.01em;
+  --letter_spacing_normal: 0;
+  --letter_spacing_wide: 0.02em;
+  --letter_spacing_wider: 0.05em;
+
+  /* Transition aliases */
+  --transition_fast: 0.1s ease;
+  --transition_medium: 0.2s ease;
 }
 
 * {
@@ -95,24 +148,19 @@ body {
 }
 
 #pg-toolbar hyperlane-button[variant='default'] button {
-  background: var(--btn_bk_color);
-  color: var(--theme_text_color);
+  background: var(--hl-bg);
+  color: var(--hl-fg);
+  border: 1px solid var(--hl-border-strong);
   box-shadow: none;
-}
-#pg-toolbar hyperlane-button[variant='default'] button:hover:not(:disabled) {
-  background: var(--btn_hover_bk_color);
-  transform: none;
-  filter: none;
 }
 #pg-toolbar hyperlane-button[variant='success'] button {
   background: var(--pg-success);
   color: var(--pg-surface);
+  border: 1px solid var(--pg-success);
   box-shadow: none;
 }
-#pg-toolbar hyperlane-button[variant='success'] button:hover:not(:disabled) {
-  background: var(--pg-success-strong);
-  transform: none;
-  filter: none;
+#pg-toolbar hyperlane-button[variant='success'] button span {
+  color: inherit;
 }
 
 #pg-body {
@@ -152,24 +200,26 @@ body {
 }
 
 .pg-icon-btn {
-  width: 24px;
-  height: 24px;
-  border: 1px solid var(--pg-border);
-  background: var(--pg-surface);
-  color: var(--pg-muted);
-  border-radius: var(--radius_sm);
+  border: var(--hl-border-w-thin) solid var(--hl-border);
+  background: var(--hl-accent);
+  color: var(--hl-accent-fg);
+  border-radius: var(--hl-radius-sm);
   cursor: pointer;
-  font-size: var(--font_size_lg);
-  line-height: 1;
   font-family: inherit;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  padding: 4px 10px;
+  font-size: var(--font_size_md, 14px);
+  font-weight: var(--font_weight_semibold);
+  line-height: 1;
+  flex-shrink: 0;
 }
 
-.pg-icon-btn:hover {
-  background: var(--btn_hover_bk_color);
-  border-color: var(--pg-muted);
+.pg-icon-btn#pg-new-icon {
+  width: auto;
+  min-width: 0;
+  height: 24px;
 }
 
 .pg-project-list {
@@ -177,14 +227,19 @@ body {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
-  padding: var(--space_2) 0;
+  padding: var(--hl-list-padding);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--hl-list-item-spacing);
   position: relative;
+  border-top: 1px solid var(--pg-border-strong);
 }
 
 .pg-loading-spinner {
   width: 28px;
   height: 28px;
-  border: 3px solid var(--pg-border);
+  border: 3px solid var(--hl-border);
   border-top-color: var(--pg-success);
   border-radius: var(--radius_full);
   animation: pg-spin 0.9s linear infinite;
@@ -292,11 +347,6 @@ body {
     border-color var(--transition_fast);
 }
 
-.pg-loading-retry:hover:not(:disabled) {
-  background: var(--pg-success-strong);
-  border-color: var(--pg-success-strong);
-}
-
 .pg-loading-retry:disabled {
   background: var(--pg-muted);
   border-color: var(--pg-muted);
@@ -313,22 +363,34 @@ body {
 }
 
 .pg-project-item {
-  padding: var(--space_3) var(--space_4);
+  padding: var(--hl-list-item-padding);
   cursor: pointer;
-  border-left: 3px solid transparent;
+  border: var(--hl-border-w-thin) solid var(--hl-border);
+  border-left: var(--hl-border-w-medium) solid var(--hl-border);
+  border-radius: var(--hl-list-item-radius);
   display: flex;
   flex-direction: column;
   gap: var(--space_0_5);
   user-select: none;
+  background: var(--hl-surface);
+  color: var(--hl-fg);
+  margin-bottom: var(--hl-list-gap);
 }
 
-.pg-project-item:hover {
-  background: var(--btn_hover_bk_color);
+.pg-project-item:last-child {
+  margin-bottom: 0;
 }
 
 .pg-project-item.pg-active {
-  background: var(--pg-success);
-  border-left-color: var(--pg-success);
+  background: var(--hl-accent);
+  color: var(--hl-accent-fg);
+  border-color: var(--hl-accent);
+  border-left-color: var(--hl-accent);
+}
+
+.pg-project-item.pg-active .pg-project-name,
+.pg-project-item.pg-active .pg-project-meta {
+  color: var(--hl-accent-fg);
 }
 
 .pg-project-item .pg-project-name {
@@ -341,20 +403,15 @@ body {
 }
 
 .pg-project-item.pg-active .pg-project-name {
-  color: var(--pg-surface);
   font-weight: var(--font_weight_semibold);
 }
 
 .pg-project-item .pg-project-meta {
   font-size: var(--font_size_meta);
-  color: var(--pg-muted);
+  color: var(--hl-fg-muted);
   font-family: var(--font_family_mono);
   display: flex;
   gap: var(--space_2);
-}
-
-.pg-project-item.pg-active .pg-project-meta {
-  color: var(--pg-surface);
 }
 
 .pg-project-item .pg-project-saved {
@@ -395,12 +452,8 @@ body {
   font-size: var(--font_size_meta);
   color: var(--pg-link);
   cursor: pointer;
-  text-decoration: underline;
+  text-decoration: none;
   font-family: inherit;
-}
-
-.pg-link-btn:hover {
-  color: var(--pg-link);
 }
 
 #pg-main {
@@ -571,10 +624,6 @@ hyperlane-monaco-editor {
   font-family: inherit;
 }
 
-.pg-dialog-close:hover {
-  color: var(--theme_text_color);
-}
-
 .pg-dialog-label {
   font-size: var(--font_size_xs);
   font-weight: var(--font_weight_semibold);
@@ -633,25 +682,12 @@ hyperlane-monaco-editor {
   cursor: pointer;
   background: var(--pg-surface);
   color: var(--theme_text_color);
-  transition:
-    background var(--transition_fast),
-    color var(--transition_fast),
-    border-color var(--transition_fast);
-}
-
-.pg-dialog-cancel:hover {
-  background: var(--btn_hover_bk_color);
 }
 
 .pg-dialog-submit {
   background: var(--pg-success);
   border-color: var(--pg-success);
   color: var(--pg-surface);
-}
-
-.pg-dialog-submit:hover:not(:disabled) {
-  background: var(--pg-success-strong);
-  border-color: var(--pg-success-strong);
 }
 
 .pg-dialog-submit:disabled {

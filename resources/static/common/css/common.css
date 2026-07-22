@@ -1,6 +1,7 @@
 @import url('./tokens.css');
 @import url('./base.css');
 @import url('./animation.css');
+@import url('./disable-animations.css');
 @import url('./toast.css');
 @import url('./button.css');
 @import url('./form.css');

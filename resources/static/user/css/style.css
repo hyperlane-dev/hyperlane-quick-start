@@ -48,14 +48,14 @@ button,
 .sidebar-header h2 .nav-logo {
   width: 28px;
   height: 28px;
-  border-radius: 6px;
+  border-radius: var(--hl-radius-sm);
   object-fit: contain;
   vertical-align: middle;
 }
 
 .sidebar-nav {
   flex: 1;
-  padding: 16px 0;
+  padding: var(--hl-list-padding);
   overflow-y: auto;
 }
 
@@ -63,18 +63,16 @@ button,
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 20px;
+  padding: var(--hl-list-item-padding);
   cursor: pointer;
-  color: var(--hl-fg-muted);
+  background: var(--hl-surface);
+  border: 1px solid var(--hl-border);
+  border-radius: var(--hl-list-item-radius);
+  color: var(--hl-fg);
   font-size: 14px;
   font-weight: 600;
-  transition: all 0.2s;
-  border-left: 3px solid transparent;
-}
 
-.nav-item:hover {
-  background: var(--hl-bg-muted);
-  color: var(--hl-fg);
+  border-left: 3px solid transparent;
 }
 
 .nav-item.active {
@@ -113,7 +111,7 @@ button,
   background: var(--hl-success);
   color: var(--hl-accent-fg);
   padding: 2px 8px;
-  border-radius: 10px;
+  border-radius: var(--hl-radius-md);
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
@@ -137,7 +135,6 @@ button,
 .content-header {
   margin-bottom: 12px;
   flex-shrink: 0;
-  animation: fadeInDown 0.6s ease;
 }
 
 .content-header h1 {
@@ -152,22 +149,16 @@ button,
 .btn {
   padding: 8px 16px;
   border: 1px solid var(--hl-border-strong);
-  border-radius: 6px;
+  border-radius: var(--hl-radius-sm);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
   background: var(--hl-bg-muted);
   color: var(--hl-fg);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-}
-
-.btn:hover {
-  background: var(--hl-bg-muted);
-  border-color: var(--hl-border);
 }
 
 .btn:disabled {
@@ -182,20 +173,10 @@ button,
   color: var(--hl-accent-fg);
 }
 
-.btn-primary:hover {
-  background: var(--hl-accent);
-  border-color: transparent;
-}
-
 .btn-danger {
   background: var(--hl-error-bg);
   border-color: var(--hl-error-bg);
   color: var(--hl-error);
-}
-
-.btn-danger:hover {
-  background: var(--hl-error-bg);
-  border-color: var(--hl-error-bg);
 }
 
 .btn-success {
@@ -204,18 +185,10 @@ button,
   color: var(--hl-success);
 }
 
-.btn-success:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
 .btn-secondary {
   background: var(--hl-bg-muted);
   border-color: var(--hl-border);
   color: var(--hl-fg-muted);
-}
-
-.btn-secondary:hover {
-  background: var(--hl-accent);
 }
 
 .btn-sm {
@@ -240,18 +213,11 @@ button,
   padding: 10px 12px;
   background: var(--hl-bg-subtle);
   border: 1px solid var(--hl-border-strong);
-  border-radius: 6px;
+  border-radius: var(--hl-radius-sm);
   color: var(--hl-fg);
   font-size: 14px;
   transition: all 0.2s;
   box-sizing: border-box;
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: var(--hl-accent);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
-  background: var(--hl-surface);
 }
 
 .form-input::placeholder {
@@ -266,7 +232,7 @@ button,
 .card {
   background: var(--hl-surface);
   border: 1px solid var(--hl-border-strong);
-  border-radius: 12px;
+  border-radius: var(--hl-radius-lg);
   overflow: hidden;
   margin-bottom: 16px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -322,16 +288,17 @@ button,
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: var(--hl-list-item-spacing);
+  padding: var(--hl-list-padding);
   margin-bottom: 16px;
   flex-shrink: 0;
 }
 
 .stat-card {
   background: var(--hl-surface);
-  border: 1px solid var(--hl-border-strong);
-  border-radius: 12px;
-  padding: 20px;
+  border: 1px solid var(--hl-border);
+  border-radius: var(--hl-list-item-radius);
+  padding: var(--hl-list-item-padding);
   text-align: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   min-width: 0;
@@ -400,7 +367,8 @@ button,
 .user-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--hl-list-item-spacing);
+  padding: var(--hl-list-padding);
   flex: 1;
   overflow-y: auto;
   min-height: 0;
@@ -410,17 +378,11 @@ button,
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 16px;
-  background: var(--hl-bg-subtle);
-  border: 1px solid var(--hl-border-strong);
-  border-radius: 8px;
-  transition: all 0.2s;
-}
-
-.user-card:hover {
-  border-color: var(--hl-accent);
-  background: var(--hl-info-bg);
-  cursor: pointer;
+  padding: var(--hl-list-item-padding);
+  background: var(--hl-surface);
+  border: 1px solid var(--hl-border);
+  border-radius: var(--hl-list-item-radius);
+  color: var(--hl-fg);
 }
 
 .user-info {
@@ -434,9 +396,9 @@ button,
 .user-avatar {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
-  background: var(--hl-gray-900);
-  color: var(--hl-gray-0);
+  border-radius: var(--hl-radius-circle);
+  background: var(--hl-accent);
+  color: var(--hl-accent-fg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -478,7 +440,7 @@ button,
 
 .badge {
   padding: 4px 10px;
-  border-radius: 20px;
+  border-radius: var(--hl-radius-xl);
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
@@ -537,7 +499,7 @@ button,
   height: 40px;
   border: 3px solid var(--hl-gray-200);
   border-top-color: var(--hl-accent);
-  border-radius: 50%;
+  border-radius: var(--hl-radius-circle);
   animation: spin 0.8s linear infinite;
 }
 
@@ -567,7 +529,7 @@ button,
 .modal-content {
   background: var(--hl-surface);
   border: 1px solid var(--hl-border-strong);
-  border-radius: 12px;
+  border-radius: var(--hl-radius-lg);
   max-width: 480px;
   width: 90%;
   max-height: 80vh;
@@ -614,13 +576,8 @@ button,
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
+  border-radius: var(--hl-radius-sm);
   transition: all 0.2s;
-}
-
-.modal-close:hover {
-  background: var(--hl-bg-muted);
-  color: var(--hl-fg);
 }
 
 .modal-footer {
@@ -698,8 +655,8 @@ button,
   padding: 16px;
   margin-top: 16px;
   background: var(--hl-surface);
-  border: 1px solid var(--hl-border-strong);
-  border-radius: 12px;
+  border: 1px solid var(--hl-border);
+  border-radius: var(--hl-radius-lg);
   flex-wrap: wrap;
   gap: 12px;
   flex-shrink: 0;
@@ -723,18 +680,13 @@ button,
   min-width: 80px;
   background: var(--hl-bg-muted);
   border: 1px solid var(--hl-border-strong);
-  border-radius: 6px;
+  border-radius: var(--hl-radius-sm);
   padding: 6px 12px;
   font-size: 14px;
   font-weight: 500;
   color: var(--hl-fg);
   cursor: pointer;
   transition: all 0.2s ease;
-}
-
-.pagination-controls > button:hover:not(:disabled) {
-  background: var(--hl-bg-muted);
-  border-color: var(--hl-border);
 }
 
 .pagination-controls > button:disabled {
@@ -752,19 +704,9 @@ button,
   }
 }
 
-@keyframes fadeInDown {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
 @media (max-width: 768px) {
   .sidebar {
     width: 100%;
-    transition: transform 0.3s;
   }
 
   .main-content {
@@ -785,7 +727,7 @@ button,
     height: 32px;
     background: var(--hl-bg-muted);
     border: 1px solid var(--hl-border-strong);
-    border-radius: 6px;
+    border-radius: var(--hl-radius-sm);
     color: var(--hl-fg);
     font-size: 16px;
     cursor: pointer;

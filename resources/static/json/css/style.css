@@ -35,35 +35,23 @@ body {
   white-space: pre;
   word-wrap: normal;
   tab-size: 2;
-  border: 1px solid var(--hl-gray-300);
-  border-radius: 8px;
-  padding: 12px 14px;
+  border: var(--hl-border-w-thin) solid var(--hl-border);
+  border-radius: var(--hl-radius-input);
+  padding: var(--hl-list-item-padding);
   background: var(--hl-bg-subtle);
   color: var(--hl-fg);
   outline: none;
   transition: all 0.2s ease;
-}
-
-.json-input:focus {
-  border-color: var(--hl-accent);
-  background: var(--hl-surface);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.12);
 }
 
 .modal-input {
-  border: 1px solid var(--hl-gray-300);
-  border-radius: 8px;
-  padding: 10px 14px;
+  border: var(--hl-border-w-thin) solid var(--hl-border);
+  border-radius: var(--hl-radius-input);
+  padding: var(--hl-space-2) var(--hl-space-4);
   background: var(--hl-bg-subtle);
   color: var(--hl-fg);
   outline: none;
   transition: all 0.2s ease;
-}
-
-.modal-input:focus {
-  border-color: var(--hl-accent);
-  background: var(--hl-surface);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.12);
 }
 
 .modal-input[readonly] {
@@ -73,9 +61,9 @@ body {
 }
 
 .modal-textarea {
-  border: 1px solid var(--hl-gray-300);
-  border-radius: 8px;
-  padding: 12px 14px;
+  border: var(--hl-border-w-thin) solid var(--hl-border);
+  border-radius: var(--hl-radius-input);
+  padding: var(--hl-list-item-padding);
   background: var(--hl-bg-subtle);
   color: var(--hl-fg);
   outline: none;
@@ -92,12 +80,6 @@ body {
   tab-size: 2;
 }
 
-.modal-textarea:focus {
-  border-color: var(--hl-accent);
-  background: var(--hl-surface);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.12);
-}
-
 .field-count {
   font-size: 14px;
   color: var(--hl-fg-muted);
@@ -105,11 +87,18 @@ body {
 }
 
 .tree-card-body {
-  padding: 12px 0;
+  padding: var(--hl-list-padding);
+  border-radius: var(--hl-list-item-radius);
+  display: flex;
+  flex-direction: column;
+  gap: var(--hl-list-item-spacing);
 }
 
 .tree-root {
-  padding: 0;
+  padding: var(--hl-list-padding);
+  display: flex;
+  flex-direction: column;
+  gap: var(--hl-list-item-spacing);
 }
 
 .tree-node {
@@ -118,10 +107,12 @@ body {
   min-height: 36px;
   cursor: pointer;
   user-select: none;
-}
-
-.tree-node:hover {
-  background: var(--hl-bg-muted);
+  padding: var(--hl-list-item-padding);
+  background: var(--hl-surface);
+  border: var(--hl-border-w-thin) solid var(--hl-border);
+  border-radius: var(--hl-list-item-radius);
+  color: var(--hl-fg);
+  margin: 0;
 }
 
 .tree-indent {
@@ -180,11 +171,11 @@ body {
   font-weight: 500;
   padding: 1px 6px;
   background: var(--hl-bg-muted);
-  border-radius: 4px;
+  border-radius: var(--hl-radius-xs);
 }
 
 .tree-type-json {
-  color: var(--hl-accent);
+  color: var(--hl-accent-fg);
   background: var(--hl-info-bg);
 }
 
@@ -220,26 +211,22 @@ body {
   color: var(--hl-accent);
   cursor: pointer;
   white-space: nowrap;
-  opacity: 0;
+  opacity: 1;
   transition: opacity 0.2s;
   padding: 2px 8px;
-  border-radius: 4px;
-}
-
-.tree-node:hover .tree-edit {
-  opacity: 1;
-}
-
-.tree-edit:hover {
-  background: var(--hl-info-bg);
+  border-radius: var(--hl-radius-xs);
 }
 
 .tree-children {
   display: none;
+  padding: var(--hl-list-padding);
+  display: flex;
+  flex-direction: column;
+  gap: var(--hl-list-item-spacing);
 }
 
 .tree-children.expanded {
-  display: block;
+  display: flex;
 }
 
 .modal {
@@ -249,7 +236,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.8);
+  background: var(--hl-overlay);
   z-index: 1000;
   justify-content: center;
   align-items: center;
@@ -261,25 +248,25 @@ body {
 
 .modal-content {
   background: var(--hl-surface);
-  border-radius: 12px;
+  border-radius: var(--hl-radius-lg);
   padding: 30px;
   max-width: 560px;
   width: 90%;
   max-height: 80vh;
   overflow-y: auto;
   position: relative;
-  box-shadow: 0 8px 40px rgba(255, 255, 255, 0.3);
+  box-shadow: var(--hl-shadow-modal);
 }
 
 .modal-close {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: var(--hl-space-2);
+  right: var(--hl-space-2);
   background: var(--hl-bg-subtle);
-  border: 1px solid var(--hl-gray-150);
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  border: var(--hl-border-w-thin) solid var(--hl-border);
+  border-radius: var(--hl-radius-circle);
+  width: var(--hl-space-8);
+  height: var(--hl-space-8);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -293,12 +280,6 @@ body {
   outline: none;
   -webkit-appearance: none;
   appearance: none;
-}
-
-.modal-close:hover {
-  background: var(--hl-error-bg);
-  color: var(--hl-accent-fg);
-  border-color: var(--hl-error-bg);
 }
 
 .modal-close span {

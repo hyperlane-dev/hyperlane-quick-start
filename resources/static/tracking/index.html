@@ -35,10 +35,9 @@
 
       .search-panel {
         background: rgba(255, 255, 255, 0.98);
-        border-radius: 12px;
+        border-radius: var(--hl-radius-lg);
         padding: 30px;
         margin-bottom: 30px;
-        box-shadow: 0 4px 20px rgba(255, 255, 255, 0.15);
         position: relative;
       }
 
@@ -50,7 +49,7 @@
         right: 0;
         bottom: 0;
         border: 2px solid rgba(255, 255, 255, 0.2);
-        border-radius: 12px;
+        border-radius: var(--hl-radius-lg);
         pointer-events: none;
       }
 
@@ -62,18 +61,7 @@
         right: 0;
         height: 3px;
         background: var(--hl-accent);
-        border-radius: 12px 12px 0 0;
-      }
-
-      @keyframes gradientMove {
-        0%,
-        100% {
-          background-position: 0% 0%;
-        }
-
-        50% {
-          background-position: 100% 0%;
-        }
+        border-radius: var(--hl-radius-lg) var(--hl-radius-lg) 0 0;
       }
 
       .search-title {
@@ -105,12 +93,9 @@
 
       .form-input {
         background: var(--hl-surface);
-        border: 2px solid var(--hl-border-strong);
-        border-radius: 8px;
         padding: 12px;
         color: var(--hl-fg);
         font-size: 1rem;
-        transition: all 0.3s ease;
         font-family:
           -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
       }
@@ -121,22 +106,13 @@
 
       .form-input:focus {
         outline: none;
-        border-color: var(--hl-accent);
-        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
       }
 
       .form-input[type='datetime-local']::-webkit-calendar-picker-indicator {
         cursor: pointer;
         opacity: 0.7;
-        transition: all 0.3s ease;
         filter: brightness(0) saturate(100%) invert(27%) sepia(8%)
           saturate(1567%) hue-rotate(169deg) brightness(95%) contrast(88%);
-      }
-
-      .form-input[type='datetime-local']::-webkit-calendar-picker-indicator:hover {
-        opacity: 1;
-        filter: brightness(0) saturate(100%) invert(42%) sepia(93%)
-          saturate(1352%) hue-rotate(223deg) brightness(97%) contrast(91%);
       }
 
       .form-input[type='datetime-local']::-webkit-datetime-edit {
@@ -169,23 +145,14 @@
         width: 100%;
         padding: 12px 35px 12px 12px;
         background: var(--hl-surface);
-        border: 2px solid var(--hl-border-strong);
-        border-radius: 8px;
         color: var(--hl-fg);
         font-size: 1rem;
         font-family: inherit;
         cursor: pointer;
-        transition: all 0.3s ease;
-      }
-
-      .datetime-picker-input:hover {
-        border-color: var(--hl-accent);
       }
 
       .datetime-picker-input:focus {
         outline: none;
-        border-color: var(--hl-accent);
-        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
       }
 
       .datetime-picker-icon {
@@ -204,10 +171,9 @@
         margin-top: 8px;
         background: var(--hl-surface);
         border: 2px solid var(--hl-border-strong);
-        border-radius: 12px;
+        border-radius: var(--hl-radius-lg);
         padding: 16px;
         z-index: 1000;
-        box-shadow: var(--hl-shadow-lg, 0 8px 30px rgba(0, 0, 0, 0.2));
         min-width: 320px;
         display: none;
       }
@@ -228,7 +194,7 @@
       .datetime-picker-nav {
         background: var(--hl-accent);
         border: none;
-        border-radius: 6px;
+        border-radius: var(--hl-radius-sm);
         color: var(--hl-accent-fg);
         width: 32px;
         height: 32px;
@@ -237,11 +203,6 @@
         align-items: center;
         justify-content: center;
         font-size: 14px;
-        transition: all 0.3s ease;
-      }
-
-      .datetime-picker-nav:hover {
-        box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
       }
 
       .datetime-picker-month-year {
@@ -282,14 +243,8 @@
         color: var(--hl-fg);
         background: transparent;
         border: 2px solid transparent;
-        border-radius: 8px;
+        border-radius: var(--hl-radius-md);
         cursor: pointer;
-        transition: all 0.3s ease;
-      }
-
-      .datetime-picker-day:hover:not(.disabled):not(.selected) {
-        background: var(--hl-info-bg);
-        border-color: var(--hl-accent);
       }
 
       .datetime-picker-day.selected {
@@ -326,8 +281,6 @@
       .datetime-picker-time-input {
         width: 60px;
         padding: 6px;
-        border: 2px solid var(--hl-gray-150);
-        border-radius: 6px;
         text-align: center;
         font-size: 14px;
         color: var(--hl-fg);
@@ -335,7 +288,6 @@
 
       .datetime-picker-time-input:focus {
         outline: none;
-        border-color: var(--hl-accent);
       }
 
       .datetime-picker-footer {
@@ -346,27 +298,18 @@
 
       .datetime-picker-btn {
         padding: 8px 16px;
-        background: var(--hl-bg-muted);
-        border: none;
-        border-radius: 6px;
+        background: var(--hl-surface);
+        border: var(--hl-border-w-thin) solid var(--hl-border);
+        border-radius: var(--hl-radius-sm);
         color: var(--hl-fg-muted);
         font-size: 14px;
         cursor: pointer;
-        transition: all 0.3s ease;
         flex: 1;
-      }
-
-      .datetime-picker-btn:hover {
-        background: var(--hl-gray-200);
       }
 
       .datetime-picker-btn.primary {
         background: var(--hl-accent);
         color: var(--hl-accent-fg);
-      }
-
-      .datetime-picker-btn.primary:hover {
-        box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
       }
 
       .button-group {
@@ -378,13 +321,12 @@
       .btn {
         padding: 12px 30px;
         border: none;
-        border-radius: 8px;
+        border-radius: var(--hl-radius-md);
         font-size: 1rem;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 1px;
         cursor: pointer;
-        transition: all 0.3s ease;
         font-family: 'Rajdhani', sans-serif;
       }
 
@@ -393,17 +335,9 @@
         color: var(--hl-accent-fg);
       }
 
-      .btn-primary:hover {
-        box-shadow: 0 6px 16px rgba(255, 255, 255, 0.4);
-      }
-
       .btn-secondary {
         background: var(--hl-fg-muted);
         color: var(--hl-accent-fg);
-      }
-
-      .btn-secondary:hover {
-        background: var(--hl-fg-muted);
       }
 
       .stats-panel {
@@ -416,11 +350,9 @@
       .stat-card {
         background: var(--hl-surface);
         border: 2px solid rgba(0, 0, 0, 0.2);
-        border-radius: 12px;
+        border-radius: var(--hl-radius-lg);
         padding: 20px;
         text-align: center;
-        transition: all 0.3s ease;
-        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
         position: relative;
         overflow: hidden;
       }
@@ -433,13 +365,6 @@
         right: 0;
         height: 3px;
         background: var(--hl-accent);
-        transition: transform 0.3s ease;
-      }
-
-      .stat-card:hover {
-        border-color: var(--hl-accent);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-        background: var(--hl-surface);
       }
 
       .stat-label {
@@ -457,9 +382,8 @@
 
       .results-panel {
         background: rgba(255, 255, 255, 0.98);
-        border-radius: 12px;
+        border-radius: var(--hl-radius-lg);
         padding: 30px;
-        box-shadow: 0 4px 20px rgba(255, 255, 255, 0.15);
         position: relative;
       }
 
@@ -471,7 +395,7 @@
         right: 0;
         bottom: 0;
         border: 2px solid rgba(255, 255, 255, 0.2);
-        border-radius: 12px;
+        border-radius: var(--hl-radius-lg);
         pointer-events: none;
       }
 
@@ -483,7 +407,7 @@
         width: 4px;
         height: 100%;
         background: var(--hl-accent);
-        border-radius: 12px 0 0 12px;
+        border-radius: var(--hl-radius-lg) 0 0 var(--hl-radius-lg);
       }
 
       .results-title {
@@ -541,22 +465,6 @@
         width: 22%;
       }
 
-      th::after {
-        content: '';
-        position: absolute;
-        bottom: -2px;
-        left: 0;
-        right: 0;
-        height: 2px;
-        background: var(--hl-accent);
-        opacity: 0;
-        transition: opacity 0.3s ease;
-      }
-
-      th:hover::after {
-        opacity: 1;
-      }
-
       td {
         padding: 15px;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -575,32 +483,21 @@
       }
 
       tbody tr {
-        transition: all 0.3s ease;
-        background: rgba(255, 255, 255, 0.5);
+        background: var(--hl-bg-muted);
       }
 
       tbody tr:nth-child(even) {
-        background: rgba(255, 255, 255, 0.5);
-      }
-
-      tbody tr:hover {
-        background: rgba(255, 255, 255, 0.08);
-        box-shadow: 0 2px 8px rgba(255, 255, 255, 0.15);
+        background: var(--hl-bg-subtle);
       }
 
       .detail-btn {
         padding: 6px 12px;
         background: var(--hl-accent);
         border: none;
-        border-radius: 6px;
+        border-radius: var(--hl-radius-sm);
         color: var(--hl-accent-fg);
         font-weight: 600;
         cursor: pointer;
-        transition: all 0.3s ease;
-      }
-
-      .detail-btn:hover {
-        box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
       }
 
       .pagination {
@@ -615,15 +512,9 @@
         padding: 8px 16px;
         background: var(--hl-surface);
         border: 1px solid var(--hl-border-strong);
-        border-radius: 6px;
+        border-radius: var(--hl-radius-sm);
         color: var(--hl-fg);
         cursor: pointer;
-        transition: all 0.3s ease;
-      }
-
-      .page-btn:hover:not(:disabled) {
-        background: var(--hl-accent);
-        color: var(--hl-accent-fg);
       }
 
       .page-btn:disabled {
@@ -662,14 +553,13 @@
 
       .modal-content {
         background: var(--hl-surface);
-        border-radius: 12px;
+        border-radius: var(--hl-radius-lg);
         padding: 30px;
         max-width: 1200px;
         width: 90%;
         max-height: 80vh;
         overflow-y: auto;
         position: relative;
-        box-shadow: 0 8px 40px rgba(255, 255, 255, 0.3);
         user-select: text !important;
         -webkit-user-select: text !important;
         -moz-user-select: text !important;
@@ -684,7 +574,7 @@
         right: 0;
         bottom: 0;
         border: 2px solid rgba(255, 255, 255, 0.3);
-        border-radius: 12px;
+        border-radius: var(--hl-radius-lg);
         pointer-events: none;
       }
 
@@ -696,7 +586,7 @@
         right: 0;
         height: 4px;
         background: var(--hl-accent);
-        border-radius: 12px 12px 0 0;
+        border-radius: var(--hl-radius-lg) var(--hl-radius-lg) 0 0;
       }
 
       .modal-close {
@@ -714,14 +604,6 @@
         cursor: pointer;
         color: var(--hl-fg-muted);
         font-size: 1.5rem;
-        transition: all 0.3s ease;
-      }
-
-      .modal-close:hover {
-        background: var(--hl-error-bg);
-        color: var(--hl-error);
-        border-color: var(--hl-error-bg);
-        transform: rotate(90deg);
       }
 
       .modal-title {
@@ -751,14 +633,14 @@
       }
 
       .detail-value {
-        background: var(--hl-bg-subtle);
-        border-radius: 8px;
+        background: var(--hl-surface);
+        border: var(--hl-border-w-thin) solid var(--hl-border);
+        border-radius: var(--hl-radius-md);
         padding: 15px;
         color: var(--hl-fg);
         font-family: 'Courier New', monospace;
         white-space: pre-wrap;
         word-break: break-all;
-        box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.05);
         position: relative;
         user-select: text !important;
         -webkit-user-select: text !important;
@@ -774,7 +656,7 @@
         right: 0;
         bottom: 0;
         border: 2px solid rgba(255, 255, 255, 0.15);
-        border-radius: 8px;
+        border-radius: var(--hl-radius-md);
         pointer-events: none;
       }
 
@@ -783,27 +665,6 @@
         padding: 40px;
         color: var(--hl-accent);
         font-size: 1.2rem;
-      }
-
-      .loading::after {
-        content: '...';
-        animation: dots 1.5s steps(4, end) infinite;
-      }
-
-      @keyframes dots {
-        0%,
-        20% {
-          content: '.';
-        }
-
-        40% {
-          content: '..';
-        }
-
-        60%,
-        100% {
-          content: '...';
-        }
       }
 
       .no-data {

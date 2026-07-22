@@ -3,14 +3,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--hl-gray-900);
+  background: var(--hl-bg);
   padding: 20px;
 }
 
 .auth-container {
   background: var(--hl-surface);
-  border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--hl-border-strong);
+  border-radius: var(--hl-radius-card);
   width: 100%;
   max-width: 420px;
   overflow: hidden;
@@ -21,7 +21,6 @@
   color: var(--hl-accent-fg);
   padding: 40px 30px;
   text-align: center;
-  transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
 }
@@ -52,48 +51,26 @@
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
-  color: var(--hl-gray-700);
+  color: var(--hl-fg);
   font-size: 14px;
 }
 
 .form-input {
   width: 100%;
   padding: 14px 18px;
-  border: 2px solid var(--hl-gray-200);
-  border-radius: 12px;
+  border: 2px solid var(--hl-border);
+  border-radius: var(--hl-radius-lg);
   font-size: 15px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-sizing: border-box;
-  background: var(--hl-bg-subtle);
-  box-shadow:
-    inset 0 2px 4px rgba(0, 0, 0, 0.02),
-    0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.form-input:hover {
-  border-color: var(--hl-border);
-  box-shadow:
-    inset 0 2px 4px rgba(0, 0, 0, 0.02),
-    0 2px 8px rgba(255, 255, 255, 0.1);
+  background: var(--hl-surface);
 }
 
 .form-input:focus {
   outline: none;
-  border-color: var(--hl-accent);
-  background: var(--hl-surface);
-  box-shadow:
-    inset 0 2px 4px rgba(0, 0, 0, 0.02),
-    0 0 0 4px rgba(255, 255, 255, 0.15),
-    0 4px 12px rgba(255, 255, 255, 0.2);
 }
 
 .form-input::placeholder {
   color: var(--hl-fg-subtle);
-  transition: color 0.3s ease;
-}
-
-.form-input:focus::placeholder {
-  color: var(--hl-border);
 }
 
 .btn-block {
@@ -106,7 +83,7 @@
 .auth-footer {
   padding: 20px 30px;
   text-align: center;
-  border-top: 1px solid var(--hl-gray-150);
+  border-top: 1px solid var(--hl-border);
   background: var(--hl-bg-subtle);
 }
 
@@ -120,11 +97,6 @@
   color: var(--hl-accent);
   text-decoration: none;
   font-weight: 500;
-  transition: color 0.3s ease;
-}
-
-.auth-footer a:hover {
-  color: var(--hl-accent);
 }
 
 .hidden {
@@ -143,7 +115,7 @@
 .nav-logo {
   width: 40px;
   height: 40px;
-  border-radius: 8px;
+  border-radius: var(--hl-radius-md);
 }
 
 .app-subtitle {
@@ -154,7 +126,7 @@
 
 @media (max-width: 480px) {
   .auth-container {
-    border-radius: 12px;
+    border-radius: var(--hl-radius-lg);
   }
 
   .auth-header {

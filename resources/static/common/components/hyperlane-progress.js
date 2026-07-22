@@ -54,28 +54,16 @@ class HyperlaneProgress extends HTMLElement {
         }
         .progress-bar {
           height: ${height};
-          background: var(--hl-bg-muted);
-          border-radius: ${parseInt(height) / 2}px;
+          background: var(--hl-overlay-muted);
+          border-radius: var(--hl-radius-pill);
           overflow: hidden;
+          border: var(--hl-border-w-thin) solid var(--hl-border);
         }
         .progress-fill {
           height: 100%;
-          background: var(--hl-gray-900);
-          border-radius: ${parseInt(height) / 2}px;
-          transition: width 0.3s ease;
+          background: var(--hl-accent);
+          border-radius: var(--hl-radius-pill);
           width: ${percentage}%;
-          ${
-            animated
-              ? `
-            opacity: 0.85;
-            animation: pulse 2s ease-in-out infinite;
-          `
-              : ''
-          }
-        }
-        @keyframes pulse {
-          0%, 100% { opacity: 0.85; }
-          50% { opacity: 0.6; }
         }
       </style>
       <div class="progress-bar">

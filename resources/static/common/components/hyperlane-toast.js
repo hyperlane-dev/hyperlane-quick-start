@@ -54,10 +54,8 @@ class HyperlaneToast extends HTMLElement {
   hide() {
     const toast = this.shadowRoot.querySelector('.toast');
     if (toast) {
-      toast.style.animation = 'slideOut 0.3s ease forwards';
-      setTimeout(() => {
-        this.removeAttribute('message');
-      }, 300);
+      toast.style.opacity = '0';
+      this.removeAttribute('message');
     }
   }
 
@@ -71,11 +69,13 @@ class HyperlaneToast extends HTMLElement {
     }
 
     const typeStyles = {
-      success: 'background: var(--hl-gray-900); color: var(--hl-accent-fg);',
-      error: 'background: var(--hl-error-bg); color: var(--hl-error);',
+      success:
+        'background: var(--hl-accent); color: var(--hl-accent-fg); border: var(--hl-border-w-thin) solid var(--hl-border);',
+      error:
+        'background: var(--hl-error-bg); color: var(--hl-error-fg); border: var(--hl-border-w-thin) solid var(--hl-border);',
       warning:
-        'background: var(--hl-warning-bg); color: var(--hl-warning); border: 1px solid var(--hl-border-strong);',
-      info: 'background: var(--hl-info-bg); color: var(--hl-info); border: 1px solid var(--hl-border);',
+        'background: var(--hl-warning-bg); color: var(--hl-warning-fg); border: var(--hl-border-w-thin) solid var(--hl-border);',
+      info: 'background: var(--hl-info-bg); color: var(--hl-info-fg); border: var(--hl-border-w-thin) solid var(--hl-border);',
     };
 
     this.shadowRoot.innerHTML = `
@@ -89,31 +89,12 @@ class HyperlaneToast extends HTMLElement {
         .toast {
           padding: 12px 24px;
           border-radius: var(--hl-radius-sm);
-          border: 1px solid var(--hl-border);
           font-weight: 500;
-          box-shadow: var(--hl-shadow-lg, 0 4px 12px rgba(0, 0, 0, 0.15));
-          animation: slideIn 0.3s ease;
           min-width: 200px;
           max-width: 400px;
           word-wrap: break-word;
           box-sizing: border-box;
           ${typeStyles[type] || typeStyles.success}
-        }
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-        @keyframes slideOut {
-          from {
-            opacity: 1;
-          }
-          to {
-            opacity: 0;
-          }
         }
       </style>
       <div class="toast">${message}</div>

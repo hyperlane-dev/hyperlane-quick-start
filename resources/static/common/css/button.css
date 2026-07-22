@@ -5,18 +5,12 @@
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: var(--hl-transition);
   background: var(--hl-surface);
   color: var(--hl-fg);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-}
-
-.btn:hover {
-  background: var(--hl-surface-hover);
-  border-color: var(--hl-border-strong);
 }
 
 .btn:disabled {
@@ -31,31 +25,16 @@
   color: var(--hl-accent-fg);
 }
 
-.btn-primary:hover {
-  background: var(--hl-accent-hover);
-  border-color: var(--hl-accent-hover);
-}
-
 .btn-danger {
   background: var(--hl-error-bg);
   border-color: var(--hl-error-bg);
-  color: var(--hl-error);
-}
-
-.btn-danger:hover {
-  opacity: 0.85;
-  background: var(--hl-error-bg);
-  border-color: var(--hl-error-bg);
+  color: var(--hl-error-fg);
 }
 
 .btn-success {
   background: var(--hl-success-bg);
   border-color: var(--hl-border-strong);
-  color: var(--hl-success);
-}
-
-.btn-success:hover {
-  background: var(--hl-surface-hover);
+  color: var(--hl-success-fg);
 }
 
 .btn-sm {

@@ -68,24 +68,18 @@ class HyperlaneConfirm extends HTMLElement {
           left: 0;
           width: 100%;
           height: 100%;
-          background: var(--hl-overlay, rgba(0, 0, 0, 0.6));
+          background: var(--hl-overlay);
           z-index: 10001;
           justify-content: center;
           align-items: center;
         }
         .confirm-box {
           background: var(--hl-surface);
-          border: 1px solid var(--hl-border);
+          border: var(--hl-border-w-medium) solid var(--hl-border);
           border-radius: var(--hl-radius-md);
           padding: 28px 32px;
           max-width: 400px;
           width: 90%;
-          box-shadow: var(--hl-shadow-lg, 0 8px 40px rgba(0, 0, 0, 0.2));
-          animation: scaleIn 0.2s ease;
-        }
-        @keyframes scaleIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
         }
         .confirm-message {
           color: var(--hl-fg);
@@ -101,28 +95,19 @@ class HyperlaneConfirm extends HTMLElement {
         }
         .btn {
           padding: 10px 24px;
-          border: none;
+          border: var(--hl-border-w-thin) solid var(--hl-border);
           border-radius: var(--hl-radius-sm);
           font-size: 0.95rem;
           font-weight: 600;
           cursor: pointer;
-          transition: all 0.25s ease;
         }
         .btn-cancel {
-          background: var(--hl-bg-muted);
-          color: var(--hl-fg-muted);
-          border: 1px solid var(--hl-border);
-        }
-        .btn-cancel:hover {
-          background: var(--hl-surface-hover);
+          background: var(--hl-surface);
+          color: var(--hl-fg);
         }
         .btn-confirm {
-          background: var(--hl-gray-900);
+          background: var(--hl-accent);
           color: var(--hl-accent-fg);
-          box-shadow: var(--hl-shadow-md, 0 2px 8px rgba(0, 0, 0, 0.1));
-        }
-        .btn-confirm:hover {
-          background: var(--hl-accent-hover);
         }
       </style>
       <div class="confirm-box">

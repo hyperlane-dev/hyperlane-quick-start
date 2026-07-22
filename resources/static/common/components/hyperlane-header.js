@@ -67,9 +67,8 @@ class HyperlaneHeader extends HTMLElement {
         }
         .app-header {
           text-align: center;
-          color: ${light ? 'var(--hl-fg)' : 'var(--hl-accent-fg)'};
+          color: var(--hl-fg);
           padding: 40px 20px;
-          animation: fadeInDown 0.6s ease;
         }
         .header-content {
           max-width: 1200px;
@@ -85,29 +84,18 @@ class HyperlaneHeader extends HTMLElement {
         .nav-logo {
           width: 40px;
           height: 40px;
-          border-radius: 8px;
+          border-radius: var(--hl-radius-md);
           object-fit: contain;
           vertical-align: middle;
           margin-right: 12px;
         }
         .text {
-          color: ${light ? 'var(--hl-gray-900)' : 'var(--hl-accent-fg)'};
+          color: var(--hl-fg);
+          font-weight: 600;
         }
         .text.shimmer {
-          color: inherit;
-        }
-        h1 a::after {
-          content: '';
-          position: absolute;
-          left: 0;
-          bottom: -2px;
-          width: 0;
-          height: 2px;
-          background: currentColor;
-          transition: width 0.4s ease;
-        }
-        h1 a:hover::after {
-          width: 100%;
+          color: var(--hl-fg);
+          opacity: 1;
         }
         .app-title {
           font-size: 2.5rem;
@@ -119,23 +107,12 @@ class HyperlaneHeader extends HTMLElement {
         }
         .app-subtitle {
           font-size: 1.1rem;
-          color: ${light ? 'var(--hl-fg-muted)' : 'var(--hl-fg-muted, rgba(255, 255, 255, 0.9))'};
+          color: var(--hl-fg-muted);
           font-weight: 400;
           margin-top: 8px;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
-        }
-        @keyframes fadeInDown {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-        @keyframes shimmer {
-          to { background-position: 200% center; }
         }
         @media (max-width: 768px) {
           .app-title {

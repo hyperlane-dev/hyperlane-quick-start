@@ -29,12 +29,8 @@
       }
 
       *::-webkit-scrollbar-thumb {
-        background: var(--hl-gray-300);
-        border-radius: 4px;
-      }
-
-      *::-webkit-scrollbar-thumb:hover {
-        background: var(--hl-gray-400);
+        background: var(--hl-border);
+        border-radius: var(--hl-radius-sm);
       }
 
       body {
@@ -79,28 +75,22 @@
       .header h1 .nav-logo {
         width: 32px;
         height: 32px;
-        border-radius: 6px;
+        border-radius: var(--hl-radius-md);
         object-fit: contain;
       }
 
       .btn {
         padding: 6px 16px;
         border: 1px solid var(--hl-border-strong);
-        border-radius: 6px;
+        border-radius: var(--hl-radius-sm);
         font-size: 14px;
         font-weight: 500;
         cursor: pointer;
-        transition: all 0.2s;
         background: var(--hl-bg-muted);
         color: var(--hl-fg);
         display: inline-flex;
         align-items: center;
         gap: 6px;
-      }
-
-      .btn:hover {
-        background: var(--hl-bg-muted);
-        border-color: var(--hl-border);
       }
 
       .btn-primary {
@@ -109,27 +99,17 @@
         color: var(--hl-accent-fg);
       }
 
-      .btn-primary:hover {
-        background: var(--hl-accent);
-      }
-
       .btn-danger {
         background: var(--hl-error-bg);
         border-color: var(--hl-error-bg);
-        color: var(--hl-error);
-      }
-
-      .btn-danger:hover {
-        background: var(--hl-error-bg);
-        border-color: var(--hl-error-bg);
+        color: var(--hl-error-fg);
       }
 
       .container {
         margin: 24px 12px;
         padding: 24px;
         background: var(--hl-surface);
-        border-radius: 12px;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        border-radius: var(--hl-radius-lg);
         margin-bottom: 44px;
       }
 
@@ -147,14 +127,9 @@
         color: var(--hl-fg-muted);
         font-size: 14px;
         font-weight: 700;
-        transition: all 0.2s;
         display: flex;
         align-items: center;
         gap: 6px;
-      }
-
-      .tab:hover {
-        color: var(--hl-fg);
       }
 
       .tab.active {
@@ -163,62 +138,38 @@
       }
 
       .tab .count {
-        background: var(--hl-bg-muted);
+        background: var(--hl-surface);
+        border: var(--hl-border-w-thin) solid var(--hl-border-w-medium);
         padding: 2px 8px;
-        border-radius: 10px;
+        border-radius: var(--hl-radius-badge);
         font-size: 12px;
         font-weight: 700;
         color: var(--hl-fg);
       }
 
-      .card {
-        background: var(--hl-surface);
-        border: 1px solid var(--hl-border-strong);
-        border-radius: 12px;
-        overflow: hidden;
-        margin-bottom: 16px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-      }
-
-      .card-header {
-        padding: 16px 20px;
-        border-bottom: 1px solid var(--hl-gray-200);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-
-      .card-title {
+      .section-title {
         font-size: 18px;
         font-weight: 700;
         color: var(--hl-accent);
-      }
-
-      .card-body {
-        padding: 20px;
+        margin: 0 0 16px;
       }
 
       .pipeline-list {
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: var(--hl-list-item-spacing);
+        padding: var(--hl-list-padding);
       }
 
       .pipeline-item {
         background: var(--hl-bg-subtle);
         border: 1px solid var(--hl-border-strong);
-        border-radius: 8px;
-        padding: 16px;
+        border-radius: var(--hl-list-item-radius);
+        padding: var(--hl-list-item-padding);
         display: flex;
         align-items: center;
         gap: 16px;
-        transition: all 0.2s;
         cursor: pointer;
-      }
-
-      .pipeline-item:hover {
-        border-color: var(--hl-accent);
-        background: var(--hl-info-bg);
       }
 
       .pipeline-status {
@@ -230,7 +181,6 @@
 
       .pipeline-status.active {
         background: var(--hl-success);
-        box-shadow: 0 0 8px var(--hl-success);
       }
 
       .pipeline-status.inactive {
@@ -270,24 +220,19 @@
       .run-list {
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: var(--hl-list-item-spacing);
+        padding: var(--hl-list-padding);
       }
 
       .run-item {
         background: var(--hl-bg-subtle);
         border: 1px solid var(--hl-border-strong);
-        border-radius: 8px;
+        border-radius: var(--hl-list-item-radius);
         padding: 12px 16px;
         display: flex;
         align-items: center;
         gap: 12px;
         cursor: pointer;
-        transition: all 0.2s;
-      }
-
-      .run-item:hover {
-        background: var(--hl-info-bg);
-        border-color: var(--hl-accent);
       }
 
       .run-status {
@@ -308,7 +253,7 @@
       }
 
       .run-status.failure {
-        background: var(--hl-error);
+        background: var(--hl-error-bg);
         color: var(--hl-accent-fg);
         padding-bottom: 3px;
       }
@@ -351,22 +296,11 @@
       .run-status.running {
         background: var(--hl-accent);
         color: var(--hl-accent-fg);
-        animation: pulse 1.5s infinite;
       }
 
       .run-status.cancelled {
         background: var(--hl-gray-500);
         color: var(--hl-accent-fg);
-      }
-
-      @keyframes pulse {
-        0%,
-        100% {
-          opacity: 1;
-        }
-        50% {
-          opacity: 0.5;
-        }
       }
 
       .run-info {
@@ -413,20 +347,15 @@
         width: 100%;
         padding: 8px 12px;
         background: var(--hl-bg-subtle);
-        border: 1px solid var(--hl-border-strong);
-        border-radius: 6px;
         color: var(--hl-fg);
         font-size: 14px;
-        transition: all 0.2s;
       }
 
       .form-input:focus,
       .form-textarea:focus,
       .form-select:focus {
         outline: none;
-        border-color: var(--hl-accent);
-        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
-        background: var(--hl-surface);
+        box-shadow: none;
       }
 
       .form-textarea {
@@ -436,6 +365,7 @@
         line-height: 1.5;
         resize: none;
         overflow: hidden;
+        border-radius: var(--hl-radius-sm);
       }
 
       .modal {
@@ -459,12 +389,11 @@
       .modal-content {
         background: var(--hl-surface);
         border: 1px solid var(--hl-border-strong);
-        border-radius: 12px;
+        border-radius: var(--hl-radius-lg);
         max-width: 700px;
         width: 100%;
         max-height: 90vh;
         overflow-y: auto;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
       }
 
       .modal-header {
@@ -493,13 +422,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 6px;
-        transition: all 0.2s;
-      }
-
-      .modal-close:hover {
-        background: var(--hl-bg-muted);
-        color: var(--hl-fg);
+        border-radius: var(--hl-radius-sm);
       }
 
       .modal-body {
@@ -535,14 +458,15 @@
       .job-list {
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: var(--hl-list-item-spacing);
+        padding: var(--hl-list-padding);
         margin-top: 16px;
       }
 
       .job-item {
         background: var(--hl-bg-subtle);
         border: 1px solid var(--hl-border-strong);
-        border-radius: 8px;
+        border-radius: var(--hl-list-item-radius);
         overflow: hidden;
       }
 
@@ -566,10 +490,9 @@
       }
 
       .step-item {
-        border-radius: 6px;
+        border-radius: var(--hl-radius-sm);
         display: flex;
         flex-direction: column;
-        transition: all 0.2s;
       }
 
       .step-header-row {
@@ -578,11 +501,6 @@
         gap: 10px;
         padding: 10px 12px;
         cursor: pointer;
-        transition: all 0.2s;
-      }
-
-      .step-header-row:hover {
-        background: var(--hl-info-bg);
       }
 
       .step-status {
@@ -611,7 +529,6 @@
       .step-status.running {
         background: var(--hl-accent);
         color: var(--hl-accent-fg);
-        animation: pulse 1.5s infinite;
       }
       .step-status.skipped {
         background: var(--hl-gray-500);
@@ -634,7 +551,7 @@
       .log-output {
         background: var(--hl-bg-subtle);
         border: 1px solid var(--hl-border-strong);
-        border-radius: 6px;
+        border-radius: var(--hl-radius-sm);
         padding: 16px;
         font-family:
           'SFMono-Regular', 'Monaco', 'Inconsolata', 'Fira Code', 'Consolas',
@@ -667,23 +584,23 @@
 
       .log-error {
         color: var(--hl-error);
-        background: rgba(0, 0, 0, 0.1);
+        background: var(--hl-overlay-muted);
         padding: 0 4px;
-        border-radius: 3px;
+        border-radius: var(--hl-radius-xs);
       }
 
       .log-warning {
         color: var(--hl-warning);
-        background: rgba(255, 255, 255, 0.1);
+        background: var(--hl-overlay-muted);
         padding: 0 4px;
-        border-radius: 3px;
+        border-radius: var(--hl-radius-xs);
       }
 
       .log-success {
         color: var(--hl-success);
-        background: rgba(255, 255, 255, 0.1);
+        background: var(--hl-overlay-muted);
         padding: 0 4px;
-        border-radius: 3px;
+        border-radius: var(--hl-radius-xs);
       }
 
       .log-info {
@@ -718,11 +635,6 @@
         align-items: center;
         justify-content: space-between;
         cursor: pointer;
-        transition: background 0.2s;
-      }
-
-      .step-log-header:hover {
-        background: var(--hl-info-bg);
       }
 
       .step-log-toggle {
@@ -734,7 +646,6 @@
       }
 
       .step-log-toggle-icon {
-        transition: transform 0.2s;
         font-size: 10px;
       }
 
@@ -773,38 +684,18 @@
       .toast {
         background: var(--hl-surface);
         border: 1px solid var(--hl-border-strong);
-        border-radius: 8px;
+        border-radius: var(--hl-radius-md);
         padding: 12px 16px;
         min-width: 280px;
         max-width: 400px;
         display: flex;
         align-items: center;
         gap: 12px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-        animation: slideIn 0.3s ease;
         cursor: pointer;
       }
 
       .toast.hiding {
-        animation: slideOut 0.3s ease forwards;
-      }
-
-      @keyframes slideIn {
-        from {
-          opacity: 0;
-        }
-        to {
-          opacity: 1;
-        }
-      }
-
-      @keyframes slideOut {
-        from {
-          opacity: 1;
-        }
-        to {
-          opacity: 0;
-        }
+        opacity: 0;
       }
 
       .toast-icon {
@@ -960,7 +851,7 @@
           max-width: 100%;
           max-height: 95vh;
           margin: 10px;
-          border-radius: 8px;
+          border-radius: var(--hl-radius-md);
         }
 
         .modal-header {
@@ -1036,18 +927,11 @@
           font-size: 11px;
         }
 
-        .card-header {
-          padding: 12px 16px;
-        }
-
-        .card-title {
-          font-size: 15px;
+        .section-title {
+          font-size: 18px;
           font-weight: 700;
           color: var(--hl-accent);
-        }
-
-        .card-body {
-          padding: 16px;
+          margin: 0 0 16px;
         }
 
         .back-btn {
@@ -1116,7 +1000,7 @@
 
         .modal-content {
           margin: 5px;
-          border-radius: 6px;
+          border-radius: var(--hl-radius-sm);
         }
 
         .modal-header,
@@ -1160,12 +1044,10 @@
           onclick="showCreateModal()"
           style="
             margin-left: 16px;
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            border-radius: 8px;
+            border-radius: var(--hl-radius-md);
             padding: 8px 16px;
             font-weight: 600;
             font-size: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
             flex-shrink: 0;
             line-height: 1;
           "
@@ -1186,53 +1068,41 @@
       </div>
 
       <div id="pipelines-view">
-        <div class="card">
-          <div class="card-header">
-            <span class="card-title">All Pipelines</span>
-          </div>
-          <div class="card-body">
-            <div class="pipeline-list" id="pipeline-list">
-              <div class="empty-state">
-                <div class="empty-state-icon">📦</div>
-                <div class="empty-state-title">No pipelines yet</div>
-                <p>Create your first pipeline to get started</p>
-              </div>
-            </div>
+        <h2 class="section-title">All Pipelines</h2>
+        <div class="pipeline-list" id="pipeline-list">
+          <div class="empty-state">
+            <div class="empty-state-icon">📦</div>
+            <div class="empty-state-title">No pipelines yet</div>
+            <p>Create your first pipeline to get started</p>
           </div>
         </div>
       </div>
 
       <div id="runs-view" class="hidden">
-        <div class="card">
-          <div class="card-header">
-            <span class="card-title">Recent Runs</span>
-          </div>
-          <div class="card-body">
-            <div class="run-list" id="run-list">
-              <div class="empty-state">
-                <div class="empty-state-icon" aria-hidden="true">
-                  <svg
-                    width="48"
-                    height="48"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <polygon points="6 4 20 12 6 20 6 4"></polygon>
-                  </svg>
-                </div>
-                <div class="empty-state-title">No runs yet</div>
-                <p>Trigger a pipeline to see runs here</p>
-              </div>
+        <h2 class="section-title">Recent Runs</h2>
+        <div class="run-list" id="run-list">
+          <div class="empty-state">
+            <div class="empty-state-icon" aria-hidden="true">
+              <svg
+                width="48"
+                height="48"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polygon points="6 4 20 12 6 20 6 4"></polygon>
+              </svg>
             </div>
-            <div class="loading-more hidden" id="loading-more">
-              <div class="loading-spinner"></div>
-              <span>Loading more...</span>
-            </div>
+            <div class="empty-state-title">No runs yet</div>
+            <p>Trigger a pipeline to see runs here</p>
           </div>
+        </div>
+        <div class="loading-more hidden" id="loading-more">
+          <div class="loading-spinner"></div>
+          <span>Loading more...</span>
         </div>
       </div>
 
@@ -1319,7 +1189,7 @@ jobs:
               id="run-config-pipeline-name"
               style="
                 background: var(--hl-accent);
-                color: var(--hl-fg);
+                color: var(--hl-accent-fg);
                 cursor: default;
                 font-weight: 600;
               "
@@ -1331,11 +1201,12 @@ jobs:
               class="form-textarea"
               id="run-config-content"
               style="
-                background: var(--hl-bg-subtle);
+                background: var(--hl-surface);
                 color: var(--hl-fg);
-                border: 1px solid var(--hl-accent);
+                border: var(--hl-border-w-thin) solid var(--hl-border);
                 overflow: auto;
                 min-height: 300px;
+                padding: 12px;
                 cursor: default;
                 white-space: pre-wrap;
                 word-wrap: break-word;

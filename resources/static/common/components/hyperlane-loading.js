@@ -60,18 +60,15 @@ class HyperlaneLoading extends HTMLElement {
         .loading-container {
           text-align: center;
           background: var(--hl-surface);
-          backdrop-filter: blur(10px);
           border-radius: var(--hl-radius-lg);
           padding: 60px 40px;
-          box-shadow: var(--hl-shadow-lg, 0 10px 40px rgba(0, 0, 0, 0.1));
-          border: 1px solid var(--hl-border);
-          animation: fadeIn 0.3s ease;
+          border: var(--hl-border-w-medium) solid var(--hl-border);
         }
         .spinner {
           width: ${styles.spinner};
           height: ${styles.spinner};
           border: 4px solid var(--hl-border);
-          border-top: 4px solid var(--hl-gray-900);
+          border-top: 4px solid var(--hl-accent);
           border-radius: 50%;
           animation: spin 1s linear infinite;
           margin: 0 auto 20px;
@@ -83,10 +80,6 @@ class HyperlaneLoading extends HTMLElement {
         }
         @keyframes spin {
           to { transform: rotate(360deg); }
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
         }
       </style>
       <div class="loading-container">

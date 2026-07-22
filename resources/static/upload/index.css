@@ -1,8 +1,6 @@
 :root {
   --primary-gradient: var(--hl-accent);
-  --primary-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  --hover-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-  --border-radius: 12px;
+  --primary-shadow: var(--hl-shadow-md);
   --spacing-xs: 0.25rem;
   --spacing-sm: 0.5rem;
   --spacing-md: 1rem;
@@ -67,10 +65,9 @@ body {
 
 .upload-container {
   background-color: var(--hl-surface);
-  border-radius: var(--border-radius);
+  border-radius: var(--hl-radius-lg);
   padding: var(--spacing-lg);
   box-shadow: var(--primary-shadow);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
@@ -82,9 +79,9 @@ body {
 .history-container {
   flex: 1;
   overflow-y: auto;
-  border-radius: var(--border-radius);
-  background: rgba(255, 255, 255, 0.5);
-  padding: var(--spacing-md);
+  border-radius: var(--hl-radius-lg);
+  background: var(--hl-overlay-muted);
+  padding: var(--hl-list-padding);
   margin-bottom: var(--spacing-md);
 }
 
@@ -94,31 +91,28 @@ body {
 
 .history-container::-webkit-scrollbar-track {
   background: var(--hl-bg-muted);
-  border-radius: 3px;
+  border-radius: var(--hl-radius-xs);
 }
 
 .history-container::-webkit-scrollbar-thumb {
   background: var(--primary-gradient);
-  border-radius: 3px;
+  border-radius: var(--hl-radius-xs);
 }
 
 .history-list {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-sm);
+  gap: var(--hl-list-item-spacing);
 }
 
 .history-item {
   background: var(--hl-surface);
-  border-radius: var(--border-radius);
-  padding: var(--spacing-md);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
-}
-
-.history-item:hover {
-  box-shadow: var(--primary-shadow);
+  border: 1px solid var(--hl-border);
+  border-radius: var(--hl-list-item-radius);
+  padding: var(--hl-list-item-padding);
+  color: var(--hl-fg);
+  transition: none;
 }
 
 .history-item-header {
@@ -147,7 +141,7 @@ body {
 .progress-bar {
   height: 6px;
   background: var(--hl-accent);
-  border-radius: 3px;
+  border-radius: var(--hl-radius-xs);
   overflow: hidden;
 }
 
@@ -179,11 +173,10 @@ body {
 
 .btn {
   padding: var(--spacing-md);
-  border-radius: var(--border-radius);
+  border-radius: var(--hl-radius-lg);
   border: none;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
   text-align: center;
   font-size: var(--font-size-md);
   background: var(--hl-success);
@@ -193,11 +186,6 @@ body {
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
-}
-
-.btn:hover {
-  background: var(--hl-success);
-  box-shadow: var(--hover-shadow);
 }
 
 .btn:disabled {
@@ -214,7 +202,7 @@ body {
 .status {
   position: relative;
   padding: var(--spacing-sm) var(--spacing-lg);
-  border-radius: var(--border-radius);
+  border-radius: var(--hl-radius-lg);
   font-size: var(--font-size-sm);
   animation: slideIn 0.3s ease;
   z-index: 1000;
@@ -230,13 +218,13 @@ body {
 
 .status.success {
   background-color: var(--hl-success-bg);
-  color: var(--hl-success);
-  border-left: 4px solid var(--hl-success);
+  color: var(--hl-success-fg);
+  border-left: 4px solid var(--hl-success-bg);
 }
 
 .status.error {
-  background-color: var(--hl-error);
-  color: var(--hl-error);
+  background-color: var(--hl-error-bg);
+  color: var(--hl-error-fg);
   border-left: 4px solid var(--hl-error);
 }
 

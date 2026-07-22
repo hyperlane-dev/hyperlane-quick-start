@@ -32,7 +32,7 @@ button,
 .login-container {
   background: rgba(255, 255, 255, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
+  border-radius: var(--hl-radius-lg);
   padding: 40px;
   width: 100%;
   max-width: 400px;
@@ -87,10 +87,6 @@ button,
   text-decoration: none;
 }
 
-.login-footer a:hover {
-  text-decoration: underline;
-}
-
 .main-app {
   display: flex;
   height: 100dvh;
@@ -130,7 +126,7 @@ button,
 .sidebar-header h2 .nav-logo {
   width: 28px;
   height: 28px;
-  border-radius: 6px;
+  border-radius: var(--hl-radius-sm);
   object-fit: contain;
   vertical-align: middle;
 }
@@ -145,7 +141,7 @@ button,
 .login-header h1 .nav-logo {
   width: 32px;
   height: 32px;
-  border-radius: 6px;
+  border-radius: var(--hl-radius-sm);
   object-fit: contain;
   vertical-align: middle;
   margin-right: 8px;
@@ -153,32 +149,31 @@ button,
 
 .sidebar-nav {
   flex: 1;
-  padding: 16px 0;
+  padding: var(--hl-list-padding);
+  display: flex;
+  flex-direction: column;
+  gap: var(--hl-list-item-spacing);
   overflow-y: auto;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 20px;
+  gap: var(--hl-list-gap);
+  padding: var(--hl-list-item-padding);
   cursor: pointer;
   color: var(--hl-fg-muted);
   font-size: 14px;
   font-weight: 600;
-  transition: all 0.2s;
-  border-left: 3px solid transparent;
-}
-
-.nav-item:hover {
-  background: var(--hl-bg-muted);
-  color: var(--hl-fg);
+  border-radius: var(--hl-list-item-radius);
+  border: var(--hl-border-w-thin) solid var(--hl-border);
+  background: var(--hl-surface);
 }
 
 .nav-item.active {
   background: var(--hl-accent);
   color: var(--hl-accent-fg);
-  border-left-color: var(--hl-accent);
+  border-color: var(--hl-accent);
   font-weight: 700;
 }
 
@@ -211,7 +206,7 @@ button,
   background: var(--hl-success);
   color: var(--hl-accent-fg);
   padding: 2px 8px;
-  border-radius: 10px;
+  border-radius: var(--hl-radius-md);
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
@@ -235,7 +230,6 @@ button,
 .content-header {
   margin-bottom: 12px;
   flex-shrink: 0;
-  animation: fadeInDown 0.6s ease;
 }
 
 .content-header h1 {
@@ -250,22 +244,16 @@ button,
 .btn {
   padding: 8px 16px;
   border: 1px solid var(--hl-border-strong);
-  border-radius: 6px;
+  border-radius: var(--hl-radius-sm);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
   background: var(--hl-bg-muted);
   color: var(--hl-fg);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-}
-
-.btn:hover {
-  background: var(--hl-bg-muted);
-  border-color: var(--hl-border);
 }
 
 .btn:disabled {
@@ -280,20 +268,10 @@ button,
   color: var(--hl-accent-fg);
 }
 
-.btn-primary:hover {
-  background: var(--hl-accent);
-  border-color: transparent;
-}
-
 .btn-danger {
   background: var(--hl-error-bg);
   border-color: var(--hl-error-bg);
   color: var(--hl-error);
-}
-
-.btn-danger:hover {
-  background: var(--hl-error-bg);
-  border-color: var(--hl-error-bg);
 }
 
 .btn-sm {
@@ -323,7 +301,7 @@ button,
   padding: 10px 12px;
   background: var(--hl-bg-subtle);
   border: 1px solid var(--hl-border-strong);
-  border-radius: 6px;
+  border-radius: var(--hl-radius-sm);
   color: var(--hl-fg);
   font-size: 14px;
   transition: all 0.2s;
@@ -334,7 +312,7 @@ button,
   padding: 10px 36px 10px 12px;
   background: var(--hl-bg-subtle);
   border: 1px solid var(--hl-border-strong);
-  border-radius: 6px;
+  border-radius: var(--hl-radius-sm);
   color: var(--hl-fg);
   font-size: 14px;
   transition: all 0.2s;
@@ -350,20 +328,6 @@ button,
   text-overflow: ellipsis;
 }
 
-.form-input:focus {
-  outline: none;
-  border-color: var(--hl-accent);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
-  background: var(--hl-surface);
-}
-
-.form-select:focus {
-  outline: none;
-  border-color: var(--hl-accent);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
-  background: var(--hl-surface);
-}
-
 .form-input::placeholder {
   color: var(--hl-fg-subtle);
 }
@@ -373,7 +337,7 @@ button,
   padding: 10px 12px;
   background: var(--hl-bg-subtle);
   border: 1px solid var(--hl-border-strong);
-  border-radius: 6px;
+  border-radius: var(--hl-radius-sm);
   color: var(--hl-fg-muted);
   font-size: 14px;
 }
@@ -404,14 +368,10 @@ hyperlane-select .select-trigger {
   padding: 10px 36px 10px 12px;
   background: var(--hl-bg-subtle);
   border: 1px solid var(--hl-border-strong);
-  border-radius: 6px;
+  border-radius: var(--hl-radius-sm);
   color: var(--hl-fg);
   font-size: 14px;
   transition: all 0.2s;
-}
-
-hyperlane-select .select-trigger:hover:not(.disabled) {
-  border-color: var(--hl-accent);
 }
 
 hyperlane-select .select-trigger.open {
@@ -422,7 +382,7 @@ hyperlane-select .select-trigger.open {
 
 hyperlane-select .select-dropdown {
   border: 1px solid var(--hl-border-strong);
-  border-radius: 6px;
+  border-radius: var(--hl-radius-sm);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
@@ -432,16 +392,6 @@ hyperlane-select .option-item {
 }
 
 hyperlane-select .option-item.selected {
-  background: var(--hl-accent);
-  color: var(--hl-accent-fg);
-}
-
-hyperlane-select .option-item:hover {
-  background: var(--hl-info-bg);
-  color: var(--hl-accent);
-}
-
-hyperlane-select .option-item.selected:hover {
   background: var(--hl-accent);
   color: var(--hl-accent-fg);
 }
@@ -459,10 +409,6 @@ input[type='date'].form-input::-webkit-calendar-picker-indicator {
   filter: invert(0.4);
   cursor: pointer;
   opacity: 0.8;
-}
-
-input[type='date'].form-input::-webkit-calendar-picker-indicator:hover {
-  opacity: 1;
 }
 
 input[type='date'].form-input::-webkit-datetime-edit {
@@ -496,7 +442,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 .card {
   background: var(--hl-surface);
   border: 1px solid var(--hl-border-strong);
-  border-radius: 12px;
+  border-radius: var(--hl-radius-lg);
   overflow: hidden;
   margin-bottom: 16px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -650,21 +596,21 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 #overview-page .stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: var(--hl-list-item-spacing);
   margin-bottom: 24px;
 }
 
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: var(--hl-list-item-spacing);
   margin-bottom: 24px;
 }
 
 .stat-card {
   background: var(--hl-surface);
   border: 1px solid var(--hl-border-strong);
-  border-radius: 12px;
+  border-radius: var(--hl-radius-lg);
   padding: 20px;
   text-align: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -673,15 +619,15 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .stat-card.income {
-  border-left: 4px solid var(--hl-success);
+  border-left: 4px solid var(--hl-accent);
 }
 
 .stat-card.expense {
-  border-left: 4px solid var(--hl-error);
+  border-left: 4px solid var(--hl-accent);
 }
 
 .stat-card.balance {
-  border-left: 4px solid var(--hl-warning);
+  border-left: 4px solid var(--hl-accent);
 }
 
 .stat-label {
@@ -705,11 +651,11 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .stat-card.income .stat-value {
-  color: var(--hl-success);
+  color: var(--hl-accent);
 }
 
 .stat-card.expense .stat-value {
-  color: var(--hl-error);
+  color: var(--hl-accent);
 }
 
 .filter-bar {
@@ -775,7 +721,8 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 .record-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--hl-list-item-spacing);
+  padding: var(--hl-list-padding);
   flex: 1;
   overflow-y: auto;
   min-height: 0;
@@ -787,7 +734,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   padding: 12px 16px;
   background: var(--hl-surface);
   border: 1px solid var(--hl-border-strong);
-  border-radius: 8px;
+  border-radius: var(--hl-radius-md);
   margin-bottom: 16px;
   flex-wrap: wrap;
 }
@@ -816,17 +763,12 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 .record-item {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 16px;
-  background: var(--hl-bg-subtle);
-  border: 1px solid var(--hl-border-strong);
-  border-radius: 8px;
-  transition: all 0.2s;
-}
-
-.record-item:hover {
-  border-color: var(--hl-accent);
-  background: var(--hl-info-bg);
+  gap: var(--hl-space-4);
+  padding: var(--hl-list-item-padding);
+  background: var(--hl-surface);
+  border: var(--hl-border-w-thin) solid var(--hl-border);
+  border-radius: var(--hl-list-item-radius);
+  margin-bottom: 0;
 }
 
 .loading-more {
@@ -844,14 +786,14 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   height: 20px;
   border: 2px solid var(--hl-gray-200);
   border-top-color: var(--hl-accent);
-  border-radius: 50%;
+  border-radius: var(--hl-radius-circle);
   animation: spin 0.8s linear infinite;
 }
 
 .record-type {
   width: 40px;
   height: 40px;
-  border-radius: 8px;
+  border-radius: var(--hl-radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -912,7 +854,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .record-amount-inline.expense {
-  color: var(--hl-error-bg);
+  color: var(--hl-error);
 }
 
 .record-description {
@@ -1003,7 +945,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .record-amount.expense {
-  color: var(--hl-error-bg);
+  color: var(--hl-error);
 }
 
 .record-date {
@@ -1023,21 +965,16 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .btn-print {
-  margin-top: 8px;
-  padding: 4px 12px;
+  margin-top: var(--hl-space-2);
+  padding: var(--hl-space-1) var(--hl-space-3);
   background: var(--hl-surface-hover);
   border: 1px solid var(--hl-border-strong);
-  border-radius: 6px;
+  border-radius: var(--hl-radius-sm);
   color: var(--hl-fg);
   font-size: 13px;
   cursor: pointer;
   transition: all 0.2s;
   font-weight: 700;
-}
-
-.btn-print:hover {
-  background: var(--hl-bg-muted);
-  border-color: var(--hl-border-strong);
 }
 
 .record-actions {
@@ -1048,7 +985,8 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 .user-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--hl-list-item-spacing);
+  padding: var(--hl-list-padding);
   flex: 1;
   overflow-y: auto;
   min-height: 0;
@@ -1057,23 +995,18 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 .user-item {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 16px;
-  background: var(--hl-bg-subtle);
-  border: 1px solid var(--hl-border-strong);
-  border-radius: 8px;
-  transition: all 0.2s;
-}
-
-.user-item:hover {
-  border-color: var(--hl-accent);
-  background: var(--hl-info-bg);
+  gap: var(--hl-space-4);
+  padding: var(--hl-list-item-padding);
+  background: var(--hl-surface);
+  border: var(--hl-border-w-thin) solid var(--hl-border);
+  border-radius: var(--hl-list-item-radius);
+  margin-bottom: 0;
 }
 
 .user-avatar {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
+  border-radius: var(--hl-radius-circle);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1110,7 +1043,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 
 .user-status {
   padding: 4px 12px;
-  border-radius: 12px;
+  border-radius: var(--hl-radius-lg);
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
@@ -1188,7 +1121,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   height: 40px;
   border: 3px solid var(--hl-gray-200);
   border-top-color: var(--hl-accent);
-  border-radius: 50%;
+  border-radius: var(--hl-radius-circle);
   animation: spin 0.8s linear infinite;
   z-index: 101;
 }
@@ -1244,13 +1177,8 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
+  border-radius: var(--hl-radius-sm);
   transition: all 0.2s;
-}
-
-.modal-close:hover {
-  background: var(--hl-bg-muted);
-  color: var(--hl-fg);
 }
 
 .modal-close:disabled {
@@ -1288,7 +1216,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   height: 40px;
   border: 3px solid var(--hl-gray-200);
   border-top-color: var(--hl-accent);
-  border-radius: 50%;
+  border-radius: var(--hl-radius-circle);
   animation: spin 0.8s linear infinite;
 }
 
@@ -1325,38 +1253,18 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 .toast {
   background: var(--hl-surface);
   border: 1px solid var(--hl-border-strong);
-  border-radius: 8px;
+  border-radius: var(--hl-radius-md);
   padding: 12px 16px;
   min-width: 280px;
   max-width: 400px;
   display: flex;
   align-items: center;
   gap: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  animation: slideIn 0.3s ease;
   cursor: pointer;
 }
 
 .toast.hiding {
-  animation: slideOut 0.3s ease forwards;
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideOut {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
+  opacity: 0;
 }
 
 .toast-icon {
@@ -1443,7 +1351,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
     height: 32px;
     background: var(--hl-bg-muted);
     border: 1px solid var(--hl-border-strong);
-    border-radius: 6px;
+    border-radius: var(--hl-radius-sm);
     color: var(--hl-fg);
     font-size: 16px;
     cursor: pointer;
@@ -1720,6 +1628,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 
   #dashboard-page .chart-card {
     min-height: auto;
+    border-radius: var(--hl-radius-card);
   }
 
   #dashboard-page .chart-container {
@@ -1831,7 +1740,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   margin-top: 16px;
   background: var(--hl-surface);
   border: 1px solid var(--hl-border-strong);
-  border-radius: 12px;
+  border-radius: var(--hl-radius-lg);
   flex-wrap: wrap;
   gap: 12px;
 }
@@ -1872,18 +1781,13 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   min-width: 80px;
   background: var(--hl-bg-muted);
   border: 1px solid var(--hl-border-strong);
-  border-radius: 6px;
+  border-radius: var(--hl-radius-sm);
   padding: 6px 12px;
   font-size: 14px;
   font-weight: 500;
   color: var(--hl-fg);
   cursor: pointer;
   transition: all 0.2s ease;
-}
-
-.pagination-controls > button:hover:not(:disabled) {
-  background: var(--hl-bg-muted);
-  border-color: var(--hl-border);
 }
 
 .pagination-controls > button:disabled {
@@ -1903,7 +1807,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   padding: 6px 12px;
   background: var(--hl-bg-muted);
   border: 1px solid var(--hl-border-strong);
-  border-radius: 6px;
+  border-radius: var(--hl-radius-sm);
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
@@ -1911,11 +1815,6 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   transition: all 0.2s ease;
   min-width: 36px;
   text-align: center;
-}
-
-.page-btn:hover:not(.active):not(:disabled) {
-  background: var(--hl-bg-muted);
-  border-color: var(--hl-border);
 }
 
 .page-btn.active {
@@ -2012,25 +1911,25 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 .stats-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: var(--hl-list-item-spacing);
   width: 100%;
 }
 
 .stats-row .stat-card {
   background: var(--hl-surface);
   border: 1px solid var(--hl-border-strong);
-  border-radius: 12px;
+  border-radius: var(--hl-radius-lg);
   padding: 20px;
   text-align: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .stats-row .stat-card.income {
-  border-left: 4px solid var(--hl-success);
+  border-left: 4px solid var(--hl-accent);
 }
 
 .stats-row .stat-card.expense {
-  border-left: 4px solid var(--hl-error);
+  border-left: 4px solid var(--hl-accent);
 }
 
 .stats-row .stat-card.balance {
@@ -2052,11 +1951,11 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .stats-row .stat-card.income .stat-value {
-  color: var(--hl-success);
+  color: var(--hl-accent);
 }
 
 .stats-row .stat-card.expense .stat-value {
-  color: var(--hl-error);
+  color: var(--hl-accent);
 }
 
 .chart-container {
@@ -2088,7 +1987,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   height: 40px;
   border: 3px solid var(--hl-gray-200);
   border-top-color: var(--hl-accent);
-  border-radius: 50%;
+  border-radius: var(--hl-radius-circle);
   animation: spin 0.8s linear infinite;
 }
 
@@ -2139,7 +2038,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   padding-right: 30px;
   background: var(--hl-surface);
   border: 1px solid var(--hl-border-strong);
-  border-radius: 6px;
+  border-radius: var(--hl-radius-sm);
   color: var(--hl-fg);
   font-size: 13px;
   font-family: inherit;
@@ -2148,23 +2047,18 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   box-sizing: border-box;
 }
 
-.date-picker-input:hover {
-  border-color: var(--hl-border);
-}
-
-.date-picker-input:focus {
-  outline: none;
-  border-color: var(--hl-accent);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
-}
-
 .date-picker-icon {
   position: absolute;
   right: 8px;
   top: 50%;
+  transform: translateY(-50%);
   color: var(--hl-fg-muted);
   font-size: 14px;
   pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
 }
 
 .date-picker-calendar {
@@ -2172,7 +2066,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   margin-top: 4px;
   background: var(--hl-surface);
   border: 1px solid var(--hl-border-strong);
-  border-radius: 8px;
+  border-radius: var(--hl-radius-md);
   padding: 12px;
   z-index: 99999;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
@@ -2196,7 +2090,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 .date-picker-nav {
   background: var(--hl-bg-muted);
   border: 1px solid var(--hl-border-strong);
-  border-radius: 4px;
+  border-radius: var(--hl-radius-xs);
   color: var(--hl-fg);
   width: 28px;
   height: 28px;
@@ -2206,11 +2100,6 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   justify-content: center;
   font-size: 12px;
   transition: all 0.2s;
-}
-
-.date-picker-nav:hover {
-  background: var(--hl-bg-muted);
-  border-color: var(--hl-border);
 }
 
 .date-picker-month-year {
@@ -2249,14 +2138,9 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   color: var(--hl-fg);
   background: transparent;
   border: 1px solid transparent;
-  border-radius: 4px;
+  border-radius: var(--hl-radius-xs);
   cursor: pointer;
   transition: all 0.2s;
-}
-
-.date-picker-day:hover:not(.disabled):not(.selected) {
-  background: var(--hl-bg-muted);
-  border-color: var(--hl-border);
 }
 
 .date-picker-day.selected {
@@ -2286,7 +2170,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   width: 4px;
   height: 4px;
   background: var(--hl-accent);
-  border-radius: 50%;
+  border-radius: var(--hl-radius-circle);
 }
 
 .date-picker-footer {
@@ -2298,29 +2182,20 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 }
 
 .date-picker-btn {
-  padding: 4px 12px;
+  padding: var(--hl-space-1) var(--hl-space-3);
   background: var(--hl-bg-muted);
   border: 1px solid var(--hl-border-strong);
-  border-radius: 4px;
+  border-radius: var(--hl-radius-xs);
   color: var(--hl-fg);
   font-size: 12px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
-.date-picker-btn:hover {
-  background: var(--hl-bg-muted);
-  border-color: var(--hl-accent);
-}
-
 .date-picker-btn.primary {
   background: var(--hl-accent);
   border-color: transparent;
   color: var(--hl-accent-fg);
-}
-
-.date-picker-btn.primary:hover {
-  background: var(--hl-accent);
 }
 
 .scan-modal-content {
@@ -2341,7 +2216,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   width: 100%;
   margin: 0 auto 20px;
   background: var(--hl-bg-subtle);
-  border-radius: 12px;
+  border-radius: var(--hl-radius-lg);
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -2381,31 +2256,10 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 .scan-frame {
   width: 200px;
   height: 200px;
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  border-radius: 12px;
+  border: 2px solid var(--hl-accent);
+  border-radius: var(--hl-radius-lg);
   position: relative;
-}
-
-.scan-frame::before,
-.scan-frame::after {
-  content: '';
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  border-color: var(--hl-accent);
-  border-style: solid;
-}
-
-.scan-frame::before {
-  top: -2px;
-  left: -2px;
-  border-width: 4px 0 0 4px;
-}
-
-.scan-frame::after {
-  bottom: -2px;
-  right: -2px;
-  border-width: 0 4px 4px 0;
+  box-sizing: border-box;
 }
 
 .scan-line {
@@ -2418,11 +2272,11 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 
 .scan-error {
   text-align: center;
-  color: var(--hl-error);
+  color: var(--hl-error-fg);
   padding: 12px;
-  background: rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(0, 0, 0, 0.3);
-  border-radius: 8px;
+  background: var(--hl-error-bg);
+  border: var(--hl-border-w-thin) solid var(--hl-border);
+  border-radius: var(--hl-radius-md);
   margin-bottom: 16px;
 }
 
@@ -2456,7 +2310,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   flex: 1;
   background: var(--hl-surface);
   padding: 20px;
-  border-radius: 12px;
+  border-radius: var(--hl-radius-lg);
   margin-bottom: 20px;
   display: flex;
   align-items: center;
@@ -2504,17 +2358,12 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 
 .image-upload-area {
   border: 2px dashed var(--hl-gray-300);
-  border-radius: 8px;
+  border-radius: var(--hl-radius-md);
   padding: 20px;
   text-align: center;
   cursor: pointer;
   transition: all 0.2s;
   background: var(--hl-bg-subtle);
-}
-
-.image-upload-area:hover {
-  border-color: var(--hl-accent);
-  background: var(--hl-bg-muted);
 }
 
 .image-upload-placeholder {
@@ -2554,7 +2403,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   position: relative;
   width: 80px;
   height: 80px;
-  border-radius: 6px;
+  border-radius: var(--hl-radius-sm);
   overflow: hidden;
   border: 1px solid var(--hl-border-strong);
   cursor: pointer;
@@ -2564,7 +2413,6 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.2s;
 }
 
 .image-remove-btn {
@@ -2573,9 +2421,9 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   right: 2px;
   width: 20px;
   height: 20px;
-  border-radius: 50%;
-  background: var(--hl-overlay, rgba(0, 0, 0, 0.9));
-  color: var(--hl-accent-fg);
+  border-radius: var(--hl-radius-circle);
+  background: var(--hl-error-bg);
+  color: var(--hl-error-fg);
   border: none;
   font-size: 14px;
   line-height: 1;
@@ -2583,11 +2431,6 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s;
-}
-
-.image-remove-btn:hover {
-  background: rgba(0, 0, 0, 1);
 }
 
 .modal-content-large,
@@ -2623,7 +2466,7 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   align-items: center;
   justify-content: center;
   overflow: auto;
-  background: var(--hl-fg);
+  background: var(--hl-bg-subtle);
   padding: 20px;
 }
 
@@ -2631,7 +2474,6 @@ input[type='number'].form-input::-webkit-inner-spin-button {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-  transition: transform 0.2s ease;
   cursor: grab;
   user-select: none;
   -webkit-user-select: none;
@@ -2682,16 +2524,11 @@ input[type='number'].form-input::-webkit-inner-spin-button {
 .record-image-thumbnail {
   width: 60px;
   height: 60px;
-  border-radius: 6px;
+  border-radius: var(--hl-radius-sm);
   overflow: hidden;
   border: 1px solid var(--hl-border-strong);
   cursor: pointer;
   transition: all 0.2s;
-}
-
-.record-image-thumbnail:hover {
-  border-color: var(--hl-accent);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .record-image-thumbnail img {

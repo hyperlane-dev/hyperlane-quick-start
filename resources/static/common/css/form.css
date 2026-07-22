@@ -21,11 +21,23 @@
   transition: var(--hl-transition);
 }
 
+textarea,
+textarea.form-input,
+.form-textarea {
+  border-radius: var(--hl-radius-sm);
+}
+
 .form-input:focus {
   outline: none;
   border-color: var(--hl-border-strong);
   box-shadow: 0 0 0 3px var(--hl-focus-ring);
   background: var(--hl-surface);
+}
+
+.form-select:hover {
+  background-color: var(--hl-accent);
+  color: var(--hl-accent-fg);
+  border-color: var(--hl-accent);
 }
 
 .form-input::placeholder {

@@ -16,11 +16,10 @@ body {
 
 .card {
   background: var(--hl-surface);
-  border-radius: 12px;
+  border: 1px solid var(--hl-border-strong);
+  border-radius: var(--hl-radius-lg);
   padding: 24px;
   margin-bottom: 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  animation: fadeInUp 0.6s ease;
 }
 
 .card h2 {
@@ -37,18 +36,28 @@ body {
 .form-group input {
   width: 100%;
   padding: 12px 16px;
-  border: 2px solid var(--hl-gray-150);
-  border-radius: 8px;
+  border: var(--hl-border-w-medium) solid var(--hl-border);
+  border-radius: var(--hl-radius-md);
   font-size: 16px;
-  transition: all 0.3s ease;
 }
 
-.form-group input:focus {
-  outline: none;
-  border-color: var(--hl-accent);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+.record-item {
+  background: var(--hl-surface);
+  border-radius: var(--hl-list-item-radius);
+  padding: var(--hl-list-item-padding);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: var(--hl-border-w-thin) solid var(--hl-border);
+  color: var(--hl-fg);
 }
 
+#records-list {
+  padding: var(--hl-list-padding);
+  display: flex;
+  flex-direction: column;
+  gap: var(--hl-list-item-spacing);
+}
 .form-row {
   display: flex;
   gap: 12px;
@@ -73,12 +82,10 @@ body {
 .btn {
   padding: 12px 24px;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--hl-radius-md);
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .btn-primary {
@@ -86,18 +93,10 @@ body {
   color: var(--hl-accent-fg);
 }
 
-.btn-primary:hover {
-  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.4);
-}
-
 .btn-warning {
   background: var(--hl-warning-bg);
-  color: var(--hl-warning);
-  border: 1px solid var(--hl-border-strong);
-}
-
-.btn-warning:hover {
-  background: var(--hl-surface-hover);
+  color: var(--hl-warning-fg);
+  border: var(--hl-border-w-thin) solid var(--hl-border-strong);
 }
 
 .btn-danger {
@@ -105,34 +104,9 @@ body {
   color: var(--hl-accent-fg);
 }
 
-.btn-danger:hover {
-  background: var(--hl-error-bg);
-}
-
 .btn-secondary {
   background: var(--hl-fg-muted);
   color: var(--hl-accent-fg);
-}
-
-.btn-secondary:hover {
-  background: var(--hl-fg-muted);
-}
-
-.record-item {
-  background: var(--hl-bg-subtle);
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  transition: all 0.3s ease;
-  border: 1px solid var(--hl-gray-150);
-}
-
-.record-item:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-color: var(--hl-accent);
 }
 
 .record-info {
@@ -167,7 +141,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--hl-overlay);
   z-index: 1000;
   align-items: center;
   justify-content: center;
@@ -179,12 +153,10 @@ body {
 
 .modal-content {
   background: var(--hl-surface);
-  border-radius: 12px;
+  border-radius: var(--hl-radius-lg);
   padding: 30px;
   max-width: 500px;
   width: 90%;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-  animation: modalSlideIn 0.3s ease;
 }
 
 .modal-content h3 {
@@ -212,12 +184,10 @@ body {
 
 .toast {
   padding: 16px 24px;
-  border-radius: 8px;
+  border-radius: var(--hl-radius-md);
   background: var(--hl-accent);
   color: var(--hl-accent-fg);
   font-weight: 500;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  animation: slideInRight 0.3s ease;
   min-width: 280px;
   max-width: 400px;
   word-break: break-word;
@@ -236,56 +206,8 @@ body {
   color: var(--hl-warning);
 }
 
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes fadeOut {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
 .toast.hide {
-  animation: fadeOut 0.3s ease forwards;
-}
-
-@keyframes fadeInDown {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes modalSlideIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
+  opacity: 0;
 }
 
 .title-short {

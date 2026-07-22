@@ -49,22 +49,18 @@ class HyperlaneStatus extends HTMLElement {
       success: `
         background-color: var(--hl-success-bg);
         color: var(--hl-success);
-        border-left: 4px solid var(--hl-success);
       `,
       error: `
         background-color: var(--hl-error-bg);
         color: var(--hl-error);
-        border-left: 4px solid var(--hl-border-strong);
       `,
       warning: `
         background-color: var(--hl-warning-bg);
         color: var(--hl-warning);
-        border-left: 4px solid var(--hl-warning);
       `,
       info: `
         background-color: var(--hl-info-bg);
         color: var(--hl-info);
-        border-left: 4px solid var(--hl-info);
       `,
     };
 
@@ -83,11 +79,9 @@ class HyperlaneStatus extends HTMLElement {
         .status {
           position: relative;
           padding: 8px 24px;
-          border-radius: 12px;
+          border-radius: var(--hl-radius-md);
           font-size: 0.875rem;
-          animation: slideIn 0.3s ease;
           z-index: 1000;
-          box-shadow: var(--hl-shadow-lg, 0 4px 20px rgba(0, 0, 0, 0.1));
           width: 100%;
           display: flex;
           align-items: center;
@@ -96,14 +90,6 @@ class HyperlaneStatus extends HTMLElement {
           background: var(--hl-surface);
           margin-bottom: 16px;
           ${typeStyles[type] || typeStyles.info}
-        }
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
         }
       </style>
       <div class="status">

@@ -115,11 +115,10 @@ class HyperlaneInput extends HTMLElement {
         }
         input {
           width: 100%;
-          padding: 12px 16px;
-          border: 2px solid var(--hl-border-strong);
-          border-radius: var(--hl-radius-sm);
-          font-size: 16px;
-          transition: all 0.3s ease;
+          padding: 14px 18px;
+          border: var(--hl-border-w-thin) solid var(--hl-border);
+          border-radius: var(--hl-radius-md);
+          font-size: 15px;
           background: var(--hl-surface);
           color: var(--hl-fg);
           box-sizing: border-box;
@@ -127,15 +126,15 @@ class HyperlaneInput extends HTMLElement {
         }
         input:focus {
           outline: none;
-          border-color: var(--hl-accent);
-          box-shadow: 0 0 0 3px var(--hl-focus-ring, rgba(0, 0, 0, 0.12));
+          border-color: var(--hl-border-strong);
         }
         input::placeholder {
           color: var(--hl-fg-subtle);
           opacity: 1;
         }
         input:disabled {
-          background: var(--hl-bg-muted);
+          background: var(--hl-surface);
+          opacity: 0.55;
           cursor: not-allowed;
         }
         input[type="url"]:valid:not(:placeholder-shown) {

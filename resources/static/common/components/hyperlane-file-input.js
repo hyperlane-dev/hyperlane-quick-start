@@ -93,15 +93,13 @@ class HyperlaneFileInput extends HTMLElement {
         .file-label {
           padding: 12px 24px;
           border-radius: var(--hl-radius-md);
-          border: none;
+          border: var(--hl-border-w-thin) solid var(--hl-border);
           font-weight: 600;
           cursor: ${disabled ? 'not-allowed' : 'pointer'};
-          transition: all 0.3s ease;
           text-align: center;
           font-size: 1rem;
-          background: var(--hl-gray-900);
+          background: var(--hl-accent);
           color: var(--hl-accent-fg);
-          box-shadow: var(--hl-shadow-lg, 0 4px 20px rgba(0, 0, 0, 0.1));
           display: inline-flex;
           align-items: center;
           justify-content: center;
@@ -111,10 +109,6 @@ class HyperlaneFileInput extends HTMLElement {
           width: 100%;
           height: 100%;
           box-sizing: border-box;
-        }
-        .file-label:hover:not(:disabled) {
-          background: var(--hl-accent-hover);
-          box-shadow: var(--hl-shadow-lg, 0 8px 30px rgba(0, 0, 0, 0.15));
         }
         ::slotted(svg) {
           width: 20px;

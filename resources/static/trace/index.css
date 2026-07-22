@@ -16,6 +16,7 @@ body {
 
 .search-card {
   margin-bottom: 20px;
+  border-radius: var(--hl-radius-card);
 }
 
 .search-container {
@@ -35,17 +36,12 @@ body {
 
 #traceId::part(input) {
   padding: 12px 16px;
-  border: 2px solid var(--hl-border-strong);
-  border-radius: 8px;
   font-size: 16px;
-  transition: all 0.3s ease;
   font-family: 'Courier New', monospace;
 }
 
 #traceId::part(input):focus {
   outline: none;
-  border-color: var(--hl-accent);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
 }
 
 hl-button {
@@ -56,11 +52,7 @@ hl-button {
   --hl-button-radius: 8px;
   --hl-button-font-size: 16px;
   --hl-button-font-weight: 600;
-  box-shadow: var(--hl-shadow-md, 0 2px 8px rgba(0, 0, 0, 0.3));
-}
-
-hl-button::part(button):hover {
-  box-shadow: var(--hl-shadow-lg, 0 4px 12px rgba(0, 0, 0, 0.4));
+  box-shadow: var(--hl-shadow-md, 0 2px 8px var(--hl-overlay-soft));
 }
 
 .app-title,
@@ -71,53 +63,46 @@ button {
 
 .result-card {
   animation-delay: 0.1s;
+  border-radius: var(--hl-radius-card);
 }
 
 .request-url {
   margin-bottom: 16px;
   padding: 12px 16px;
-  background: var(--hl-bg-muted);
-  border: 1px solid var(--hl-border);
-  border-radius: 8px;
+  background: var(--hl-bg);
+  border: 1px solid var(--hl-border-strong);
+  border-radius: var(--hl-radius-md);
   font-family: 'Courier New', monospace;
   font-size: 13px;
   word-break: break-all;
   cursor: pointer;
-  transition: all 0.3s ease;
   color: var(--hl-accent);
   font-weight: 500;
 }
 
-.request-url:hover {
-  background: var(--hl-surface-hover);
-  border-color: var(--hl-border-strong);
-  box-shadow: var(--hl-shadow-md, 0 4px 12px rgba(0, 0, 0, 0.12));
-}
-
 .status-message {
   padding: 12px 16px;
-  border-radius: 8px;
+  border-radius: var(--hl-radius-md);
   margin-bottom: 16px;
   font-weight: 600;
-  animation: fadeIn 0.3s ease;
 }
 
 .status-message.success {
   background: var(--hl-success-bg);
-  color: var(--hl-success);
+  color: var(--hl-success-fg);
   border-left: 4px solid var(--hl-success);
 }
 
 .status-message.error {
   background: var(--hl-error-bg);
-  color: var(--hl-error);
-  border-left: 4px solid var(--hl-border-strong);
+  color: var(--hl-error-fg);
+  border-left: 4px solid var(--hl-error);
 }
 
 #result {
-  background: var(--hl-bg-subtle);
-  border: 1px solid var(--hl-gray-150);
-  border-radius: 8px;
+  background: var(--hl-bg);
+  border: 1px solid var(--hl-bg);
+  border-radius: var(--hl-radius-md);
   padding: 16px;
   white-space: pre-wrap;
   word-wrap: break-word;
@@ -136,12 +121,12 @@ button {
 }
 
 #result::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.05);
+  background: var(--hl-overlay-muted);
 }
 
 #result::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 3px;
+  background: var(--hl-overlay-fade);
+  border-radius: var(--hl-radius-xs);
 }
 
 .empty-result {
@@ -149,36 +134,6 @@ button {
   font-style: italic;
   text-align: center;
   padding: 40px 20px;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes fadeInDown {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
 }
 
 @media (max-width: 768px) {

@@ -37,7 +37,7 @@ button,
 .shortlink-form {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  border-radius: 20px;
+  border-radius: var(--hl-radius-xl);
   padding: 40px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   margin-bottom: 40px;
@@ -61,7 +61,7 @@ button,
 }
 
 .required {
-  color: var(--hl-error-bg);
+  color: var(--hl-error);
   font-weight: 700;
 }
 
@@ -75,7 +75,7 @@ button,
   width: 100%;
   padding: 16px 20px 16px 50px;
   border: 2px solid var(--hl-gray-150);
-  border-radius: 12px;
+  border-radius: var(--hl-radius-lg);
   font-size: 1rem;
   transition: all 0.3s ease;
   background: var(--hl-surface);
@@ -84,8 +84,6 @@ button,
 
 .url-input:focus {
   outline: none;
-  border-color: var(--hl-accent);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.25);
 }
 
 .url-input:valid {
@@ -111,7 +109,7 @@ button,
   background: var(--hl-accent);
   color: var(--hl-accent-fg);
   border: none;
-  border-radius: 12px;
+  border-radius: var(--hl-radius-lg);
   font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
@@ -121,25 +119,6 @@ button,
   align-items: center;
   justify-content: center;
   min-width: 200px;
-}
-
-.generate-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: rgba(255, 255, 255, 0.2);
-  transition: left 0.5s ease;
-}
-
-.generate-btn:hover:not(:disabled) {
-  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.4);
-}
-
-.generate-btn:hover:not(:disabled)::before {
-  left: 100%;
 }
 
 .generate-btn:disabled {
@@ -159,7 +138,7 @@ button,
 .result-container {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  border-radius: 20px;
+  border-radius: var(--hl-radius-xl);
   padding: 40px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -188,7 +167,7 @@ button,
 
 .shortlink-display {
   background: var(--hl-bg-subtle);
-  border-radius: 12px;
+  border-radius: var(--hl-radius-lg);
   padding: 20px;
   margin-bottom: 30px;
   border: 1px solid var(--hl-gray-150);
@@ -220,7 +199,7 @@ button,
   width: auto;
   min-width: 44px;
   height: 100%;
-  border-radius: 8px;
+  border-radius: var(--hl-radius-md);
 }
 
 .shortlink-text {
@@ -232,7 +211,7 @@ button,
   word-break: break-all;
   padding: 10px 16px;
   background: var(--hl-surface);
-  border-radius: 8px;
+  border-radius: var(--hl-radius-md);
   border: 1px solid var(--hl-gray-150);
 }
 
@@ -241,7 +220,7 @@ button,
   background: var(--hl-success);
   color: var(--hl-accent-fg);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--hl-radius-md);
   cursor: pointer;
   font-size: 1.2rem;
   transition: all 0.3s ease;
@@ -250,10 +229,6 @@ button,
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.copy-btn:hover {
-  background: var(--hl-success);
 }
 
 .actions {
@@ -269,7 +244,7 @@ button,
   overflow: hidden;
   padding: 14px 28px;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--hl-radius-md);
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -283,28 +258,20 @@ button,
 .open-btn {
   background: var(--hl-success);
   color: var(--hl-accent-fg);
-  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
-}
-
-.open-btn:hover {
-  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.4);
+  box-shadow: var(--hl-overlay-fade);
 }
 
 .new-link-btn {
   background: var(--hl-accent);
   color: var(--hl-accent-fg);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-}
-
-.new-link-btn:hover {
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--hl-overlay-soft);
 }
 
 .loading-container {
   text-align: center;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  border-radius: 20px;
+  border-radius: var(--hl-radius-xl);
   padding: 60px 40px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -315,7 +282,7 @@ button,
   height: 50px;
   border: 4px solid var(--hl-gray-100);
   border-top: 4px solid var(--hl-accent);
-  border-radius: 50%;
+  border-radius: var(--hl-radius-circle);
   animation: spin 1s linear infinite;
   margin: 0 auto 20px;
 }
@@ -330,7 +297,7 @@ button,
   text-align: center;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  border-radius: 20px;
+  border-radius: var(--hl-radius-xl);
   padding: 40px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -349,7 +316,7 @@ button,
 .error-title {
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--hl-error-bg);
+  color: var(--hl-error);
   margin-bottom: 10px;
   white-space: nowrap;
   overflow: hidden;
@@ -369,7 +336,7 @@ button,
   background: var(--hl-error-bg);
   color: var(--hl-accent-fg);
   border: none;
-  border-radius: 10px;
+  border-radius: var(--hl-radius-md);
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -377,11 +344,7 @@ button,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-}
-
-.retry-btn:hover {
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--hl-overlay-soft);
 }
 
 .info-section {
@@ -394,7 +357,7 @@ button,
 .info-card {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  border-radius: 20px;
+  border-radius: var(--hl-radius-xl);
   padding: 30px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -425,16 +388,21 @@ button,
 
 .info-list {
   list-style: none;
-  padding: 0;
+  padding: var(--hl-list-padding);
   margin: 0;
+  border: var(--hl-border-w-thin) solid var(--hl-border);
+  border-radius: var(--hl-radius-md);
+  overflow: hidden;
 }
 
 .info-list li {
   position: relative;
-  padding-left: 20px;
-  margin-bottom: 10px;
-  color: var(--hl-fg-muted);
+  padding: var(--hl-list-item-padding);
+  border: var(--hl-border-w-thin) solid var(--hl-border);
+  color: var(--hl-fg);
   line-height: 1.6;
+  background: var(--hl-surface);
+  border-radius: var(--hl-list-item-radius);
 }
 
 .info-list li::before {

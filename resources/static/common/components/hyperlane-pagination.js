@@ -87,27 +87,18 @@ class HyperlanePagination extends HTMLElement {
           align-items: center;
           gap: 12px;
           margin-top: 40px;
-          animation: fadeIn 0.6s ease;
           width: 100%;
         }
         .pagination-btn {
           background: var(--hl-surface);
           color: var(--hl-fg);
-          border: 1px solid var(--hl-border);
+          border: var(--hl-border-w-thin) solid var(--hl-border);
           padding: 10px 20px;
           border-radius: var(--hl-radius-sm);
           cursor: pointer;
           font-weight: 600;
           font-size: 0.95rem;
-          transition: all 0.3s ease;
-          box-shadow: var(--hl-shadow-sm, 0 2px 8px rgba(0, 0, 0, 0.1));
           white-space: nowrap;
-        }
-        .pagination-btn:hover:not(:disabled) {
-          background: var(--hl-gray-900);
-          color: var(--hl-accent-fg);
-          border-color: var(--hl-gray-900);
-          box-shadow: var(--hl-shadow-md, 0 4px 12px rgba(0, 0, 0, 0.15));
         }
         .pagination-btn:disabled {
           opacity: 0.5;
@@ -120,10 +111,6 @@ class HyperlanePagination extends HTMLElement {
           padding: 0 12px;
           white-space: nowrap;
           text-align: center;
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
         }
         @media (max-width: 768px) {
           .pagination {

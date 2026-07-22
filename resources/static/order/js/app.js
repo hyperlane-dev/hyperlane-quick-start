@@ -524,7 +524,7 @@ function initTrendChart(dailyTrend) {
   const option = {
     tooltip: {
       trigger: 'axis',
-      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      backgroundColor: 'var(--hl-surface)',
       borderColor: 'var(--hl-gray-200)',
       borderWidth: 1,
       textStyle: { color: 'var(--hl-fg)', fontSize: 13 },
@@ -538,7 +538,7 @@ function initTrendChart(dailyTrend) {
       },
       padding: [12, 16],
       extraCssText:
-        'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
+        'box-shadow: var(--hl-shadow-pop); border-radius: var(--hl-radius-md);',
     },
     legend: {
       data: ['Income', 'Expense'],
@@ -584,8 +584,8 @@ function initTrendChart(dailyTrend) {
         lineStyle: { width: 2.5, color: 'var(--hl-gray-700)' },
         areaStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(0, 0, 0, 0.18)' },
-            { offset: 1, color: 'rgba(0, 0, 0, 0.02)' },
+            { offset: 0, color: 'var(--hl-fg)' },
+            { offset: 1, color: 'var(--hl-fg)' },
           ]),
         },
       },
@@ -600,8 +600,8 @@ function initTrendChart(dailyTrend) {
         lineStyle: { width: 2.5, color: 'var(--hl-gray-400)' },
         areaStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(255, 255, 255, 0.25)' },
-            { offset: 1, color: 'rgba(255, 255, 255, 0.02)' },
+            { offset: 0, color: 'var(--hl-surface)' },
+            { offset: 1, color: 'var(--hl-surface)' },
           ]),
         },
       },
@@ -622,17 +622,17 @@ function initCompareChart(monthlyComparison) {
   const option = {
     tooltip: {
       trigger: 'axis',
-      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      backgroundColor: 'var(--hl-surface)',
       borderColor: 'var(--hl-gray-200)',
       borderWidth: 1,
       textStyle: { color: 'var(--hl-fg)', fontSize: 13 },
       axisPointer: {
         type: 'shadow',
-        shadowStyle: { color: 'rgba(0, 0, 0, 0.05)' },
+        shadowStyle: { color: 'var(--hl-fg)' },
       },
       padding: [12, 16],
       extraCssText:
-        'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
+        'box-shadow: var(--hl-shadow-pop); border-radius: var(--hl-radius-md);',
     },
     legend: {
       data: ['Income', 'Expense'],
@@ -736,14 +736,14 @@ function initCategoryChart(categoryDistribution) {
   const option = {
     tooltip: {
       trigger: 'item',
-      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      backgroundColor: 'var(--hl-surface)',
       borderColor: 'var(--hl-gray-200)',
       borderWidth: 1,
       textStyle: { color: 'var(--hl-fg)', fontSize: 13 },
       formatter: '{b}: <b>{c}</b> ({d}%)',
       padding: [12, 16],
       extraCssText:
-        'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
+        'box-shadow: var(--hl-shadow-pop); border-radius: var(--hl-radius-md);',
     },
     legend: {
       orient: 'vertical',
@@ -776,7 +776,7 @@ function initCategoryChart(categoryDistribution) {
           itemStyle: {
             shadowBlur: 20,
             shadowOffsetX: 0,
-            shadowColor: 'rgba(0, 0, 0, 0.2)',
+            shadowColor: 'var(--hl-fg)',
           },
           label: {
             show: true,
@@ -806,7 +806,7 @@ function initUserGrowthChart(userGrowth) {
   const option = {
     tooltip: {
       trigger: 'axis',
-      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      backgroundColor: 'var(--hl-surface)',
       borderColor: 'var(--hl-gray-200)',
       borderWidth: 1,
       textStyle: { color: 'var(--hl-fg)', fontSize: 13 },
@@ -820,7 +820,7 @@ function initUserGrowthChart(userGrowth) {
       },
       padding: [12, 16],
       extraCssText:
-        'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
+        'box-shadow: var(--hl-shadow-pop); border-radius: var(--hl-radius-md);',
     },
     grid: {
       left: '3%',
@@ -885,14 +885,14 @@ function initTypeDistributionChart(distribution) {
   const option = {
     tooltip: {
       trigger: 'item',
-      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      backgroundColor: 'var(--hl-surface)',
       borderColor: 'var(--hl-gray-200)',
       borderWidth: 1,
       textStyle: { color: 'var(--hl-fg)', fontSize: 13 },
       formatter: '{b}: <b>{c}</b> ({d}%)',
       padding: [12, 16],
       extraCssText:
-        'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
+        'box-shadow: var(--hl-shadow-pop); border-radius: var(--hl-radius-md);',
     },
     legend: {
       orient: 'vertical',
@@ -926,7 +926,7 @@ function initTypeDistributionChart(distribution) {
           itemStyle: {
             shadowBlur: 20,
             shadowOffsetX: 0,
-            shadowColor: 'rgba(0, 0, 0, 0.2)',
+            shadowColor: 'var(--hl-fg)',
           },
           label: {
             show: true,
@@ -977,7 +977,7 @@ function initCountTrendChart(trend) {
   const option = {
     tooltip: {
       trigger: 'axis',
-      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      backgroundColor: 'var(--hl-surface)',
       borderColor: 'var(--hl-gray-200)',
       borderWidth: 1,
       textStyle: { color: 'var(--hl-fg)', fontSize: 13 },
@@ -991,7 +991,7 @@ function initCountTrendChart(trend) {
       },
       padding: [12, 16],
       extraCssText:
-        'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
+        'box-shadow: var(--hl-shadow-pop); border-radius: var(--hl-radius-md);',
     },
     grid: {
       left: '3%',
@@ -1029,8 +1029,8 @@ function initCountTrendChart(trend) {
         lineStyle: { width: 2.5, color: 'var(--hl-warning)' },
         areaStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(255, 255, 255, 0.25)' },
-            { offset: 1, color: 'rgba(255, 255, 255, 0.02)' },
+            { offset: 0, color: 'var(--hl-surface)' },
+            { offset: 1, color: 'var(--hl-surface)' },
           ]),
         },
       },
@@ -1053,18 +1053,18 @@ function initCategoryAmountChart(distribution) {
   const option = {
     tooltip: {
       trigger: 'axis',
-      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      backgroundColor: 'var(--hl-surface)',
       borderColor: 'var(--hl-gray-200)',
       borderWidth: 1,
       textStyle: { color: 'var(--hl-fg)', fontSize: 13 },
       axisPointer: {
         type: 'shadow',
-        shadowStyle: { color: 'rgba(0, 0, 0, 0.05)' },
+        shadowStyle: { color: 'var(--hl-fg)' },
       },
       formatter: '{b}: <b>¥{c}</b>',
       padding: [12, 16],
       extraCssText:
-        'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
+        'box-shadow: var(--hl-shadow-pop); border-radius: var(--hl-radius-md);',
     },
     grid: {
       left: '3%',
@@ -1127,7 +1127,7 @@ function initUserActivityChart(activity) {
   const option = {
     tooltip: {
       trigger: 'axis',
-      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      backgroundColor: 'var(--hl-surface)',
       borderColor: 'var(--hl-gray-200)',
       borderWidth: 1,
       textStyle: { color: 'var(--hl-fg)', fontSize: 13 },
@@ -1141,7 +1141,7 @@ function initUserActivityChart(activity) {
       },
       padding: [12, 16],
       extraCssText:
-        'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
+        'box-shadow: var(--hl-shadow-pop); border-radius: var(--hl-radius-md);',
     },
     legend: {
       data: ['Active Users', 'New Records'],
@@ -1187,8 +1187,8 @@ function initUserActivityChart(activity) {
         lineStyle: { width: 2.5, color: 'var(--hl-accent)' },
         areaStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(255, 255, 255, 0.2)' },
-            { offset: 1, color: 'rgba(255, 255, 255, 0.02)' },
+            { offset: 0, color: 'var(--hl-surface)' },
+            { offset: 1, color: 'var(--hl-surface)' },
           ]),
         },
       },
@@ -1203,8 +1203,8 @@ function initUserActivityChart(activity) {
         lineStyle: { width: 2.5, color: 'var(--hl-accent)' },
         areaStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(255, 255, 255, 0.2)' },
-            { offset: 1, color: 'rgba(255, 255, 255, 0.02)' },
+            { offset: 0, color: 'var(--hl-surface)' },
+            { offset: 1, color: 'var(--hl-surface)' },
           ]),
         },
       },
@@ -1227,7 +1227,7 @@ function initRatioTrendChart(ratioTrend) {
   const option = {
     tooltip: {
       trigger: 'axis',
-      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      backgroundColor: 'var(--hl-surface)',
       borderColor: 'var(--hl-gray-200)',
       borderWidth: 1,
       textStyle: { color: 'var(--hl-fg)', fontSize: 13 },
@@ -1241,7 +1241,7 @@ function initRatioTrendChart(ratioTrend) {
       },
       padding: [12, 16],
       extraCssText:
-        'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
+        'box-shadow: var(--hl-shadow-pop); border-radius: var(--hl-radius-md);',
       formatter: function (params) {
         const idx = params[0].dataIndex;
         const item = ratioTrend[idx];
@@ -1287,8 +1287,8 @@ function initRatioTrendChart(ratioTrend) {
         lineStyle: { width: 2.5, color: 'var(--hl-accent)' },
         areaStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(255, 255, 255, 0.3)' },
-            { offset: 1, color: 'rgba(255, 255, 255, 0.02)' },
+            { offset: 0, color: 'var(--hl-surface)' },
+            { offset: 1, color: 'var(--hl-surface)' },
           ]),
         },
         markLine: {
@@ -1328,13 +1328,13 @@ function initHourlyDistributionChart(hourlyData) {
   const option = {
     tooltip: {
       trigger: 'axis',
-      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      backgroundColor: 'var(--hl-surface)',
       borderColor: 'var(--hl-gray-200)',
       borderWidth: 1,
       textStyle: { color: 'var(--hl-fg)', fontSize: 13 },
       padding: [12, 16],
       extraCssText:
-        'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
+        'box-shadow: var(--hl-shadow-pop); border-radius: var(--hl-radius-md);',
     },
     grid: {
       left: '3%',
@@ -1404,13 +1404,13 @@ function initWeeklyTrendChart(weeklyTrend) {
   const option = {
     tooltip: {
       trigger: 'axis',
-      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      backgroundColor: 'var(--hl-surface)',
       borderColor: 'var(--hl-gray-200)',
       borderWidth: 1,
       textStyle: { color: 'var(--hl-fg)', fontSize: 13 },
       padding: [12, 16],
       extraCssText:
-        'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
+        'box-shadow: var(--hl-shadow-pop); border-radius: var(--hl-radius-md);',
     },
     legend: {
       data: ['Income', 'Expense'],
@@ -1489,13 +1489,13 @@ function initPeriodOverPeriodChart(popData) {
   const option = {
     tooltip: {
       trigger: 'axis',
-      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      backgroundColor: 'var(--hl-surface)',
       borderColor: 'var(--hl-gray-200)',
       borderWidth: 1,
       textStyle: { color: 'var(--hl-fg)', fontSize: 13 },
       padding: [12, 16],
       extraCssText:
-        'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
+        'box-shadow: var(--hl-shadow-pop); border-radius: var(--hl-radius-md);',
       formatter: function (params) {
         let result = `<div style="font-weight:600;margin-bottom:5px">${params[0].axisValue}</div>`;
         params.forEach((param) => {
@@ -1600,13 +1600,13 @@ function initCategoryTrendChart(categoryTrends) {
   const option = {
     tooltip: {
       trigger: 'axis',
-      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      backgroundColor: 'var(--hl-surface)',
       borderColor: 'var(--hl-gray-200)',
       borderWidth: 1,
       textStyle: { color: 'var(--hl-fg)', fontSize: 13 },
       padding: [12, 16],
       extraCssText:
-        'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
+        'box-shadow: var(--hl-shadow-pop); border-radius: var(--hl-radius-md);',
     },
     legend: {
       data: categoryTrends.slice(0, 6).map((item) => item.category),
@@ -1659,13 +1659,13 @@ function initUserRetentionChart(retentionData) {
   const option = {
     tooltip: {
       trigger: 'axis',
-      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      backgroundColor: 'var(--hl-surface)',
       borderColor: 'var(--hl-gray-200)',
       borderWidth: 1,
       textStyle: { color: 'var(--hl-fg)', fontSize: 13 },
       padding: [12, 16],
       extraCssText:
-        'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
+        'box-shadow: var(--hl-shadow-pop); border-radius: var(--hl-radius-md);',
       formatter: function (params) {
         const idx = params[0].dataIndex;
         const item = retentionData[idx];
@@ -1716,8 +1716,8 @@ function initUserRetentionChart(retentionData) {
         lineStyle: { width: 2.5, color: 'var(--hl-warning)' },
         areaStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(255, 255, 255, 0.3)' },
-            { offset: 1, color: 'rgba(255, 255, 255, 0.02)' },
+            { offset: 0, color: 'var(--hl-surface)' },
+            { offset: 1, color: 'var(--hl-surface)' },
           ]),
         },
       },
@@ -1741,13 +1741,13 @@ function initTopUsersChart(topUsers) {
   const option = {
     tooltip: {
       trigger: 'axis',
-      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      backgroundColor: 'var(--hl-surface)',
       borderColor: 'var(--hl-gray-200)',
       borderWidth: 1,
       textStyle: { color: 'var(--hl-fg)', fontSize: 13 },
       padding: [12, 16],
       extraCssText:
-        'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); border-radius: 8px;',
+        'box-shadow: var(--hl-shadow-pop); border-radius: var(--hl-radius-md);',
       formatter: function (params) {
         const idx = params[0].dataIndex;
         const item = topUsers[idx];
@@ -2283,7 +2283,7 @@ function printRecordData(record) {
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--hl-gray-100); padding: 20px; }
-    .receipt-container { max-width: 600px; margin: 0 auto; background: var(--hl-gray-0); border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden; }
+    .receipt-container { max-width: 600px; margin: 0 auto; background: var(--hl-gray-0); border-radius: 12px; box-shadow: var(--hl-shadow-pop); overflow: hidden; }
     .receipt-header { background: var(--hl-gray-900); color: var(--hl-gray-0); padding: 30px; text-align: center; }
     .receipt-header h1 { font-size: 24px; margin-bottom: 8px; }
     .bill-no { font-size: 14px; opacity: 0.9; }
@@ -3432,8 +3432,8 @@ function generateMyQRCode(userId) {
     text: userId,
     width: 512,
     height: 512,
-    colorDark: 'var(--hl-gray-950)',
-    colorLight: 'var(--hl-gray-0)',
+    colorDark: '#0a0a0a',
+    colorLight: '#ffffff',
     correctLevel: QRCode.CorrectLevel.M,
   });
   const img = container.querySelector('img');

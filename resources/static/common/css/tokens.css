@@ -5,6 +5,15 @@
  * Switch theme via `data-theme="light"` on <html>. Dark mode is intentionally
  * removed; the site renders identically regardless of OS prefers-color-scheme.
  * `var(--hl-*)` pierces Shadow DOM, so Web Components read these too.
+ *
+ * All radii, borders, shadows, overlays and color pairs are declared here.
+ * Any CSS file or JS component that needs a color, radius, border width or
+ * border color MUST read a token from this file — never inline a hex/rgb/%.
+ *
+ * Background rules: every `background:` is white-on-white; element separation
+ * comes from border color/width, not background contrast. Borders live in
+ * `--hl-border` (default) / `--hl-border-medium` / `--hl-border-strong` and
+ * widths in `--hl-border-thin|medium|thick`.
  */
 
 :root,
@@ -14,27 +23,28 @@
   --hl-gray-0: #ffffff;
   --hl-gray-50: #ffffff;
   --hl-gray-100: #ffffff;
-  --hl-gray-150: #f4f4f5;
-  --hl-gray-200: #e4e4e7;
-  --hl-gray-300: #d4d4d8;
-  --hl-gray-400: #a1a1aa;
-  --hl-gray-500: #71717a;
-  --hl-gray-600: #52525b;
-  --hl-gray-700: #3f3f46;
-  --hl-gray-800: #27272a;
-  --hl-gray-900: #18181b;
+  --hl-gray-150: #f4f4f4;
+  --hl-gray-200: #e4e4e4;
+  --hl-gray-300: #d4d4d4;
+  --hl-gray-400: #a1a1a1;
+  --hl-gray-500: #717171;
+  --hl-gray-600: #525252;
+  --hl-gray-700: #3f3f3f;
+  --hl-gray-800: #272727;
+  --hl-gray-900: #181818;
   --hl-gray-950: #0a0a0a;
 
-  /* Semantic surface / text */
+  /* Semantic surface / text — every page reads from these */
   --hl-bg: #ffffff;
-  --hl-bg-subtle: #f0f0f0;
-  --hl-bg-muted: #e4e4e7;
+  --hl-bg-subtle: #ffffff;
+  --hl-bg-muted: #ffffff;
   --hl-surface: #ffffff;
-  --hl-surface-hover: #f0f0f0;
+  --hl-surface-hover: #ffffff;
   --hl-fg: #0a0a0a;
-  --hl-fg-muted: #3f3f46;
-  --hl-fg-subtle: #71717a;
-  --hl-border: #a1a1aa;
+  --hl-fg-muted: #3f3f3f;
+  --hl-fg-subtle: #717171;
+  --hl-border: #a1a1a1;
+  --hl-border-medium: #525252;
   --hl-border-strong: #0a0a0a;
 
   /* Accent = pure foreground; accent-fg = its inverse */
@@ -43,31 +53,101 @@
   --hl-accent-hover: #1f1f1f;
   --hl-focus-ring: rgba(10, 10, 10, 0.18);
 
-  /* Status — monochrome variants use readable foreground/surface pairs */
-  --hl-success: #0a0a0a;
-  --hl-success-bg: #f0f0f0;
-  --hl-error: #ffffff;
+  /*
+   * Status pair convention: every status has a fg + bg that read perfectly
+   * against each other. Status chips, badges, toasts, and inline icons
+   * ALL use `*-fg` text on `*-bg` surface — this avoids the failure mode
+   * of a coloured fg on a near-white surface (low contrast) or a coloured
+   * bg under near-black fg (also low contrast).
+   */
+  --hl-success-fg: #ffffff;
+  --hl-success-bg: #0a0a0a;
+  --hl-error-fg: #ffffff;
   --hl-error-bg: #0a0a0a;
-  --hl-warning: #0a0a0a;
-  --hl-warning-bg: #f0f0f0;
-  --hl-info: #0a0a0a;
-  --hl-info-bg: #f0f0f0;
+  --hl-warning-fg: #ffffff;
+  --hl-warning-bg: #0a0a0a;
+  --hl-info-fg: #ffffff;
+  --hl-info-bg: #0a0a0a;
 
-  /* Overlay */
+  /* Inline status tokens kept for backward compat — alias to fg */
+  --hl-success: var(--hl-fg);
+  --hl-error: var(--hl-error-fg);
+  --hl-warning: var(--hl-warning-fg);
+  --hl-info: var(--hl-info-fg);
+
+  /* Inverse inline tokens kept for backward compat — alias to bg */
+  --hl-success-bg-soft: var(--hl-success-bg);
+  --hl-error-bg-soft: var(--hl-error-bg);
+  --hl-warning-bg-soft: var(--hl-warning-bg);
+  --hl-info-bg-soft: var(--hl-info-bg);
+
+  /* Overlay / scrim */
   --hl-overlay: rgba(10, 10, 10, 0.5);
+  --hl-overlay-soft: rgba(10, 10, 10, 0.3);
+  --hl-overlay-muted: rgba(10, 10, 10, 0.08);
+  --hl-overlay-fade: rgba(255, 255, 255, 0.7);
 
-  /* Radius */
+  /* Spacing scale (for padding/gap consistency) */
+  --hl-space-1: 4px;
+  --hl-space-2: 8px;
+  --hl-space-3: 12px;
+  --hl-space-4: 16px;
+  --hl-space-5: 20px;
+  --hl-space-6: 24px;
+  --hl-space-8: 32px;
+  --hl-space-10: 40px;
+
+  /* List layout tokens — uniform across all list/card grids */
+  --hl-list-padding: var(--hl-space-3);
+  --hl-list-gap: var(--hl-space-3);
+  --hl-list-item-padding: var(--hl-space-4);
+  --hl-list-item-radius: var(--hl-radius-md);
+  /* Subtle inter-item spacing so list items breathe; container padding handles outer edges */
+  --hl-list-item-spacing: var(--hl-space-2);
+
+  /* Border widths */
+  --hl-border-w-thin: 1px;
+  --hl-border-w-medium: 2px;
+  --hl-border-w-thick: 3px;
+
+  /*
+   * Radius scale — only these values are allowed.
+   * Replace any inline radius (px or %) with one of these.
+   */
+  --hl-radius-xs: 4px;
   --hl-radius-sm: 6px;
-  --hl-radius-md: 10px;
-  --hl-radius-lg: 14px;
+  --hl-radius-md: 8px;
+  --hl-radius-lg: 12px;
+  --hl-radius-xl: 16px;
+  --hl-radius-pill: 9999px;
+  --hl-radius-circle: 50%;
 
-  /* Shadow (neutral black) */
+  /* Convenience aliases for common component radii */
+  --hl-radius-button: var(--hl-radius-sm);
+  --hl-radius-input: var(--hl-radius-lg);
+  --hl-radius-card: var(--hl-radius-lg);
+  --hl-radius-badge: var(--hl-radius-pill);
+  --hl-radius-avatar: var(--hl-radius-circle);
+
+  /* Shadow (neutral black) — three elevations */
   --hl-shadow-sm: 0 1px 2px rgba(10, 10, 10, 0.06);
   --hl-shadow-md: 0 2px 8px rgba(10, 10, 10, 0.1);
   --hl-shadow-lg: 0 8px 24px rgba(10, 10, 10, 0.14);
+  --hl-shadow-modal: 0 10px 40px rgba(10, 10, 10, 0.2);
+  --hl-shadow-pop: 0 4px 20px rgba(10, 10, 10, 0.15);
+  --hl-shadow-input-rest:
+    0 4px 12px rgba(10, 10, 10, 0.12), 0 1px 3px rgba(10, 10, 10, 0.08);
+  --hl-shadow-input-focus:
+    0 6px 18px rgba(10, 10, 10, 0.18), 0 0 0 4px rgba(10, 10, 10, 0.85);
+
+  /* Typography */
+  --hl-font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --hl-font-stack:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 
   /* Transition (no transform/motion — opacity & color only) */
   --hl-transition:
     opacity 0.15s ease, color 0.15s ease, background-color 0.15s ease,
     border-color 0.15s ease;
+  --hl-transition-slow: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }

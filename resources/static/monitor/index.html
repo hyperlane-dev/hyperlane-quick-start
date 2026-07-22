@@ -51,7 +51,6 @@
         background: rgba(255, 255, 255, 0.05);
         pointer-events: none;
         z-index: 1;
-        transition: all 0.3s ease;
       }
 
       .app-header {
@@ -63,17 +62,6 @@
         margin: 0 auto;
       }
 
-      @keyframes gradientShift {
-        0%,
-        100% {
-          background-position: 0% 50%;
-        }
-
-        50% {
-          background-position: 100% 50%;
-        }
-      }
-
       .system-overview {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -81,8 +69,7 @@
         margin-bottom: 40px;
         padding: 30px;
         background: rgba(255, 255, 255, 0.95);
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        border-radius: var(--hl-radius-lg);
         position: relative;
         overflow: hidden;
       }
@@ -95,7 +82,7 @@
         right: 0;
         bottom: 0;
         border: 2px solid rgba(255, 255, 255, 0.2);
-        border-radius: 12px;
+        border-radius: var(--hl-radius-lg);
         pointer-events: none;
       }
 
@@ -103,11 +90,9 @@
         text-align: center;
         padding: 20px;
         background: var(--hl-surface);
-        border-radius: 8px;
-        transition: all 0.3s ease;
+        border-radius: var(--hl-radius-md);
         position: relative;
         overflow: hidden;
-        box-shadow: 0 2px 8px rgba(255, 255, 255, 0.08);
       }
 
       .system-info-item::before {
@@ -118,35 +103,8 @@
         right: 0;
         bottom: 0;
         border: 2px solid rgba(255, 255, 255, 0.15);
-        border-radius: 8px;
+        border-radius: var(--hl-radius-md);
         pointer-events: none;
-        transition: border-color 0.3s ease;
-      }
-
-      .system-info-item::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 3px;
-        background: var(--hl-accent);
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        border-radius: 8px 8px 0 0;
-      }
-
-      .system-info-item:hover {
-        box-shadow: 0 6px 16px rgba(255, 255, 255, 0.25);
-        background: var(--hl-surface);
-      }
-
-      .system-info-item:hover::before {
-        border-color: var(--hl-accent);
-      }
-
-      .system-info-item:hover::after {
-        opacity: 1;
       }
 
       .system-info-label {
@@ -174,22 +132,14 @@
       .metric-card {
         background: var(--hl-surface);
         border: 2px solid rgba(0, 0, 0, 0.15);
-        border-radius: 12px;
+        border-radius: var(--hl-radius-lg);
         padding: 20px;
         position: relative;
         overflow: hidden;
-        transition: all 0.3s ease;
-        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         min-height: 140px;
-      }
-
-      .metric-card:hover {
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-        border-color: var(--hl-accent);
-        background: var(--hl-surface);
       }
 
       .metric-title {
@@ -226,7 +176,7 @@
         width: 100%;
         height: 12px;
         background: rgba(0, 0, 0, 0.5);
-        border-radius: 6px;
+        border-radius: var(--hl-radius-sm);
         overflow: hidden;
         margin-top: 15px;
         position: relative;
@@ -236,21 +186,9 @@
         height: 100%;
         background: var(--hl-accent);
         border-radius: inherit;
-        transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         position: relative;
         overflow: hidden;
         min-width: 12px;
-      }
-
-      .progress-bar::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(255, 255, 255, 0.4);
-        animation: progressShimmer 2s infinite;
       }
 
       .charts-section {
@@ -265,13 +203,11 @@
 
       .chart-card {
         background: var(--hl-surface);
-        border-radius: 12px;
+        border-radius: var(--hl-radius-lg);
         padding: 24px;
         position: relative;
         overflow: hidden;
         height: 400px;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 16px rgba(255, 255, 255, 0.12);
       }
 
       .chart-card::before {
@@ -282,9 +218,8 @@
         right: 0;
         bottom: 0;
         border: 2px solid rgba(255, 255, 255, 0.2);
-        border-radius: 12px;
+        border-radius: var(--hl-radius-lg);
         pointer-events: none;
-        transition: border-color 0.3s ease;
       }
 
       .chart-card::after {
@@ -295,26 +230,7 @@
         right: 0;
         height: 4px;
         background: var(--hl-accent);
-        border-radius: 12px 12px 0 0;
-      }
-
-      @keyframes borderFlow {
-        0% {
-          background-position: 0% 0%;
-        }
-
-        100% {
-          background-position: 200% 0%;
-        }
-      }
-
-      .chart-card:hover {
-        box-shadow: 0 8px 28px rgba(255, 255, 255, 0.25);
-        background: var(--hl-surface);
-      }
-
-      .chart-card:hover::before {
-        border-color: var(--hl-accent);
+        border-radius: var(--hl-radius-lg) var(--hl-radius-lg) 0 0;
       }
 
       .chart-title {
@@ -336,7 +252,7 @@
         top: 20px;
         right: 20px;
         padding: 12px 20px;
-        border-radius: 8px;
+        border-radius: var(--hl-radius-md);
         background: var(--hl-surface);
         border: 1px solid var(--hl-success);
         color: var(--hl-success);
@@ -346,13 +262,12 @@
         gap: 8px;
         z-index: 1000;
         font-weight: 600;
-        box-shadow: var(--hl-shadow-md, 0 2px 8px rgba(0, 0, 0, 0.1));
       }
 
       .connection-status.disconnected {
-        background: var(--hl-surface);
+        background: var(--hl-error-bg);
         border-color: var(--hl-error-bg);
-        color: var(--hl-error-bg);
+        color: var(--hl-error-fg);
       }
 
       .status-indicator {
@@ -361,18 +276,6 @@
         height: 10px;
         border-radius: 50%;
         background: var(--hl-success);
-        animation: statusPulse 2s infinite;
-      }
-
-      @keyframes statusPulse {
-        0%,
-        100% {
-          opacity: 1;
-        }
-
-        50% {
-          opacity: 0.6;
-        }
       }
 
       @media (min-width: 769px) and (max-width: 1024px) {

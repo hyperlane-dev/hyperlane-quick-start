@@ -148,16 +148,13 @@ class HyperlaneFeedItem extends HTMLElement {
           border-radius: 12px;
           padding: 24px;
           margin-bottom: 20px;
-          box-shadow: var(--hl-shadow-md, 0 4px 20px rgba(0, 0, 0, 0.1));
+          box-shadow: var(--hl-shadow-pop);
           transition: all 0.3s ease;
           animation: fadeInUp 0.6s ease both;
           animation-delay: ${index * 0.1}s;
         }
         .feed-item:last-child {
           margin-bottom: 0;
-        }
-        .feed-item:hover {
-          box-shadow: var(--hl-shadow-lg, 0 8px 30px rgba(0, 0, 0, 0.15));
         }
         h3 {
           color: var(--hl-fg);
@@ -171,9 +168,6 @@ class HyperlaneFeedItem extends HTMLElement {
           color: var(--hl-accent);
           text-decoration: none;
           transition: color 0.3s ease;
-        }
-        h3 a:hover {
-          color: var(--hl-accent);
         }
         .feed-meta {
           display: flex;
@@ -243,9 +237,6 @@ class HyperlaneFeedItem extends HTMLElement {
           display: inline-block;
           transition: all 0.3s ease;
           flex-shrink: 0;
-        }
-        .download-btn:hover {
-          background: var(--hl-success);
         }
         @keyframes fadeInUp {
           from {

@@ -1,15 +1,14 @@
 .card {
   background: var(--hl-surface);
-  border: 1px solid var(--hl-border);
-  border-radius: var(--hl-radius-md);
+  border: 1px solid var(--hl-border-strong);
+  border-radius: var(--hl-radius-card);
   overflow: hidden;
-  margin-bottom: 16px;
-  box-shadow: var(--hl-shadow-sm);
+  margin-bottom: var(--hl-space-4);
 }
 
 .card-header {
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--hl-border);
+  padding: var(--hl-space-4) var(--hl-space-5);
+  border-bottom: 1px solid var(--hl-border-strong);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -25,5 +24,5 @@
 }
 
 .card-body {
-  padding: 20px;
+  padding: var(--hl-space-5);
 }

@@ -62,7 +62,7 @@ body {
 .brand img {
   width: 36px;
   height: 36px;
-  border-radius: 10px;
+  border-radius: var(--hl-radius-md);
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
 }
 
@@ -77,7 +77,7 @@ body {
 .status-dot {
   width: 10px;
   height: 10px;
-  border-radius: 50%;
+  border-radius: var(--hl-radius-circle);
   background: var(--error);
 }
 
@@ -104,7 +104,7 @@ button,
 .panel {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 20px;
+  border-radius: var(--hl-radius-xl);
   padding: 20px;
   box-shadow: 0 16px 32px rgba(255, 255, 255, 0.25);
   display: flex;
@@ -137,7 +137,7 @@ button,
 .field input {
   background: var(--hl-bg-subtle);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--hl-radius-md);
   padding: 10px 12px;
   color: var(--text);
   font-size: 14px;
@@ -151,7 +151,7 @@ button,
 
 button {
   border: 1px solid var(--hl-accent);
-  border-radius: 10px;
+  border-radius: var(--hl-radius-md);
   padding: 10px 12px;
   font-weight: 600;
   cursor: pointer;
@@ -164,11 +164,6 @@ button.secondary {
   background: transparent;
   color: var(--text);
   border: 1px solid var(--hl-border-strong);
-}
-
-button.secondary:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: var(--hl-fg-muted);
 }
 
 button:disabled {
@@ -200,7 +195,7 @@ button:disabled {
   width: min(60vw, 600px);
   aspect-ratio: 1;
   background: var(--board-bg);
-  border-radius: 18px;
+  border-radius: var(--hl-radius-xl);
   display: grid;
   grid-template-columns: repeat(15, 1fr);
   border: 1px solid var(--hl-border-strong);
@@ -222,7 +217,7 @@ button:disabled {
   content: '';
   width: 70%;
   height: 70%;
-  border-radius: 50%;
+  border-radius: var(--hl-radius-circle);
   border: 2px dashed rgba(255, 255, 255, 0.6);
   position: absolute;
 }
@@ -231,7 +226,7 @@ button:disabled {
   width: 70%;
   aspect-ratio: 1;
   height: auto;
-  border-radius: 50%;
+  border-radius: var(--hl-radius-circle);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
 }
 
@@ -250,7 +245,8 @@ button:disabled {
 .sidebar-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  padding: var(--hl-list-padding);
+  gap: 0;
 }
 
 .sidebar-list span {
@@ -261,9 +257,10 @@ button:disabled {
 .move-log {
   flex: 1;
   overflow-y: auto;
+  padding: var(--hl-list-padding);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--hl-list-item-spacing);
   min-height: 0;
 }
 
@@ -273,17 +270,19 @@ button:disabled {
 
 .move-log::-webkit-scrollbar-thumb {
   background: var(--accent);
-  border-radius: 6px;
+  border-radius: var(--hl-radius-sm);
 }
 
 .move-log::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--hl-overlay-muted);
 }
 
 .move-item {
-  padding: 8px 10px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.1);
+  padding: var(--hl-list-item-padding);
+  border-radius: var(--hl-list-item-radius);
+  background: var(--hl-surface);
+  border: 1px solid var(--hl-border);
+  color: var(--hl-fg);
   font-size: 13px;
 }
 
@@ -343,7 +342,7 @@ button:disabled {
   .panel {
     padding: 14px;
     gap: 10px;
-    border-radius: 16px;
+    border-radius: var(--hl-radius-xl);
   }
 
   .panel h2 {
@@ -445,7 +444,7 @@ button:disabled {
   .panel {
     padding: 16px;
     gap: 12px;
-    border-radius: 16px;
+    border-radius: var(--hl-radius-xl);
   }
 
   .panel h2 {
@@ -474,7 +473,7 @@ button:disabled {
 
   .board {
     width: min(98vw - 32px, 520px);
-    border-radius: 12px;
+    border-radius: var(--hl-radius-lg);
   }
 
   .stone {
@@ -509,7 +508,7 @@ button:disabled {
 
   .panel {
     padding: 12px;
-    border-radius: 12px;
+    border-radius: var(--hl-radius-lg);
   }
 
   .actions {
@@ -523,7 +522,7 @@ button:disabled {
 
   .board {
     width: min(100vw - 24px, 400px);
-    border-radius: 10px;
+    border-radius: var(--hl-radius-md);
   }
 
   .sidebar-list span {
@@ -539,7 +538,7 @@ button:disabled {
 @media (max-width: 360px) {
   .board {
     width: calc(100vw - 24px);
-    border-radius: 8px;
+    border-radius: var(--hl-radius-md);
   }
 
   .header {

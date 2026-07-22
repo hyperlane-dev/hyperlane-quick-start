@@ -256,25 +256,17 @@ class HyperlaneSelect extends HTMLElement {
           align-items: center;
           justify-content: space-between;
           padding: 10px 15px;
-          border: 2px solid var(--hl-border-strong);
+          border: var(--hl-border-w-thin) solid var(--hl-border);
           border-radius: var(--hl-radius-sm);
           background: var(--hl-surface);
           cursor: pointer;
-          transition: all 0.3s ease;
           user-select: none;
           min-height: 20px;
-        }
-        .select-trigger:hover:not(.disabled) {
-          border-color: var(--hl-gray-900);
-        }
-        .select-trigger.open {
-          border-color: var(--hl-gray-900);
-          box-shadow: 0 0 0 3px var(--hl-focus-ring, rgba(0, 0, 0, 0.12));
         }
         .select-trigger.disabled {
           opacity: 0.7;
           cursor: not-allowed;
-          background: var(--hl-bg-muted);
+          background: var(--hl-surface);
         }
         .select-trigger-text {
           color: var(--hl-fg);
@@ -291,7 +283,6 @@ class HyperlaneSelect extends HTMLElement {
           height: 16px;
           flex-shrink: 0;
           margin-left: 8px;
-          transition: transform 0.3s ease;
           color: var(--hl-fg-muted);
         }
         .select-trigger.open .select-trigger-arrow {
@@ -303,13 +294,11 @@ class HyperlaneSelect extends HTMLElement {
           left: 0;
           right: 0;
           background: var(--hl-surface);
-          border: 2px solid var(--hl-border-strong);
+          border: var(--hl-border-w-thin) solid var(--hl-border);
           border-radius: var(--hl-radius-sm);
-          box-shadow: var(--hl-shadow-lg, 0 8px 24px rgba(0, 0, 0, 0.12));
           z-index: 1000;
           opacity: 0;
           visibility: hidden;
-          transition: all 0.2s ease;
           overflow: hidden;
         }
         .select-dropdown.open {
@@ -329,19 +318,15 @@ class HyperlaneSelect extends HTMLElement {
         }
         .options-list::-webkit-scrollbar-thumb {
           background: var(--hl-border);
-          border-radius: 3px;
-        }
-        .options-list::-webkit-scrollbar-thumb:hover {
-          background: var(--hl-border-strong);
+          border-radius: var(--hl-radius-xs);
         }
         .option-item {
           padding: 8px 12px;
           margin: 4px 0;
-          border-radius: 6px;
+          border-radius: var(--hl-radius-sm);
           cursor: pointer;
           font-size: 0.95rem;
           color: var(--hl-fg);
-          transition: all 0.2s ease;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -352,17 +337,17 @@ class HyperlaneSelect extends HTMLElement {
         .option-item:last-child {
           margin-bottom: 0;
         }
-        .option-item:hover {
-          background: var(--hl-surface-hover);
-          color: var(--hl-fg);
-        }
         .option-item.selected {
-          background: var(--hl-gray-900);
+          background: var(--hl-accent);
           color: var(--hl-accent-fg);
         }
         .option-item.highlighted {
-          background: var(--hl-surface-hover);
+          background: var(--hl-overlay-muted);
           color: var(--hl-fg);
+        }
+        .option-item:hover {
+          background: var(--hl-accent);
+          color: var(--hl-accent-fg);
         }
         .option-item.selected.highlighted {
           background: var(--hl-accent-hover);
