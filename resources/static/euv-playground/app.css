@@ -374,7 +374,6 @@ body {
   user-select: none;
   background: var(--hl-surface);
   color: var(--hl-fg);
-  margin-bottom: var(--hl-list-gap);
 }
 
 .pg-project-item:last-child {

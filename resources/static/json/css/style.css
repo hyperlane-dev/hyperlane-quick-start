@@ -220,7 +220,6 @@ body {
 .tree-children {
   display: none;
   padding: var(--hl-list-padding);
-  display: flex;
   flex-direction: column;
   gap: var(--hl-list-item-spacing);
 }

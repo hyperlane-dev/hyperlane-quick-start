@@ -519,6 +519,7 @@ body {
   border-radius: var(--hl-list-item-radius);
   color: var(--hl-fg);
   font-size: 12px;
+  margin-bottom: var(--hl-list-item-spacing);
 }
 
 .diff-stat-item {
@@ -618,13 +619,13 @@ body {
 }
 
 .diff-line.added {
-  background-color: var(--hl-success-bg);
-  color: var(--hl-success-fg);
+  background-color: var(--hl-bg-subtle);
+  color: var(--hl-fg);
 }
 
 .diff-line.removed {
-  background-color: var(--hl-error-bg);
-  color: var(--hl-error-fg);
+  background-color: var(--hl-bg-subtle);
+  color: var(--hl-fg);
 }
 
 .diff-line.empty {
@@ -635,22 +636,26 @@ body {
 .diff-chars-added {
   background-color: var(--hl-accent);
   color: var(--hl-accent-fg);
-  font-weight: bolder;
+  font-weight: bold;
   display: inline;
+  padding: 0 2px;
 }
 
 .diff-chars-removed {
-  background-color: var(--hl-border-strong);
-  color: var(--hl-surface);
-  font-weight: bolder;
-  text-decoration: none;
+  background-color: var(--hl-accent);
+  color: var(--hl-accent-fg);
+  font-weight: bold;
+  text-decoration: line-through;
   display: inline;
+  padding: 0 2px;
 }
 
 .diff-unified-view {
   background: var(--hl-surface);
   display: flex;
   flex-direction: column;
+  padding: var(--hl-list-item-spacing);
+  border-radius: var(--hl-list-item-radius);
 }
 
 .diff-unified-row {
@@ -664,11 +669,13 @@ body {
 }
 
 .diff-unified-row.added {
-  background-color: var(--hl-success-bg);
+  background-color: var(--hl-bg-subtle);
+  color: var(--hl-fg);
 }
 
 .diff-unified-row.removed {
-  background-color: var(--hl-error);
+  background-color: var(--hl-bg-subtle);
+  color: var(--hl-fg);
 }
 
 .diff-unified-marker {
