@@ -39,6 +39,7 @@
     projectsLoaded: false,
     defaultCodeLoaded: false,
     lastBuildUrl: '',
+    runToken: 0,
   };
 
   function $(id) {
@@ -360,6 +361,8 @@
     }
     hideShareButton();
     resetPreviewPane();
+    state.runToken += 1;
+    state.running = false;
     showEditorLoading('Loading project…');
     const detail = await loadProject(id);
     if (!detail) {
@@ -476,6 +479,8 @@
   async function loadDetailAndOpen(id, nameHint) {
     hideShareButton();
     resetPreviewPane();
+    state.runToken += 1;
+    state.running = false;
     showEditorLoading('Loading project…');
     const detail = await loadProject(id);
     if (!detail) {
@@ -655,12 +660,15 @@
     const projectId = state.current.id;
     const runBtn = $('pg-run');
     state.running = true;
+    state.runToken += 1;
+    const myToken = state.runToken;
     if (runBtn) runBtn.setAttribute('disabled', '');
     setStatus('Building… (cold start ~20-30s, hot ~2s)', 'running');
     clearStderr();
     showPreviewLoading('Building…');
     try {
       const data = await runProject(projectId, code);
+      if (myToken !== state.runToken) return;
       if (!data.ok) {
         setStatus('Build failed', 'error');
         const stderrText =
@@ -681,14 +689,17 @@
       }
       setStatus('Running', '');
     } catch (e) {
+      if (myToken !== state.runToken) return;
       const msg = e && e.stack ? e.stack : String(e);
       setStatus('Request failed', 'error');
       showStderr(msg);
       scrollStderrToTop();
     } finally {
-      state.running = false;
-      if (runBtn) runBtn.removeAttribute('disabled');
-      hidePreviewLoading();
+      if (myToken === state.runToken) {
+        state.running = false;
+        if (runBtn) runBtn.removeAttribute('disabled');
+        hidePreviewLoading();
+      }
     }
   }
 
