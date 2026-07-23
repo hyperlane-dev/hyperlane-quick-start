@@ -1994,7 +1994,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "23.0.31"
+version = "23.0.32"
 dependencies = [
  "hyperlane",
  "hyperlane-utils",
@@ -2013,9 +2013,9 @@ checksum = "e5480b89b70d89bc6d07bea700bf052bb00bea5e9175468a775128e174dfd614"
 
 [[package]]
 name = "hyperlane-utils"
-version = "33.1.12"
+version = "33.1.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e1296ea1ce57133ce4fb967609d63f7970d58e0eb6e767b48680d5298b5da04f"
+checksum = "21330349629982278967c3f22a74ef43ab6565c95ba7ff8867a7d6b184aff820"
 dependencies = [
  "aes 0.9.1",
  "ahash 0.8.12",
