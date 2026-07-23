@@ -372,6 +372,17 @@ button,
   display: flex;
   align-items: flex-start;
   gap: 20px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.info-card:active,
+.info-card:focus,
+.info-card:focus-visible {
+  background: rgba(255, 255, 255, 0.95) !important;
+  transform: none !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  outline: none !important;
 }
 
 .info-icon {

@@ -646,11 +646,6 @@ hyperlane-monaco-editor {
     box-shadow var(--transition_medium);
 }
 
-.pg-dialog-input:focus {
-  border-color: var(--pg-success);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.12);
-}
-
 .pg-dialog-input.is-invalid {
   border-color: var(--pg-stderr-fg);
   box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);

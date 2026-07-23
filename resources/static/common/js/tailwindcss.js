@@ -10921,12 +10921,6 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             'read-only',
             'empty',
             'focus-within',
-            [
-              'hover',
-              we(t(), 'hoverOnlyWhenSupported')
-                ? '@media (hover: hover) and (pointer: fine) { &:hover }'
-                : '&:hover',
-            ],
             'focus',
             'focus-visible',
             'active',

@@ -1,15 +1,17 @@
-/* Global reset — kill every mouse-driven animation, transition, and hover/focus visual effect.
+/* Global reset — kill every mouse-driven animation and transition.
  * Elements still work (click, type, submit); they simply stop animating.
  * Loaded early in common.css so page-level spinners (loading, progress) still animate;
- * only interaction-driven motion is suppressed here. */
+ * only interaction-driven motion and color shifts are suppressed here.
+ * Element base box-shadow is intentionally preserved on :focus/:active. */
 * {
   transition: none !important;
+  -webkit-tap-highlight-color: transparent;
 }
 
 *:focus,
 *:focus-visible,
 *:active {
-  box-shadow: none !important;
+  transform: none !important;
 }
 
 *:focus,
@@ -22,4 +24,14 @@
 *:focus-visible,
 *:active {
   animation: none !important;
+}
+
+/* Suppress click/focus color shifts (opacity, background-color, color) from mouse-driven pseudo-classes.
+ * Inherit lets elements keep their theme-driven base color without an instant shift on press. */
+*:focus,
+*:focus-visible,
+*:active {
+  background-color: inherit;
+  color: inherit;
+  opacity: 1;
 }

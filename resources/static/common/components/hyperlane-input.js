@@ -126,7 +126,6 @@ class HyperlaneInput extends HTMLElement {
         }
         input:focus {
           outline: none;
-          border-color: var(--hl-border-strong);
         }
         input::placeholder {
           color: var(--hl-fg-subtle);

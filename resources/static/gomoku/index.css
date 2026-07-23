@@ -551,13 +551,6 @@ button:disabled {
 }
 
 @media (hover: none) and (pointer: coarse) {
-  .cell:active {
-    background: rgba(255, 255, 255, 0.2);
-  }
-
-  button:active {
-    opacity: 0.9;
-  }
 }
 
 @media (orientation: landscape) and (max-height: 600px) {

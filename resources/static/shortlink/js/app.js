@@ -57,12 +57,14 @@ const ShortlinkApp = {
 
     const urlInput = document.getElementById('urlInput');
     if (urlInput) {
-      urlInput.addEventListener('hyperlane-blur', () =>
-        this.validateUrl(urlInput),
-      );
-      urlInput.addEventListener('hyperlane-input', () =>
-        this.clearInputError(urlInput),
-      );
+      let hasUserInput = false;
+      urlInput.addEventListener('hyperlane-input', () => {
+        hasUserInput = true;
+        this.clearInputError(urlInput);
+      });
+      urlInput.addEventListener('hyperlane-blur', () => {
+        if (hasUserInput) this.validateUrl(urlInput);
+      });
     }
   },
 
@@ -110,8 +112,8 @@ const ShortlinkApp = {
     const url = input.value.trim();
 
     if (!url) {
-      this.showInputError(input, 'URL is required');
-      return false;
+      this.clearInputError(input);
+      return true;
     }
 
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
