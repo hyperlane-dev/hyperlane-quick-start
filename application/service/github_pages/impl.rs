@@ -1,3 +1,4 @@
+use super::r#type::*;
 use super::*;
 
 /// Implements [`PendingFetch`] construction and the sender accessor.
@@ -104,7 +105,7 @@ impl GithubPagesService {
         let rewritten: Vec<u8> =
             Self::rewrite_proxy_paths(owner, repository, &raw_bytes, &extension);
         if let Some(parent) = Path::new(&local_path).parent() {
-            let _ = fs::create_dir_all(parent).await;
+            let _: Result<(), Error> = fs::create_dir_all(parent).await;
         }
         if let Err(error) = fs::write(&local_path, &rewritten).await {
             error!("Failed to cache resource file {local_path} {error}");
@@ -276,7 +277,7 @@ impl GithubPagesService {
         let cache_dir: String = format!("{CACHE_DIR}/{owner}/{repository}");
         let temp_dir: String = format!("{CACHE_DIR}/{owner}/{repository}.tmp");
         // Clean up any stale temp directory from a previous interrupted sync
-        let _ = fs::remove_dir_all(&temp_dir).await;
+        let _: Result<(), Error> = fs::remove_dir_all(&temp_dir).await;
         let base_url: String = BASE_URL_TEMPLATE
             .replace("{owner}", owner)
             .replace("{repository}", repository);
@@ -362,14 +363,14 @@ impl GithubPagesService {
                             );
                             let local_path: String = format!("{temp_dir}/{normalized_path}");
                             if let Some(parent) = Path::new(&local_path).parent() {
-                                let _ = fs::create_dir_all(parent).await;
+                                let _: Result<(), Error> = fs::create_dir_all(parent).await;
                             }
                             if let Err(error) = fs::write(&local_path, &rewritten).await {
                                 error!("Failed to cache {local_path} {error}");
                             }
-                            let _ = sender.send(Ok((normalized_path.clone(), linked)));
+                            let _: Result<(), FetchResourceSendError> = sender.send(Ok((normalized_path.clone(), linked)));
                         } else {
-                            let _ = sender.send(Err(normalized_path.clone()));
+                            let _: Result<(), FetchResourceSendError> = sender.send(Err(normalized_path.clone()));
                         }
                         return;
                     }
@@ -396,7 +397,7 @@ impl GithubPagesService {
                             // Save rewritten content to temp_dir
                             let local_path: String = format!("{temp_dir}/{normalized_path}");
                             if let Some(parent) = Path::new(&local_path).parent() {
-                                let _ = fs::create_dir_all(parent).await;
+                                let _: Result<(), Error> = fs::create_dir_all(parent).await;
                             }
                             if let Err(error) = fs::write(&local_path, &rewritten).await {
                                 error!("Failed to cache {local_path} {error}");
@@ -410,7 +411,7 @@ impl GithubPagesService {
                             }
                             map.remove(&sync_resource_key);
                             drop(map);
-                            let _ = sender.send(Ok((normalized_path.clone(), linked)));
+                            let _: Result<(), FetchResourceSendError> = sender.send(Ok((normalized_path.clone(), linked)));
                         }
                         Err(error) => {
                             // Notify waiters of the failure, then clean up
@@ -422,7 +423,7 @@ impl GithubPagesService {
                             map.remove(&sync_resource_key);
                             drop(map);
                             warn!("Failed to sync {normalized_path} {error}");
-                            let _ = sender.send(Err(normalized_path.clone()));
+                            let _: Result<(), FetchResourceSendError> = sender.send(Err(normalized_path.clone()));
                         }
                     }
                 });
@@ -456,7 +457,7 @@ impl GithubPagesService {
         }
         // ----- Atomically move the fully-downloaded tree to the cache dir -----
         if fs::metadata(&temp_dir).await.is_ok() {
-            let _ = fs::remove_dir_all(&cache_dir).await;
+            let _: Result<(), Error> = fs::remove_dir_all(&cache_dir).await;
             fs::rename(&temp_dir, &cache_dir)
                 .await
                 .map_err(|error: std::io::Error| {
@@ -490,7 +491,7 @@ impl GithubPagesService {
                 .map(|t| t.is_file())
                 .unwrap_or(false)
             {
-                let _ = fs::read(&entry_path).await;
+                let _: Result<Vec<u8>, Error> = fs::read(&entry_path).await;
             }
         }
     }
@@ -585,7 +586,7 @@ impl GithubPagesService {
             .get_content_type()
             .to_string();
         if fs::metadata(&local_path).await.is_err() {
-            let _ = Self::fetch_resource(owner, repository, path).await?;
+            let _: (Vec<u8>, String) = Self::fetch_resource(owner, repository, path).await?;
         }
         let file_metadata: std::fs::Metadata =
             std::fs::metadata(&local_path).map_err(|error: std::io::Error| error.to_string())?;

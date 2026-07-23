@@ -144,12 +144,12 @@ impl MessageQueueBroker {
         if topic.get_state() == &TopicState::Closed {
             return Err(format!("Topic '{topic_name}' is closed"));
         }
-        let _ = topic.get_sender().send(payload.clone());
+        let _: Result<usize, SendError<Vec<u8>>> = topic.get_sender().send(payload.clone());
         drop(topics);
         let groups: RwLockReadGuard<'_, ConsumerGroupRegistry> = self.consumer_groups.read().await;
         for (_, group) in groups.iter() {
             if group.get_topic_name() == topic_name {
-                let _ = group.get_sender().send(payload.clone());
+                let _: Result<usize, SendError<Vec<u8>>> = group.get_sender().send(payload.clone());
             }
         }
         Ok(())

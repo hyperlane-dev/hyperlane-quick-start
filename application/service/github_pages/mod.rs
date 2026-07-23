@@ -5,9 +5,9 @@ mod r#static;
 mod r#struct;
 mod r#type;
 
-pub use {r#const::*, r#fn::*, r#struct::*};
+pub use {r#const::*, r#fn::*, r#struct::*, r#type::*};
 
-use {r#static::*, r#type::*};
+use r#static::*;
 
 use {super::*, model::response::github_pages::*, utils::content_type::*};
 
@@ -15,6 +15,7 @@ use {hyperlane_config::application::github_pages::*, hyperlane_plugin::message_q
 
 use std::{
     collections::{HashSet, VecDeque},
+    io::Error,
     path::Path,
     sync::Arc,
     time::Duration,

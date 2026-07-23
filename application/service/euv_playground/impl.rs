@@ -177,14 +177,14 @@ impl EuvPlaygroundService {
         let stdout_task = async move {
             let mut buf: Vec<u8> = Vec::new();
             if let Some(mut s) = stdout {
-                let _ = s.read_to_end(&mut buf).await;
+                let _: Result<usize, Error> = s.read_to_end(&mut buf).await;
             }
             buf
         };
         let stderr_task = async move {
             let mut buf: Vec<u8> = Vec::new();
             if let Some(mut s) = stderr {
-                let _ = s.read_to_end(&mut buf).await;
+                let _: Result<usize, Error> = s.read_to_end(&mut buf).await;
             }
             buf
         };
@@ -268,7 +268,7 @@ impl EuvPlaygroundService {
         let child = match cmd.spawn() {
             Ok(c) => c,
             Err(e) => {
-                let _ = remove_dir_all(&dir_path);
+                let _: Result<(), Error> = remove_dir_all(&dir_path);
                 return Err(format!(
                     "Failed to spawn wasm-pack at {wasm_pack_display}. Install it with `cargo install wasm-pack`, add Cargo's bin directory to PATH, or set {EUV_PLAYGROUND_WASM_PACK_ENV}: {e}"
                 ));
@@ -282,18 +282,18 @@ impl EuvPlaygroundService {
         {
             Ok(Ok(o)) => o,
             Ok(Err(e)) => {
-                let _ = remove_dir_all(&dir_path);
+                let _: Result<(), Error> = remove_dir_all(&dir_path);
                 return Err(format!("wasm-pack wait failed: {e}"));
             }
             Err(_) => {
-                let _ = remove_dir_all(&dir_path);
+                let _: Result<(), Error> = remove_dir_all(&dir_path);
                 return Err(format!(
                     "wasm-pack timed out after {EUV_PLAYGROUND_BUILD_TIMEOUT_SECS}s"
                 ));
             }
         };
         let cleanup = |err: String| -> String {
-            let _ = remove_dir_all(&dir_path);
+            let _: Result<(), Error> = remove_dir_all(&dir_path);
             err
         };
         if !output.status.success() {
@@ -314,14 +314,14 @@ impl EuvPlaygroundService {
             counter
         ));
         if let Err(e) = create_dir_all(PathBuf::from(EUV_PLAYGROUND_BUILDS_DIR)) {
-            let _ = remove_dir_all(&dir_path);
+            let _: Result<(), Error> = remove_dir_all(&dir_path);
             return Err(format!(
                 "Failed to create builds dir {}: {e}",
                 EUV_PLAYGROUND_BUILDS_DIR
             ));
         }
         if let Err(e) = create_dir_all(&target_tmp) {
-            let _ = remove_dir_all(&dir_path);
+            let _: Result<(), Error> = remove_dir_all(&dir_path);
             return Err(format!(
                 "Failed to create build staging dir {}: {e}",
                 target_tmp.display()
@@ -347,22 +347,22 @@ impl EuvPlaygroundService {
             Ok(())
         }
         if let Err(e) = copy_dir_recursive(&www_dir, &target_tmp) {
-            let _ = remove_dir_all(&dir_path);
-            let _ = remove_dir_all(&target_tmp);
+            let _: Result<(), Error> = remove_dir_all(&dir_path);
+            let _: Result<(), Error> = remove_dir_all(&target_tmp);
             return Err(e);
         }
         if target_dir.exists() {
-            let _ = remove_dir_all(&target_dir);
+            let _: Result<(), Error> = remove_dir_all(&target_dir);
         }
         if let Err(e) = rename(&target_tmp, &target_dir) {
-            let _ = remove_dir_all(&dir_path);
-            let _ = remove_dir_all(&target_tmp);
+            let _: Result<(), Error> = remove_dir_all(&dir_path);
+            let _: Result<(), Error> = remove_dir_all(&target_tmp);
             return Err(format!(
                 "Failed to publish build to {}: {e}",
                 target_dir.display()
             ));
         }
-        let _ = remove_dir_all(&dir_path);
+        let _: Result<(), Error> = remove_dir_all(&dir_path);
         Ok(target_dir)
     }
 
@@ -508,7 +508,7 @@ impl EuvPlaygroundService {
     #[instrument_trace]
     pub fn write_project(project_dir: &Path, name: &str, code: &str) -> Result<i64, String> {
         if let Some(parent) = project_dir.parent() {
-            let _ = create_dir_all(parent);
+            let _: Result<(), Error> = create_dir_all(parent);
         }
         if create_dir_all(project_dir).is_err() {
             return Err(format!(
@@ -558,7 +558,7 @@ impl EuvPlaygroundService {
     pub fn user_dir(user_id: i32) -> PathBuf {
         let p: PathBuf =
             PathBuf::from(EUV_PLAYGROUND_DATA_DIR).join(Self::encode_id(user_id as i64));
-        let _ = create_dir_all(&p);
+        let _: Result<(), Error> = create_dir_all(&p);
         p
     }
 
@@ -602,7 +602,7 @@ impl EuvPlaygroundService {
             to_string(name).unwrap_or_else(|_| "\"Untitled\"".to_string()),
             updated_at_ms
         );
-        let _ = write(project_dir.join(EUV_PLAYGROUND_META_FILE), json);
+        let _: Result<(), Error> = write(project_dir.join(EUV_PLAYGROUND_META_FILE), json);
     }
 
     /// Monotonic per-user project-id counter. Persisted to disk in the

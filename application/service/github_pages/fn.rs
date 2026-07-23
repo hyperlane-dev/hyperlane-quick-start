@@ -298,7 +298,7 @@ fn extract_tag_src_paths(html: &str, paths: &mut HashSet<String>) {
                     }
                     found_attr = true;
                 } else if !eq_ignore_case(attr_name, target_attr) {
-                    let _ = read_attr_value(bytes, &mut position);
+                    let _: Option<String> = read_attr_value(bytes, &mut position);
                 }
             }
         }

@@ -16,6 +16,7 @@ use std::{
         DirEntry, ReadDir, copy, create_dir_all, read_dir, read_to_string, remove_dir_all, rename,
         write,
     },
+    io::Error,
     num::ParseIntError,
     path::{Path, PathBuf},
     process::{ExitStatus, Output, Stdio, id},
