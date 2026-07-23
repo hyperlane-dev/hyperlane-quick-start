@@ -44,6 +44,14 @@ button,
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+.shortlink-form hyperlane-button::part(button),
+.result-container hyperlane-button::part(button),
+.error-container hyperlane-button::part(button) {
+  background: var(--hl-accent);
+  color: var(--hl-accent-fg);
+  border-color: var(--hl-accent);
+}
+
 .input-group {
   margin-bottom: 30px;
 }
@@ -390,19 +398,14 @@ button,
   list-style: none;
   padding: var(--hl-list-padding);
   margin: 0;
-  border: var(--hl-border-w-thin) solid var(--hl-border);
-  border-radius: var(--hl-radius-md);
-  overflow: hidden;
 }
 
 .info-list li {
   position: relative;
   padding: var(--hl-list-item-padding);
-  border: var(--hl-border-w-thin) solid var(--hl-border);
   color: var(--hl-fg);
   line-height: 1.6;
   background: var(--hl-surface);
-  border-radius: var(--hl-list-item-radius);
 }
 
 .info-list li::before {

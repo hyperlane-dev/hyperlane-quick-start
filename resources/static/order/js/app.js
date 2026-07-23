@@ -3647,7 +3647,6 @@ function setupImagePreviewInteractions() {
   container.onmousedown = handleImageMouseDown;
   container.onmousemove = handleImageMouseMove;
   container.onmouseup = handleImageMouseUp;
-  container.onmouseleave = handleImageMouseUp;
   container.ondblclick = handleImageDoubleClick;
   img.ondragstart = () => false;
 }

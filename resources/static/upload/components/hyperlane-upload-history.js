@@ -114,7 +114,7 @@ class HyperlaneUploadHistory extends HTMLElement {
           padding: 0;
         }
         .history-item {
-          background: var(--hl-surface);
+          background: transparent;
           border: 1px solid var(--hl-border);
           border-radius: 12px;
           padding: 16px;

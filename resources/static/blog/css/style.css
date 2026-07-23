@@ -18,7 +18,7 @@ button,
 .sidebar {
   width: 260px;
   background: var(--hl-surface);
-  border-right: 1px solid var(--hl-border);
+  border-right: 1px solid var(--hl-gray-200);
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -30,7 +30,7 @@ button,
 
 .sidebar-header {
   padding: 20px;
-  border-bottom: 1px solid var(--hl-border);
+  border-bottom: 1px solid var(--hl-gray-200);
 }
 
 .sidebar-header h2 {
@@ -55,20 +55,22 @@ button,
 
 .sidebar-nav {
   flex: 1;
-  padding: 16px 0;
+  padding: var(--hl-list-padding);
+  display: flex;
+  flex-direction: column;
+  gap: var(--hl-list-item-spacing);
   overflow-y: auto;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--hl-list-gap);
   padding: var(--hl-list-item-padding);
   cursor: pointer;
-  color: var(--hl-fg);
+  color: var(--hl-fg-muted);
   background: var(--hl-surface);
-  border: 1px solid var(--hl-border);
-  border-left: var(--hl-border-w-thick) solid transparent;
+  border: var(--hl-border-w-thin) solid var(--hl-border);
   border-radius: var(--hl-list-item-radius);
   font-size: 14px;
   font-weight: 600;
@@ -77,7 +79,7 @@ button,
 .nav-item.active {
   background: var(--hl-accent);
   color: var(--hl-accent-fg);
-  border-left-color: var(--hl-accent);
+  border-color: var(--hl-accent);
   font-weight: 700;
 }
 
@@ -89,7 +91,7 @@ button,
 
 .sidebar-footer {
   padding: 16px 20px;
-  border-top: 1px solid var(--hl-border);
+  border-top: 1px solid var(--hl-gray-200);
 }
 
 #logout-btn {

@@ -769,15 +769,6 @@
       });
     }
 
-    document.addEventListener('keydown', function (e) {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-        if (state.current) {
-          e.preventDefault();
-          runCurrent();
-        }
-      }
-    });
-
     window.addEventListener('beforeunload', function () {
       if (state.dirty && state.current) {
         const editor = $('pg-editor');

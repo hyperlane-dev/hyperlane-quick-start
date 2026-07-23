@@ -34,12 +34,6 @@ textarea.form-input,
   background: var(--hl-surface);
 }
 
-.form-select:hover {
-  background-color: var(--hl-accent);
-  color: var(--hl-accent-fg);
-  border-color: var(--hl-accent);
-}
-
 .form-input::placeholder {
   color: var(--hl-fg-subtle);
 }

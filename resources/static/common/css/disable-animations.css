@@ -6,7 +6,6 @@
   transition: none !important;
 }
 
-*:hover,
 *:focus,
 *:focus-visible,
 *:active {
@@ -19,7 +18,6 @@
 }
 
 /* Any animation triggered by mouse state is removed. */
-*:hover,
 *:focus,
 *:focus-visible,
 *:active {

@@ -1082,7 +1082,6 @@ class BlogApp {
     container.onmousedown = (event) => this.handleImageMouseDown(event);
     container.onmousemove = (event) => this.handleImageMouseMove(event);
     container.onmouseup = () => this.handleImageMouseUp();
-    container.onmouseleave = () => this.handleImageMouseUp();
     container.ondblclick = () => this.resetZoom();
     img.ondragstart = () => false;
   }
