@@ -368,9 +368,11 @@ impl GithubPagesService {
                             if let Err(error) = fs::write(&local_path, &rewritten).await {
                                 error!("Failed to cache {local_path} {error}");
                             }
-                            let _: Result<(), FetchResourceSendError> = sender.send(Ok((normalized_path.clone(), linked)));
+                            let _: Result<(), FetchResourceSendError> =
+                                sender.send(Ok((normalized_path.clone(), linked)));
                         } else {
-                            let _: Result<(), FetchResourceSendError> = sender.send(Err(normalized_path.clone()));
+                            let _: Result<(), FetchResourceSendError> =
+                                sender.send(Err(normalized_path.clone()));
                         }
                         return;
                     }
@@ -411,7 +413,8 @@ impl GithubPagesService {
                             }
                             map.remove(&sync_resource_key);
                             drop(map);
-                            let _: Result<(), FetchResourceSendError> = sender.send(Ok((normalized_path.clone(), linked)));
+                            let _: Result<(), FetchResourceSendError> =
+                                sender.send(Ok((normalized_path.clone(), linked)));
                         }
                         Err(error) => {
                             // Notify waiters of the failure, then clean up
@@ -423,7 +426,8 @@ impl GithubPagesService {
                             map.remove(&sync_resource_key);
                             drop(map);
                             warn!("Failed to sync {normalized_path} {error}");
-                            let _: Result<(), FetchResourceSendError> = sender.send(Err(normalized_path.clone()));
+                            let _: Result<(), FetchResourceSendError> =
+                                sender.send(Err(normalized_path.clone()));
                         }
                     }
                 });
