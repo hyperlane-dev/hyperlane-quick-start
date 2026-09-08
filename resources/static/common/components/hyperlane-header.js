@@ -74,10 +74,21 @@ class HyperlaneHeader extends HTMLElement {
           max-width: 1200px;
           margin: 0 auto;
         }
+        h1 {
+          display: flex;
+          justify-content: center;
+          max-width: 100%;
+          margin: 0;
+        }
         h1 a {
           position: relative;
-          display: inline-flex;
+          display: flex;
           align-items: center;
+          max-width: 100%;
+          min-width: 0;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 12px;
           text-decoration: none;
           color: inherit;
         }
@@ -87,42 +98,31 @@ class HyperlaneHeader extends HTMLElement {
           border-radius: var(--hl-radius-md);
           object-fit: contain;
           vertical-align: middle;
-          margin-right: 12px;
+          flex-shrink: 0;
         }
         .text {
           color: var(--hl-fg);
           font-weight: 600;
+          min-width: 0;
         }
         .text.shimmer {
           color: var(--hl-fg);
           opacity: 1;
         }
         .app-title {
-          font-size: 2.5rem;
+          font-size: clamp(1rem, 4.5vw, 2.5rem);
           font-weight: 700;
           margin-bottom: 10px;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
+          max-width: 100%;
         }
         .app-subtitle {
-          font-size: 1.1rem;
+          font-size: clamp(0.85rem, 2.6vw, 1.1rem);
           color: var(--hl-fg-muted);
           font-weight: 400;
           margin-top: 8px;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-        @media (max-width: 768px) {
-          .app-title {
-            font-size: 2rem;
-          }
+          max-width: 100%;
         }
         @media (max-width: 480px) {
-          .app-title {
-            font-size: 1.8rem;
-          }
           .app-header {
             padding: 30px 15px;
           }
