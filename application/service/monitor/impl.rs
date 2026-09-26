@@ -329,7 +329,7 @@ impl MonitorService {
         let networks: RwLockReadGuard<'_, Networks> = Self::get_or_init_networks().read().await;
         let mut rx_bytes: u64 = 0;
         let mut tx_bytes: u64 = 0;
-        for (_, network) in networks.iter() {
+        for network in networks.values() {
             rx_bytes += network.total_received();
             tx_bytes += network.total_transmitted();
         }

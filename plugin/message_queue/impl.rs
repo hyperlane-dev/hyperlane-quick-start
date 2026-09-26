@@ -147,7 +147,7 @@ impl MessageQueueBroker {
         let _: Result<usize, SendError<Vec<u8>>> = topic.get_sender().send(payload.clone());
         drop(topics);
         let groups: RwLockReadGuard<'_, ConsumerGroupRegistry> = self.consumer_groups.read().await;
-        for (_, group) in groups.iter() {
+        for group in groups.values() {
             if group.get_topic_name() == topic_name {
                 let _: Result<usize, SendError<Vec<u8>>> = group.get_sender().send(payload.clone());
             }
