@@ -6,6 +6,8 @@ WORKDIR /hyperlane-quick-start
 
 COPY . .
 
+RUN rustup target add wasm32-unknown-unknown
+
 RUN cargo install wasm-bindgen-cli --locked && \
     cargo install wasm-pack --locked
 
