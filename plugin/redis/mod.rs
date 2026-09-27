@@ -9,7 +9,7 @@ pub use {r#const::*, r#struct::*, r#type::*};
 use {super::*, database::*, env::*, r#static::*};
 
 use {
-    hyperlane_utils::redis::*,
+    ::redis::*,
     tokio::{
         spawn,
         sync::{RwLock, RwLockWriteGuard},

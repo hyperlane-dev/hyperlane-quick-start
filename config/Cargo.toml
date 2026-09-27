@@ -24,7 +24,9 @@ exclude = [
 path = "lib.rs"
 
 [dependencies]
+log = { workspace = true }
 serde = { workspace = true }
+tokio = { workspace = true }
 tracing = { workspace = true }
 hyperlane = { workspace = true }
-hyperlane-utils = { workspace = true }
+hyperlane-macros = { workspace = true }

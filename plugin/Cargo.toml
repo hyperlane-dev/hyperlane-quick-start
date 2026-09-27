@@ -26,7 +26,19 @@ path = "lib.rs"
 [dependencies]
 hyperlane_resources = { workspace = true }
 
+log = { workspace = true }
+redis = { workspace = true }
 serde = { workspace = true }
+tokio = { workspace = true }
+dotenvy = { workspace = true }
+sea-orm = { workspace = true }
 tracing = { workspace = true }
+color-log = { workspace = true }
 hyperlane = { workspace = true }
-hyperlane-utils = { workspace = true }
+serde_yaml = { workspace = true }
+color-output = { workspace = true }
+lombok-macros = { workspace = true }
+file-operation = { workspace = true }
+server-manager = { workspace = true }
+hyperlane-macros = { workspace = true }
+instrument-level = { workspace = true }

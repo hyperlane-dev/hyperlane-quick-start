@@ -12,7 +12,7 @@ use {
     hyperlane_plugin::{common::GetOrInit, env::*, process::*},
 };
 
-use hyperlane_utils::log::*;
+use log::*;
 
 /// Entry point for the Hyperlane server application.
 ///

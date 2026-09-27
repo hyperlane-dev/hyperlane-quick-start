@@ -27,8 +27,8 @@ impl ProcessPlugin {
         trace!("Pid file path: {}", pid_path.as_ref());
         let mut manager: ServerManager = ServerManager::new();
         manager
-            .set_pid_file(pid_path.as_ref())
-            .set_server_hook(server_hook);
+            .set_pid_file(pid_path.as_ref().to_string())
+            .set_server_hook(Arc::new(move || Box::pin(server_hook())));
         let is_daemon: bool = args.len() >= 3 && args[2].to_lowercase() == DAEMON_FLAG;
         let start_server = || async {
             if is_daemon {

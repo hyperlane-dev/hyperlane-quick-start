@@ -13,7 +13,7 @@ impl ShortlinkService {
     /// - `Result<i32, String>`: The decoded numeric ID, or an error if the format is invalid.
     #[instrument_trace]
     fn decrypt_id(encoded_id: &str) -> Result<i32, String> {
-        let decoded: String = hyperlane_utils::Decode::execute(CHARSETS, encoded_id)
+        let decoded: String = bin_encode_decode::Decode::execute(CHARSETS, encoded_id)
             .map_err(|_: DecodeError| ERROR_INVALID_SHORTLINK_ID_FORMAT.to_string())?;
         decoded
             .parse::<i32>()
@@ -31,7 +31,7 @@ impl ShortlinkService {
     /// - `Result<String, String>`: The encoded string, or an error if encoding fails.
     #[instrument_trace]
     fn encrypt_id(id: i32) -> Result<String, String> {
-        hyperlane_utils::Encode::execute(CHARSETS, &id.to_string())
+        bin_encode_decode::Encode::execute(CHARSETS, &id.to_string())
             .map_err(|_: EncodeError| ERROR_FAILED_TO_ENCRYPT_SHORTLINK_ID.to_string())
     }
 

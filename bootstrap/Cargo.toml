@@ -24,12 +24,23 @@ exclude = [
 path = "lib.rs"
 
 [dependencies]
-hyperlane_application = { workspace = true }
 hyperlane_config = { workspace = true }
 hyperlane_plugin = { workspace = true }
 hyperlane_resources = { workspace = true }
+hyperlane_application = { workspace = true }
 
+log = { workspace = true }
+redis = { workspace = true }
 serde = { workspace = true }
+tokio = { workspace = true }
+sea-orm = { workspace = true }
 tracing = { workspace = true }
+num_cpus = { workspace = true }
+color-log = { workspace = true }
 hyperlane = { workspace = true }
-hyperlane-utils = { workspace = true }
+color-output = { workspace = true }
+lombok-macros = { workspace = true }
+file-operation = { workspace = true }
+server-manager = { workspace = true }
+hyperlane-macros = { workspace = true }
+instrument-level = { workspace = true }

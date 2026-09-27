@@ -25,26 +25,128 @@ resolver = "3"
 members = ["application", "bootstrap", "config", "plugin", "resources"]
 
 [workspace.dependencies]
-hyperlane_application = { path = "application", version = "23.0.35" }
-hyperlane_bootstrap = { path = "bootstrap", version = "23.0.35" }
 hyperlane_config = { path = "config", version = "23.0.35" }
 hyperlane_plugin = { path = "plugin", version = "23.0.35" }
+hyperlane_bootstrap = { path = "bootstrap", version = "23.0.35" }
 hyperlane_resources = { path = "resources", version = "23.0.35" }
+hyperlane_application = { path = "application", version = "23.0.35" }
 
+md5 = "0.8.1"
+log = "0.4.34"
+redis = "1.7.0"
+regex = "1.13.1"
+base64 = "0.22.1"
+chrono = "0.4.45"
+dotenvy = "0.15.7"
+futures = "0.3.33"
+sysinfo = "0.38.4"
 tracing = "0.1.44"
+chunkify = "0.6.60"
+num_cpus = "1.17.0"
 hyperlane = "21.3.6"
-hyperlane-utils = "33.1.14"
+once_cell = "1.21.4"
+color-log = "10.1.11"
+serde_with = "3.21.0"
+serde_yaml = "0.9.34"
+urlencoding = "2.1.3"
+jwt-service = "0.2.11"
+color-output = "10.1.11"
+lombok-macros = "10.1.11"
+file-operation = "10.1.11"
+server-manager = "10.1.11"
+instrument-level = "1.0.21"
+bin-encode-decode = "1.1.51"
+hyperlane-macros = "23.0.21"
+hyperlane-broadcast = "2.0.13"
+hyperlane-plugin-websocket = "14.0.18"
+tokio = { version = "1.53.1", features = ["full"] }
 serde = { version = "1.0.229", features = ["derive"] }
+rust_decimal = { version = "1.42.1", features = ["serde"] }
+ed25519-dalek = { version = "2.2.0", features = [
+    "rand_core",
+] }
+utoipa-rapidoc = { version = "6.0.0", features = ["actix-web"] }
+utoipa = { version = "5.5.0", features = ["openapi_extensions"] }
+utoipa-swagger-ui = { version = "9.0.2", features = [
+    "debug-embed",
+    "vendored",
+    "actix-web",
+] }
+reqwest = { version = "0.13.4", features = [
+    "json",
+    "stream",
+    "multipart",
+    "cookies",
+    "gzip",
+    "socks",
+    "blocking",
+] }
+sea-orm = { version = "1.1.20", features = [
+    "sqlx-mysql",
+    "sqlx-postgres",
+    "sqlx-sqlite",
+    "runtime-tokio-rustls",
+] }
+rsa = { version = "0.9.10", default-features = false, features = [
+    "std",
+    "pem",
+    "u64_digit",
+    "hazmat",
+    "getrandom",
+    "nightly",
+    "serde",
+    "sha2",
+    "sha1",
+    "pkcs5",
+] }
+uuid = { version = "1.24.0", features = [
+    "v1",
+    "v3",
+    "v4",
+    "v5",
+    "v6",
+    "v7",
+    "v8",
+    "serde",
+    "fast-rng",
+    "macro-diagnostics",
+    "arbitrary",
+    "bytemuck",
+    "rng-rand",
+    "rng-getrandom",
+    "rng",
+    "md5",
+    "sha1",
+    "borsh",
+    "zerocopy",
+] }
 
 [dependencies]
-hyperlane_bootstrap = { workspace = true }
 hyperlane_config = { workspace = true }
 hyperlane_plugin = { workspace = true }
+hyperlane_bootstrap = { workspace = true }
 
+log = { workspace = true }
+uuid = { workspace = true }
+redis = { workspace = true }
 serde = { workspace = true }
+chrono = { workspace = true }
+utoipa = { workspace = true }
+dotenvy = { workspace = true }
+sea-orm = { workspace = true }
 tracing = { workspace = true }
+color-log = { workspace = true }
 hyperlane = { workspace = true }
-hyperlane-utils = { workspace = true }
+serde_with = { workspace = true }
+serde_yaml = { workspace = true }
+color-output = { workspace = true }
+rust_decimal = { workspace = true }
+lombok-macros = { workspace = true }
+file-operation = { workspace = true }
+server-manager = { workspace = true }
+hyperlane-macros = { workspace = true }
+instrument-level = { workspace = true }
+bin-encode-decode = { workspace = true }
 
 [patch.crates-io]
 hyperlane_application = { path = "application" }
