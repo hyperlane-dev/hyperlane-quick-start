@@ -33,47 +33,45 @@ hyperlane_application = { path = "application", version = "23.0.35" }
 
 md5 = "0.8.1"
 log = "0.4.34"
-redis = "1.7.0"
+redis = "1.7.1"
 regex = "1.13.1"
-base64 = "0.22.1"
+base64 = "0.23.1"
 chrono = "0.4.45"
 dotenvy = "0.15.7"
-futures = "0.3.33"
-sysinfo = "0.38.4"
+futures = "0.3.34"
+sysinfo = "0.39.6"
 tracing = "0.1.44"
-chunkify = "0.6.60"
 num_cpus = "1.17.0"
+chunkify = "10.1.11"
 hyperlane = "21.7.8"
 once_cell = "1.21.4"
 color-log = "10.1.11"
-serde_with = "3.21.0"
-serde_yaml = "0.9.34"
+serde_with = "3.24.0"
+serde_yaml = "0.9.33"
 urlencoding = "2.1.3"
-jwt-service = "0.2.11"
+jwt-service = "10.1.11"
 color-output = "10.1.11"
 hyperlane-core = "21.7.8"
 lombok-macros = "10.1.11"
 file-operation = "10.1.11"
 server-manager = "10.1.11"
-hyperlane-macros = "21.7.8"
-instrument-level = "1.0.21"
-bin-encode-decode = "1.1.51"
+hyperlane-macros = "23.0.21"
+instrument-level = "10.1.11"
+bin-encode-decode = "10.1.11"
 hyperlane-broadcast = "2.0.13"
 hyperlane-plugin-websocket = "21.7.8"
 tokio = { version = "1.53.1", features = ["full"] }
 serde = { version = "1.0.229", features = ["derive"] }
-rust_decimal = { version = "1.42.1", features = ["serde"] }
-ed25519-dalek = { version = "2.2.0", features = [
-    "rand_core",
-] }
-utoipa-rapidoc = { version = "6.0.0", features = ["actix-web"] }
-utoipa = { version = "5.5.0", features = ["openapi_extensions"] }
-utoipa-swagger-ui = { version = "9.0.2", features = [
+rust_decimal = { version = "1.43.0", features = ["serde"] }
+ed25519-dalek = { version = "3.0.0", features = ["rand_core"] }
+utoipa-rapidoc = { version = "7.0.0", features = ["actix-web"] }
+utoipa = { version = "6.0.0", features = ["openapi_extensions"] }
+utoipa-swagger-ui = { version = "10.0.1", features = [
     "debug-embed",
     "vendored",
     "actix-web",
 ] }
-reqwest = { version = "0.13.4", features = [
+reqwest = { version = "0.13.5", features = [
     "json",
     "stream",
     "multipart",
@@ -82,7 +80,7 @@ reqwest = { version = "0.13.4", features = [
     "socks",
     "blocking",
 ] }
-sea-orm = { version = "1.1.20", features = [
+sea-orm = { version = "2.0.3", features = [
     "sqlx-mysql",
     "sqlx-postgres",
     "sqlx-sqlite",
@@ -100,7 +98,7 @@ rsa = { version = "0.9.10", default-features = false, features = [
     "sha1",
     "pkcs5",
 ] }
-uuid = { version = "1.24.0", features = [
+uuid = { version = "1.26.1", features = [
     "v1",
     "v3",
     "v4",
