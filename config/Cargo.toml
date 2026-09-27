@@ -29,4 +29,5 @@ serde = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
 hyperlane = { workspace = true }
+hyperlane-core = { workspace = true }
 hyperlane-macros = { workspace = true }

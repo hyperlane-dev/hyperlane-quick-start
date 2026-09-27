@@ -207,15 +207,15 @@ checksum = "250f629c0161ad8107cf89319e990051fae62832fd343083bea452d93e2205fd"
 
 [[package]]
 name = "alloc-no-stdlib"
-version = "2.0.4"
+version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cc7bb162ec39d46ab1ca8c77bf72e890535becd1751bb45f64c597edb4c8c6b3"
+checksum = "c2fb6cfd47bf496ff64095c20eaba0c201404ee38714d4142fcfa1dc334fcc7a"
 
 [[package]]
 name = "alloc-stdlib"
-version = "0.2.4"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0e76a019e91224d279006ff972f1e984179a6e9feb050adba6ce8274aef23195"
+checksum = "0b5c1865780388bfa186411ab5f247819487fc4864c6e9c3106611fa347586e1"
 dependencies = [
  "alloc-no-stdlib",
 ]
@@ -466,9 +466,9 @@ dependencies = [
 
 [[package]]
 name = "brotli"
-version = "8.0.4"
+version = "9.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5cc91aac060a7a1e25823bdccbfb6af1875b88f17c6daac97894eed8207166b3"
+checksum = "f8b851b75c23ca7873623d612fe49bd1989aeb03d08fb9432187eb253d3d4c6b"
 dependencies = [
  "alloc-no-stdlib",
  "alloc-stdlib",
@@ -477,9 +477,9 @@ dependencies = [
 
 [[package]]
 name = "brotli-decompressor"
-version = "5.0.3"
+version = "6.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3a32acac15fe1967bc3986b2a6347dffc965602354ea6f450ad07e8bfd253583"
+checksum = "941cd9bd4ddab83cb46fa5a2d428f1c857b24ac78cb876cf7beb710840934bd7"
 dependencies = [
  "alloc-no-stdlib",
  "alloc-stdlib",
@@ -638,7 +638,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e93b064ce9d27838541de346fbfee8f074b9ab521eba07de0b7b22c7760edd65"
 dependencies = [
  "file-operation 10.1.11",
- "lombok-macros 10.1.11",
+ "lombok-macros",
  "system-time",
 ]
 
@@ -648,7 +648,7 @@ version = "10.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "88be6189bde0b974f933f3a481ebb1dc3585d4ee449db762a58257a10e69588c"
 dependencies = [
- "lombok-macros 10.1.11",
+ "lombok-macros",
  "system-time",
 ]
 
@@ -1599,9 +1599,9 @@ dependencies = [
 
 [[package]]
 name = "http-compress"
-version = "3.0.28"
+version = "21.7.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "48d9be56203dc9558e0eedeb3b9f0e8ba929e9e864e5bdcc8b3a99e23f027d6e"
+checksum = "aa71aef4547b75428d5b43bc4385c9e9432c61749b088e8c5c7806f6397d2542"
 dependencies = [
  "brotli",
  "flate2",
@@ -1610,20 +1610,20 @@ dependencies = [
 
 [[package]]
 name = "http-constant"
-version = "5.6.15"
+version = "21.7.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bfb6b51a24140c9097b8487f9ddf45a22ef30352c0f65c6e56e7a0d4f868943b"
+checksum = "721f996c7e0e1a8fadffdc0816a421b205aba8c88d5d79721d924837745d302e"
 
 [[package]]
 name = "http-type"
-version = "20.1.9"
+version = "21.7.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "07a2732daefc401847f7f0f54d4e4974df7419435b92576db9f3ba6d1eae4485"
+checksum = "b0c9b506628539230c5db4ca5832b606ea6d9d0d60afb4d061f0b325c770cab3"
 dependencies = [
  "hex",
  "http-compress",
  "http-constant",
- "lombok-macros 2.0.36",
+ "lombok-macros",
  "serde",
  "serde-xml-rs",
  "serde_json",
@@ -1717,15 +1717,12 @@ dependencies = [
 
 [[package]]
 name = "hyperlane"
-version = "21.3.6"
+version = "21.7.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fa2ac2c29051ca029c413a4eb794e061f714d44824d17389ab30ac9f177e0665"
+checksum = "9d45ea568bedf75e0aab8a9f1e768f4cc5262c1227a52a6a6888d0b8d1d15bff"
 dependencies = [
- "http-type",
- "inventory",
- "lombok-macros 2.0.36",
- "regex",
- "serde",
+ "hyperlane-core",
+ "hyperlane-macros",
 ]
 
 [[package]]
@@ -1740,25 +1737,38 @@ dependencies = [
 ]
 
 [[package]]
-name = "hyperlane-macros"
-version = "23.0.21"
+name = "hyperlane-core"
+version = "21.7.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "72f3ee7ee8c7ae9eaef79be9a25580387949401d7cbb88992fa21384277aeafb"
+checksum = "2da1f246ed8f2b1d11ac837905d1ff337e7032f960c08286ca342c8b013963e1"
 dependencies = [
- "hyperlane",
+ "http-type",
+ "inventory",
+ "lombok-macros",
+ "regex",
+ "serde",
+]
+
+[[package]]
+name = "hyperlane-macros"
+version = "21.7.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9325ac1b99f83aa94098276fd33a31affa5d7c45d63b9fa108a9d18025ee578c"
+dependencies = [
+ "hyperlane-core",
  "proc-macro2",
  "quote",
- "syn 2.0.119",
+ "syn 3.0.6",
 ]
 
 [[package]]
 name = "hyperlane-plugin-websocket"
-version = "14.0.18"
+version = "21.7.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5bc21dee799691de81cc7bf9bd2c39ec64ec41a4b2010dcf1947808ee169ec05"
+checksum = "80d0bac895d74c6ae6510c1f20373727e84d1b06a2dd4381752d62827eea91f7"
 dependencies = [
  "hyperlane",
- "hyperlane-broadcast",
+ "tokio-broadcast",
 ]
 
 [[package]]
@@ -1772,13 +1782,14 @@ dependencies = [
  "dotenvy",
  "file-operation 10.1.11",
  "hyperlane",
+ "hyperlane-core",
  "hyperlane-macros",
  "hyperlane_bootstrap",
  "hyperlane_config",
  "hyperlane_plugin",
  "instrument-level",
  "log",
- "lombok-macros 10.1.11",
+ "lombok-macros",
  "redis",
  "rust_decimal",
  "sea-orm",
@@ -1806,6 +1817,7 @@ dependencies = [
  "futures",
  "hyperlane",
  "hyperlane-broadcast",
+ "hyperlane-core",
  "hyperlane-macros",
  "hyperlane-plugin-websocket",
  "hyperlane_config",
@@ -1814,7 +1826,7 @@ dependencies = [
  "instrument-level",
  "jwt-service",
  "log",
- "lombok-macros 10.1.11",
+ "lombok-macros",
  "md5",
  "once_cell",
  "redis",
@@ -1845,6 +1857,7 @@ dependencies = [
  "color-output",
  "file-operation 10.1.11",
  "hyperlane",
+ "hyperlane-core",
  "hyperlane-macros",
  "hyperlane_application",
  "hyperlane_config",
@@ -1852,7 +1865,7 @@ dependencies = [
  "hyperlane_resources",
  "instrument-level",
  "log",
- "lombok-macros 10.1.11",
+ "lombok-macros",
  "num_cpus",
  "redis",
  "sea-orm",
@@ -1867,6 +1880,7 @@ name = "hyperlane_config"
 version = "23.0.35"
 dependencies = [
  "hyperlane",
+ "hyperlane-core",
  "hyperlane-macros",
  "log",
  "serde",
@@ -1883,11 +1897,12 @@ dependencies = [
  "dotenvy",
  "file-operation 10.1.11",
  "hyperlane",
+ "hyperlane-core",
  "hyperlane-macros",
  "hyperlane_resources",
  "instrument-level",
  "log",
- "lombok-macros 10.1.11",
+ "lombok-macros",
  "redis",
  "sea-orm",
  "serde",
@@ -2358,17 +2373,6 @@ name = "log"
 version = "0.4.34"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f9f8bd3e56ce4dfc153cf470fffbfa98c7620958b312ca5c3a4b8d5181fd13c6"
-
-[[package]]
-name = "lombok-macros"
-version = "2.0.36"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "07e5e7040986aa74960106e9050a06ce27d4ed061fbc73f48aff57bacd89c682"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.119",
-]
 
 [[package]]
 name = "lombok-macros"
@@ -3711,7 +3715,7 @@ version = "10.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6345f1d2a9cdde1b47dc7e825bdb1e5137e68dad216eeb21fb1f203b5cc451fc"
 dependencies = [
- "lombok-macros 10.1.11",
+ "lombok-macros",
  "tokio",
 ]
 
@@ -4272,6 +4276,17 @@ dependencies = [
  "socket2",
  "tokio-macros",
  "windows-sys 0.61.2",
+]
+
+[[package]]
+name = "tokio-broadcast"
+version = "10.1.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "36b4ba3b1e713aabb7a54477e915b573badf65f39cd4d5af613e237b06670384"
+dependencies = [
+ "dashmap",
+ "tokio",
+ "twox-hash",
 ]
 
 [[package]]

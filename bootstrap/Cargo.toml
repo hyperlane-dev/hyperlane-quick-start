@@ -41,6 +41,7 @@ hyperlane = { workspace = true }
 color-output = { workspace = true }
 lombok-macros = { workspace = true }
 file-operation = { workspace = true }
+hyperlane-core = { workspace = true }
 server-manager = { workspace = true }
 hyperlane-macros = { workspace = true }
 instrument-level = { workspace = true }

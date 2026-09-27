@@ -57,6 +57,7 @@ rust_decimal = { workspace = true }
 ed25519-dalek = { workspace = true }
 lombok-macros = { workspace = true }
 file-operation = { workspace = true }
+hyperlane-core = { workspace = true }
 server-manager = { workspace = true }
 utoipa-rapidoc = { workspace = true }
 hyperlane-macros = { workspace = true }
