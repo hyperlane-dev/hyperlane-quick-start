@@ -1,4 +1,6 @@
-pub mod request;
-pub mod response;
+mod request;
+mod response;
 
-use {super::*, utils::json::*};
+pub use {request::*, response::*};
+
+use {super::*, utils::*};

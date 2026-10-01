@@ -6,12 +6,12 @@ impl ServerHook for SendMiddleware {
     ///
     /// # Arguments
     ///
-    /// - `&mut Stream`: The incoming connection stream.
-    /// - `&mut Context`: The request context.
+    /// - `&mut Stream` - The incoming connection stream.
+    /// - `&mut Context` - The request context.
     ///
     /// # Returns
     ///
-    /// - `SendMiddleware`: The newly created send middleware handler.
+    /// - `SendMiddleware` - The newly created send middleware handler.
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
@@ -21,13 +21,13 @@ impl ServerHook for SendMiddleware {
     ///
     /// # Arguments
     ///
-    /// - `Self`: The send middleware handler.
-    /// - `&mut Stream`: The incoming connection stream.
-    /// - `&mut Context`: The request context.
+    /// - `Self` - The send middleware handler.
+    /// - `&mut Stream` - The incoming connection stream.
+    /// - `&mut Context` - The request context.
     ///
     /// # Returns
     ///
-    /// - `Status::Continue`: Always returns continue after attempting to send.
+    /// - `Status` - Always returns continue after attempting to send.
     #[prologue_macros(
         reject(ctx.get_request().is_ws_upgrade_type()),
         try_send
@@ -44,12 +44,12 @@ impl ServerHook for LogMiddleware {
     ///
     /// # Arguments
     ///
-    /// - `&mut Stream`: The incoming connection stream.
-    /// - `&mut Context`: The request context.
+    /// - `&mut Stream` - The incoming connection stream.
+    /// - `&mut Context` - The request context.
     ///
     /// # Returns
     ///
-    /// - `LogMiddleware`: The newly created log middleware handler.
+    /// - `LogMiddleware` - The newly created log middleware handler.
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
@@ -59,13 +59,13 @@ impl ServerHook for LogMiddleware {
     ///
     /// # Arguments
     ///
-    /// - `Self`: The log middleware handler.
-    /// - `&mut Stream`: The incoming connection stream.
-    /// - `&mut Context`: The request context.
+    /// - `Self` - The log middleware handler.
+    /// - `&mut Stream` - The incoming connection stream.
+    /// - `&mut Context` - The request context.
     ///
     /// # Returns
     ///
-    /// - `Status::Continue`: Always returns continue after logging.
+    /// - `Status` - Always returns continue after logging.
     #[instrument_trace]
     async fn handle(self, _: &mut Stream, ctx: &mut Context) -> Status {
         let request_json: String = get_request_json(ctx).await;

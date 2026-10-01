@@ -1,4 +1,6 @@
-pub mod json;
-pub mod send;
+mod json;
+mod send;
+
+pub use {json::*, send::*};
 
 use super::*;

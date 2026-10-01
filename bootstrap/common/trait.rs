@@ -7,5 +7,9 @@ pub trait BootstrapSyncInit {
 /// Trait for asynchronous bootstrap initialization, returning the initialized instance.
 pub trait BootstrapAsyncInit {
     /// Initializes the component asynchronously and returns the instance.
+    ///
+    /// # Returns
+    ///
+    /// - `impl Future<Output = Self>` - A future resolving to the initialized component.
     fn init() -> impl Future<Output = Self> + Send;
 }

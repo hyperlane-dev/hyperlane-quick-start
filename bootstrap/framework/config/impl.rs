@@ -6,7 +6,7 @@ impl BootstrapAsyncInit for ConfigBootstrap {
     ///
     /// # Returns
     ///
-    /// - `Self`: The initialized `ConfigBootstrap` instance containing server and request configs.
+    /// - `Self` - The initialized `ConfigBootstrap` instance containing server and request configs.
     #[hyperlane(server_config: ServerConfig)]
     async fn init() -> Self {
         let env_config: &EnvConfig = EnvPlugin::get_or_init();

@@ -1,3 +1,5 @@
-pub mod common;
+mod common;
+
+pub use common::*;
 
 use super::*;

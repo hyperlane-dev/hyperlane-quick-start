@@ -24,11 +24,12 @@ exclude = [
 path = "lib.rs"
 
 [dependencies]
-hyperlane_application = { workspace = true }
 hyperlane_config = { workspace = true }
 hyperlane_plugin = { workspace = true }
+hyperlane_application = { workspace = true }
 
 serde = { workspace = true }
 tracing = { workspace = true }
 hyperlane = { workspace = true }
+hyperlane-core = { workspace = true }
 hyperlane-utils = { workspace = true }

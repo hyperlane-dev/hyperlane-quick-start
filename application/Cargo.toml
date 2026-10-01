@@ -31,4 +31,5 @@ hyperlane_resources = { workspace = true }
 serde = { workspace = true }
 tracing = { workspace = true }
 hyperlane = { workspace = true }
+hyperlane-core = { workspace = true }
 hyperlane-utils = { workspace = true }

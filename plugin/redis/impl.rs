@@ -8,7 +8,7 @@ impl GetOrInit for RedisPlugin {
     ///
     /// # Returns
     ///
-    /// - `&'static RwLock<RedisConnectionMap>`: The static reference to the global Redis connection map.
+    /// - `&'static Self::Instance` - The static reference to the global Redis connection map.
     #[instrument_trace]
     fn get_or_init() -> &'static Self::Instance {
         REDIS_CONNECTIONS.get_or_init(|| RwLock::new(HashMap::new()))
@@ -29,7 +29,7 @@ impl DatabaseConnectionPlugin for RedisPlugin {
     ///
     /// # Returns
     ///
-    /// - `PluginType::Redis`: The Redis plugin type.
+    /// - `PluginType` - The Redis plugin type.
     #[instrument_trace]
     fn plugin_type() -> PluginType {
         PluginType::Redis
@@ -39,12 +39,12 @@ impl DatabaseConnectionPlugin for RedisPlugin {
     ///
     /// # Arguments
     ///
-    /// - `I`: The instance name identifier.
-    /// - `Option<DatabaseSchema>`: The optional database schema (unused for Redis).
+    /// - `I` - The instance name identifier.
+    /// - `Option<DatabaseSchema>` - The optional database schema (unused for Redis).
     ///
     /// # Returns
     ///
-    /// - `Result<Self::Connection, String>`: The connection on success, or an error message on failure.
+    /// - `Result<Self::Connection, String>` - The connection on success, or an error message on failure.
     #[instrument_trace]
     async fn connection_db<I>(
         instance_name: I,
@@ -71,7 +71,7 @@ impl DatabaseConnectionPlugin for RedisPlugin {
             Err(error) => {
                 AutoCreationLogger::log_auto_creation_error(
                     &error,
-                    "Auto-creation process",
+                    AUTO_CREATION_PROCESS_LABEL,
                     database::PluginType::Redis,
                     Some(instance.get_name().as_str()),
                 )
@@ -119,7 +119,7 @@ impl DatabaseConnectionPlugin for RedisPlugin {
                     error_msg
                 })?,
                 Err(_) => {
-                    let error_msg: String = "Redis connection task failed".to_string();
+                    let error_msg: String = CONNECTION_TASK_FAILED_MESSAGE.to_string();
                     let instance_name_clone: String = instance_name_str.to_string();
                     let error_msg_clone: String = error_msg.clone();
                     spawn(async move {
@@ -158,12 +158,12 @@ impl DatabaseConnectionPlugin for RedisPlugin {
     ///
     /// # Arguments
     ///
-    /// - `I`: The instance name identifier.
-    /// - `Option<DatabaseSchema>`: The optional database schema (unused for Redis).
+    /// - `I` - The instance name identifier.
+    /// - `Option<DatabaseSchema>` - The optional database schema (unused for Redis).
     ///
     /// # Returns
     ///
-    /// - `Result<Self::Connection, String>`: The connection on success, or an error message on failure.
+    /// - `Result<Self::Connection, String>` - The connection on success, or an error message on failure.
     #[instrument_trace]
     async fn get_connection<I>(
         instance_name: I,
@@ -215,12 +215,12 @@ impl DatabaseConnectionPlugin for RedisPlugin {
     ///
     /// # Arguments
     ///
-    /// - `&Self::InstanceConfig`: The Redis instance configuration.
-    /// - `Option<DatabaseSchema>`: The optional database schema (unused for Redis).
+    /// - `&Self::InstanceConfig` - The Redis instance configuration.
+    /// - `Option<DatabaseSchema>` - The optional database schema (unused for Redis).
     ///
     /// # Returns
     ///
-    /// - `Result<AutoCreationResult, AutoCreationError>`: The auto-creation result on success, or an error on failure.
+    /// - `Result<AutoCreationResult, AutoCreationError>` - The auto-creation result on success, or an error on failure.
     #[instrument_trace]
     async fn perform_auto_creation(
         instance: &Self::InstanceConfig,
@@ -244,7 +244,7 @@ impl DatabaseConnectionPlugin for RedisPlugin {
             Err(error) => {
                 AutoCreationLogger::log_auto_creation_error(
                     &error,
-                    "Database validation",
+                    DATABASE_VALIDATION_LABEL,
                     database::PluginType::Redis,
                     Some(instance.get_name().as_str()),
                 )
@@ -263,7 +263,7 @@ impl DatabaseConnectionPlugin for RedisPlugin {
             Err(error) => {
                 AutoCreationLogger::log_auto_creation_error(
                     &error,
-                    "Namespace setup",
+                    NAMESPACE_SETUP_LABEL,
                     database::PluginType::Redis,
                     Some(instance.get_name().as_str()),
                 )
@@ -274,7 +274,7 @@ impl DatabaseConnectionPlugin for RedisPlugin {
         if let Err(error) = auto_creator.verify_connection().await {
             AutoCreationLogger::log_auto_creation_error(
                 &error,
-                "Connection verification",
+                CONNECTION_VERIFICATION_LABEL,
                 database::PluginType::Redis,
                 Some(instance.get_name().as_str()),
             )
@@ -297,7 +297,7 @@ impl Default for RedisAutoCreation {
     ///
     /// # Returns
     ///
-    /// - `RedisAutoCreation`: The default auto-creation handler.
+    /// - `RedisAutoCreation` - The default auto-creation handler.
     #[instrument_trace]
     fn default() -> Self {
         if let Some(instance) = EnvPlugin::get_or_init().get_default_redis_instance() {
@@ -315,17 +315,21 @@ impl RedisAutoCreation {
     ///
     /// # Returns
     ///
-    /// - `Result<Connection, AutoCreationError>`: The Redis connection on success, or an error on failure.
+    /// - `Result<Connection, AutoCreationError>` - The Redis connection on success, or an error on failure.
     #[instrument_trace]
     async fn create_mutable_connection(&self) -> Result<Connection, AutoCreationError> {
-        let db_url: String = self.instance.get_connection_url();
+        let db_url: String = self.get_instance().get_connection_url();
         let client: Client = Client::open(db_url).map_err(|error: RedisError| {
             let error_msg: String = error.to_string();
-            if error_msg.contains("authentication failed") || error_msg.contains("NOAUTH") {
+            if error_msg.contains(ERROR_MARKER_AUTHENTICATION_FAILED)
+                || error_msg.contains(ERROR_MARKER_NOAUTH)
+            {
                 AutoCreationError::InsufficientPermissions(format!(
                     "Redis authentication failed {error_msg}"
                 ))
-            } else if error_msg.contains("Connection refused") || error_msg.contains("timeout") {
+            } else if error_msg.contains(ERROR_MARKER_CONNECTION_REFUSED)
+                || error_msg.contains(ERROR_MARKER_TIMEOUT)
+            {
                 AutoCreationError::ConnectionFailed(format!(
                     "Cannot connect to Redis server {error_msg}"
                 ))
@@ -341,12 +345,14 @@ impl RedisAutoCreation {
             Ok(join_result) => match join_result {
                 Ok(result) => result.map_err(|error: RedisError| {
                     let error_msg: String = error.to_string();
-                    if error_msg.contains("authentication failed") || error_msg.contains("NOAUTH") {
+                    if error_msg.contains(ERROR_MARKER_AUTHENTICATION_FAILED)
+                        || error_msg.contains(ERROR_MARKER_NOAUTH)
+                    {
                         AutoCreationError::InsufficientPermissions(format!(
                             "Redis authentication failed {error_msg}"
                         ))
-                    } else if error_msg.contains("Connection refused")
-                        || error_msg.contains("timeout")
+                    } else if error_msg.contains(ERROR_MARKER_CONNECTION_REFUSED)
+                        || error_msg.contains(ERROR_MARKER_TIMEOUT)
                     {
                         AutoCreationError::ConnectionFailed(format!(
                             "Cannot connect to Redis server {error_msg}"
@@ -359,7 +365,7 @@ impl RedisAutoCreation {
                 })?,
                 Err(_) => {
                     return Err(AutoCreationError::ConnectionFailed(
-                        "Redis connection task failed".to_string(),
+                        CONNECTION_TASK_FAILED_MESSAGE.to_string(),
                     ));
                 }
             },
@@ -376,33 +382,31 @@ impl RedisAutoCreation {
     ///
     /// # Returns
     ///
-    /// - `Result<(), AutoCreationError>`: Ok if the server is valid, or an error on failure.
+    /// - `Result<(), AutoCreationError>` - Ok if the server is valid, or an error on failure.
     #[instrument_trace]
     async fn validate_redis_server(&self) -> Result<(), AutoCreationError> {
         let mut conn: Connection = self.create_mutable_connection().await?;
-        let pong: String = redis::cmd("PING")
-            .query(&mut conn)
-            .map_err(|error: RedisError| {
-                AutoCreationError::ConnectionFailed(format!("Redis PING failed {error}"))
-            })?;
-        if pong != "PONG" {
-            return Err(AutoCreationError::ConnectionFailed(
-                "Redis PING returned unexpected response".to_string(),
-            ));
-        }
-        let info: String =
-            redis::cmd("INFO")
-                .arg("server")
+        let pong: String =
+            redis::cmd(REDIS_COMMAND_PING)
                 .query(&mut conn)
                 .map_err(|error: RedisError| {
-                    AutoCreationError::DatabaseError(format!(
-                        "Failed to get Redis server info {error}"
-                    ))
+                    AutoCreationError::ConnectionFailed(format!("Redis PING failed {error}"))
                 })?;
-        if info.contains("redis_version:") {
+        if pong != REDIS_RESPONSE_PONG {
+            return Err(AutoCreationError::ConnectionFailed(
+                PING_UNEXPECTED_RESPONSE_MESSAGE.to_string(),
+            ));
+        }
+        let info: String = redis::cmd(REDIS_COMMAND_INFO)
+            .arg(REDIS_INFO_SECTION_SERVER)
+            .query(&mut conn)
+            .map_err(|error: RedisError| {
+                AutoCreationError::DatabaseError(format!("Failed to get Redis server info {error}"))
+            })?;
+        if info.contains(REDIS_INFO_VERSION_KEY) {
             AutoCreationLogger::log_connection_verification(
                 database::PluginType::Redis,
-                self.instance.get_name().as_str(),
+                self.get_instance().get_name().as_str(),
                 true,
                 None,
             )
@@ -415,13 +419,13 @@ impl RedisAutoCreation {
     ///
     /// # Returns
     ///
-    /// - `Result<Vec<String>, AutoCreationError>`: A list of keys that were set up.
+    /// - `Result<Vec<String>, AutoCreationError>` - A list of keys that were set up.
     #[instrument_trace]
     async fn setup_redis_namespace(&self) -> Result<Vec<String>, AutoCreationError> {
         let mut setup_operations: Vec<String> = Vec::new();
         let mut conn: Connection = self.create_mutable_connection().await?;
-        let app_key: String = format!("{}:initialized", self.instance.get_name());
-        let exists: i32 = redis::cmd("EXISTS")
+        let app_key: String = format!("{}:initialized", self.get_instance().get_name());
+        let exists: i32 = redis::cmd(REDIS_COMMAND_EXISTS)
             .arg(&app_key)
             .query(&mut conn)
             .map_err(|error: RedisError| {
@@ -432,7 +436,7 @@ impl RedisAutoCreation {
         if exists == 0 {
             let _: () = redis::cmd("SET")
                 .arg(&app_key)
-                .arg("true")
+                .arg(REDIS_INIT_KEY_VALUE)
                 .query(&mut conn)
                 .map_err(|error: RedisError| {
                     AutoCreationError::DatabaseError(format!(
@@ -440,10 +444,10 @@ impl RedisAutoCreation {
                     ))
                 })?;
             setup_operations.push(app_key.clone());
-            let config_key: String = format!("{}:config:version", self.instance.get_name());
+            let config_key: String = format!("{}:config:version", self.get_instance().get_name());
             let _: () = redis::cmd("SET")
                 .arg(&config_key)
-                .arg("1.0.0")
+                .arg(REDIS_CONFIG_VERSION_VALUE)
                 .query(&mut conn)
                 .map_err(|error: RedisError| {
                     AutoCreationError::DatabaseError(format!(
@@ -464,7 +468,7 @@ impl DatabaseAutoCreation for RedisAutoCreation {
     ///
     /// # Arguments
     ///
-    /// - `RedisInstanceConfig`: The Redis instance configuration.
+    /// - `Self::InstanceConfig` - The Redis instance configuration.
     #[instrument_trace]
     fn new(instance: Self::InstanceConfig) -> Self {
         Self {
@@ -477,8 +481,8 @@ impl DatabaseAutoCreation for RedisAutoCreation {
     ///
     /// # Arguments
     ///
-    /// - `RedisInstanceConfig`: The Redis instance configuration.
-    /// - `DatabaseSchema`: The database schema (unused for Redis).
+    /// - `Self::InstanceConfig` - The Redis instance configuration.
+    /// - `DatabaseSchema` - The database schema (unused for Redis).
     #[instrument_trace]
     fn with_schema(instance: Self::InstanceConfig, schema: DatabaseSchema) -> Self
     where
@@ -491,12 +495,12 @@ impl DatabaseAutoCreation for RedisAutoCreation {
     ///
     /// # Returns
     ///
-    /// - `Result<bool, AutoCreationError>`: Always returns false, as Redis does not require database creation.
+    /// - `Result<bool, AutoCreationError>` - Always returns false, as Redis does not require database creation.
     #[instrument_trace]
     async fn create_database_if_not_exists(&self) -> Result<bool, AutoCreationError> {
         self.validate_redis_server().await?;
         AutoCreationLogger::log_database_exists(
-            self.instance.get_name().as_str(),
+            self.get_instance().get_name().as_str(),
             database::PluginType::Redis,
         )
         .await;
@@ -507,21 +511,21 @@ impl DatabaseAutoCreation for RedisAutoCreation {
     ///
     /// # Returns
     ///
-    /// - `Result<Vec<String>, AutoCreationError>`: A list of keys that were set up.
+    /// - `Result<Vec<String>, AutoCreationError>` - A list of keys that were set up.
     #[instrument_trace]
     async fn create_tables_if_not_exist(&self) -> Result<Vec<String>, AutoCreationError> {
         let setup_operations: Vec<String> = self.setup_redis_namespace().await?;
         if !setup_operations.is_empty() {
             AutoCreationLogger::log_tables_created(
                 &setup_operations,
-                self.instance.get_name().as_str(),
+                self.get_instance().get_name().as_str(),
                 database::PluginType::Redis,
             )
             .await;
         } else {
             AutoCreationLogger::log_tables_created(
                 &[],
-                self.instance.get_name().as_str(),
+                self.get_instance().get_name().as_str(),
                 database::PluginType::Redis,
             )
             .await;
@@ -533,7 +537,7 @@ impl DatabaseAutoCreation for RedisAutoCreation {
     ///
     /// # Returns
     ///
-    /// - `Result<(), AutoCreationError>`: Always returns Ok.
+    /// - `Result<(), AutoCreationError>` - Always returns Ok.
     #[instrument_trace]
     async fn init_data(&self) -> Result<(), AutoCreationError> {
         Ok(())
@@ -543,14 +547,14 @@ impl DatabaseAutoCreation for RedisAutoCreation {
     ///
     /// # Returns
     ///
-    /// - `Result<(), AutoCreationError>`: Ok if the connection is valid, or an error on failure.
+    /// - `Result<(), AutoCreationError>` - Ok if the connection is valid, or an error on failure.
     #[instrument_trace]
     async fn verify_connection(&self) -> Result<(), AutoCreationError> {
         match self.validate_redis_server().await {
             Ok(_) => {
                 AutoCreationLogger::log_connection_verification(
                     database::PluginType::Redis,
-                    self.instance.get_name().as_str(),
+                    self.get_instance().get_name().as_str(),
                     true,
                     None,
                 )
@@ -560,7 +564,7 @@ impl DatabaseAutoCreation for RedisAutoCreation {
             Err(error) => {
                 AutoCreationLogger::log_connection_verification(
                     database::PluginType::Redis,
-                    self.instance.get_name().as_str(),
+                    self.get_instance().get_name().as_str(),
                     false,
                     Some(&error.to_string()),
                 )

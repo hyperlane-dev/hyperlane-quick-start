@@ -1,4 +1,4 @@
-//! Hyperlane config
+//! hyperlane_config
 //!
 //! Configuration layer containing application-level and framework-level constants for logging, caching, and static assets.
 

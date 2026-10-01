@@ -1,4 +1,4 @@
-//! Hyperlane plugin
+//! hyperlane_plugin
 //!
 //! Plugin layer providing environment configuration, database connections, logging, process management, and shutdown handling for the Hyperlane framework.
 

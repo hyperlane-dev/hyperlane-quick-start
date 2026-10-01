@@ -7,7 +7,7 @@ impl BootstrapAsyncInit for DbBootstrap {
     ///
     /// # Returns
     ///
-    /// - `Self`: The initialized `DbBootstrap` instance.
+    /// - `Self` - The initialized `DbBootstrap` instance.
     async fn init() -> Self {
         let _: Result<DatabaseConnection, String> =
             MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await;

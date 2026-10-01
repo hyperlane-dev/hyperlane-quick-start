@@ -4,6 +4,11 @@ use super::*;
 impl GetOrInit for EnvPlugin {
     type Instance = EnvConfig;
 
+    /// Returns a static reference to the globally initialized environment configuration.
+    ///
+    /// # Returns
+    ///
+    /// - `&'static Self::Instance` - The process-wide `EnvConfig`, built on first access.
     #[instrument_trace]
     fn get_or_init() -> &'static Self::Instance {
         GLOBAL_ENV_CONFIG.get_or_init(EnvConfig::default)
@@ -16,15 +21,13 @@ impl EnvPlugin {
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok if the configuration was loaded successfully, or an error message on failure.
+    /// - `Result<(), String>` - Ok if the configuration was loaded successfully, or an error message on failure.
     #[instrument_trace]
     pub fn try_load_config() -> Result<(), String> {
         let config: EnvConfig = EnvConfig::load()?;
         GLOBAL_ENV_CONFIG
             .set(config.clone())
-            .map_err(|_: EnvConfig| {
-                "Failed to initialize global environment configuration".to_string()
-            })?;
+            .map_err(|_: EnvConfig| GLOBAL_ENV_INIT_ERROR.to_string())?;
         Ok(())
     }
 }
@@ -35,7 +38,7 @@ impl MySqlInstanceConfig {
     ///
     /// # Returns
     ///
-    /// - `String`: The MySQL connection URL in the format `mysql://user:password@host:port/database`.
+    /// - `String` - The MySQL connection URL in the format `mysql://user:password@host:port/database`.
     pub(crate) fn get_connection_url(&self) -> String {
         format!(
             "mysql://{}:{}@{}:{}/{}",
@@ -51,7 +54,7 @@ impl MySqlInstanceConfig {
     ///
     /// # Returns
     ///
-    /// - `String`: The MySQL admin URL in the format `mysql://user:password@host:port`.
+    /// - `String` - The MySQL admin URL in the format `mysql://user:password@host:port`.
     pub(crate) fn get_admin_url(&self) -> String {
         format!(
             "mysql://{}:{}@{}:{}",
@@ -69,7 +72,7 @@ impl PostgreSqlInstanceConfig {
     ///
     /// # Returns
     ///
-    /// - `String`: The PostgreSQL connection URL in the format `postgres://user:password@host:port/database`.
+    /// - `String` - The PostgreSQL connection URL in the format `postgres://user:password@host:port/database`.
     pub(crate) fn get_connection_url(&self) -> String {
         format!(
             "postgres://{}:{}@{}:{}/{}",
@@ -85,7 +88,7 @@ impl PostgreSqlInstanceConfig {
     ///
     /// # Returns
     ///
-    /// - `String`: The PostgreSQL admin URL in the format `postgres://user:password@host:port/postgres`.
+    /// - `String` - The PostgreSQL admin URL in the format `postgres://user:password@host:port/postgres`.
     pub(crate) fn get_admin_url(&self) -> String {
         format!(
             "postgres://{}:{}@{}:{}/postgres",
@@ -103,7 +106,7 @@ impl RedisInstanceConfig {
     ///
     /// # Returns
     ///
-    /// - `String`: The Redis connection URL in the format `redis://user:password@host:port` or `redis://:password@host:port`.
+    /// - `String` - The Redis connection URL in the format `redis://user:password@host:port` or `redis://:password@host:port`.
     pub(crate) fn get_connection_url(&self) -> String {
         if self.get_username().is_empty() {
             format!(
@@ -130,11 +133,11 @@ impl EnvConfig {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The name of the MySQL instance to find.
+    /// - `&str` - The name of the MySQL instance to find.
     ///
     /// # Returns
     ///
-    /// - `Option<&MySqlInstanceConfig>`: The instance configuration if found, or None.
+    /// - `Option<&MySqlInstanceConfig>` - The instance configuration if found, or None.
     pub(crate) fn get_mysql_instance(&self, name: &str) -> Option<&MySqlInstanceConfig> {
         self.get_mysql_instances()
             .iter()
@@ -145,11 +148,11 @@ impl EnvConfig {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The name of the PostgreSQL instance to find.
+    /// - `&str` - The name of the PostgreSQL instance to find.
     ///
     /// # Returns
     ///
-    /// - `Option<&PostgreSqlInstanceConfig>`: The instance configuration if found, or None.
+    /// - `Option<&PostgreSqlInstanceConfig>` - The instance configuration if found, or None.
     pub(crate) fn get_postgresql_instance(&self, name: &str) -> Option<&PostgreSqlInstanceConfig> {
         self.get_postgresql_instances()
             .iter()
@@ -160,7 +163,7 @@ impl EnvConfig {
     ///
     /// # Returns
     ///
-    /// - `Option<&MySqlInstanceConfig>`: The default MySQL instance if any exist, or None.
+    /// - `Option<&MySqlInstanceConfig>` - The default MySQL instance if any exist, or None.
     pub(crate) fn get_default_mysql_instance(&self) -> Option<&MySqlInstanceConfig> {
         self.get_mysql_instances().first()
     }
@@ -169,7 +172,7 @@ impl EnvConfig {
     ///
     /// # Returns
     ///
-    /// - `Option<&PostgreSqlInstanceConfig>`: The default PostgreSQL instance if any exist, or None.
+    /// - `Option<&PostgreSqlInstanceConfig>` - The default PostgreSQL instance if any exist, or None.
     pub(crate) fn get_default_postgresql_instance(&self) -> Option<&PostgreSqlInstanceConfig> {
         self.get_postgresql_instances().first()
     }
@@ -178,11 +181,11 @@ impl EnvConfig {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The name of the Redis instance to find.
+    /// - `&str` - The name of the Redis instance to find.
     ///
     /// # Returns
     ///
-    /// - `Option<&RedisInstanceConfig>`: The instance configuration if found, or None.
+    /// - `Option<&RedisInstanceConfig>` - The instance configuration if found, or None.
     pub(crate) fn get_redis_instance(&self, name: &str) -> Option<&RedisInstanceConfig> {
         self.get_redis_instances()
             .iter()
@@ -193,7 +196,7 @@ impl EnvConfig {
     ///
     /// # Returns
     ///
-    /// - `Option<&RedisInstanceConfig>`: The default Redis instance if any exist, or None.
+    /// - `Option<&RedisInstanceConfig>` - The default Redis instance if any exist, or None.
     pub(crate) fn get_default_redis_instance(&self) -> Option<&RedisInstanceConfig> {
         self.get_redis_instances().first()
     }
@@ -202,15 +205,15 @@ impl EnvConfig {
     ///
     /// # Returns
     ///
-    /// - `Result<Self, String>`: The loaded configuration on success, or an error message on failure.
+    /// - `Result<Self, String>` - The loaded configuration on success, or an error message on failure.
     #[instrument_trace]
     pub(crate) fn load() -> Result<Self, String> {
         dotenvy::from_path(SERVER_ENV_FILE_PATH)
             .map_err(|error: dotenvy::Error| format!("Failed to load env file {error}"))?;
-        let get_env_required = |key: &str| -> Result<String, String> {
+        let get_env_required: fn(&str) -> Result<String, String> = |key: &str| {
             var(key).map_err(|_: VarError| format!("Environment variable {key} is not set"))
         };
-        let get_env_u16 = |key: &str| -> Result<u16, String> {
+        let get_env_u16: fn(&str) -> Result<u16, String> = |key: &str| {
             var(key)
                 .map_err(|_: VarError| format!("Environment variable {key} is not set"))?
                 .parse::<u16>()
@@ -218,7 +221,7 @@ impl EnvConfig {
                     format!("Environment variable {key} must be a valid u16")
                 })
         };
-        let get_env_u32 = |key: &str| -> Result<u32, String> {
+        let get_env_u32: fn(&str) -> Result<u32, String> = |key: &str| {
             var(key)
                 .map_err(|_: VarError| format!("Environment variable {key} is not set"))?
                 .parse::<u32>()
@@ -226,7 +229,7 @@ impl EnvConfig {
                     format!("Environment variable {key} must be a valid u32")
                 })
         };
-        let get_env_u64 = |key: &str| -> Result<u64, String> {
+        let get_env_u64: fn(&str) -> Result<u64, String> = |key: &str| {
             var(key)
                 .map_err(|_: VarError| format!("Environment variable {key} is not set"))?
                 .parse::<u64>()
@@ -234,7 +237,7 @@ impl EnvConfig {
                     format!("Environment variable {key} must be a valid u64")
                 })
         };
-        let get_env_usize = |key: &str| -> Result<usize, String> {
+        let get_env_usize: fn(&str) -> Result<usize, String> = |key: &str| {
             var(key)
                 .map_err(|_: VarError| format!("Environment variable {key} is not set"))?
                 .parse::<usize>()
@@ -242,12 +245,14 @@ impl EnvConfig {
                     format!("Environment variable {key} must be a valid usize")
                 })
         };
-        let get_env_bool = |key: &str| -> Result<bool, String> {
+        let get_env_bool: fn(&str) -> Result<bool, String> = |key: &str| {
             let value: String =
                 var(key).map_err(|_: VarError| format!("Environment variable {key} is not set"))?;
-            if value.eq_ignore_ascii_case("true") || value.eq_ignore_ascii_case("1") {
+            if value.eq_ignore_ascii_case(ENV_BOOL_TRUE_VALUE) || value.eq_ignore_ascii_case("1") {
                 Ok(true)
-            } else if value.eq_ignore_ascii_case("false") || value.eq_ignore_ascii_case("0") {
+            } else if value.eq_ignore_ascii_case(ENV_BOOL_FALSE_VALUE)
+                || value.eq_ignore_ascii_case("0")
+            {
                 Ok(false)
             } else {
                 Err(format!(
@@ -293,11 +298,11 @@ impl EnvConfig {
     ///
     /// # Arguments
     ///
-    /// - `&DockerComposeConfig`: The Docker Compose configuration providing default port values.
+    /// - `&DockerComposeConfig` - The Docker Compose configuration providing default port values.
     ///
     /// # Returns
     ///
-    /// - `Result<Vec<MySqlInstanceConfig>, String>`: The parsed MySQL instances on success, or an error message on failure.
+    /// - `Result<Vec<MySqlInstanceConfig>, String>` - The parsed MySQL instances on success, or an error message on failure.
     fn parse_mysql_instances(
         docker_config: &DockerComposeConfig,
     ) -> Result<Vec<MySqlInstanceConfig>, String> {
@@ -321,11 +326,11 @@ impl EnvConfig {
     ///
     /// # Arguments
     ///
-    /// - `&DockerComposeConfig`: The Docker Compose configuration providing default port values.
+    /// - `&DockerComposeConfig` - The Docker Compose configuration providing default port values.
     ///
     /// # Returns
     ///
-    /// - `Result<Vec<PostgreSqlInstanceConfig>, String>`: The parsed PostgreSQL instances on success, or an error message on failure.
+    /// - `Result<Vec<PostgreSqlInstanceConfig>, String>` - The parsed PostgreSQL instances on success, or an error message on failure.
     fn parse_postgresql_instances(
         docker_config: &DockerComposeConfig,
     ) -> Result<Vec<PostgreSqlInstanceConfig>, String> {
@@ -353,11 +358,11 @@ impl EnvConfig {
     ///
     /// # Arguments
     ///
-    /// - `&DockerComposeConfig`: The Docker Compose configuration providing default port values.
+    /// - `&DockerComposeConfig` - The Docker Compose configuration providing default port values.
     ///
     /// # Returns
     ///
-    /// - `Result<Vec<RedisInstanceConfig>, String>`: The parsed Redis instances on success, or an error message on failure.
+    /// - `Result<Vec<RedisInstanceConfig>, String>` - The parsed Redis instances on success, or an error message on failure.
     fn parse_redis_instances(
         docker_config: &DockerComposeConfig,
     ) -> Result<Vec<RedisInstanceConfig>, String> {
@@ -381,11 +386,11 @@ impl EnvConfig {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The file path to the Docker Compose YAML file.
+    /// - `&str` - The file path to the Docker Compose YAML file.
     ///
     /// # Returns
     ///
-    /// - `Result<DockerComposeConfig, String>`: The parsed Docker Compose configuration on success, or an error message on failure.
+    /// - `Result<DockerComposeConfig, String>` - The parsed Docker Compose configuration on success, or an error message on failure.
     #[instrument_trace]
     fn load_from_docker_compose(file_path: &str) -> Result<DockerComposeConfig, String> {
         let docker_compose_content: Vec<u8> =
@@ -523,7 +528,7 @@ impl EnvConfig {
             info!(
                 "  GPT_API_URL: {}",
                 if config.get_gpt_api_url().is_empty() {
-                    "(not set)"
+                    LOG_PLACEHOLDER_NOT_SET
                 } else {
                     config.get_gpt_api_url()
                 }
@@ -531,7 +536,7 @@ impl EnvConfig {
             info!(
                 "  GPT_MODEL: {}",
                 if config.get_gpt_model().is_empty() {
-                    "(not set)"
+                    LOG_PLACEHOLDER_NOT_SET
                 } else {
                     config.get_gpt_model()
                 }
@@ -573,7 +578,7 @@ impl EnvConfig {
                     info!(
                         "    Username: {}",
                         if instance.get_username().is_empty() {
-                            "(none)"
+                            LOG_PLACEHOLDER_NONE
                         } else {
                             instance.get_username()
                         }
@@ -607,7 +612,7 @@ impl EnvConfig {
             info!(
                 "GPT API URL {}",
                 if config.get_gpt_api_url().is_empty() {
-                    "(not set)"
+                    LOG_PLACEHOLDER_NOT_SET
                 } else {
                     config.get_gpt_api_url()
                 }
@@ -615,7 +620,7 @@ impl EnvConfig {
             info!(
                 "GPT Model {}",
                 if config.get_gpt_model().is_empty() {
-                    "(not set)"
+                    LOG_PLACEHOLDER_NOT_SET
                 } else {
                     config.get_gpt_model()
                 }
@@ -659,7 +664,7 @@ impl EnvConfig {
                         "  Instance '{}' {}:***@{}:{}",
                         instance.get_name(),
                         if instance.get_username().is_empty() {
-                            "(none)"
+                            LOG_PLACEHOLDER_NONE
                         } else {
                             instance.get_username()
                         },

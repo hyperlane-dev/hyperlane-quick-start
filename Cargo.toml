@@ -25,21 +25,22 @@ resolver = "3"
 members = ["application", "bootstrap", "config", "plugin", "resources"]
 
 [workspace.dependencies]
-hyperlane_application = { path = "application", version = "23.0.36" }
-hyperlane_bootstrap = { path = "bootstrap", version = "23.0.36" }
 hyperlane_config = { path = "config", version = "23.0.36" }
 hyperlane_plugin = { path = "plugin", version = "23.0.36" }
+hyperlane_bootstrap = { path = "bootstrap", version = "23.0.36" }
 hyperlane_resources = { path = "resources", version = "23.0.36" }
+hyperlane_application = { path = "application", version = "23.0.36" }
 
 tracing = "0.1.44"
 hyperlane = "21.3.6"
+hyperlane-core = "21.7.6"
 hyperlane-utils = "33.1.14"
 serde = { version = "1.0.229", features = ["derive"] }
 
 [dependencies]
-hyperlane_bootstrap = { workspace = true }
 hyperlane_config = { workspace = true }
 hyperlane_plugin = { workspace = true }
+hyperlane_bootstrap = { workspace = true }
 
 serde = { workspace = true }
 tracing = { workspace = true }

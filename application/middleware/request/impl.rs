@@ -6,12 +6,12 @@ impl ServerHook for HttpRequestMiddleware {
     ///
     /// # Arguments
     ///
-    /// - `&mut Stream`: The incoming connection stream.
-    /// - `&mut Context`: The request context.
+    /// - `&mut Stream` - The incoming connection stream.
+    /// - `&mut Context` - The request context.
     ///
     /// # Returns
     ///
-    /// - `HttpRequestMiddleware`: The newly created HTTP request middleware handler.
+    /// - `HttpRequestMiddleware` - The newly created HTTP request middleware handler.
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
@@ -21,13 +21,13 @@ impl ServerHook for HttpRequestMiddleware {
     ///
     /// # Arguments
     ///
-    /// - `Self`: The HTTP request middleware handler.
-    /// - `&mut Stream`: The incoming connection stream.
-    /// - `&mut Context`: The request context.
+    /// - `Self` - The HTTP request middleware handler.
+    /// - `&mut Stream` - The incoming connection stream.
+    /// - `&mut Context` - The request context.
     ///
     /// # Returns
     ///
-    /// - `Status::Continue`: Always returns continue after closing the stream.
+    /// - `Status` - Always returns continue after closing the stream.
     #[prologue_macros(
         reject(ctx.get_request().get_version().is_http()),
         send,
@@ -45,12 +45,12 @@ impl ServerHook for CrossMiddleware {
     ///
     /// # Arguments
     ///
-    /// - `&mut Stream`: The incoming connection stream.
-    /// - `&mut Context`: The request context.
+    /// - `&mut Stream` - The incoming connection stream.
+    /// - `&mut Context` - The request context.
     ///
     /// # Returns
     ///
-    /// - `CrossMiddleware`: The newly created CORS middleware handler.
+    /// - `CrossMiddleware` - The newly created CORS middleware handler.
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
@@ -60,13 +60,13 @@ impl ServerHook for CrossMiddleware {
     ///
     /// # Arguments
     ///
-    /// - `Self`: The CORS middleware handler.
-    /// - `&mut Stream`: The incoming connection stream.
-    /// - `&mut Context`: The request context.
+    /// - `Self` - The CORS middleware handler.
+    /// - `&mut Stream` - The incoming connection stream.
+    /// - `&mut Context` - The request context.
     ///
     /// # Returns
     ///
-    /// - `Status::Continue`: Always returns continue after setting CORS headers.
+    /// - `Status` - Always returns continue after setting CORS headers.
     #[response_version(HttpVersion::Http1_1)]
     #[response_header(ACCESS_CONTROL_ALLOW_ORIGIN => WILDCARD_ANY)]
     #[response_header(ACCESS_CONTROL_ALLOW_METHODS => ALL_METHODS)]
@@ -83,12 +83,12 @@ impl ServerHook for ResponseHeaderMiddleware {
     ///
     /// # Arguments
     ///
-    /// - `&mut Stream`: The incoming connection stream.
-    /// - `&mut Context`: The request context.
+    /// - `&mut Stream` - The incoming connection stream.
+    /// - `&mut Context` - The request context.
     ///
     /// # Returns
     ///
-    /// - `ResponseHeaderMiddleware`: The newly created response header middleware handler.
+    /// - `ResponseHeaderMiddleware` - The newly created response header middleware handler.
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
@@ -98,13 +98,13 @@ impl ServerHook for ResponseHeaderMiddleware {
     ///
     /// # Arguments
     ///
-    /// - `Self`: The response header middleware handler.
-    /// - `&mut Stream`: The incoming connection stream.
-    /// - `&mut Context`: The request context.
+    /// - `Self` - The response header middleware handler.
+    /// - `&mut Stream` - The incoming connection stream.
+    /// - `&mut Context` - The request context.
     ///
     /// # Returns
     ///
-    /// - `Status::Continue`: Always returns continue after setting response headers.
+    /// - `Status` - Always returns continue after setting response headers.
     #[response_header(DATE => gmt())]
     #[response_header(SERVER => HYPERLANE)]
     #[response_header(CONNECTION => KEEP_ALIVE)]
@@ -123,12 +123,12 @@ impl ServerHook for ResponseStatusCodeMiddleware {
     ///
     /// # Arguments
     ///
-    /// - `&mut Stream`: The incoming connection stream.
-    /// - `&mut Context`: The request context.
+    /// - `&mut Stream` - The incoming connection stream.
+    /// - `&mut Context` - The request context.
     ///
     /// # Returns
     ///
-    /// - `ResponseStatusCodeMiddleware`: The newly created response status code middleware handler.
+    /// - `ResponseStatusCodeMiddleware` - The newly created response status code middleware handler.
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
@@ -138,13 +138,13 @@ impl ServerHook for ResponseStatusCodeMiddleware {
     ///
     /// # Arguments
     ///
-    /// - `Self`: The response status code middleware handler.
-    /// - `&mut Stream`: The incoming connection stream.
-    /// - `&mut Context`: The request context.
+    /// - `Self` - The response status code middleware handler.
+    /// - `&mut Stream` - The incoming connection stream.
+    /// - `&mut Context` - The request context.
     ///
     /// # Returns
     ///
-    /// - `Status::Continue`: Always returns continue after setting the status code.
+    /// - `Status` - Always returns continue after setting the status code.
     #[response_status_code(200)]
     #[instrument_trace]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
@@ -158,12 +158,12 @@ impl ServerHook for OptionMethodMiddleware {
     ///
     /// # Arguments
     ///
-    /// - `&mut Stream`: The incoming connection stream.
-    /// - `&mut Context`: The request context.
+    /// - `&mut Stream` - The incoming connection stream.
+    /// - `&mut Context` - The request context.
     ///
     /// # Returns
     ///
-    /// - `OptionMethodMiddleware`: The newly created OPTIONS method middleware handler.
+    /// - `OptionMethodMiddleware` - The newly created OPTIONS method middleware handler.
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
@@ -173,13 +173,13 @@ impl ServerHook for OptionMethodMiddleware {
     ///
     /// # Arguments
     ///
-    /// - `Self`: The OPTIONS method middleware handler.
-    /// - `&mut Stream`: The incoming connection stream.
-    /// - `&mut Context`: The request context.
+    /// - `Self` - The OPTIONS method middleware handler.
+    /// - `&mut Stream` - The incoming connection stream.
+    /// - `&mut Context` - The request context.
     ///
     /// # Returns
     ///
-    /// - `Status::Reject`: Always returns reject for OPTIONS requests.
+    /// - `Status` - Always returns reject for OPTIONS requests.
     #[prologue_macros(
         filter(ctx.get_request().get_method().is_options()),
         send
@@ -196,12 +196,12 @@ impl ServerHook for UpgradeMiddleware {
     ///
     /// # Arguments
     ///
-    /// - `&mut Stream`: The incoming connection stream.
-    /// - `&mut Context`: The request context.
+    /// - `&mut Stream` - The incoming connection stream.
+    /// - `&mut Context` - The request context.
     ///
     /// # Returns
     ///
-    /// - `UpgradeMiddleware`: The newly created upgrade middleware handler.
+    /// - `UpgradeMiddleware` - The newly created upgrade middleware handler.
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
@@ -211,13 +211,13 @@ impl ServerHook for UpgradeMiddleware {
     ///
     /// # Arguments
     ///
-    /// - `Self`: The upgrade middleware handler.
-    /// - `&mut Stream`: The incoming connection stream.
-    /// - `&mut Context`: The request context.
+    /// - `Self` - The upgrade middleware handler.
+    /// - `&mut Stream` - The incoming connection stream.
+    /// - `&mut Context` - The request context.
     ///
     /// # Returns
     ///
-    /// - `Status::Continue`: Always returns continue after handling the upgrade.
+    /// - `Status` - Always returns continue after handling the upgrade.
     #[prologue_macros(
         is_ws_upgrade_type,
         response_version(HttpVersion::Http1_1),

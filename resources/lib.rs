@@ -1,4 +1,4 @@
-//! Hyperlane resources
+//! hyperlane_resources
 //!
 //! Resource module containing static assets, SQL scripts, Docker configurations, environment files, and templates used by the Hyperlane framework.
 

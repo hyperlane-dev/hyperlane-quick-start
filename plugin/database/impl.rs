@@ -6,12 +6,12 @@ impl fmt::Display for PluginType {
     ///
     /// # Arguments
     ///
-    /// - `&self`: The plugin type instance.
-    /// - `&mut fmt::Formatter<'_>`: The formatter.
+    /// - `&Self` - The plugin type instance.
+    /// - `&mut fmt::Formatter<'_>` - The formatter.
     ///
     /// # Returns
     ///
-    /// - `fmt::Result`: The result of the formatting operation.
+    /// - `fmt::Result` - The result of the formatting operation.
     #[instrument_trace]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -30,11 +30,11 @@ impl FromStr for PluginType {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The string to parse.
+    /// - `&str` - The string to parse.
     ///
     /// # Returns
     ///
-    /// - `Result<Self, ()>`: The parsed plugin type, or an error if the string is not recognized.
+    /// - `Result<Self, Self::Err>` - The parsed plugin type, or an error if the string is not recognized.
     #[instrument_trace]
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -52,12 +52,12 @@ impl std::fmt::Display for AutoCreationError {
     ///
     /// # Arguments
     ///
-    /// - `&self`: The error instance.
-    /// - `&mut std::fmt::Formatter<'_>`: The formatter.
+    /// - `&Self` - The error instance.
+    /// - `&mut std::fmt::Formatter<'_>` - The formatter.
     ///
     /// # Returns
     ///
-    /// - `std::fmt::Result`: The result of the formatting operation.
+    /// - `std::fmt::Result` - The result of the formatting operation.
     #[instrument_trace]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -81,7 +81,7 @@ impl AutoCreationError {
     ///
     /// # Returns
     ///
-    /// - `bool`: True if the process should continue, false if it should abort.
+    /// - `bool` - True if the process should continue, false if it should abort.
     #[instrument_trace]
     pub fn should_continue(&self) -> bool {
         match self {
@@ -97,7 +97,7 @@ impl AutoCreationError {
     ///
     /// # Returns
     ///
-    /// - `&str`: The error message string.
+    /// - `&str` - The error message string.
     #[instrument_trace]
     pub fn user_message(&self) -> &str {
         match self {
@@ -116,11 +116,11 @@ impl TableSchema {
     ///
     /// # Arguments
     ///
-    /// - `String`: The name of the dependency table.
+    /// - `String` - The name of the dependency table.
     ///
     /// # Returns
     ///
-    /// - `Self`: The updated table schema with the added dependency.
+    /// - `Self` - The updated table schema with the added dependency.
     #[instrument_trace]
     pub fn with_dependency(mut self, dependency: String) -> Self {
         self.get_mut_dependencies().push(dependency);
@@ -134,7 +134,7 @@ impl DatabasePlugin {
     ///
     /// # Returns
     ///
-    /// - `Duration`: The connection timeout duration.
+    /// - `Duration` - The connection timeout duration.
     ///
     /// # Panics
     ///
@@ -157,7 +157,7 @@ impl DatabasePlugin {
     ///
     /// # Returns
     ///
-    /// - `Duration`: The retry interval duration.
+    /// - `Duration` - The retry interval duration.
     ///
     /// # Panics
     ///
@@ -180,7 +180,7 @@ impl DatabasePlugin {
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error message on failure.
+    /// - `Result<(), String>` - Ok on success, or an error message on failure.
     #[instrument_trace]
     pub async fn initialize_auto_creation() -> Result<(), String> {
         Self::initialize_auto_creation_with_schema(None, None, None).await
@@ -190,13 +190,13 @@ impl DatabasePlugin {
     ///
     /// # Arguments
     ///
-    /// - `Option<DatabaseSchema>`: The optional MySQL schema for table creation.
-    /// - `Option<DatabaseSchema>`: The optional PostgreSQL schema for table creation.
-    /// - `Option<()>`: The optional Redis schema (currently unused).
+    /// - `Option<DatabaseSchema>` - The optional MySQL schema for table creation.
+    /// - `Option<DatabaseSchema>` - The optional PostgreSQL schema for table creation.
+    /// - `Option<()>` - The optional Redis schema (currently unused).
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error message on failure.
+    /// - `Result<(), String>` - Ok on success, or an error message on failure.
     #[instrument_trace]
     pub async fn initialize_auto_creation_with_schema(
         mysql_schema: Option<DatabaseSchema>,
@@ -217,9 +217,9 @@ impl DatabasePlugin {
                         "MySQL ({})  {}",
                         instance.get_name(),
                         if result.has_changes() {
-                            "initialized with changes"
+                            AUTO_CREATION_STATUS_INITIALIZED_WITH_CHANGES
                         } else {
-                            "verified"
+                            AUTO_CREATION_STATUS_VERIFIED
                         }
                     ));
                 }
@@ -245,9 +245,9 @@ impl DatabasePlugin {
                         "PostgreSQL ({})  {}",
                         instance.get_name(),
                         if result.has_changes() {
-                            "initialized with changes"
+                            AUTO_CREATION_STATUS_INITIALIZED_WITH_CHANGES
                         } else {
-                            "verified"
+                            AUTO_CREATION_STATUS_VERIFIED
                         }
                     ));
                 }
@@ -272,9 +272,9 @@ impl DatabasePlugin {
                         "Redis ({})  {}",
                         instance.get_name(),
                         if result.has_changes() {
-                            "initialized with changes"
+                            AUTO_CREATION_STATUS_INITIALIZED_WITH_CHANGES
                         } else {
-                            "verified"
+                            AUTO_CREATION_STATUS_VERIFIED
                         }
                     ));
                 }
@@ -308,11 +308,11 @@ impl<T: Clone> ConnectionCache<T> {
     ///
     /// # Arguments
     ///
-    /// - `Result<T, String>`: The connection result to cache.
+    /// - `Result<T, String>` - The connection result to cache.
     ///
     /// # Returns
     ///
-    /// - `Self`: A new connection cache entry.
+    /// - `Self` - A new connection cache entry.
     #[instrument_trace]
     pub fn new(result: Result<T, String>) -> Self {
         Self {
@@ -325,11 +325,11 @@ impl<T: Clone> ConnectionCache<T> {
     ///
     /// # Arguments
     ///
-    /// - `Duration`: The maximum age of the cached result before it is considered expired.
+    /// - `Duration` - The maximum age of the cached result before it is considered expired.
     ///
     /// # Returns
     ///
-    /// - `bool`: True if the cache entry has expired.
+    /// - `bool` - True if the cache entry has expired.
     #[instrument_trace]
     pub fn is_expired(&self, duration: Duration) -> bool {
         self.get_last_attempt().elapsed() >= duration
@@ -339,11 +339,11 @@ impl<T: Clone> ConnectionCache<T> {
     ///
     /// # Arguments
     ///
-    /// - `Duration`: The minimum time to wait before retrying.
+    /// - `Duration` - The minimum time to wait before retrying.
     ///
     /// # Returns
     ///
-    /// - `bool`: True if the connection should be retried (failed and expired).
+    /// - `bool` - True if the connection should be retried (failed and expired).
     #[instrument_trace]
     pub fn should_retry(&self, duration: Duration) -> bool {
         self.try_get_result().is_err() && self.is_expired(duration)
@@ -356,7 +356,7 @@ impl AutoCreationResult {
     ///
     /// # Returns
     ///
-    /// - `bool`: True if a database was created or tables were created.
+    /// - `bool` - True if a database was created or tables were created.
     #[instrument_trace]
     pub fn has_changes(&self) -> bool {
         self.get_database_created() || !self.get_tables_created().is_empty()
@@ -366,7 +366,7 @@ impl AutoCreationResult {
     ///
     /// # Returns
     ///
-    /// - `bool`: True if there are errors in the result.
+    /// - `bool` - True if there are errors in the result.
     #[instrument_trace]
     pub fn has_errors(&self) -> bool {
         !self.get_errors().is_empty()
@@ -379,11 +379,11 @@ impl DatabaseSchema {
     ///
     /// # Arguments
     ///
-    /// - `TableSchema`: The table schema to add.
+    /// - `TableSchema` - The table schema to add.
     ///
     /// # Returns
     ///
-    /// - `Self`: The updated database schema with the added table.
+    /// - `Self` - The updated database schema with the added table.
     #[instrument_trace]
     pub fn add_table(mut self, table: TableSchema) -> Self {
         self.get_mut_tables().push(table);
@@ -394,11 +394,11 @@ impl DatabaseSchema {
     ///
     /// # Arguments
     ///
-    /// - `String`: The index SQL statement to add.
+    /// - `String` - The index SQL statement to add.
     ///
     /// # Returns
     ///
-    /// - `Self`: The updated database schema with the added index.
+    /// - `Self` - The updated database schema with the added index.
     #[instrument_trace]
     pub fn add_index(mut self, index: String) -> Self {
         self.get_mut_indexes().push(index);
@@ -409,11 +409,11 @@ impl DatabaseSchema {
     ///
     /// # Arguments
     ///
-    /// - `String`: The constraint SQL statement to add.
+    /// - `String` - The constraint SQL statement to add.
     ///
     /// # Returns
     ///
-    /// - `Self`: The updated database schema with the added constraint.
+    /// - `Self` - The updated database schema with the added constraint.
     #[instrument_trace]
     pub fn add_constraint(mut self, constraint: String) -> Self {
         self.get_mut_constraints().push(constraint);
@@ -424,11 +424,11 @@ impl DatabaseSchema {
     ///
     /// # Arguments
     ///
-    /// - `String`: The init data SQL statement to add.
+    /// - `String` - The init data SQL statement to add.
     ///
     /// # Returns
     ///
-    /// - `Self`: The updated database schema with the added init data.
+    /// - `Self` - The updated database schema with the added init data.
     #[instrument_trace]
     pub fn add_init_data(mut self, init_data: String) -> Self {
         self.get_mut_init_data().push(init_data);
@@ -442,7 +442,7 @@ impl DatabaseSchema {
     ///
     /// # Returns
     ///
-    /// - `Vec<&TableSchema>`: The ordered list of table schema references.
+    /// - `Vec<&TableSchema>` - The ordered list of table schema references.
     #[instrument_trace]
     pub fn ordered_tables(&self) -> Vec<&TableSchema> {
         let mut ordered: Vec<&TableSchema> = Vec::new();
@@ -481,18 +481,18 @@ impl AutoCreationConfig {
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok if validation passes, or an error message identifying the missing plugin.
+    /// - `Result<(), String>` - Ok if validation passes, or an error message identifying the missing plugin.
     #[instrument_trace]
     pub fn validate() -> Result<(), String> {
         let env: &'static EnvConfig = EnvPlugin::get_or_init();
         if env.get_mysql_instances().is_empty() {
-            return Err("At least one MySQL instance is required".to_string());
+            return Err(MISSING_MYSQL_INSTANCE_ERROR.to_string());
         }
         if env.get_postgresql_instances().is_empty() {
-            return Err("At least one PostgreSQL instance is required".to_string());
+            return Err(MISSING_POSTGRESQL_INSTANCE_ERROR.to_string());
         }
         if env.get_redis_instances().is_empty() {
-            return Err("At least one Redis instance is required".to_string());
+            return Err(MISSING_REDIS_INSTANCE_ERROR.to_string());
         }
         Ok(())
     }
@@ -501,11 +501,11 @@ impl AutoCreationConfig {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The name of the plugin.
+    /// - `&str` - The name of the plugin.
     ///
     /// # Returns
     ///
-    /// - `PluginAutoCreationConfig`: The configuration for the specified plugin.
+    /// - `PluginAutoCreationConfig` - The configuration for the specified plugin.
     #[instrument_trace]
     pub fn for_plugin(plugin_name: &str) -> PluginAutoCreationConfig {
         PluginAutoCreationConfig {
@@ -520,7 +520,7 @@ impl PluginAutoCreationConfig {
     ///
     /// # Returns
     ///
-    /// - `bool`: True if the plugin name maps to a valid `PluginType`.
+    /// - `bool` - True if the plugin name maps to a valid `PluginType`.
     #[instrument_trace]
     pub fn is_plugin_enabled(&self) -> bool {
         PluginType::from_str(self.get_plugin_name()).is_ok()
@@ -530,7 +530,7 @@ impl PluginAutoCreationConfig {
     ///
     /// # Returns
     ///
-    /// - `String`: The database name, or "unknown" if no default instance is found.
+    /// - `String` - The database name, or "unknown" if no default instance is found.
     #[instrument_trace]
     pub fn get_database_name(&self) -> String {
         let env: &'static EnvConfig = EnvPlugin::get_or_init();
@@ -540,20 +540,20 @@ impl PluginAutoCreationConfig {
                     if let Some(instance) = env.get_default_mysql_instance() {
                         instance.get_database().clone()
                     } else {
-                        "unknown".to_string()
+                        UNKNOWN_DATABASE_NAME.to_string()
                     }
                 }
                 PluginType::PostgreSQL => {
                     if let Some(instance) = env.get_default_postgresql_instance() {
                         instance.get_database().clone()
                     } else {
-                        "unknown".to_string()
+                        UNKNOWN_DATABASE_NAME.to_string()
                     }
                 }
-                PluginType::Redis => "default".to_string(),
+                PluginType::Redis => DEFAULT_REDIS_DATABASE_NAME.to_string(),
             }
         } else {
-            "unknown".to_string()
+            UNKNOWN_DATABASE_NAME.to_string()
         }
     }
 
@@ -561,7 +561,7 @@ impl PluginAutoCreationConfig {
     ///
     /// # Returns
     ///
-    /// - `String`: The connection information string, or "unknown" if no default instance is found.
+    /// - `String` - The connection information string, or "unknown" if no default instance is found.
     #[instrument_trace]
     pub fn get_connection_info(&self) -> String {
         let env: &'static EnvConfig = EnvPlugin::get_or_init();
@@ -576,7 +576,7 @@ impl PluginAutoCreationConfig {
                             instance.get_database()
                         )
                     } else {
-                        "unknown".to_string()
+                        UNKNOWN_DATABASE_NAME.to_string()
                     }
                 }
                 PluginType::PostgreSQL => {
@@ -588,19 +588,19 @@ impl PluginAutoCreationConfig {
                             instance.get_database()
                         )
                     } else {
-                        "unknown".to_string()
+                        UNKNOWN_DATABASE_NAME.to_string()
                     }
                 }
                 PluginType::Redis => {
                     if let Some(instance) = env.get_default_redis_instance() {
                         format!("{}:{}", instance.get_host(), instance.get_port())
                     } else {
-                        "unknown".to_string()
+                        UNKNOWN_DATABASE_NAME.to_string()
                     }
                 }
             }
         } else {
-            "unknown".to_string()
+            UNKNOWN_DATABASE_NAME.to_string()
         }
     }
 }
@@ -611,8 +611,8 @@ impl AutoCreationLogger {
     ///
     /// # Arguments
     ///
-    /// - `PluginType`: The type of the database plugin.
-    /// - `&str`: The name of the database being created.
+    /// - `PluginType` - The type of the database plugin.
+    /// - `&str` - The name of the database being created.
     #[instrument_trace]
     pub async fn log_auto_creation_start(plugin_type: PluginType, database_name: &str) {
         info!(
@@ -624,8 +624,8 @@ impl AutoCreationLogger {
     ///
     /// # Arguments
     ///
-    /// - `PluginType`: The type of the database plugin.
-    /// - `&AutoCreationResult`: The result of the auto-creation operation.
+    /// - `PluginType` - The type of the database plugin.
+    /// - `&AutoCreationResult` - The result of the auto-creation operation.
     #[instrument_trace]
     pub async fn log_auto_creation_complete(plugin_type: PluginType, result: &AutoCreationResult) {
         if result.has_errors() {
@@ -642,10 +642,10 @@ impl AutoCreationLogger {
     ///
     /// # Arguments
     ///
-    /// - `&AutoCreationError`: The error that occurred.
-    /// - `&str`: The operation that failed.
-    /// - `PluginType`: The type of the database plugin.
-    /// - `Option<&str>`: The optional database name.
+    /// - `&AutoCreationError` - The error that occurred.
+    /// - `&str` - The operation that failed.
+    /// - `PluginType` - The type of the database plugin.
+    /// - `Option<&str>` - The optional database name.
     #[instrument_trace]
     pub async fn log_auto_creation_error(
         error: &AutoCreationError,
@@ -655,7 +655,7 @@ impl AutoCreationLogger {
     ) {
         error!(
             "[AUTO-CREATION] {operation} failed for {plugin_type} database '{}' {error}",
-            database_name.unwrap_or("unknown")
+            database_name.unwrap_or(UNKNOWN_DATABASE_NAME)
         );
     }
 
@@ -663,10 +663,10 @@ impl AutoCreationLogger {
     ///
     /// # Arguments
     ///
-    /// - `PluginType`: The type of the database plugin.
-    /// - `&str`: The name of the database.
-    /// - `bool`: Whether the verification was successful.
-    /// - `Option<&str>`: The optional error message if verification failed.
+    /// - `PluginType` - The type of the database plugin.
+    /// - `&str` - The name of the database.
+    /// - `bool` - Whether the verification was successful.
+    /// - `Option<&str>` - The optional error message if verification failed.
     #[instrument_trace]
     pub async fn log_connection_verification(
         plugin_type: PluginType,
@@ -681,7 +681,7 @@ impl AutoCreationLogger {
         } else {
             error!(
                 "[AUTO-CREATION] Connection verification failed for {plugin_type} database '{database_name}' {}",
-                error.unwrap_or("Unknown error")
+                error.unwrap_or(UNKNOWN_ERROR_MESSAGE)
             );
         };
     }
@@ -690,8 +690,8 @@ impl AutoCreationLogger {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The name of the database that was created.
-    /// - `PluginType`: The type of the database plugin.
+    /// - `&str` - The name of the database that was created.
+    /// - `PluginType` - The type of the database plugin.
     #[instrument_trace]
     pub async fn log_database_created(database_name: &str, plugin_type: PluginType) {
         info!(
@@ -703,8 +703,8 @@ impl AutoCreationLogger {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The name of the database.
-    /// - `PluginType`: The type of the database plugin.
+    /// - `&str` - The name of the database.
+    /// - `PluginType` - The type of the database plugin.
     #[instrument_trace]
     pub async fn log_database_exists(database_name: &str, plugin_type: PluginType) {
         info!("[AUTO-CREATION] Database '{database_name}' already exists for {plugin_type} plugin");
@@ -714,9 +714,9 @@ impl AutoCreationLogger {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The name of the table that was created.
-    /// - `&str`: The name of the database.
-    /// - `PluginType`: The type of the database plugin.
+    /// - `&str` - The name of the table that was created.
+    /// - `&str` - The name of the database.
+    /// - `PluginType` - The type of the database plugin.
     #[instrument_trace]
     pub async fn log_table_created(table_name: &str, database_name: &str, plugin_type: PluginType) {
         info!(
@@ -728,9 +728,9 @@ impl AutoCreationLogger {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The name of the table.
-    /// - `&str`: The name of the database.
-    /// - `PluginType`: The type of the database plugin.
+    /// - `&str` - The name of the table.
+    /// - `&str` - The name of the database.
+    /// - `PluginType` - The type of the database plugin.
     #[instrument_trace]
     pub async fn log_table_exists(table_name: &str, database_name: &str, plugin_type: PluginType) {
         info!(
@@ -742,9 +742,9 @@ impl AutoCreationLogger {
     ///
     /// # Arguments
     ///
-    /// - `&[String]`: The list of table names that were created.
-    /// - `&str`: The name of the database.
-    /// - `PluginType`: The type of the database plugin.
+    /// - `&[String]` - The list of table names that were created.
+    /// - `&str` - The name of the database.
+    /// - `PluginType` - The type of the database plugin.
     #[instrument_trace]
     pub async fn log_tables_created(
         tables: &[String],

@@ -2101,6 +2101,7 @@ name = "hyperlane_application"
 version = "23.0.36"
 dependencies = [
  "hyperlane",
+ "hyperlane-core",
  "hyperlane-utils",
  "hyperlane_config",
  "hyperlane_plugin",
@@ -2114,6 +2115,7 @@ name = "hyperlane_bootstrap"
 version = "23.0.36"
 dependencies = [
  "hyperlane",
+ "hyperlane-core",
  "hyperlane-utils",
  "hyperlane_application",
  "hyperlane_config",

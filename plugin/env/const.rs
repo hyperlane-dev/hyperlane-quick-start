@@ -96,3 +96,18 @@ pub const DOCKER_POSTGRES_PASSWORD: &str = "POSTGRES_PASSWORD";
 
 /// Docker command flag for setting the Redis requirepass password.
 pub const DOCKER_REDIS_PASSWORD_FLAG: &str = "--requirepass";
+
+/// Error message reported when the global environment configuration singleton fails to initialize.
+pub const GLOBAL_ENV_INIT_ERROR: &str = "Failed to initialize global environment configuration";
+
+/// Boolean literal accepted as the true value when parsing an environment variable.
+pub const ENV_BOOL_TRUE_VALUE: &str = "true";
+
+/// Boolean literal accepted as the false value when parsing an environment variable.
+pub const ENV_BOOL_FALSE_VALUE: &str = "false";
+
+/// Placeholder logged in place of a configuration value that is empty or not set.
+pub const LOG_PLACEHOLDER_NOT_SET: &str = "(not set)";
+
+/// Placeholder logged in place of a credential value that is empty.
+pub const LOG_PLACEHOLDER_NONE: &str = "(none)";

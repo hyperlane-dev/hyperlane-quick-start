@@ -8,7 +8,7 @@ impl GetOrInit for MySqlPlugin {
     ///
     /// # Returns
     ///
-    /// - `&'static RwLock<HashMap<String, ConnectionCache<DatabaseConnection>>>`: The static reference to the global MySQL connection map.
+    /// - `&'static Self::Instance` - The static reference to the global MySQL connection map.
     #[instrument_trace]
     fn get_or_init() -> &'static Self::Instance {
         MYSQL_CONNECTIONS.get_or_init(|| RwLock::new(HashMap::new()))
@@ -29,7 +29,7 @@ impl DatabaseConnectionPlugin for MySqlPlugin {
     ///
     /// # Returns
     ///
-    /// - `PluginType::MySQL`: The MySQL plugin type.
+    /// - `PluginType` - The MySQL plugin type.
     #[instrument_trace]
     fn plugin_type() -> PluginType {
         PluginType::MySQL
@@ -39,12 +39,12 @@ impl DatabaseConnectionPlugin for MySqlPlugin {
     ///
     /// # Arguments
     ///
-    /// - `I`: The instance name identifier.
-    /// - `Option<DatabaseSchema>`: The optional database schema for auto-creation.
+    /// - `I` - The instance name identifier.
+    /// - `Option<DatabaseSchema>` - The optional database schema for auto-creation.
     ///
     /// # Returns
     ///
-    /// - `Result<Self::Connection, String>`: The connection on success, or an error message on failure.
+    /// - `Result<Self::Connection, String>` - The connection on success, or an error message on failure.
     #[instrument_trace]
     async fn connection_db<I>(
         instance_name: I,
@@ -68,7 +68,7 @@ impl DatabaseConnectionPlugin for MySqlPlugin {
             Err(error) => {
                 AutoCreationLogger::log_auto_creation_error(
                     &error,
-                    "Auto-creation process",
+                    AUTO_CREATION_PROCESS_LABEL,
                     PluginType::MySQL,
                     Some(instance.get_database().as_str()),
                 )
@@ -109,12 +109,12 @@ impl DatabaseConnectionPlugin for MySqlPlugin {
     ///
     /// # Arguments
     ///
-    /// - `I`: The instance name identifier.
-    /// - `Option<DatabaseSchema>`: The optional database schema for auto-creation.
+    /// - `I` - The instance name identifier.
+    /// - `Option<DatabaseSchema>` - The optional database schema for auto-creation.
     ///
     /// # Returns
     ///
-    /// - `Result<Self::Connection, String>`: The connection on success, or an error message on failure.
+    /// - `Result<Self::Connection, String>` - The connection on success, or an error message on failure.
     #[instrument_trace]
     async fn get_connection<I>(
         instance_name: I,
@@ -170,12 +170,12 @@ impl DatabaseConnectionPlugin for MySqlPlugin {
     ///
     /// # Arguments
     ///
-    /// - `&Self::InstanceConfig`: The MySQL instance configuration.
-    /// - `Option<DatabaseSchema>`: The optional database schema for table creation.
+    /// - `&Self::InstanceConfig` - The MySQL instance configuration.
+    /// - `Option<DatabaseSchema>` - The optional database schema for table creation.
     ///
     /// # Returns
     ///
-    /// - `Result<AutoCreationResult, AutoCreationError>`: The auto-creation result on success, or an error on failure.
+    /// - `Result<AutoCreationResult, AutoCreationError>` - The auto-creation result on success, or an error on failure.
     #[instrument_trace]
     async fn perform_auto_creation(
         instance: &Self::InstanceConfig,
@@ -196,7 +196,7 @@ impl DatabaseConnectionPlugin for MySqlPlugin {
             Err(error) => {
                 AutoCreationLogger::log_auto_creation_error(
                     &error,
-                    "Database creation",
+                    DATABASE_CREATION_LABEL,
                     PluginType::MySQL,
                     Some(instance.get_database()),
                 )
@@ -215,7 +215,7 @@ impl DatabaseConnectionPlugin for MySqlPlugin {
             Err(error) => {
                 AutoCreationLogger::log_auto_creation_error(
                     &error,
-                    "Table creation",
+                    TABLE_CREATION_LABEL,
                     PluginType::MySQL,
                     Some(instance.get_database().as_str()),
                 )
@@ -226,7 +226,7 @@ impl DatabaseConnectionPlugin for MySqlPlugin {
         if let Err(error) = auto_creator.create_indexes().await {
             AutoCreationLogger::log_auto_creation_error(
                 &error,
-                "Index creation",
+                INDEX_CREATION_LABEL,
                 PluginType::MySQL,
                 Some(instance.get_database().as_str()),
             )
@@ -236,7 +236,7 @@ impl DatabaseConnectionPlugin for MySqlPlugin {
         if let Err(error) = auto_creator.init_data().await {
             AutoCreationLogger::log_auto_creation_error(
                 &error,
-                "Init data",
+                INIT_DATA_LABEL,
                 PluginType::MySQL,
                 Some(instance.get_database().as_str()),
             )
@@ -246,7 +246,7 @@ impl DatabaseConnectionPlugin for MySqlPlugin {
         if let Err(error) = auto_creator.verify_connection().await {
             AutoCreationLogger::log_auto_creation_error(
                 &error,
-                "Connection verification",
+                CONNECTION_VERIFICATION_LABEL,
                 PluginType::MySQL,
                 Some(instance.get_database().as_str()),
             )
@@ -269,7 +269,7 @@ impl Default for MySqlAutoCreation {
     ///
     /// # Returns
     ///
-    /// - `MySqlAutoCreation`: The default auto-creation handler.
+    /// - `MySqlAutoCreation` - The default auto-creation handler.
     #[instrument_trace]
     fn default() -> Self {
         let env: &'static EnvConfig = EnvPlugin::get_or_init();
@@ -288,10 +288,10 @@ impl MySqlAutoCreation {
     ///
     /// # Returns
     ///
-    /// - `Result<DatabaseConnection, AutoCreationError>`: The admin connection on success, or an error on failure.
+    /// - `Result<DatabaseConnection, AutoCreationError>` - The admin connection on success, or an error on failure.
     #[instrument_trace]
     async fn create_admin_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
-        let admin_url: String = self.instance.get_admin_url();
+        let admin_url: String = self.get_instance().get_admin_url();
         let timeout_duration: Duration = DatabasePlugin::get_connection_timeout_duration();
         let timeout_seconds: u64 = timeout_duration.as_secs();
         let connection_result: Result<DatabaseConnection, DbErr> =
@@ -305,11 +305,15 @@ impl MySqlAutoCreation {
             };
         connection_result.map_err(|error: DbErr| {
             let error_msg: String = error.to_string();
-            if error_msg.contains("Access denied") || error_msg.contains("permission") {
+            if error_msg.contains(ERROR_MARKER_ACCESS_DENIED)
+                || error_msg.contains(ERROR_MARKER_PERMISSION)
+            {
                 AutoCreationError::InsufficientPermissions(format!(
                     "Cannot connect to MySQL server for database creation {error_msg}"
                 ))
-            } else if error_msg.contains("timeout") || error_msg.contains("Connection refused") {
+            } else if error_msg.contains(ERROR_MARKER_TIMEOUT)
+                || error_msg.contains(ERROR_MARKER_CONNECTION_REFUSED)
+            {
                 AutoCreationError::ConnectionFailed(format!(
                     "Cannot connect to MySQL server {error_msg}"
                 ))
@@ -323,11 +327,11 @@ impl MySqlAutoCreation {
     ///
     /// # Arguments
     ///
-    /// - `&DatabaseConnection`: The admin connection to the MySQL server.
+    /// - `&DatabaseConnection` - The admin connection to the MySQL server.
     ///
     /// # Returns
     ///
-    /// - `Result<bool, AutoCreationError>`: True if the database exists, false otherwise.
+    /// - `Result<bool, AutoCreationError>` - True if the database exists, false otherwise.
     #[instrument_trace]
     async fn database_exists(
         &self,
@@ -335,7 +339,7 @@ impl MySqlAutoCreation {
     ) -> Result<bool, AutoCreationError> {
         let query: String = format!(
             "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '{}'",
-            self.instance.get_database()
+            self.get_instance().get_database()
         );
         let statement: Statement = Statement::from_string(DatabaseBackend::MySql, query);
         match connection.query_all(statement).await {
@@ -350,11 +354,11 @@ impl MySqlAutoCreation {
     ///
     /// # Arguments
     ///
-    /// - `&DatabaseConnection`: The admin connection to the MySQL server.
+    /// - `&DatabaseConnection` - The admin connection to the MySQL server.
     ///
     /// # Returns
     ///
-    /// - `Result<bool, AutoCreationError>`: True if the database was created, false if it already existed.
+    /// - `Result<bool, AutoCreationError>` - True if the database was created, false if it already existed.
     #[instrument_trace]
     async fn create_database(
         &self,
@@ -362,7 +366,7 @@ impl MySqlAutoCreation {
     ) -> Result<bool, AutoCreationError> {
         if self.database_exists(connection).await? {
             AutoCreationLogger::log_database_exists(
-                self.instance.get_database().as_str(),
+                self.get_instance().get_database().as_str(),
                 PluginType::MySQL,
             )
             .await;
@@ -370,13 +374,13 @@ impl MySqlAutoCreation {
         }
         let create_query: String = format!(
             "CREATE DATABASE IF NOT EXISTS `{}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
-            self.instance.get_database()
+            self.get_instance().get_database()
         );
         let statement: Statement = Statement::from_string(DatabaseBackend::MySql, create_query);
         match connection.execute(statement).await {
             Ok(_) => {
                 AutoCreationLogger::log_database_created(
-                    self.instance.get_database().as_str(),
+                    self.get_instance().get_database().as_str(),
                     PluginType::MySQL,
                 )
                 .await;
@@ -384,16 +388,18 @@ impl MySqlAutoCreation {
             }
             Err(error) => {
                 let error_msg: String = error.to_string();
-                if error_msg.contains("Access denied") || error_msg.contains("permission") {
+                if error_msg.contains(ERROR_MARKER_ACCESS_DENIED)
+                    || error_msg.contains(ERROR_MARKER_PERMISSION)
+                {
                     Err(AutoCreationError::InsufficientPermissions(format!(
                         "Cannot create MySQL database '{}' {}",
-                        self.instance.get_database().as_str(),
+                        self.get_instance().get_database().as_str(),
                         error_msg
                     )))
                 } else {
                     Err(AutoCreationError::DatabaseError(format!(
                         "Failed to create MySQL database '{}' {}",
-                        self.instance.get_database().as_str(),
+                        self.get_instance().get_database().as_str(),
                         error_msg
                     )))
                 }
@@ -405,10 +411,10 @@ impl MySqlAutoCreation {
     ///
     /// # Returns
     ///
-    /// - `Result<DatabaseConnection, AutoCreationError>`: The database connection on success, or an error on failure.
+    /// - `Result<DatabaseConnection, AutoCreationError>` - The database connection on success, or an error on failure.
     #[instrument_trace]
     async fn create_target_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
-        let db_url: String = self.instance.get_connection_url();
+        let db_url: String = self.get_instance().get_connection_url();
         let timeout_duration: Duration = DatabasePlugin::get_connection_timeout_duration();
         let timeout_seconds: u64 = timeout_duration.as_secs();
         let connection_result: Result<DatabaseConnection, DbErr> =
@@ -417,14 +423,14 @@ impl MySqlAutoCreation {
                 Err(_) => {
                     return Err(AutoCreationError::Timeout(format!(
                         "MySQL database connection timeout after {timeout_seconds} seconds {}",
-                        self.instance.get_database()
+                        self.get_instance().get_database()
                     )));
                 }
             };
         connection_result.map_err(|error: DbErr| {
             AutoCreationError::ConnectionFailed(format!(
                 "Cannot connect to MySQL database '{}' {}",
-                self.instance.get_database().as_str(),
+                self.get_instance().get_database().as_str(),
                 error
             ))
         })
@@ -434,12 +440,12 @@ impl MySqlAutoCreation {
     ///
     /// # Arguments
     ///
-    /// - `&DatabaseConnection`: The connection to the target database.
-    /// - `T`: The table name to check.
+    /// - `&DatabaseConnection` - The connection to the target database.
+    /// - `T` - The table name to check.
     ///
     /// # Returns
     ///
-    /// - `Result<bool, AutoCreationError>`: True if the table exists, false otherwise.
+    /// - `Result<bool, AutoCreationError>` - True if the table exists, false otherwise.
     #[instrument_trace]
     async fn table_exists<T>(
         &self,
@@ -452,7 +458,7 @@ impl MySqlAutoCreation {
         let table_name_str: &str = table_name.as_ref();
         let query: String = format!(
             "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{}' AND TABLE_NAME = '{table_name_str}'",
-            self.instance.get_database()
+            self.get_instance().get_database()
         );
         let statement: Statement = Statement::from_string(DatabaseBackend::MySql, query);
         match connection.query_all(statement).await {
@@ -467,12 +473,12 @@ impl MySqlAutoCreation {
     ///
     /// # Arguments
     ///
-    /// - `&DatabaseConnection`: The connection to the target database.
-    /// - `&TableSchema`: The table schema containing the creation SQL.
+    /// - `&DatabaseConnection` - The connection to the target database.
+    /// - `&TableSchema` - The table schema containing the creation SQL.
     ///
     /// # Returns
     ///
-    /// - `Result<(), AutoCreationError>`: Ok on success, or an error on failure.
+    /// - `Result<(), AutoCreationError>` - Ok on success, or an error on failure.
     #[instrument_trace]
     async fn create_table(
         &self,
@@ -485,7 +491,9 @@ impl MySqlAutoCreation {
             Ok(_) => Ok(()),
             Err(error) => {
                 let error_msg: String = error.to_string();
-                if error_msg.contains("Access denied") || error_msg.contains("permission") {
+                if error_msg.contains(ERROR_MARKER_ACCESS_DENIED)
+                    || error_msg.contains(ERROR_MARKER_PERMISSION)
+                {
                     Err(AutoCreationError::InsufficientPermissions(format!(
                         "Cannot create MySQL table '{}' {}",
                         table.get_name(),
@@ -506,12 +514,12 @@ impl MySqlAutoCreation {
     ///
     /// # Arguments
     ///
-    /// - `&DatabaseConnection`: The connection to the target database.
-    /// - `S`: The SQL statement to execute.
+    /// - `&DatabaseConnection` - The connection to the target database.
+    /// - `S` - The SQL statement to execute.
     ///
     /// # Returns
     ///
-    /// - `Result<(), AutoCreationError>`: Ok on success, or an error on failure.
+    /// - `Result<(), AutoCreationError>` - Ok on success, or an error on failure.
     #[instrument_trace]
     async fn execute_sql<S>(
         &self,
@@ -534,17 +542,17 @@ impl MySqlAutoCreation {
     ///
     /// # Returns
     ///
-    /// - `&DatabaseSchema`: The database schema reference.
+    /// - `&DatabaseSchema` - The database schema reference.
     #[instrument_trace]
     fn get_database_schema(&self) -> &DatabaseSchema {
-        &self.schema
+        self.get_schema()
     }
 
     /// Creates indexes and constraints defined in the database schema on the target MySQL database.
     ///
     /// # Returns
     ///
-    /// - `Result<(), AutoCreationError>`: Ok on success, or an error on failure.
+    /// - `Result<(), AutoCreationError>` - Ok on success, or an error on failure.
     #[instrument_trace]
     async fn create_indexes(&self) -> Result<(), AutoCreationError> {
         let connection: DatabaseConnection = self.create_target_connection().await?;
@@ -553,9 +561,9 @@ impl MySqlAutoCreation {
             if let Err(error) = self.execute_sql(&connection, index_sql).await {
                 AutoCreationLogger::log_auto_creation_error(
                     &error,
-                    "Index creation",
+                    INDEX_CREATION_LABEL,
                     PluginType::MySQL,
-                    Some(self.instance.get_database().as_str()),
+                    Some(self.get_instance().get_database().as_str()),
                 )
                 .await;
             }
@@ -564,9 +572,9 @@ impl MySqlAutoCreation {
             if let Err(error) = self.execute_sql(&connection, constraint_sql).await {
                 AutoCreationLogger::log_auto_creation_error(
                     &error,
-                    "Constraint creation",
+                    CONSTRAINT_CREATION_LABEL,
                     PluginType::MySQL,
-                    Some(self.instance.get_database().as_str()),
+                    Some(self.get_instance().get_database().as_str()),
                 )
                 .await;
             }
@@ -584,7 +592,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
     ///
     /// # Arguments
     ///
-    /// - `MySqlInstanceConfig`: The MySQL instance configuration.
+    /// - `Self::InstanceConfig` - The MySQL instance configuration.
     #[instrument_trace]
     fn new(instance: Self::InstanceConfig) -> Self {
         Self {
@@ -597,8 +605,8 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
     ///
     /// # Arguments
     ///
-    /// - `MySqlInstanceConfig`: The MySQL instance configuration.
-    /// - `DatabaseSchema`: The database schema containing table definitions.
+    /// - `Self::InstanceConfig` - The MySQL instance configuration.
+    /// - `DatabaseSchema` - The database schema containing table definitions.
     #[instrument_trace]
     fn with_schema(instance: Self::InstanceConfig, schema: DatabaseSchema) -> Self
     where
@@ -611,7 +619,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
     ///
     /// # Returns
     ///
-    /// - `Result<bool, AutoCreationError>`: True if the database was created, false if it already existed.
+    /// - `Result<bool, AutoCreationError>` - True if the database was created, false if it already existed.
     #[instrument_trace]
     async fn create_database_if_not_exists(&self) -> Result<bool, AutoCreationError> {
         let admin_connection: DatabaseConnection = self.create_admin_connection().await?;
@@ -624,7 +632,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
     ///
     /// # Returns
     ///
-    /// - `Result<Vec<String>, AutoCreationError>`: A list of table names that were created.
+    /// - `Result<Vec<String>, AutoCreationError>` - A list of table names that were created.
     #[instrument_trace]
     async fn create_tables_if_not_exist(&self) -> Result<Vec<String>, AutoCreationError> {
         let connection: DatabaseConnection = self.create_target_connection().await?;
@@ -636,14 +644,14 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                 created_tables.push(table.get_name().clone());
                 AutoCreationLogger::log_table_created(
                     table.get_name(),
-                    self.instance.get_database().as_str(),
+                    self.get_instance().get_database().as_str(),
                     PluginType::MySQL,
                 )
                 .await;
             } else {
                 AutoCreationLogger::log_table_exists(
                     table.get_name(),
-                    self.instance.get_database().as_str(),
+                    self.get_instance().get_database().as_str(),
                     PluginType::MySQL,
                 )
                 .await;
@@ -652,7 +660,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
         let _: Result<(), DbErr> = connection.close().await;
         AutoCreationLogger::log_tables_created(
             &created_tables,
-            self.instance.get_database().as_str(),
+            self.get_instance().get_database().as_str(),
             PluginType::MySQL,
         )
         .await;
@@ -663,7 +671,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
     ///
     /// # Returns
     ///
-    /// - `Result<(), AutoCreationError>`: Ok on success, or an error on failure.
+    /// - `Result<(), AutoCreationError>` - Ok on success, or an error on failure.
     #[instrument_trace]
     async fn init_data(&self) -> Result<(), AutoCreationError> {
         let connection: DatabaseConnection = self.create_target_connection().await?;
@@ -672,9 +680,9 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
             if let Err(error) = self.execute_sql(&connection, init_data_sql).await {
                 AutoCreationLogger::log_auto_creation_error(
                     &error,
-                    "Init data insertion",
+                    INIT_DATA_INSERTION_LABEL,
                     PluginType::MySQL,
-                    Some(self.instance.get_database().as_str()),
+                    Some(self.get_instance().get_database().as_str()),
                 )
                 .await;
             }
@@ -687,10 +695,10 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
     ///
     /// # Returns
     ///
-    /// - `Result<(), AutoCreationError>`: Ok if the connection is valid, or an error on failure.
+    /// - `Result<(), AutoCreationError>` - Ok if the connection is valid, or an error on failure.
     #[instrument_trace]
     async fn verify_connection(&self) -> Result<(), AutoCreationError> {
-        let db_url: String = self.instance.get_connection_url();
+        let db_url: String = self.get_instance().get_connection_url();
         let timeout_duration: Duration = DatabasePlugin::get_connection_timeout_duration();
         let timeout_seconds: u64 = timeout_duration.as_secs();
         let connection_result: Result<DatabaseConnection, DbErr> =
@@ -708,13 +716,13 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
             ))
         })?;
         let statement: Statement =
-            Statement::from_string(DatabaseBackend::MySql, "SELECT 1".to_string());
+            Statement::from_string(DatabaseBackend::MySql, CONNECTION_PROBE_QUERY.to_string());
         match connection.query_all(statement).await {
             Ok(_) => {
                 let _: Result<(), DbErr> = connection.close().await;
                 AutoCreationLogger::log_connection_verification(
                     PluginType::MySQL,
-                    self.instance.get_database().as_str(),
+                    self.get_instance().get_database().as_str(),
                     true,
                     None,
                 )
@@ -726,7 +734,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                 let error_msg: String = error.to_string();
                 AutoCreationLogger::log_connection_verification(
                     PluginType::MySQL,
-                    self.instance.get_database().as_str(),
+                    self.get_instance().get_database().as_str(),
                     false,
                     Some(&error_msg),
                 )

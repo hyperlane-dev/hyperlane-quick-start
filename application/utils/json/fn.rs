@@ -4,11 +4,11 @@ use super::*;
 ///
 /// # Arguments
 ///
-/// - `&Context`: The request context to serialize.
+/// - `&Context` - The request context to serialize.
 ///
 /// # Returns
 ///
-/// - `String`: The JSON string representation of the request with body length instead of full body.
+/// - `String` - The JSON string representation of the request with body length instead of full body.
 #[instrument_trace]
 pub async fn get_request_json(ctx: &Context) -> String {
     let mut request: Request = ctx.get_request().clone();
@@ -20,11 +20,11 @@ pub async fn get_request_json(ctx: &Context) -> String {
 ///
 /// # Arguments
 ///
-/// - `&Context`: The response context to serialize.
+/// - `&Context` - The response context to serialize.
 ///
 /// # Returns
 ///
-/// - `String`: The JSON string representation of the response with body length instead of full body.
+/// - `String` - The JSON string representation of the response with body length instead of full body.
 #[instrument_trace]
 pub async fn get_response_json(ctx: &Context) -> String {
     let mut response: Response = ctx.get_response().clone();

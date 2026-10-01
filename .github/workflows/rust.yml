@@ -130,9 +130,11 @@ jobs:
           # Sync workspace.dependencies.<pkg_name>.version for all member packages using sed
           for pkg_name in $MEMBER_PKG_NAMES; do
             if grep -q "^${pkg_name}[[:space:]]*=" Cargo.toml && grep -q "^${pkg_name}[[:space:]]*=.*version" Cargo.toml; then
+              # ci-allow-version-write: mirrors the human-authored root version into [workspace.dependencies]; it never picks or increments a version, it only keeps the release train in lockstep so one tag matches every manifest.
               sed -i -E "s|^(${pkg_name}[[:space:]]*=[[:space:]]*\{.*version[[:space:]]*=[[:space:]]*\")([^\"]+)(\".*)|\1${VERSION}\3|" Cargo.toml
               echo "🔧 workspace.dependencies.${pkg_name}.version -> $VERSION (inline)"
             elif grep -q "^\[workspace\.dependencies\.${pkg_name}\]" Cargo.toml; then
+              # ci-allow-version-write: mirrors the human-authored root version into [workspace.dependencies]; it never picks or increments a version, it only keeps the release train in lockstep so one tag matches every manifest.
               sed -i -E "/^\[workspace\.dependencies\.${pkg_name}\]/,/^\[/ s|^(version[[:space:]]*=[[:space:]]*\")([^\"]+)(\")|\1${VERSION}\3|" Cargo.toml
               echo "🔧 workspace.dependencies.${pkg_name}.version -> $VERSION (sub-table)"
             else
@@ -144,6 +146,7 @@ jobs:
           for member in $MEMBERS; do
             SUB_TOML="${ROOT_DIR}/${member}/Cargo.toml"
             if [ -f "$SUB_TOML" ]; then
+              # ci-allow-version-write: propagates the human-authored root version into each member manifest so the workspace publishes one coherent version; the number itself is committed by a human, never chosen here.
               sed -i -E "s|^(version[[:space:]]*=[[:space:]]*\")([^\"]+)(\")|\1${VERSION}\3|" "$SUB_TOML"
               echo "🔧 ${member}/Cargo.toml package.version -> $VERSION"
             else
@@ -152,6 +155,7 @@ jobs:
           done
 
           # Sync the root package.version itself
+          # ci-allow-version-write: normalises the already-human-authored root version so every manifest in the workspace agrees; the version is never incremented or chosen by CI.
           sed -i -E "0,/^(version[[:space:]]*=[[:space:]]*\")([^\"]+)(\")/s|^(version[[:space:]]*=[[:space:]]*\")([^\"]+)(\")|\1${VERSION}\3|" Cargo.toml
           echo "🔧 Cargo.toml package.version -> $VERSION"
       - name: Update Cargo.lock
