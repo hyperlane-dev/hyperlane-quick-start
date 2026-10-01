@@ -6,7 +6,7 @@ impl TrackingRepository {
     ///
     /// # Returns
     ///
-    /// - `&'static DatabaseConnection`: A reference to the initialized database connection.
+    /// - `&'static DatabaseConnection` - A reference to the initialized database connection.
     #[instrument_trace]
     pub fn get_db_connection() -> &'static DatabaseConnection {
         TRACKING_DB_CONNECTION.get_or_init(|| {
@@ -15,7 +15,7 @@ impl TrackingRepository {
                     let db: DatabaseConnection =
                         PostgreSqlPlugin::connection_db(DEFAULT_POSTGRESQL_INSTANCE_NAME, None)
                             .await
-                            .expect("Failed to connect to PostgreSQL database");
+                            .expect(ERROR_FAILED_TO_CONNECT_DATABASE);
                     db
                 })
             })
@@ -26,11 +26,11 @@ impl TrackingRepository {
     ///
     /// # Arguments
     ///
-    /// - `TrackingRecord`: The tracking record to insert.
+    /// - `TrackingRecord` - The tracking record to insert.
     ///
     /// # Returns
     ///
-    /// - `Result<(), DbErr>`: Ok on success, or a database error.
+    /// - `Result<(), DbErr>` - Ok on success, or a database error.
     #[instrument_trace]
     pub async fn insert(record: TrackingRecord) -> Result<(), DbErr> {
         let headers_json: String =
@@ -54,11 +54,11 @@ impl TrackingRepository {
     ///
     /// # Arguments
     ///
-    /// - `&TrackingQuery`: The query parameters including time range, page, and cache ID.
+    /// - `&TrackingQuery` - The query parameters including time range, page, and cache ID.
     ///
     /// # Returns
     ///
-    /// - `Result<(Vec<Model>, i64), DbErr>`: The paginated records and total count.
+    /// - `Result<(Vec<Model>, i64), DbErr>` - The paginated records and total count.
     #[instrument_trace]
     pub async fn query(query: &TrackingQuery) -> Result<(Vec<Model>, i64), DbErr> {
         let db: &DatabaseConnection = Self::get_db_connection();
@@ -86,11 +86,11 @@ impl TrackingRepository {
     ///
     /// # Arguments
     ///
-    /// - `&TrackingHeaderQuery`: The query parameters including header key, value, and time range.
+    /// - `&TrackingHeaderQuery` - The query parameters including header key, value, and time range.
     ///
     /// # Returns
     ///
-    /// - `Result<(Vec<Model>, i64), DbErr>`: The filtered and paginated records and total count.
+    /// - `Result<(Vec<Model>, i64), DbErr>` - The filtered and paginated records and total count.
     #[instrument_trace]
     pub async fn query_by_header(query: &TrackingHeaderQuery) -> Result<(Vec<Model>, i64), DbErr> {
         let db: &DatabaseConnection = Self::get_db_connection();
@@ -169,11 +169,11 @@ impl TrackingRepository {
     ///
     /// # Arguments
     ///
-    /// - `&TrackingBodyQuery`: The query parameters including body content and time range.
+    /// - `&TrackingBodyQuery` - The query parameters including body content and time range.
     ///
     /// # Returns
     ///
-    /// - `Result<(Vec<Model>, i64), DbErr>`: The filtered and paginated records and total count.
+    /// - `Result<(Vec<Model>, i64), DbErr>` - The filtered and paginated records and total count.
     #[instrument_trace]
     pub async fn query_by_body_content(
         query: &TrackingBodyQuery,

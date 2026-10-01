@@ -6,20 +6,20 @@ impl ActiveModel {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The job identifier to associate the step with.
-    /// - `String`: The name of the step.
-    /// - `Option<String>`: The optional shell command to execute.
+    /// - `i32` - The job identifier to associate the step with.
+    /// - `String` - The name of the step.
+    /// - `Option<String>` - The optional shell command to execute.
     ///
     /// # Returns
     ///
-    /// - `ActiveModel`: A new active model with status "pending" ready for insertion.
+    /// - `ActiveModel` - A new active model with status "pending" ready for insertion.
     #[instrument_trace]
     pub fn new(job_id: i32, name: String, command: Option<String>) -> Self {
         Self {
             job_id: ActiveValue::Set(job_id),
             name: ActiveValue::Set(name),
             command: ActiveValue::Set(command),
-            status: ActiveValue::Set("pending".to_string()),
+            status: ActiveValue::Set(CICD_STEP_STATUS_PENDING.to_string()),
             id: ActiveValue::NotSet,
             output: ActiveValue::NotSet,
             dockerfile: ActiveValue::Set(None),

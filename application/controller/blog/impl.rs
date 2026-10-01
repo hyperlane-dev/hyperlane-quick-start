@@ -3,6 +3,12 @@ use super::*;
 /// Implementation of `BlogPostCreateRoute` for `ServerHook`.
 impl ServerHook for BlogPostCreateRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `BlogPostCreateRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -13,6 +19,18 @@ impl ServerHook for BlogPostCreateRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `BlogPostCreateRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let request: CreateBlogPostRequest = match request_opt {
             Ok(data) => data,
@@ -53,6 +71,12 @@ impl ServerHook for BlogPostCreateRoute {
 /// Implementation of `BlogPostUpdateRoute` for `ServerHook`.
 impl ServerHook for BlogPostUpdateRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `BlogPostUpdateRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -64,6 +88,18 @@ impl ServerHook for BlogPostUpdateRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `BlogPostUpdateRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let post_id: i32 = match id_opt {
             Some(id_str) => match AuthService::decode_id(&id_str) {
@@ -121,6 +157,12 @@ impl ServerHook for BlogPostUpdateRoute {
 /// Implementation of `BlogPostDeleteRoute` for `ServerHook`.
 impl ServerHook for BlogPostDeleteRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `BlogPostDeleteRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -131,6 +173,18 @@ impl ServerHook for BlogPostDeleteRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `BlogPostDeleteRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let post_id: i32 = match id_opt {
             Some(id_str) => match AuthService::decode_id(&id_str) {
@@ -179,6 +233,12 @@ impl ServerHook for BlogPostDeleteRoute {
 /// Implementation of `BlogPostGetRoute` for `ServerHook`.
 impl ServerHook for BlogPostGetRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `BlogPostGetRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -189,6 +249,18 @@ impl ServerHook for BlogPostGetRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `BlogPostGetRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let post_id: i32 = match id_opt {
             Some(id_str) => match AuthService::decode_id(&id_str) {
@@ -233,6 +305,12 @@ impl ServerHook for BlogPostGetRoute {
 /// Implementation of `BlogPostListRoute` for `ServerHook`.
 impl ServerHook for BlogPostListRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `BlogPostListRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -243,6 +321,18 @@ impl ServerHook for BlogPostListRoute {
     #[try_get_request_query("is_published" => is_published_opt)]
     #[try_get_request_query("page" => page_opt)]
     #[try_get_request_query("limit" => limit_opt)]
+    /// Handles the `BlogPostListRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let current_user_id: Option<i32> = AuthService::extract_user_from_cookie(ctx).ok();
         let mut query: BlogPostListQueryRequest = BlogPostListQueryRequest::default();
@@ -284,6 +374,12 @@ impl ServerHook for BlogPostListRoute {
 /// Implementation of `BlogPostMyListRoute` for `ServerHook`.
 impl ServerHook for BlogPostMyListRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `BlogPostMyListRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -293,6 +389,18 @@ impl ServerHook for BlogPostMyListRoute {
     #[try_get_request_query("keyword" => keyword_opt)]
     #[try_get_request_query("page" => page_opt)]
     #[try_get_request_query("limit" => limit_opt)]
+    /// Handles the `BlogPostMyListRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
@@ -338,6 +446,12 @@ impl ServerHook for BlogPostMyListRoute {
 /// Implementation of `BlogPostLikeRoute` for `ServerHook`.
 impl ServerHook for BlogPostLikeRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `BlogPostLikeRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -348,6 +462,18 @@ impl ServerHook for BlogPostLikeRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `BlogPostLikeRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let post_id: i32 = match id_opt {
             Some(id_str) => match AuthService::decode_id(&id_str) {
@@ -396,6 +522,12 @@ impl ServerHook for BlogPostLikeRoute {
 /// Implementation of `BlogPostFavoriteRoute` for `ServerHook`.
 impl ServerHook for BlogPostFavoriteRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `BlogPostFavoriteRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -406,6 +538,18 @@ impl ServerHook for BlogPostFavoriteRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `BlogPostFavoriteRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let post_id: i32 = match id_opt {
             Some(id_str) => match AuthService::decode_id(&id_str) {
@@ -454,6 +598,12 @@ impl ServerHook for BlogPostFavoriteRoute {
 /// Implementation of `BlogPostFavoriteListRoute` for `ServerHook`.
 impl ServerHook for BlogPostFavoriteListRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `BlogPostFavoriteListRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -462,6 +612,18 @@ impl ServerHook for BlogPostFavoriteListRoute {
     #[instrument_trace]
     #[try_get_request_query("page" => page_opt)]
     #[try_get_request_query("limit" => limit_opt)]
+    /// Handles the `BlogPostFavoriteListRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
@@ -504,6 +666,12 @@ impl ServerHook for BlogPostFavoriteListRoute {
 /// Implementation of `BlogCommentCreateRoute` for `ServerHook`.
 impl ServerHook for BlogCommentCreateRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `BlogCommentCreateRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -514,6 +682,18 @@ impl ServerHook for BlogCommentCreateRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `BlogCommentCreateRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let request: CreateBlogCommentRequest = match request_opt {
             Ok(data) => data,
@@ -554,6 +734,12 @@ impl ServerHook for BlogCommentCreateRoute {
 /// Implementation of `BlogCommentDeleteRoute` for `ServerHook`.
 impl ServerHook for BlogCommentDeleteRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `BlogCommentDeleteRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -564,6 +750,18 @@ impl ServerHook for BlogCommentDeleteRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `BlogCommentDeleteRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let comment_id: i32 = match id_opt {
             Some(id_str) => match AuthService::decode_id(&id_str) {
@@ -614,6 +812,12 @@ impl ServerHook for BlogCommentDeleteRoute {
 /// Implementation of `BlogCommentListRoute` for `ServerHook`.
 impl ServerHook for BlogCommentListRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `BlogCommentListRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -623,6 +827,18 @@ impl ServerHook for BlogCommentListRoute {
     #[try_get_request_query("post_id" => post_id_opt)]
     #[try_get_request_query("page" => page_opt)]
     #[try_get_request_query("limit" => limit_opt)]
+    /// Handles the `BlogCommentListRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let mut query: BlogCommentListQueryRequest = BlogCommentListQueryRequest::default();
         match post_id_opt {
@@ -664,6 +880,12 @@ impl ServerHook for BlogCommentListRoute {
 /// Implementation of `BlogImageUploadRoute` for `ServerHook`.
 impl ServerHook for BlogImageUploadRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `BlogImageUploadRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -673,6 +895,18 @@ impl ServerHook for BlogImageUploadRoute {
     #[try_get_request_header(X_ORIGINAL_NAME => original_name_opt)]
     #[try_get_request_header(X_MIME_TYPE => mime_type_opt)]
     #[instrument_trace]
+    /// Handles the `BlogImageUploadRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
@@ -732,12 +966,30 @@ impl ServerHook for BlogImageUploadRoute {
 /// Implementation of `BlogImageDownloadRoute` for `ServerHook`.
 impl ServerHook for BlogImageDownloadRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `BlogImageDownloadRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(is_get_method, try_get_route_param(ID_KEY => id_opt))]
     #[instrument_trace]
+    /// Handles the `BlogImageDownloadRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let image_id: i32 = match id_opt {
             Some(id_str) => match AuthService::decode_id(&id_str) {

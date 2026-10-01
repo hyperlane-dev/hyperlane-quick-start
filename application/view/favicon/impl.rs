@@ -6,12 +6,8 @@ impl ServerHook for FaviconRoute {
     ///
     /// # Arguments
     ///
-    /// - `&mut Stream`: The incoming connection stream.
-    /// - `&mut Context`: The request context.
-    ///
-    /// # Returns
-    ///
-    /// - `FaviconRoute`: The newly created favicon route handler.
+    /// - `&mut Stream` - The incoming connection stream.
+    /// - `&mut Context` - The request context.
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
@@ -21,13 +17,13 @@ impl ServerHook for FaviconRoute {
     ///
     /// # Arguments
     ///
-    /// - `Self`: The favicon route handler.
-    /// - `&mut Stream`: The incoming connection stream.
-    /// - `&mut Context`: The request context.
+    /// - `Self` - The favicon route handler.
+    /// - `&mut Stream` - The incoming connection stream.
+    /// - `&mut Context` - The request context.
     ///
     /// # Returns
     ///
-    /// - `Status::Continue`: Always returns continue after setting redirect headers.
+    /// - `Status` - The handle result.
     #[prologue_macros(
         is_get_method,
         response_status_code(302),

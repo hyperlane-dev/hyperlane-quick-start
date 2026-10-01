@@ -6,15 +6,15 @@ impl ChatHistoryRepository {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The session identifier.
-    /// - `&str`: The sender name.
-    /// - `&str`: The sender type (e.g., "user" or "system").
-    /// - `&str`: The message type.
-    /// - `&str`: The message content.
+    /// - `&str` - The session identifier.
+    /// - `&str` - The sender name.
+    /// - `&str` - The sender type (e.g., "user" or "system").
+    /// - `&str` - The message type.
+    /// - `&str` - The message content.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error message on failure.
+    /// - `Result<(), String>` - Ok on success, or an error message on failure.
     #[instrument_trace]
     pub async fn insert_message(
         session_id: &str,
@@ -47,12 +47,12 @@ impl ChatHistoryRepository {
     ///
     /// # Arguments
     ///
-    /// - `Option<i64>`: An optional message ID to fetch messages before (cursor).
-    /// - `u64`: The maximum number of messages to return.
+    /// - `Option<i64>` - An optional message ID to fetch messages before (cursor).
+    /// - `u64` - The maximum number of messages to return.
     ///
     /// # Returns
     ///
-    /// - `Result<Vec<ChatHistory>, String>`: The list of chat history messages.
+    /// - `Result<Vec<ChatHistory>, String>` - The list of chat history messages.
     #[instrument_trace]
     pub async fn get_history(
         before_id: Option<i64>,
@@ -78,7 +78,7 @@ impl ChatHistoryRepository {
     ///
     /// # Returns
     ///
-    /// - `Result<i64, String>`: The total message count.
+    /// - `Result<i64, String>` - The total message count.
     #[instrument_trace]
     pub async fn count_messages() -> Result<i64, String> {
         let db: DatabaseConnection =

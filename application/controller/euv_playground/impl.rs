@@ -3,6 +3,12 @@ use super::*;
 /// Implementation of `EuvPlaygroundProjectsListRoute` for `ServerHook`.
 impl ServerHook for EuvPlaygroundProjectsListRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `EuvPlaygroundProjectsListRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -12,6 +18,18 @@ impl ServerHook for EuvPlaygroundProjectsListRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `EuvPlaygroundProjectsListRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let Some(user_id) = EuvPlaygroundHelpers::require_user(ctx) else {
             return Status::Continue;
@@ -76,6 +94,12 @@ impl ServerHook for EuvPlaygroundProjectsListRoute {
 /// Project create — POST /api/euv/playground/projects/create
 impl ServerHook for EuvPlaygroundProjectsCreateRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `EuvPlaygroundProjectsCreateRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -86,6 +110,18 @@ impl ServerHook for EuvPlaygroundProjectsCreateRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `EuvPlaygroundProjectsCreateRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let Some(user_id) = EuvPlaygroundHelpers::require_user(ctx) else {
             return Status::Continue;
@@ -151,6 +187,12 @@ impl ServerHook for EuvPlaygroundProjectsCreateRoute {
 /// Project get — GET /api/euv/playground/projects/get/{id}
 impl ServerHook for EuvPlaygroundProjectsGetRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `EuvPlaygroundProjectsGetRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -161,6 +203,18 @@ impl ServerHook for EuvPlaygroundProjectsGetRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `EuvPlaygroundProjectsGetRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let Some(user_id) = EuvPlaygroundHelpers::require_user(ctx) else {
             return Status::Continue;
@@ -232,6 +286,12 @@ impl ServerHook for EuvPlaygroundProjectsGetRoute {
 /// Project save — PUT /api/euv/playground/projects/save/{id}
 impl ServerHook for EuvPlaygroundProjectsSaveRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `EuvPlaygroundProjectsSaveRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -243,6 +303,18 @@ impl ServerHook for EuvPlaygroundProjectsSaveRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `EuvPlaygroundProjectsSaveRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let Some(user_id) = EuvPlaygroundHelpers::require_user(ctx) else {
             return Status::Continue;
@@ -364,7 +436,8 @@ impl ServerHook for EuvPlaygroundProjectsSaveRoute {
         };
         match EuvPlaygroundService::write_project(&pdir, &new_name, &final_code) {
             Ok(ts) => {
-                let mut payload = EuvPlaygroundProjectMutationResponse::default();
+                let mut payload: EuvPlaygroundProjectMutationResponse =
+                    EuvPlaygroundProjectMutationResponse::default();
                 payload
                     .set_id(EuvPlaygroundService::encode_id(id))
                     .set_name(new_name)
@@ -387,6 +460,12 @@ impl ServerHook for EuvPlaygroundProjectsSaveRoute {
 /// Project delete — DELETE /api/euv/playground/projects/delete/{id}
 impl ServerHook for EuvPlaygroundProjectsDeleteRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `EuvPlaygroundProjectsDeleteRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -397,6 +476,18 @@ impl ServerHook for EuvPlaygroundProjectsDeleteRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `EuvPlaygroundProjectsDeleteRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let Some(user_id) = EuvPlaygroundHelpers::require_user(ctx) else {
             return Status::Continue;
@@ -445,7 +536,8 @@ impl ServerHook for EuvPlaygroundProjectsDeleteRoute {
             });
         match std::fs::remove_dir_all(&pdir) {
             Ok(_) => {
-                let mut payload = EuvPlaygroundProjectMutationResponse::default();
+                let mut payload: EuvPlaygroundProjectMutationResponse =
+                    EuvPlaygroundProjectMutationResponse::default();
                 payload
                     .set_id(EuvPlaygroundService::encode_id(id))
                     .set_name(name)
@@ -476,6 +568,12 @@ impl ServerHook for EuvPlaygroundProjectsDeleteRoute {
 /// the user has selected or created a project.
 impl ServerHook for EuvPlaygroundDefaultCodeRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `EuvPlaygroundDefaultCodeRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -485,6 +583,18 @@ impl ServerHook for EuvPlaygroundDefaultCodeRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `EuvPlaygroundDefaultCodeRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let mut payload: EuvPlaygroundDefaultCodeResponse =
             EuvPlaygroundDefaultCodeResponse::default();
@@ -499,6 +609,12 @@ impl ServerHook for EuvPlaygroundDefaultCodeRoute {
 /// Run — POST /api/euv/playground/run (compile + publish wasm)
 impl ServerHook for EuvPlaygroundRunRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `EuvPlaygroundRunRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -509,6 +625,18 @@ impl ServerHook for EuvPlaygroundRunRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `EuvPlaygroundRunRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let Some(user_id) = EuvPlaygroundHelpers::require_user(ctx) else {
             return Status::Continue;
@@ -614,6 +742,12 @@ impl ServerHook for EuvPlaygroundRunRoute {
 /// belongs to a different user.
 impl ServerHook for EuvPlaygroundBuildStatusRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `EuvPlaygroundBuildStatusRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -624,6 +758,18 @@ impl ServerHook for EuvPlaygroundBuildStatusRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `EuvPlaygroundBuildStatusRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let Some(user_id) = EuvPlaygroundHelpers::require_user(ctx) else {
             return Status::Continue;
@@ -650,7 +796,7 @@ impl ServerHook for EuvPlaygroundBuildStatusRoute {
                 return Status::Continue;
             }
         };
-        let job = match EuvPlaygroundService::get_build_status(job_id, user_id).await {
+        let job: BuildJob = match EuvPlaygroundService::get_build_status(job_id, user_id).await {
             Some(job) => job,
             None => {
                 let resp: ApiResponse<String> = ApiResponse::new(
@@ -688,6 +834,14 @@ impl EuvPlaygroundHelpers {
     /// Helper — try to extract the current user id from the cookie. Returns
     /// the id on success, or writes a 401 JSON envelope to the response and
     /// returns `None`.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Option<i32>` - The current user id, or `None` when the cookie is missing or invalid.
     pub fn require_user(ctx: &mut Context) -> Option<i32> {
         match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => Some(id),

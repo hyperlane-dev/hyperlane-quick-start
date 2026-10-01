@@ -6,12 +6,12 @@ impl BlogService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The user ID of the post author.
-    /// - `CreateBlogPostRequest`: The request containing title, summary, content, and image IDs.
+    /// - `i32` - The user ID of the post author.
+    /// - `CreateBlogPostRequest` - The request containing title, summary, content, and image IDs.
     ///
     /// # Returns
     ///
-    /// - `Result<BlogPostResponse, String>`: The created blog post response.
+    /// - `Result<BlogPostResponse, String>` - The created blog post response.
     #[instrument_trace]
     pub async fn create_post(
         user_id: i32,
@@ -57,13 +57,13 @@ impl BlogService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The post ID.
-    /// - `i32`: The user ID for ownership verification.
-    /// - `UpdateBlogPostRequest`: The request containing fields to update.
+    /// - `i32` - The post ID.
+    /// - `UpdateBlogPostRequest` - The request containing fields to update.
     ///
     /// # Returns
     ///
-    /// - `Result<BlogPostResponse, String>`: The updated blog post response, or an error if not found or not owned.
+    /// - `Result<BlogPostResponse, String>` - The updated blog post response, or an error if not
+    ///     found or not owned.
     #[instrument_trace]
     pub async fn update_post(
         post_id: i32,
@@ -72,9 +72,9 @@ impl BlogService {
     ) -> Result<BlogPostResponse, String> {
         let model: BlogPostModel = BlogPostRepository::find_by_id(post_id)
             .await?
-            .ok_or_else(|| "Blog post not found".to_string())?;
+            .ok_or_else(|| ERROR_BLOG_POST_NOT_FOUND.to_string())?;
         if model.get_user_id() != user_id {
-            return Err("You can only update your own posts".to_string());
+            return Err(ERROR_UPDATE_OWN_POSTS_ONLY.to_string());
         }
         let mut active_model: BlogPostActiveModel = BlogPostActiveModel {
             id: ActiveValue::NotSet,
@@ -119,19 +119,18 @@ impl BlogService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The post ID.
-    /// - `i32`: The user ID for ownership verification.
+    /// - `i32` - The post ID.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error if not found or not owned.
+    /// - `Result<(), String>` - Ok on success, or an error if not found or not owned.
     #[instrument_trace]
     pub async fn delete_post(post_id: i32, user_id: i32) -> Result<(), String> {
         let model: BlogPostModel = BlogPostRepository::find_by_id(post_id)
             .await?
-            .ok_or_else(|| "Blog post not found".to_string())?;
+            .ok_or_else(|| ERROR_BLOG_POST_NOT_FOUND.to_string())?;
         if model.get_user_id() != user_id {
-            return Err("You can only delete your own posts".to_string());
+            return Err(ERROR_DELETE_OWN_POSTS_ONLY.to_string());
         }
         BlogPostRepository::soft_delete_by_id(post_id).await
     }
@@ -142,12 +141,12 @@ impl BlogService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The post ID.
-    /// - `Option<i32>`: The optional current user ID for visibility checks.
+    /// - `i32` - The post ID.
+    /// - `Option<i32>` - The optional current user ID for visibility checks.
     ///
     /// # Returns
     ///
-    /// - `Result<Option<BlogPostResponse>, String>`: The blog post response if visible, or `None`.
+    /// - `Result<Option<BlogPostResponse>, String>` - The blog post response if visible, or `None`.
     #[instrument_trace]
     pub async fn get_post(
         post_id: i32,
@@ -179,12 +178,13 @@ impl BlogService {
     ///
     /// # Arguments
     ///
-    /// - `BlogPostListQueryRequest`: The query parameters including keyword, publish status, page, and limit.
-    /// - `Option<i32>`: The optional current user ID for like/favorite status.
+    /// - `BlogPostListQueryRequest` - The query parameters including keyword, publish status, page,
+    ///     and limit.
+    /// - `Option<i32>` - The optional current user ID for like/favorite status.
     ///
     /// # Returns
     ///
-    /// - `Result<BlogPostListResponse, String>`: The paginated blog post list response.
+    /// - `Result<BlogPostListResponse, String>` - The paginated blog post list response.
     #[instrument_trace]
     pub async fn list_posts(
         query: BlogPostListQueryRequest,
@@ -220,12 +220,12 @@ impl BlogService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The user ID of the post author.
-    /// - `BlogPostListQueryRequest`: The query parameters including keyword, page, and limit.
+    /// - `i32` - The user ID of the post author.
+    /// - `BlogPostListQueryRequest` - The query parameters including keyword, page, and limit.
     ///
     /// # Returns
     ///
-    /// - `Result<BlogPostListResponse, String>`: The paginated blog post list response.
+    /// - `Result<BlogPostListResponse, String>` - The paginated blog post list response.
     #[instrument_trace]
     pub async fn list_my_posts(
         user_id: i32,
@@ -260,17 +260,16 @@ impl BlogService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The post ID.
-    /// - `i32`: The user ID.
+    /// - `i32` - The post ID.
     ///
     /// # Returns
     ///
-    /// - `Result<BlogLikeStatusResponse, String>`: The like status response with updated count.
+    /// - `Result<BlogLikeStatusResponse, String>` - The like status response with updated count.
     #[instrument_trace]
     pub async fn toggle_like(post_id: i32, user_id: i32) -> Result<BlogLikeStatusResponse, String> {
         let post: BlogPostModel = BlogPostRepository::find_by_id(post_id)
             .await?
-            .ok_or_else(|| "Blog post not found".to_string())?;
+            .ok_or_else(|| ERROR_BLOG_POST_NOT_FOUND.to_string())?;
         match BlogLikeRepository::find_by_post_and_user(post_id, user_id).await? {
             Some(_) => {
                 BlogLikeRepository::delete_by_post_and_user(post_id, user_id).await?;
@@ -303,12 +302,12 @@ impl BlogService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The user ID.
-    /// - `BlogPostListQueryRequest`: The query parameters including page and limit.
+    /// - `i32` - The user ID.
+    /// - `BlogPostListQueryRequest` - The query parameters including page and limit.
     ///
     /// # Returns
     ///
-    /// - `Result<BlogPostListResponse, String>`: The paginated list of favorite posts.
+    /// - `Result<BlogPostListResponse, String>` - The paginated list of favorite posts.
     #[instrument_trace]
     pub async fn list_favorite_posts(
         user_id: i32,
@@ -344,12 +343,12 @@ impl BlogService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The post ID.
-    /// - `i32`: The user ID.
+    /// - `i32` - The post ID.
     ///
     /// # Returns
     ///
-    /// - `Result<BlogFavoriteStatusResponse, String>`: The favorite status response with updated count.
+    /// - `Result<BlogFavoriteStatusResponse, String>` - The favorite status response with updated
+    ///     count.
     #[instrument_trace]
     pub async fn toggle_favorite(
         post_id: i32,
@@ -357,7 +356,7 @@ impl BlogService {
     ) -> Result<BlogFavoriteStatusResponse, String> {
         let post: BlogPostModel = BlogPostRepository::find_by_id(post_id)
             .await?
-            .ok_or_else(|| "Blog post not found".to_string())?;
+            .ok_or_else(|| ERROR_BLOG_POST_NOT_FOUND.to_string())?;
         match BlogFavoriteRepository::find_by_post_and_user(post_id, user_id).await? {
             Some(_) => {
                 BlogFavoriteRepository::delete_by_post_and_user(post_id, user_id).await?;
@@ -392,12 +391,13 @@ impl BlogService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The user ID of the commenter.
-    /// - `CreateBlogCommentRequest`: The request containing post ID, content, and optional parent ID.
+    /// - `i32` - The user ID of the commenter.
+    /// - `CreateBlogCommentRequest` - The request containing post ID, content, and optional parent
+    ///     ID.
     ///
     /// # Returns
     ///
-    /// - `Result<BlogCommentResponse, String>`: The created comment response.
+    /// - `Result<BlogCommentResponse, String>` - The created comment response.
     #[instrument_trace]
     pub async fn create_comment(
         user_id: i32,
@@ -406,7 +406,7 @@ impl BlogService {
         let post_id: i32 = AuthService::decode_id(request.get_post_id())?;
         let _: BlogPostModel = BlogPostRepository::find_by_id(post_id)
             .await?
-            .ok_or_else(|| "Blog post not found".to_string())?;
+            .ok_or_else(|| ERROR_BLOG_POST_NOT_FOUND.to_string())?;
         let parent_id: i32 = match request.try_get_parent_id() {
             Some(parent_id_str) => AuthService::decode_id(parent_id_str).unwrap_or(0),
             None => 0,
@@ -416,7 +416,7 @@ impl BlogService {
                 .await?
                 .is_none()
         {
-            return Err("Parent comment not found".to_string());
+            return Err(ERROR_PARENT_COMMENT_NOT_FOUND.to_string());
         }
         let active_model: BlogCommentActiveModel = BlogCommentActiveModel {
             post_id: ActiveValue::Set(post_id),
@@ -438,19 +438,18 @@ impl BlogService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The comment ID.
-    /// - `i32`: The user ID for ownership verification.
+    /// - `i32` - The comment ID.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error if not found or not owned.
+    /// - `Result<(), String>` - Ok on success, or an error if not found or not owned.
     #[instrument_trace]
     pub async fn delete_comment(comment_id: i32, user_id: i32) -> Result<(), String> {
         let model: BlogCommentModel = BlogCommentRepository::find_by_id(comment_id)
             .await?
-            .ok_or_else(|| "Comment not found".to_string())?;
+            .ok_or_else(|| ERROR_COMMENT_NOT_FOUND.to_string())?;
         if model.get_user_id() != user_id {
-            return Err("You can only delete your own comments".to_string());
+            return Err(ERROR_DELETE_OWN_COMMENTS_ONLY.to_string());
         }
         BlogCommentRepository::soft_delete_by_id(comment_id).await?;
         BlogPostRepository::update_comment_count(model.get_post_id(), -1).await?;
@@ -461,11 +460,12 @@ impl BlogService {
     ///
     /// # Arguments
     ///
-    /// - `BlogCommentListQueryRequest`: The query parameters including post ID, page, and limit.
+    /// - `BlogCommentListQueryRequest` - The query parameters including post ID, page, and limit.
     ///
     /// # Returns
     ///
-    /// - `Result<BlogCommentListResponse, String>`: The paginated comment list with nested replies.
+    /// - `Result<BlogCommentListResponse, String>` - The paginated comment list with nested
+    ///     replies.
     #[instrument_trace]
     pub async fn list_comments(
         query: BlogCommentListQueryRequest,
@@ -517,13 +517,13 @@ impl BlogService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The parent comment ID.
-    /// - `&HashMap<i32, BlogCommentModel>`: The map of all comments by ID.
-    /// - `&HashMap<i32, Vec<i32>>`: The map of child comment IDs by parent ID.
+    /// - `i32` - The parent comment ID.
+    /// - `&HashMap<i32, BlogCommentModel>` - The map of all comments by ID.
+    /// - `&HashMap<i32, Vec<i32>>` - The map of child comment IDs by parent ID.
     ///
     /// # Returns
     ///
-    /// - `Result<Vec<BlogCommentResponse>, String>`: The list of nested reply responses.
+    /// - `Result<Vec<BlogCommentResponse>, String>` - The list of nested reply responses.
     fn build_reply_tree(
         parent_id: i32,
         comment_map: &HashMap<i32, BlogCommentModel>,
@@ -549,15 +549,14 @@ impl BlogService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The user ID of the uploader.
-    /// - `String`: The stored file name.
-    /// - `Option<String>`: The original file name.
-    /// - `String`: The MIME type of the image.
-    /// - `Vec<u8>`: The binary image data.
+    /// - `i32` - The user ID of the uploader.
+    /// - `String` - The stored file name.
+    /// - `Option<String>` - The original file name.
+    /// - `Vec<u8>` - The binary image data.
     ///
     /// # Returns
     ///
-    /// - `Result<BlogImageResponse, String>`: The uploaded image response with download URL.
+    /// - `Result<BlogImageResponse, String>` - The uploaded image response with download URL.
     #[instrument_trace]
     pub async fn upload_image(
         user_id: i32,
@@ -586,11 +585,12 @@ impl BlogService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The image ID.
+    /// - `i32` - The image ID.
     ///
     /// # Returns
     ///
-    /// - `Result<Option<BlogImageDataResponse>, String>`: The image data response if found, or `None`.
+    /// - `Result<Option<BlogImageDataResponse>, String>` - The image data response if found, or
+    ///     `None`.
     #[instrument_trace]
     pub async fn get_image_data(image_id: i32) -> Result<Option<BlogImageDataResponse>, String> {
         match BlogImageRepository::find_by_id(image_id).await? {
@@ -613,13 +613,13 @@ impl BlogService {
     ///
     /// # Arguments
     ///
-    /// - `&BlogPostModel`: The database model to convert.
-    /// - `i32`: The current user ID for like/favorite status checks.
-    /// - `bool`: Whether to include the full content or omit it.
+    /// - `&BlogPostModel` - The database model to convert.
+    /// - `i32` - The current user ID for like/favorite status checks.
+    /// - `bool` - Whether to include the full content or omit it.
     ///
     /// # Returns
     ///
-    /// - `Result<BlogPostResponse, String>`: The converted blog post response.
+    /// - `Result<BlogPostResponse, String>` - The converted blog post response.
     #[instrument_trace]
     async fn model_to_post_response(
         model: &BlogPostModel,
@@ -709,11 +709,11 @@ impl BlogService {
     ///
     /// # Arguments
     ///
-    /// - `&BlogCommentModel`: The database model to convert.
+    /// - `&BlogCommentModel` - The database model to convert.
     ///
     /// # Returns
     ///
-    /// - `Result<BlogCommentResponse, String>`: The converted comment response.
+    /// - `Result<BlogCommentResponse, String>` - The converted comment response.
     #[instrument_trace]
     async fn model_to_comment_response(
         model: &BlogCommentModel,
@@ -725,7 +725,7 @@ impl BlogService {
             AuthService::encode_id(model.get_user_id()).unwrap_or_default();
         let username: String = match UserRepository::find_by_id(model.get_user_id()).await? {
             Some(user) => user.get_username().clone(),
-            None => "Unknown".to_string(),
+            None => AUTHOR_UNKNOWN.to_string(),
         };
         let parent_id: Option<String> = if model.get_parent_id() > 0 {
             Some(AuthService::encode_id(model.get_parent_id()).unwrap_or_default())
@@ -755,11 +755,11 @@ impl BlogService {
     ///
     /// # Arguments
     ///
-    /// - `&BlogCommentModel`: The database model to convert.
+    /// - `&BlogCommentModel` - The database model to convert.
     ///
     /// # Returns
     ///
-    /// - `Result<BlogCommentResponse, String>`: The converted comment response.
+    /// - `Result<BlogCommentResponse, String>` - The converted comment response.
     fn model_to_comment_response_sync(
         model: &BlogCommentModel,
     ) -> Result<BlogCommentResponse, String> {
@@ -768,7 +768,7 @@ impl BlogService {
             AuthService::encode_id(model.get_post_id()).unwrap_or_default();
         let encoded_user_id: String =
             AuthService::encode_id(model.get_user_id()).unwrap_or_default();
-        let username: String = "Unknown".to_string();
+        let username: String = AUTHOR_UNKNOWN.to_string();
         let parent_id: Option<String> = if model.get_parent_id() > 0 {
             Some(AuthService::encode_id(model.get_parent_id()).unwrap_or_default())
         } else {
@@ -795,12 +795,12 @@ impl BlogService {
     ///
     /// # Arguments
     ///
-    /// - `&BlogImageModel`: The database model to convert.
-    /// - `i32`: The post ID for the image association.
+    /// - `&BlogImageModel` - The database model to convert.
+    /// - `i32` - The post ID for the image association.
     ///
     /// # Returns
     ///
-    /// - `Result<BlogImageResponse, String>`: The converted image response.
+    /// - `Result<BlogImageResponse, String>` - The converted image response.
     #[instrument_trace]
     fn model_to_image_response(
         model: &BlogImageModel,

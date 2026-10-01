@@ -5,10 +5,10 @@ use super::*;
     get,
     path = "/",
     responses(
-        (status = 302, description = "Redirect to external URL"),
-        (status = 500, description = "Internal Server Error")
+        (status = 302, description = OPENAPI_DESCRIPTION_INDEX_REDIRECT),
+        (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     ),
-    tag = "index"
+    tag = OPENAPI_TAG_INDEX
 )]
 #[instrument_trace]
 pub fn openapi_index() {}

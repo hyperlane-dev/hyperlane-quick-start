@@ -3,12 +3,12 @@ use super::*;
 /// Renders the upload page and serves as the OpenAPI documentation endpoint for upload routes.
 #[utoipa::path(
     get,
-    path = "/upload",
+    path = ROUTE_UPLOAD,
     responses(
-        (status = 200, description = "Success"),
-        (status = 400, description = "Bad Request"),
-        (status = 404, description = "Not Found"),
-        (status = 500, description = "Internal Server Error")
+        (status = 200, description = HTTP_REASON_SUCCESS),
+        (status = 400, description = HTTP_REASON_BAD_REQUEST),
+        (status = 404, description = HTTP_REASON_NOT_FOUND),
+        (status = 500, description = HTTP_REASON_INTERNAL_SERVER_ERROR)
     )
 )]
 #[instrument_trace]
@@ -17,16 +17,16 @@ pub fn openapi_upload_view() {}
 /// Serves the file upload endpoint and serves as the OpenAPI documentation endpoint for file upload routes.
 #[utoipa::path(
     get,
-    path = "/upload/file/{upload_dir}/{upload_file}",
+    path = ROUTE_UPLOAD_FILE,
     params(
-        ("upload_dir" = String, Path, description = "Upload directory"),
-        ("upload_file" = String, Path, description = "Upload file name")
+        ("upload_dir" = String, Path, description = ROUTE_PARAM_DESC_UPLOAD_DIR),
+        ("upload_file" = String, Path, description = ROUTE_PARAM_DESC_UPLOAD_FILE)
     ),
     responses(
-        (status = 200, description = "Success"),
-        (status = 400, description = "Bad Request"),
-        (status = 404, description = "Not Found"),
-        (status = 500, description = "Internal Server Error")
+        (status = 200, description = HTTP_REASON_SUCCESS),
+        (status = 400, description = HTTP_REASON_BAD_REQUEST),
+        (status = 404, description = HTTP_REASON_NOT_FOUND),
+        (status = 500, description = HTTP_REASON_INTERNAL_SERVER_ERROR)
     )
 )]
 #[instrument_trace]

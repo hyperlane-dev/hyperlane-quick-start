@@ -3,12 +3,12 @@ use super::*;
 /// openapi github pages list.
 #[utoipa::path(
     get,
-    path = "/api/github/pages/list",
+    path = OPENAPI_PATH_GITHUB_PAGES_LIST,
     responses(
-        (status = 200, description = "Success"),
-        (status = 400, description = "Bad Request"),
-        (status = 404, description = "Not Found"),
-        (status = 500, description = "Internal Server Error")
+        (status = 200, description = OPENAPI_DESCRIPTION_SUCCESS),
+        (status = 400, description = OPENAPI_DESCRIPTION_BAD_REQUEST),
+        (status = 404, description = OPENAPI_DESCRIPTION_NOT_FOUND),
+        (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
 #[instrument_trace]
@@ -17,16 +17,16 @@ pub fn openapi_github_pages_list() {}
 /// openapi github pages sync.
 #[utoipa::path(
     post,
-    path = "/api/github/pages/sync/{owner}/{repository}",
+    path = OPENAPI_PATH_GITHUB_PAGES_SYNC,
     params(
-        ("owner" = String, Path, description = "GitHub owner or organization name"),
-        ("repository" = String, Path, description = "GitHub repository name")
+        ("owner" = String, Path, description = OPENAPI_PARAM_DESCRIPTION_OWNER),
+        ("repository" = String, Path, description = OPENAPI_PARAM_DESCRIPTION_REPOSITORY)
     ),
     responses(
-        (status = 200, description = "Success"),
-        (status = 400, description = "Bad Request"),
-        (status = 404, description = "Not Found"),
-        (status = 500, description = "Internal Server Error")
+        (status = 200, description = OPENAPI_DESCRIPTION_SUCCESS),
+        (status = 400, description = OPENAPI_DESCRIPTION_BAD_REQUEST),
+        (status = 404, description = OPENAPI_DESCRIPTION_NOT_FOUND),
+        (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
 #[instrument_trace]

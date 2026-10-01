@@ -6,13 +6,13 @@ impl ActiveModel {
     ///
     /// # Arguments
     ///
-    /// - `String`: The pipeline name.
-    /// - `Option<String>`: An optional description.
-    /// - `Option<String>`: An optional YAML configuration content.
+    /// - `String` - The pipeline name.
+    /// - `Option<String>` - An optional description.
+    /// - `Option<String>` - An optional YAML configuration content.
     ///
     /// # Returns
     ///
-    /// - `ActiveModel`: A new active model ready for insertion.
+    /// - `ActiveModel` - A new active model ready for insertion.
     #[instrument_trace]
     pub fn new(name: String, description: Option<String>, config_content: Option<String>) -> Self {
         Self {

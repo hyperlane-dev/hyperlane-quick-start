@@ -15,5 +15,4 @@ use {
 };
 
 use ::log::*;
-
 use tokio::sync::{RwLockReadGuard, RwLockWriteGuard, broadcast::error::SendError};

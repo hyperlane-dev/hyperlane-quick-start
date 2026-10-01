@@ -3,6 +3,12 @@ use super::*;
 /// Implementation of `NotificationCreateRoute` for `ServerHook`.
 impl ServerHook for NotificationCreateRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `NotificationCreateRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -13,6 +19,18 @@ impl ServerHook for NotificationCreateRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `NotificationCreateRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let request: CreateNotificationRequest = match request_opt {
             Ok(data) => data,
@@ -53,6 +71,12 @@ impl ServerHook for NotificationCreateRoute {
 /// Implementation of `NotificationListRoute` for `ServerHook`.
 impl ServerHook for NotificationListRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `NotificationListRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -63,6 +87,18 @@ impl ServerHook for NotificationListRoute {
     #[try_get_request_query("is_read" => is_read_opt)]
     #[try_get_request_query("page" => page_opt)]
     #[try_get_request_query("limit" => limit_opt)]
+    /// Handles the `NotificationListRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
@@ -113,6 +149,12 @@ impl ServerHook for NotificationListRoute {
 /// Implementation of `NotificationGetRoute` for `ServerHook`.
 impl ServerHook for NotificationGetRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `NotificationGetRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -123,6 +165,18 @@ impl ServerHook for NotificationGetRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `NotificationGetRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let notification_id: i32 = match id_opt {
             Some(id_str) => match AuthService::decode_id(&id_str) {
@@ -182,6 +236,12 @@ impl ServerHook for NotificationGetRoute {
 /// Implementation of `NotificationReadRoute` for `ServerHook`.
 impl ServerHook for NotificationReadRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `NotificationReadRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -192,6 +252,18 @@ impl ServerHook for NotificationReadRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `NotificationReadRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let notification_id: i32 = match id_opt {
             Some(id_str) => match AuthService::decode_id(&id_str) {
@@ -246,12 +318,30 @@ impl ServerHook for NotificationReadRoute {
 /// Implementation of `NotificationReadAllRoute` for `ServerHook`.
 impl ServerHook for NotificationReadAllRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `NotificationReadAllRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(is_post_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
+    /// Handles the `NotificationReadAllRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
@@ -285,6 +375,12 @@ impl ServerHook for NotificationReadAllRoute {
 /// Implementation of `NotificationDeleteRoute` for `ServerHook`.
 impl ServerHook for NotificationDeleteRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `NotificationDeleteRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -295,6 +391,18 @@ impl ServerHook for NotificationDeleteRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `NotificationDeleteRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let notification_id: i32 = match id_opt {
             Some(id_str) => match AuthService::decode_id(&id_str) {
@@ -347,12 +455,30 @@ impl ServerHook for NotificationDeleteRoute {
 /// Implementation of `NotificationUnreadCountRoute` for `ServerHook`.
 impl ServerHook for NotificationUnreadCountRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `NotificationUnreadCountRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(is_get_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
+    /// Handles the `NotificationUnreadCountRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,

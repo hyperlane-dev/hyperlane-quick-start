@@ -6,11 +6,11 @@ impl UserRepository {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The user identifier.
+    /// - `i32` - The user identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<Option<UserModel>, String>`: The user model if found, or `None`.
+    /// - `Result<Option<UserModel>, String>` - The user model if found, or `None`.
     #[instrument_trace]
     pub async fn find_by_id(user_id: i32) -> Result<Option<UserModel>, String> {
         let db: DatabaseConnection =
@@ -26,11 +26,11 @@ impl UserRepository {
     ///
     /// # Arguments
     ///
-    /// - `String`: The username to search for.
+    /// - `String` - The username to search for.
     ///
     /// # Returns
     ///
-    /// - `Result<Option<UserModel>, String>`: The user model if found, or `None`.
+    /// - `Result<Option<UserModel>, String>` - The user model if found, or `None`.
     #[instrument_trace]
     pub async fn find_by_username(username: String) -> Result<Option<UserModel>, String> {
         let db: DatabaseConnection =
@@ -47,11 +47,11 @@ impl UserRepository {
     ///
     /// # Arguments
     ///
-    /// - `Vec<i32>`: The list of user identifiers.
+    /// - `Vec<i32>` - The list of user identifiers.
     ///
     /// # Returns
     ///
-    /// - `Result<Vec<UserModel>, String>`: The list of found user models.
+    /// - `Result<Vec<UserModel>, String>` - The list of found user models.
     #[instrument_trace]
     pub async fn find_by_ids(user_ids: Vec<i32>) -> Result<Vec<UserModel>, String> {
         let db: DatabaseConnection =
@@ -68,11 +68,11 @@ impl UserRepository {
     ///
     /// # Arguments
     ///
-    /// - `UserActiveModel`: The active model containing the user data to insert.
+    /// - `UserActiveModel` - The active model containing the user data to insert.
     ///
     /// # Returns
     ///
-    /// - `Result<UserModel, String>`: The inserted user model with generated fields.
+    /// - `Result<UserModel, String>` - The inserted user model with generated fields.
     #[instrument_trace]
     pub async fn insert(active_model: UserActiveModel) -> Result<UserModel, String> {
         let db: DatabaseConnection =
@@ -88,11 +88,11 @@ impl UserRepository {
     ///
     /// # Arguments
     ///
-    /// - `UserActiveModel`: The active model containing the updated user data.
+    /// - `UserActiveModel` - The active model containing the updated user data.
     ///
     /// # Returns
     ///
-    /// - `Result<UserModel, String>`: The updated user model.
+    /// - `Result<UserModel, String>` - The updated user model.
     #[instrument_trace]
     pub async fn update(active_model: UserActiveModel) -> Result<UserModel, String> {
         let db: DatabaseConnection =
@@ -108,13 +108,13 @@ impl UserRepository {
     ///
     /// # Arguments
     ///
-    /// - `Option<String>`: Optional keyword to search across username, email, phone, and ID.
-    /// - `Option<i32>`: Optional last ID for cursor-based pagination.
-    /// - `u64`: The page size limit.
+    /// - `Option<String>` - Optional keyword to search across username, email, phone, and ID.
+    /// - `Option<i32>` - Optional last ID for cursor-based pagination.
+    /// - `u64` - The page size limit.
     ///
     /// # Returns
     ///
-    /// - `Result<(Vec<UserModel>, i64, bool), String>`: The users, total count, and has-more flag.
+    /// - `Result<(Vec<UserModel>, i64, bool), String>` - The users, total count, and has-more flag.
     #[instrument_trace]
     pub async fn query_with_pagination(
         keyword: Option<String>,
@@ -161,12 +161,12 @@ impl UserRepository {
     ///
     /// # Arguments
     ///
-    /// - `NaiveDateTime`: The start of the date range.
-    /// - `NaiveDateTime`: The end of the date range.
+    /// - `NaiveDateTime` - The start of the date range.
+    /// - `NaiveDateTime` - The end of the date range.
     ///
     /// # Returns
     ///
-    /// - `Result<i64, String>`: The count of users created in the range.
+    /// - `Result<i64, String>` - The count of users created in the range.
     #[instrument_trace]
     pub async fn count_by_created_at_range(
         start: NaiveDateTime,
@@ -187,12 +187,12 @@ impl UserRepository {
     ///
     /// # Arguments
     ///
-    /// - `NaiveDateTime`: The start of the date range.
-    /// - `NaiveDateTime`: The end of the date range.
+    /// - `NaiveDateTime` - The start of the date range.
+    /// - `NaiveDateTime` - The end of the date range.
     ///
     /// # Returns
     ///
-    /// - `Result<Vec<UserModel>, String>`: The list of users created in the range.
+    /// - `Result<Vec<UserModel>, String>` - The list of users created in the range.
     #[instrument_trace]
     pub async fn find_by_created_at_range(
         start: NaiveDateTime,
@@ -213,11 +213,11 @@ impl UserRepository {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The user identifier to delete.
+    /// - `i32` - The user identifier to delete.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error message.
+    /// - `Result<(), String>` - Ok on success, or an error message.
     #[instrument_trace]
     pub async fn delete_by_id(user_id: i32) -> Result<(), String> {
         let db: DatabaseConnection =

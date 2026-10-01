@@ -6,11 +6,11 @@ impl UserService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The user ID.
+    /// - `i32` - The user ID.
     ///
     /// # Returns
     ///
-    /// - `Result<Option<UserResponse>, String>`: The user response if found, or `None`.
+    /// - `Result<Option<UserResponse>, String>` - The user response if found, or `None`.
     #[instrument_trace]
     pub async fn get_user(user_id: i32) -> Result<Option<UserResponse>, String> {
         match UserRepository::find_by_id(user_id).await? {
@@ -23,11 +23,11 @@ impl UserService {
     ///
     /// # Arguments
     ///
-    /// - `UserListQueryRequest`: The query parameters including keyword, last ID, and limit.
+    /// - `UserListQueryRequest` - The query parameters including keyword, last ID, and limit.
     ///
     /// # Returns
     ///
-    /// - `Result<UserListResponse, String>`: The paginated user list response with encoded IDs.
+    /// - `Result<UserListResponse, String>` - The paginated user list response with encoded IDs.
     #[instrument_trace]
     pub async fn list_users(query: UserListQueryRequest) -> Result<UserListResponse, String> {
         let limit: u64 = query.get_limit().unwrap_or(DEFAULT_PAGE_LIMIT);
@@ -60,12 +60,13 @@ impl UserService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The user ID.
-    /// - `UpdateUserRequest`: The update request containing optional email and phone.
+    /// - `i32` - The user ID.
+    /// - `UpdateUserRequest` - The update request containing optional email and phone.
     ///
     /// # Returns
     ///
-    /// - `Result<UserResponse, String>`: The updated user response, or an error if not found or validation fails.
+    /// - `Result<UserResponse, String>` - The updated user response, or an error if not found or
+    ///     validation fails.
     #[instrument_trace]
     pub async fn update_user(
         user_id: i32,
@@ -97,11 +98,11 @@ impl UserService {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The email address to validate.
+    /// - `&str` - The email address to validate.
     ///
     /// # Returns
     ///
-    /// - `bool`: `true` if valid, `false` otherwise.
+    /// - `bool` - `true` if valid, `false` otherwise.
     #[instrument_trace]
     fn validate_email(email: &str) -> bool {
         match EMAIL_REGEX.as_ref() {
@@ -114,11 +115,11 @@ impl UserService {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The phone number to validate.
+    /// - `&str` - The phone number to validate.
     ///
     /// # Returns
     ///
-    /// - `bool`: `true` if valid, `false` otherwise.
+    /// - `bool` - `true` if valid, `false` otherwise.
     #[instrument_trace]
     fn validate_phone(phone: &str) -> bool {
         match PHONE_REGEX_OPT.as_ref() {
@@ -131,12 +132,13 @@ impl UserService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The user ID.
-    /// - `bool`: `true` to approve, `false` to reject.
+    /// - `i32` - The user ID.
+    /// - `bool` - `true` to approve, `false` to reject.
     ///
     /// # Returns
     ///
-    /// - `Result<UserResponse, String>`: The updated user response, or an error if the user is not found or is an admin being rejected.
+    /// - `Result<UserResponse, String>` - The updated user response, or an error if the user is not
+    ///     found or is an admin being rejected.
     #[instrument_trace]
     pub async fn update_user_status(user_id: i32, approved: bool) -> Result<UserResponse, String> {
         match UserRepository::find_by_id(user_id).await? {
@@ -163,12 +165,13 @@ impl UserService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The user ID.
-    /// - `ChangePasswordRequest`: The request containing old and new passwords.
+    /// - `i32` - The user ID.
+    /// - `ChangePasswordRequest` - The request containing old and new passwords.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error if the old password is incorrect or user is not found.
+    /// - `Result<(), String>` - Ok on success, or an error if the old password is incorrect or user
+    ///     is not found.
     #[instrument_trace]
     pub async fn change_password(
         user_id: i32,
@@ -198,11 +201,11 @@ impl UserService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The user ID.
+    /// - `i32` - The user ID.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error if the user is not found.
+    /// - `Result<(), String>` - Ok on success, or an error if the user is not found.
     #[instrument_trace]
     pub async fn delete_user(user_id: i32) -> Result<(), String> {
         match UserRepository::find_by_id(user_id).await? {
@@ -218,11 +221,12 @@ impl UserService {
     ///
     /// # Arguments
     ///
-    /// - `&UserModel`: The database model to convert.
+    /// - `&UserModel` - The database model to convert.
     ///
     /// # Returns
     ///
-    /// - `Result<UserResponse, String>`: The converted user response, or an error if ID encoding fails.
+    /// - `Result<UserResponse, String>` - The converted user response, or an error if ID encoding
+    ///     fails.
     #[instrument_trace]
     fn model_to_user_response(model: &UserModel) -> Result<UserResponse, String> {
         let mut response: UserResponse = UserResponse::default();

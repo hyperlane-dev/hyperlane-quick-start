@@ -7,11 +7,11 @@ use super::*;
 ///
 /// # Arguments
 ///
-/// - `&str`: The file extension (without leading dot).
+/// - `&str` - The file extension (without leading dot).
 ///
 /// # Returns
 ///
-/// - `bool`: `true` if the extension is gzip-compressible, `false` otherwise.
+/// - `bool` - `true` if the extension is gzip-compressible, `false` otherwise.
 #[instrument_trace]
 pub fn is_gzip_compressible(extension: &str) -> bool {
     GZIP_COMPRESSIBLE_EXTENSIONS.contains(&extension)

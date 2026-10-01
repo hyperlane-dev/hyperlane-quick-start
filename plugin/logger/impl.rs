@@ -8,7 +8,7 @@ impl GetOrInit for LoggerPlugin {
     ///
     /// # Returns
     ///
-    /// - `&'static RwLock<FileLogger>`: The static reference to the global file logger.
+    /// - `&'static Self::Instance` - The static reference to the global file logger.
     fn get_or_init() -> &'static Self::Instance {
         FILE_LOGGER.get_or_init(|| RwLock::new(FileLogger::default()))
     }
@@ -20,11 +20,11 @@ impl Log for Logger {
     ///
     /// # Arguments
     ///
-    /// - `&Metadata`: The log metadata to check.
+    /// - `&Metadata` - The log metadata to check.
     ///
     /// # Returns
     ///
-    /// - `bool`: True if the metadata level is at or below the maximum level.
+    /// - `bool` - True if the metadata level is at or below the maximum level.
     fn enabled(&self, metadata: &Metadata) -> bool {
         metadata.level() <= max_level()
     }
@@ -33,7 +33,7 @@ impl Log for Logger {
     ///
     /// # Arguments
     ///
-    /// - `&Record`: The log record to output.
+    /// - `&Record` - The log record to output.
     fn log(&self, record: &Record) {
         if !self.enabled(record.metadata()) {
             return;
@@ -112,7 +112,7 @@ impl Logger {
     ///
     /// # Returns
     ///
-    /// - `RwLockReadGuard<'static, FileLogger>`: The read guard for the file logger.
+    /// - `RwLockReadGuard<'static, FileLogger>` - The read guard for the file logger.
     fn read() -> RwLockReadGuard<'static, FileLogger> {
         LoggerPlugin::get_or_init().try_read().unwrap()
     }
@@ -121,7 +121,7 @@ impl Logger {
     ///
     /// # Returns
     ///
-    /// - `RwLockWriteGuard<'static, FileLogger>`: The write guard for the file logger.
+    /// - `RwLockWriteGuard<'static, FileLogger>` - The write guard for the file logger.
     fn write() -> RwLockWriteGuard<'static, FileLogger> {
         LoggerPlugin::get_or_init().try_write().unwrap()
     }
@@ -130,8 +130,8 @@ impl Logger {
     ///
     /// # Arguments
     ///
-    /// - `LevelFilter`: The maximum log level to enable.
-    /// - `FileLogger`: The file logger configuration for writing logs to files.
+    /// - `LevelFilter` - The maximum log level to enable.
+    /// - `FileLogger` - The file logger configuration for writing logs to files.
     pub fn init(level: LevelFilter, file_logger: FileLogger) {
         set_logger(&LOGGER).unwrap();
         set_max_level(level);
@@ -142,7 +142,7 @@ impl Logger {
     ///
     /// # Arguments
     ///
-    /// - `T`: The data to log, which must implement `AsRef<str>`.
+    /// - `T` - The data to log, which must implement `AsRef<str>`.
     pub fn log_trace<T>(data: T)
     where
         T: AsRef<str>,
@@ -154,7 +154,7 @@ impl Logger {
     ///
     /// # Arguments
     ///
-    /// - `T`: The data to log, which must implement `AsRef<str>`.
+    /// - `T` - The data to log, which must implement `AsRef<str>`.
     #[instrument_trace]
     pub fn log_debug<T>(data: T)
     where
@@ -167,7 +167,7 @@ impl Logger {
     ///
     /// # Arguments
     ///
-    /// - `T`: The data to log, which must implement `AsRef<str>`.
+    /// - `T` - The data to log, which must implement `AsRef<str>`.
     #[instrument_trace]
     pub fn log_info<T>(data: T)
     where
@@ -180,7 +180,7 @@ impl Logger {
     ///
     /// # Arguments
     ///
-    /// - `T`: The data to log, which must implement `AsRef<str>`.
+    /// - `T` - The data to log, which must implement `AsRef<str>`.
     #[instrument_trace]
     pub fn log_warn<T>(data: T)
     where
@@ -193,7 +193,7 @@ impl Logger {
     ///
     /// # Arguments
     ///
-    /// - `T`: The data to log, which must implement `AsRef<str>`.
+    /// - `T` - The data to log, which must implement `AsRef<str>`.
     #[instrument_trace]
     pub fn log_error<T>(data: T)
     where

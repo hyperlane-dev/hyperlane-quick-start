@@ -2,11 +2,27 @@ use super::*;
 
 /// Implementation of `ChatConnectedHook` for `ServerHook`.
 impl ServerHook for ChatConnectedHook {
+    /// Creates a new instance.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The .
+    /// - `&mut Context` - The .
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
+    /// Handles one request and writes the response.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The stream.
+    /// - `&mut Context` - The request context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The handle result.
     #[try_get_request_query("uuid" => uuid_opt)]
     #[instrument_trace]
     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
@@ -28,11 +44,27 @@ impl ServerHook for ChatConnectedHook {
 
 /// Implementation of `ChatRequestHook` for `ServerHook`.
 impl ServerHook for ChatRequestHook {
+    /// Creates a new instance.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The .
+    /// - `&mut Context` - The .
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
+    /// Handles one request and writes the response.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The stream.
+    /// - `&mut Context` - The request context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The handle result.
     #[try_get_request_query("uuid" => uuid_opt)]
     #[instrument_trace]
     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
@@ -79,11 +111,27 @@ impl ServerHook for ChatRequestHook {
 
 /// Implementation of `ChatSendedHook` for `ServerHook`.
 impl ServerHook for ChatSendedHook {
+    /// Creates a new instance.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The .
+    /// - `&mut Context` - The .
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
+    /// Handles one request and writes the response.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The stream.
+    /// - `&mut Context` - The request context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The handle result.
     #[try_get_request_query("uuid" => uuid_opt)]
     #[instrument_trace]
     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
@@ -108,11 +156,27 @@ impl ServerHook for ChatSendedHook {
 
 /// Implementation of `ChatClosedHook` for `ServerHook`.
 impl ServerHook for ChatClosedHook {
+    /// Creates a new instance.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The .
+    /// - `&mut Context` - The .
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
+    /// Handles one request and writes the response.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The stream.
+    /// - `&mut Context` - The request context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The handle result.
     #[try_get_request_query("uuid" => uuid_opt)]
     #[instrument_trace]
     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
@@ -132,6 +196,11 @@ impl ServerHook for ChatClosedHook {
 /// Implementation of methods for `ChatService`.
 impl ChatService {
     /// Pre-processes a WebSocket upgrade request, registering the user in the online users map.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The stream.
+    /// - `&mut Context` - The request context.
     #[instrument_trace]
     pub async fn pre_ws_upgrade(stream: &mut Stream, ctx: &mut Context) {
         let socket_addr: String = stream
@@ -145,6 +214,16 @@ impl ChatService {
     }
 
     /// Creates an online count response message payload.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The stream.
+    /// - `&mut Context` - The request context.
+    /// - `String` - The receiver count.
+    ///
+    /// # Returns
+    ///
+    /// - `ResponseBody` - The created online count message.
     #[instrument_trace]
     pub async fn create_online_count_message(
         stream: &mut Stream,
@@ -158,12 +237,26 @@ impl ChatService {
     }
 
     /// Broadcasts the current online user count to all connected WebSocket clients.
+    ///
+    /// # Arguments
+    ///
+    /// - `BroadcastType<String>` - The lookup key.
+    /// - `ResponseBody` - The human readable message.
     #[instrument_trace]
     pub fn broadcast_online_count(key: BroadcastType<String>, message: ResponseBody) {
         let websocket: &WebSocket = get_global_websocket();
         let _: Result<Option<ReceiverCount>, SendError<Vec<u8>>> = websocket.try_send(key, message);
     }
 
+    /// Removes the `@` mentions from the text.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str` - The text.
+    ///
+    /// # Returns
+    ///
+    /// - `String` - The mentions result.
     #[instrument_trace]
     fn remove_mentions(text: &str) -> String {
         text.split_whitespace()
@@ -173,6 +266,16 @@ impl ChatService {
     }
 
     /// handle ping request.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The stream.
+    /// - `&mut Context` - The request context.
+    /// - `&WebSocketReqData` - The req data.
+    ///
+    /// # Returns
+    ///
+    /// - `bool` - Whether the ping request condition holds.
     #[instrument_trace]
     pub async fn handle_ping_request(
         stream: &mut Stream,
@@ -190,6 +293,14 @@ impl ChatService {
     }
 
     /// is gpt mentioned.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str` - The human readable message.
+    ///
+    /// # Returns
+    ///
+    /// - `bool` - Whether the GPT mentioned condition holds.
     #[instrument_trace]
     pub fn is_gpt_mentioned(message: &str) -> bool {
         message.contains(GPT_MENTION_UPPER)
@@ -201,9 +312,8 @@ impl ChatService {
     ///
     /// # Arguments
     ///
-    /// - `String`: The session UUID for the conversation.
-    /// - `String`: The incoming message content from the user.
-    /// - `&mut Context`: The Hyperlane request context.
+    /// - `String` - The session UUID for the conversation.
+    /// - `&mut Context` - The Hyperlane request context.
     #[instrument_trace]
     pub async fn process_gpt_request(uuid: String, message: String, ctx: &mut Context) {
         let path: String = ctx.get_request().get_path().clone();
@@ -242,7 +352,8 @@ impl ChatService {
                 }
             };
             if !response_content.is_empty() {
-                let uuid_opt: Option<RequestQuerysValue> = ctx.get_request().try_get_query("uuid");
+                let uuid_opt: Option<RequestQuerysValue> =
+                    ctx.get_request().try_get_query(CHAT_SESSION_ID_SCHEME);
                 let uuid_ctx: String = uuid_opt.unwrap_or_default();
                 let mut gpt_resp_data: WebSocketRespData = WebSocketRespData::default();
                 gpt_resp_data
@@ -255,9 +366,9 @@ impl ChatService {
                     websocket.try_send(key.clone(), gpt_resp_json);
                 let save_res: Result<(), String> = Self::save_message(
                     &uuid,
-                    "GPT Assistant",
-                    "assistant",
-                    "GptResponse",
+                    CHAT_GPT_ASSISTANT_NAME,
+                    CHAT_ROLE_ASSISTANT,
+                    CHAT_RESPONSE_SCHEMA_NAME,
                     &response_content,
                 )
                 .await;
@@ -286,6 +397,15 @@ impl ChatService {
         }
     }
 
+    /// Builds the GPT request body.
+    ///
+    /// # Arguments
+    ///
+    /// - `&ChatSession` - The session.
+    ///
+    /// # Returns
+    ///
+    /// - `serde_json::Value` - The created GPT request body.
     #[instrument_trace]
     fn build_gpt_request_body(session: &ChatSession) -> serde_json::Value {
         let schema_json: serde_json::Value =
@@ -305,24 +425,33 @@ impl ChatService {
             .collect();
         messages.extend(session_messages);
         json!({
-            "model": model,
-            "enable_thinking": enable_thinking,
-            "messages": messages,
-            "response_format": {
-                "type": "json_schema",
-                "json_schema": {
-                    "name": "chat_response",
-                    "strict": true,
-                    "schema": schema_json
+            CHAT_REQUEST_MODEL: model,
+            CHAT_FLAG_ENABLE_THINKING: enable_thinking,
+            CHAT_REQUEST_MESSAGES: messages,
+            CHAT_REQUEST_RESPONSE_FORMAT: {
+                JSON_KEY_TYPE: CHAT_FORMAT_JSON_SCHEMA,
+                CHAT_FORMAT_JSON_SCHEMA: {
+                    JSON_KEY_NAME: CHAT_RESPONSE_FIELD,
+                    CHAT_SCHEMA_STRICT_MODE: true,
+                    CHAT_SCHEMA_FIELD: schema_json
                 }
             },
-            "chat_template_kwargs": {
-                "enable_thinking": enable_thinking,
-                "clear_thinking": true
+            CHAT_TEMPLATE_KWARGS_FIELD: {
+                CHAT_FLAG_ENABLE_THINKING: enable_thinking,
+                CHAT_FLAG_CLEAR_THINKING: true
             }
         })
     }
 
+    /// Builds the GPT request headers.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str` - The API key.
+    ///
+    /// # Returns
+    ///
+    /// - `HashMapXxHash3_64<&'static str, String>` - The created GPT request headers.
     #[instrument_trace]
     fn build_gpt_request_headers(api_key: &str) -> HashMapXxHash3_64<&'static str, String> {
         let mut headers: HashMapXxHash3_64<&'static str, String> = hash_map_xx_hash3_64();
@@ -333,6 +462,15 @@ impl ChatService {
         headers
     }
 
+    /// Extracts the textual body from a response.
+    ///
+    /// # Arguments
+    ///
+    /// - `&serde_json::Value` - The response JSON.
+    ///
+    /// # Returns
+    ///
+    /// - `Option<String>` - The response content result, when present.
     #[instrument_trace]
     fn extract_response_content(response_json: &serde_json::Value) -> Option<String> {
         response_json
@@ -352,13 +490,19 @@ impl ChatService {
             })
     }
 
+    /// Handles one GPT API response.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str` - The response text.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(String, bool), String>` - The GPT API response result, or an error message.
     #[instrument_trace]
     fn handle_gpt_api_response(response_text: &str) -> Result<(String, bool), String> {
         if response_text.trim().is_empty() {
-            return Err(
-                "API response is empty, possible authentication failure or network issue"
-                    .to_string(),
-            );
+            return Err(ERROR_EMPTY_API_RESPONSE.to_string());
         }
         let response_json: serde_json::Value =
             serde_json::from_str(response_text).map_err(|error: serde_json::Error| {
@@ -374,6 +518,15 @@ impl ChatService {
         Ok((parsed.get_data().clone(), parsed.get_continue_flag()))
     }
 
+    /// Calls the GPT API with the given context.
+    ///
+    /// # Arguments
+    ///
+    /// - `&ChatSession` - The session.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(String, bool), String>` - The GPT API with context result, or an error message.
     #[instrument_trace]
     async fn call_gpt_api_with_context(session: &ChatSession) -> Result<(String, bool), String> {
         let config: &EnvConfig = EnvPlugin::get_or_init();
@@ -402,35 +555,42 @@ impl ChatService {
     }
 
     /// Saves a message to the database from a structured response in a background task.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str` - The session ID.
+    /// - `&ResponseBody` - The response body.
     #[instrument_trace]
     pub async fn save_message_from_response(session_id: &str, response_body: &ResponseBody) {
         let response_body_string: String = String::from_utf8_lossy(response_body).into_owned();
         if let Ok(resp_data) = serde_json::from_str::<serde_json::Value>(&response_body_string) {
             let message_type: String = resp_data
-                .get("type")
+                .get(JSON_KEY_TYPE)
                 .and_then(|v: &serde_json::Value| v.as_str())
-                .unwrap_or("Unknown")
+                .unwrap_or(MODEL_NAME_UNKNOWN)
                 .to_string();
-            if message_type == "Ping" || message_type == "Pang" {
+            if message_type == CHAT_PING_TEXT || message_type == CHAT_PONG_TEXT {
                 return;
             }
             let sender_name: String = resp_data
-                .get("name")
+                .get(JSON_KEY_NAME)
                 .and_then(|v: &serde_json::Value| v.as_str())
-                .unwrap_or("Unknown")
+                .unwrap_or(MODEL_NAME_UNKNOWN)
                 .to_string();
             let content: String = resp_data
-                .get("data")
+                .get(JSON_KEY_DATA)
                 .and_then(|v: &serde_json::Value| v.as_str())
                 .unwrap_or("")
                 .to_string();
             let session_id: String = session_id.to_string();
             let sender_type: &str = if sender_name == SYSTEM_NAME {
-                "system"
-            } else if sender_name == "GPT Assistant" || message_type == "GptResponse" {
-                "assistant"
+                CHAT_ROLE_SYSTEM
+            } else if sender_name == CHAT_GPT_ASSISTANT_NAME
+                || message_type == CHAT_RESPONSE_SCHEMA_NAME
+            {
+                CHAT_ROLE_ASSISTANT
             } else {
-                "user"
+                CHAT_ROLE_USER
             };
             spawn(async move {
                 let save_res: Result<(), String> = Self::save_message(
@@ -454,15 +614,12 @@ impl ChatService {
     /// Persists a chat message to the database via the repository layer.
     ///
     /// # Arguments
-    /// - `&str`: The session ID grouping the conversation.
-    /// - `&str`: The display name of the message sender.
-    /// - `&str`: The type of the sender (e.g., "user", "assistant").
-    /// - `&str`: The type of the message (e.g., "text", "image").
-    /// - `&str`: The textual content of the message.
+    ///
+    /// - `&str` - The session ID grouping the conversation.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error message on failure.
+    /// - `Result<(), String>` - Ok on success, or an error message on failure.
     #[instrument_trace]
     pub async fn save_message(
         session_id: &str,
@@ -482,6 +639,15 @@ impl ChatService {
     }
 
     /// get chat history.
+    ///
+    /// # Arguments
+    ///
+    /// - `Option<i64>` - The before ID.
+    /// - `u64` - The maximum number of items.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<ChatHistoryResponse, String>` - The chat history, or an error message.
     #[instrument_trace]
     pub async fn get_chat_history(
         before_id: Option<i64>,

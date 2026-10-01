@@ -3,16 +3,16 @@ use super::*;
 /// openapi github pages proxy root.
 #[utoipa::path(
     get,
-    path = "/github/pages/{owner}/{repository}",
+    path = ROUTE_GITHUB_PAGES,
     params(
-        ("owner" = String, Path, description = "GitHub owner or organization name"),
-        ("repository" = String, Path, description = "GitHub repository name")
+        ("owner" = String, Path, description = ROUTE_PARAM_DESC_OWNER),
+        ("repository" = String, Path, description = ROUTE_PARAM_DESC_REPOSITORY)
     ),
     responses(
-        (status = 200, description = "Success"),
-        (status = 400, description = "Bad Request"),
-        (status = 404, description = "Not Found"),
-        (status = 500, description = "Internal Server Error")
+        (status = 200, description = HTTP_REASON_SUCCESS),
+        (status = 400, description = HTTP_REASON_BAD_REQUEST),
+        (status = 404, description = HTTP_REASON_NOT_FOUND),
+        (status = 500, description = HTTP_REASON_INTERNAL_SERVER_ERROR)
     )
 )]
 #[instrument_trace]
@@ -21,17 +21,17 @@ pub fn openapi_github_pages_proxy_root() {}
 /// openapi github pages proxy.
 #[utoipa::path(
     get,
-    path = "/github/pages/{owner}/{repository}/{path:.*}",
+    path = ROUTE_GITHUB_PAGES_ASSET,
     params(
-        ("owner" = String, Path, description = "GitHub owner or organization name"),
-        ("repository" = String, Path, description = "GitHub repository name"),
-        ("path" = String, Path, description = "Resource path")
+        ("owner" = String, Path, description = ROUTE_PARAM_DESC_OWNER),
+        ("repository" = String, Path, description = ROUTE_PARAM_DESC_REPOSITORY),
+        ("path" = String, Path, description = ROUTE_PARAM_DESC_PATH)
     ),
     responses(
-        (status = 200, description = "Success"),
-        (status = 400, description = "Bad Request"),
-        (status = 404, description = "Not Found"),
-        (status = 500, description = "Internal Server Error")
+        (status = 200, description = HTTP_REASON_SUCCESS),
+        (status = 400, description = HTTP_REASON_BAD_REQUEST),
+        (status = 404, description = HTTP_REASON_NOT_FOUND),
+        (status = 500, description = HTTP_REASON_INTERNAL_SERVER_ERROR)
     )
 )]
 #[instrument_trace]

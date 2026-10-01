@@ -4,7 +4,7 @@ use super::*;
 ///
 /// # Returns
 ///
-/// - `&'static MessageQueueBroker`: The static reference to the global broker.
+/// - `&'static MessageQueueBroker` - The static reference to the global broker.
 #[instrument_trace]
 pub fn get_message_queue_broker() -> &'static MessageQueueBroker {
     MESSAGE_QUEUE_BROKER.get_or_init(MessageQueueBroker::new)
@@ -18,12 +18,12 @@ pub fn get_message_queue_broker() -> &'static MessageQueueBroker {
 ///
 /// # Arguments
 ///
-/// - `&str`: The topic name to listen to.
-/// - `F`: The async handler closure invoked for each received message payload.
+/// - `&str` - The topic name to listen to.
+/// - `F` - The async handler closure invoked for each received message payload.
 ///
 /// # Returns
 ///
-/// - `JoinHandle<()>`: The join handle for the spawned listener task.
+/// - `JoinHandle<()>` - The join handle for the spawned listener task.
 ///
 /// # Panics
 ///
@@ -65,13 +65,13 @@ where
 ///
 /// # Arguments
 ///
-/// - `&str`: The topic name the group is bound to.
-/// - `&str`: The consumer group name.
-/// - `F`: The async handler closure invoked for each received message payload.
+/// - `&str` - The topic name the group is bound to.
+/// - `&str` - The consumer group name.
+/// - `F` - The async handler closure invoked for each received message payload.
 ///
 /// # Returns
 ///
-/// - `JoinHandle<()>`: The join handle for the spawned listener task.
+/// - `JoinHandle<()>` - The join handle for the spawned listener task.
 ///
 /// # Panics
 ///

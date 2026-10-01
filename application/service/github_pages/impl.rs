@@ -1,16 +1,23 @@
-use super::r#type::*;
 use super::*;
 
 /// Implements [`PendingFetch`] construction and the sender accessor.
 impl PendingFetch {
     /// Creates a new `PendingFetch` and returns the handle together with a
     /// receiver that waiters can use to observe the completion.
+    ///
+    /// # Returns
+    ///
+    /// - `(Self, FetchPendingReceiver)` - The new result.
     pub(crate) fn new() -> (Self, FetchPendingReceiver) {
         let (tx, rx) = watch::channel(None);
         (Self { tx }, rx)
     }
 
     /// Returns a reference to the sender, allowing other callers to subscribe.
+    ///
+    /// # Returns
+    ///
+    /// - `&FetchPendingSender` - The sender.
     pub(crate) fn get_sender(&self) -> &FetchPendingSender {
         &self.tx
     }
@@ -29,13 +36,11 @@ impl GithubPagesService {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The GitHub owner name.
-    /// - `&str`: The GitHub repository name.
-    /// - `&str`: The resource path relative to the repository root.
+    /// - `&str` - The GitHub owner name.
     ///
     /// # Returns
     ///
-    /// - `Result<(Vec<u8>, String), String>`: A tuple of (content bytes, content type) on success.
+    /// - `Result<(Vec<u8>, String), String>` - A tuple of (content bytes, content type) on success.
     #[instrument_trace]
     pub async fn fetch_resource(
         owner: &str,
@@ -84,8 +89,8 @@ impl GithubPagesService {
         }
         // --- Designated fetcher: do the actual remote fetch ---
         let base_url: String = BASE_URL_TEMPLATE
-            .replace("{owner}", owner)
-            .replace("{repository}", repository);
+            .replace(PLACEHOLDER_OWNER, owner)
+            .replace(PLACEHOLDER_REPOSITORY, repository);
         let remote_url: String = format!("{base_url}{normalized_path}");
         let client: &Client = get_http_client();
         let raw_bytes: Vec<u8> = match Self::fetch_resource_bytes(client, &remote_url).await {
@@ -128,6 +133,14 @@ impl GithubPagesService {
     /// Returns `Ok(bytes)` if the file exists and is readable, `Err` otherwise.
     /// Serves as a tiny helper so `fetch_resource` can double-check the cache
     /// concisely.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str` - The local path.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Vec<u8>, ()>` - The local cached, or the failure reason.
     async fn read_local_cached(local_path: &str) -> Result<Vec<u8>, ()> {
         fs::read(local_path).await.map_err(|_| ())
     }
@@ -139,6 +152,14 @@ impl GithubPagesService {
     /// - Paths ending with `/` → appends `index.html`
     /// - Paths without extension → appends `/index.html`
     /// - Strips the repository prefix if present
+    ///
+    /// # Arguments
+    ///
+    /// - `&str` - The repository.
+    ///
+    /// # Returns
+    ///
+    /// - `String` - The normalize path static result.
     #[instrument_trace]
     pub fn normalize_path_static(repository: &str, path: &str) -> String {
         if path.is_empty() || path == ROOT_PATH {
@@ -173,6 +194,15 @@ impl GithubPagesService {
     /// Rewrites resource paths in text content from the original GitHub Pages
     /// format to the proxy format, ensuring browsers request resources through
     /// the proxy route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str` - The owner.
+    /// - `&[u8]` - The payload content.
+    ///
+    /// # Returns
+    ///
+    /// - `Vec<u8>` - The rewrite proxy paths result.
     #[instrument_trace]
     fn rewrite_proxy_paths(
         owner: &str,
@@ -193,6 +223,10 @@ impl GithubPagesService {
     }
 
     /// Lists all cached GitHub Pages by scanning the cache directory.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<GithubPagesListResponse, String>` - The github pages, or an error message.
     #[instrument_trace]
     pub async fn list_github_pages() -> Result<GithubPagesListResponse, String> {
         let mut pages: Vec<GithubPagesInfo> = Vec::new();
@@ -241,12 +275,12 @@ impl GithubPagesService {
                     .map(|duration: std::time::Duration| {
                         let datetime: chrono::DateTime<chrono::Utc> =
                             chrono::DateTime::from(std::time::UNIX_EPOCH + duration);
-                        datetime.format("%Y-%m-%d %H:%M:%S").to_string()
+                        datetime.format(FORMAT_DATE_TIME).to_string()
                     })
                     .unwrap_or_default();
                 let base_url: String = BASE_URL_TEMPLATE
-                    .replace("{owner}", &owner_name)
-                    .replace("{repository}", &repo_name);
+                    .replace(PLACEHOLDER_OWNER, &owner_name)
+                    .replace(PLACEHOLDER_REPOSITORY, &repo_name);
                 let mut info: GithubPagesInfo = GithubPagesInfo::default();
                 info.set_owner(owner_name.clone())
                     .set_repository(repo_name)
@@ -269,6 +303,14 @@ impl GithubPagesService {
     /// Uses the shared HTTP client and benefits from the fetch-dedup mechanism
     /// so that concurrent proxy requests that happen to touch the same resource
     /// during a sync are served from a single remote fetch.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str` - The owner.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), String>` - The github pages result, or an error message.
     #[instrument_trace]
     pub async fn sync_github_pages(owner: &str, repository: &str) -> Result<(), String> {
         if !is_safe_path(owner) || !is_safe_path(repository) {
@@ -279,8 +321,8 @@ impl GithubPagesService {
         // Clean up any stale temp directory from a previous interrupted sync
         let _: Result<(), Error> = fs::remove_dir_all(&temp_dir).await;
         let base_url: String = BASE_URL_TEMPLATE
-            .replace("{owner}", owner)
-            .replace("{repository}", repository);
+            .replace(PLACEHOLDER_OWNER, owner)
+            .replace(PLACEHOLDER_REPOSITORY, repository);
         let client: &Client = get_http_client();
         let semaphore: Arc<Semaphore> = Arc::new(Semaphore::new(MAX_CONCURRENT_FETCHES));
         let visited: Arc<RwLock<HashSet<String>>> = Arc::new(RwLock::new(HashSet::new()));
@@ -480,6 +522,10 @@ impl GithubPagesService {
 
     /// Recursively walks `directory` and reads every file to warm the OS disk cache.
     /// This ensures the first user request after a sync is served from memory, not disk.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str` - The directory.
     async fn warm_cache_directory(directory: &str) {
         let mut entries: fs::ReadDir = match fs::read_dir(directory).await {
             Ok(entries) => entries,
@@ -487,12 +533,17 @@ impl GithubPagesService {
         };
         while let Ok(Some(entry)) = entries.next_entry().await {
             let entry_path: std::path::PathBuf = entry.path();
-            if entry.file_type().await.map(|t| t.is_dir()).unwrap_or(false) {
+            if entry
+                .file_type()
+                .await
+                .map(|t: std::fs::FileType| t.is_dir())
+                .unwrap_or(false)
+            {
                 Box::pin(Self::warm_cache_directory(&entry_path.to_string_lossy())).await;
             } else if entry
                 .file_type()
                 .await
-                .map(|t| t.is_file())
+                .map(|t: std::fs::FileType| t.is_file())
                 .unwrap_or(false)
             {
                 let _: Result<Vec<u8>, Error> = fs::read(&entry_path).await;
@@ -501,6 +552,15 @@ impl GithubPagesService {
     }
 
     /// Extracts linked resource paths from content for recursive fetching during sync.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str` - The repository.
+    /// - `&[u8]` - The payload content.
+    ///
+    /// # Returns
+    ///
+    /// - `Vec<String>` - The linked paths result.
     #[instrument_trace]
     fn extract_linked_paths(
         repository: &str,
@@ -539,6 +599,14 @@ impl GithubPagesService {
     }
 
     /// Resolves a relative path against a base directory.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str` - The base dir.
+    ///
+    /// # Returns
+    ///
+    /// - `Option<String>` - The relative path, when present.
     #[instrument_trace]
     fn resolve_relative_path(base_dir: &str, relative_path: &str) -> Option<String> {
         let normalized_relative: String = relative_path.trim_start_matches("./").to_string();
@@ -569,6 +637,15 @@ impl GithubPagesService {
     }
 
     /// Fetches a resource range for HTTP Range request support.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str` - The owner.
+    /// - `u64` - The inclusive start bound.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(Vec<u8>, String, u64, u64), String>` - The resource range, or an error message.
     #[instrument_trace]
     pub async fn fetch_resource_range(
         owner: &str,
@@ -601,6 +678,15 @@ impl GithubPagesService {
     }
 
     /// Fetches raw bytes from a URL with retry logic.
+    ///
+    /// # Arguments
+    ///
+    /// - `&Client` - The client.
+    /// - `&str` - The URL.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Vec<u8>, String>` - The resource bytes, or an error message.
     #[instrument_trace]
     async fn fetch_resource_bytes(client: &Client, url: &str) -> Result<Vec<u8>, String> {
         let mut attempt: u32 = 0;
@@ -659,12 +745,12 @@ impl GithubPagesService {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The GitHub owner name.
-    /// - `&str`: The GitHub repository name.
+    /// - `&str` - The GitHub owner name.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok if the message was published, or an error if the topic does not exist.
+    /// - `Result<(), String>` - Ok if the message was published, or an error if the topic does not
+    ///     exist.
     #[instrument_trace]
     pub async fn publish_sync_task(owner: &str, repository: &str) -> Result<(), String> {
         let broker: &MessageQueueBroker = get_message_queue_broker();

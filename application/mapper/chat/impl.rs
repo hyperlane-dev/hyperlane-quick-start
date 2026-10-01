@@ -5,6 +5,11 @@ impl ActiveModelBehavior for ActiveModel {}
 
 /// Implementation of methods for `From`.
 impl From<Model> for ChatHistory {
+    /// Converts a chat history `Model` into its response representation.
+    ///
+    /// # Arguments
+    ///
+    /// - `Model` - The database record to convert.
     fn from(model: Model) -> Self {
         let mut history: ChatHistory = ChatHistory::default();
         history

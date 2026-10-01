@@ -4,12 +4,13 @@ use super::*;
 ///
 /// # Arguments
 ///
-/// - `&mut Stream`: The client stream to send the response to.
-/// - `&mut Context`: The request/response context containing the response data.
+/// - `&mut Stream` - The client stream to send the response to.
+/// - `&mut Context` - The request/response context containing the response data.
 ///
 /// # Returns
 ///
-/// - `Result<(), ResponseError>`: Ok if the response was sent successfully, or an error if sending failed.
+/// - `Result<(), ResponseError>` - Ok if the response was sent successfully, or an error if sending
+///     failed.
 #[instrument_trace]
 pub async fn try_send_body_hook(
     stream: &mut Stream,
@@ -33,8 +34,8 @@ pub async fn try_send_body_hook(
 ///
 /// # Arguments
 ///
-/// - `&mut Stream`: The client stream to send the response to.
-/// - `&mut Context`: The request/response context containing the response data.
+/// - `&mut Stream` - The client stream to send the response to.
+/// - `&mut Context` - The request/response context containing the response data.
 ///
 /// # Panics
 ///

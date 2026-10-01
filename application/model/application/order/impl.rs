@@ -3,6 +3,10 @@ use super::*;
 /// Implementation of methods for `JwtConfigEnum`.
 impl JwtConfigEnum {
     /// expiration as u64.
+    ///
+    /// # Returns
+    ///
+    /// - `u64` - The expiration as u64 result.
     #[instrument_trace]
     pub fn expiration_as_u64(&self) -> u64 {
         match self {
@@ -14,6 +18,15 @@ impl JwtConfigEnum {
 
 /// Implementation of `JwtConfigEnum` for `std::fmt::Display`.
 impl std::fmt::Display for JwtConfigEnum {
+    /// Formats the value for display.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut std::fmt::Formatter<'_>` - The output formatter.
+    ///
+    /// # Returns
+    ///
+    /// - `std::fmt::Result` - The fmt result.
     #[instrument_trace]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -26,6 +39,15 @@ impl std::fmt::Display for JwtConfigEnum {
 
 /// Implementation of `TransactionType` for `std::fmt::Display`.
 impl std::fmt::Display for TransactionType {
+    /// Formats the value for display.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut std::fmt::Formatter<'_>` - The output formatter.
+    ///
+    /// # Returns
+    ///
+    /// - `std::fmt::Result` - The fmt result.
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             TransactionType::Income => write!(f, "income"),
@@ -40,20 +62,25 @@ impl TransactionType {
     ///
     /// # Returns
     ///
-    /// - `&'static str`: The static string slice representing the variant.
+    /// - `&'static str` - The static string slice representing the variant.
     pub fn as_str(&self) -> &'static str {
         match self {
-            TransactionType::Income => "income",
-            TransactionType::Expense => "expense",
+            TransactionType::Income => TRANSACTION_TYPE_INCOME,
+            TransactionType::Expense => TRANSACTION_TYPE_EXPENSE,
         }
     }
 }
 
 /// Implementation of methods for `From`.
 impl From<&str> for TransactionType {
+    /// Builds the value from its component parts.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str` - The textual input.
     fn from(s: &str) -> Self {
         match s {
-            "income" => TransactionType::Income,
+            TRANSACTION_TYPE_INCOME => TransactionType::Income,
             _ => TransactionType::Expense,
         }
     }
@@ -61,6 +88,15 @@ impl From<&str> for TransactionType {
 
 /// Implementation of `WeekDay` for `std::fmt::Display`.
 impl std::fmt::Display for WeekDay {
+    /// Formats the value for display.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut std::fmt::Formatter<'_>` - The output formatter.
+    ///
+    /// # Returns
+    ///
+    /// - `std::fmt::Result` - The fmt result.
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.as_str())
     }
@@ -72,7 +108,7 @@ impl WeekDay {
     ///
     /// # Returns
     ///
-    /// - `&'static str`: The static string slice representing the variant.
+    /// - `&'static str` - The static string slice representing the variant.
     pub fn as_str(&self) -> &'static str {
         match self {
             WeekDay::Monday => WEEK_DAYS[0],
@@ -88,6 +124,11 @@ impl WeekDay {
 
 /// Implementation of methods for `From`.
 impl From<u32> for WeekDay {
+    /// Builds the value from its component parts.
+    ///
+    /// # Arguments
+    ///
+    /// - `u32` - The num.
     fn from(num: u32) -> Self {
         match num % 7 {
             0 => WeekDay::Monday,

@@ -15,9 +15,8 @@ use {
     utils::json::*,
 };
 
+use tokio::sync::broadcast::error::SendError;
 use {
     hyperlane_config::application::charset::*,
     hyperlane_plugin::{common::*, env::*},
 };
-
-use tokio::sync::broadcast::error::SendError;

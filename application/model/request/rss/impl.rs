@@ -4,6 +4,15 @@ use super::*;
 impl std::str::FromStr for Timezone {
     type Err = String;
 
+    /// Parses the value from its textual form.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str` - The textual input.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Self, Self::Err>` - The converted str, or the failure reason.
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "UTC" => Ok(Timezone::Utc),
@@ -16,13 +25,13 @@ impl std::str::FromStr for Timezone {
             "PST" => Ok(Timezone::Pst),
             "PDT" => Ok(Timezone::Pdt),
             "GMT" => Ok(Timezone::Gmt),
-            "CST_CN" => Ok(Timezone::CstCn),
+            TIMEZONE_CST_CN => Ok(Timezone::CstCn),
             "JST" => Ok(Timezone::Jst),
             "IST" => Ok(Timezone::Ist),
-            "AEST" => Ok(Timezone::Aest),
-            "AEDT" => Ok(Timezone::Aedt),
+            TIMEZONE_AEST => Ok(Timezone::Aest),
+            TIMEZONE_AEDT => Ok(Timezone::Aedt),
             "CET" => Ok(Timezone::Cet),
-            "CEST" => Ok(Timezone::Cest),
+            TIMEZONE_CEST => Ok(Timezone::Cest),
             _ => Err(format!("Unknown timezone: {}", s)),
         }
     }

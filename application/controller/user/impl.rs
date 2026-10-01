@@ -3,12 +3,30 @@ use super::*;
 /// Implementation of `UserListRoute` for `ServerHook`.
 impl ServerHook for UserListRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `UserListRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(is_get_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
+    /// Handles the `UserListRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
@@ -41,10 +59,10 @@ impl ServerHook for UserListRoute {
         let user_role: UserRole = current_user.get_role().parse().unwrap_or_default();
         if user_role.is_admin() {
             let querys: &RequestQuerys = ctx.get_request().get_querys();
-            let keyword: Option<String> = querys.get("keyword").cloned();
-            let last_id: Option<String> = querys.get("last_id").cloned();
+            let keyword: Option<String> = querys.get(QUERY_KEY_KEYWORD).cloned();
+            let last_id: Option<String> = querys.get(QUERY_KEY_LAST_ID).cloned();
             let limit: Option<u64> = querys
-                .get("limit")
+                .get(QUERY_KEY_LIMIT)
                 .and_then(|s: &String| s.parse().ok())
                 .map(|l: u64| l.min(MAX_LIMIT));
             query
@@ -72,12 +90,30 @@ impl ServerHook for UserListRoute {
 /// Implementation of `UserGetRoute` for `ServerHook`.
 impl ServerHook for UserGetRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `UserGetRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(is_get_method, try_get_route_param(ID_KEY => id_opt), response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
+    /// Handles the `UserGetRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let user_id: i32 = match id_opt {
             Some(id_str) => match AuthService::decode_id(&id_str) {
@@ -121,12 +157,30 @@ impl ServerHook for UserGetRoute {
 /// Implementation of `UserUpdateRoute` for `ServerHook`.
 impl ServerHook for UserUpdateRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `UserUpdateRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(is_post_method, try_get_route_param(ID_KEY => id_opt), request_body_json_result(request_opt: UpdateUserRequest), response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
+    /// Handles the `UserUpdateRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let target_user_id: i32 = match id_opt {
             Some(id_str) => match AuthService::decode_id(&id_str) {
@@ -208,12 +262,30 @@ impl ServerHook for UserUpdateRoute {
 /// Implementation of `UserChangePasswordRoute` for `ServerHook`.
 impl ServerHook for UserChangePasswordRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `UserChangePasswordRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(is_post_method, try_get_route_param(ID_KEY => id_opt), request_body_json_result(request_opt: ChangePasswordRequest), response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
+    /// Handles the `UserChangePasswordRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let user_id: i32 = match id_opt {
             Some(id_str) => match AuthService::decode_id(&id_str) {
@@ -260,12 +332,30 @@ impl ServerHook for UserChangePasswordRoute {
 /// Implementation of `UserUpdateStatusRoute` for `ServerHook`.
 impl ServerHook for UserUpdateStatusRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `UserUpdateStatusRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(is_post_method, try_get_route_param(ID_KEY => id_opt), request_body_json_result(request_opt: UpdateUserStatusRequest), response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
+    /// Handles the `UserUpdateStatusRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let user_id: i32 = match id_opt {
             Some(id_str) => match AuthService::decode_id(&id_str) {
@@ -313,12 +403,30 @@ impl ServerHook for UserUpdateStatusRoute {
 /// Implementation of `UserDeleteRoute` for `ServerHook`.
 impl ServerHook for UserDeleteRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `UserDeleteRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(is_post_method, try_get_route_param(ID_KEY => id_opt), response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
+    /// Handles the `UserDeleteRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,

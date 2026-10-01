@@ -10,7 +10,7 @@ impl BootstrapSyncInit for RuntimeBootstrap {
     ///
     /// # Returns
     ///
-    /// - `Self`: The initialized `RuntimeBootstrap` instance containing the runtime.
+    /// - `Self` - The initialized `RuntimeBootstrap` instance containing the runtime.
     fn init() -> Self {
         let runtime: Runtime = Builder::new_multi_thread()
             .worker_threads(num_cpus::get_physical() << 1)

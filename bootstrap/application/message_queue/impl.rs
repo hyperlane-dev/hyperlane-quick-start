@@ -6,6 +6,7 @@ use super::*;
 /// consumer groups, and spawns a dedicated listener thread for each consumer
 /// so that messages start being processed immediately upon server startup.
 impl BootstrapAsyncInit for MessageQueueBootstrap {
+    /// Reports the number of initialized topics and consumer groups.
     #[instrument_trace]
     async fn init() -> Self {
         let broker: &MessageQueueBroker = get_message_queue_broker();

@@ -1,4 +1,4 @@
-//! Hyperlane plugin
+//! hyperlane_plugin
 //!
 //! Plugin layer providing environment configuration, database connections, logging, process management, and shutdown handling for the Hyperlane framework.
 
@@ -29,7 +29,6 @@ use {
     color_output::*,
     file_operation::*,
     hyperlane::*,
-    hyperlane_macros::*,
     instrument_level::*,
     log::*,
     lombok_macros::*,

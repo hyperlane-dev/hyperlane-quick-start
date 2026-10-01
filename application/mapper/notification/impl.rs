@@ -2,6 +2,11 @@ use super::*;
 
 /// Implementation of `Relation` for `RelationTrait`.
 impl RelationTrait for Relation {
+    /// Defines the relations owned by this entity.
+    ///
+    /// # Returns
+    ///
+    /// - `RelationDef` - The relation definition declared by this entity.
     fn def(&self) -> RelationDef {
         panic!("No relations defined - using manual association management")
     }
@@ -13,12 +18,12 @@ impl NotificationType {
     ///
     /// # Returns
     ///
-    /// - `&'static str`: The static string slice representing the variant.
+    /// - `&'static str` - The static string slice representing the variant.
     pub fn as_str(&self) -> &'static str {
         match self {
-            NotificationType::System => "system",
-            NotificationType::Message => "message",
-            NotificationType::Alert => "alert",
+            NotificationType::System => NOTIFICATION_TYPE_SYSTEM,
+            NotificationType::Message => NOTIFICATION_TYPE_MESSAGE,
+            NotificationType::Alert => NOTIFICATION_TYPE_ALERT,
         }
     }
 
@@ -26,16 +31,16 @@ impl NotificationType {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The string to parse (e.g., "system", "message", "alert").
+    /// - `&str` - The string to parse (e.g., "system", "message", "alert").
     ///
     /// # Returns
     ///
-    /// - `Option<Self>`: The matching enum variant, or None.
+    /// - `Option<Self>` - The matching enum variant, or None.
     pub fn from_string(s: &str) -> Option<Self> {
         match s {
-            "system" => Some(NotificationType::System),
-            "message" => Some(NotificationType::Message),
-            "alert" => Some(NotificationType::Alert),
+            NOTIFICATION_TYPE_SYSTEM => Some(NotificationType::System),
+            NOTIFICATION_TYPE_MESSAGE => Some(NotificationType::Message),
+            NOTIFICATION_TYPE_ALERT => Some(NotificationType::Alert),
             _ => None,
         }
     }
@@ -44,7 +49,7 @@ impl NotificationType {
     ///
     /// # Returns
     ///
-    /// - `i16`: The numeric discriminant of the variant.
+    /// - `i16` - The numeric discriminant of the variant.
     pub fn to_i16(&self) -> i16 {
         *self as i16
     }
@@ -53,11 +58,11 @@ impl NotificationType {
     ///
     /// # Arguments
     ///
-    /// - `i16`: The numeric value to convert.
+    /// - `i16` - The numeric value to convert.
     ///
     /// # Returns
     ///
-    /// - `Option<Self>`: The matching enum variant, or None.
+    /// - `Option<Self>` - The matching enum variant, or None.
     pub fn from_i16(v: i16) -> Option<Self> {
         match v {
             0 => Some(NotificationType::System),
@@ -70,6 +75,11 @@ impl NotificationType {
 
 /// Implementation of methods for `From`.
 impl From<NotificationType> for i16 {
+    /// Converts a `NotificationType` into its numeric discriminant.
+    ///
+    /// # Arguments
+    ///
+    /// - `NotificationType` - The notification type to convert.
     fn from(notification_type: NotificationType) -> Self {
         notification_type as i16
     }
@@ -79,6 +89,15 @@ impl From<NotificationType> for i16 {
 impl TryFrom<i16> for NotificationType {
     type Error = String;
 
+    /// Converts a numeric discriminant into its `NotificationType` variant.
+    ///
+    /// # Arguments
+    ///
+    /// - `i16` - The numeric discriminant to convert.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Self, Self::Error>` - The matching type, or an error message.
     fn try_from(v: i16) -> Result<Self, Self::Error> {
         NotificationType::from_i16(v).ok_or_else(|| format!("Invalid NotificationType value: {v}"))
     }

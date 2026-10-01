@@ -3,6 +3,15 @@ use super::*;
 /// Implementation of methods for `TrackingService`.
 impl TrackingService {
     /// save tracking record.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Context` - The request context.
+    /// - `&RequestBody` - The request.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), String>` - The tracking record result, or an error message.
     #[instrument_trace]
     pub async fn save_tracking_record(
         ctx: &mut Context,
@@ -24,11 +33,13 @@ impl TrackingService {
     ///
     /// # Arguments
     ///
-    /// - `TrackingQueryRequest`: The query parameters including time range, header/body filters, and pagination.
+    /// - `TrackingQueryRequest` - The query parameters including time range, header/body filters,
+    ///     and pagination.
     ///
     /// # Returns
     ///
-    /// - `Result<TrackingQueryResponse, String>`: The paginated query results on success, or an error message on failure.
+    /// - `Result<TrackingQueryResponse, String>` - The paginated query results on success, or an
+    ///     error message on failure.
     #[instrument_trace]
     pub async fn query_tracking_records(
         request: TrackingQueryRequest,
@@ -37,7 +48,7 @@ impl TrackingService {
             && let Some(end) = request.try_get_end_time()
             && start > end
         {
-            return Err("start_time must be less than or equal to end_time".to_string());
+            return Err(ERROR_START_AFTER_END.to_string());
         }
         let page: i64 = (request.try_get_page())
             .unwrap_or(DEFAULT_PAGE_NUMBER)

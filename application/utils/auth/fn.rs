@@ -1,13 +1,21 @@
 use super::*;
 
 /// build auth redirect url.
+///
+/// # Arguments
+///
+/// - `&Context` - The request context.
+///
+/// # Returns
+///
+/// - `String` - The created auth redirect URL.
 #[instrument_trace]
 pub fn build_auth_redirect_url(ctx: &Context) -> String {
     let current_path: String = ctx.get_request().get_path().clone();
     let querys: &RequestQuerys = ctx.get_request().get_querys();
     let query_parts: Vec<String> = querys
         .iter()
-        .map(|(key, value)| format!("{key}={value}"))
+        .map(|(key, value): (&String, &String)| format!("{key}={value}"))
         .collect();
     let query_string: String = query_parts.join("&");
     let full_path: String = if query_string.is_empty() {

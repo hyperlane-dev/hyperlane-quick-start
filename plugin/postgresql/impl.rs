@@ -8,7 +8,7 @@ impl GetOrInit for PostgreSqlPlugin {
     ///
     /// # Returns
     ///
-    /// - `&'static RwLock<HashMap<String, ConnectionCache<DatabaseConnection>>>`: The static reference to the global PostgreSQL connection map.
+    /// - `&'static Self::Instance` - The static reference to the global PostgreSQL connection map.
     #[instrument_trace]
     fn get_or_init() -> &'static Self::Instance {
         POSTGRESQL_CONNECTIONS.get_or_init(|| RwLock::new(HashMap::new()))
@@ -29,7 +29,7 @@ impl DatabaseConnectionPlugin for PostgreSqlPlugin {
     ///
     /// # Returns
     ///
-    /// - `PluginType::PostgreSQL`: The PostgreSQL plugin type.
+    /// - `PluginType` - The PostgreSQL plugin type.
     #[instrument_trace]
     fn plugin_type() -> PluginType {
         PluginType::PostgreSQL
@@ -39,12 +39,12 @@ impl DatabaseConnectionPlugin for PostgreSqlPlugin {
     ///
     /// # Arguments
     ///
-    /// - `I`: The instance name identifier.
-    /// - `Option<DatabaseSchema>`: The optional database schema for auto-creation.
+    /// - `I` - The instance name identifier.
+    /// - `Option<DatabaseSchema>` - The optional database schema for auto-creation.
     ///
     /// # Returns
     ///
-    /// - `Result<Self::Connection, String>`: The connection on success, or an error message on failure.
+    /// - `Result<Self::Connection, String>` - The connection on success, or an error message on failure.
     #[instrument_trace]
     async fn connection_db<I>(
         instance_name: I,
@@ -68,7 +68,7 @@ impl DatabaseConnectionPlugin for PostgreSqlPlugin {
             Err(error) => {
                 AutoCreationLogger::log_auto_creation_error(
                     &error,
-                    "Auto-creation process",
+                    AUTO_CREATION_PROCESS_LABEL,
                     PluginType::PostgreSQL,
                     Some(instance.get_database().as_str()),
                 )
@@ -109,12 +109,12 @@ impl DatabaseConnectionPlugin for PostgreSqlPlugin {
     ///
     /// # Arguments
     ///
-    /// - `I`: The instance name identifier.
-    /// - `Option<DatabaseSchema>`: The optional database schema for auto-creation.
+    /// - `I` - The instance name identifier.
+    /// - `Option<DatabaseSchema>` - The optional database schema for auto-creation.
     ///
     /// # Returns
     ///
-    /// - `Result<Self::Connection, String>`: The connection on success, or an error message on failure.
+    /// - `Result<Self::Connection, String>` - The connection on success, or an error message on failure.
     #[instrument_trace]
     async fn get_connection<I>(
         instance_name: I,
@@ -170,12 +170,12 @@ impl DatabaseConnectionPlugin for PostgreSqlPlugin {
     ///
     /// # Arguments
     ///
-    /// - `&Self::InstanceConfig`: The PostgreSQL instance configuration.
-    /// - `Option<DatabaseSchema>`: The optional database schema for table creation.
+    /// - `&Self::InstanceConfig` - The PostgreSQL instance configuration.
+    /// - `Option<DatabaseSchema>` - The optional database schema for table creation.
     ///
     /// # Returns
     ///
-    /// - `Result<AutoCreationResult, AutoCreationError>`: The auto-creation result on success, or an error on failure.
+    /// - `Result<AutoCreationResult, AutoCreationError>` - The auto-creation result on success, or an error on failure.
     #[instrument_trace]
     async fn perform_auto_creation(
         instance: &Self::InstanceConfig,
@@ -199,7 +199,7 @@ impl DatabaseConnectionPlugin for PostgreSqlPlugin {
             Err(error) => {
                 AutoCreationLogger::log_auto_creation_error(
                     &error,
-                    "Database creation",
+                    DATABASE_CREATION_LABEL,
                     PluginType::PostgreSQL,
                     Some(instance.get_database().as_str()),
                 )
@@ -218,7 +218,7 @@ impl DatabaseConnectionPlugin for PostgreSqlPlugin {
             Err(error) => {
                 AutoCreationLogger::log_auto_creation_error(
                     &error,
-                    "Table creation",
+                    TABLE_CREATION_LABEL,
                     PluginType::PostgreSQL,
                     Some(instance.get_database().as_str()),
                 )
@@ -229,7 +229,7 @@ impl DatabaseConnectionPlugin for PostgreSqlPlugin {
         if let Err(error) = auto_creator.create_indexes().await {
             AutoCreationLogger::log_auto_creation_error(
                 &error,
-                "Index creation",
+                INDEX_CREATION_LABEL,
                 PluginType::PostgreSQL,
                 Some(instance.get_database().as_str()),
             )
@@ -239,7 +239,7 @@ impl DatabaseConnectionPlugin for PostgreSqlPlugin {
         if let Err(error) = auto_creator.init_data().await {
             AutoCreationLogger::log_auto_creation_error(
                 &error,
-                "Init data",
+                INIT_DATA_LABEL,
                 PluginType::PostgreSQL,
                 Some(instance.get_database().as_str()),
             )
@@ -249,7 +249,7 @@ impl DatabaseConnectionPlugin for PostgreSqlPlugin {
         if let Err(error) = auto_creator.verify_connection().await {
             AutoCreationLogger::log_auto_creation_error(
                 &error,
-                "Connection verification",
+                CONNECTION_VERIFICATION_LABEL,
                 PluginType::PostgreSQL,
                 Some(instance.get_database().as_str()),
             )
@@ -272,7 +272,7 @@ impl Default for PostgreSqlAutoCreation {
     ///
     /// # Returns
     ///
-    /// - `PostgreSqlAutoCreation`: The default auto-creation handler.
+    /// - `PostgreSqlAutoCreation` - The default auto-creation handler.
     #[instrument_trace]
     fn default() -> Self {
         let env: &'static EnvConfig = EnvPlugin::get_or_init();
@@ -291,10 +291,10 @@ impl PostgreSqlAutoCreation {
     ///
     /// # Returns
     ///
-    /// - `Result<DatabaseConnection, AutoCreationError>`: The admin connection on success, or an error on failure.
+    /// - `Result<DatabaseConnection, AutoCreationError>` - The admin connection on success, or an error on failure.
     #[instrument_trace]
     async fn create_admin_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
-        let admin_url: String = self.instance.get_admin_url();
+        let admin_url: String = self.get_instance().get_admin_url();
         let timeout_duration: Duration = DatabasePlugin::get_connection_timeout_duration();
         let timeout_seconds: u64 = timeout_duration.as_secs();
         let connection_result: Result<DatabaseConnection, DbErr> =
@@ -308,11 +308,15 @@ impl PostgreSqlAutoCreation {
             };
         connection_result.map_err(|error: DbErr| {
             let error_msg: String = error.to_string();
-            if error_msg.contains("authentication failed") || error_msg.contains("permission") {
+            if error_msg.contains(ERROR_MARKER_AUTHENTICATION_FAILED)
+                || error_msg.contains(ERROR_MARKER_PERMISSION)
+            {
                 AutoCreationError::InsufficientPermissions(format!(
                     "Cannot connect to PostgreSQL server for database creation {error_msg}"
                 ))
-            } else if error_msg.contains("timeout") || error_msg.contains("Connection refused") {
+            } else if error_msg.contains(ERROR_MARKER_TIMEOUT)
+                || error_msg.contains(ERROR_MARKER_CONNECTION_REFUSED)
+            {
                 AutoCreationError::ConnectionFailed(format!(
                     "Cannot connect to PostgreSQL server {error_msg}"
                 ))
@@ -326,10 +330,10 @@ impl PostgreSqlAutoCreation {
     ///
     /// # Returns
     ///
-    /// - `Result<DatabaseConnection, AutoCreationError>`: The database connection on success, or an error on failure.
+    /// - `Result<DatabaseConnection, AutoCreationError>` - The database connection on success, or an error on failure.
     #[instrument_trace]
     async fn create_target_connection(&self) -> Result<DatabaseConnection, AutoCreationError> {
-        let db_url: String = self.instance.get_connection_url();
+        let db_url: String = self.get_instance().get_connection_url();
         let timeout_duration: Duration = DatabasePlugin::get_connection_timeout_duration();
         let timeout_seconds: u64 = timeout_duration.as_secs();
         let connection_result: Result<DatabaseConnection, DbErr> =
@@ -338,14 +342,14 @@ impl PostgreSqlAutoCreation {
                 Err(_) => {
                     return Err(AutoCreationError::Timeout(format!(
                         "PostgreSQL database connection timeout after {timeout_seconds} seconds {}",
-                        self.instance.get_database().as_str()
+                        self.get_instance().get_database().as_str()
                     )));
                 }
             };
         connection_result.map_err(|error: DbErr| {
             AutoCreationError::ConnectionFailed(format!(
                 "Cannot connect to PostgreSQL database '{}' {error}",
-                self.instance.get_database().as_str(),
+                self.get_instance().get_database().as_str(),
             ))
         })
     }
@@ -354,11 +358,11 @@ impl PostgreSqlAutoCreation {
     ///
     /// # Arguments
     ///
-    /// - `&DatabaseConnection`: The admin connection to the PostgreSQL server.
+    /// - `&DatabaseConnection` - The admin connection to the PostgreSQL server.
     ///
     /// # Returns
     ///
-    /// - `Result<bool, AutoCreationError>`: True if the database exists, false otherwise.
+    /// - `Result<bool, AutoCreationError>` - True if the database exists, false otherwise.
     #[instrument_trace]
     async fn database_exists(
         &self,
@@ -366,10 +370,10 @@ impl PostgreSqlAutoCreation {
     ) -> Result<bool, AutoCreationError> {
         let query: String = format!(
             "SELECT 1 FROM pg_database WHERE datname = '{}'",
-            self.instance.get_database().as_str()
+            self.get_instance().get_database().as_str()
         );
         let statement: Statement = Statement::from_string(DatabaseBackend::Postgres, query);
-        match connection.query_all(statement).await {
+        match connection.query_all_raw(statement).await {
             Ok(results) => Ok(!results.is_empty()),
             Err(error) => Err(AutoCreationError::DatabaseError(format!(
                 "Failed to check if database exists {error}"
@@ -381,11 +385,11 @@ impl PostgreSqlAutoCreation {
     ///
     /// # Arguments
     ///
-    /// - `&DatabaseConnection`: The admin connection to the PostgreSQL server.
+    /// - `&DatabaseConnection` - The admin connection to the PostgreSQL server.
     ///
     /// # Returns
     ///
-    /// - `Result<bool, AutoCreationError>`: True if the database was created, false if it already existed.
+    /// - `Result<bool, AutoCreationError>` - True if the database was created, false if it already existed.
     #[instrument_trace]
     async fn create_database(
         &self,
@@ -393,7 +397,7 @@ impl PostgreSqlAutoCreation {
     ) -> Result<bool, AutoCreationError> {
         if self.database_exists(connection).await? {
             AutoCreationLogger::log_database_exists(
-                self.instance.get_database().as_str(),
+                self.get_instance().get_database().as_str(),
                 PluginType::PostgreSQL,
             )
             .await;
@@ -401,13 +405,13 @@ impl PostgreSqlAutoCreation {
         }
         let create_query: String = format!(
             "CREATE DATABASE \"{}\" WITH ENCODING='UTF8' LC_COLLATE='en_US.UTF-8' LC_CTYPE='en_US.UTF-8'",
-            self.instance.get_database().as_str()
+            self.get_instance().get_database().as_str()
         );
         let statement: Statement = Statement::from_string(DatabaseBackend::Postgres, create_query);
-        match connection.execute(statement).await {
+        match connection.execute_raw(statement).await {
             Ok(_) => {
                 AutoCreationLogger::log_database_created(
-                    self.instance.get_database().as_str(),
+                    self.get_instance().get_database().as_str(),
                     PluginType::PostgreSQL,
                 )
                 .await;
@@ -415,15 +419,17 @@ impl PostgreSqlAutoCreation {
             }
             Err(error) => {
                 let error_msg: String = error.to_string();
-                if error_msg.contains("permission denied") || error_msg.contains("must be owner") {
+                if error_msg.contains(ERROR_MARKER_PERMISSION_DENIED)
+                    || error_msg.contains(ERROR_MARKER_MUST_BE_OWNER)
+                {
                     Err(AutoCreationError::InsufficientPermissions(format!(
                         "Cannot create PostgreSQL database '{}' {}",
-                        self.instance.get_database().as_str(),
+                        self.get_instance().get_database().as_str(),
                         error_msg
                     )))
-                } else if error_msg.contains("already exists") {
+                } else if error_msg.contains(ERROR_MARKER_ALREADY_EXISTS) {
                     AutoCreationLogger::log_database_exists(
-                        self.instance.get_database().as_str(),
+                        self.get_instance().get_database().as_str(),
                         PluginType::PostgreSQL,
                     )
                     .await;
@@ -431,7 +437,7 @@ impl PostgreSqlAutoCreation {
                 } else {
                     Err(AutoCreationError::DatabaseError(format!(
                         "Failed to create PostgreSQL database '{}' {}",
-                        self.instance.get_database().as_str(),
+                        self.get_instance().get_database().as_str(),
                         error_msg
                     )))
                 }
@@ -443,12 +449,12 @@ impl PostgreSqlAutoCreation {
     ///
     /// # Arguments
     ///
-    /// - `&DatabaseConnection`: The connection to the target database.
-    /// - `T`: The table name to check.
+    /// - `&DatabaseConnection` - The connection to the target database.
+    /// - `T` - The table name to check.
     ///
     /// # Returns
     ///
-    /// - `Result<bool, AutoCreationError>`: True if the table exists, false otherwise.
+    /// - `Result<bool, AutoCreationError>` - True if the table exists, false otherwise.
     #[instrument_trace]
     async fn table_exists<T>(
         &self,
@@ -463,7 +469,7 @@ impl PostgreSqlAutoCreation {
             "SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = '{table_name_str}'"
         );
         let statement: Statement = Statement::from_string(DatabaseBackend::Postgres, query);
-        match connection.query_all(statement).await {
+        match connection.query_all_raw(statement).await {
             Ok(results) => Ok(!results.is_empty()),
             Err(error) => Err(AutoCreationError::DatabaseError(format!(
                 "Failed to check if table '{table_name_str}' exists {error}"
@@ -475,12 +481,12 @@ impl PostgreSqlAutoCreation {
     ///
     /// # Arguments
     ///
-    /// - `&DatabaseConnection`: The connection to the target database.
-    /// - `&TableSchema`: The table schema containing the creation SQL.
+    /// - `&DatabaseConnection` - The connection to the target database.
+    /// - `&TableSchema` - The table schema containing the creation SQL.
     ///
     /// # Returns
     ///
-    /// - `Result<(), AutoCreationError>`: Ok on success, or an error on failure.
+    /// - `Result<(), AutoCreationError>` - Ok on success, or an error on failure.
     #[instrument_trace]
     async fn create_table(
         &self,
@@ -489,11 +495,11 @@ impl PostgreSqlAutoCreation {
     ) -> Result<(), AutoCreationError> {
         let statement: Statement =
             Statement::from_string(DatabaseBackend::Postgres, table.get_sql().clone());
-        match connection.execute(statement).await {
+        match connection.execute_raw(statement).await {
             Ok(_) => Ok(()),
             Err(error) => {
                 let error_msg: String = error.to_string();
-                if error_msg.contains("permission denied") {
+                if error_msg.contains(ERROR_MARKER_PERMISSION_DENIED) {
                     Err(AutoCreationError::InsufficientPermissions(format!(
                         "Cannot create PostgreSQL table '{}' {}",
                         table.get_name(),
@@ -514,12 +520,12 @@ impl PostgreSqlAutoCreation {
     ///
     /// # Arguments
     ///
-    /// - `&DatabaseConnection`: The connection to the target database.
-    /// - `S`: The SQL statement to execute.
+    /// - `&DatabaseConnection` - The connection to the target database.
+    /// - `S` - The SQL statement to execute.
     ///
     /// # Returns
     ///
-    /// - `Result<(), AutoCreationError>`: Ok on success, or an error on failure.
+    /// - `Result<(), AutoCreationError>` - Ok on success, or an error on failure.
     #[instrument_trace]
     async fn execute_sql<S>(
         &self,
@@ -530,7 +536,7 @@ impl PostgreSqlAutoCreation {
         S: AsRef<str>,
     {
         let statement: Statement = Statement::from_string(DatabaseBackend::Postgres, sql.as_ref());
-        match connection.execute(statement).await {
+        match connection.execute_raw(statement).await {
             Ok(_) => Ok(()),
             Err(error) => Err(AutoCreationError::DatabaseError(format!(
                 "Failed to execute SQL {error}"
@@ -542,17 +548,17 @@ impl PostgreSqlAutoCreation {
     ///
     /// # Returns
     ///
-    /// - `&DatabaseSchema`: The database schema reference.
+    /// - `&DatabaseSchema` - The database schema reference.
     #[instrument_trace]
     fn get_database_schema(&self) -> &DatabaseSchema {
-        &self.schema
+        &self.get_schema()
     }
 
     /// Creates indexes and constraints defined in the database schema on the target PostgreSQL database.
     ///
     /// # Returns
     ///
-    /// - `Result<(), AutoCreationError>`: Ok on success, or an error on failure.
+    /// - `Result<(), AutoCreationError>` - Ok on success, or an error on failure.
     #[instrument_trace]
     async fn create_indexes(&self) -> Result<(), AutoCreationError> {
         let connection: DatabaseConnection = self.create_target_connection().await?;
@@ -561,9 +567,9 @@ impl PostgreSqlAutoCreation {
             if let Err(error) = self.execute_sql(&connection, index_sql).await {
                 AutoCreationLogger::log_auto_creation_error(
                     &error,
-                    "Index creation",
+                    INDEX_CREATION_LABEL,
                     PluginType::PostgreSQL,
-                    Some(self.instance.get_database().as_str()),
+                    Some(self.get_instance().get_database().as_str()),
                 )
                 .await;
             }
@@ -572,9 +578,9 @@ impl PostgreSqlAutoCreation {
             if let Err(error) = self.execute_sql(&connection, constraint_sql).await {
                 AutoCreationLogger::log_auto_creation_error(
                     &error,
-                    "Constraint creation",
+                    CONSTRAINT_CREATION_LABEL,
                     PluginType::PostgreSQL,
-                    Some(self.instance.get_database().as_str()),
+                    Some(self.get_instance().get_database().as_str()),
                 )
                 .await;
             }
@@ -592,7 +598,7 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
     ///
     /// # Arguments
     ///
-    /// - `PostgreSqlInstanceConfig`: The PostgreSQL instance configuration.
+    /// - `Self::InstanceConfig` - The PostgreSQL instance configuration.
     #[instrument_trace]
     fn new(instance: Self::InstanceConfig) -> Self {
         Self {
@@ -605,8 +611,8 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
     ///
     /// # Arguments
     ///
-    /// - `PostgreSqlInstanceConfig`: The PostgreSQL instance configuration.
-    /// - `DatabaseSchema`: The database schema containing table definitions.
+    /// - `Self::InstanceConfig` - The PostgreSQL instance configuration.
+    /// - `DatabaseSchema` - The database schema containing table definitions.
     #[instrument_trace]
     fn with_schema(instance: Self::InstanceConfig, schema: DatabaseSchema) -> Self
     where
@@ -619,7 +625,7 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
     ///
     /// # Returns
     ///
-    /// - `Result<bool, AutoCreationError>`: True if the database was created, false if it already existed.
+    /// - `Result<bool, AutoCreationError>` - True if the database was created, false if it already existed.
     #[instrument_trace]
     async fn create_database_if_not_exists(&self) -> Result<bool, AutoCreationError> {
         let admin_connection: DatabaseConnection = self.create_admin_connection().await?;
@@ -632,7 +638,7 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
     ///
     /// # Returns
     ///
-    /// - `Result<Vec<String>, AutoCreationError>`: A list of table names that were created.
+    /// - `Result<Vec<String>, AutoCreationError>` - A list of table names that were created.
     #[instrument_trace]
     async fn create_tables_if_not_exist(&self) -> Result<Vec<String>, AutoCreationError> {
         let connection: DatabaseConnection = self.create_target_connection().await?;
@@ -644,14 +650,14 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
                 created_tables.push(table.get_name().clone());
                 AutoCreationLogger::log_table_created(
                     table.get_name(),
-                    self.instance.get_database().as_str(),
+                    self.get_instance().get_database().as_str(),
                     PluginType::PostgreSQL,
                 )
                 .await;
             } else {
                 AutoCreationLogger::log_table_exists(
                     table.get_name(),
-                    self.instance.get_database().as_str(),
+                    self.get_instance().get_database().as_str(),
                     PluginType::PostgreSQL,
                 )
                 .await;
@@ -660,7 +666,7 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
         let _: Result<(), DbErr> = connection.close().await;
         AutoCreationLogger::log_tables_created(
             &created_tables,
-            self.instance.get_database().as_str(),
+            self.get_instance().get_database().as_str(),
             PluginType::PostgreSQL,
         )
         .await;
@@ -671,7 +677,7 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
     ///
     /// # Returns
     ///
-    /// - `Result<(), AutoCreationError>`: Ok on success, or an error on failure.
+    /// - `Result<(), AutoCreationError>` - Ok on success, or an error on failure.
     #[instrument_trace]
     async fn init_data(&self) -> Result<(), AutoCreationError> {
         let connection: DatabaseConnection = self.create_target_connection().await?;
@@ -680,9 +686,9 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
             if let Err(error) = self.execute_sql(&connection, init_data_sql).await {
                 AutoCreationLogger::log_auto_creation_error(
                     &error,
-                    "Init data insertion",
+                    INIT_DATA_INSERTION_LABEL,
                     PluginType::PostgreSQL,
-                    Some(self.instance.get_database().as_str()),
+                    Some(self.get_instance().get_database().as_str()),
                 )
                 .await;
             }
@@ -695,18 +701,20 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
     ///
     /// # Returns
     ///
-    /// - `Result<(), AutoCreationError>`: Ok if the connection is valid, or an error on failure.
+    /// - `Result<(), AutoCreationError>` - Ok if the connection is valid, or an error on failure.
     #[instrument_trace]
     async fn verify_connection(&self) -> Result<(), AutoCreationError> {
         let connection: DatabaseConnection = self.create_target_connection().await?;
-        let statement: Statement =
-            Statement::from_string(DatabaseBackend::Postgres, "SELECT 1".to_string());
-        match connection.query_all(statement).await {
+        let statement: Statement = Statement::from_string(
+            DatabaseBackend::Postgres,
+            CONNECTION_VERIFICATION_SQL.to_string(),
+        );
+        match connection.query_all_raw(statement).await {
             Ok(_) => {
                 let _: Result<(), DbErr> = connection.close().await;
                 AutoCreationLogger::log_connection_verification(
                     PluginType::PostgreSQL,
-                    self.instance.get_database().as_str(),
+                    self.get_instance().get_database().as_str(),
                     true,
                     None,
                 )
@@ -718,7 +726,7 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
                 let error_msg: String = error.to_string();
                 AutoCreationLogger::log_connection_verification(
                     PluginType::PostgreSQL,
-                    self.instance.get_database().as_str(),
+                    self.get_instance().get_database().as_str(),
                     false,
                     Some(&error_msg),
                 )

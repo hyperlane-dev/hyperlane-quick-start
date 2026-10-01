@@ -6,18 +6,18 @@ impl ActiveModel {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The run identifier to associate the job with.
-    /// - `String`: The name of the job.
+    /// - `i32` - The run identifier to associate the job with.
+    /// - `String` - The name of the job.
     ///
     /// # Returns
     ///
-    /// - `ActiveModel`: A new active model with status "pending" ready for insertion.
+    /// - `ActiveModel` - A new active model with status "pending" ready for insertion.
     #[instrument_trace]
     pub fn new(run_id: i32, name: String) -> Self {
         Self {
             run_id: ActiveValue::Set(run_id),
             name: ActiveValue::Set(name),
-            status: ActiveValue::Set("pending".to_string()),
+            status: ActiveValue::Set(CICD_JOB_STATUS_PENDING.to_string()),
             id: ActiveValue::NotSet,
             runner: ActiveValue::NotSet,
             started_at: ActiveValue::NotSet,

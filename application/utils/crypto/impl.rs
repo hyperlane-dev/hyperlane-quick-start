@@ -6,7 +6,8 @@ impl RsaUtil {
     ///
     /// # Returns
     ///
-    /// - `Result<(RsaPrivateKey, RsaPublicKey), String>`: The generated private and public key pair, or an error message.
+    /// - `Result<(RsaPrivateKey, RsaPublicKey), String>` - The generated private and public key
+    ///     pair, or an error message.
     #[instrument_trace]
     pub fn generate_key_pair() -> Result<(RsaPrivateKey, RsaPublicKey), String> {
         let mut rng: OsRng = OsRng;
@@ -20,11 +21,11 @@ impl RsaUtil {
     ///
     /// # Arguments
     ///
-    /// - `&RsaPrivateKey`: The RSA private key to encode.
+    /// - `&RsaPrivateKey` - The RSA private key to encode.
     ///
     /// # Returns
     ///
-    /// - `Result<String, String>`: The PEM-encoded private key string, or an error message.
+    /// - `Result<String, String>` - The PEM-encoded private key string, or an error message.
     #[instrument_trace]
     pub fn private_key_to_pem(private_key: &RsaPrivateKey) -> Result<String, String> {
         let pem_string: String = private_key
@@ -38,16 +39,16 @@ impl RsaUtil {
     ///
     /// # Arguments
     ///
-    /// - `&RsaPublicKey`: The RSA public key to encode.
+    /// - `&RsaPublicKey` - The RSA public key to encode.
     ///
     /// # Returns
     ///
-    /// - `Result<String, String>`: The PEM-encoded public key string, or an error message.
+    /// - `Result<String, String>` - The PEM-encoded public key string, or an error message.
     #[instrument_trace]
     pub fn public_key_to_pem(public_key: &RsaPublicKey) -> Result<String, String> {
         let pem_string: String = public_key
             .to_public_key_pem(rsa::pkcs8::LineEnding::LF)
-            .map_err(|error: ed25519_dalek::pkcs8::spki::Error| error.to_string())?
+            .map_err(|error: rsa::pkcs8::spki::Error| error.to_string())?
             .to_string();
         Ok(pem_string)
     }
@@ -56,11 +57,12 @@ impl RsaUtil {
     ///
     /// # Arguments
     ///
-    /// - `&RsaPublicKey`: The RSA public key to convert.
+    /// - `&RsaPublicKey` - The RSA public key to convert.
     ///
     /// # Returns
     ///
-    /// - `Result<(String, String), String>`: A tuple of (base64-encoded modulus, base64-encoded exponent).
+    /// - `Result<(String, String), String>` - A tuple of (base64-encoded modulus, base64-encoded
+    ///     exponent).
     #[instrument_trace]
     pub fn public_key_to_jwk(public_key: &RsaPublicKey) -> Result<(String, String), String> {
         let n_bytes: Vec<u8> = public_key.n().to_bytes_be();
@@ -74,11 +76,11 @@ impl RsaUtil {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The PEM-encoded private key string.
+    /// - `&str` - The PEM-encoded private key string.
     ///
     /// # Returns
     ///
-    /// - `Result<RsaPrivateKey, String>`: The parsed RSA private key, or an error message.
+    /// - `Result<RsaPrivateKey, String>` - The parsed RSA private key, or an error message.
     #[instrument_trace]
     pub fn private_key_from_pem(pem_str: &str) -> Result<RsaPrivateKey, String> {
         let private_key: RsaPrivateKey = RsaPrivateKey::from_pkcs1_pem(pem_str)
@@ -90,11 +92,11 @@ impl RsaUtil {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The PEM-encoded public key string.
+    /// - `&str` - The PEM-encoded public key string.
     ///
     /// # Returns
     ///
-    /// - `Result<RsaPublicKey, String>`: The parsed RSA public key, or an error message.
+    /// - `Result<RsaPublicKey, String>` - The parsed RSA public key, or an error message.
     #[instrument_trace]
     pub fn public_key_from_pem(pem_str: &str) -> Result<RsaPublicKey, String> {
         let public_key: RsaPublicKey = RsaPublicKey::from_pkcs1_pem(pem_str)
@@ -106,12 +108,12 @@ impl RsaUtil {
     ///
     /// # Arguments
     ///
-    /// - `&RsaPublicKey`: The RSA public key used for encryption.
-    /// - `&str`: The plaintext to encrypt.
+    /// - `&RsaPublicKey` - The RSA public key used for encryption.
+    /// - `&str` - The plaintext to encrypt.
     ///
     /// # Returns
     ///
-    /// - `Result<Vec<u8>, String>`: The encrypted data bytes, or an error message.
+    /// - `Result<Vec<u8>, String>` - The encrypted data bytes, or an error message.
     #[instrument_trace]
     pub fn encrypt_with_public_key(
         public_key: &RsaPublicKey,
@@ -128,12 +130,12 @@ impl RsaUtil {
     ///
     /// # Arguments
     ///
-    /// - `&RsaPrivateKey`: The RSA private key used for decryption.
-    /// - `&[u8]`: The encrypted ciphertext bytes.
+    /// - `&RsaPrivateKey` - The RSA private key used for decryption.
+    /// - `&[u8]` - The encrypted ciphertext bytes.
     ///
     /// # Returns
     ///
-    /// - `Result<String, String>`: The decrypted plaintext string, or an error message.
+    /// - `Result<String, String>` - The decrypted plaintext string, or an error message.
     #[instrument_trace]
     pub fn decrypt_with_private_key(
         private_key: &RsaPrivateKey,
@@ -151,11 +153,11 @@ impl RsaUtil {
     ///
     /// # Arguments
     ///
-    /// - `&[u8]`: The binary data to encode.
+    /// - `&[u8]` - The binary data to encode.
     ///
     /// # Returns
     ///
-    /// - `String`: The base64-encoded string.
+    /// - `String` - The base64-encoded string.
     #[instrument_trace]
     pub fn base64_encode(data: &[u8]) -> String {
         general_purpose::STANDARD.encode(data)
@@ -165,11 +167,11 @@ impl RsaUtil {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The base64-encoded string.
+    /// - `&str` - The base64-encoded string.
     ///
     /// # Returns
     ///
-    /// - `Result<Vec<u8>, String>`: The decoded binary data, or an error message.
+    /// - `Result<Vec<u8>, String>` - The decoded binary data, or an error message.
     #[instrument_trace]
     pub fn base64_decode(encoded: &str) -> Result<Vec<u8>, String> {
         let decoded: Vec<u8> = general_purpose::STANDARD

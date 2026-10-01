@@ -9,11 +9,11 @@ impl TraceService {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The trace identifier value to search for.
+    /// - `&str` - The trace identifier value to search for.
     ///
     /// # Returns
     ///
-    /// - `String`: The matching log line with context, or a not-found message.
+    /// - `String` - The matching log line with context, or a not-found message.
     #[instrument_trace]
     pub async fn search_trace(trace: &str) -> String {
         let env_config: &EnvConfig = EnvPlugin::get_or_init();

@@ -6,12 +6,12 @@ impl GomokuDomain {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The room identifier.
-    /// - `&str`: The owner's user identifier.
+    /// - `&str` - The room identifier.
+    /// - `&str` - The owner's user identifier.
     ///
     /// # Returns
     ///
-    /// - `GomokuRoom`: The newly created room with initialized board and waiting status.
+    /// - `GomokuRoom` - The newly created room with initialized board and waiting status.
     #[instrument_trace]
     pub fn create_room(room_id: &str, owner_id: &str) -> GomokuRoom {
         let mut room: GomokuRoom = GomokuRoom::default();
@@ -34,19 +34,19 @@ impl GomokuDomain {
     ///
     /// # Arguments
     ///
-    /// - `&mut GomokuRoom`: The room to add the player to.
-    /// - `&str`: The user identifier of the player to add.
+    /// - `&mut GomokuRoom` - The room to add the player to.
+    /// - `&str` - The user identifier of the player to add.
     ///
     /// # Returns
     ///
-    /// - `Result<StoneColor, String>`: The assigned stone color, or an error if the room is full.
+    /// - `Result<StoneColor, String>` - The assigned stone color, or an error if the room is full.
     #[instrument_trace]
     pub fn add_player(room: &mut GomokuRoom, user_id: &str) -> Result<StoneColor, String> {
         if let Some(color) = Self::get_player_color(room, user_id) {
             return Ok(color);
         }
         if room.get_players().len() >= 2 {
-            return Err("Room is full".to_string());
+            return Err(ERROR_ROOM_IS_FULL.to_string());
         }
         let mut player: GomokuPlayer = GomokuPlayer::default();
         let color: StoneColor = if room.get_players().is_empty() {
@@ -63,12 +63,12 @@ impl GomokuDomain {
     ///
     /// # Arguments
     ///
-    /// - `&mut GomokuRoom`: The room to add the spectator to.
-    /// - `&str`: The user identifier of the spectator.
+    /// - `&mut GomokuRoom` - The room to add the spectator to.
+    /// - `&str` - The user identifier of the spectator.
     ///
     /// # Returns
     ///
-    /// - `bool`: `true` if the spectator was added, `false` if they are already in the room.
+    /// - `bool` - `true` if the spectator was added, `false` if they are already in the room.
     #[instrument_trace]
     pub fn add_spectator(room: &mut GomokuRoom, user_id: &str) -> bool {
         if Self::get_player_color(room, user_id).is_some() {
@@ -89,12 +89,12 @@ impl GomokuDomain {
     ///
     /// # Arguments
     ///
-    /// - `&mut GomokuRoom`: The room to remove the user from.
-    /// - `&str`: The user identifier to remove.
+    /// - `&mut GomokuRoom` - The room to remove the user from.
+    /// - `&str` - The user identifier to remove.
     ///
     /// # Returns
     ///
-    /// - `bool`: `true` if the user was found and removed, `false` otherwise.
+    /// - `bool` - `true` if the user was found and removed, `false` otherwise.
     #[instrument_trace]
     pub fn remove_user(room: &mut GomokuRoom, user_id: &str) -> bool {
         let mut removed: bool = false;
@@ -129,15 +129,15 @@ impl GomokuDomain {
     ///
     /// # Arguments
     ///
-    /// - `&mut GomokuRoom`: The room to start the game in.
+    /// - `&mut GomokuRoom` - The room to start the game in.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error if waiting for the second player.
+    /// - `Result<(), String>` - Ok on success, or an error if waiting for the second player.
     #[instrument_trace]
     pub fn start_game(room: &mut GomokuRoom) -> Result<(), String> {
         if room.get_players().len() != 2 {
-            return Err("Waiting for second player".to_string());
+            return Err(ERROR_WAITING_FOR_SECOND_PLAYER.to_string());
         }
         Self::ensure_board(room);
         room.set_status(GameStatus::InProgress);
@@ -148,7 +148,7 @@ impl GomokuDomain {
     ///
     /// # Arguments
     ///
-    /// - `&mut GomokuRoom`: The room whose board should be validated.
+    /// - `&mut GomokuRoom` - The room whose board should be validated.
     #[instrument_trace]
     pub fn ensure_board(room: &mut GomokuRoom) {
         let size: usize = 15;
@@ -176,11 +176,11 @@ impl GomokuDomain {
     ///
     /// # Arguments
     ///
-    /// - `usize`: The size of the board (width and height).
+    /// - `usize` - The size of the board (width and height).
     ///
     /// # Returns
     ///
-    /// - `Vec<Vec<u8>>`: The empty board.
+    /// - `Vec<Vec<u8>>` - The empty board.
     #[instrument_trace]
     fn build_empty_board(size: usize) -> Vec<Vec<u8>> {
         let mut board: Vec<Vec<u8>> = vec![];
@@ -200,14 +200,14 @@ impl GomokuDomain {
     ///
     /// # Arguments
     ///
-    /// - `&mut GomokuRoom`: The room where the stone is placed.
-    /// - `&str`: The user identifier of the player placing the stone.
-    /// - `usize`: The x-coordinate (column) of the position.
-    /// - `usize`: The y-coordinate (row) of the position.
+    /// - `&mut GomokuRoom` - The room where the stone is placed.
+    /// - `&str` - The user identifier of the player placing the stone.
+    /// - `usize` - The x-coordinate (column) of the position.
+    /// - `usize` - The y-coordinate (row) of the position.
     ///
     /// # Returns
     ///
-    /// - `Result<GomokuPlaceResult, String>`: The result of the placement including game status and winner, or an error.
+    /// - `Result<GomokuPlaceResult, String>` - The result of the placement including game status and winner, or an error.
     #[instrument_trace]
     pub fn place_stone(
         room: &mut GomokuRoom,
@@ -216,28 +216,28 @@ impl GomokuDomain {
         y: usize,
     ) -> Result<GomokuPlaceResult, String> {
         if room.get_status() != &GameStatus::InProgress {
-            return Err("Game is not in progress".to_string());
+            return Err(ERROR_GAME_NOT_IN_PROGRESS.to_string());
         }
         Self::ensure_board(room);
         let player_color: StoneColor =
-            Self::get_player_color(room, user_id).ok_or("Player not found".to_string())?;
+            Self::get_player_color(room, user_id).ok_or(ERROR_PLAYER_NOT_FOUND.to_string())?;
         if &player_color != room.get_next_turn() {
-            return Err("Not your turn".to_string());
+            return Err(ERROR_NOT_YOUR_TURN.to_string());
         }
         let board_len: usize = room.get_board().len();
         if y >= board_len {
-            return Err("Invalid position".to_string());
+            return Err(ERROR_INVALID_POSITION.to_string());
         }
         let row_len: usize = room.get_board()[y].len();
         if x >= row_len {
-            return Err("Invalid position".to_string());
+            return Err(ERROR_INVALID_POSITION.to_string());
         }
         let step: usize = room.get_moves().len() + 1;
         let value: u8 = player_color.to_value();
         {
             let board: &mut Vec<Vec<u8>> = room.get_mut_board();
             if board[y][x] != 0 {
-                return Err("Position occupied".to_string());
+                return Err(ERROR_POSITION_OCCUPIED.to_string());
             }
             board[y][x] = value;
         }
@@ -281,12 +281,12 @@ impl GomokuDomain {
     ///
     /// # Arguments
     ///
-    /// - `&GomokuRoom`: The room to search.
-    /// - `&str`: The user identifier.
+    /// - `&GomokuRoom` - The room to search.
+    /// - `&str` - The user identifier.
     ///
     /// # Returns
     ///
-    /// - `Option<StoneColor>`: The stone color if the user is a player, or `None`.
+    /// - `Option<StoneColor>` - The stone color if the user is a player, or `None`.
     #[instrument_trace]
     fn get_player_color(room: &GomokuRoom, user_id: &str) -> Option<StoneColor> {
         for player in room.get_players().iter() {
@@ -301,11 +301,11 @@ impl GomokuDomain {
     ///
     /// # Arguments
     ///
-    /// - `&[Vec<u8>]`: The game board.
+    /// - `&[Vec<u8>]` - The game board.
     ///
     /// # Returns
     ///
-    /// - `bool`: `true` if the board is full, `false` otherwise.
+    /// - `bool` - `true` if the board is full, `false` otherwise.
     #[instrument_trace]
     fn is_board_full(board: &[Vec<u8>]) -> bool {
         for row in board.iter() {
@@ -322,14 +322,14 @@ impl GomokuDomain {
     ///
     /// # Arguments
     ///
-    /// - `&[Vec<u8>]`: The game board.
-    /// - `usize`: The x-coordinate of the position.
-    /// - `usize`: The y-coordinate of the position.
-    /// - `u8`: The stone value to check.
+    /// - `&[Vec<u8>]` - The game board.
+    /// - `usize` - The x-coordinate of the position.
+    /// - `usize` - The y-coordinate of the position.
+    /// - `u8` - The stone value to check.
     ///
     /// # Returns
     ///
-    /// - `bool`: `true` if five in a row is detected, `false` otherwise.
+    /// - `bool` - `true` if five in a row is detected, `false` otherwise.
     #[instrument_trace]
     fn check_five(board: &[Vec<u8>], x: usize, y: usize, value: u8) -> bool {
         let directions: [(isize, isize); 4] = [(1, 0), (0, 1), (1, 1), (1, -1)];
@@ -348,16 +348,16 @@ impl GomokuDomain {
     ///
     /// # Arguments
     ///
-    /// - `&[Vec<u8>]`: The game board.
-    /// - `usize`: The x-coordinate of the starting position.
-    /// - `usize`: The y-coordinate of the starting position.
-    /// - `isize`: The x-direction step.
-    /// - `isize`: The y-direction step.
-    /// - `u8`: The stone value to match.
+    /// - `&[Vec<u8>]` - The game board.
+    /// - `usize` - The x-coordinate of the starting position.
+    /// - `usize` - The y-coordinate of the starting position.
+    /// - `isize` - The x-direction step.
+    /// - `isize` - The y-direction step.
+    /// - `u8` - The stone value to match.
     ///
     /// # Returns
     ///
-    /// - `usize`: The count of consecutive matching stones in that direction.
+    /// - `usize` - The count of consecutive matching stones in that direction.
     #[instrument_trace]
     fn count_direction(
         board: &[Vec<u8>],

@@ -3,12 +3,12 @@ use super::*;
 /// OpenAPI documentation endpoint for the Server-Sent Events (SSE) streaming route.
 #[utoipa::path(
     get,
-    path = "/sse",
+    path = OPENAPI_PATH_SSE,
     responses(
-        (status = 200, description = "Success"),
-        (status = 400, description = "Bad Request"),
-        (status = 404, description = "Not Found"),
-        (status = 500, description = "Internal Server Error")
+        (status = 200, description = OPENAPI_DESCRIPTION_SUCCESS),
+        (status = 400, description = OPENAPI_DESCRIPTION_BAD_REQUEST),
+        (status = 404, description = OPENAPI_DESCRIPTION_NOT_FOUND),
+        (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
 #[instrument_trace]

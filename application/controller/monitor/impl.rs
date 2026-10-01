@@ -3,6 +3,12 @@ use super::*;
 /// Implementation of `ServerStatusRoute` for `ServerHook`.
 impl ServerHook for ServerStatusRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `ServerStatusRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -14,6 +20,18 @@ impl ServerHook for ServerStatusRoute {
         try_send
     )]
     #[instrument_trace]
+    /// Handles the `ServerStatusRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
         loop {
             let server_status: ServerStatus = MonitorService::get_server_status().await;
@@ -37,6 +55,12 @@ impl ServerHook for ServerStatusRoute {
 /// Implementation of `SystemInfoRoute` for `ServerHook`.
 impl ServerHook for SystemInfoRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `SystemInfoRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -46,6 +70,18 @@ impl ServerHook for SystemInfoRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `SystemInfoRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let system_info: SystemInfo = MonitorService::get_system_info().await;
         let response: ApiResponse<SystemInfo> =
@@ -58,12 +94,30 @@ impl ServerHook for SystemInfoRoute {
 /// Implementation of `NetworkCaptureRoute` for `ServerHook`.
 impl ServerHook for NetworkCaptureRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `NetworkCaptureRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(methods(get, post))]
     #[instrument_trace]
+    /// Handles the `NetworkCaptureRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         MonitorService::get_network_capture_data(ctx).await;
         Status::Continue
@@ -73,6 +127,12 @@ impl ServerHook for NetworkCaptureRoute {
 /// Implementation of `NetworkCaptureStreamRoute` for `ServerHook`.
 impl ServerHook for NetworkCaptureStreamRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `NetworkCaptureStreamRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -84,6 +144,18 @@ impl ServerHook for NetworkCaptureStreamRoute {
         response_header(ACCESS_CONTROL_ALLOW_ORIGIN => WILDCARD_ANY)
     )]
     #[instrument_trace]
+    /// Handles the `NetworkCaptureStreamRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         MonitorService::get_network_capture_stream(ctx).await;
         Status::Continue
@@ -93,6 +165,12 @@ impl ServerHook for NetworkCaptureStreamRoute {
 /// Implementation of `PerformanceHistoryRoute` for `ServerHook`.
 impl ServerHook for PerformanceHistoryRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `PerformanceHistoryRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -102,6 +180,18 @@ impl ServerHook for PerformanceHistoryRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `PerformanceHistoryRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let history_response: PerformanceHistoryResponse =
             MonitorService::get_performance_history_response().await;

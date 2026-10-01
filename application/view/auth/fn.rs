@@ -3,10 +3,10 @@ use super::*;
 /// Renders the authentication page and serves as the OpenAPI documentation endpoint for auth routes.
 #[utoipa::path(
     get,
-    path = "/auth",
+    path = ROUTE_AUTH,
     responses(
-        (status = 302, description = "Redirect to auth page"),
-        (status = 500, description = "Internal Server Error")
+        (status = 302, description = RESPONSE_DESCRIPTION_REDIRECT),
+        (status = 500, description = RESPONSE_DESCRIPTION_SERVER_ERROR)
     )
 )]
 #[instrument_trace]

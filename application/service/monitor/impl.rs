@@ -6,7 +6,7 @@ impl MonitorService {
     ///
     /// # Returns
     ///
-    /// - `&'static RwLock<System>`: The static reference to the system information.
+    /// - `&'static RwLock<System>` - The static reference to the system information.
     #[instrument_trace]
     fn get_or_init_system() -> &'static RwLock<System> {
         SYSTEM.get_or_init(|| RwLock::new(System::new_all()))
@@ -16,7 +16,7 @@ impl MonitorService {
     ///
     /// # Returns
     ///
-    /// - `&'static RwLock<Networks>`: The static reference to the network information.
+    /// - `&'static RwLock<Networks>` - The static reference to the network information.
     #[instrument_trace]
     fn get_or_init_networks() -> &'static RwLock<Networks> {
         NETWORKS.get_or_init(|| RwLock::new(Networks::new_with_refreshed_list()))
@@ -77,7 +77,8 @@ impl MonitorService {
     ///
     /// # Returns
     ///
-    /// - `PerformanceDataPoint`: The collected data point containing CPU, memory, disk, network, and process metrics.
+    /// - `PerformanceDataPoint` - The collected data point containing CPU, memory, disk, network,
+    ///     and process metrics.
     #[instrument_trace]
     async fn collect_performance_data_point() -> PerformanceDataPoint {
         Self::refresh_system().await;
@@ -110,7 +111,8 @@ impl MonitorService {
     ///
     /// # Returns
     ///
-    /// - `PerformanceHistoryResponse`: The response containing all data points, total count, and time range.
+    /// - `PerformanceHistoryResponse` - The response containing all data points, total count, and
+    ///     time range.
     #[instrument_trace]
     pub async fn get_performance_history_response() -> PerformanceHistoryResponse {
         let data_points: Vec<PerformanceDataPoint> = get_performance_history().await;
@@ -140,7 +142,7 @@ impl MonitorService {
     ///
     /// # Returns
     ///
-    /// - `Option<NetworkStats>`: The captured network statistics, or `None` if refresh fails.
+    /// - `Option<NetworkStats>` - The captured network statistics, or `None` if refresh fails.
     async fn capture_network_data() -> Option<NetworkStats> {
         Self::refresh_networks().await;
         let mut stats: NetworkStats = NetworkStats::default();
@@ -167,7 +169,7 @@ impl MonitorService {
     ///
     /// # Arguments
     ///
-    /// - `&mut Context`: The request context to write the response to.
+    /// - `&mut Context` - The request context to write the response to.
     #[instrument_trace]
     pub async fn get_network_capture_data(ctx: &mut Context) {
         let response_data: NetworkStats = get_network_stats().await.unwrap_or_default();
@@ -180,7 +182,7 @@ impl MonitorService {
     ///
     /// # Arguments
     ///
-    /// - `&mut Context`: The request context to write the SSE response to.
+    /// - `&mut Context` - The request context to write the SSE response to.
     #[instrument_trace]
     pub async fn get_network_capture_stream(ctx: &mut Context) {
         let response_data: NetworkStats = get_network_stats().await.unwrap_or_default();
@@ -194,7 +196,7 @@ impl MonitorService {
     ///
     /// # Returns
     ///
-    /// - `ServerStatus`: The comprehensive server status object.
+    /// - `ServerStatus` - The comprehensive server status object.
     #[instrument_trace]
     pub async fn get_server_status() -> ServerStatus {
         let recent_data: Vec<PerformanceDataPoint> = get_recent_performance_data(1).await;
@@ -237,7 +239,7 @@ impl MonitorService {
     ///
     /// # Returns
     ///
-    /// - `SystemInfo`: The system information object.
+    /// - `SystemInfo` - The system information object.
     #[instrument_trace]
     pub async fn get_system_info() -> SystemInfo {
         let hostname: String = Self::get_hostname();
@@ -264,7 +266,7 @@ impl MonitorService {
     ///
     /// # Returns
     ///
-    /// - `f64`: The average CPU usage percentage (0.0 to 100.0).
+    /// - `f64` - The average CPU usage percentage (0.0 to 100.0).
     #[instrument_trace]
     async fn get_cpu_usage() -> f64 {
         Self::refresh_cpu().await;
@@ -281,7 +283,7 @@ impl MonitorService {
     ///
     /// # Returns
     ///
-    /// - `(u64, u64, f64)`: A tuple of (used bytes, total bytes, usage percentage).
+    /// - `(u64, u64, f64)` - A tuple of (used bytes, total bytes, usage percentage).
     #[instrument_trace]
     async fn get_memory_info() -> (u64, u64, f64) {
         Self::refresh_memory().await;
@@ -300,7 +302,7 @@ impl MonitorService {
     ///
     /// # Returns
     ///
-    /// - `(u64, u64, f64)`: A tuple of (used bytes, total bytes, usage percentage).
+    /// - `(u64, u64, f64)` - A tuple of (used bytes, total bytes, usage percentage).
     #[instrument_trace]
     fn get_disk_info() -> (u64, u64, f64) {
         let disks: Disks = Disks::new_with_refreshed_list();
@@ -322,7 +324,7 @@ impl MonitorService {
     ///
     /// # Returns
     ///
-    /// - `(u64, u64)`: A tuple of (received bytes, transmitted bytes).
+    /// - `(u64, u64)` - A tuple of (received bytes, transmitted bytes).
     #[instrument_trace]
     async fn get_network_info() -> (u64, u64) {
         Self::refresh_networks().await;
@@ -340,7 +342,7 @@ impl MonitorService {
     ///
     /// # Returns
     ///
-    /// - `u64`: The number of seconds since boot.
+    /// - `u64` - The number of seconds since boot.
     #[instrument_trace]
     fn get_uptime() -> u64 {
         System::uptime()
@@ -350,7 +352,7 @@ impl MonitorService {
     ///
     /// # Returns
     ///
-    /// - `f64`: The load average value (0.0 to ~number_of_cpus).
+    /// - `f64` - The load average value (0.0 to ~number_of_cpus).
     #[instrument_trace]
     async fn get_load_average() -> f64 {
         let system: RwLockReadGuard<'_, System> = Self::get_or_init_system().read().await;
@@ -367,7 +369,7 @@ impl MonitorService {
     ///
     /// # Returns
     ///
-    /// - `u32`: The number of active connections.
+    /// - `u32` - The number of active connections.
     #[instrument_trace]
     async fn get_active_connections() -> u32 {
         Self::get_or_init_system().read().await.processes().len() as u32
@@ -377,7 +379,7 @@ impl MonitorService {
     ///
     /// # Returns
     ///
-    /// - `u32`: The process count.
+    /// - `u32` - The process count.
     #[instrument_trace]
     async fn get_process_count() -> u32 {
         Self::get_or_init_system().read().await.processes().len() as u32
@@ -387,7 +389,7 @@ impl MonitorService {
     ///
     /// # Returns
     ///
-    /// - `String`: The hostname string.
+    /// - `String` - The hostname string.
     #[instrument_trace]
     fn get_hostname() -> String {
         System::host_name().unwrap_or_else(|| FALLBACK_UNKNOWN.to_string())
@@ -397,7 +399,7 @@ impl MonitorService {
     ///
     /// # Returns
     ///
-    /// - `String`: The OS name string.
+    /// - `String` - The OS name string.
     #[instrument_trace]
     fn get_os_name() -> String {
         System::name().unwrap_or_else(|| FALLBACK_UNKNOWN.to_string())
@@ -407,7 +409,7 @@ impl MonitorService {
     ///
     /// # Returns
     ///
-    /// - `String`: The OS version string.
+    /// - `String` - The OS version string.
     #[instrument_trace]
     fn get_os_version() -> String {
         System::os_version().unwrap_or_else(|| FALLBACK_UNKNOWN.to_string())
@@ -417,7 +419,7 @@ impl MonitorService {
     ///
     /// # Returns
     ///
-    /// - `String`: The kernel version string.
+    /// - `String` - The kernel version string.
     #[instrument_trace]
     fn get_kernel_version() -> String {
         System::kernel_version().unwrap_or_else(|| FALLBACK_UNKNOWN.to_string())
@@ -427,7 +429,7 @@ impl MonitorService {
     ///
     /// # Returns
     ///
-    /// - `u32`: The CPU core count.
+    /// - `u32` - The CPU core count.
     #[instrument_trace]
     async fn get_cpu_cores() -> u32 {
         Self::get_or_init_system().read().await.cpus().len() as u32
@@ -437,7 +439,7 @@ impl MonitorService {
     ///
     /// # Returns
     ///
-    /// - `String`: The CPU brand/model string.
+    /// - `String` - The CPU brand/model string.
     #[instrument_trace]
     async fn get_cpu_model() -> String {
         let system: RwLockReadGuard<'_, System> = Self::get_or_init_system().read().await;
@@ -451,7 +453,7 @@ impl MonitorService {
     ///
     /// # Returns
     ///
-    /// - `u64`: The total memory in bytes.
+    /// - `u64` - The total memory in bytes.
     #[instrument_trace]
     async fn get_total_memory() -> u64 {
         Self::refresh_memory().await;
@@ -462,7 +464,7 @@ impl MonitorService {
     ///
     /// # Returns
     ///
-    /// - `u64`: The total disk space in bytes.
+    /// - `u64` - The total disk space in bytes.
     #[instrument_trace]
     fn get_total_disk() -> u64 {
         let disks: Disks = Disks::new_with_refreshed_list();

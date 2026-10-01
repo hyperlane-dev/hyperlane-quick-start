@@ -3,12 +3,12 @@ use super::*;
 /// openapi notification create.
 #[utoipa::path(
     post,
-    path = "/api/notification/create",
+    path = OPENAPI_PATH_NOTIFICATION_CREATE,
     responses(
-        (status = 200, description = "Notification created successfully"),
-        (status = 400, description = "Bad request"),
-        (status = 401, description = "Unauthorized"),
-        (status = 500, description = "Internal server error")
+        (status = 200, description = OPENAPI_DESCRIPTION_NOTIFICATION_CREATED),
+        (status = 400, description = OPENAPI_DESCRIPTION_BAD_REQUEST),
+        (status = 401, description = OPENAPI_DESCRIPTION_UNAUTHORIZED),
+        (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
 #[instrument_trace]
@@ -17,11 +17,11 @@ pub fn openapi_notification_create() {}
 /// openapi notification list.
 #[utoipa::path(
     get,
-    path = "/api/notification/list",
+    path = OPENAPI_PATH_NOTIFICATION_LIST,
     responses(
-        (status = 200, description = "List of notifications retrieved successfully"),
-        (status = 401, description = "Unauthorized"),
-        (status = 500, description = "Internal server error")
+        (status = 200, description = OPENAPI_DESCRIPTION_NOTIFICATION_LIST_RETRIEVED),
+        (status = 401, description = OPENAPI_DESCRIPTION_UNAUTHORIZED),
+        (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
 #[instrument_trace]
@@ -30,15 +30,15 @@ pub fn openapi_notification_list() {}
 /// openapi notification get.
 #[utoipa::path(
     get,
-    path = "/api/notification/get/{id}",
+    path = OPENAPI_PATH_NOTIFICATION_GET,
     params(
-        ("id" = i32, Path, description = "Notification ID")
+        ("id" = i32, Path, description = OPENAPI_PARAM_DESCRIPTION_NOTIFICATION_ID)
     ),
     responses(
-        (status = 200, description = "Notification details retrieved successfully"),
-        (status = 400, description = "Bad request"),
-        (status = 404, description = "Notification not found"),
-        (status = 500, description = "Internal server error")
+        (status = 200, description = OPENAPI_DESCRIPTION_NOTIFICATION_DETAILS_RETRIEVED),
+        (status = 400, description = OPENAPI_DESCRIPTION_BAD_REQUEST),
+        (status = 404, description = OPENAPI_DESCRIPTION_NOTIFICATION_NOT_FOUND),
+        (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
 #[instrument_trace]
@@ -47,15 +47,15 @@ pub fn openapi_notification_get() {}
 /// openapi notification read.
 #[utoipa::path(
     post,
-    path = "/api/notification/read/{id}",
+    path = OPENAPI_PATH_NOTIFICATION_MARK_READ,
     params(
-        ("id" = i32, Path, description = "Notification ID")
+        ("id" = i32, Path, description = OPENAPI_PARAM_DESCRIPTION_NOTIFICATION_ID)
     ),
     responses(
-        (status = 200, description = "Notification marked as read successfully"),
-        (status = 400, description = "Bad request"),
-        (status = 404, description = "Notification not found"),
-        (status = 500, description = "Internal server error")
+        (status = 200, description = OPENAPI_DESCRIPTION_NOTIFICATION_MARKED_AS_READ),
+        (status = 400, description = OPENAPI_DESCRIPTION_BAD_REQUEST),
+        (status = 404, description = OPENAPI_DESCRIPTION_NOTIFICATION_NOT_FOUND),
+        (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
 #[instrument_trace]
@@ -64,11 +64,11 @@ pub fn openapi_notification_read() {}
 /// openapi notification read all.
 #[utoipa::path(
     post,
-    path = "/api/notification/read-all",
+    path = OPENAPI_PATH_NOTIFICATION_READ_ALL,
     responses(
-        (status = 200, description = "All notifications marked as read successfully"),
-        (status = 401, description = "Unauthorized"),
-        (status = 500, description = "Internal server error")
+        (status = 200, description = OPENAPI_DESCRIPTION_NOTIFICATION_ALL_MARKED_READ),
+        (status = 401, description = OPENAPI_DESCRIPTION_UNAUTHORIZED),
+        (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
 #[instrument_trace]
@@ -77,15 +77,15 @@ pub fn openapi_notification_read_all() {}
 /// openapi notification delete.
 #[utoipa::path(
     post,
-    path = "/api/notification/delete/{id}",
+    path = OPENAPI_PATH_NOTIFICATION_DELETE,
     params(
-        ("id" = i32, Path, description = "Notification ID")
+        ("id" = i32, Path, description = OPENAPI_PARAM_DESCRIPTION_NOTIFICATION_ID)
     ),
     responses(
-        (status = 200, description = "Notification deleted successfully"),
-        (status = 400, description = "Bad request"),
-        (status = 404, description = "Notification not found"),
-        (status = 500, description = "Internal server error")
+        (status = 200, description = SUCCESS_NOTIFICATION_DELETED),
+        (status = 400, description = OPENAPI_DESCRIPTION_BAD_REQUEST),
+        (status = 404, description = OPENAPI_DESCRIPTION_NOTIFICATION_NOT_FOUND),
+        (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
 #[instrument_trace]
@@ -94,11 +94,11 @@ pub fn openapi_notification_delete() {}
 /// openapi notification unread count.
 #[utoipa::path(
     get,
-    path = "/api/notification/unread-count",
+    path = OPENAPI_PATH_NOTIFICATION_UNREAD_COUNT,
     responses(
-        (status = 200, description = "Unread count retrieved successfully"),
-        (status = 401, description = "Unauthorized"),
-        (status = 500, description = "Internal server error")
+        (status = 200, description = OPENAPI_DESCRIPTION_NOTIFICATION_UNREAD_COUNT_RETRIEVED),
+        (status = 401, description = OPENAPI_DESCRIPTION_UNAUTHORIZED),
+        (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
 #[instrument_trace]

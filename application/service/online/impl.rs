@@ -2,11 +2,27 @@ use super::*;
 
 /// Implementation of `OnlineConnectedHook` for `ServerHook`.
 impl ServerHook for OnlineConnectedHook {
+    /// Creates a new instance.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The .
+    /// - `&mut Context` - The .
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
+    /// Handles one request and writes the response.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The stream.
+    /// - `&mut Context` - The request context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The handle result.
     #[instrument_trace]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let websocket: &WebSocket = get_global_websocket();
@@ -20,11 +36,27 @@ impl ServerHook for OnlineConnectedHook {
 
 /// Implementation of `OnlineClosedHook` for `ServerHook`.
 impl ServerHook for OnlineClosedHook {
+    /// Creates a new instance.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The .
+    /// - `&mut Context` - The .
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
+    /// Handles one request and writes the response.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The stream.
+    /// - `&mut Context` - The request context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The handle result.
     #[instrument_trace]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let websocket: &WebSocket = get_global_websocket();
@@ -38,6 +70,12 @@ impl ServerHook for OnlineClosedHook {
 
 /// Implementation of methods for `OnlineService`.
 impl OnlineService {
+    /// Broadcasts the current online user count.
+    ///
+    /// # Arguments
+    ///
+    /// - `BroadcastType<String>` - The lookup key.
+    /// - `ReceiverCount` - The number of items.
     #[instrument_trace]
     async fn broadcast_online_count(key: BroadcastType<String>, count: ReceiverCount) {
         let websocket: &WebSocket = get_global_websocket();

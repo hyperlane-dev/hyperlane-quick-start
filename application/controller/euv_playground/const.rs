@@ -57,3 +57,59 @@ pub const ERROR_CODE_EXCEEDS_PREFIX: &str = "code exceeds ";
 /// own `r#const::*` re-export. Keeping the value in sync is a one-line
 /// audit (`rg UNTITLED_PROJECT_NAME`).
 pub const CONTROLLER_UNTITLED_PROJECT_NAME: &str = "Untitled";
+
+/// OpenAPI response description for bad request.
+pub const OPENAPI_DESCRIPTION_BAD_REQUEST: &str = "Bad Request";
+
+/// OpenAPI response description for euv job not found.
+pub const OPENAPI_DESCRIPTION_EUV_JOB_NOT_FOUND: &str = "Job not found";
+
+/// OpenAPI response description for euv project name exists.
+pub const OPENAPI_DESCRIPTION_EUV_PROJECT_NAME_EXISTS: &str = "Project name already exists";
+
+/// OpenAPI response description for euv project not found.
+pub const OPENAPI_DESCRIPTION_EUV_PROJECT_NOT_FOUND: &str = "Project not found";
+
+/// OpenAPI response description for internal server error.
+pub const OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR: &str = "Internal Server Error";
+
+/// OpenAPI response description for success.
+pub const OPENAPI_DESCRIPTION_SUCCESS: &str = "Success";
+
+/// OpenAPI response description for unauthorized.
+pub const OPENAPI_DESCRIPTION_UNAUTHORIZED: &str = "Unauthorized";
+
+/// OpenAPI description of the build job id parameter.
+pub const OPENAPI_PARAM_DESCRIPTION_BUILD_JOB_ID: &str = "Build job id returned by /run";
+
+/// OpenAPI description of the project id parameter.
+pub const OPENAPI_PARAM_DESCRIPTION_PROJECT_ID: &str = "Project id";
+
+/// OpenAPI route path for the euv playground default code endpoint.
+pub const OPENAPI_PATH_EUV_PLAYGROUND_DEFAULT_CODE: &str = "/api/euv/playground/default-code";
+
+/// OpenAPI route path for the euv playground projects endpoint.
+pub const OPENAPI_PATH_EUV_PLAYGROUND_PROJECTS: &str = "/api/euv/playground/projects";
+
+/// OpenAPI route path for the euv playground projects create endpoint.
+pub const OPENAPI_PATH_EUV_PLAYGROUND_PROJECTS_CREATE: &str = "/api/euv/playground/projects/create";
+
+/// OpenAPI route path for the euv playground projects delete endpoint.
+pub const OPENAPI_PATH_EUV_PLAYGROUND_PROJECTS_DELETE: &str =
+    "/api/euv/playground/projects/delete/{id}";
+
+/// OpenAPI route path for the euv playground projects get endpoint.
+pub const OPENAPI_PATH_EUV_PLAYGROUND_PROJECTS_GET: &str = "/api/euv/playground/projects/get/{id}";
+
+/// OpenAPI route path for the euv playground projects save endpoint.
+pub const OPENAPI_PATH_EUV_PLAYGROUND_PROJECTS_SAVE: &str =
+    "/api/euv/playground/projects/save/{id}";
+
+/// OpenAPI route path for the euv playground run endpoint.
+pub const OPENAPI_PATH_EUV_PLAYGROUND_RUN: &str = "/api/euv/playground/run";
+
+/// OpenAPI route path for the euv playground run status endpoint.
+pub const OPENAPI_PATH_EUV_PLAYGROUND_RUN_STATUS: &str = "/api/euv/playground/run/status/{id}";
+
+/// OpenAPI tag grouping the euv playground routes.
+pub const OPENAPI_TAG_EUV_PLAYGROUND: &str = "euv_playground";

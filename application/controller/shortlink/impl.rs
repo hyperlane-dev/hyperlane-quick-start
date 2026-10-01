@@ -3,6 +3,12 @@ use super::*;
 /// Implementation of `InsertRoute` for `ServerHook`.
 impl ServerHook for InsertRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `InsertRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -13,6 +19,18 @@ impl ServerHook for InsertRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `InsertRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let request: ShortlinkInsertRequest = match request_opt {
             Ok(data) => data,
@@ -43,6 +61,12 @@ impl ServerHook for InsertRoute {
 /// Implementation of `QueryRoute` for `ServerHook`.
 impl ServerHook for QueryRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `QueryRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -53,6 +77,18 @@ impl ServerHook for QueryRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `QueryRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let encrypted_id: String = match id_opt {
             Some(id_str) => id_str,

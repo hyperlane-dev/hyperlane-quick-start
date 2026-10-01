@@ -3,6 +3,10 @@ use super::*;
 /// Conversion from `CicdPipelineModel` to `PipelineDto`.
 impl From<CicdPipelineModel> for PipelineDto {
     /// Converts a database pipeline model into a pipeline DTO, mapping timestamps to milliseconds.
+    ///
+    /// # Arguments
+    ///
+    /// - `CicdPipelineModel` - The source model.
     fn from(model: CicdPipelineModel) -> Self {
         let mut dto: PipelineDto = Self::default();
         dto.set_id(model.get_id())
@@ -26,6 +30,10 @@ impl From<CicdPipelineModel> for PipelineDto {
 /// Conversion from `CicdRunModel` to `RunDto`.
 impl From<CicdRunModel> for RunDto {
     /// Converts a database run model into a run DTO, parsing the status string into a `CicdStatus` enum.
+    ///
+    /// # Arguments
+    ///
+    /// - `CicdRunModel` - The source model.
     fn from(model: CicdRunModel) -> Self {
         let status: CicdStatus = model.get_status().parse().unwrap_or_default();
         let mut dto: RunDto = Self::default();
@@ -60,6 +68,10 @@ impl From<CicdRunModel> for RunDto {
 /// Conversion from `CicdJobModel` to `JobDto`.
 impl From<CicdJobModel> for JobDto {
     /// Converts a database job model into a job DTO, parsing the status string into a `CicdStatus` enum.
+    ///
+    /// # Arguments
+    ///
+    /// - `CicdJobModel` - The source model.
     fn from(model: CicdJobModel) -> Self {
         let status: CicdStatus = model.get_status().parse().unwrap_or_default();
         let mut dto: JobDto = Self::default();
@@ -86,6 +98,10 @@ impl From<CicdJobModel> for JobDto {
 /// Conversion from `CicdStepModel` to `StepDto`.
 impl From<CicdStepModel> for StepDto {
     /// Converts a database step model into a step DTO, parsing the status string into a `CicdStatus` enum.
+    ///
+    /// # Arguments
+    ///
+    /// - `CicdStepModel` - The source model.
     fn from(model: CicdStepModel) -> Self {
         let status: CicdStatus = model.get_status().parse().unwrap_or_default();
         let mut dto: StepDto = Self::default();
@@ -116,11 +132,11 @@ impl CicdService {
     ///
     /// # Arguments
     ///
-    /// - `CreatePipelineParam`: The pipeline creation parameters.
+    /// - `CreatePipelineParam` - The pipeline creation parameters.
     ///
     /// # Returns
     ///
-    /// - `Result<i32, String>`: The newly created pipeline identifier, or an error message.
+    /// - `Result<i32, String>` - The newly created pipeline identifier, or an error message.
     #[instrument_trace]
     pub async fn create_pipeline(param: CreatePipelineParam) -> Result<i32, String> {
         PipelineRepository::create(
@@ -135,11 +151,11 @@ impl CicdService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The pipeline identifier.
+    /// - `i32` - The pipeline identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<Option<PipelineDto>, String>`: The pipeline DTO if found, or `None`.
+    /// - `Result<Option<PipelineDto>, String>` - The pipeline DTO if found, or `None`.
     #[instrument_trace]
     pub async fn get_pipeline_by_id(id: i32) -> Result<Option<PipelineDto>, String> {
         Ok(PipelineRepository::find_by_id(id).await?.map(Into::into))
@@ -149,7 +165,7 @@ impl CicdService {
     ///
     /// # Returns
     ///
-    /// - `Result<Vec<PipelineDto>, String>`: A list of all pipeline DTOs.
+    /// - `Result<Vec<PipelineDto>, String>` - A list of all pipeline DTOs.
     #[instrument_trace]
     pub async fn get_all_pipelines() -> Result<Vec<PipelineDto>, String> {
         let models: Vec<CicdPipelineModel> = PipelineRepository::find_all().await?;
@@ -161,11 +177,12 @@ impl CicdService {
     ///
     /// # Arguments
     ///
-    /// - `TriggerRunParam`: The run trigger parameters including pipeline ID and optional commit info.
+    /// - `TriggerRunParam` - The run trigger parameters including pipeline ID and optional commit
+    ///     info.
     ///
     /// # Returns
     ///
-    /// - `Result<i32, String>`: The newly created run identifier, or an error message.
+    /// - `Result<i32, String>` - The newly created run identifier, or an error message.
     #[instrument_trace]
     pub async fn trigger_run(param: TriggerRunParam) -> Result<i32, String> {
         let pipeline_id: i32 = param.get_pipeline_id();
@@ -173,7 +190,7 @@ impl CicdService {
             PipelineRepository::find_by_id(pipeline_id).await?;
         let config_content: String = pipeline
             .and_then(|model: CicdPipelineModel| model.try_get_config_content().clone())
-            .ok_or_else(|| "Pipeline config content is required".to_string())?;
+            .ok_or_else(|| ERROR_PIPELINE_CONFIG_CONTENT_REQUIRED.to_string())?;
         let run_number: i32 = RunRepository::get_next_run_number(pipeline_id).await?;
         let run_result: CicdRunModel = RunRepository::create(
             pipeline_id,
@@ -198,12 +215,12 @@ impl CicdService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The run identifier to associate jobs with.
-    /// - `&str`: The YAML configuration content to parse.
+    /// - `i32` - The run identifier to associate jobs with.
+    /// - `&str` - The YAML configuration content to parse.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or a YAML parse error message.
+    /// - `Result<(), String>` - Ok on success, or a YAML parse error message.
     #[instrument_trace]
     async fn parse_config_and_create_jobs(run_id: i32, config_content: &str) -> Result<(), String> {
         let config: PipelineConfig = serde_yaml::from_str(config_content)
@@ -227,11 +244,11 @@ impl CicdService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The run identifier to execute.
+    /// - `i32` - The run identifier to execute.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on completion, or an error if any step fails to update.
+    /// - `Result<(), String>` - Ok on completion, or an error if any step fails to update.
     #[instrument_trace]
     pub async fn execute_run(run_id: i32) -> Result<(), String> {
         RunRepository::start(run_id).await?;
@@ -243,7 +260,7 @@ impl CicdService {
             param
                 .set_job_id(job_id)
                 .set_status(CicdStatus::Running)
-                .set_runner(Some("local-runner".to_string()));
+                .set_runner(Some(LOCAL_RUNNER.to_string()));
             Self::update_job_status(param).await?;
             let steps: Vec<StepDto> = Self::get_steps_by_job(job_id).await?;
             let mut job_has_error: bool = false;
@@ -259,7 +276,7 @@ impl CicdService {
                 Self::update_step_status(param).await?;
                 let command: String = step.try_get_command().clone().unwrap_or_default();
                 let output: String = Self::execute_command(run_id, step_id, &command).await;
-                let step_status: CicdStatus = if output.starts_with("Error:") {
+                let step_status: CicdStatus = if output.starts_with(ERROR_PREFIX) {
                     job_has_error = true;
                     has_error = true;
                     CicdStatus::Failure
@@ -289,7 +306,7 @@ impl CicdService {
             param
                 .set_job_id(job_id)
                 .set_status(job_status)
-                .set_runner(Some("local-runner".to_string()));
+                .set_runner(Some(LOCAL_RUNNER.to_string()));
             Self::update_job_status(param).await?;
             if job_has_error {
                 break;
@@ -310,17 +327,16 @@ impl CicdService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The run identifier for log streaming.
-    /// - `i32`: The step identifier for log streaming.
-    /// - `&str`: The shell command to execute.
+    /// - `i32` - The run identifier for log streaming.
+    /// - `&str` - The shell command to execute.
     ///
     /// # Returns
     ///
-    /// - `String`: The command output, or an error-prefixed string if execution fails.
+    /// - `String` - The command output, or an error-prefixed string if execution fails.
     #[instrument_trace]
     async fn execute_command(run_id: i32, step_id: i32, command: &str) -> String {
         if command.is_empty() {
-            return "No command to execute".to_string();
+            return NO_COMMAND_TO_EXECUTE.to_string();
         }
         let log_manager: &LogStreamManager = get_log_stream_manager();
         let output_result: Result<String, String> =
@@ -336,14 +352,13 @@ impl CicdService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The run identifier.
-    /// - `i32`: The step identifier.
-    /// - `&str`: The shell command to execute.
-    /// - `&LogStreamManager`: The manager for streaming step output to subscribers.
+    /// - `i32` - The run identifier.
+    /// - `&str` - The shell command to execute.
+    /// - `&LogStreamManager` - The manager for streaming step output to subscribers.
     ///
     /// # Returns
     ///
-    /// - `Result<String, String>`: The formatted step output on success, or an error message.
+    /// - `Result<String, String>` - The formatted step output on success, or an error message.
     #[instrument_trace]
     async fn execute_shell_command(
         run_id: i32,
@@ -353,10 +368,10 @@ impl CicdService {
     ) -> Result<String, String> {
         let is_windows: bool = cfg!(target_os = "windows");
         let shell: String = if is_windows {
-            std::env::var("COMSPEC")
+            std::env::var(ENV_COMSPEC)
                 .unwrap_or_else(|_: std::env::VarError| DEFAULT_SHELL_WINDOWS.to_string())
         } else {
-            std::env::var("SHELL")
+            std::env::var(ENV_SHELL)
                 .unwrap_or_else(|_: std::env::VarError| DEFAULT_SHELL_UNIX.to_string())
         };
         let mut cmd: Command = Command::new(&shell);
@@ -435,14 +450,13 @@ impl CicdService {
     ///
     /// # Arguments
     ///
-    /// - `ChildStdout`: The stdout handle of the child process.
-    /// - `i32`: The run identifier.
-    /// - `i32`: The step identifier.
-    /// - `&LogStreamManager`: The manager for streaming output.
+    /// - `ChildStdout` - The stdout handle of the child process.
+    /// - `i32` - The run identifier.
+    /// - `&LogStreamManager` - The manager for streaming output.
     ///
     /// # Returns
     ///
-    /// - `Result<String, String>`: The captured stdout content, or a read error message.
+    /// - `Result<String, String>` - The captured stdout content, or a read error message.
     #[instrument_trace]
     async fn read_stdout_stream(
         reader: ChildStdout,
@@ -465,14 +479,13 @@ impl CicdService {
     ///
     /// # Arguments
     ///
-    /// - `ChildStderr`: The stderr handle of the child process.
-    /// - `i32`: The run identifier.
-    /// - `i32`: The step identifier.
-    /// - `&LogStreamManager`: The manager for streaming output.
+    /// - `ChildStderr` - The stderr handle of the child process.
+    /// - `i32` - The run identifier.
+    /// - `&LogStreamManager` - The manager for streaming output.
     ///
     /// # Returns
     ///
-    /// - `Result<String, String>`: The captured stderr content, or a read error message.
+    /// - `Result<String, String>` - The captured stderr content, or a read error message.
     #[instrument_trace]
     async fn read_stderr_stream(
         reader: ChildStderr,
@@ -495,16 +508,15 @@ impl CicdService {
     ///
     /// # Arguments
     ///
-    /// - `R`: The asynchronous stream reader.
-    /// - `i32`: The run identifier.
-    /// - `i32`: The step identifier.
-    /// - `&LogStreamManager`: The manager for streaming output.
-    /// - `bool`: Whether the stream is stderr.
-    /// - `&str`: The prefix used when read errors occur.
+    /// - `R` - The asynchronous stream reader.
+    /// - `i32` - The run identifier.
+    /// - `&LogStreamManager` - The manager for streaming output.
+    /// - `bool` - Whether the stream is stderr.
+    /// - `&str` - The prefix used when read errors occur.
     ///
     /// # Returns
     ///
-    /// - `Result<String, String>`: The captured stream content, or a read error message.
+    /// - `Result<String, String>` - The captured stream content, or a read error message.
     #[instrument_trace]
     async fn read_output_stream<R>(
         mut reader: R,
@@ -540,11 +552,11 @@ impl CicdService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The pipeline identifier.
+    /// - `i32` - The pipeline identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<i32, String>`: The next run number, or an error message.
+    /// - `Result<i32, String>` - The next run number, or an error message.
     #[instrument_trace]
     pub async fn get_next_run_number(pipeline_id: i32) -> Result<i32, String> {
         RunRepository::get_next_run_number(pipeline_id).await
@@ -554,11 +566,11 @@ impl CicdService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The run identifier.
+    /// - `i32` - The run identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<Option<RunDto>, String>`: The run DTO if found, or `None`.
+    /// - `Result<Option<RunDto>, String>` - The run DTO if found, or `None`.
     #[instrument_trace]
     pub async fn get_run_by_id(id: i32) -> Result<Option<RunDto>, String> {
         Ok(RunRepository::find_by_id(id).await?.map(Into::into))
@@ -568,11 +580,11 @@ impl CicdService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The pipeline identifier.
+    /// - `i32` - The pipeline identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<Vec<RunDto>, String>`: A list of run DTOs for the pipeline.
+    /// - `Result<Vec<RunDto>, String>` - A list of run DTOs for the pipeline.
     #[instrument_trace]
     pub async fn get_runs_by_pipeline(pipeline_id: i32) -> Result<Vec<RunDto>, String> {
         let models: Vec<CicdRunModel> = RunRepository::find_by_pipeline(pipeline_id).await?;
@@ -583,11 +595,12 @@ impl CicdService {
     ///
     /// # Arguments
     ///
-    /// - `QueryRunsParam`: The query parameters including pagination and filter options.
+    /// - `QueryRunsParam` - The query parameters including pagination and filter options.
     ///
     /// # Returns
     ///
-    /// - `Result<PaginatedRunsDto, String>`: The paginated run results including total count and has-more flag.
+    /// - `Result<PaginatedRunsDto, String>` - The paginated run results including total count and
+    ///     has-more flag.
     #[instrument_trace]
     pub async fn query_runs(param: QueryRunsParam) -> Result<PaginatedRunsDto, String> {
         let page_size: u64 = param.try_get_page_size().unwrap_or(50) as u64;
@@ -613,12 +626,12 @@ impl CicdService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The run identifier.
-    /// - `CicdStatus`: The new status to set.
+    /// - `i32` - The run identifier.
+    /// - `CicdStatus` - The new status to set.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error message.
+    /// - `Result<(), String>` - Ok on success, or an error message.
     #[instrument_trace]
     pub async fn update_run_status(id: i32, status: CicdStatus) -> Result<(), String> {
         RunRepository::update_status(id, status).await
@@ -628,11 +641,11 @@ impl CicdService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The run identifier.
+    /// - `i32` - The run identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error message.
+    /// - `Result<(), String>` - Ok on success, or an error message.
     #[instrument_trace]
     pub async fn start_run(id: i32) -> Result<(), String> {
         RunRepository::start(id).await
@@ -642,12 +655,12 @@ impl CicdService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The run identifier.
-    /// - `CicdStatus`: The final status (Success or Failure).
+    /// - `i32` - The run identifier.
+    /// - `CicdStatus` - The final status (Success or Failure).
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error message.
+    /// - `Result<(), String>` - Ok on success, or an error message.
     #[instrument_trace]
     pub async fn complete_run(id: i32, status: CicdStatus) -> Result<(), String> {
         RunRepository::complete(id, status).await
@@ -657,12 +670,12 @@ impl CicdService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The run identifier to associate the job with.
-    /// - `String`: The name of the job.
+    /// - `i32` - The run identifier to associate the job with.
+    /// - `String` - The name of the job.
     ///
     /// # Returns
     ///
-    /// - `Result<i32, String>`: The newly created job identifier, or an error message.
+    /// - `Result<i32, String>` - The newly created job identifier, or an error message.
     #[instrument_trace]
     pub async fn create_job(run_id: i32, name: String) -> Result<i32, String> {
         let result: CicdJobModel = JobRepository::create(run_id, name).await?;
@@ -673,11 +686,11 @@ impl CicdService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The run identifier.
+    /// - `i32` - The run identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<Vec<JobDto>, String>`: A list of job DTOs for the run.
+    /// - `Result<Vec<JobDto>, String>` - A list of job DTOs for the run.
     #[instrument_trace]
     pub async fn get_jobs_by_run(run_id: i32) -> Result<Vec<JobDto>, String> {
         let models: Vec<CicdJobModel> = JobRepository::find_by_run(run_id).await?;
@@ -688,11 +701,11 @@ impl CicdService {
     ///
     /// # Arguments
     ///
-    /// - `UpdateJobStatusParam`: The job status update parameters.
+    /// - `UpdateJobStatusParam` - The job status update parameters.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error message.
+    /// - `Result<(), String>` - Ok on success, or an error message.
     #[instrument_trace]
     pub async fn update_job_status(param: UpdateJobStatusParam) -> Result<(), String> {
         JobRepository::update_status(
@@ -707,13 +720,13 @@ impl CicdService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The job identifier to associate the step with.
-    /// - `String`: The name of the step.
-    /// - `Option<String>`: The optional shell command to execute.
+    /// - `i32` - The job identifier to associate the step with.
+    /// - `String` - The name of the step.
+    /// - `Option<String>` - The optional shell command to execute.
     ///
     /// # Returns
     ///
-    /// - `Result<i32, String>`: The newly created step identifier, or an error message.
+    /// - `Result<i32, String>` - The newly created step identifier, or an error message.
     #[instrument_trace]
     pub async fn create_step(
         job_id: i32,
@@ -728,11 +741,11 @@ impl CicdService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The job identifier.
+    /// - `i32` - The job identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<Vec<StepDto>, String>`: A list of step DTOs for the job.
+    /// - `Result<Vec<StepDto>, String>` - A list of step DTOs for the job.
     #[instrument_trace]
     pub async fn get_steps_by_job(job_id: i32) -> Result<Vec<StepDto>, String> {
         let models: Vec<CicdStepModel> = StepRepository::find_by_job(job_id).await?;
@@ -743,11 +756,11 @@ impl CicdService {
     ///
     /// # Arguments
     ///
-    /// - `UpdateStepStatusParam`: The step status update parameters.
+    /// - `UpdateStepStatusParam` - The step status update parameters.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error message.
+    /// - `Result<(), String>` - Ok on success, or an error message.
     #[instrument_trace]
     pub async fn update_step_status(param: UpdateStepStatusParam) -> Result<(), String> {
         StepRepository::update_status(
@@ -762,11 +775,11 @@ impl CicdService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The run identifier.
+    /// - `i32` - The run identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<Option<RunDetailDto>, String>`: The detailed run DTO if found, or `None`.
+    /// - `Result<Option<RunDetailDto>, String>` - The detailed run DTO if found, or `None`.
     #[instrument_trace]
     pub async fn get_run_detail(run_id: i32) -> Result<Option<RunDetailDto>, String> {
         let run: Option<RunDto> = Self::get_run_by_id(run_id).await?;
@@ -792,7 +805,7 @@ impl CicdService {
     ///
     /// # Returns
     ///
-    /// - `Result<u32, String>`: The number of recovered runs, or an error message.
+    /// - `Result<u32, String>` - The number of recovered runs, or an error message.
     #[instrument_trace]
     pub async fn recover_interrupted_runs() -> Result<u32, String> {
         let running_runs: Vec<CicdRunModel> =
@@ -801,7 +814,7 @@ impl CicdService {
         if count == 0 {
             return Ok(0);
         }
-        let error_message: &str = "[System] Task was interrupted due to server restart";
+        let error_message: &str = LOG_TASK_INTERRUPTED;
         for run in running_runs {
             let run_id: i32 = run.get_id();
             let jobs: Vec<CicdJobModel> =
@@ -841,12 +854,14 @@ impl CicdService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The run identifier.
-    /// - `Vec<StepOffsetParam>`: The per-step offset parameters indicating how much output has been consumed.
+    /// - `i32` - The run identifier.
+    /// - `Vec<StepOffsetParam>` - The per-step offset parameters indicating how much output has
+    ///     been consumed.
     ///
     /// # Returns
     ///
-    /// - `Result<Option<IncrementalRunDetailDto>, String>`: The incremental run detail if found, or `None`.
+    /// - `Result<Option<IncrementalRunDetailDto>, String>` - The incremental run detail if found,
+    ///     or `None`.
     #[instrument_trace]
     pub async fn get_incremental_run_detail(
         run_id: i32,
@@ -935,10 +950,6 @@ impl CicdService {
 /// Builder for constructing formatted step output from stdout, stderr, and timeout state.
 impl StepOutputBuilder {
     /// Creates a new `StepOutputBuilder` with empty output and no timeout.
-    ///
-    /// # Returns
-    ///
-    /// - `StepOutputBuilder`: A new builder instance.
     fn new() -> Self {
         Self {
             stdout: String::new(),
@@ -952,31 +963,31 @@ impl StepOutputBuilder {
     ///
     /// # Arguments
     ///
-    /// - `C`: The content to append, implementing `AsRef<str>`.
+    /// - `C` - The content to append, implementing `AsRef<str>`.
     fn add_stdout<C>(&mut self, content: C)
     where
         C: AsRef<str>,
     {
-        self.stdout.push_str(content.as_ref());
+        self.get_mut_stdout().push_str(content.as_ref());
     }
 
     /// Appends stderr content to the builder.
     ///
     /// # Arguments
     ///
-    /// - `C`: The content to append, implementing `AsRef<str>`.
+    /// - `C` - The content to append, implementing `AsRef<str>`.
     fn add_stderr<C>(&mut self, content: C)
     where
         C: AsRef<str>,
     {
-        self.stderr.push_str(content.as_ref());
+        self.get_mut_stderr().push_str(content.as_ref());
     }
 
     /// Marks the step as having timed out with the specified duration.
     ///
     /// # Arguments
     ///
-    /// - `u64`: The timeout duration in seconds.
+    /// - `u64` - The timeout duration in seconds.
     fn mark_timeout(&mut self, secs: u64) {
         self.set_is_timeout(true);
         self.set_timeout_secs(secs);
@@ -986,26 +997,26 @@ impl StepOutputBuilder {
     ///
     /// # Returns
     ///
-    /// - `String`: The formatted step output string.
+    /// - `String` - The formatted step output string.
     fn build(self) -> String {
         let mut parts: Vec<String> = vec![];
-        let stdout: String = self.stdout.trim().to_string();
-        let stderr: String = self.stderr.trim().to_string();
+        let stdout: String = self.get_stdout().trim().to_string();
+        let stderr: String = self.get_stderr().trim().to_string();
         if !stdout.is_empty() {
             parts.push(format!("[Stdout]{BR}{stdout}"));
         }
         if !stderr.is_empty() {
             parts.push(format!("[Stderr]{BR}{stderr}"));
         }
-        if self.is_timeout {
+        if self.get_is_timeout() {
             parts.push(format!(
                 "[Timeout]{BR}Task was cancelled after {} seconds due to timeout",
-                self.timeout_secs
+                self.get_timeout_secs()
             ));
         }
         if parts.is_empty() {
-            "Command executed successfully (no output)".to_string()
-        } else if self.is_timeout {
+            NO_OUTPUT_MESSAGE.to_string()
+        } else if self.get_is_timeout() {
             let parts_join: String = parts.join(&format!("{BR}{BR}"));
             format!("Error: Task timeout{BR}{BR}{}", parts_join)
         } else {
@@ -1017,10 +1028,6 @@ impl StepOutputBuilder {
 /// Real-time log streaming and step output management for `LogStreamManager`.
 impl LogStreamManager {
     /// Creates a new `LogStreamManager` with empty broadcast channels and output storage.
-    ///
-    /// # Returns
-    ///
-    /// - `LogStreamManager`: A new instance ready for log streaming.
     #[instrument_trace]
     pub fn new() -> Self {
         Self {
@@ -1035,12 +1042,11 @@ impl LogStreamManager {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The run identifier.
-    /// - `i32`: The step identifier.
+    /// - `i32` - The run identifier.
     ///
     /// # Returns
     ///
-    /// - `String`: The composite key in the format "{run_id}:{step_id}".
+    /// - `String` - The composite key in the format "{run_id}:{step_id}".
     #[instrument_trace]
     fn get_step_key(run_id: i32, step_id: i32) -> String {
         format!("{run_id}:{step_id}")
@@ -1050,8 +1056,7 @@ impl LogStreamManager {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The run identifier.
-    /// - `i32`: The step identifier.
+    /// - `i32` - The run identifier.
     #[instrument_trace]
     pub async fn start_step_stream(&self, run_id: i32, step_id: i32) {
         let key: String = Self::get_step_key(run_id, step_id);
@@ -1067,7 +1072,7 @@ impl LogStreamManager {
                 stderr: arc_rwlock(String::new()),
             },
         );
-        self.step_statuses
+        self.get_step_statuses()
             .write()
             .await
             .insert(step_id, arc_rwlock(CicdStatus::Running));
@@ -1083,10 +1088,9 @@ impl LogStreamManager {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The run identifier.
-    /// - `i32`: The step identifier.
-    /// - `&str`: The log content to append.
-    /// - `bool`: Whether the content is from stderr.
+    /// - `i32` - The run identifier.
+    /// - `&str` - The log content to append.
+    /// - `bool` - Whether the content is from stderr.
     #[instrument_trace]
     pub async fn append_log(&self, run_id: i32, step_id: i32, content: &str, is_stderr: bool) {
         let key: String = Self::get_step_key(run_id, step_id);
@@ -1097,7 +1101,7 @@ impl LogStreamManager {
             is_stderr,
         };
         let entry_json: String = serde_json::to_string(&entry).unwrap_or_default();
-        if let Err(error) = self.broadcast_map.try_send(key, entry_json.clone()) {
+        if let Err(error) = self.get_broadcast_map().try_send(key, entry_json.clone()) {
             tracing::debug!("CICD log broadcast skipped: {error}");
         }
         if let Some(output) = self.get_step_outputs().read().await.get(&step_id) {
@@ -1115,12 +1119,12 @@ impl LogStreamManager {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The run identifier.
-    /// - `i32`: The step identifier.
+    /// - `i32` - The run identifier.
     ///
     /// # Returns
     ///
-    /// - `Option<BroadcastMapReceiver<String>>`: A receiver if the step has an active stream, or `None`.
+    /// - `Option<BroadcastMapReceiver<String>>` - A receiver if the step has an active stream, or
+    ///     `None`.
     #[instrument_trace]
     pub async fn create_step_receiver(
         &self,
@@ -1128,19 +1132,18 @@ impl LogStreamManager {
         step_id: i32,
     ) -> Option<BroadcastMapReceiver<String>> {
         let key: String = Self::get_step_key(run_id, step_id);
-        self.broadcast_map.subscribe(key)
+        self.get_broadcast_map().subscribe(key)
     }
 
     /// Updates the in-memory status of a step for real-time status queries.
     ///
     /// # Arguments
     ///
-    /// - `i32`: The run identifier (unused but kept for API consistency).
-    /// - `i32`: The step identifier.
-    /// - `CicdStatus`: The new status to set.
+    /// - `i32` - The run identifier (unused but kept for API consistency).
+    /// - `CicdStatus` - The new status to set.
     #[instrument_trace]
     pub async fn update_step_status(&self, _run_id: i32, step_id: i32, status: CicdStatus) {
-        if let Some(step_status) = self.step_statuses.read().await.get(&step_id) {
+        if let Some(step_status) = self.get_step_statuses().read().await.get(&step_id) {
             let mut status_guard: RwLockWriteGuard<'_, CicdStatus> = step_status.write().await;
             *status_guard = status;
         }
@@ -1150,12 +1153,11 @@ impl LogStreamManager {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The run identifier (unused but kept for API consistency).
-    /// - `i32`: The step identifier.
+    /// - `i32` - The run identifier (unused but kept for API consistency).
     ///
     /// # Returns
     ///
-    /// - `Option<String>`: The formatted output if the step exists, or `None`.
+    /// - `Option<String>` - The formatted output if the step exists, or `None`.
     #[instrument_trace]
     pub async fn get_step_output(&self, _run_id: i32, step_id: i32) -> Option<String> {
         let step_outputs: RwLockReadGuard<'_, HashMap<i32, StepOutput>> =
@@ -1165,7 +1167,7 @@ impl LogStreamManager {
         let stderr_guard: RwLockReadGuard<'_, String> = output.stderr.read().await;
         let mut result: String = String::new();
         if !stdout_guard.is_empty() {
-            result.push_str("[Stdout]");
+            result.push_str(OUTPUT_LABEL_STDOUT);
             result.push_str(BR);
             result.push_str(&stdout_guard);
         }
@@ -1173,7 +1175,7 @@ impl LogStreamManager {
             if !result.is_empty() {
                 result.push_str(BR);
             }
-            result.push_str("[Stderr]");
+            result.push_str(OUTPUT_LABEL_STDERR);
             result.push_str(BR);
             result.push_str(&stderr_guard);
         }
@@ -1184,12 +1186,11 @@ impl LogStreamManager {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The run identifier (unused but kept for API consistency).
-    /// - `i32`: The step identifier.
+    /// - `i32` - The run identifier (unused but kept for API consistency).
     ///
     /// # Returns
     ///
-    /// - `Option<String>`: The stdout content if the step exists, or `None`.
+    /// - `Option<String>` - The stdout content if the step exists, or `None`.
     #[instrument_trace]
     pub async fn get_step_stdout(&self, _run_id: i32, step_id: i32) -> Option<String> {
         Some(
@@ -1208,12 +1209,11 @@ impl LogStreamManager {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The run identifier (unused but kept for API consistency).
-    /// - `i32`: The step identifier.
+    /// - `i32` - The run identifier (unused but kept for API consistency).
     ///
     /// # Returns
     ///
-    /// - `Option<String>`: The stderr content if the step exists, or `None`.
+    /// - `Option<String>` - The stderr content if the step exists, or `None`.
     #[instrument_trace]
     pub async fn get_step_stderr(&self, _run_id: i32, step_id: i32) -> Option<String> {
         Some(
@@ -1232,11 +1232,11 @@ impl LogStreamManager {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The run identifier.
+    /// - `i32` - The run identifier.
     ///
     /// # Returns
     ///
-    /// - `Vec<i32>`: The list of active step identifiers.
+    /// - `Vec<i32>` - The list of active step identifiers.
     #[instrument_trace]
     pub async fn get_run_step_ids(&self, run_id: i32) -> Vec<i32> {
         self.get_active_steps()
@@ -1251,8 +1251,7 @@ impl LogStreamManager {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The run identifier.
-    /// - `i32`: The step identifier.
+    /// - `i32` - The run identifier.
     #[instrument_trace]
     pub async fn end_step_stream(&self, run_id: i32, step_id: i32) {
         if let Some(steps) = self.get_active_steps().write().await.get_mut(&run_id) {
@@ -1264,7 +1263,7 @@ impl LogStreamManager {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The run identifier.
+    /// - `i32` - The run identifier.
     #[instrument_trace]
     pub async fn end_run_streams(&self, run_id: i32) {
         self.get_active_steps().write().await.remove(&run_id);
@@ -1273,6 +1272,7 @@ impl LogStreamManager {
 
 /// Default implementation for `LogStreamManager`, delegating to `new`.
 impl Default for LogStreamManager {
+    /// Returns the default value.
     #[instrument_trace]
     fn default() -> Self {
         Self::new()

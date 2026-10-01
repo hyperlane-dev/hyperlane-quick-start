@@ -3,6 +3,12 @@ use super::*;
 /// Implementation of `ListRecordsRoute` for `ServerHook`.
 impl ServerHook for ListRecordsRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `ListRecordsRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -12,6 +18,18 @@ impl ServerHook for ListRecordsRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `ListRecordsRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         match RedisService::get_all_redis_records().await {
             Ok(records) => {
@@ -32,6 +50,12 @@ impl ServerHook for ListRecordsRoute {
 /// Implementation of `CreateRecordRoute` for `ServerHook`.
 impl ServerHook for CreateRecordRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `CreateRecordRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -42,6 +66,18 @@ impl ServerHook for CreateRecordRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `CreateRecordRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let record: RedisRecord = match record_opt {
             Ok(data) => data,
@@ -71,6 +107,12 @@ impl ServerHook for CreateRecordRoute {
 /// Implementation of `UpdateRecordRoute` for `ServerHook`.
 impl ServerHook for UpdateRecordRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `UpdateRecordRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -81,6 +123,18 @@ impl ServerHook for UpdateRecordRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `UpdateRecordRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let record: RedisRecord = match record_opt {
             Ok(data) => data,
@@ -110,6 +164,12 @@ impl ServerHook for UpdateRecordRoute {
 /// Implementation of `DeleteRecordRoute` for `ServerHook`.
 impl ServerHook for DeleteRecordRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `DeleteRecordRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -119,6 +179,18 @@ impl ServerHook for DeleteRecordRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `DeleteRecordRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let querys: &RequestQuerys = ctx.get_request().get_querys();
         let key: &String = match querys.get("key") {

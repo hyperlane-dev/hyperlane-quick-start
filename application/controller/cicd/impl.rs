@@ -3,6 +3,12 @@ use super::*;
 /// Implementation of `CreatePipelineRoute` for `ServerHook`.
 impl ServerHook for CreatePipelineRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `CreatePipelineRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -13,6 +19,18 @@ impl ServerHook for CreatePipelineRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `CreatePipelineRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let param: CreatePipelineParam = match param {
             Ok(data) => data,
@@ -42,6 +60,12 @@ impl ServerHook for CreatePipelineRoute {
 /// Implementation of `ListPipelinesRoute` for `ServerHook`.
 impl ServerHook for ListPipelinesRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `ListPipelinesRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -51,6 +75,18 @@ impl ServerHook for ListPipelinesRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `ListPipelinesRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         match CicdService::get_all_pipelines().await {
             Ok(pipelines) => {
@@ -72,6 +108,12 @@ impl ServerHook for ListPipelinesRoute {
 /// Implementation of `GetPipelineRoute` for `ServerHook`.
 impl ServerHook for GetPipelineRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `GetPipelineRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -81,6 +123,18 @@ impl ServerHook for GetPipelineRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `GetPipelineRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let id: i32 = match ctx
             .get_request()
@@ -125,6 +179,12 @@ impl ServerHook for GetPipelineRoute {
 /// Implementation of `TriggerRunRoute` for `ServerHook`.
 impl ServerHook for TriggerRunRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `TriggerRunRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -135,6 +195,18 @@ impl ServerHook for TriggerRunRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `TriggerRunRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let param: TriggerRunParam = match param {
             Ok(data) => data,
@@ -164,6 +236,12 @@ impl ServerHook for TriggerRunRoute {
 /// Implementation of `ListRunsRoute` for `ServerHook`.
 impl ServerHook for ListRunsRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `ListRunsRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -173,15 +251,29 @@ impl ServerHook for ListRunsRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `ListRunsRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let querys: &RequestQuerys = ctx.get_request().get_querys();
         let page_size: Option<i32> = querys
-            .get("page_size")
+            .get(QUERY_KEY_PAGE_SIZE)
             .and_then(|s: &String| s.parse().ok())
             .map(|p: i32| p.min(MAX_PAGE_SIZE));
-        let last_id: Option<i32> = querys.get("last_id").and_then(|s: &String| s.parse().ok());
+        let last_id: Option<i32> = querys
+            .get(QUERY_KEY_LAST_ID)
+            .and_then(|s: &String| s.parse().ok());
         let pipeline_id: Option<i32> = querys
-            .get("pipeline_id")
+            .get(QUERY_KEY_PIPELINE_ID)
             .and_then(|s: &String| s.parse().ok());
         let mut param: QueryRunsParam = QueryRunsParam::default();
         param
@@ -209,6 +301,12 @@ impl ServerHook for ListRunsRoute {
 /// Implementation of `GetRunRoute` for `ServerHook`.
 impl ServerHook for GetRunRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `GetRunRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -218,6 +316,18 @@ impl ServerHook for GetRunRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `GetRunRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let querys: &RequestQuerys = ctx.get_request().get_querys();
         let id: i32 = match querys.get("id").and_then(|s: &String| s.parse().ok()) {
@@ -256,6 +366,12 @@ impl ServerHook for GetRunRoute {
 /// Implementation of `GetRunDetailRoute` for `ServerHook`.
 impl ServerHook for GetRunDetailRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `GetRunDetailRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -265,6 +381,18 @@ impl ServerHook for GetRunDetailRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `GetRunDetailRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let id: i32 = match ctx
             .get_request()
@@ -307,6 +435,12 @@ impl ServerHook for GetRunDetailRoute {
 /// Implementation of `UpdateJobRoute` for `ServerHook`.
 impl ServerHook for UpdateJobRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `UpdateJobRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -317,6 +451,18 @@ impl ServerHook for UpdateJobRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `UpdateJobRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let param: UpdateJobStatusParam = match param {
             Ok(data) => data,
@@ -347,6 +493,12 @@ impl ServerHook for UpdateJobRoute {
 /// Implementation of `UpdateStepRoute` for `ServerHook`.
 impl ServerHook for UpdateStepRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `UpdateStepRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -357,6 +509,18 @@ impl ServerHook for UpdateStepRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `UpdateStepRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let param: UpdateStepStatusParam = match param {
             Ok(data) => data,
@@ -387,6 +551,12 @@ impl ServerHook for UpdateStepRoute {
 /// Implementation of `GetIncrementalRunDetailRoute` for `ServerHook`.
 impl ServerHook for GetIncrementalRunDetailRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `GetIncrementalRunDetailRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -396,9 +566,24 @@ impl ServerHook for GetIncrementalRunDetailRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `GetIncrementalRunDetailRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let querys: &RequestQuerys = ctx.get_request().get_querys();
-        let run_id: i32 = match querys.get("run_id").and_then(|s: &String| s.parse().ok()) {
+        let run_id: i32 = match querys
+            .get(QUERY_KEY_RUN_ID)
+            .and_then(|s: &String| s.parse().ok())
+        {
             Some(id) => id,
             None => {
                 let response: ApiResponse<&str> = ApiResponse::new(
@@ -409,7 +594,7 @@ impl ServerHook for GetIncrementalRunDetailRoute {
                 return Status::Continue;
             }
         };
-        let step_offsets: Vec<StepOffsetParam> = match querys.get("offsets") {
+        let step_offsets: Vec<StepOffsetParam> = match querys.get(QUERY_KEY_OFFSETS) {
             Some(offsets_str) => {
                 serde_json::from_str::<Vec<StepOffsetParam>>(offsets_str).unwrap_or_default()
             }
@@ -440,6 +625,12 @@ impl ServerHook for GetIncrementalRunDetailRoute {
 /// Implementation of `CicdViewRoute` for `ServerHook`.
 impl ServerHook for CicdViewRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `CicdViewRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -450,6 +641,18 @@ impl ServerHook for CicdViewRoute {
         response_header(LOCATION => CICD_VIEW_REDIRECT_PATH)
     )]
     #[instrument_trace]
+    /// Handles the `CicdViewRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue
     }
@@ -458,6 +661,12 @@ impl ServerHook for CicdViewRoute {
 /// Implementation of `RunLogsSseRoute` for `ServerHook`.
 impl ServerHook for RunLogsSseRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `RunLogsSseRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -469,9 +678,24 @@ impl ServerHook for RunLogsSseRoute {
         response_header(CONNECTION => KEEP_ALIVE)
     )]
     #[instrument_trace]
+    /// Handles the `RunLogsSseRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
         let querys: &RequestQuerys = ctx.get_request().get_querys();
-        let run_id: i32 = match querys.get("run_id").and_then(|s: &String| s.parse().ok()) {
+        let run_id: i32 = match querys
+            .get(QUERY_KEY_RUN_ID)
+            .and_then(|s: &String| s.parse().ok())
+        {
             Some(id) => id,
             None => {
                 let response: ApiResponse<&str> = ApiResponse::new(
@@ -575,15 +799,25 @@ impl ServerHook for RunLogsSseRoute {
 
 /// Implementation of methods for `RunLogsSseRoute`.
 impl RunLogsSseRoute {
+    /// Escapes every character that may not appear literally inside a
+    /// JSON string, so the text can be embedded in one.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str` - The raw text whose characters are escaped.
+    ///
+    /// # Returns
+    ///
+    /// - `String` - The escaped JSON string literal.
     fn escape_json_string(escape: &str) -> String {
         escape
             .chars()
-            .map(|escape_item| match escape_item {
-                '"' => "\\\"".to_string(),
-                '\\' => "\\\\".to_string(),
-                '\n' => "\\n".to_string(),
-                '\r' => "\\r".to_string(),
-                '\t' => "\\t".to_string(),
+            .map(|escape_item: char| match escape_item {
+                '"' => JSON_ESCAPED_DOUBLE_QUOTE.to_string(),
+                '\\' => JSON_ESCAPED_BACKSLASH.to_string(),
+                '\n' => JSON_ESCAPED_LINE_FEED.to_string(),
+                '\r' => JSON_ESCAPED_CARRIAGE_RETURN.to_string(),
+                '\t' => JSON_ESCAPED_TAB.to_string(),
                 escape_item if escape_item.is_control() => format!("\\u{:04x}", escape_item as u32),
                 escape_item => escape_item.to_string(),
             })

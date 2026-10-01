@@ -2,6 +2,11 @@ use super::*;
 
 /// Implementation of `Relation` for `RelationTrait`.
 impl RelationTrait for Relation {
+    /// Defines the relations owned by this entity.
+    ///
+    /// # Returns
+    ///
+    /// - `RelationDef` - The relation definition declared by this entity.
     fn def(&self) -> RelationDef {
         panic!("No relations defined - using manual association management")
     }
@@ -11,11 +16,20 @@ impl RelationTrait for Relation {
 impl std::str::FromStr for UserRole {
     type Err = String;
 
+    /// Parses a role name into its `UserRole` variant.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str` - The role name to parse.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Self, Self::Err>` - The matching role, or the default when the name is unknown.
     #[instrument_trace]
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "admin" => Ok(UserRole::Admin),
-            "user" => Ok(UserRole::User),
+            USER_ROLE_ADMIN => Ok(UserRole::Admin),
+            USER_ROLE_USER => Ok(UserRole::User),
             _ => Ok(UserRole::default()),
         }
     }
@@ -27,12 +41,12 @@ impl UserRole {
     ///
     /// # Returns
     ///
-    /// - `&'static str`: The static string slice representing the variant.
+    /// - `&'static str` - The static string slice representing the variant.
     #[instrument_trace]
     pub fn as_str(&self) -> &'static str {
         match self {
-            UserRole::User => "user",
-            UserRole::Admin => "admin",
+            UserRole::User => USER_ROLE_USER,
+            UserRole::Admin => USER_ROLE_ADMIN,
         }
     }
 
@@ -40,16 +54,16 @@ impl UserRole {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The string to parse (e.g., "user", "admin").
+    /// - `&str` - The string to parse (e.g., "user", "admin").
     ///
     /// # Returns
     ///
-    /// - `Option<Self>`: The matching enum variant, or None.
+    /// - `Option<Self>` - The matching enum variant, or None.
     #[instrument_trace]
     pub fn from_string(s: &str) -> Option<Self> {
         match s {
-            "user" => Some(UserRole::User),
-            "admin" => Some(UserRole::Admin),
+            USER_ROLE_USER => Some(UserRole::User),
+            USER_ROLE_ADMIN => Some(UserRole::Admin),
             _ => None,
         }
     }
@@ -58,7 +72,7 @@ impl UserRole {
     ///
     /// # Returns
     ///
-    /// - `i16`: The numeric discriminant of the variant.
+    /// - `i16` - The numeric discriminant of the variant.
     #[instrument_trace]
     pub fn to_i16(&self) -> i16 {
         *self as i16
@@ -68,11 +82,11 @@ impl UserRole {
     ///
     /// # Arguments
     ///
-    /// - `i16`: The numeric value to convert.
+    /// - `i16` - The numeric value to convert.
     ///
     /// # Returns
     ///
-    /// - `Option<Self>`: The matching enum variant, or None.
+    /// - `Option<Self>` - The matching enum variant, or None.
     #[instrument_trace]
     pub fn from_i16(v: i16) -> Option<Self> {
         match v {
@@ -86,7 +100,7 @@ impl UserRole {
     ///
     /// # Returns
     ///
-    /// - `bool`: True if the role is Admin.
+    /// - `bool` - True if the role is Admin.
     #[instrument_trace]
     pub fn is_admin(&self) -> bool {
         matches!(self, UserRole::Admin)
@@ -95,6 +109,11 @@ impl UserRole {
 
 /// Implementation of methods for `From`.
 impl From<UserRole> for i16 {
+    /// Converts a `UserRole` into its numeric discriminant.
+    ///
+    /// # Arguments
+    ///
+    /// - `UserRole` - The role to convert.
     #[instrument_trace]
     fn from(role: UserRole) -> Self {
         role as i16
@@ -105,6 +124,15 @@ impl From<UserRole> for i16 {
 impl TryFrom<i16> for UserRole {
     type Error = String;
 
+    /// Converts a numeric discriminant into its `UserRole` variant.
+    ///
+    /// # Arguments
+    ///
+    /// - `i16` - The numeric discriminant to convert.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Self, Self::Error>` - The matching role, or an error message.
     #[instrument_trace]
     fn try_from(v: i16) -> Result<Self, Self::Error> {
         UserRole::from_i16(v).ok_or_else(|| format!("Invalid UserRole value: {v}"))
@@ -117,13 +145,13 @@ impl UserStatus {
     ///
     /// # Returns
     ///
-    /// - `&'static str`: The static string slice representing the variant.
+    /// - `&'static str` - The static string slice representing the variant.
     #[instrument_trace]
     pub fn as_str(&self) -> &'static str {
         match self {
-            UserStatus::Pending => "pending",
-            UserStatus::Approved => "approved",
-            UserStatus::Rejected => "rejected",
+            UserStatus::Pending => USER_STATUS_PENDING,
+            UserStatus::Approved => USER_STATUS_APPROVED,
+            UserStatus::Rejected => USER_STATUS_REJECTED,
         }
     }
 
@@ -131,17 +159,17 @@ impl UserStatus {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The string to parse (e.g., "pending", "approved", "rejected").
+    /// - `&str` - The string to parse (e.g., "pending", "approved", "rejected").
     ///
     /// # Returns
     ///
-    /// - `Option<Self>`: The matching enum variant, or None.
+    /// - `Option<Self>` - The matching enum variant, or None.
     #[instrument_trace]
     pub fn from_string(s: &str) -> Option<Self> {
         match s {
-            "pending" => Some(UserStatus::Pending),
-            "approved" => Some(UserStatus::Approved),
-            "rejected" => Some(UserStatus::Rejected),
+            USER_STATUS_PENDING => Some(UserStatus::Pending),
+            USER_STATUS_APPROVED => Some(UserStatus::Approved),
+            USER_STATUS_REJECTED => Some(UserStatus::Rejected),
             _ => None,
         }
     }
@@ -150,7 +178,7 @@ impl UserStatus {
     ///
     /// # Returns
     ///
-    /// - `i16`: The numeric discriminant of the variant.
+    /// - `i16` - The numeric discriminant of the variant.
     #[instrument_trace]
     pub fn to_i16(&self) -> i16 {
         *self as i16
@@ -160,11 +188,11 @@ impl UserStatus {
     ///
     /// # Arguments
     ///
-    /// - `i16`: The numeric value to convert.
+    /// - `i16` - The numeric value to convert.
     ///
     /// # Returns
     ///
-    /// - `Option<Self>`: The matching enum variant, or None.
+    /// - `Option<Self>` - The matching enum variant, or None.
     #[instrument_trace]
     pub fn from_i16(v: i16) -> Option<Self> {
         match v {
@@ -178,6 +206,11 @@ impl UserStatus {
 
 /// Implementation of methods for `From`.
 impl From<UserStatus> for i16 {
+    /// Converts a `UserStatus` into its numeric discriminant.
+    ///
+    /// # Arguments
+    ///
+    /// - `UserStatus` - The status to convert.
     #[instrument_trace]
     fn from(status: UserStatus) -> Self {
         status as i16
@@ -188,6 +221,15 @@ impl From<UserStatus> for i16 {
 impl TryFrom<i16> for UserStatus {
     type Error = String;
 
+    /// Converts a numeric discriminant into its `UserStatus` variant.
+    ///
+    /// # Arguments
+    ///
+    /// - `i16` - The numeric discriminant to convert.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Self, Self::Error>` - The matching status, or an error message.
     #[instrument_trace]
     fn try_from(v: i16) -> Result<Self, Self::Error> {
         UserStatus::from_i16(v).ok_or_else(|| format!("Invalid UserStatus value: {v}"))

@@ -6,7 +6,7 @@ impl OrderService {
     ///
     /// # Returns
     ///
-    /// - `String`: The generated bill number string.
+    /// - `String` - The generated bill number string.
     #[instrument_trace]
     fn generate_bill_no() -> String {
         let timestamp: u64 = timestamp_millis();
@@ -17,12 +17,14 @@ impl OrderService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The user ID of the record owner.
-    /// - `CreateRecordRequest`: The request containing amount, category, transaction type, description, bill date, and image IDs.
+    /// - `i32` - The user ID of the record owner.
+    /// - `CreateRecordRequest` - The request containing amount, category, transaction type,
+    ///     description, bill date, and image IDs.
     ///
     /// # Returns
     ///
-    /// - `Result<CreateRecordWithImagesResponse, String>`: The created record with its images, or an error.
+    /// - `Result<CreateRecordWithImagesResponse, String>` - The created record with its images, or
+    ///     an error.
     #[instrument_trace]
     pub async fn create_record(
         user_id: i32,
@@ -68,11 +70,12 @@ impl OrderService {
     ///
     /// # Arguments
     ///
-    /// - `RecordQueryRequest`: The query parameters including user ID, date range, category, transaction type, page, and limit.
+    /// - `RecordQueryRequest` - The query parameters including user ID, date range, category,
+    ///     transaction type, page, and limit.
     ///
     /// # Returns
     ///
-    /// - `Result<RecordListResponse, String>`: The paginated list of records with statistics.
+    /// - `Result<RecordListResponse, String>` - The paginated list of records with statistics.
     #[instrument_trace]
     pub async fn list_records(query: RecordQueryRequest) -> Result<RecordListResponse, String> {
         let page: i32 = query.get_page().unwrap_or(1);
@@ -130,11 +133,11 @@ impl OrderService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The record ID.
+    /// - `i32` - The record ID.
     ///
     /// # Returns
     ///
-    /// - `Result<Option<RecordWithImagesResponse>, String>`: The record with images if found, or `None`.
+    /// - `Result<Option<RecordResponse>, String>` - The record, or an error message.
     #[instrument_trace]
     pub async fn get_record(record_id: i32) -> Result<Option<RecordResponse>, String> {
         match RecordRepository::find_by_id(record_id).await? {
@@ -147,6 +150,16 @@ impl OrderService {
         }
     }
 
+    /// Fills record responses with their users and images.
+    ///
+    /// # Arguments
+    ///
+    /// - `Vec<OrderRecordModel>` - The records to process.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Vec<RecordResponse>, String>` - The enriched records with users and images, or an
+    ///     error message.
     #[instrument_trace]
     async fn enrich_records_with_users_and_images(
         records: Vec<OrderRecordModel>,
@@ -199,6 +212,15 @@ impl OrderService {
         Ok(responses)
     }
 
+    /// Fills a record response with its user data.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut RecordResponse` - The response.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), String>` - The enriched record with user, or an error message.
     #[instrument_trace]
     async fn enrich_record_with_user(response: &mut RecordResponse) -> Result<(), String> {
         let user_id: i32 = AuthService::decode_id(response.get_user_id())?;
@@ -212,6 +234,15 @@ impl OrderService {
         Ok(())
     }
 
+    /// Converts the record model into its response.
+    ///
+    /// # Arguments
+    ///
+    /// - `&OrderRecordModel` - The source model.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<RecordResponse, String>` - The model to record response result.
     #[instrument_trace]
     fn model_to_record_response(model: &OrderRecordModel) -> Result<RecordResponse, String> {
         let mut response: RecordResponse = RecordResponse::default();
@@ -242,7 +273,8 @@ impl OrderService {
     ///
     /// # Returns
     ///
-    /// - `Result<OverviewStatisticsResponse, String>`: The aggregated statistics on success, or an error message on failure.
+    /// - `Result<OverviewStatisticsResponse, String>` - The aggregated statistics on success, or an
+    ///     error message on failure.
     #[instrument_trace]
     pub async fn get_overview_statistics() -> Result<OverviewStatisticsResponse, String> {
         let today: NaiveDate = Local::now().naive_local().date();
@@ -335,6 +367,15 @@ impl OrderService {
         Ok(response)
     }
 
+    /// Gets the date statistics.
+    ///
+    /// # Arguments
+    ///
+    /// - `NaiveDate` - The target date.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(i64, Decimal, Decimal), String>` - The date statistics, or an error message.
     #[instrument_trace]
     async fn get_date_statistics(date: NaiveDate) -> Result<(i64, Decimal, Decimal), String> {
         let records: Vec<OrderRecordModel> = RecordRepository::find_by_bill_date(date).await?;
@@ -352,6 +393,15 @@ impl OrderService {
         Ok((transaction_count, total_income, total_expense))
     }
 
+    /// Returns the number of newly registered users.
+    ///
+    /// # Arguments
+    ///
+    /// - `NaiveDate` - The target date.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<i64, String>` - The new users count, or an error message.
     #[instrument_trace]
     async fn get_new_users_count(date: NaiveDate) -> Result<i64, String> {
         let start_of_day: NaiveDateTime = date.and_hms_opt(0, 0, 0).unwrap();
@@ -359,6 +409,15 @@ impl OrderService {
         UserRepository::count_by_created_at_range(start_of_day, end_of_day).await
     }
 
+    /// Gets the daily trend.
+    ///
+    /// # Arguments
+    ///
+    /// - `i64` - The number of days.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<DailyTrend, String>` - The daily trend, or an error message.
     #[instrument_trace]
     async fn get_daily_trend(days: i64) -> Result<DailyTrend, String> {
         let end_date: NaiveDate = Local::now().naive_local().date();
@@ -373,7 +432,7 @@ impl OrderService {
             dates.push(current_date.to_string());
             let day_records: Vec<&OrderRecordModel> = records
                 .iter()
-                .filter(|r| r.get_bill_date() == &current_date)
+                .filter(|r: &&OrderRecordModel| r.get_bill_date() == &current_date)
                 .collect();
             let mut day_income: Decimal = Decimal::ZERO;
             let mut day_expense: Decimal = Decimal::ZERO;
@@ -396,6 +455,15 @@ impl OrderService {
         Ok(trend)
     }
 
+    /// Gets the monthly comparison.
+    ///
+    /// # Arguments
+    ///
+    /// - `i64` - The months.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<MonthlyComparison, String>` - The monthly comparison, or an error message.
     #[instrument_trace]
     async fn get_monthly_comparison(months: i64) -> Result<MonthlyComparison, String> {
         let now: chrono::DateTime<Local> = Local::now();
@@ -438,6 +506,11 @@ impl OrderService {
         Ok(comparison)
     }
 
+    /// Gets the category distribution.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Vec<CategoryItem>, String>` - The category distribution, or an error message.
     #[instrument_trace]
     async fn get_category_distribution() -> Result<Vec<CategoryItem>, String> {
         let records: Vec<OrderRecordModel> = RecordRepository::find_all().await?;
@@ -450,7 +523,7 @@ impl OrderService {
         }
         let mut result: Vec<CategoryItem> = category_map
             .into_iter()
-            .map(|(name, value)| {
+            .map(|(name, value): (String, i64)| {
                 let mut item: CategoryItem = CategoryItem::default();
                 item.set_name(name);
                 item.set_value(value);
@@ -465,6 +538,15 @@ impl OrderService {
         Ok(result)
     }
 
+    /// Gets the user growth.
+    ///
+    /// # Arguments
+    ///
+    /// - `i64` - The number of days.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<UserGrowth, String>` - The user growth, or an error message.
     #[instrument_trace]
     async fn get_user_growth(days: i64) -> Result<UserGrowth, String> {
         let end_date: NaiveDate = Local::now().naive_local().date();
@@ -487,6 +569,12 @@ impl OrderService {
         Ok(growth)
     }
 
+    /// Gets the transaction type distribution.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<TransactionTypeDistribution, String>` - The transaction type distribution, or an
+    ///     error message.
     #[instrument_trace]
     async fn get_transaction_type_distribution() -> Result<TransactionTypeDistribution, String> {
         let records: Vec<OrderRecordModel> = RecordRepository::find_all().await?;
@@ -512,6 +600,16 @@ impl OrderService {
         Ok(distribution)
     }
 
+    /// Gets the transaction count trend.
+    ///
+    /// # Arguments
+    ///
+    /// - `i64` - The number of days.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<TransactionCountTrend, String>` - The transaction count trend, or an error
+    ///     message.
     #[instrument_trace]
     async fn get_transaction_count_trend(days: i64) -> Result<TransactionCountTrend, String> {
         let end_date: NaiveDate = Local::now().naive_local().date();
@@ -525,7 +623,7 @@ impl OrderService {
             dates.push(current_date.to_string());
             let day_count: i64 = records
                 .iter()
-                .filter(|r| r.get_bill_date() == &current_date)
+                .filter(|r: &&OrderRecordModel| r.get_bill_date() == &current_date)
                 .count() as i64;
             counts.push(day_count);
             current_date += chrono::Duration::days(1);
@@ -536,6 +634,12 @@ impl OrderService {
         Ok(trend)
     }
 
+    /// Gets the category amount distribution.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Vec<CategoryAmountItem>, String>` - The category amount distribution, or an error
+    ///     message.
     #[instrument_trace]
     async fn get_category_amount_distribution() -> Result<Vec<CategoryAmountItem>, String> {
         let records: Vec<OrderRecordModel> = RecordRepository::find_all().await?;
@@ -564,6 +668,15 @@ impl OrderService {
         Ok(result)
     }
 
+    /// Gets the user activity.
+    ///
+    /// # Arguments
+    ///
+    /// - `i64` - The number of days.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<UserActivity, String>` - The user activity, or an error message.
     #[instrument_trace]
     async fn get_user_activity(days: i64) -> Result<UserActivity, String> {
         let end_date: NaiveDate = Local::now().naive_local().date();
@@ -578,7 +691,7 @@ impl OrderService {
             dates.push(current_date.to_string());
             let day_records: Vec<&OrderRecordModel> = records
                 .iter()
-                .filter(|r| r.get_bill_date() == &current_date)
+                .filter(|r: &&OrderRecordModel| r.get_bill_date() == &current_date)
                 .collect();
             let unique_users: HashSet<i32> = day_records
                 .iter()
@@ -598,6 +711,15 @@ impl OrderService {
 
 /// Implementation of methods for `OrderService`.
 impl OrderService {
+    /// Calculates the change percentage.
+    ///
+    /// # Arguments
+    ///
+    /// - `f64` - The current.
+    ///
+    /// # Returns
+    ///
+    /// - `Option<f64>` - The change percentage result, when present.
     #[instrument_trace]
     fn calculate_change_percentage(current: f64, previous: f64) -> Option<f64> {
         if previous == 0.0 {
@@ -609,6 +731,16 @@ impl OrderService {
         Some(((current - previous) / previous) * 100.0)
     }
 
+    /// Gets the income expense ratio trend.
+    ///
+    /// # Arguments
+    ///
+    /// - `i64` - The number of days.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Vec<IncomeExpenseRatioItem>, String>` - The income expense ratio trend, or an
+    ///     error message.
     #[instrument_trace]
     async fn get_income_expense_ratio_trend(
         days: i64,
@@ -622,7 +754,7 @@ impl OrderService {
         while current_date <= end_date {
             let day_records: Vec<&OrderRecordModel> = records
                 .iter()
-                .filter(|r| r.get_bill_date() == &current_date)
+                .filter(|r: &&OrderRecordModel| r.get_bill_date() == &current_date)
                 .collect();
             let mut day_income: Decimal = Decimal::ZERO;
             let mut day_expense: Decimal = Decimal::ZERO;
@@ -650,6 +782,12 @@ impl OrderService {
         Ok(result)
     }
 
+    /// Gets the hourly distribution.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Vec<HourlyDistributionItem>, String>` - The hourly distribution, or an error
+    ///     message.
     #[instrument_trace]
     async fn get_hourly_distribution() -> Result<Vec<HourlyDistributionItem>, String> {
         let today: NaiveDate = Local::now().naive_local().date();
@@ -692,6 +830,11 @@ impl OrderService {
         Ok(result)
     }
 
+    /// Gets the weekly trend.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Vec<WeeklyTrendItem>, String>` - The weekly trend, or an error message.
     #[instrument_trace]
     async fn get_weekly_trend() -> Result<Vec<WeeklyTrendItem>, String> {
         let today: NaiveDate = Local::now().naive_local().date();
@@ -714,7 +857,7 @@ impl OrderService {
         let result: Vec<WeeklyTrendItem> = days
             .into_iter()
             .enumerate()
-            .map(|(idx, day)| {
+            .map(|(idx, day): (usize, &str)| {
                 let (income, expense, count) = weekly_data[idx];
                 let mut item: WeeklyTrendItem = WeeklyTrendItem::default();
                 item.set_day_of_week(day.to_string());
@@ -727,6 +870,12 @@ impl OrderService {
         Ok(result)
     }
 
+    /// Gets the period over period analysis.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Vec<PeriodOverPeriodItem>, String>` - The period over period analysis, or an error
+    ///     message.
     #[instrument_trace]
     async fn get_period_over_period_analysis() -> Result<Vec<PeriodOverPeriodItem>, String> {
         let today: NaiveDate = Local::now().naive_local().date();
@@ -782,6 +931,15 @@ impl OrderService {
         Ok(result)
     }
 
+    /// Gets the period stats.
+    ///
+    /// # Arguments
+    ///
+    /// - `NaiveDate` - The inclusive start bound.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(Decimal, Decimal, i64), String>` - The period stats, or an error message.
     #[instrument_trace]
     async fn get_period_stats(
         start: NaiveDate,
@@ -802,6 +960,15 @@ impl OrderService {
         Ok((income, expense, records.len() as i64))
     }
 
+    /// Gets the category trends.
+    ///
+    /// # Arguments
+    ///
+    /// - `i64` - The number of days.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Vec<CategoryTrendItem>, String>` - The category trends, or an error message.
     #[instrument_trace]
     async fn get_category_trends(days: i64) -> Result<Vec<CategoryTrendItem>, String> {
         let end_date: NaiveDate = Local::now().naive_local().date();
@@ -834,8 +1001,8 @@ impl OrderService {
                     .map(|date: &String| {
                         let total: Decimal = data
                             .iter()
-                            .filter(|(data_item, _)| data_item == date)
-                            .map(|(_, amount)| amount)
+                            .filter(|(data_item, _): &&(String, Decimal)| data_item == date)
+                            .map(|(_, amount): &(String, Decimal)| amount)
                             .sum();
                         total.to_string()
                     })
@@ -850,6 +1017,15 @@ impl OrderService {
         Ok(result)
     }
 
+    /// Gets the user retention.
+    ///
+    /// # Arguments
+    ///
+    /// - `i64` - The number of days.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Vec<UserRetentionItem>, String>` - The user retention, or an error message.
     #[instrument_trace]
     async fn get_user_retention(days: i64) -> Result<Vec<UserRetentionItem>, String> {
         let end_date: NaiveDate = Local::now().naive_local().date();
@@ -899,6 +1075,15 @@ impl OrderService {
         Ok(result)
     }
 
+    /// Gets the top users.
+    ///
+    /// # Arguments
+    ///
+    /// - `i64` - The maximum number of items.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Vec<TopUserItem>, String>` - The top users, or an error message.
     #[instrument_trace]
     async fn get_top_users(limit: i64) -> Result<Vec<TopUserItem>, String> {
         let today: NaiveDate = Local::now().naive_local().date();
@@ -938,6 +1123,12 @@ impl OrderService {
         Ok(result)
     }
 
+    /// Gets the average transaction stats.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<AverageTransactionStats, String>` - The average transaction stats, or an error
+    ///     message.
     #[instrument_trace]
     async fn get_average_transaction_stats() -> Result<AverageTransactionStats, String> {
         let today: NaiveDate = Local::now().naive_local().date();
@@ -990,6 +1181,15 @@ impl OrderService {
         Ok(stats)
     }
 
+    /// Gets the date avg stats.
+    ///
+    /// # Arguments
+    ///
+    /// - `NaiveDate` - The target date.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(Decimal, Decimal), String>` - The date avg stats, or an error message.
     #[instrument_trace]
     async fn get_date_avg_stats(date: NaiveDate) -> Result<(Decimal, Decimal), String> {
         let records: Vec<OrderRecordModel> = RecordRepository::find_by_bill_date(date).await?;
@@ -1024,6 +1224,16 @@ impl OrderService {
 /// Implementation of methods for `OrderService`.
 impl OrderService {
     /// create record with images.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32` - The owning user id.
+    /// - `CreateRecordWithImagesRequest` - The request.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<CreateRecordWithImagesResponse, String>` - The created record with images, or an
+    ///     error message.
     #[instrument_trace]
     pub async fn create_record_with_images(
         user_id: i32,
@@ -1090,6 +1300,17 @@ impl OrderService {
     }
 
     /// create record with single image.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32` - The owning user id.
+    /// - `CreateRecordRequest` - The record request.
+    /// - `ImageUploadRequest` - The image request.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<CreateRecordWithImagesResponse, String>` - The created record with single image,
+    ///     or an error message.
     #[instrument_trace]
     pub async fn create_record_with_single_image(
         user_id: i32,
@@ -1153,12 +1374,13 @@ impl OrderService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The record ID to associate the image with.
-    /// - `i32`: The image ID to bind.
+    /// - `i32` - The record ID to associate the image with.
+    /// - `ImageUploadRequest` - The image request.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error if the image is not found.
+    /// - `Result<CreateRecordWithImagesResponse, String>` - The created image to record, or an
+    ///     error message.
     #[instrument_trace]
     pub async fn add_image_to_record(
         record_id: i32,
@@ -1207,11 +1429,11 @@ impl OrderService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The record ID.
+    /// - `i32` - The record ID.
     ///
     /// # Returns
     ///
-    /// - `Result<RecordImageListResponse, String>`: The list of images for the record.
+    /// - `Result<RecordImageListResponse, String>` - The list of images for the record.
     #[instrument_trace]
     pub async fn get_record_images(record_id: i32) -> Result<RecordImageListResponse, String> {
         let images: Vec<OrderRecordImageModel> =
@@ -1249,11 +1471,11 @@ impl OrderService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The image ID.
+    /// - `i32` - The image ID.
     ///
     /// # Returns
     ///
-    /// - `Result<Option<OrderImageDataResponse>, String>`: The image data response if found, or `None`.
+    /// - `Result<Option<ImageDataResponse>, String>` - The image data, or an error message.
     #[instrument_trace]
     pub async fn get_image_data(
         image_id: i32,
@@ -1264,7 +1486,7 @@ impl OrderService {
             None => return Err(ERROR_USER_NOT_FOUND.to_string()),
         };
         if !user_role.is_admin() {
-            return Err("Only admin can access image data".to_string());
+            return Err(ERROR_ONLY_ADMIN_CAN_ACCESS_IMAGE_DATA.to_string());
         }
         match RecordImageRepository::find_by_id(image_id).await? {
             Some(model) => {
@@ -1288,15 +1510,14 @@ impl OrderService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The user ID of the uploader.
-    /// - `String`: The stored file name.
-    /// - `Option<String>`: The original file name.
-    /// - `String`: The MIME type of the image.
-    /// - `Vec<u8>`: The binary image data.
+    /// - `i32` - The user ID of the uploader.
+    /// - `String` - The stored file name.
+    /// - `Option<String>` - The original file name.
+    /// - `Vec<u8>` - The binary image data.
     ///
     /// # Returns
     ///
-    /// - `Result<RecordImageResponse, String>`: The uploaded image response with download URL.
+    /// - `Result<RecordImageResponse, String>` - The uploaded image response with download URL.
     #[instrument_trace]
     pub async fn upload_image(
         user_id: i32,
@@ -1322,6 +1543,15 @@ impl OrderService {
     }
 
     /// bind images to record.
+    ///
+    /// # Arguments
+    ///
+    /// - `i32` - The record ID.
+    /// - `Vec<i32>` - The image IDs.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), String>` - The images to record result, or an error message.
     #[instrument_trace]
     pub async fn bind_images_to_record(record_id: i32, image_ids: Vec<i32>) -> Result<(), String> {
         for image_id in image_ids {
@@ -1334,6 +1564,16 @@ impl OrderService {
         Ok(())
     }
 
+    /// Converts the image model into its response.
+    ///
+    /// # Arguments
+    ///
+    /// - `&OrderRecordImageModel` - The source model.
+    /// - `i32` - The record ID.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<RecordImageResponse, String>` - The model to image response result.
     #[instrument_trace]
     fn model_to_image_response(
         model: &OrderRecordImageModel,

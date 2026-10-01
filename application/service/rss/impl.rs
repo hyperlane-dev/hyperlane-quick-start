@@ -6,11 +6,11 @@ impl RssService {
     ///
     /// # Arguments
     ///
-    /// - `Timezone`: The timezone variant.
+    /// - `Timezone` - The timezone variant.
     ///
     /// # Returns
     ///
-    /// - `FixedOffset`: The UTC offset for the timezone.
+    /// - `FixedOffset` - The UTC offset for the timezone.
     fn timezone_to_offset(timezone: Timezone) -> FixedOffset {
         match timezone {
             Timezone::Utc => FixedOffset::east_opt(0).unwrap_or(FixedOffset::east_opt(0).unwrap()),
@@ -66,17 +66,17 @@ impl RssService {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The timestamp string in "%Y-%m-%d %H:%M:%S%.3f" format.
-    /// - `Timezone`: The timezone for the output date.
+    /// - `&str` - The timestamp string in "%Y-%m-%d %H:%M:%S%.3f" format.
+    /// - `Timezone` - The timezone for the output date.
     ///
     /// # Returns
     ///
-    /// - `String`: The formatted RFC 822 date string, or the original string if parsing fails.
+    /// - `String` - The formatted RFC 822 date string, or the original string if parsing fails.
     fn format_rfc822_date_with_timezone(timestamp: &str, timezone: Timezone) -> String {
         if timestamp.is_empty() {
             return String::new();
         }
-        match NaiveDateTime::parse_from_str(timestamp, "%Y-%m-%d %H:%M:%S%.3f") {
+        match NaiveDateTime::parse_from_str(timestamp, FORMAT_DATE_TIME_MILLIS) {
             Ok(naive_dt) => {
                 let utc_datetime: DateTime<Utc> =
                     DateTime::from_naive_utc_and_offset(naive_dt, Utc);
@@ -92,7 +92,7 @@ impl RssService {
     ///
     /// # Returns
     ///
-    /// - `Vec<UploadedFile>`: The list of uploaded file information objects.
+    /// - `Vec<UploadedFile>` - The list of uploaded file information objects.
     #[instrument_trace]
     pub async fn get_uploaded_files() -> Vec<UploadedFile> {
         let entries: Vec<DirEntry> = match read_dir(UPLOAD_DIR).await {
@@ -105,16 +105,18 @@ impl RssService {
             }
             Err(_) => return vec![],
         };
-        let tasks: Vec<_> = entries
+        let tasks: Vec<Pin<Box<dyn Future<Output = Vec<UploadedFile>> + Send>>> = entries
             .into_iter()
-            .map(|entry: DirEntry| {
-                let path: PathBuf = entry.path();
-                async move {
-                    let mut files: Vec<UploadedFile> = vec![];
-                    Self::scan_directory_recursive_sync(&path, &mut files).await;
-                    files
-                }
-            })
+            .map(
+                |entry: DirEntry| -> Pin<Box<dyn Future<Output = Vec<UploadedFile>> + Send>> {
+                    let path: PathBuf = entry.path();
+                    Box::pin(async move {
+                        let mut files: Vec<UploadedFile> = vec![];
+                        Self::scan_directory_recursive_sync(&path, &mut files).await;
+                        files
+                    })
+                },
+            )
             .collect();
         let results: Vec<Vec<UploadedFile>> = join_all(tasks).await;
         let mut files: Vec<UploadedFile> = results.into_iter().flatten().collect();
@@ -128,8 +130,12 @@ impl RssService {
     ///
     /// # Arguments
     ///
-    /// - `&Path`: The directory path to scan.
-    /// - `&mut Vec<UploadedFile>`: The collection to append found files to.
+    /// - `&'a Path` - The filesystem path.
+    /// - `&'a mut Vec<UploadedFile>` - The uploaded files.
+    ///
+    /// # Returns
+    ///
+    /// - `Pin<Box<dyn Future<Output = ()> + Send + 'a>>` - The directory recursive sync result.
     fn scan_directory_recursive_sync<'a>(
         path: &'a Path,
         files: &'a mut Vec<UploadedFile>,
@@ -156,11 +162,12 @@ impl RssService {
     ///
     /// # Arguments
     ///
-    /// - `&Path`: The file path.
+    /// - `&Path` - The file path.
     ///
     /// # Returns
     ///
-    /// - `Option<UploadedFile>`: The file information object, or `None` if metadata cannot be read.
+    /// - `Option<UploadedFile>` - The file information object, or `None` if metadata cannot be
+    ///     read.
     #[instrument_trace]
     fn create_uploaded_file_sync(path: &Path) -> Option<UploadedFile> {
         let meta_data: std::fs::Metadata = metadata(path).ok()?;
@@ -182,7 +189,7 @@ impl RssService {
                 let dt: chrono::DateTime<chrono::Utc> =
                     chrono::DateTime::from_timestamp(secs, millis as u32 * 1_000_000)
                         .unwrap_or_default();
-                dt.format("%Y-%m-%d %H:%M:%S%.3f").to_string()
+                dt.format(FORMAT_DATE_TIME_MILLIS).to_string()
             })
             .unwrap_or_else(time_millis);
         let file_url: String = if let Some(parent_path) = path.parent() {
@@ -227,14 +234,13 @@ impl RssService {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The base URL for the feed and item links.
-    /// - `Option<usize>`: The maximum number of items to include.
-    /// - `Option<usize>`: The number of items to skip.
-    /// - `Option<Timezone>`: The timezone for publication dates.
+    /// - `&str` - The base URL for the feed and item links.
+    /// - `Option<usize>` - The maximum number of items to include.
+    /// - `Option<Timezone>` - The timezone for publication dates.
     ///
     /// # Returns
     ///
-    /// - `String`: The complete RSS 2.0 XML feed string.
+    /// - `String` - The complete RSS 2.0 XML feed string.
     #[instrument_trace]
     pub async fn generate_rss_feed(
         base_url: &str,
@@ -251,12 +257,16 @@ impl RssService {
         };
         let tz: Timezone = timezone.unwrap_or(Timezone::Utc);
         let base_url_arc: std::sync::Arc<String> = std::sync::Arc::new(base_url.to_string());
-        let tasks: Vec<_> = limited_files
+        let tasks: Vec<Pin<Box<dyn Future<Output = RssItem> + Send>>> = limited_files
             .into_iter()
-            .map(|file: UploadedFile| {
-                let base_url_clone: std::sync::Arc<String> = base_url_arc.clone();
-                async move { Self::convert_file_to_rss_item(file, &base_url_clone, tz).await }
-            })
+            .map(
+                |file: UploadedFile| -> Pin<Box<dyn Future<Output = RssItem> + Send>> {
+                    let base_url_clone: std::sync::Arc<String> = base_url_arc.clone();
+                    Box::pin(async move {
+                        Self::convert_file_to_rss_item(file, &base_url_clone, tz).await
+                    })
+                },
+            )
             .collect();
         let items: Vec<RssItem> = join_all(tasks).await;
         let mut channel: RssChannel = RssChannel::default();
@@ -273,13 +283,13 @@ impl RssService {
     ///
     /// # Arguments
     ///
-    /// - `UploadedFile`: The uploaded file information.
-    /// - `&str`: The base URL for constructing the full file URL.
-    /// - `Timezone`: The timezone for the publication date.
+    /// - `UploadedFile` - The uploaded file information.
+    /// - `&str` - The base URL for constructing the full file URL.
+    /// - `Timezone` - The timezone for the publication date.
     ///
     /// # Returns
     ///
-    /// - `RssItem`: The RSS item with title, link, description, enclosure, and publication date.
+    /// - `RssItem` - The RSS item with title, link, description, enclosure, and publication date.
     #[instrument_trace]
     async fn convert_file_to_rss_item(file: UploadedFile, base_url: &str, tz: Timezone) -> RssItem {
         let full_url: String = format!("{base_url}{}", file.get_file_url());
@@ -315,11 +325,11 @@ impl RssService {
     ///
     /// # Arguments
     ///
-    /// - `&RssChannel`: The RSS channel data.
+    /// - `&RssChannel` - The RSS channel data.
     ///
     /// # Returns
     ///
-    /// - `String`: The complete RSS XML document string.
+    /// - `String` - The complete RSS XML document string.
     #[instrument_trace]
     fn build_rss_xml(channel: &RssChannel) -> String {
         let mut xml: String = String::from(r#"<?xml version="1.0" encoding="UTF-8"?>"#);
@@ -384,17 +394,17 @@ impl RssService {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The text to escape.
+    /// - `&str` - The text to escape.
     ///
     /// # Returns
     ///
-    /// - `String`: The XML-escaped text.
+    /// - `String` - The XML-escaped text.
     #[instrument_trace]
     fn escape_xml(text: &str) -> String {
-        text.replace('&', "&amp;")
-            .replace('<', "&lt;")
-            .replace('>', "&gt;")
-            .replace('"', "&quot;")
-            .replace('\'', "&apos;")
+        text.replace('&', XML_ENTITY_AMP)
+            .replace('<', XML_ENTITY_LT)
+            .replace('>', XML_ENTITY_GT)
+            .replace('"', XML_ENTITY_QUOT)
+            .replace('\'', XML_ENTITY_APOS)
     }
 }

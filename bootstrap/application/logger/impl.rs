@@ -6,7 +6,7 @@ impl BootstrapSyncInit for LoggerBootstrap {
     ///
     /// # Returns
     ///
-    /// - `Self`: The initialized `LoggerBootstrap` instance.
+    /// - `Self` - The initialized `LoggerBootstrap` instance.
     fn init() -> Self {
         let env_config: &EnvConfig = EnvPlugin::get_or_init();
         let mut file_logger: FileLogger = FileLogger::default();

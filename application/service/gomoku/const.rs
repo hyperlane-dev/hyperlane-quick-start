@@ -33,3 +33,11 @@ pub const QUERY_UUID: &str = "uuid";
 
 /// Query parameter key for uid.
 pub const QUERY_UID: &str = "uid";
+/// JSON key carrying the operation result.
+pub const JSON_KEY_RESULT: &str = "result";
+
+/// JSON key carrying the room identifier.
+pub const JSON_KEY_ROOM: &str = "room";
+
+/// JSON key carrying a message.
+pub const JSON_KEY_MESSAGE: &str = "message";

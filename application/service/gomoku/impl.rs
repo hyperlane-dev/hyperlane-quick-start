@@ -3,10 +3,6 @@ use super::*;
 /// Room subscription and message broadcasting management for `RoomBroadcastManager`.
 impl RoomBroadcastManager {
     /// Creates a new `RoomBroadcastManager` with empty broadcast channels and user subscriptions.
-    ///
-    /// # Returns
-    ///
-    /// - `RoomBroadcastManager`: A new instance with no active rooms or subscribers.
     #[instrument_trace]
     pub fn new() -> Self {
         Self {
@@ -19,12 +15,11 @@ impl RoomBroadcastManager {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The unique identifier of the user.
-    /// - `&str`: The identifier of the room to subscribe to.
+    /// - `&str` - The unique identifier of the user.
     #[instrument_trace]
     pub async fn subscribe_to_room(&self, user_id: &str, room_id: &str) {
         let mut subs: RwLockWriteGuard<'_, HashMap<String, String>> =
-            self.user_subscriptions.write().await;
+            self.get_user_subscriptions().write().await;
         if let Some(old_room) = subs.get(user_id) {
             if old_room == room_id {
                 trace!("User {user_id} already subscribed to room {room_id}");
@@ -43,11 +38,11 @@ impl RoomBroadcastManager {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The unique identifier of the user to unsubscribe.
+    /// - `&str` - The unique identifier of the user to unsubscribe.
     #[instrument_trace]
     pub async fn unsubscribe_user(&self, user_id: &str) {
         let mut subs: RwLockWriteGuard<'_, HashMap<String, String>> =
-            self.user_subscriptions.write().await;
+            self.get_user_subscriptions().write().await;
         if let Some(room_id) = subs.remove(user_id) {
             trace!("User {user_id} unsubscribed from room {room_id}");
         }
@@ -57,8 +52,7 @@ impl RoomBroadcastManager {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The identifier of the target room.
-    /// - `&str`: The message content to broadcast.
+    /// - `&str` - The identifier of the target room.
     #[instrument_trace]
     pub fn broadcast_to_room(&self, room_id: &str, message: &str) {
         if self
@@ -76,21 +70,22 @@ impl RoomBroadcastManager {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The unique identifier of the user.
+    /// - `&str` - The unique identifier of the user.
     ///
     /// # Returns
     ///
-    /// - `Option<String>`: The room identifier if the user is subscribed, or `None`.
+    /// - `Option<String>` - The room identifier if the user is subscribed, or `None`.
     #[instrument_trace]
     pub async fn get_user_room(&self, user_id: &str) -> Option<String> {
         let subs: RwLockReadGuard<'_, HashMap<String, String>> =
-            self.user_subscriptions.read().await;
+            self.get_user_subscriptions().read().await;
         subs.get(user_id).cloned()
     }
 }
 
 /// Default implementation for `RoomBroadcastManager`, delegating to `new`.
 impl Default for RoomBroadcastManager {
+    /// Returns the default value.
     #[instrument_trace]
     fn default() -> Self {
         Self::new()
@@ -99,6 +94,12 @@ impl Default for RoomBroadcastManager {
 
 /// WebSocket connection hook that re-subscribes users to their rooms on reconnect.
 impl ServerHook for GomokuConnectedHook {
+    /// Creates a new instance.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The .
+    /// - `&mut Context` - The .
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
@@ -106,6 +107,15 @@ impl ServerHook for GomokuConnectedHook {
 
     /// Handles a WebSocket connection by looking up the user's room and subscribing them
     /// to receive room state updates upon reconnection.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The stream.
+    /// - `&mut Context` - The request context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The handle result.
     #[try_get_request_query("uuid" => uuid_opt)]
     #[instrument_trace]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
@@ -134,6 +144,12 @@ impl ServerHook for GomokuConnectedHook {
 
 /// WebSocket request hook that processes Gomoku game actions and broadcasts updates.
 impl ServerHook for GomokuRequestHook {
+    /// Creates a new instance.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The .
+    /// - `&mut Context` - The .
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
@@ -141,6 +157,15 @@ impl ServerHook for GomokuRequestHook {
 
     /// Handles incoming WebSocket messages by dispatching to `GomokuWebSocketService`
     /// and broadcasting room state changes to all subscribers.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The stream.
+    /// - `&mut Context` - The request context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The handle result.
     #[try_get_request_query("uid" => uid_opt)]
     #[request_body_json_result(req_data_res: GomokuWsRequest)]
     #[instrument_trace]
@@ -169,11 +194,27 @@ impl ServerHook for GomokuRequestHook {
 
 /// Post-send hook for Gomoku WebSocket messages (no-op).
 impl ServerHook for GomokuSendedHook {
+    /// Creates a new instance.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The .
+    /// - `&mut Context` - The .
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
+    /// Handles one request and writes the response.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The stream.
+    /// - `&mut Context` - The .
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The handle result.
     #[instrument_trace]
     async fn handle(self, _stream: &mut Stream, _: &mut Context) -> Status {
         Status::Continue
@@ -182,12 +223,27 @@ impl ServerHook for GomokuSendedHook {
 
 /// WebSocket disconnection hook that unsubscribes users from their rooms.
 impl ServerHook for GomokuClosedHook {
+    /// Creates a new instance.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The .
+    /// - `&mut Context` - The .
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     /// Handles a WebSocket disconnection by removing the user from their subscribed room.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The stream.
+    /// - `&mut Context` - The request context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The handle result.
     #[try_get_request_query("uid" => uid_opt)]
     #[instrument_trace]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
@@ -208,13 +264,13 @@ impl GomokuWebSocketService {
     ///
     /// # Arguments
     ///
-    /// - `&mut Stream`: The WebSocket stream (unused).
-    /// - `&mut Context`: The request context used to set the response body.
-    /// - `&GomokuWsRequest`: The incoming ping request.
+    /// - `&mut Stream` - The WebSocket stream (unused).
+    /// - `&mut Context` - The request context used to set the response body.
+    /// - `&GomokuWsRequest` - The incoming ping request.
     ///
     /// # Returns
     ///
-    /// - `bool`: `true` if the request was a ping and was handled, `false` otherwise.
+    /// - `bool` - `true` if the request was a ping and was handled, `false` otherwise.
     #[try_get_request_query("uid" => uid_opt)]
     #[instrument_trace]
     pub async fn handle_ping_request(
@@ -241,13 +297,14 @@ impl GomokuWebSocketService {
     ///
     /// # Arguments
     ///
-    /// - `&mut Context`: The request context.
-    /// - `&GomokuWsRequest`: The incoming game request.
-    /// - `&str`: The sender's user identifier.
+    /// - `&mut Context` - The request context.
+    /// - `&GomokuWsRequest` - The incoming game request.
+    /// - `&str` - The sender's user identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<(ResponseBody, String), String>`: The response body and room identifier on success, or an error message.
+    /// - `Result<(ResponseBody, String), String>` - The response body and room identifier on
+    ///     success, or an error message.
     #[instrument_trace]
     pub async fn handle_request(
         _: &mut Context,
@@ -261,7 +318,7 @@ impl GomokuWebSocketService {
             GomokuMessageType::Leave => Self::handle_leave(req_data, sender_id).await,
             GomokuMessageType::PlaceStone => Self::handle_place_stone(req_data, sender_id).await,
             GomokuMessageType::Sync => Self::handle_sync(req_data, sender_id).await,
-            _ => Err("Unsupported message type".to_string()),
+            _ => Err(ERROR_UNSUPPORTED_MESSAGE_TYPE.to_string()),
         }
     }
 
@@ -269,12 +326,13 @@ impl GomokuWebSocketService {
     ///
     /// # Arguments
     ///
-    /// - `&GomokuWsRequest`: The request containing the optional room identifier.
-    /// - `&str`: The creator's user identifier.
+    /// - `&GomokuWsRequest` - The request containing the optional room identifier.
+    /// - `&str` - The creator's user identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<(ResponseBody, String), String>`: The room state response and room identifier, or an error if the room already exists.
+    /// - `Result<(ResponseBody, String), String>` - The room state response and room identifier, or
+    ///     an error if the room already exists.
     #[instrument_trace]
     async fn handle_create_room(
         req_data: &GomokuWsRequest,
@@ -305,12 +363,13 @@ impl GomokuWebSocketService {
     ///
     /// # Arguments
     ///
-    /// - `&GomokuWsRequest`: The request containing the room identifier.
-    /// - `&str`: The joining player's user identifier.
+    /// - `&GomokuWsRequest` - The request containing the room identifier.
+    /// - `&str` - The joining player's user identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<(ResponseBody, String), String>`: The room state response and room identifier, or an error if the room is not found or full.
+    /// - `Result<(ResponseBody, String), String>` - The room state response and room identifier, or
+    ///     an error if the room is not found or full.
     #[instrument_trace]
     async fn handle_join_room(
         req_data: &GomokuWsRequest,
@@ -319,7 +378,7 @@ impl GomokuWebSocketService {
         let room_id: String = req_data.get_room_id().clone();
         let mut room: GomokuRoom = GomokuRoomMapper::get_room(&room_id)
             .await
-            .ok_or("Room not found".to_string())?;
+            .ok_or(ERROR_ROOM_NOT_FOUND.to_string())?;
         let _color: StoneColor = GomokuDomain::add_player(&mut room, sender_id)?;
         GomokuRoomMapper::set_user_room(sender_id, &room_id).await;
         let manager: &RoomBroadcastManager = get_room_broadcast_manager();
@@ -341,12 +400,13 @@ impl GomokuWebSocketService {
     ///
     /// # Arguments
     ///
-    /// - `&GomokuWsRequest`: The request containing the room identifier.
-    /// - `&str`: The spectator's user identifier.
+    /// - `&GomokuWsRequest` - The request containing the room identifier.
+    /// - `&str` - The spectator's user identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<(ResponseBody, String), String>`: The room state response and room identifier, or an error if the room is not found or already joined.
+    /// - `Result<(ResponseBody, String), String>` - The room state response and room identifier, or
+    ///     an error if the room is not found or already joined.
     #[instrument_trace]
     async fn handle_spectate(
         req_data: &GomokuWsRequest,
@@ -355,7 +415,7 @@ impl GomokuWebSocketService {
         let room_id: String = req_data.get_room_id().clone();
         let mut room: GomokuRoom = GomokuRoomMapper::get_room(&room_id)
             .await
-            .ok_or("Room not found".to_string())?;
+            .ok_or(ERROR_ROOM_NOT_FOUND.to_string())?;
         let added: bool = GomokuDomain::add_spectator(&mut room, sender_id);
         if !added {
             return Err(ERROR_ALREADY_IN_ROOM.to_string());
@@ -377,12 +437,13 @@ impl GomokuWebSocketService {
     ///
     /// # Arguments
     ///
-    /// - `&GomokuWsRequest`: The request containing the room identifier.
-    /// - `&str`: The leaving user's identifier.
+    /// - `&GomokuWsRequest` - The request containing the room identifier.
+    /// - `&str` - The leaving user's identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<(ResponseBody, String), String>`: The updated room state response and room identifier, or an error if the room or user is not found.
+    /// - `Result<(ResponseBody, String), String>` - The updated room state response and room
+    ///     identifier, or an error if the room or user is not found.
     #[instrument_trace]
     async fn handle_leave(
         req_data: &GomokuWsRequest,
@@ -396,14 +457,14 @@ impl GomokuWebSocketService {
             req_data.get_room_id().clone()
         };
         if room_id.is_empty() {
-            return Err("Room not found".to_string());
+            return Err(ERROR_ROOM_NOT_FOUND.to_string());
         }
         let mut room: GomokuRoom = GomokuRoomMapper::get_room(&room_id)
             .await
-            .ok_or("Room not found".to_string())?;
+            .ok_or(ERROR_ROOM_NOT_FOUND.to_string())?;
         let removed: bool = GomokuDomain::remove_user(&mut room, sender_id);
         if !removed {
-            return Err("User not in room".to_string());
+            return Err(ERROR_USER_NOT_IN_ROOM.to_string());
         }
         let manager: &RoomBroadcastManager = get_room_broadcast_manager();
         manager.unsubscribe_user(sender_id).await;
@@ -426,12 +487,13 @@ impl GomokuWebSocketService {
     ///
     /// # Arguments
     ///
-    /// - `&GomokuWsRequest`: The request containing the room identifier and position payload.
-    /// - `&str`: The player's user identifier.
+    /// - `&GomokuWsRequest` - The request containing the room identifier and position payload.
+    /// - `&str` - The player's user identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<(ResponseBody, String), String>`: The move result and room state response, or an error if the move is invalid.
+    /// - `Result<(ResponseBody, String), String>` - The move result and room state response, or an
+    ///     error if the move is invalid.
     #[instrument_trace]
     async fn handle_place_stone(
         req_data: &GomokuWsRequest,
@@ -440,13 +502,13 @@ impl GomokuWebSocketService {
         let room_id: String = req_data.get_room_id().clone();
         let mut room: GomokuRoom = GomokuRoomMapper::get_room(&room_id)
             .await
-            .ok_or("Room not found".to_string())?;
+            .ok_or(ERROR_ROOM_NOT_FOUND.to_string())?;
         let (x, y): (usize, usize) = Self::parse_position(req_data.get_payload())?;
         let result: GomokuPlaceResult = GomokuDomain::place_stone(&mut room, sender_id, x, y)?;
         GomokuRoomMapper::save_room(room.clone()).await;
         let payload: serde_json::Value = json!({
-            "result": result,
-            "room": room
+            JSON_KEY_RESULT: result,
+            JSON_KEY_ROOM: room
         });
         let resp_body: ResponseBody =
             Self::build_response_body(GomokuMessageType::MoveResult, &room_id, sender_id, payload)?;
@@ -457,12 +519,13 @@ impl GomokuWebSocketService {
     ///
     /// # Arguments
     ///
-    /// - `&GomokuWsRequest`: The request containing the room identifier.
-    /// - `&str`: The user's identifier.
+    /// - `&GomokuWsRequest` - The request containing the room identifier.
+    /// - `&str` - The user's identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<(ResponseBody, String), String>`: The current room state response and room identifier, or an error if the room is not found.
+    /// - `Result<(ResponseBody, String), String>` - The current room state response and room
+    ///     identifier, or an error if the room is not found.
     #[instrument_trace]
     async fn handle_sync(
         req_data: &GomokuWsRequest,
@@ -477,7 +540,7 @@ impl GomokuWebSocketService {
         };
         let mut room: GomokuRoom = GomokuRoomMapper::get_room(&room_id)
             .await
-            .ok_or("Room not found".to_string())?;
+            .ok_or(ERROR_ROOM_NOT_FOUND.to_string())?;
         GomokuDomain::ensure_board(&mut room);
         GomokuRoomMapper::save_room(room.clone()).await;
         let resp_body: ResponseBody = Self::build_response_body(
@@ -493,21 +556,22 @@ impl GomokuWebSocketService {
     ///
     /// # Arguments
     ///
-    /// - `&serde_json::Value`: The payload containing "x" and "y" fields.
+    /// - `&serde_json::Value` - The payload containing "x" and "y" fields.
     ///
     /// # Returns
     ///
-    /// - `Result<(usize, usize), String>`: The parsed coordinates on success, or an error message if values are missing or invalid.
+    /// - `Result<(usize, usize), String>` - The parsed coordinates on success, or an error message
+    ///     if values are missing or invalid.
     #[instrument_trace]
     fn parse_position(payload: &serde_json::Value) -> Result<(usize, usize), String> {
         let x: usize = payload
             .get("x")
             .and_then(|val: &serde_json::Value| val.as_u64())
-            .ok_or("Invalid x".to_string())? as usize;
+            .ok_or(ERROR_INVALID_X.to_string())? as usize;
         let y: usize = payload
             .get("y")
             .and_then(|val: &serde_json::Value| val.as_u64())
-            .ok_or("Invalid y".to_string())? as usize;
+            .ok_or(ERROR_INVALID_Y.to_string())? as usize;
         Ok((x, y))
     }
 
@@ -515,14 +579,14 @@ impl GomokuWebSocketService {
     ///
     /// # Arguments
     ///
-    /// - `GomokuMessageType`: The type of the response message.
-    /// - `&str`: The room identifier.
-    /// - `&str`: The sender's user identifier.
-    /// - `serde_json::Value`: The JSON payload to include in the response.
+    /// - `GomokuMessageType` - The type of the response message.
+    /// - `&str` - The room identifier.
+    /// - `serde_json::Value` - The JSON payload to include in the response.
     ///
     /// # Returns
     ///
-    /// - `Result<ResponseBody, String>`: The serialized response body on success, or a serialization error message.
+    /// - `Result<ResponseBody, String>` - The serialized response body on success, or a
+    ///     serialization error message.
     #[instrument_trace]
     fn build_response_body(
         msg_type: GomokuMessageType,
@@ -543,20 +607,20 @@ impl GomokuWebSocketService {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The sender's user identifier.
-    /// - `&GomokuWsRequest`: The original request that caused the error.
-    /// - `String`: The error message to include in the response.
+    /// - `&str` - The sender's user identifier.
+    /// - `&GomokuWsRequest` - The original request that caused the error.
+    /// - `String` - The error message to include in the response.
     ///
     /// # Returns
     ///
-    /// - `ResponseBody`: The serialized error response body.
+    /// - `ResponseBody` - The serialized error response body.
     #[instrument_trace]
     pub fn error_response(
         sender_id: &str,
         req_data: &GomokuWsRequest,
         error: String,
     ) -> ResponseBody {
-        let payload: serde_json::Value = json!({ "message": error });
+        let payload: serde_json::Value = json!({ JSON_KEY_MESSAGE: error });
         Self::build_response_body(
             GomokuMessageType::Error,
             req_data.get_room_id(),
@@ -570,9 +634,8 @@ impl GomokuWebSocketService {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The identifier of the room to broadcast to.
-    /// - `&str`: The sender's user identifier (for logging only).
-    /// - `&ResponseBody`: The response body to send to each room member.
+    /// - `&str` - The identifier of the room to broadcast to.
+    /// - `&ResponseBody` - The response body to send to each room member.
     #[instrument_trace]
     pub async fn broadcast_room(room_id: &str, sender_id: &str, resp_body: &ResponseBody) {
         let user_ids: Vec<String> = GomokuRoomMapper::get_room_user_ids(room_id).await;
@@ -589,11 +652,11 @@ impl GomokuWebSocketService {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The creator's user identifier.
+    /// - `&str` - The creator's user identifier.
     ///
     /// # Returns
     ///
-    /// - `String`: A unique room identifier in the format "{sender_id}_{timestamp_millis}".
+    /// - `String` - A unique room identifier in the format "{sender_id}_{timestamp_millis}".
     #[instrument_trace]
     fn generate_room_id(sender_id: &str) -> String {
         let timestamp: i64 = Utc::now().timestamp_millis();

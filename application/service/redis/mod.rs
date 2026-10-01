@@ -7,7 +7,6 @@ pub use {r#const::*, r#struct::*};
 use {super::*, mapper::redis::*, model::request::redis::*};
 
 use hyperlane_plugin::{common::*, redis::*};
-
 use {
     ::redis::{Commands, Connection, cmd},
     tokio::sync::RwLockWriteGuard,

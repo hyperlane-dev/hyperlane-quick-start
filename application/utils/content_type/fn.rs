@@ -8,11 +8,12 @@ use super::*;
 /// otherwise returns the original content type string unchanged.
 ///
 /// # Arguments
-/// - `&str`: The raw content type string (e.g. `"text/html"`, `"video/mp4"`).
-/// - `&str`: The file extension (without leading dot), e.g. `"html"`, `"mp4"`.
+///
+/// - `&str` - The raw content type string (e.g. `"text/html"`, `"video/mp4"`).
 ///
 /// # Returns
-/// - `String`: The formatted content type, with charset appended for text types.
+///
+/// - `String` - The formatted content type, with charset appended for text types.
 #[instrument_trace]
 pub fn format_content_type(content_type: &str, extension: &str) -> String {
     if TEXT_CONTENT_EXTENSIONS.contains(&extension) {

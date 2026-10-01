@@ -6,12 +6,8 @@ impl ServerHook for TaskPanicHook {
     ///
     /// # Arguments
     ///
-    /// - `&mut Stream`: The incoming connection stream.
-    /// - `&mut Context`: The request context.
-    ///
-    /// # Returns
-    ///
-    /// - `TaskPanicHook`: The newly created task panic hook handler.
+    /// - `&mut Stream` - The incoming connection stream.
+    /// - `&mut Context` - The request context.
     #[task_panic_data(task_panic_data)]
     #[instrument_trace]
     async fn new(_stream: &mut Stream, ctx: &mut Context) -> Self {
@@ -25,19 +21,19 @@ impl ServerHook for TaskPanicHook {
     ///
     /// # Arguments
     ///
-    /// - `Self`: The task panic hook handler.
-    /// - `&mut Stream`: The incoming connection stream.
-    /// - `&mut Context`: The request context.
+    /// - `Self` - The task panic hook handler.
+    /// - `&mut Stream` - The incoming connection stream.
+    /// - `&mut Context` - The request context.
     ///
     /// # Returns
     ///
-    /// - `Status::Continue`: Always returns continue after sending the error response.
+    /// - `Status` - The handle result.
     #[prologue_macros(
         response_version(HttpVersion::Http1_1),
         response_status_code(500),
         clear_response_headers,
         response_header(SERVER => HYPERLANE),
-        response_header(CONTENT_TYPE, &self.content_type),
+        response_header(CONTENT_TYPE, &self.get_content_type()),
     )]
     #[epilogue_macros(response_body(&response_body), try_send)]
     #[instrument_trace]
@@ -59,12 +55,8 @@ impl ServerHook for RequestErrorHook {
     ///
     /// # Arguments
     ///
-    /// - `&mut Stream`: The incoming connection stream.
-    /// - `&mut Context`: The request context.
-    ///
-    /// # Returns
-    ///
-    /// - `RequestErrorHook`: The newly created request error hook handler.
+    /// - `&mut Stream` - The incoming connection stream.
+    /// - `&mut Context` - The request context.
     #[request_error_data(request_error_data)]
     #[instrument_trace]
     async fn new(_stream: &mut Stream, ctx: &mut Context) -> Self {
@@ -79,19 +71,20 @@ impl ServerHook for RequestErrorHook {
     ///
     /// # Arguments
     ///
-    /// - `Self`: The request error hook handler.
-    /// - `&mut Stream`: The incoming connection stream.
-    /// - `&mut Context`: The request context.
+    /// - `Self` - The request error hook handler.
+    /// - `&mut Stream` - The incoming connection stream.
+    /// - `&mut Context` - The request context.
     ///
     /// # Returns
     ///
-    /// - `Status`: Returns `Reject` for bad requests, otherwise `Continue` after sending the error response.
+    /// - `Status` - Returns `Reject` for bad requests, otherwise `Continue` after sending the error
+    ///     response.
     #[prologue_macros(
         response_version(HttpVersion::Http1_1),
         response_status_code(self.get_response_status_code()),
         clear_response_headers,
         response_header(SERVER => HYPERLANE),
-        response_header(CONTENT_TYPE, &self.content_type),
+        response_header(CONTENT_TYPE, &self.get_content_type()),
         response_header(TRACE => uuid::Uuid::new_v4().to_string()),
     )]
     #[epilogue_macros(response_body(&response_body), try_send)]

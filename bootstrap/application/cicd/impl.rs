@@ -2,6 +2,7 @@ use super::*;
 
 /// Implementation of `CicdBootstrap` for `BootstrapAsyncInit`.
 impl BootstrapAsyncInit for CicdBootstrap {
+    /// Recovers the CICD runs that were interrupted by a server restart.
     #[instrument_trace]
     async fn init() -> Self {
         match CicdService::recover_interrupted_runs().await {

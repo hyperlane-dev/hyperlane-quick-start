@@ -3,12 +3,30 @@ use super::*;
 /// Implementation of `RecordCreateRoute` for `ServerHook`.
 impl ServerHook for RecordCreateRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `RecordCreateRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(is_post_method, request_body_json_result(request_opt: CreateRecordRequest), response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
+    /// Handles the `RecordCreateRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let request: CreateRecordRequest = match request_opt {
             Ok(data) => data,
@@ -97,6 +115,12 @@ impl ServerHook for RecordCreateRoute {
 /// Implementation of `RecordListRoute` for `ServerHook`.
 impl ServerHook for RecordListRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `RecordListRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -111,6 +135,18 @@ impl ServerHook for RecordListRoute {
     #[try_get_request_query("cache_id" => cache_id_opt)]
     #[try_get_request_query("page" => page_opt)]
     #[try_get_request_query("limit" => limit_opt)]
+    /// Handles the `RecordListRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
@@ -150,12 +186,13 @@ impl ServerHook for RecordListRoute {
             query.set_user_id(Some(current_user_id));
         }
         if let Some(start_date_str) = start_date_opt
-            && let Ok(start_date) = NaiveDate::parse_from_str(&start_date_str, "%Y-%m-%d")
+            && let Ok(start_date) =
+                NaiveDate::parse_from_str(&start_date_str, DATE_FORMAT_YYYY_MM_DD)
         {
             query.set_start_date(Some(start_date));
         }
         if let Some(end_date_str) = end_date_opt
-            && let Ok(end_date) = NaiveDate::parse_from_str(&end_date_str, "%Y-%m-%d")
+            && let Ok(end_date) = NaiveDate::parse_from_str(&end_date_str, DATE_FORMAT_YYYY_MM_DD)
         {
             query.set_end_date(Some(end_date));
         }
@@ -200,12 +237,30 @@ impl ServerHook for RecordListRoute {
 /// Implementation of `RecordGetRoute` for `ServerHook`.
 impl ServerHook for RecordGetRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `RecordGetRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(is_get_method, try_get_route_param(ID_KEY => id_opt), response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
+    /// Handles the `RecordGetRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let record_id: i32 = match id_opt {
             Some(id_str) => match AuthService::decode_id(&id_str) {
@@ -251,12 +306,30 @@ impl ServerHook for RecordGetRoute {
 /// Implementation of `OverviewStatisticsRoute` for `ServerHook`.
 impl ServerHook for OverviewStatisticsRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `OverviewStatisticsRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(is_get_method, response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
+    /// Handles the `OverviewStatisticsRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
@@ -311,6 +384,12 @@ impl ServerHook for OverviewStatisticsRoute {
 /// Implementation of `ImageUploadRoute` for `ServerHook`.
 impl ServerHook for ImageUploadRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `ImageUploadRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -320,6 +399,18 @@ impl ServerHook for ImageUploadRoute {
     #[try_get_request_header(X_ORIGINAL_NAME => original_name_opt)]
     #[try_get_request_header(X_MIME_TYPE => mime_type_opt)]
     #[instrument_trace]
+    /// Handles the `ImageUploadRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
@@ -379,12 +470,30 @@ impl ServerHook for ImageUploadRoute {
 /// Implementation of `ImageListRoute` for `ServerHook`.
 impl ServerHook for ImageListRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `ImageListRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(is_get_method, try_get_route_param(RECORD_ID_KEY => record_id_opt), response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
+    /// Handles the `ImageListRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let record_id: i32 = match record_id_opt {
             Some(id_str) => match AuthService::decode_id(&id_str) {
@@ -425,12 +534,30 @@ impl ServerHook for ImageListRoute {
 /// Implementation of `ImageDownloadRoute` for `ServerHook`.
 impl ServerHook for ImageDownloadRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `ImageDownloadRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(is_get_method, try_get_route_param(ID_KEY => id_opt))]
     #[instrument_trace]
+    /// Handles the `ImageDownloadRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(user_id) => user_id,

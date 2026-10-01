@@ -6,11 +6,11 @@ impl ShortlinkRepository {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The URL to search for.
+    /// - `&str` - The URL to search for.
     ///
     /// # Returns
     ///
-    /// - `Result<Option<ShortlinkModel>, String>`: The shortlink model if found, or `None`.
+    /// - `Result<Option<ShortlinkModel>, String>` - The shortlink model if found, or `None`.
     #[instrument_trace]
     pub async fn find_by_url(url: &str) -> Result<Option<ShortlinkModel>, String> {
         let db: DatabaseConnection =
@@ -27,11 +27,11 @@ impl ShortlinkRepository {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The shortlink identifier.
+    /// - `i32` - The shortlink identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<Option<ShortlinkModel>, String>`: The shortlink model if found, or `None`.
+    /// - `Result<Option<ShortlinkModel>, String>` - The shortlink model if found, or `None`.
     #[instrument_trace]
     pub async fn find_by_id(id: i32) -> Result<Option<ShortlinkModel>, String> {
         let db: DatabaseConnection =
@@ -47,11 +47,11 @@ impl ShortlinkRepository {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The original URL to create a shortlink for.
+    /// - `&str` - The original URL to create a shortlink for.
     ///
     /// # Returns
     ///
-    /// - `Result<ShortlinkModel, String>`: The inserted shortlink model with generated ID.
+    /// - `Result<ShortlinkModel, String>` - The inserted shortlink model with generated ID.
     #[instrument_trace]
     pub async fn insert(url: &str) -> Result<ShortlinkModel, String> {
         let db: DatabaseConnection =

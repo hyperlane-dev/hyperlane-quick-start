@@ -7,7 +7,7 @@ pub use {r#const::*, r#struct::*};
 use super::*;
 
 use {
-    base64::{Engine as _, engine::general_purpose},
+    base64::{Engine, engine::general_purpose},
     rsa::{
         RsaPrivateKey, RsaPublicKey,
         pkcs1::{DecodeRsaPrivateKey, DecodeRsaPublicKey, EncodeRsaPrivateKey},

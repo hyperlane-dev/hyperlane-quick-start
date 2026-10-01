@@ -2,6 +2,7 @@ use super::*;
 
 /// Implementation of `ChatSession` for `Default`.
 impl Default for ChatSession {
+    /// Returns the default value.
     #[instrument_trace]
     fn default() -> Self {
         Self {
@@ -18,8 +19,8 @@ impl ChatSession {
     ///
     /// # Arguments
     ///
-    /// - `R`: The role of the message sender (implements `AsRef<str>`).
-    /// - `C`: The content of the message (implements `AsRef<str>`).
+    /// - `R` - The role of the message sender (implements `AsRef<str>`).
+    /// - `C` - The content of the message (implements `AsRef<str>`).
     #[instrument_trace]
     pub fn add_message<R, C>(&mut self, role: R, content: C)
     where

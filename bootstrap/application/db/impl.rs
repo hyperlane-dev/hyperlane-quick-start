@@ -2,6 +2,16 @@ use super::*;
 
 /// Implementation of `Display` for `MysqlTableName`, converting MySQL table name variants to their string representations.
 impl std::fmt::Display for MysqlTableName {
+    /// Writes the MySQL table name of the variant.
+    ///
+    /// # Arguments
+    ///
+    /// - `&Self` - The table name variant.
+    /// - `&mut std::fmt::Formatter<'_>` - The formatter.
+    ///
+    /// # Returns
+    ///
+    /// - `std::fmt::Result` - The result of the formatting operation.
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             MysqlTableName::CicdPipeline => write!(f, "cicd_pipeline"),
@@ -14,6 +24,16 @@ impl std::fmt::Display for MysqlTableName {
 
 /// Implementation of `Display` for `PostgresqlTableName`, converting PostgreSQL table name variants to their string representations.
 impl std::fmt::Display for PostgresqlTableName {
+    /// Writes the PostgreSQL table name of the variant.
+    ///
+    /// # Arguments
+    ///
+    /// - `&Self` - The table name variant.
+    /// - `&mut std::fmt::Formatter<'_>` - The formatter.
+    ///
+    /// # Returns
+    ///
+    /// - `std::fmt::Result` - The result of the formatting operation.
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             PostgresqlTableName::ChatHistory => write!(f, "chat_history"),
@@ -36,7 +56,7 @@ impl DbBootstrap {
     ///
     /// # Returns
     ///
-    /// - `DatabaseSchema`: The MySQL database schema with pipeline, run, job, and step tables.
+    /// - `DatabaseSchema` - The MySQL database schema with pipeline, run, job, and step tables.
     #[instrument_trace]
     pub fn build_mysql_schema() -> DatabaseSchema {
         DatabaseSchema::default()
@@ -66,7 +86,7 @@ impl DbBootstrap {
     ///
     /// # Returns
     ///
-    /// - `DatabaseSchema`: The PostgreSQL database schema with chat, tracking, shortlink, auth, order, notification, and blog tables.
+    /// - `DatabaseSchema` - The PostgreSQL database schema with chat, tracking, shortlink, auth, order, notification, and blog tables.
     #[instrument_trace]
     pub fn build_postgresql_schema() -> DatabaseSchema {
         DatabaseSchema::default()
@@ -90,19 +110,19 @@ impl DbBootstrap {
             .add_index(POSTGRESQL_SHORTLINK_INDEX_SQL.to_string())
             .add_table(TableSchema::new(
                 vec![],
-                "auth_user".to_string(),
+                POSTGRESQL_AUTH_USER_TABLE_NAME.to_string(),
                 POSTGRESQL_AUTH_USER_TABLE_SQL.to_string(),
             ))
             .add_index(POSTGRESQL_AUTH_INDEX_SQL.to_string())
             .add_init_data(POSTGRESQL_AUTH_DATA_SQL.to_string())
             .add_table(TableSchema::new(
-                vec!["auth_user".to_string()],
-                "order_record".to_string(),
+                vec![POSTGRESQL_AUTH_USER_TABLE_NAME.to_string()],
+                POSTGRESQL_ORDER_RECORD_TABLE_NAME.to_string(),
                 POSTGRESQL_ORDER_RECORD_TABLE_SQL.to_string(),
             ))
             .add_table(TableSchema::new(
-                vec!["order_record".to_string()],
-                "order_record_image".to_string(),
+                vec![POSTGRESQL_ORDER_RECORD_TABLE_NAME.to_string()],
+                POSTGRESQL_ORDER_RECORD_IMAGE_TABLE_NAME.to_string(),
                 POSTGRESQL_ORDER_RECORD_IMAGE_TABLE_SQL.to_string(),
             ))
             .add_index(POSTGRESQL_ORDER_INDEX_SQL.to_string())
@@ -148,7 +168,7 @@ impl BootstrapAsyncInit for DbBootstrap {
     ///
     /// # Returns
     ///
-    /// - `Self`: The initialized `DbBootstrap` instance.
+    /// - `Self` - The initialized `DbBootstrap` instance.
     async fn init() -> Self {
         let mysql_schema: DatabaseSchema = Self::build_mysql_schema();
         let postgresql_schema: DatabaseSchema = Self::build_postgresql_schema();

@@ -6,11 +6,11 @@ impl RecordRepository {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The record identifier.
+    /// - `i32` - The record identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<Option<OrderRecordModel>, String>`: The record model if found, or `None`.
+    /// - `Result<Option<OrderRecordModel>, String>` - The record model if found, or `None`.
     #[instrument_trace]
     pub async fn find_by_id(record_id: i32) -> Result<Option<OrderRecordModel>, String> {
         let db: DatabaseConnection =
@@ -26,11 +26,11 @@ impl RecordRepository {
     ///
     /// # Arguments
     ///
-    /// - `OrderRecordActiveModel`: The active model containing the record data to insert.
+    /// - `OrderRecordActiveModel` - The active model containing the record data to insert.
     ///
     /// # Returns
     ///
-    /// - `Result<OrderRecordModel, String>`: The inserted record model.
+    /// - `Result<OrderRecordModel, String>` - The inserted record model.
     #[instrument_trace]
     pub async fn insert(active_model: OrderRecordActiveModel) -> Result<OrderRecordModel, String> {
         let db: DatabaseConnection =
@@ -46,12 +46,12 @@ impl RecordRepository {
     ///
     /// # Arguments
     ///
-    /// - `&DatabaseTransaction`: The active database transaction.
-    /// - `OrderRecordActiveModel`: The active model containing the record data to insert.
+    /// - `&DatabaseTransaction` - The active database transaction.
+    /// - `OrderRecordActiveModel` - The active model containing the record data to insert.
     ///
     /// # Returns
     ///
-    /// - `Result<OrderRecordModel, String>`: The inserted record model.
+    /// - `Result<OrderRecordModel, String>` - The inserted record model.
     #[instrument_trace]
     pub async fn insert_with_transaction(
         txn: &DatabaseTransaction,
@@ -68,16 +68,16 @@ impl RecordRepository {
     ///
     /// # Arguments
     ///
-    /// - `Option<i32>`: Optional user identifier filter.
-    /// - `Option<NaiveDate>`: Optional start date filter.
-    /// - `Option<NaiveDate>`: Optional end date filter.
-    /// - `Option<String>`: Optional category filter.
-    /// - `Option<String>`: Optional transaction type filter.
-    /// - `Option<i32>`: Optional cache ID for cursor-based pagination.
+    /// - `Option<i32>` - Optional user identifier filter.
+    /// - `Option<NaiveDate>` - Optional start date filter.
+    /// - `Option<NaiveDate>` - Optional end date filter.
+    /// - `Option<String>` - Optional category filter.
+    /// - `Option<String>` - Optional transaction type filter.
+    /// - `Option<i32>` - Optional cache ID for cursor-based pagination.
     ///
     /// # Returns
     ///
-    /// - `Result<Vec<OrderRecordModel>, String>`: The filtered list of order records.
+    /// - `Result<Vec<OrderRecordModel>, String>` - The filtered list of order records.
     #[instrument_trace]
     pub async fn query_with_filters(
         user_id: Option<i32>,
@@ -120,11 +120,11 @@ impl RecordRepository {
     ///
     /// # Arguments
     ///
-    /// - `RecordPaginationQuery`: The pagination query parameters including filters.
+    /// - `RecordPaginationQuery` - The pagination query parameters including filters.
     ///
     /// # Returns
     ///
-    /// - `Result<(Vec<OrderRecordModel>, i64), String>`: The paginated records and total count.
+    /// - `Result<(Vec<OrderRecordModel>, i64), String>` - The paginated records and total count.
     #[instrument_trace]
     pub async fn query_with_pagination(
         query: RecordPaginationQuery,
@@ -171,16 +171,16 @@ impl RecordRepository {
     ///
     /// # Arguments
     ///
-    /// - `Option<i32>`: Optional user identifier filter.
-    /// - `Option<NaiveDate>`: Optional start date filter.
-    /// - `Option<NaiveDate>`: Optional end date filter.
-    /// - `Option<String>`: Optional category filter.
-    /// - `Option<i32>`: Optional cache ID for cursor-based pagination.
-    /// - `String`: The transaction type to sum (e.g., "income" or "expense").
+    /// - `Option<i32>` - Optional user identifier filter.
+    /// - `Option<NaiveDate>` - Optional start date filter.
+    /// - `Option<NaiveDate>` - Optional end date filter.
+    /// - `Option<String>` - Optional category filter.
+    /// - `Option<i32>` - Optional cache ID for cursor-based pagination.
+    /// - `String` - The transaction type to sum (e.g., "income" or "expense").
     ///
     /// # Returns
     ///
-    /// - `Result<Decimal, String>`: The sum of amounts, or zero if no records match.
+    /// - `Result<Decimal, String>` - The sum of amounts, or zero if no records match.
     #[instrument_trace]
     pub async fn sum_amount_by_transaction_type(
         user_id: Option<i32>,
@@ -227,12 +227,12 @@ impl RecordRepository {
     ///
     /// # Arguments
     ///
-    /// - `NaiveDate`: The start date of the range.
-    /// - `NaiveDate`: The end date of the range.
+    /// - `NaiveDate` - The start date of the range.
+    /// - `NaiveDate` - The end date of the range.
     ///
     /// # Returns
     ///
-    /// - `Result<Vec<OrderRecordModel>, String>`: The list of records in the date range.
+    /// - `Result<Vec<OrderRecordModel>, String>` - The list of records in the date range.
     #[instrument_trace]
     pub async fn find_by_bill_date_range(
         start_date: NaiveDate,
@@ -254,13 +254,13 @@ impl RecordRepository {
     ///
     /// # Arguments
     ///
-    /// - `NaiveDate`: The start date of the range.
-    /// - `NaiveDate`: The end date of the range.
-    /// - `String`: The transaction type to filter by.
+    /// - `NaiveDate` - The start date of the range.
+    /// - `NaiveDate` - The end date of the range.
+    /// - `String` - The transaction type to filter by.
     ///
     /// # Returns
     ///
-    /// - `Result<Vec<OrderRecordModel>, String>`: The filtered list of records.
+    /// - `Result<Vec<OrderRecordModel>, String>` - The filtered list of records.
     #[instrument_trace]
     pub async fn find_by_bill_date_range_and_transaction_type(
         start_date: NaiveDate,
@@ -283,11 +283,11 @@ impl RecordRepository {
     ///
     /// # Arguments
     ///
-    /// - `NaiveDate`: The bill date to filter by.
+    /// - `NaiveDate` - The bill date to filter by.
     ///
     /// # Returns
     ///
-    /// - `Result<Vec<OrderRecordModel>, String>`: The list of records for the specified date.
+    /// - `Result<Vec<OrderRecordModel>, String>` - The list of records for the specified date.
     #[instrument_trace]
     pub async fn find_by_bill_date(bill_date: NaiveDate) -> Result<Vec<OrderRecordModel>, String> {
         let db: DatabaseConnection =
@@ -304,7 +304,7 @@ impl RecordRepository {
     ///
     /// # Returns
     ///
-    /// - `Result<Vec<OrderRecordModel>, String>`: The complete list of order records.
+    /// - `Result<Vec<OrderRecordModel>, String>` - The complete list of order records.
     #[instrument_trace]
     pub async fn find_all() -> Result<Vec<OrderRecordModel>, String> {
         let db: DatabaseConnection =
@@ -323,11 +323,11 @@ impl RecordImageRepository {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The image identifier.
+    /// - `i32` - The image identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<Option<OrderRecordImageModel>, String>`: The image model if found, or `None`.
+    /// - `Result<Option<OrderRecordImageModel>, String>` - The image model if found, or `None`.
     #[instrument_trace]
     pub async fn find_by_id(image_id: i32) -> Result<Option<OrderRecordImageModel>, String> {
         let db: DatabaseConnection =
@@ -343,11 +343,11 @@ impl RecordImageRepository {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The record identifier.
+    /// - `i32` - The record identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<Vec<OrderRecordImageModel>, String>`: The list of images for the record.
+    /// - `Result<Vec<OrderRecordImageModel>, String>` - The list of images for the record.
     #[instrument_trace]
     pub async fn find_by_record_id(record_id: i32) -> Result<Vec<OrderRecordImageModel>, String> {
         let db: DatabaseConnection =
@@ -365,11 +365,11 @@ impl RecordImageRepository {
     ///
     /// # Arguments
     ///
-    /// - `Vec<i32>`: The list of record identifiers.
+    /// - `Vec<i32>` - The list of record identifiers.
     ///
     /// # Returns
     ///
-    /// - `Result<Vec<OrderRecordImageModel>, String>`: The list of images for the specified records.
+    /// - `Result<Vec<OrderRecordImageModel>, String>` - The list of images for the specified records.
     #[instrument_trace]
     pub async fn find_by_record_ids(
         record_ids: Vec<i32>,
@@ -389,11 +389,11 @@ impl RecordImageRepository {
     ///
     /// # Arguments
     ///
-    /// - `OrderRecordImageActiveModel`: The active model containing the image data to insert.
+    /// - `OrderRecordImageActiveModel` - The active model containing the image data to insert.
     ///
     /// # Returns
     ///
-    /// - `Result<OrderRecordImageModel, String>`: The inserted image model.
+    /// - `Result<OrderRecordImageModel, String>` - The inserted image model.
     #[instrument_trace]
     pub async fn insert(
         active_model: OrderRecordImageActiveModel,
@@ -411,12 +411,12 @@ impl RecordImageRepository {
     ///
     /// # Arguments
     ///
-    /// - `&DatabaseTransaction`: The active database transaction.
-    /// - `OrderRecordImageActiveModel`: The active model containing the image data to insert.
+    /// - `&DatabaseTransaction` - The active database transaction.
+    /// - `OrderRecordImageActiveModel` - The active model containing the image data to insert.
     ///
     /// # Returns
     ///
-    /// - `Result<OrderRecordImageModel, String>`: The inserted image model.
+    /// - `Result<OrderRecordImageModel, String>` - The inserted image model.
     #[instrument_trace]
     pub async fn insert_with_transaction(
         txn: &DatabaseTransaction,
@@ -433,11 +433,11 @@ impl RecordImageRepository {
     ///
     /// # Arguments
     ///
-    /// - `Vec<i32>`: The list of user identifiers.
+    /// - `Vec<i32>` - The list of user identifiers.
     ///
     /// # Returns
     ///
-    /// - `Result<Vec<OrderRecordImageModel>, String>`: The list of images for the specified users.
+    /// - `Result<Vec<OrderRecordImageModel>, String>` - The list of images for the specified users.
     #[instrument_trace]
     pub async fn find_by_user_ids(
         user_ids: Vec<i32>,
@@ -456,11 +456,11 @@ impl RecordImageRepository {
     ///
     /// # Arguments
     ///
-    /// - `OrderRecordImageActiveModel`: The active model containing the updated image data.
+    /// - `OrderRecordImageActiveModel` - The active model containing the updated image data.
     ///
     /// # Returns
     ///
-    /// - `Result<OrderRecordImageModel, String>`: The updated image model.
+    /// - `Result<OrderRecordImageModel, String>` - The updated image model.
     #[instrument_trace]
     pub async fn update(
         active_model: OrderRecordImageActiveModel,

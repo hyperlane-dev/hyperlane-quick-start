@@ -6,7 +6,7 @@ impl MessageQueueBroker {
     ///
     /// # Returns
     ///
-    /// - `MessageQueueBroker`: A new broker instance with no topics or consumer groups.
+    /// - `MessageQueueBroker` - A new broker instance with no topics or consumer groups.
     #[instrument_trace]
     pub fn new() -> Self {
         Self {
@@ -19,11 +19,11 @@ impl MessageQueueBroker {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The unique name for the new topic.
+    /// - `&str` - The unique name for the new topic.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error if the topic already exists.
+    /// - `Result<(), String>` - Ok on success, or an error if the topic already exists.
     #[instrument_trace]
     pub async fn create_topic(&self, name: &str) -> Result<(), String> {
         self.create_topic_with_capacity(name, DEFAULT_TOPIC_CAPACITY)
@@ -34,19 +34,19 @@ impl MessageQueueBroker {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The unique name for the new topic.
-    /// - `usize`: The broadcast channel capacity for this topic.
+    /// - `&str` - The unique name for the new topic.
+    /// - `usize` - The broadcast channel capacity for this topic.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error if the topic already exists.
+    /// - `Result<(), String>` - Ok on success, or an error if the topic already exists.
     #[instrument_trace]
     pub async fn create_topic_with_capacity(
         &self,
         name: &str,
         capacity: usize,
     ) -> Result<(), String> {
-        let mut topics: RwLockWriteGuard<'_, TopicRegistry> = self.topics.write().await;
+        let mut topics: RwLockWriteGuard<'_, TopicRegistry> = self.get_topics().write().await;
         if topics.contains_key(name) {
             return Err(ERROR_TOPIC_ALREADY_EXISTS.to_string());
         }
@@ -68,12 +68,12 @@ impl MessageQueueBroker {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The topic name to bind the group to.
-    /// - `&str`: The unique name for the consumer group.
+    /// - `&str` - The topic name to bind the group to.
+    /// - `&str` - The unique name for the consumer group.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error if the topic does not exist or the group already exists.
+    /// - `Result<(), String>` - Ok on success, or an error if the topic does not exist or the group already exists.
     #[instrument_trace]
     pub async fn create_consumer_group(
         &self,
@@ -88,13 +88,13 @@ impl MessageQueueBroker {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The topic name to bind the group to.
-    /// - `&str`: The unique name for the consumer group.
-    /// - `usize`: The broadcast channel capacity for this consumer group.
+    /// - `&str` - The topic name to bind the group to.
+    /// - `&str` - The unique name for the consumer group.
+    /// - `usize` - The broadcast channel capacity for this consumer group.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error if the topic does not exist or the group already exists.
+    /// - `Result<(), String>` - Ok on success, or an error if the topic does not exist or the group already exists.
     #[instrument_trace]
     pub async fn create_consumer_group_with_capacity(
         &self,
@@ -103,14 +103,14 @@ impl MessageQueueBroker {
         capacity: usize,
     ) -> Result<(), String> {
         {
-            let topics: RwLockReadGuard<'_, TopicRegistry> = self.topics.read().await;
+            let topics: RwLockReadGuard<'_, TopicRegistry> = self.get_topics().read().await;
             if !topics.contains_key(topic_name) {
                 return Err(ERROR_TOPIC_NOT_FOUND.to_string());
             }
         }
         let composite_key: String = format!("{topic_name}::{group_name}");
         let mut groups: RwLockWriteGuard<'_, ConsumerGroupRegistry> =
-            self.consumer_groups.write().await;
+            self.get_consumer_groups().write().await;
         if groups.contains_key(&composite_key) {
             return Err(ERROR_CONSUMER_GROUP_ALREADY_EXISTS.to_string());
         }
@@ -129,15 +129,15 @@ impl MessageQueueBroker {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The topic name to publish to.
-    /// - `&MessagePayload`: The message payload bytes.
+    /// - `&str` - The topic name to publish to.
+    /// - `&MessagePayload` - The message payload bytes.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error if the topic does not exist or is closed.
+    /// - `Result<(), String>` - Ok on success, or an error if the topic does not exist or is closed.
     #[instrument_trace]
     pub async fn publish(&self, topic_name: &str, payload: &MessagePayload) -> Result<(), String> {
-        let topics: RwLockReadGuard<'_, TopicRegistry> = self.topics.read().await;
+        let topics: RwLockReadGuard<'_, TopicRegistry> = self.get_topics().read().await;
         let topic: &Topic = topics
             .get(topic_name)
             .ok_or_else(|| ERROR_TOPIC_NOT_FOUND.to_string())?;
@@ -146,7 +146,8 @@ impl MessageQueueBroker {
         }
         let _: Result<usize, SendError<Vec<u8>>> = topic.get_sender().send(payload.clone());
         drop(topics);
-        let groups: RwLockReadGuard<'_, ConsumerGroupRegistry> = self.consumer_groups.read().await;
+        let groups: RwLockReadGuard<'_, ConsumerGroupRegistry> =
+            self.get_consumer_groups().read().await;
         for group in groups.values() {
             if group.get_topic_name() == topic_name {
                 let _: Result<usize, SendError<Vec<u8>>> = group.get_sender().send(payload.clone());
@@ -160,14 +161,14 @@ impl MessageQueueBroker {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The topic name to subscribe to.
+    /// - `&str` - The topic name to subscribe to.
     ///
     /// # Returns
     ///
-    /// - `Result<TopicReceiver, String>`: A receiver on success, or an error if the topic does not exist.
+    /// - `Result<TopicReceiver, String>` - A receiver on success, or an error if the topic does not exist.
     #[instrument_trace]
     pub async fn subscribe(&self, topic_name: &str) -> Result<TopicReceiver, String> {
-        let topics: RwLockReadGuard<'_, TopicRegistry> = self.topics.read().await;
+        let topics: RwLockReadGuard<'_, TopicRegistry> = self.get_topics().read().await;
         let topic: &Topic = topics
             .get(topic_name)
             .ok_or_else(|| ERROR_TOPIC_NOT_FOUND.to_string())?;
@@ -179,12 +180,12 @@ impl MessageQueueBroker {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The topic name the group is bound to.
-    /// - `&str`: The consumer group name.
+    /// - `&str` - The topic name the group is bound to.
+    /// - `&str` - The consumer group name.
     ///
     /// # Returns
     ///
-    /// - `Result<TopicReceiver, String>`: A receiver on success, or an error if the group does not exist.
+    /// - `Result<TopicReceiver, String>` - A receiver on success, or an error if the group does not exist.
     #[instrument_trace]
     pub async fn subscribe_group(
         &self,
@@ -192,7 +193,8 @@ impl MessageQueueBroker {
         group_name: &str,
     ) -> Result<TopicReceiver, String> {
         let composite_key: String = format!("{topic_name}::{group_name}");
-        let groups: RwLockReadGuard<'_, ConsumerGroupRegistry> = self.consumer_groups.read().await;
+        let groups: RwLockReadGuard<'_, ConsumerGroupRegistry> =
+            self.get_consumer_groups().read().await;
         let group: &ConsumerGroup = groups
             .get(&composite_key)
             .ok_or_else(|| ERROR_CONSUMER_GROUP_NOT_FOUND.to_string())?;
@@ -204,14 +206,14 @@ impl MessageQueueBroker {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The topic name to pause.
+    /// - `&str` - The topic name to pause.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error if the topic does not exist.
+    /// - `Result<(), String>` - Ok on success, or an error if the topic does not exist.
     #[instrument_trace]
     pub async fn pause_topic(&self, topic_name: &str) -> Result<(), String> {
-        let mut topics: RwLockWriteGuard<'_, TopicRegistry> = self.topics.write().await;
+        let mut topics: RwLockWriteGuard<'_, TopicRegistry> = self.get_topics().write().await;
         let topic: &mut Topic = topics
             .get_mut(topic_name)
             .ok_or_else(|| ERROR_TOPIC_NOT_FOUND.to_string())?;
@@ -223,14 +225,14 @@ impl MessageQueueBroker {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The topic name to resume.
+    /// - `&str` - The topic name to resume.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error if the topic does not exist.
+    /// - `Result<(), String>` - Ok on success, or an error if the topic does not exist.
     #[instrument_trace]
     pub async fn resume_topic(&self, topic_name: &str) -> Result<(), String> {
-        let mut topics: RwLockWriteGuard<'_, TopicRegistry> = self.topics.write().await;
+        let mut topics: RwLockWriteGuard<'_, TopicRegistry> = self.get_topics().write().await;
         let topic: &mut Topic = topics
             .get_mut(topic_name)
             .ok_or_else(|| ERROR_TOPIC_NOT_FOUND.to_string())?;
@@ -242,14 +244,14 @@ impl MessageQueueBroker {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The topic name to close.
+    /// - `&str` - The topic name to close.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error if the topic does not exist.
+    /// - `Result<(), String>` - Ok on success, or an error if the topic does not exist.
     #[instrument_trace]
     pub async fn close_topic(&self, topic_name: &str) -> Result<(), String> {
-        let mut topics: RwLockWriteGuard<'_, TopicRegistry> = self.topics.write().await;
+        let mut topics: RwLockWriteGuard<'_, TopicRegistry> = self.get_topics().write().await;
         let topic: &mut Topic = topics
             .get_mut(topic_name)
             .ok_or_else(|| ERROR_TOPIC_NOT_FOUND.to_string())?;
@@ -261,25 +263,26 @@ impl MessageQueueBroker {
     ///
     /// # Returns
     ///
-    /// - `usize`: The count of topics.
+    /// - `usize` - The count of topics.
     #[instrument_trace]
     pub async fn topic_count(&self) -> usize {
-        self.topics.read().await.len()
+        self.get_topics().read().await.len()
     }
 
     /// Returns the number of consumer groups across all topics.
     ///
     /// # Returns
     ///
-    /// - `usize`: The count of consumer groups.
+    /// - `usize` - The count of consumer groups.
     #[instrument_trace]
     pub async fn consumer_group_count(&self) -> usize {
-        self.consumer_groups.read().await.len()
+        self.get_consumer_groups().read().await.len()
     }
 }
 
 /// Default implementation for `MessageQueueBroker`, delegating to `new`.
 impl Default for MessageQueueBroker {
+    /// Returns a broker built with the default configuration.
     #[instrument_trace]
     fn default() -> Self {
         Self::new()

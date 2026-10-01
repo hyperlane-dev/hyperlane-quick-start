@@ -8,7 +8,7 @@ impl GetOrInit for ShutdownPlugin {
     ///
     /// # Returns
     ///
-    /// - `&'static ServerControlHookHandler<()>`: The static reference to the shutdown hook handler.
+    /// - `&'static Self::Instance` - The static reference to the shutdown hook handler.
     fn get_or_init() -> &'static Self::Instance {
         SHUTDOWN.get_or_init(Self::get_init)
     }
@@ -20,7 +20,7 @@ impl ShutdownPlugin {
     ///
     /// # Returns
     ///
-    /// - `ServerControlHookHandler<()>`: The default shutdown hook handler.
+    /// - `ServerControlHookHandler<()>` - The default shutdown hook handler.
     #[instrument_trace]
     pub fn get_init() -> ServerControlHookHandler<()> {
         Arc::new(|| {
@@ -34,7 +34,7 @@ impl ShutdownPlugin {
     ///
     /// # Arguments
     ///
-    /// - `&ServerControlHookHandler<()>`: The shutdown hook handler to set.
+    /// - `&ServerControlHookHandler<()>` - The shutdown hook handler to set.
     #[instrument_trace]
     pub fn set(shutdown: &ServerControlHookHandler<()>) {
         drop(SHUTDOWN.set(shutdown.clone()));

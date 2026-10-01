@@ -6,6 +6,8 @@ use super::*;
 /// starts a background consumer that processes sync tasks, and publishes
 /// initial sync messages for all repositories listed in `SYNC_REPOSITORIES`.
 impl BootstrapAsyncInit for GithubPagesBootstrap {
+    /// Creates the topics and consumer groups, then publishes the initial sync
+    /// messages for every configured repository.
     #[instrument_trace]
     async fn init() -> Self {
         let broker: &MessageQueueBroker = get_message_queue_broker();

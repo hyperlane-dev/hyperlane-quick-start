@@ -6,11 +6,11 @@ impl ShortlinkService {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The encoded shortlink ID string.
+    /// - `&str` - The encoded shortlink ID string.
     ///
     /// # Returns
     ///
-    /// - `Result<i32, String>`: The decoded numeric ID, or an error if the format is invalid.
+    /// - `Result<i32, String>` - The decoded numeric ID, or an error if the format is invalid.
     #[instrument_trace]
     fn decrypt_id(encoded_id: &str) -> Result<i32, String> {
         let decoded: String = bin_encode_decode::Decode::execute(CHARSETS, encoded_id)
@@ -24,11 +24,11 @@ impl ShortlinkService {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The numeric ID to encode.
+    /// - `i32` - The numeric ID to encode.
     ///
     /// # Returns
     ///
-    /// - `Result<String, String>`: The encoded string, or an error if encoding fails.
+    /// - `Result<String, String>` - The encoded string, or an error if encoding fails.
     #[instrument_trace]
     fn encrypt_id(id: i32) -> Result<String, String> {
         bin_encode_decode::Encode::execute(CHARSETS, &id.to_string())
@@ -39,11 +39,11 @@ impl ShortlinkService {
     ///
     /// # Arguments
     ///
-    /// - `ShortlinkInsertRequest`: The request containing the target URL.
+    /// - `ShortlinkInsertRequest` - The request containing the target URL.
     ///
     /// # Returns
     ///
-    /// - `Result<String, String>`: The encoded shortlink ID, or an error if the URL is empty.
+    /// - `Result<String, String>` - The encoded shortlink ID, or an error if the URL is empty.
     #[instrument_trace]
     pub async fn insert_shortlink(request: ShortlinkInsertRequest) -> Result<String, String> {
         if request.get_url().is_empty() {
@@ -64,11 +64,11 @@ impl ShortlinkService {
     ///
     /// # Arguments
     ///
-    /// - `String`: The encoded shortlink ID string.
+    /// - `String` - The encoded shortlink ID string.
     ///
     /// # Returns
     ///
-    /// - `Result<Option<ShortlinkRecord>, String>`: The shortlink record if found, or `None`.
+    /// - `Result<Option<ShortlinkRecord>, String>` - The shortlink record if found, or `None`.
     #[instrument_trace]
     pub async fn query_shortlink(encrypted_id: String) -> Result<Option<ShortlinkRecord>, String> {
         let id: i32 = Self::decrypt_id(&encrypted_id)?;
@@ -81,7 +81,7 @@ impl ShortlinkService {
                     .set_created_at(
                         model
                             .try_get_created_at()
-                            .map(|dt: NaiveDateTime| dt.format("%Y-%m-%d %H:%M:%S").to_string())
+                            .map(|dt: NaiveDateTime| dt.format(FORMAT_DATE_TIME).to_string())
                             .unwrap_or_default(),
                     );
                 Ok(Some(record))

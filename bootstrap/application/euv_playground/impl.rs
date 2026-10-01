@@ -7,6 +7,8 @@ use super::*;
 /// periodic GC coroutine that evicts finished jobs past
 /// [`BUILD_JOB_TTL_MS`].
 impl BootstrapAsyncInit for EuvPlaygroundBootstrap {
+    /// Creates the build topic and worker consumer group and spawns the worker
+    /// listener together with the periodic GC coroutine.
     #[instrument_trace]
     async fn init() -> Self {
         let broker: &MessageQueueBroker = get_message_queue_broker();

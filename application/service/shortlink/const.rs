@@ -6,3 +6,5 @@ pub const ERROR_FAILED_TO_ENCRYPT_SHORTLINK_ID: &str = "Failed to encrypt shortl
 
 /// Error message when url cannot be empty.
 pub const ERROR_URL_CANNOT_BE_EMPTY: &str = "URL cannot be empty";
+/// Date and time format used in cache keys.
+pub const FORMAT_DATE_TIME: &str = "%Y-%m-%d %H:%M:%S";

@@ -6,11 +6,11 @@ impl RedisService {
     ///
     /// # Arguments
     ///
-    /// - `RedisRecord`: The record containing the key and value to store.
+    /// - `RedisRecord` - The record containing the key and value to store.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error if the Redis operation fails.
+    /// - `Result<(), String>` - Ok on success, or an error if the Redis operation fails.
     #[instrument_trace]
     pub async fn create_redis_record(record: RedisRecord) -> Result<(), String> {
         let conn_arc: ArcRwLock<Connection> =
@@ -29,7 +29,8 @@ impl RedisService {
     ///
     /// # Returns
     ///
-    /// - `Result<Vec<RedisRecord>, String>`: The list of all Redis records, or an error if the operation fails.
+    /// - `Result<Vec<RedisRecord>, String>` - The list of all Redis records, or an error if the
+    ///     operation fails.
     #[instrument_trace]
     pub async fn get_all_redis_records() -> Result<Vec<RedisRecord>, String> {
         let conn_arc: ArcRwLock<Connection> =
@@ -60,11 +61,11 @@ impl RedisService {
     ///
     /// # Arguments
     ///
-    /// - `RedisRecord`: The record containing the key and updated value.
+    /// - `RedisRecord` - The record containing the key and updated value.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error if the Redis operation fails.
+    /// - `Result<(), String>` - Ok on success, or an error if the Redis operation fails.
     #[instrument_trace]
     pub async fn update_redis_record(record: RedisRecord) -> Result<(), String> {
         let conn_arc: ArcRwLock<Connection> =
@@ -79,11 +80,11 @@ impl RedisService {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The key of the record to delete.
+    /// - `&str` - The key of the record to delete.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error if the Redis operation fails.
+    /// - `Result<(), String>` - Ok on success, or an error if the Redis operation fails.
     #[instrument_trace]
     pub async fn delete_redis_record(key: &str) -> Result<(), String> {
         let conn_arc: ArcRwLock<Connection> =

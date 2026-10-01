@@ -6,15 +6,15 @@ impl ActiveModel {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The pipeline identifier.
-    /// - `i32`: The sequential run number.
-    /// - `Option<String>`: The user who triggered the run.
-    /// - `Option<String>`: The commit hash.
-    /// - `Option<String>`: The commit message.
+    /// - `i32` - The pipeline identifier.
+    /// - `i32` - The sequential run number.
+    /// - `Option<String>` - The user who triggered the run.
+    /// - `Option<String>` - The commit hash.
+    /// - `Option<String>` - The commit message.
     ///
     /// # Returns
     ///
-    /// - `ActiveModel`: A new active model with status "pending" ready for insertion.
+    /// - `ActiveModel` - A new active model with status "pending" ready for insertion.
     #[instrument_trace]
     pub fn new(
         pipeline_id: i32,
@@ -26,7 +26,7 @@ impl ActiveModel {
         Self {
             pipeline_id: ActiveValue::Set(pipeline_id),
             run_number: ActiveValue::Set(run_number),
-            status: ActiveValue::Set("pending".to_string()),
+            status: ActiveValue::Set(CICD_RUN_STATUS_PENDING.to_string()),
             triggered_by: ActiveValue::Set(triggered_by),
             commit_hash: ActiveValue::Set(commit_hash),
             commit_message: ActiveValue::Set(commit_message),

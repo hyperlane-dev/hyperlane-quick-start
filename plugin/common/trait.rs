@@ -9,6 +9,10 @@ pub trait GetOrInit: Clone + Copy + Default + Send + Sync + 'static {
     type Instance: Send + Sync + 'static;
 
     /// Returns a static reference to the lazily-initialized singleton instance.
+    ///
+    /// # Returns
+    ///
+    /// - `&'static Self::Instance` - A static reference to the shared instance.
     fn get_or_init() -> &'static Self::Instance;
 }
 
@@ -29,18 +33,22 @@ pub trait DatabaseConnectionPlugin: Clone + Copy + Default + Send + Sync + 'stat
     type ConnectionCache: Send + Sync + 'static;
 
     /// Returns the plugin type (MySQL, PostgreSQL, or Redis).
+    ///
+    /// # Returns
+    ///
+    /// - `PluginType` - The plugin type of the implementor.
     fn plugin_type() -> PluginType;
 
     /// Creates a new database connection for the specified instance and schema.
     ///
     /// # Arguments
     ///
-    /// - `I`: The instance name identifier.
-    /// - `Option<DatabaseSchema>`: The optional database schema for auto-creation.
+    /// - `I` - The instance name identifier.
+    /// - `Option<DatabaseSchema>` - The optional database schema for auto-creation.
     ///
     /// # Returns
     ///
-    /// - `Result<Self::Connection, String>`: The connection on success, or an error message on failure.
+    /// - `impl Future<Output = Result<Self::Connection, String>>` - The connection on success, or an error message on failure.
     fn connection_db<I>(
         instance_name: I,
         schema: Option<DatabaseSchema>,
@@ -52,12 +60,12 @@ pub trait DatabaseConnectionPlugin: Clone + Copy + Default + Send + Sync + 'stat
     ///
     /// # Arguments
     ///
-    /// - `I`: The instance name identifier.
-    /// - `Option<DatabaseSchema>`: The optional database schema for auto-creation.
+    /// - `I` - The instance name identifier.
+    /// - `Option<DatabaseSchema>` - The optional database schema for auto-creation.
     ///
     /// # Returns
     ///
-    /// - `Result<Self::Connection, String>`: The connection on success, or an error message on failure.
+    /// - `impl Future<Output = Result<Self::Connection, String>>` - The connection on success, or an error message on failure.
     fn get_connection<I>(
         instance_name: I,
         schema: Option<DatabaseSchema>,
@@ -69,12 +77,12 @@ pub trait DatabaseConnectionPlugin: Clone + Copy + Default + Send + Sync + 'stat
     ///
     /// # Arguments
     ///
-    /// - `&Self::InstanceConfig`: The instance configuration.
-    /// - `Option<DatabaseSchema>`: The optional database schema containing table definitions.
+    /// - `&Self::InstanceConfig` - The instance configuration.
+    /// - `Option<DatabaseSchema>` - The optional database schema containing table definitions.
     ///
     /// # Returns
     ///
-    /// - `Result<AutoCreationResult, AutoCreationError>`: The auto-creation result on success, or an error on failure.
+    /// - `impl Future<Output = Result<AutoCreationResult, AutoCreationError>>` - The auto-creation result on success, or an error on failure.
     fn perform_auto_creation(
         instance: &Self::InstanceConfig,
         schema: Option<DatabaseSchema>,
@@ -92,15 +100,15 @@ pub trait DatabaseAutoCreation: Clone + Send + Sync + 'static {
     ///
     /// # Arguments
     ///
-    /// - `Self::InstanceConfig`: The instance configuration.
+    /// - `Self::InstanceConfig` - The instance configuration.
     fn new(instance: Self::InstanceConfig) -> Self;
 
     /// Creates a new auto-creation handler with an explicit database schema.
     ///
     /// # Arguments
     ///
-    /// - `Self::InstanceConfig`: The instance configuration.
-    /// - `DatabaseSchema`: The database schema containing table definitions.
+    /// - `Self::InstanceConfig` - The instance configuration.
+    /// - `DatabaseSchema` - The database schema containing table definitions.
     fn with_schema(instance: Self::InstanceConfig, schema: DatabaseSchema) -> Self
     where
         Self: Sized;
@@ -109,7 +117,7 @@ pub trait DatabaseAutoCreation: Clone + Send + Sync + 'static {
     ///
     /// # Returns
     ///
-    /// - `Result<bool, AutoCreationError>`: True if the database was created, false if it already existed.
+    /// - `impl Future<Output = Result<bool, AutoCreationError>>` - True if the database was created, false if it already existed.
     fn create_database_if_not_exists(
         &self,
     ) -> impl Future<Output = Result<bool, AutoCreationError>> + Send;
@@ -118,7 +126,7 @@ pub trait DatabaseAutoCreation: Clone + Send + Sync + 'static {
     ///
     /// # Returns
     ///
-    /// - `Result<Vec<String>, AutoCreationError>`: A list of table names that were created.
+    /// - `impl Future<Output = Result<Vec<String>, AutoCreationError>>` - A list of table names that were created.
     fn create_tables_if_not_exist(
         &self,
     ) -> impl Future<Output = Result<Vec<String>, AutoCreationError>> + Send;
@@ -127,13 +135,13 @@ pub trait DatabaseAutoCreation: Clone + Send + Sync + 'static {
     ///
     /// # Returns
     ///
-    /// - `Result<(), AutoCreationError>`: Ok on success, or an error on failure.
+    /// - `impl Future<Output = Result<(), AutoCreationError>>` - Ok on success, or an error on failure.
     fn init_data(&self) -> impl Future<Output = Result<(), AutoCreationError>> + Send;
 
     /// Verifies the database connection is working correctly.
     ///
     /// # Returns
     ///
-    /// - `Result<(), AutoCreationError>`: Ok if the connection is valid, or an error on failure.
+    /// - `impl Future<Output = Result<(), AutoCreationError>>` - Ok if the connection is valid, or an error on failure.
     fn verify_connection(&self) -> impl Future<Output = Result<(), AutoCreationError>> + Send;
 }

@@ -6,11 +6,11 @@ impl LogService {
     ///
     /// # Arguments
     ///
-    /// - `&Path`: The log directory path to scan.
+    /// - `&Path` - The log directory path to scan.
     ///
     /// # Returns
     ///
-    /// - `Vec<String>`: The sorted directory names.
+    /// - `Vec<String>` - The sorted directory names.
     #[instrument_trace]
     pub fn get_sorted_dirs(path: &Path) -> Vec<String> {
         fs::read_dir(path)
@@ -32,6 +32,14 @@ impl LogService {
     }
 
     /// get sorted log files.
+    ///
+    /// # Arguments
+    ///
+    /// - `&Path` - The filesystem path.
+    ///
+    /// # Returns
+    ///
+    /// - `Vec<String>` - The sorted log files.
     #[instrument_trace]
     pub fn get_sorted_log_files(path: &Path) -> Vec<String> {
         fs::read_dir(path)
@@ -54,6 +62,14 @@ impl LogService {
     }
 
     /// read and reverse log file.
+    ///
+    /// # Arguments
+    ///
+    /// - `&Path` - The full path.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<String, String>` - The and reverse log file, or an error message.
     #[instrument_trace]
     pub async fn read_and_reverse_log_file(full_path: &Path) -> Result<String, String> {
         async_read_from_file::<Vec<u8>>(full_path.to_str().unwrap_or_default())
@@ -69,7 +85,7 @@ impl LogService {
             .map_err(|_: Box<dyn std::error::Error>| {
                 format!(
                     "Failed to read file {}",
-                    full_path.to_str().unwrap_or("invalid path")
+                    full_path.to_str().unwrap_or(ERROR_INVALID_PATH)
                 )
             })
     }
@@ -78,12 +94,12 @@ impl LogService {
     ///
     /// # Arguments
     ///
-    /// - `&Path`: The parent log directory path.
-    /// - `&str`: The date subdirectory name.
+    /// - `&Path` - The parent log directory path.
+    /// - `&str` - The date subdirectory name.
     ///
     /// # Returns
     ///
-    /// - `Vec<String>`: A list of log file content strings read from the date directory.
+    /// - `Vec<String>` - A list of log file content strings read from the date directory.
     #[instrument_trace]
     pub async fn process_date_directory(log_dir: &Path, date_dir: &str) -> Vec<String> {
         let date_path: PathBuf = log_dir.join(date_dir);
@@ -104,11 +120,11 @@ impl LogService {
     ///
     /// # Arguments
     ///
-    /// - `&Path`: The log file path to read.
+    /// - `Level` - The level.
     ///
     /// # Returns
     ///
-    /// - `Result<String, String>`: The file content, or an error if reading fails.
+    /// - `String` - The log file.
     #[instrument_trace]
     pub async fn read_log_file(level: Level) -> String {
         let env_config: &EnvConfig = EnvPlugin::get_or_init();

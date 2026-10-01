@@ -15,6 +15,16 @@ use super::*;
 /// If the request path looks like a directory (no file extension, no trailing slash),
 /// a 301 redirect is issued to the same path with a trailing slash appended.
 /// This matches GitHub Pages behavior and ensures browsers resolve relative paths correctly.
+///
+/// # Arguments
+///
+/// - `String` - The owner.
+/// - `Option<String>` - The range header opt.
+/// - `&mut Context` - The request context.
+///
+/// # Returns
+///
+/// - `Status` - The github pages request result.
 async fn handle_github_pages_request(
     owner: String,
     repository: String,
@@ -160,11 +170,27 @@ async fn handle_github_pages_request(
 /// It issues a 301 redirect to append a trailing slash, matching GitHub Pages behavior
 /// where `https://{owner}.github.io/{repository}` redirects to `…/{repository}/`.
 impl ServerHook for GithubPagesProxyRootRoute {
+    /// Creates a new instance.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The .
+    /// - `&mut Context` - The .
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
+    /// Handles one request and writes the response.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The stream.
+    /// - `&mut Context` - The request context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The handle result.
     #[prologue_macros(
         methods(get),
         try_get_route_param(OWNER_KEY => owner_opt),
@@ -185,11 +211,27 @@ impl ServerHook for GithubPagesProxyRootRoute {
 
 /// Implementation of `GithubPagesProxyRoute` for `ServerHook`.
 impl ServerHook for GithubPagesProxyRoute {
+    /// Creates a new instance.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The .
+    /// - `&mut Context` - The .
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
+    /// Handles one request and writes the response.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The stream.
+    /// - `&mut Context` - The request context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The handle result.
     #[prologue_macros(
         methods(get),
         try_get_route_param(OWNER_KEY => owner_opt),

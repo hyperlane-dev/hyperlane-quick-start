@@ -2,6 +2,15 @@ use super::*;
 
 /// Implementation of `CicdStatus` for `fmt::Display`.
 impl fmt::Display for CicdStatus {
+    /// Formats the value for display.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut fmt::Formatter<'_>` - The output formatter.
+    ///
+    /// # Returns
+    ///
+    /// - `fmt::Result` - The fmt result.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             CicdStatus::Pending => write!(f, "pending"),
@@ -17,14 +26,23 @@ impl fmt::Display for CicdStatus {
 /// Implementation of `CicdStatus` for `FromStr`.
 impl FromStr for CicdStatus {
     type Err = String;
+    /// Parses the value from its textual form.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str` - The textual input.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Self, Self::Err>` - The converted str, or the failure reason.
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "pending" => Ok(CicdStatus::Pending),
-            "running" => Ok(CicdStatus::Running),
-            "success" => Ok(CicdStatus::Success),
-            "failure" => Ok(CicdStatus::Failure),
-            "cancelled" => Ok(CicdStatus::Cancelled),
-            "skipped" => Ok(CicdStatus::Skipped),
+            STATUS_PENDING => Ok(CicdStatus::Pending),
+            STATUS_RUNNING => Ok(CicdStatus::Running),
+            STATUS_SUCCESS => Ok(CicdStatus::Success),
+            STATUS_FAILURE => Ok(CicdStatus::Failure),
+            STATUS_CANCELLED => Ok(CicdStatus::Cancelled),
+            STATUS_SKIPPED => Ok(CicdStatus::Skipped),
             _ => Ok(CicdStatus::default()),
         }
     }
@@ -32,6 +50,15 @@ impl FromStr for CicdStatus {
 
 /// Implementation of `TriggerType` for `fmt::Display`.
 impl fmt::Display for TriggerType {
+    /// Formats the value for display.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut fmt::Formatter<'_>` - The output formatter.
+    ///
+    /// # Returns
+    ///
+    /// - `fmt::Result` - The fmt result.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             TriggerType::Push => write!(f, "push"),
@@ -46,13 +73,22 @@ impl fmt::Display for TriggerType {
 /// Implementation of `TriggerType` for `FromStr`.
 impl FromStr for TriggerType {
     type Err = String;
+    /// Parses the value from its textual form.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str` - The textual input.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Self, Self::Err>` - The converted str, or the failure reason.
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "push" => Ok(TriggerType::Push),
-            "pull_request" => Ok(TriggerType::PullRequest),
-            "manual" => Ok(TriggerType::Manual),
-            "schedule" => Ok(TriggerType::Schedule),
-            "webhook" => Ok(TriggerType::Webhook),
+            TRIGGER_PUSH => Ok(TriggerType::Push),
+            TRIGGER_PULL_REQUEST => Ok(TriggerType::PullRequest),
+            TRIGGER_MANUAL => Ok(TriggerType::Manual),
+            TRIGGER_SCHEDULE => Ok(TriggerType::Schedule),
+            TRIGGER_WEBHOOK => Ok(TriggerType::Webhook),
             _ => Ok(TriggerType::default()),
         }
     }
@@ -64,7 +100,7 @@ impl CicdStatus {
     ///
     /// # Returns
     ///
-    /// - `bool`: True if the status is success, failure, cancelled, or skipped.
+    /// - `bool` - True if the status is success, failure, cancelled, or skipped.
     pub fn is_terminal(self) -> bool {
         matches!(
             self,
@@ -76,7 +112,7 @@ impl CicdStatus {
     ///
     /// # Returns
     ///
-    /// - `bool`: True if the status is running.
+    /// - `bool` - True if the status is running.
     #[instrument_trace]
     pub fn is_active(self) -> bool {
         self == CicdStatus::Running
@@ -86,7 +122,7 @@ impl CicdStatus {
     ///
     /// # Returns
     ///
-    /// - `bool`: True if the status is pending.
+    /// - `bool` - True if the status is pending.
     #[instrument_trace]
     pub fn is_pending(self) -> bool {
         self == CicdStatus::Pending
@@ -95,6 +131,15 @@ impl CicdStatus {
 
 /// Implementation of methods for `From`.
 impl From<CicdStatus> for String {
+    /// Builds the value from its component parts.
+    ///
+    /// # Arguments
+    ///
+    /// - `CicdStatus` - The target status.
+    ///
+    /// # Returns
+    ///
+    /// - `String` - The from result.
     fn from(status: CicdStatus) -> String {
         status.to_string()
     }

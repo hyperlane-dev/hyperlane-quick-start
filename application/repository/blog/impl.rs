@@ -6,11 +6,11 @@ impl BlogPostRepository {
     ///
     /// # Arguments
     ///
-    /// - `BlogPostActiveModel`: The active model containing the post data to insert.
+    /// - `BlogPostActiveModel` - The active model containing the post data to insert.
     ///
     /// # Returns
     ///
-    /// - `Result<BlogPostModel, String>`: The inserted post model.
+    /// - `Result<BlogPostModel, String>` - The inserted post model.
     #[instrument_trace]
     pub async fn insert(active_model: BlogPostActiveModel) -> Result<BlogPostModel, String> {
         let db: DatabaseConnection =
@@ -26,11 +26,11 @@ impl BlogPostRepository {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The post identifier.
+    /// - `i32` - The post identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<Option<BlogPostModel>, String>`: The post model if found and not deleted, or `None`.
+    /// - `Result<Option<BlogPostModel>, String>` - The post model if found and not deleted, or `None`.
     #[instrument_trace]
     pub async fn find_by_id(id: i32) -> Result<Option<BlogPostModel>, String> {
         let db: DatabaseConnection =
@@ -47,11 +47,11 @@ impl BlogPostRepository {
     ///
     /// # Arguments
     ///
-    /// - `BlogPostQuery`: The query parameters including filters and pagination.
+    /// - `BlogPostQuery` - The query parameters including filters and pagination.
     ///
     /// # Returns
     ///
-    /// - `Result<(Vec<BlogPostModel>, i64), String>`: The paginated posts and total count.
+    /// - `Result<(Vec<BlogPostModel>, i64), String>` - The paginated posts and total count.
     #[instrument_trace]
     pub async fn query_with_pagination(
         query: BlogPostQuery,
@@ -63,11 +63,13 @@ impl BlogPostRepository {
             base_select = base_select.filter(BlogPostColumn::UserId.eq(user_id));
         }
         if let Some(keyword) = query.try_get_keyword() {
-            base_select = base_select.filter(
-                BlogPostColumn::Title
-                    .contains(keyword)
-                    .or(BlogPostColumn::Summary.contains(keyword)),
-            );
+            // `ExprTrait` is called out by path rather than imported: the
+            // trait also defines `min`/`max`, which collide with the inherent
+            // `Ord` methods used a few lines below in this same file.
+            base_select = base_select.filter(sea_orm::ExprTrait::or(
+                BlogPostColumn::Title.contains(keyword),
+                BlogPostColumn::Summary.contains(keyword),
+            ));
         }
         if let Some(is_published) = query.try_get_is_published() {
             base_select = base_select.filter(BlogPostColumn::IsPublished.eq(is_published));
@@ -92,12 +94,12 @@ impl BlogPostRepository {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The post identifier.
-    /// - `BlogPostActiveModel`: The active model containing the fields to update.
+    /// - `i32` - The post identifier.
+    /// - `BlogPostActiveModel` - The active model containing the fields to update.
     ///
     /// # Returns
     ///
-    /// - `Result<BlogPostModel, String>`: The updated post model, or an error if not found.
+    /// - `Result<BlogPostModel, String>` - The updated post model, or an error if not found.
     #[instrument_trace]
     pub async fn update(
         id: i32,
@@ -110,7 +112,7 @@ impl BlogPostRepository {
             .one(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?
-            .ok_or_else(|| "Blog post not found".to_string())?;
+            .ok_or_else(|| LOOKUP_ERROR_BLOG_POST_NOT_FOUND.to_string())?;
         let mut update_model: BlogPostActiveModel = model.into();
         if active_model.title != ActiveValue::NotSet {
             update_model.title = active_model.title;
@@ -138,11 +140,11 @@ impl BlogPostRepository {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The post identifier.
+    /// - `i32` - The post identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error if not found.
+    /// - `Result<(), String>` - Ok on success, or an error if not found.
     #[instrument_trace]
     pub async fn soft_delete_by_id(id: i32) -> Result<(), String> {
         let db: DatabaseConnection =
@@ -152,7 +154,7 @@ impl BlogPostRepository {
             .one(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?
-            .ok_or_else(|| "Blog post not found".to_string())?;
+            .ok_or_else(|| LOOKUP_ERROR_BLOG_POST_NOT_FOUND.to_string())?;
         let mut active_model: BlogPostActiveModel = model.into();
         active_model.is_deleted = ActiveValue::Set(true);
         active_model
@@ -166,11 +168,11 @@ impl BlogPostRepository {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The post identifier.
+    /// - `i32` - The post identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error if not found.
+    /// - `Result<(), String>` - Ok on success, or an error if not found.
     #[instrument_trace]
     pub async fn increment_view_count(id: i32) -> Result<(), String> {
         let db: DatabaseConnection =
@@ -180,7 +182,7 @@ impl BlogPostRepository {
             .one(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?
-            .ok_or_else(|| "Blog post not found".to_string())?;
+            .ok_or_else(|| LOOKUP_ERROR_BLOG_POST_NOT_FOUND.to_string())?;
         let new_count: i32 = model.get_view_count() + 1;
         let mut active_model: BlogPostActiveModel = model.into();
         active_model.view_count = ActiveValue::Set(new_count);
@@ -195,12 +197,12 @@ impl BlogPostRepository {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The post identifier.
-    /// - `i32`: The delta to apply (positive for increment, negative for decrement).
+    /// - `i32` - The post identifier.
+    /// - `i32` - The delta to apply (positive for increment, negative for decrement).
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error if not found.
+    /// - `Result<(), String>` - Ok on success, or an error if not found.
     #[instrument_trace]
     pub async fn update_like_count(id: i32, delta: i32) -> Result<(), String> {
         let db: DatabaseConnection =
@@ -210,7 +212,7 @@ impl BlogPostRepository {
             .one(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?
-            .ok_or_else(|| "Blog post not found".to_string())?;
+            .ok_or_else(|| LOOKUP_ERROR_BLOG_POST_NOT_FOUND.to_string())?;
         let new_count: i32 = (model.get_like_count() + delta).max(0);
         let mut active_model: BlogPostActiveModel = model.into();
         active_model.like_count = ActiveValue::Set(new_count);
@@ -225,12 +227,12 @@ impl BlogPostRepository {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The post identifier.
-    /// - `i32`: The delta to apply (positive for increment, negative for decrement).
+    /// - `i32` - The post identifier.
+    /// - `i32` - The delta to apply (positive for increment, negative for decrement).
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error if not found.
+    /// - `Result<(), String>` - Ok on success, or an error if not found.
     #[instrument_trace]
     pub async fn update_favorite_count(id: i32, delta: i32) -> Result<(), String> {
         let db: DatabaseConnection =
@@ -240,7 +242,7 @@ impl BlogPostRepository {
             .one(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?
-            .ok_or_else(|| "Blog post not found".to_string())?;
+            .ok_or_else(|| LOOKUP_ERROR_BLOG_POST_NOT_FOUND.to_string())?;
         let new_count: i32 = (model.get_favorite_count() + delta).max(0);
         let mut active_model: BlogPostActiveModel = model.into();
         active_model.favorite_count = ActiveValue::Set(new_count);
@@ -255,12 +257,12 @@ impl BlogPostRepository {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The post identifier.
-    /// - `i32`: The delta to apply (positive for increment, negative for decrement).
+    /// - `i32` - The post identifier.
+    /// - `i32` - The delta to apply (positive for increment, negative for decrement).
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error if not found.
+    /// - `Result<(), String>` - Ok on success, or an error if not found.
     #[instrument_trace]
     pub async fn update_comment_count(id: i32, delta: i32) -> Result<(), String> {
         let db: DatabaseConnection =
@@ -270,7 +272,7 @@ impl BlogPostRepository {
             .one(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?
-            .ok_or_else(|| "Blog post not found".to_string())?;
+            .ok_or_else(|| LOOKUP_ERROR_BLOG_POST_NOT_FOUND.to_string())?;
         let new_count: i32 = (model.get_comment_count() + delta).max(0);
         let mut active_model: BlogPostActiveModel = model.into();
         active_model.comment_count = ActiveValue::Set(new_count);
@@ -288,11 +290,11 @@ impl BlogCommentRepository {
     ///
     /// # Arguments
     ///
-    /// - `BlogCommentActiveModel`: The active model containing the comment data to insert.
+    /// - `BlogCommentActiveModel` - The active model containing the comment data to insert.
     ///
     /// # Returns
     ///
-    /// - `Result<BlogCommentModel, String>`: The inserted comment model.
+    /// - `Result<BlogCommentModel, String>` - The inserted comment model.
     #[instrument_trace]
     pub async fn insert(active_model: BlogCommentActiveModel) -> Result<BlogCommentModel, String> {
         let db: DatabaseConnection =
@@ -308,11 +310,11 @@ impl BlogCommentRepository {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The comment identifier.
+    /// - `i32` - The comment identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<Option<BlogCommentModel>, String>`: The comment model if found and not deleted, or `None`.
+    /// - `Result<Option<BlogCommentModel>, String>` - The comment model if found and not deleted, or `None`.
     #[instrument_trace]
     pub async fn find_by_id(id: i32) -> Result<Option<BlogCommentModel>, String> {
         let db: DatabaseConnection =
@@ -329,11 +331,11 @@ impl BlogCommentRepository {
     ///
     /// # Arguments
     ///
-    /// - `BlogCommentQuery`: The query parameters including post ID and pagination.
+    /// - `BlogCommentQuery` - The query parameters including post ID and pagination.
     ///
     /// # Returns
     ///
-    /// - `Result<(Vec<BlogCommentModel>, i64), String>`: The paginated comments and total count.
+    /// - `Result<(Vec<BlogCommentModel>, i64), String>` - The paginated comments and total count.
     #[instrument_trace]
     pub async fn query_by_post_id(
         query: BlogCommentQuery,
@@ -362,11 +364,11 @@ impl BlogCommentRepository {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The parent comment identifier.
+    /// - `i32` - The parent comment identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<Vec<BlogCommentModel>, String>`: The list of reply comments.
+    /// - `Result<Vec<BlogCommentModel>, String>` - The list of reply comments.
     #[instrument_trace]
     pub async fn query_replies_by_parent_id(
         parent_id: i32,
@@ -387,11 +389,11 @@ impl BlogCommentRepository {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The comment identifier.
+    /// - `i32` - The comment identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error if not found.
+    /// - `Result<(), String>` - Ok on success, or an error if not found.
     #[instrument_trace]
     pub async fn soft_delete_by_id(id: i32) -> Result<(), String> {
         let db: DatabaseConnection =
@@ -401,7 +403,7 @@ impl BlogCommentRepository {
             .one(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?
-            .ok_or_else(|| "Comment not found".to_string())?;
+            .ok_or_else(|| LOOKUP_ERROR_COMMENT_NOT_FOUND.to_string())?;
         let mut active_model: BlogCommentActiveModel = model.into();
         active_model.is_deleted = ActiveValue::Set(true);
         active_model
@@ -418,11 +420,11 @@ impl BlogLikeRepository {
     ///
     /// # Arguments
     ///
-    /// - `BlogLikeActiveModel`: The active model containing the like data to insert.
+    /// - `BlogLikeActiveModel` - The active model containing the like data to insert.
     ///
     /// # Returns
     ///
-    /// - `Result<BlogLikeModel, String>`: The inserted like model.
+    /// - `Result<BlogLikeModel, String>` - The inserted like model.
     #[instrument_trace]
     pub async fn insert(active_model: BlogLikeActiveModel) -> Result<BlogLikeModel, String> {
         let db: DatabaseConnection =
@@ -438,12 +440,12 @@ impl BlogLikeRepository {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The post identifier.
-    /// - `i32`: The user identifier.
+    /// - `i32` - The post identifier.
+    /// - `i32` - The user identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<Option<BlogLikeModel>, String>`: The like model if found, or `None`.
+    /// - `Result<Option<BlogLikeModel>, String>` - The like model if found, or `None`.
     #[instrument_trace]
     pub async fn find_by_post_and_user(
         post_id: i32,
@@ -464,12 +466,12 @@ impl BlogLikeRepository {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The post identifier.
-    /// - `i32`: The user identifier.
+    /// - `i32` - The post identifier.
+    /// - `i32` - The user identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error if not found.
+    /// - `Result<(), String>` - Ok on success, or an error if not found.
     #[instrument_trace]
     pub async fn delete_by_post_and_user(post_id: i32, user_id: i32) -> Result<(), String> {
         let db: DatabaseConnection =
@@ -480,7 +482,7 @@ impl BlogLikeRepository {
             .one(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?
-            .ok_or_else(|| "Like not found".to_string())?;
+            .ok_or_else(|| LOOKUP_ERROR_LIKE_NOT_FOUND.to_string())?;
         let active_model: BlogLikeActiveModel = model.into();
         active_model
             .delete(&db)
@@ -493,11 +495,11 @@ impl BlogLikeRepository {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The post identifier.
+    /// - `i32` - The post identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<i64, String>`: The count of likes for the post.
+    /// - `Result<i64, String>` - The count of likes for the post.
     #[instrument_trace]
     pub async fn count_by_post_id(post_id: i32) -> Result<i64, String> {
         let db: DatabaseConnection =
@@ -517,11 +519,11 @@ impl BlogFavoriteRepository {
     ///
     /// # Arguments
     ///
-    /// - `BlogFavoriteActiveModel`: The active model containing the favorite data to insert.
+    /// - `BlogFavoriteActiveModel` - The active model containing the favorite data to insert.
     ///
     /// # Returns
     ///
-    /// - `Result<BlogFavoriteModel, String>`: The inserted favorite model.
+    /// - `Result<BlogFavoriteModel, String>` - The inserted favorite model.
     #[instrument_trace]
     pub async fn insert(
         active_model: BlogFavoriteActiveModel,
@@ -539,12 +541,12 @@ impl BlogFavoriteRepository {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The post identifier.
-    /// - `i32`: The user identifier.
+    /// - `i32` - The post identifier.
+    /// - `i32` - The user identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<Option<BlogFavoriteModel>, String>`: The favorite model if found, or `None`.
+    /// - `Result<Option<BlogFavoriteModel>, String>` - The favorite model if found, or `None`.
     #[instrument_trace]
     pub async fn find_by_post_and_user(
         post_id: i32,
@@ -565,12 +567,12 @@ impl BlogFavoriteRepository {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The post identifier.
-    /// - `i32`: The user identifier.
+    /// - `i32` - The post identifier.
+    /// - `i32` - The user identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error if not found.
+    /// - `Result<(), String>` - Ok on success, or an error if not found.
     #[instrument_trace]
     pub async fn delete_by_post_and_user(post_id: i32, user_id: i32) -> Result<(), String> {
         let db: DatabaseConnection =
@@ -581,7 +583,7 @@ impl BlogFavoriteRepository {
             .one(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?
-            .ok_or_else(|| "Favorite not found".to_string())?;
+            .ok_or_else(|| LOOKUP_ERROR_FAVORITE_NOT_FOUND.to_string())?;
         let active_model: BlogFavoriteActiveModel = model.into();
         active_model
             .delete(&db)
@@ -594,11 +596,11 @@ impl BlogFavoriteRepository {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The post identifier.
+    /// - `i32` - The post identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<i64, String>`: The count of favorites for the post.
+    /// - `Result<i64, String>` - The count of favorites for the post.
     #[instrument_trace]
     pub async fn count_by_post_id(post_id: i32) -> Result<i64, String> {
         let db: DatabaseConnection =
@@ -615,13 +617,13 @@ impl BlogFavoriteRepository {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The user identifier.
-    /// - `i32`: The page number.
-    /// - `u64`: The page size limit.
+    /// - `i32` - The user identifier.
+    /// - `i32` - The page number.
+    /// - `u64` - The page size limit.
     ///
     /// # Returns
     ///
-    /// - `Result<(Vec<BlogFavoriteModel>, i64), String>`: The paginated favorites and total count.
+    /// - `Result<(Vec<BlogFavoriteModel>, i64), String>` - The paginated favorites and total count.
     #[instrument_trace]
     pub async fn find_by_user_id(
         user_id: i32,
@@ -654,11 +656,11 @@ impl BlogImageRepository {
     ///
     /// # Arguments
     ///
-    /// - `BlogImageActiveModel`: The active model containing the image data to insert.
+    /// - `BlogImageActiveModel` - The active model containing the image data to insert.
     ///
     /// # Returns
     ///
-    /// - `Result<BlogImageModel, String>`: The inserted image model.
+    /// - `Result<BlogImageModel, String>` - The inserted image model.
     #[instrument_trace]
     pub async fn insert(active_model: BlogImageActiveModel) -> Result<BlogImageModel, String> {
         let db: DatabaseConnection =
@@ -674,11 +676,11 @@ impl BlogImageRepository {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The image identifier.
+    /// - `i32` - The image identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<Option<BlogImageModel>, String>`: The image model if found, or `None`.
+    /// - `Result<Option<BlogImageModel>, String>` - The image model if found, or `None`.
     #[instrument_trace]
     pub async fn find_by_id(id: i32) -> Result<Option<BlogImageModel>, String> {
         let db: DatabaseConnection =
@@ -694,11 +696,11 @@ impl BlogImageRepository {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The post identifier.
+    /// - `i32` - The post identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<Vec<BlogImageModel>, String>`: The list of images for the post.
+    /// - `Result<Vec<BlogImageModel>, String>` - The list of images for the post.
     #[instrument_trace]
     pub async fn find_by_post_id(post_id: i32) -> Result<Vec<BlogImageModel>, String> {
         let db: DatabaseConnection =
@@ -716,12 +718,12 @@ impl BlogImageRepository {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The image identifier.
-    /// - `i32`: The new post identifier to associate.
+    /// - `i32` - The image identifier.
+    /// - `i32` - The new post identifier to associate.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error if the image is not found.
+    /// - `Result<(), String>` - Ok on success, or an error if the image is not found.
     #[instrument_trace]
     pub async fn update_post_id(image_id: i32, post_id: i32) -> Result<(), String> {
         let db: DatabaseConnection =
@@ -730,7 +732,7 @@ impl BlogImageRepository {
             .one(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?
-            .ok_or_else(|| "Image not found".to_string())?;
+            .ok_or_else(|| LOOKUP_ERROR_IMAGE_NOT_FOUND.to_string())?;
         let mut active_model: BlogImageActiveModel = model.into();
         active_model.post_id = ActiveValue::Set(post_id);
         active_model
@@ -744,11 +746,11 @@ impl BlogImageRepository {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The image identifier.
+    /// - `i32` - The image identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error if not found.
+    /// - `Result<(), String>` - Ok on success, or an error if not found.
     #[instrument_trace]
     pub async fn delete_by_id(id: i32) -> Result<(), String> {
         let db: DatabaseConnection =
@@ -757,7 +759,7 @@ impl BlogImageRepository {
             .one(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?
-            .ok_or_else(|| "Image not found".to_string())?;
+            .ok_or_else(|| LOOKUP_ERROR_IMAGE_NOT_FOUND.to_string())?;
         let active_model: BlogImageActiveModel = model.into();
         active_model
             .delete(&db)

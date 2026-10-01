@@ -1,4 +1,4 @@
-//! Hyperlane bootstrap
+//! hyperlane_bootstrap
 //!
 //! Bootstrap layer providing initialization logic for environment, database, logger, server configuration, runtime, and server startup.
 
@@ -11,6 +11,6 @@ pub mod framework;
 use common::*;
 
 use {
-    color_log::*, color_output::*, hyperlane::*, hyperlane_application::service::cicd::CicdService,
-    hyperlane_macros::*, instrument_level::*, log::*, lombok_macros::*,
+    color_log::*, hyperlane::*, hyperlane_application::service::cicd::CicdService,
+    instrument_level::*, log::*, lombok_macros::*,
 };

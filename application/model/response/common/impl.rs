@@ -6,11 +6,7 @@ impl From<ApiResponseStatus> for i32 {
     ///
     /// # Arguments
     ///
-    /// - `ApiResponseStatus`: The response status to convert.
-    ///
-    /// # Returns
-    ///
-    /// - `i32`: The numeric HTTP status code.
+    /// - `ApiResponseStatus` - The response status to convert.
     fn from(status: ApiResponseStatus) -> Self {
         match status {
             ApiResponseStatus::Success => 200,
@@ -35,26 +31,25 @@ impl Display for ApiResponseStatus {
     ///
     /// # Arguments
     ///
-    /// - `&self`: The response status instance.
-    /// - `&mut Formatter<'_>`: The formatter.
+    /// - `&mut Formatter<'_>` - The formatter.
     ///
     /// # Returns
     ///
-    /// - `fmt::Result`: The result of the formatting operation.
+    /// - `fmt::Result` - The result of the formatting operation.
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let message: &str = match self {
-            Self::Success => "Success",
-            Self::InvalidRequest => "Invalid request",
-            Self::Unauthorized => "Unauthorized",
-            Self::Forbidden => "Forbidden",
-            Self::ResourceNotFound => "Resource not found",
-            Self::Conflict => "Conflict",
-            Self::DatabaseError => "Database error",
-            Self::BusinessLogicError => "Business logic error",
-            Self::InternalServerError => "Internal server error",
-            Self::ExternalServiceError => "External service error",
-            Self::RateLimitExceeded => "Rate limit exceeded",
-            Self::RequestTimeout => "Request timeout",
+            Self::Success => HTTP_REASON_SUCCESS,
+            Self::InvalidRequest => ERROR_INVALID_REQUEST,
+            Self::Unauthorized => ERROR_UNAUTHORIZED,
+            Self::Forbidden => ERROR_FORBIDDEN,
+            Self::ResourceNotFound => ERROR_RESOURCE_NOT_FOUND,
+            Self::Conflict => ERROR_CONFLICT,
+            Self::DatabaseError => ERROR_DATABASE,
+            Self::BusinessLogicError => ERROR_BUSINESS_LOGIC,
+            Self::InternalServerError => ERROR_INTERNAL_SERVER,
+            Self::ExternalServiceError => ERROR_EXTERNAL_SERVICE,
+            Self::RateLimitExceeded => ERROR_RATE_LIMIT_EXCEEDED,
+            Self::RequestTimeout => ERROR_REQUEST_TIMEOUT,
         };
         write!(f, "{}", message)
     }
@@ -69,12 +64,8 @@ where
     ///
     /// # Arguments
     ///
-    /// - `ApiResponseStatus`: The response status indicating the result of the operation.
-    /// - `T`: The data payload to include in the response.
-    ///
-    /// # Returns
-    ///
-    /// - `ApiResponse<T>`: A new API response instance with code, message, data, and timestamp set.
+    /// - `ApiResponseStatus` - The response status indicating the result of the operation.
+    /// - `T` - The data payload to include in the response.
     #[instrument_trace]
     pub fn new(status: ApiResponseStatus, data: T) -> Self {
         let mut instance: ApiResponse<T> = Self::default();
@@ -90,7 +81,7 @@ where
     ///
     /// # Returns
     ///
-    /// - `serde_json::Result<String>`: The JSON string representation or a serialization error.
+    /// - `serde_json::Result<String>` - The JSON string representation or a serialization error.
     #[instrument_trace]
     pub fn try_to_json_string(&self) -> serde_json::Result<String> {
         serde_json::to_string(self)
@@ -100,7 +91,7 @@ where
     ///
     /// # Returns
     ///
-    /// - `String`: The JSON string representation of the response.
+    /// - `String` - The JSON string representation of the response.
     #[instrument_trace]
     pub fn to_json_string(&self) -> String {
         self.try_to_json_string().unwrap_or_default()
@@ -110,7 +101,7 @@ where
     ///
     /// # Returns
     ///
-    /// - `serde_json::Result<Vec<u8>>`: The JSON byte vector or a serialization error.
+    /// - `serde_json::Result<Vec<u8>>` - The JSON byte vector or a serialization error.
     #[instrument_trace]
     pub fn try_to_json_bytes(&self) -> serde_json::Result<Vec<u8>> {
         serde_json::to_vec(self)
@@ -120,7 +111,7 @@ where
     ///
     /// # Returns
     ///
-    /// - `Vec<u8>`: The JSON byte vector representation of the response.
+    /// - `Vec<u8>` - The JSON byte vector representation of the response.
     #[instrument_trace]
     pub fn to_json_bytes(&self) -> Vec<u8> {
         self.try_to_json_bytes().unwrap_or_default()

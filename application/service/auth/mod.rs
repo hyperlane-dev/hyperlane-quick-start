@@ -14,12 +14,10 @@ use {
 };
 
 use hyperlane_config::application::charset::*;
-
 use std::{
     sync::{Arc, OnceLock},
     time::Instant,
 };
-
 use {
     md5::compute,
     once_cell::sync::Lazy,

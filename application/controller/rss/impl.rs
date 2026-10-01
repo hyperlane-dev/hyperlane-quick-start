@@ -3,15 +3,21 @@ use super::*;
 /// Implementation of `RssFeedRoute` for `ServerHook`.
 impl ServerHook for RssFeedRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `RssFeedRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[prologue_macros(
         is_get_method,
-        try_get_request_query("limit" => limit_opt),
-        try_get_request_query("offset" => offset_opt),
-        try_get_request_query("timezone" => timezone_opt),
+        try_get_request_query(QUERY_KEY_LIMIT => limit_opt),
+        try_get_request_query(QUERY_KEY_OFFSET => offset_opt),
+        try_get_request_query(QUERY_KEY_TIMEZONE => timezone_opt),
     )]
     #[try_get_request_header(HOST => host_opt)]
     #[epilogue_macros(
@@ -22,6 +28,18 @@ impl ServerHook for RssFeedRoute {
         response_body(rss_xml)
     )]
     #[instrument_trace]
+    /// Handles the `RssFeedRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let limit: Option<usize> = limit_opt
             .and_then(|limit: String| limit.parse().ok())

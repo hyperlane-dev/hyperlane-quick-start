@@ -6,11 +6,12 @@ impl WebSocketService {
     ///
     /// # Arguments
     ///
-    /// - `&WebSocketMessage`: The message to serialize.
+    /// - `&WebSocketMessage` - The message to serialize.
     ///
     /// # Returns
     ///
-    /// - `Result<String, String>`: The JSON string of the response, or an error if serialization fails or the message is invalid.
+    /// - `Result<String, String>` - The JSON string of the response, or an error if serialization
+    ///     fails or the message is invalid.
     #[instrument_trace]
     pub fn get_response_body(body: &WebSocketMessage) -> Result<String, String> {
         if body.is_valid() {

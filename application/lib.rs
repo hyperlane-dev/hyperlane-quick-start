@@ -1,4 +1,4 @@
-//! Hyperlane application
+//! hyperlane_application
 //!
 //! Application layer containing controllers, services, repositories, mappers, models, middleware, views, and utilities for the Hyperlane framework.
 
@@ -31,7 +31,6 @@ use {
     file_operation::*,
     hyperlane::*,
     hyperlane_broadcast::*,
-    hyperlane_macros::*,
     hyperlane_plugin_websocket::*,
     instrument_level::*,
     jwt_service::*,

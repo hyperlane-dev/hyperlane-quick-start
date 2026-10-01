@@ -8,11 +8,27 @@ use super::*;
 /// page can send them back here. Authenticated visitors get the SPA
 /// 302-redirected to its static HTML.
 impl ServerHook for EuvPlaygroundViewRoute {
+    /// Creates a new instance.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The .
+    /// - `&mut Context` - The .
     #[instrument_trace]
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
+    /// Handles one request and writes the response.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The stream.
+    /// - `&mut Context` - The request context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The handle result.
     #[prologue_macros(
         methods(get, post),
         response_status_code(302),

@@ -6,11 +6,11 @@ impl NotificationRepository {
     ///
     /// # Arguments
     ///
-    /// - `NotificationActiveModel`: The active model containing the notification data to insert.
+    /// - `NotificationActiveModel` - The active model containing the notification data to insert.
     ///
     /// # Returns
     ///
-    /// - `Result<NotificationModel, String>`: The inserted notification model.
+    /// - `Result<NotificationModel, String>` - The inserted notification model.
     #[instrument_trace]
     pub async fn insert(
         active_model: NotificationActiveModel,
@@ -28,11 +28,11 @@ impl NotificationRepository {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The notification identifier.
+    /// - `i32` - The notification identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<Option<NotificationModel>, String>`: The notification model if found and not deleted, or `None`.
+    /// - `Result<Option<NotificationModel>, String>` - The notification model if found and not deleted, or `None`.
     #[instrument_trace]
     pub async fn find_by_id(id: i32) -> Result<Option<NotificationModel>, String> {
         let db: DatabaseConnection =
@@ -49,11 +49,11 @@ impl NotificationRepository {
     ///
     /// # Arguments
     ///
-    /// - `NotificationQuery`: The query parameters including user, type, read status, and pagination.
+    /// - `NotificationQuery` - The query parameters including user, type, read status, and pagination.
     ///
     /// # Returns
     ///
-    /// - `Result<(Vec<NotificationModel>, i64), String>`: The paginated notifications and total count.
+    /// - `Result<(Vec<NotificationModel>, i64), String>` - The paginated notifications and total count.
     #[instrument_trace]
     pub async fn query_with_pagination(
         query: NotificationQuery,
@@ -91,12 +91,12 @@ impl NotificationRepository {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The notification identifier.
-    /// - `bool`: The new read status.
+    /// - `i32` - The notification identifier.
+    /// - `bool` - The new read status.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error if the notification is not found.
+    /// - `Result<(), String>` - Ok on success, or an error if the notification is not found.
     #[instrument_trace]
     pub async fn update_read_status(id: i32, is_read: bool) -> Result<(), String> {
         let db: DatabaseConnection =
@@ -105,7 +105,7 @@ impl NotificationRepository {
             .one(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?
-            .ok_or_else(|| "Notification not found".to_string())?;
+            .ok_or_else(|| LOOKUP_ERROR_NOTIFICATION_NOT_FOUND.to_string())?;
         let mut active_model: NotificationActiveModel = notification.into();
         active_model.is_read = ActiveValue::Set(is_read);
         active_model
@@ -119,11 +119,11 @@ impl NotificationRepository {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The notification identifier.
+    /// - `i32` - The notification identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on success, or an error if the notification is not found.
+    /// - `Result<(), String>` - Ok on success, or an error if the notification is not found.
     #[instrument_trace]
     pub async fn soft_delete_by_id(id: i32) -> Result<(), String> {
         let db: DatabaseConnection =
@@ -133,7 +133,7 @@ impl NotificationRepository {
             .one(&db)
             .await
             .map_err(|error: DbErr| error.to_string())?
-            .ok_or_else(|| "Notification not found".to_string())?;
+            .ok_or_else(|| LOOKUP_ERROR_NOTIFICATION_NOT_FOUND.to_string())?;
         let mut active_model: NotificationActiveModel = notification.into();
         active_model.is_deleted = ActiveValue::Set(true);
         active_model
@@ -147,11 +147,11 @@ impl NotificationRepository {
     ///
     /// # Arguments
     ///
-    /// - `i32`: The user identifier.
+    /// - `i32` - The user identifier.
     ///
     /// # Returns
     ///
-    /// - `Result<i64, String>`: The count of unread notifications.
+    /// - `Result<i64, String>` - The count of unread notifications.
     #[instrument_trace]
     pub async fn count_unread(user_id: i32) -> Result<i64, String> {
         let db: DatabaseConnection =

@@ -8,7 +8,6 @@ pub use {r#const::*, r#struct::*};
 use {super::*, r#static::*};
 
 use hyperlane_resources::{docker::*, env::*};
-
 use std::{
     env::{VarError, var},
     num::ParseIntError,

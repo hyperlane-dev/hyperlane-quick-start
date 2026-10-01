@@ -15,9 +15,8 @@ impl EuvPlaygroundService {
     ///
     /// # Returns
     ///
-    /// - `String`: The encoded string. Falls back to the plain
-    ///   `id.to_string()` if the underlying `Encode::execute` call
-    ///   fails so the playground never blocks on an encoding error.
+    /// - `String` - The encoded string. Falls back to the plain `id.to_string()` if the underlying
+    ///     `Encode::execute` call fails so the playground never blocks on an encoding error.
     #[instrument_trace]
     pub fn encode_id(id: i64) -> String {
         Encode::execute(CHARSETS, &id.to_string())
@@ -42,8 +41,7 @@ impl EuvPlaygroundService {
     ///
     /// # Returns
     ///
-    /// - `Result<i64, String>`: The decoded numeric id, or an error if
-    ///   the format is invalid.
+    /// - `Result<i64, String>` - The decoded numeric id, or an error if the format is invalid.
     #[instrument_trace]
     pub fn decode_id(encoded: &str) -> Result<i64, String> {
         let decoded: String = Decode::execute(CHARSETS, encoded)
@@ -64,8 +62,7 @@ impl EuvPlaygroundService {
     ///
     /// # Returns
     ///
-    /// - `String`: The encoded job id; never fails (mirrors
-    ///   [`Self::encode_id`]).
+    /// - `String` - The encoded job id; never fails (mirrors [`Self::encode_id`]).
     #[instrument_trace]
     pub fn encode_job_id(job_id: BuildJobId) -> String {
         Encode::execute(CHARSETS, &job_id.to_string())
@@ -90,8 +87,8 @@ impl EuvPlaygroundService {
     ///
     /// # Returns
     ///
-    /// - `Result<BuildJobId, String>`: The decoded numeric job id, or an
-    ///   error string if the format is invalid.
+    /// - `Result<BuildJobId, String>` - The decoded numeric job id, or an error string if the
+    ///     format is invalid.
     #[instrument_trace]
     pub fn decode_job_id(encoded: &str) -> Result<BuildJobId, String> {
         let decoded: String = Decode::execute(CHARSETS, encoded)
@@ -107,8 +104,8 @@ impl EuvPlaygroundService {
     ///
     /// # Returns
     ///
-    /// - `u64`: Seconds since the unix epoch, or `0` if the system
-    ///   clock is before the epoch (rare, but a safe fallback).
+    /// - `u64` - Seconds since the unix epoch, or `0` if the system clock is before the epoch
+    ///     (rare, but a safe fallback).
     #[instrument_trace]
     pub fn timestamp_suffix() -> u64 {
         SystemTime::now()
@@ -121,8 +118,7 @@ impl EuvPlaygroundService {
     ///
     /// # Returns
     ///
-    /// - `i64`: Milliseconds since the unix epoch, or `0` on a
-    ///   pre-epoch system clock.
+    /// - `i64` - Milliseconds since the unix epoch, or `0` on a pre-epoch system clock.
     #[instrument_trace]
     pub fn now_ms() -> i64 {
         SystemTime::now()
@@ -137,14 +133,11 @@ impl EuvPlaygroundService {
     /// # Arguments
     ///
     /// - `Option<&OsStr>` - Explicit executable override.
-    /// - `Option<&OsStr>` - Process PATH value to inspect.
-    /// - `Option<&OsStr>` - Cargo installation root.
-    /// - `Option<&OsStr>` - User home used for the default `.cargo` root.
     ///
     /// # Returns
     ///
-    /// - `PathBuf`: Existing executable path when found, otherwise the bare
-    ///   wasm-pack filename so process spawning preserves the normal OS lookup.
+    /// - `PathBuf` - Existing executable path when found, otherwise the bare wasm-pack filename so
+    ///     process spawning preserves the normal OS lookup.
     #[instrument_trace]
     pub fn resolve_wasm_pack_binary_from(
         override_path: Option<&OsStr>,
@@ -188,7 +181,7 @@ impl EuvPlaygroundService {
     ///
     /// # Returns
     ///
-    /// - `PathBuf`: The executable path used for playground builds.
+    /// - `PathBuf` - The executable path used for playground builds.
     #[instrument_trace]
     pub fn resolve_wasm_pack_binary() -> PathBuf {
         let override_path: Option<OsString> = var_os(EUV_PLAYGROUND_WASM_PACK_ENV);
@@ -210,32 +203,30 @@ impl EuvPlaygroundService {
     ///
     /// # Arguments
     ///
-    /// - `Child` - The spawned child whose
-    ///   stdout/stderr have already been taken into `Option`s.
+    /// - `Child` - The spawned child whose stdout/stderr have already been taken into `Option`s.
     ///
     /// # Returns
     ///
-    /// - `std::io::Result<Output>`: The captured output
-    ///   plus exit status, or the underlying io error.
+    /// - `std::io::Result<Output>` - The captured output plus exit status, or the underlying io
+    ///     error.
     #[instrument_trace]
     pub async fn wait_with_output(mut child: Child) -> std::io::Result<Output> {
-        use tokio::io::AsyncReadExt;
         let stdout: Option<ChildStdout> = child.stdout.take();
         let stderr: Option<ChildStderr> = child.stderr.take();
-        let stdout_task = async move {
+        let stdout_task: Pin<Box<dyn Future<Output = Vec<u8>> + Send>> = Box::pin(async move {
             let mut buf: Vec<u8> = Vec::new();
             if let Some(mut stdout_pipe) = stdout {
                 let _: Result<usize, Error> = stdout_pipe.read_to_end(&mut buf).await;
             }
             buf
-        };
-        let stderr_task = async move {
+        });
+        let stderr_task: Pin<Box<dyn Future<Output = Vec<u8>> + Send>> = Box::pin(async move {
             let mut buf: Vec<u8> = Vec::new();
             if let Some(mut stderr_pipe) = stderr {
                 let _: Result<usize, Error> = stderr_pipe.read_to_end(&mut buf).await;
             }
             buf
-        };
+        });
         let (status, stdout_bytes, stderr_bytes): (
             Result<ExitStatus, std::io::Error>,
             Vec<u8>,
@@ -258,14 +249,12 @@ impl EuvPlaygroundService {
     /// # Arguments
     ///
     /// - `&str` - The user-submitted Rust source.
-    /// - `i64` - The owning project id; the build output
-    ///   directory is keyed off its encoded form.
+    /// - `i64` - The owning project id; the build output directory is keyed off its encoded form.
     ///
     /// # Returns
     ///
-    /// - `Result<PathBuf, String>`: The path to the
-    ///   published build directory on success, or a human-readable
-    ///   error describing which step failed.
+    /// - `Result<PathBuf, String>` - The path to the published build directory on success, or a
+    ///     human-readable error describing which step failed.
     #[instrument_trace]
     pub async fn build_wasm_pack_output(code: &str, project_id: i64) -> Result<PathBuf, String> {
         static COUNTER: AtomicU64 = AtomicU64::new(0);
@@ -321,12 +310,12 @@ impl EuvPlaygroundService {
                 WASM_PACK_CARGO_TERM_COLOR_NEVER,
             )
             .env(
-                "CARGO_TARGET_DIR",
+                ENV_CARGO_TARGET_DIR,
                 EUV_PLAYGROUND_SHARED_TARGET_DIR.as_os_str(),
             )
             .stdout(Stdio::piped())
             .stderr(Stdio::piped());
-        let child = match cmd.spawn() {
+        let child: Child = match cmd.spawn() {
             Ok(child) => child,
             Err(io_err) => {
                 let _: Result<(), Error> = remove_dir_all(&dir_path);
@@ -335,7 +324,7 @@ impl EuvPlaygroundService {
                 ));
             }
         };
-        let output = match timeout(
+        let output: Output = match timeout(
             Duration::from_secs(EUV_PLAYGROUND_BUILD_TIMEOUT_SECS),
             Self::wait_with_output(child),
         )
@@ -353,10 +342,6 @@ impl EuvPlaygroundService {
                 ));
             }
         };
-        let cleanup = |err: String| -> String {
-            let _: Result<(), Error> = remove_dir_all(&dir_path);
-            err
-        };
         if !output.status.success() {
             let stderr: String = String::from_utf8_lossy(&output.stderr).into_owned();
             let stdout: String = String::from_utf8_lossy(&output.stdout).into_owned();
@@ -365,7 +350,8 @@ impl EuvPlaygroundService {
             } else {
                 stderr
             };
-            return Err(cleanup(combined));
+            let _: Result<(), Error> = remove_dir_all(&dir_path);
+            return Err(combined);
         }
         let target_dir: PathBuf =
             PathBuf::from(EUV_PLAYGROUND_BUILDS_DIR).join(Self::encode_id(project_id));
@@ -384,6 +370,15 @@ impl EuvPlaygroundService {
                 target_tmp.display(),
             ));
         }
+        /// Copies a directory and its content recursively.
+        ///
+        /// # Arguments
+        ///
+        /// - `&Path` - The src.
+        ///
+        /// # Returns
+        ///
+        /// - `Result<(), String>` - The dir recursive result, or an error message.
         fn copy_dir_recursive(src: &Path, dst: &Path) -> Result<(), String> {
             create_dir_all(dst).map_err(|io_err: std::io::Error| {
                 format!("{ERROR_MKDIR} {}: {io_err}", dst.display())
@@ -453,7 +448,7 @@ impl EuvPlaygroundService {
     ///
     /// # Returns
     ///
-    /// - `String`: The normalized name.
+    /// - `String` - The normalized name.
     #[instrument_trace]
     pub fn normalize_name(input: &str) -> String {
         let cleaned: String = input
@@ -488,8 +483,8 @@ impl EuvPlaygroundService {
     ///
     /// # Returns
     ///
-    /// - `Result<bool, String>`: `true` when a matching project exists,
-    ///   otherwise `false`, or a directory-read error.
+    /// - `Result<bool, String>` - `true` when a matching project exists, otherwise `false`, or a
+    ///     directory-read error.
     #[instrument_trace]
     pub fn project_name_exists(user_dir: &Path, name: &str) -> Result<bool, String> {
         Self::project_name_exists_excluding(user_dir, name, None)
@@ -505,8 +500,8 @@ impl EuvPlaygroundService {
     ///
     /// # Returns
     ///
-    /// - `Result<bool, String>`: `true` when another match exists,
-    ///   otherwise `false`, or a directory-read error.
+    /// - `Result<bool, String>` - `true` when another match exists, otherwise `false`, or a
+    ///     directory-read error.
     #[instrument_trace]
     pub fn project_name_exists_excluding(
         user_dir: &Path,
@@ -544,7 +539,7 @@ impl EuvPlaygroundService {
     ///
     /// # Returns
     ///
-    /// - `Result<String, String>`: The file content, or an error.
+    /// - `Result<String, String>` - The file content, or an error.
     #[instrument_trace]
     pub fn read_code(project_dir: &Path) -> Result<String, String> {
         read_to_string(project_dir.join(EUV_PLAYGROUND_CODE_FILE))
@@ -558,12 +553,11 @@ impl EuvPlaygroundService {
     ///
     /// - `&Path` - The project directory.
     /// - `&str` - The normalized project name.
-    /// - `&str` - The Rust source code.
     ///
     /// # Returns
     ///
-    /// - `Result<i64, String>`: The new `updated_at_ms` timestamp, or
-    ///   an error if the file write failed.
+    /// - `Result<i64, String>` - The new `updated_at_ms` timestamp, or an error if the file write
+    ///     failed.
     #[instrument_trace]
     pub fn write_project(project_dir: &Path, name: &str, code: &str) -> Result<i64, String> {
         if let Some(parent) = project_dir.parent() {
@@ -597,7 +591,7 @@ impl EuvPlaygroundService {
     ///
     /// # Returns
     ///
-    /// - `PathBuf`: The path.
+    /// - `PathBuf` - The path.
     #[instrument_trace]
     pub fn project_dir(user_id: i32, project_id: i64) -> PathBuf {
         Self::user_dir(user_id).join(Self::encode_id(project_id))
@@ -612,7 +606,7 @@ impl EuvPlaygroundService {
     ///
     /// # Returns
     ///
-    /// - `PathBuf`: The path to the user's playground dir.
+    /// - `PathBuf` - The path to the user's playground dir.
     #[instrument_trace]
     pub fn user_dir(user_id: i32) -> PathBuf {
         let path: PathBuf =
@@ -629,8 +623,8 @@ impl EuvPlaygroundService {
     ///
     /// # Returns
     ///
-    /// - `Option<(String, i64)>`: `(name, updated_at_ms)`, or `None`
-    ///   if the file is missing or unparseable.
+    /// - `Option<(String, i64)>` - `(name, updated_at_ms)`, or `None` if the file is missing or
+    ///     unparseable.
     #[instrument_trace]
     pub fn read_metadata(project_dir: &Path) -> Option<(String, i64)> {
         let text: String = read_to_string(project_dir.join(EUV_PLAYGROUND_META_FILE)).ok()?;
@@ -673,9 +667,8 @@ impl EuvPlaygroundService {
     ///
     /// # Returns
     ///
-    /// - `i64`: The next available project id. Falls back to a
-    ///   millisecond-timestamp-based id if the seq file can't be
-    ///   written.
+    /// - `i64` - The next available project id. Falls back to a millisecond-timestamp-based id if
+    ///     the seq file can't be written.
     #[instrument_trace]
     pub fn next_project_id(user_dir: &Path) -> i64 {
         let seq_path: PathBuf = user_dir.join(EUV_PLAYGROUND_SEQ_FILE);
@@ -705,7 +698,7 @@ impl EuvPlaygroundService {
     ///
     /// # Returns
     ///
-    /// - `BuildJobId`: The freshly reserved id.
+    /// - `BuildJobId` - The freshly reserved id.
     #[instrument_trace]
     pub fn next_job_id() -> BuildJobId {
         NEXT_BUILD_JOB_ID.fetch_add(1, Ordering::Relaxed)
@@ -722,8 +715,7 @@ impl EuvPlaygroundService {
     ///
     /// # Returns
     ///
-    /// - `BuildJobId`: The new job id; the inserted row starts in
-    ///   [`build_status::PENDING`].
+    /// - `BuildJobId` - The new job id; the inserted row starts in [`build_status::PENDING`].
     #[instrument_trace]
     pub async fn register_pending_job(user_id: i32, project_id: i64) -> BuildJobId {
         let job_id: BuildJobId = Self::next_job_id();
@@ -763,9 +755,8 @@ impl EuvPlaygroundService {
     ///
     /// # Returns
     ///
-    /// - `Result<(), String>`: Ok on successful publish, or an error from
-    ///   the broker (typically a missing topic — only happens if the
-    ///   message-queue bootstrap has not yet run).
+    /// - `Result<(), String>` - Ok on successful publish, or an error from the broker (typically a
+    ///     missing topic — only happens if the message-queue bootstrap has not yet run).
     #[instrument_trace]
     pub async fn publish_build_task(
         job_id: BuildJobId,
@@ -786,13 +777,13 @@ impl EuvPlaygroundService {
     /// # Arguments
     ///
     /// - `BuildJobId` - The job id from the URL.
-    /// - `i32` - The authenticated user from the cookie; a
-    ///   mismatch returns `None` so the controller can answer 404.
+    /// - `i32` - The authenticated user from the cookie; a mismatch returns `None` so the
+    ///     controller can answer 404.
     ///
     /// # Returns
     ///
-    /// - `Option<BuildJob>`: A clone of the row when it exists and the
-    ///   supplied `user_id` owns it, otherwise `None`.
+    /// - `Option<BuildJob>` - A clone of the row when it exists and the supplied `user_id` owns it,
+    ///     otherwise `None`.
     #[instrument_trace]
     pub async fn get_build_status(job_id: BuildJobId, user_id: i32) -> Option<BuildJob> {
         let job_arc: BuildJobSlot = {

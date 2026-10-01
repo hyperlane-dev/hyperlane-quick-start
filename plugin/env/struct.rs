@@ -44,13 +44,10 @@ pub struct EnvConfig {
     #[get(type(copy))]
     pub(super) db_retry_interval_millis: u64,
     /// The GPT API URL for AI-related features.
-    #[get(pub)]
     pub(super) gpt_api_url: String,
     /// The GPT API key for AI-related features.
-    #[get(pub)]
     pub(super) gpt_api_key: String,
     /// The GPT model name for AI-related features.
-    #[get(pub)]
     pub(super) gpt_model: String,
     /// Whether to enable GPT thinking mode.
     #[get(type(copy))]
@@ -65,7 +62,6 @@ pub struct EnvConfig {
     #[get(type(copy))]
     pub(super) server_port: u16,
     /// The server host address.
-    #[get(pub)]
     pub(super) server_host: String,
     /// The server buffer size.
     #[get(type(copy))]
@@ -74,7 +70,6 @@ pub struct EnvConfig {
     #[get(type(copy))]
     pub(super) server_log_size: usize,
     /// The server log directory path.
-    #[get(pub)]
     pub(super) server_log_dir: String,
     /// Whether to enable server inner print output.
     #[get(type(copy))]
@@ -89,7 +84,6 @@ pub struct EnvConfig {
     #[get(type(copy))]
     pub(super) server_tti: Option<u32>,
     /// The server PID file path for process management.
-    #[get(pub)]
     pub(super) server_pid_file_path: String,
     /// The server HTTP request read timeout in milliseconds.
     #[get(type(copy))]

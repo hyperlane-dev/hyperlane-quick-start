@@ -10,7 +10,7 @@ impl BootstrapSyncInit for EnvBootstrap {
     ///
     /// # Returns
     ///
-    /// - `Self`: The initialized `EnvBootstrap` instance.
+    /// - `Self` - The initialized `EnvBootstrap` instance.
     fn init() -> Self {
         if let Err(error) = EnvPlugin::try_load_config() {
             panic!("{error}");

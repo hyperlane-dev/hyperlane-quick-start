@@ -3,12 +3,30 @@ use super::*;
 /// Implementation of `RegisterRoute` for `ServerHook`.
 impl ServerHook for RegisterRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `RegisterRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
 
     #[is_post_method]
     #[instrument_trace]
+    /// Handles the `RegisterRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
         let file_chunk_data_opt: Option<FileChunkData> =
             UploadService::get_register_file_chunk_data(stream, ctx).await;
@@ -25,6 +43,12 @@ impl ServerHook for RegisterRoute {
 /// Implementation of `SaveRoute` for `ServerHook`.
 impl ServerHook for SaveRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `SaveRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -33,6 +57,18 @@ impl ServerHook for SaveRoute {
     #[try_get_request_header(HEADER_X_FILE_ID => file_id_opt)]
     #[try_get_request_header(HEADER_X_CHUNK_INDEX => chunk_index_opt)]
     #[instrument_trace]
+    /// Handles the `SaveRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let file_chunk_data_opt: Option<FileChunkData> =
             UploadService::get_save_file_chunk_data(ctx, file_id_opt, chunk_index_opt).await;
@@ -58,6 +94,12 @@ impl ServerHook for SaveRoute {
 /// Implementation of `MergeRoute` for `ServerHook`.
 impl ServerHook for MergeRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `MergeRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -65,6 +107,18 @@ impl ServerHook for MergeRoute {
     #[prologue_macros(is_post_method)]
     #[try_get_request_header(HEADER_X_FILE_ID => file_id_opt)]
     #[instrument_trace]
+    /// Handles the `MergeRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let file_chunk_data_opt: Option<FileChunkData> =
             UploadService::get_merge_file_chunk_data(ctx, file_id_opt).await;

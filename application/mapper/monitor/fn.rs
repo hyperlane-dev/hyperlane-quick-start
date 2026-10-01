@@ -1,20 +1,40 @@
 use super::*;
 
+/// Returns the global network capture statistics slot, initializing it on first use.
+///
+/// # Returns
+///
+/// - `&'static RwLock<Option<NetworkStats>>` - The global network statistics slot.
 #[instrument_trace]
 fn get_or_init_network_capture_stats() -> &'static RwLock<Option<NetworkStats>> {
     NETWORK_CAPTURE_STATS.get_or_init(|| RwLock::new(None))
 }
 
+/// Returns the global capture status slot, initializing it on first use.
+///
+/// # Returns
+///
+/// - `&'static RwLock<CaptureStatus>` - The global capture status slot.
 #[instrument_trace]
 fn get_or_init_capture_status() -> &'static RwLock<CaptureStatus> {
     CAPTURE_STATUS.get_or_init(|| RwLock::new(CaptureStatus::Stopped))
 }
 
+/// Returns the global active connections map, initializing it on first use.
+///
+/// # Returns
+///
+/// - `&'static RwLock<HashMap<String, ConnectionInfo>>` - The global active connections map.
 #[instrument_trace]
 fn get_or_init_active_connections() -> &'static RwLock<HashMap<String, ConnectionInfo>> {
     ACTIVE_CONNECTIONS.get_or_init(|| RwLock::new(HashMap::new()))
 }
 
+/// Returns the global performance history buffer, initializing it on first use.
+///
+/// # Returns
+///
+/// - `&'static RwLock<PerformanceRingBuffer>` - The global performance history buffer.
 #[instrument_trace]
 fn get_or_init_performance_history() -> &'static RwLock<PerformanceRingBuffer> {
     PERFORMANCE_HISTORY.get_or_init(|| RwLock::new(PerformanceRingBuffer::default()))
@@ -29,24 +49,40 @@ pub fn init_network_capture_globals() {
     let _: &RwLock<PerformanceRingBuffer> = get_or_init_performance_history();
 }
 
-/// get network stats.
+/// Returns a copy of the currently recorded network statistics.
+///
+/// # Returns
+///
+/// - `Option<NetworkStats>` - The recorded statistics, or `None` when nothing is captured.
 #[instrument_trace]
 pub async fn get_network_stats() -> Option<NetworkStats> {
     get_or_init_network_capture_stats().read().await.clone()
 }
 
-/// set network stats.
+/// Replaces the currently recorded network statistics.
+///
+/// # Arguments
+///
+/// - `NetworkStats` - The statistics snapshot to store.
 pub async fn set_network_stats(stats: NetworkStats) {
     *get_or_init_network_capture_stats().write().await = Some(stats);
 }
 
-/// get capture status.
+/// Returns a copy of the current packet capture status.
+///
+/// # Returns
+///
+/// - `CaptureStatus` - The current capture status.
 #[instrument_trace]
 pub async fn get_capture_status() -> CaptureStatus {
     get_or_init_capture_status().read().await.clone()
 }
 
-/// set capture status.
+/// Updates the current packet capture status.
+///
+/// # Arguments
+///
+/// - `CaptureStatus` - The status to store.
 #[instrument_trace]
 pub async fn set_capture_status(status: CaptureStatus) {
     *get_or_init_capture_status().write().await = status;
@@ -56,8 +92,8 @@ pub async fn set_capture_status(status: CaptureStatus) {
 ///
 /// # Arguments
 ///
-/// - `String`: The unique connection identifier.
-/// - `ConnectionInfo`: The connection metadata to store.
+/// - `String` - The unique connection identifier.
+/// - `ConnectionInfo` - The connection metadata to store.
 #[instrument_trace]
 pub async fn add_connection(connection_id: String, info: ConnectionInfo) {
     get_or_init_active_connections()
@@ -70,7 +106,7 @@ pub async fn add_connection(connection_id: String, info: ConnectionInfo) {
 ///
 /// # Arguments
 ///
-/// - `&str`: The unique connection identifier to remove.
+/// - `&str` - The unique connection identifier to remove.
 #[instrument_trace]
 pub async fn remove_connection(connection_id: &str) {
     get_or_init_active_connections()
@@ -79,13 +115,21 @@ pub async fn remove_connection(connection_id: &str) {
         .remove(connection_id);
 }
 
-/// get active connections.
+/// Returns a copy of all currently active network connections.
+///
+/// # Returns
+///
+/// - `HashMap<String, ConnectionInfo>` - The active connections keyed by identifier.
 #[instrument_trace]
 pub async fn get_active_connections() -> HashMap<String, ConnectionInfo> {
     get_or_init_active_connections().read().await.clone()
 }
 
-/// add performance data point.
+/// Appends a performance sample to the global history buffer.
+///
+/// # Arguments
+///
+/// - `PerformanceDataPoint` - The sample to append.
 #[instrument_trace]
 pub async fn add_performance_data_point(data_point: PerformanceDataPoint) {
     get_or_init_performance_history()
@@ -94,7 +138,11 @@ pub async fn add_performance_data_point(data_point: PerformanceDataPoint) {
         .push(data_point);
 }
 
-/// get performance history.
+/// Returns every retained performance sample in chronological order.
+///
+/// # Returns
+///
+/// - `Vec<PerformanceDataPoint>` - The retained performance samples.
 #[instrument_trace]
 pub async fn get_performance_history() -> Vec<PerformanceDataPoint> {
     get_or_init_performance_history()
@@ -103,7 +151,15 @@ pub async fn get_performance_history() -> Vec<PerformanceDataPoint> {
         .get_all_sorted()
 }
 
-/// get performance history range.
+/// Returns the retained performance samples whose timestamp lies within a range.
+///
+/// # Arguments
+///
+/// - `u64` - The inclusive range boundary, in milliseconds.
+///
+/// # Returns
+///
+/// - `Vec<PerformanceDataPoint>` - The performance samples inside the range.
 #[instrument_trace]
 pub async fn get_performance_history_range(
     start_timestamp: u64,
@@ -115,7 +171,15 @@ pub async fn get_performance_history_range(
         .get_range(start_timestamp, end_timestamp)
 }
 
-/// get recent performance data.
+/// Returns the most recent performance samples, newest last.
+///
+/// # Arguments
+///
+/// - `usize` - The maximum number of samples to return.
+///
+/// # Returns
+///
+/// - `Vec<PerformanceDataPoint>` - The most recent performance samples.
 #[instrument_trace]
 pub async fn get_recent_performance_data(n: usize) -> Vec<PerformanceDataPoint> {
     get_or_init_performance_history().read().await.get_recent(n)

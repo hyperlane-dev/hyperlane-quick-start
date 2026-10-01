@@ -3,6 +3,12 @@ use super::*;
 /// Implementation of `TrackingReportRoute` for `ServerHook`.
 impl ServerHook for TrackingReportRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `TrackingReportRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -12,6 +18,18 @@ impl ServerHook for TrackingReportRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `TrackingReportRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let body: RequestBody = ctx.get_request().get_body().clone();
         match TrackingService::save_tracking_record(ctx, &body).await {
@@ -33,6 +51,12 @@ impl ServerHook for TrackingReportRoute {
 /// Implementation of `TrackingQueryRoute` for `ServerHook`.
 impl ServerHook for TrackingQueryRoute {
     #[instrument_trace]
+    /// Builds the `ServerHook` state for the `TrackingQueryRoute` route.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
     async fn new(_: &mut Stream, _: &mut Context) -> Self {
         Self
     }
@@ -42,6 +66,18 @@ impl ServerHook for TrackingQueryRoute {
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
+    /// Handles the `TrackingQueryRoute` route request and writes the JSON
+    /// response envelope into the request context.
+    ///
+    /// # Arguments
+    ///
+    /// - `Self` - The route handler instance.
+    /// - `&mut Stream` - The inbound request stream.
+    /// - `&mut Context` - The mutable request and response context.
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let body: &RequestBody = ctx.get_request().get_body();
         let request: TrackingQueryRequest = match serde_json::from_slice(body) {

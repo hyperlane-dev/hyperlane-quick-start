@@ -106,6 +106,11 @@ class! {
     }
 }
 
+/// Builds the shared application instance.
+///
+/// # Returns
+///
+/// - `VirtualNode` - The app result.
 fn app() -> VirtualNode {
     let count: Signal<i32> = App::use_signal(|| 0);
 
@@ -142,6 +147,7 @@ fn app() -> VirtualNode {
     }
 }
 
+/// Runs the application entry point.
 #[wasm_bindgen]
 pub fn main() {
     App::mount("#app", app);
@@ -523,3 +529,5 @@ pub const ERROR_CREATE_SRC_DIR: &str = "Failed to create src dir {}: {}";
 /// Error format used by `EuvPlaygroundService::create_dir` and similar
 /// when creating the `www/` directory fails. `{}` is the directory path.
 pub const ERROR_CREATE_WWW_DIR: &str = "Failed to create www dir {}: {}";
+/// Environment variable naming the Cargo target directory.
+pub const ENV_CARGO_TARGET_DIR: &str = "CARGO_TARGET_DIR";

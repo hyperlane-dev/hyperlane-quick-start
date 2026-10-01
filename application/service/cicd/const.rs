@@ -66,3 +66,11 @@ pub const SSE_INITIAL_DELAY_MILLIS: u64 = 500;
 
 /// SSE poll interval millis.
 pub const SSE_POLL_INTERVAL_MILLIS: u64 = 10;
+/// Windows environment variable naming the command processor.
+pub const ENV_COMSPEC: &str = "COMSPEC";
+
+/// Environment variable naming the login shell.
+pub const ENV_SHELL: &str = "SHELL";
+
+/// Log line emitted when a task is interrupted by a server restart.
+pub const LOG_TASK_INTERRUPTED: &str = "[System] Task was interrupted due to server restart";
