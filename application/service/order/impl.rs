@@ -466,12 +466,12 @@ impl OrderService {
     /// - `Result<MonthlyComparison, String>` - The monthly comparison, or an error message.
     #[instrument_trace]
     async fn get_monthly_comparison(months: i64) -> Result<MonthlyComparison, String> {
-        let now: chrono::DateTime<Local> = Local::now();
+        let now: DateTime<Local> = Local::now();
         let mut months_list: Vec<String> = vec![];
         let mut income_list: Vec<String> = vec![];
         let mut expense_list: Vec<String> = vec![];
         for i in (0..months).rev() {
-            let target_date: chrono::DateTime<Local> = now - chrono::Duration::days(i * 30);
+            let target_date: DateTime<Local> = now - Duration::days(i * 30);
             let year: i32 = target_date.year();
             let month: u32 = target_date.month();
             let month_key: String = format!("{year}-{month:02}");

@@ -186,7 +186,7 @@ impl RssService {
             .map(|d: Duration| {
                 let secs: i64 = d.as_secs() as i64;
                 let millis: i64 = d.subsec_millis() as i64;
-                let dt: chrono::DateTime<chrono::Utc> =
+                let dt: DateTime<Utc> =
                     chrono::DateTime::from_timestamp(secs, millis as u32 * 1_000_000)
                         .unwrap_or_default();
                 dt.format(FORMAT_DATE_TIME_MILLIS).to_string()

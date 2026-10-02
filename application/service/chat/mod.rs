@@ -16,6 +16,8 @@ use {
 };
 
 use tokio::sync::broadcast::error::SendError;
+
+use reqwest::{Client, RequestBuilder};
 use {
     hyperlane_config::application::charset::*,
     hyperlane_plugin::{common::*, env::*},

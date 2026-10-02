@@ -176,7 +176,7 @@ impl RsaUtil {
     pub fn base64_decode(encoded: &str) -> Result<Vec<u8>, String> {
         let decoded: Vec<u8> = general_purpose::STANDARD
             .decode(encoded)
-            .map_err(|error: base64::DecodeError| error.to_string())?;
+            .map_err(|error: DecodeError| error.to_string())?;
         Ok(decoded)
     }
 }

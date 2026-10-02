@@ -273,7 +273,7 @@ impl GithubPagesService {
                         time.duration_since(std::time::UNIX_EPOCH).ok()
                     })
                     .map(|duration: std::time::Duration| {
-                        let datetime: chrono::DateTime<chrono::Utc> =
+                        let datetime: DateTime<Utc> =
                             chrono::DateTime::from(std::time::UNIX_EPOCH + duration);
                         datetime.format(FORMAT_DATE_TIME).to_string()
                     })
@@ -700,7 +700,7 @@ impl GithubPagesService {
                 .await
             {
                 Ok(response) => {
-                    let status: reqwest::StatusCode = response.status();
+                    let status: StatusCode = response.status();
                     if !status.is_success() {
                         if attempt >= FETCH_MAX_RETRIES {
                             return Err(format!(

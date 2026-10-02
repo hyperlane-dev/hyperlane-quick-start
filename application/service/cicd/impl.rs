@@ -224,7 +224,7 @@ impl CicdService {
     #[instrument_trace]
     async fn parse_config_and_create_jobs(run_id: i32, config_content: &str) -> Result<(), String> {
         let config: PipelineConfig = serde_yaml::from_str(config_content)
-            .map_err(|error: serde_yaml::Error| format!("Failed to parse config: {error}"))?;
+            .map_err(|error: Error| format!("Failed to parse config: {error}"))?;
         for (job_name, job_config) in config.get_jobs() {
             let job_result: CicdJobModel = JobRepository::create(run_id, job_name.clone()).await?;
             let job_id: i32 = job_result.get_id();
@@ -1097,7 +1097,7 @@ impl LogStreamManager {
         let entry: LogEntry = LogEntry {
             step_id,
             content: content.to_string(),
-            timestamp: chrono::Utc::now().timestamp_millis(),
+            timestamp: Utc::now().timestamp_millis(),
             is_stderr,
         };
         let entry_json: String = serde_json::to_string(&entry).unwrap_or_default();
