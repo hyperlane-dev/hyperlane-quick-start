@@ -535,8 +535,7 @@ impl ChatService {
         debug!("GPT API request body: {}", body);
         let headers: HashMapXxHash3_64<&str, String> = Self::build_gpt_request_headers(api_key);
         let client: Client = Client::new();
-        let mut request_builder: RequestBuilder =
-            client.post(config.get_gpt_api_url()).json(&body);
+        let mut request_builder: RequestBuilder = client.post(config.get_gpt_api_url()).json(&body);
         for (key, value) in headers {
             request_builder = request_builder.header(key, value);
         }

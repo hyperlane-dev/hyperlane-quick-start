@@ -25,7 +25,7 @@ use {
     ::log::*,
     ::redis::RedisError,
     bin_encode_decode::{Decode, DecodeError, Encode, EncodeError},
-    chrono::{DateTime, FixedOffset, Local, NaiveDate, NaiveDateTime, Utc},
+    chrono::{FixedOffset, Local, NaiveDate, NaiveDateTime, Utc},
     chunkify::*,
     color_output::*,
     file_operation::*,
