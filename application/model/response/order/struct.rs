@@ -20,6 +20,7 @@ pub struct RecordResponse {
     /// The bill date.
     pub(super) bill_date: i64,
     /// The created at.
+    #[get(type(copy))]
     pub(super) created_at: Option<i64>,
     /// The username.
     pub(super) username: Option<String>,

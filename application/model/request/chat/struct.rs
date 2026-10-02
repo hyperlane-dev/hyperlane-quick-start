@@ -14,8 +14,10 @@ pub struct WebSocketReqData {
 pub struct ChatHistoryParams {
     /// The session id.
     pub(super) session_id: String,
+    #[get(type(copy))]
     /// The offset.
     pub(super) offset: Option<i64>,
+    #[get(type(copy))]
     /// The limit.
     pub(super) limit: Option<i64>,
 }

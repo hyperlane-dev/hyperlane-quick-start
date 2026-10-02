@@ -12,8 +12,10 @@ pub struct PipelineDto {
     pub(super) description: Option<String>,
     /// The config content.
     pub(super) config_content: Option<String>,
+    #[get(type(copy))]
     /// The created at.
     pub(super) created_at: Option<i64>,
+    #[get(type(copy))]
     /// The updated at.
     pub(super) updated_at: Option<i64>,
 }
@@ -40,13 +42,16 @@ pub struct RunDto {
     pub(super) commit_hash: Option<String>,
     /// The commit message.
     pub(super) commit_message: Option<String>,
+    #[get(type(copy))]
     /// The started at.
     pub(super) started_at: Option<i64>,
+    #[get(type(copy))]
     /// The completed at.
     pub(super) completed_at: Option<i64>,
     /// The duration ms.
     #[get(type(copy))]
     pub(super) duration_ms: i32,
+    #[get(type(copy))]
     /// The created at.
     pub(super) created_at: Option<i64>,
 }
@@ -66,8 +71,10 @@ pub struct JobDto {
     pub(super) status: CicdStatus,
     /// The runner.
     pub(super) runner: Option<String>,
+    #[get(type(copy))]
     /// The started at.
     pub(super) started_at: Option<i64>,
+    #[get(type(copy))]
     /// The completed at.
     pub(super) completed_at: Option<i64>,
     /// The duration ms.
@@ -92,8 +99,10 @@ pub struct StepDto {
     pub(super) status: CicdStatus,
     /// The output.
     pub(super) output: Option<String>,
+    #[get(type(copy))]
     /// The started at.
     pub(super) started_at: Option<i64>,
+    #[get(type(copy))]
     /// The completed at.
     pub(super) completed_at: Option<i64>,
     /// The duration ms.

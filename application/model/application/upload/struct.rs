@@ -23,6 +23,7 @@ pub struct RangeRequest {
     /// The starting byte offset (inclusive) for the range request.
     #[get(type(copy))]
     pub(super) start: u64,
+    #[get(type(copy))]
     /// The optional ending byte offset (inclusive) for the range request; if None, reads to end of file.
     pub(super) end: Option<u64>,
 }

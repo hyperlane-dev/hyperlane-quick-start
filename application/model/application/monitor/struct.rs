@@ -63,10 +63,12 @@ pub struct ConnectionInfo {
 /// Request parameters for starting a network packet capture session.
 #[derive(Clone, Data, Debug, Deserialize, Serialize, ToSchema)]
 pub struct NetworkCaptureRequest {
+    #[get(type(copy))]
     /// The optional duration in seconds for the capture session.
     pub(super) duration_seconds: Option<u64>,
     /// The optional protocol filter to capture only specific protocols.
     pub(super) filter_protocol: Option<String>,
+    #[get(type(copy))]
     /// The optional port filter to capture only traffic on a specific port.
     pub(super) filter_port: Option<usize>,
 }

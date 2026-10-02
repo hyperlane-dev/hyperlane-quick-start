@@ -24,6 +24,7 @@ pub struct UserResponse {
     pub(super) role: String,
     /// The status.
     pub(super) status: String,
+    #[get(type(copy))]
     /// The created at.
     pub(super) created_at: Option<i64>,
 }
