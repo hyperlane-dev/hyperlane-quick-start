@@ -11,6 +11,7 @@ use hyperlane_resources::{docker::*, env::*};
 
 use std::{
     env::{VarError, var},
+    error::Error,
     num::ParseIntError,
     sync::OnceLock,
 };
