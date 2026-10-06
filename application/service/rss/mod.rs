@@ -13,9 +13,10 @@ use chrono::{DateTime, Utc};
 
 use hyperlane_config::application::{charset::*, upload::*};
 use std::{
-    fs::metadata,
+    fs::{Metadata, metadata},
     path::{Path, PathBuf},
     pin::Pin,
+    sync::Arc,
     time::{SystemTime, UNIX_EPOCH},
 };
 use {

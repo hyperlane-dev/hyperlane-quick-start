@@ -104,7 +104,7 @@ fn extract_css_url_paths(content: &str, paths: &mut HashSet<String>) {
         let next_url: Option<usize> = url_idx.map(|i: usize| position + i);
         let next_import: Option<usize> = import_idx.map(|i: usize| position + i);
         let target: Option<usize> = match (next_url, next_import) {
-            (Some(u), Some(i)) => Some(std::cmp::min(u, i)),
+            (Some(u), Some(i)) => Some(min(u, i)),
             (Some(u), None) => Some(u),
             (None, Some(i)) => Some(i),
             (None, None) => None,
@@ -724,13 +724,13 @@ pub fn parse_range_header(range_header: &str, file_size: u64) -> Result<(u64, u6
 /// - `Result<Vec<u8>, String>` - The read byte buffer, or an error if the file cannot be opened or
 ///   read.
 pub async fn read_file_range(path: &str, start: u64, length: u64) -> Result<Vec<u8>, String> {
-    let mut file: std::fs::File = std::fs::File::open(path)
-        .map_err(|error: std::io::Error| format!("Failed to open file {error}"))?;
+    let mut file: File =
+        File::open(path).map_err(|error: Error| format!("Failed to open file {error}"))?;
     file.seek(SeekFrom::Start(start))
-        .map_err(|error: std::io::Error| format!("Failed to seek file {error}"))?;
+        .map_err(|error: Error| format!("Failed to seek file {error}"))?;
     let mut buffer: Vec<u8> = vec![0u8; length as usize];
     file.read_exact(&mut buffer)
-        .map_err(|error: std::io::Error| format!("Failed to read file {error}"))?;
+        .map_err(|error: Error| format!("Failed to read file {error}"))?;
     Ok(buffer)
 }
 

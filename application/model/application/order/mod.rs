@@ -4,4 +4,6 @@ mod r#impl;
 
 pub use {r#const::*, r#enum::*};
 
+use std::fmt::Display;
+
 use super::*;

@@ -6,6 +6,8 @@ mod r#struct;
 
 pub use {r#const::*, r#fn::*, r#struct::*};
 
+use std::net::SocketAddr;
+
 use {
     super::{tokio::spawn, *},
     domain::chat::*,

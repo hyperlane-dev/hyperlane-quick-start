@@ -398,7 +398,7 @@ impl EnvConfig {
     #[instrument_trace]
     fn load_from_docker_compose(file_path: &str) -> Result<DockerComposeConfig, String> {
         let docker_compose_content: Vec<u8> =
-            read_from_file(file_path).map_err(|error: Box<dyn std::error::Error>| {
+            read_from_file(file_path).map_err(|error: Box<dyn Error>| {
                 format!("Failed to read docker-compose.yml {error}")
             })?;
         let yaml: serde_yaml::Value = serde_yaml::from_slice(&docker_compose_content).map_err(

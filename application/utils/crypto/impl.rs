@@ -144,8 +144,8 @@ impl RsaUtil {
         let decrypted_data: Vec<u8> = private_key
             .decrypt(rsa::pkcs1v15::Pkcs1v15Encrypt, cipher_text)
             .map_err(|error: rsa::errors::Error| error.to_string())?;
-        let decrypted_string: String = String::from_utf8(decrypted_data)
-            .map_err(|error: std::string::FromUtf8Error| error.to_string())?;
+        let decrypted_string: String =
+            String::from_utf8(decrypted_data).map_err(|error: FromUtf8Error| error.to_string())?;
         Ok(decrypted_string)
     }
 

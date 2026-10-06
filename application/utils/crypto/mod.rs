@@ -4,6 +4,8 @@ mod r#struct;
 
 pub use {r#const::*, r#struct::*};
 
+use std::string::FromUtf8Error;
+
 use super::*;
 
 use {

@@ -1,7 +1,7 @@
 use super::*;
 
 /// Implementation of `Display` for `MysqlTableName`, converting MySQL table name variants to their string representations.
-impl std::fmt::Display for MysqlTableName {
+impl Display for MysqlTableName {
     /// Writes the MySQL table name of the variant.
     ///
     /// # Arguments
@@ -23,7 +23,7 @@ impl std::fmt::Display for MysqlTableName {
 }
 
 /// Implementation of `Display` for `PostgresqlTableName`, converting PostgreSQL table name variants to their string representations.
-impl std::fmt::Display for PostgresqlTableName {
+impl Display for PostgresqlTableName {
     /// Writes the PostgreSQL table name of the variant.
     ///
     /// # Arguments

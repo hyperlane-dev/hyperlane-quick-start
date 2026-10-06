@@ -13,9 +13,8 @@ pub static EUV_PLAYGROUND_SHARED_TARGET_DIR: LazyLock<PathBuf> =
 /// (which transitions them through `running` → `success`/`failed`)
 /// reach this map through the same lazy handle so there is no risk of
 /// accidentally constructing a second instance that would lose jobs.
-pub static BUILD_JOB_REGISTRY: LazyLock<BuildJobRegistry> = LazyLock::new(|| {
-    std::sync::Arc::new(tokio::sync::RwLock::new(std::collections::HashMap::new()))
-});
+pub static BUILD_JOB_REGISTRY: LazyLock<BuildJobRegistry> =
+    LazyLock::new(|| Arc::new(tokio::sync::RwLock::new(HashMap::new())));
 
 /// Process-wide counter that hands out unique [`BuildJobId`] values.
 pub(crate) static NEXT_BUILD_JOB_ID: AtomicU64 = AtomicU64::new(1);

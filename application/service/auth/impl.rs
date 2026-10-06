@@ -141,7 +141,7 @@ impl AuthService {
         Decode::execute(CHARSETS, encoded_id)
             .map_err(|_: DecodeError| ERROR_INVALID_ID_FORMAT.to_string())?
             .parse::<i32>()
-            .map_err(|_: std::num::ParseIntError| ERROR_INVALID_ID_FORMAT.to_string())
+            .map_err(|_: ParseIntError| ERROR_INVALID_ID_FORMAT.to_string())
     }
 
     /// Extracts the user ID from the authentication token stored in the request cookie.

@@ -14,15 +14,13 @@ impl LogService {
     #[instrument_trace]
     pub fn get_sorted_dirs(path: &Path) -> Vec<String> {
         fs::read_dir(path)
-            .map(|entries: std::fs::ReadDir| {
+            .map(|entries: ReadDir| {
                 let mut dirs: Vec<String> = entries
                     .filter_map(Result::ok)
-                    .filter(|entry: &std::fs::DirEntry| {
-                        entry
-                            .file_type()
-                            .is_ok_and(|ft: std::fs::FileType| ft.is_dir())
+                    .filter(|entry: &DirEntry| {
+                        entry.file_type().is_ok_and(|ft: FileType| ft.is_dir())
                     })
-                    .filter_map(|entry: std::fs::DirEntry| entry.file_name().into_string().ok())
+                    .filter_map(|entry: DirEntry| entry.file_name().into_string().ok())
                     .collect();
                 dirs.sort();
                 dirs.reverse();
@@ -43,15 +41,13 @@ impl LogService {
     #[instrument_trace]
     pub fn get_sorted_log_files(path: &Path) -> Vec<String> {
         fs::read_dir(path)
-            .map(|entries: std::fs::ReadDir| {
+            .map(|entries: ReadDir| {
                 let mut files: Vec<String> = entries
                     .filter_map(Result::ok)
-                    .filter(|entry: &std::fs::DirEntry| {
-                        entry
-                            .file_type()
-                            .is_ok_and(|ft: std::fs::FileType| ft.is_file())
+                    .filter(|entry: &DirEntry| {
+                        entry.file_type().is_ok_and(|ft: FileType| ft.is_file())
                     })
-                    .filter_map(|entry: std::fs::DirEntry| entry.file_name().into_string().ok())
+                    .filter_map(|entry: DirEntry| entry.file_name().into_string().ok())
                     .filter(|name: &String| name.ends_with(LOG_FILE_EXTENSION))
                     .collect();
                 files.sort();
@@ -82,7 +78,7 @@ impl LogService {
                     content_str.lines().rev().collect::<Vec<&str>>().join(BR)
                 }
             })
-            .map_err(|_: Box<dyn std::error::Error>| {
+            .map_err(|_: Box<dyn Error>| {
                 format!(
                     "Failed to read file {}",
                     full_path.to_str().unwrap_or(ERROR_INVALID_PATH)

@@ -36,7 +36,7 @@ pub async fn execute_with_config(command: &str, config: &DockerConfig) -> Docker
         };
     }
     let args: Vec<String> = build_docker_args(config, command);
-    let output_result: Result<Output, std::io::Error> =
+    let output_result: Result<Output, Error> =
         Command::new(DOCKER_COMMAND_BIN).args(&args).output().await;
     match output_result {
         Ok(output) => DockerResult::from_output(output),

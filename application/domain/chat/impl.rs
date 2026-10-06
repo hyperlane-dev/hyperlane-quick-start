@@ -170,7 +170,7 @@ impl ChatDomain {
                 session
                     .set_session_id(session_id.to_string())
                     .set_messages(vec![])
-                    .set_last_activity(std::time::Instant::now());
+                    .set_last_activity(Instant::now());
                 session
             })
             .clone()

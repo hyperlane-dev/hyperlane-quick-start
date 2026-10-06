@@ -17,7 +17,7 @@ impl JwtConfigEnum {
 }
 
 /// Implementation of `JwtConfigEnum` for `std::fmt::Display`.
-impl std::fmt::Display for JwtConfigEnum {
+impl Display for JwtConfigEnum {
     /// Formats the value for display.
     ///
     /// # Arguments
@@ -38,7 +38,7 @@ impl std::fmt::Display for JwtConfigEnum {
 }
 
 /// Implementation of `TransactionType` for `std::fmt::Display`.
-impl std::fmt::Display for TransactionType {
+impl Display for TransactionType {
     /// Formats the value for display.
     ///
     /// # Arguments
@@ -87,7 +87,7 @@ impl From<&str> for TransactionType {
 }
 
 /// Implementation of `WeekDay` for `std::fmt::Display`.
-impl std::fmt::Display for WeekDay {
+impl Display for WeekDay {
     /// Formats the value for display.
     ///
     /// # Arguments

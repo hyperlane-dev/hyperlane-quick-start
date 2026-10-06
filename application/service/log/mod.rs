@@ -8,6 +8,7 @@ use {super::*, model::application::log::*};
 
 use hyperlane_plugin::{common::*, env::*};
 use std::{
-    fs,
+    error::Error,
+    fs::{self, DirEntry, FileType, ReadDir},
     path::{Path, PathBuf},
 };

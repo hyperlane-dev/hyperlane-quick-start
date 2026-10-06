@@ -17,7 +17,7 @@ impl ShortlinkService {
             .map_err(|_: DecodeError| ERROR_INVALID_SHORTLINK_ID_FORMAT.to_string())?;
         decoded
             .parse::<i32>()
-            .map_err(|_: std::num::ParseIntError| ERROR_INVALID_SHORTLINK_ID_FORMAT.to_string())
+            .map_err(|_: ParseIntError| ERROR_INVALID_SHORTLINK_ID_FORMAT.to_string())
     }
 
     /// Encodes a numeric ID into an obfuscated string for use in short URLs.

@@ -206,7 +206,7 @@ impl ChatService {
         let socket_addr: String = stream
             .get_stream()
             .peer_addr()
-            .map(|data: std::net::SocketAddr| data.to_string())
+            .map(|data: SocketAddr| data.to_string())
             .unwrap_or_default();
         let encode_addr: String = Encode::execute(CHARSETS, &socket_addr).unwrap_or_default();
         ctx.get_mut_response()

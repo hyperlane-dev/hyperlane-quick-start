@@ -75,7 +75,7 @@ impl ServerHook for UploadFileRoute {
                     Decode::execute(CHARSETS, &dir).unwrap_or_default(),
                     Decode::execute(CHARSETS, &file).unwrap_or_default()
                 );
-                match std::fs::metadata(&file_path) {
+                match metadata(&file_path) {
                     Ok(metadata) => {
                         let file_size: u64 = metadata.len();
                         UploadService::parse_range_header(range_header, file_size).ok()

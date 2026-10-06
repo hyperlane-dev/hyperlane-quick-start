@@ -400,14 +400,14 @@ impl UploadService {
     ///     or read.
     #[instrument_trace]
     pub async fn read_file_range(path: &str, start: u64, length: u64) -> Result<Vec<u8>, String> {
-        let mut file: std::fs::File = std::fs::File::open(path)
-            .map_err(|error: std::io::Error| format!("Failed to open file {error}"))?;
+        let mut file: File =
+            File::open(path).map_err(|error: Error| format!("Failed to open file {error}"))?;
         file.seek(SeekFrom::Start(start))
-            .map_err(|error: std::io::Error| format!("Failed to seek file {error}"))?;
+            .map_err(|error: Error| format!("Failed to seek file {error}"))?;
         let mut buffer: Vec<u8> = vec![0; length as usize];
         let bytes_read: usize = file
             .read(&mut buffer)
-            .map_err(|error: std::io::Error| format!("Failed to read file {error}"))?;
+            .map_err(|error: Error| format!("Failed to read file {error}"))?;
         buffer.truncate(bytes_read);
         Ok(buffer)
     }
@@ -440,15 +440,15 @@ impl UploadService {
     ///
     /// # Returns
     ///
-    /// - `Result<(std::fs::Metadata, String), String>` - The file metadata and content type, or an
+    /// - `Result<(Metadata, String), String>` - The file metadata and content type, or an
     ///     error.
     #[instrument_trace]
     fn get_file_metadata_and_content_type(
         path: &str,
         decode_file: &str,
-    ) -> Result<(std::fs::Metadata, String), String> {
-        let file_metadata: std::fs::Metadata = std::fs::metadata(path)
-            .map_err(|_: std::io::Error| ERROR_FILE_NOT_FOUND.to_string())?;
+    ) -> Result<(Metadata, String), String> {
+        let file_metadata: Metadata =
+            metadata(path).map_err(|_: Error| ERROR_FILE_NOT_FOUND.to_string())?;
         if file_metadata.len() == 0 {
             return Err(ERROR_FILE_IS_EMPTY.to_string());
         }

@@ -13,7 +13,7 @@ impl RelationTrait for Relation {
 }
 
 /// Implementation of `UserRole` for `std::str::FromStr`.
-impl std::str::FromStr for UserRole {
+impl FromStr for UserRole {
     type Err = String;
 
     /// Parses a role name into its `UserRole` variant.

@@ -11,7 +11,7 @@ pub type BuildJobId = u64;
 /// `tokio::sync::RwLock` is used (not `std::sync`) because the worker
 /// updates the row from a tokio task and `try_read` is the only way to
 /// peek without `.await`.
-pub type BuildJobSlot = std::sync::Arc<tokio::sync::RwLock<BuildJob>>;
+pub type BuildJobSlot = Arc<tokio::sync::RwLock<BuildJob>>;
 
 /// Registry of in-flight and recently-completed build jobs.
 ///
@@ -21,9 +21,9 @@ pub type BuildJobSlot = std::sync::Arc<tokio::sync::RwLock<BuildJob>>;
 /// [`BuildJobId`]; values are [`BuildJobSlot`]s so multiple status
 /// readers can hold their own reference without re-locking the outer
 /// map.
-pub type BuildJobMap = std::collections::HashMap<BuildJobId, BuildJobSlot>;
+pub type BuildJobMap = HashMap<BuildJobId, BuildJobSlot>;
 
 /// Registry handle — the global shared [`BuildJobMap`]. Wrapped in an
 /// outer `Arc<RwLock<_>>` so the GC task, the worker, and concurrent
 /// status readers can race without one starving the others.
-pub type BuildJobRegistry = std::sync::Arc<tokio::sync::RwLock<BuildJobMap>>;
+pub type BuildJobRegistry = Arc<tokio::sync::RwLock<BuildJobMap>>;

@@ -62,7 +62,7 @@ async fn handle_github_pages_request(
                     GithubPagesService::normalize_path_static(&repository, &path);
                 let local_path: String =
                     format!("{CACHE_DIR}/{owner}/{repository}/{normalized_path}");
-                let file_metadata: std::fs::Metadata = match std::fs::metadata(&local_path) {
+                let file_metadata: Metadata = match metadata(&local_path) {
                     Ok(meta) => meta,
                     Err(_) => {
                         ctx.get_mut_response().set_status_code(502);

@@ -5,4 +5,6 @@ mod r#struct;
 
 pub use {r#const::*, r#enum::*, r#struct::*};
 
+use std::str::FromStr;
+
 use super::*;

@@ -5,6 +5,8 @@ mod r#struct;
 
 pub use {r#const::*, r#enum::*, r#struct::*};
 
+use std::fmt::Display;
+
 use super::*;
 
 use {

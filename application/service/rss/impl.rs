@@ -170,7 +170,7 @@ impl RssService {
     ///     read.
     #[instrument_trace]
     fn create_uploaded_file_sync(path: &Path) -> Option<UploadedFile> {
-        let meta_data: std::fs::Metadata = metadata(path).ok()?;
+        let meta_data: Metadata = metadata(path).ok()?;
         let file_size: u64 = meta_data.len();
         let file_name: String = path.file_name()?.to_string_lossy().to_string();
         let file_path_str: String = path.to_string_lossy().to_string();
@@ -256,12 +256,12 @@ impl RssService {
             files.into_iter().skip(offset_value).collect()
         };
         let tz: Timezone = timezone.unwrap_or(Timezone::Utc);
-        let base_url_arc: std::sync::Arc<String> = std::sync::Arc::new(base_url.to_string());
+        let base_url_arc: Arc<String> = Arc::new(base_url.to_string());
         let tasks: Vec<Pin<Box<dyn Future<Output = RssItem> + Send>>> = limited_files
             .into_iter()
             .map(
                 |file: UploadedFile| -> Pin<Box<dyn Future<Output = RssItem> + Send>> {
-                    let base_url_clone: std::sync::Arc<String> = base_url_arc.clone();
+                    let base_url_clone: Arc<String> = base_url_arc.clone();
                     Box::pin(async move {
                         Self::convert_file_to_rss_item(file, &base_url_clone, tz).await
                     })

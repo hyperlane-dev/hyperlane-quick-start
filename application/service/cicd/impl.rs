@@ -223,8 +223,10 @@ impl CicdService {
     /// - `Result<(), String>` - Ok on success, or a YAML parse error message.
     #[instrument_trace]
     async fn parse_config_and_create_jobs(run_id: i32, config_content: &str) -> Result<(), String> {
-        let config: PipelineConfig = serde_yaml::from_str(config_content)
-            .map_err(|error: Error| format!("Failed to parse config: {error}"))?;
+        let config: PipelineConfig = match serde_yaml::from_str(config_content) {
+            Ok(parsed_config) => parsed_config,
+            Err(error) => return Err(format!("Failed to parse config: {error}")),
+        };
         for (job_name, job_config) in config.get_jobs() {
             let job_result: CicdJobModel = JobRepository::create(run_id, job_name.clone()).await?;
             let job_id: i32 = job_result.get_id();
@@ -368,11 +370,9 @@ impl CicdService {
     ) -> Result<String, String> {
         let is_windows: bool = cfg!(target_os = "windows");
         let shell: String = if is_windows {
-            std::env::var(ENV_COMSPEC)
-                .unwrap_or_else(|_: std::env::VarError| DEFAULT_SHELL_WINDOWS.to_string())
+            var(ENV_COMSPEC).unwrap_or_else(|_: VarError| DEFAULT_SHELL_WINDOWS.to_string())
         } else {
-            std::env::var(ENV_SHELL)
-                .unwrap_or_else(|_: std::env::VarError| DEFAULT_SHELL_UNIX.to_string())
+            var(ENV_SHELL).unwrap_or_else(|_: VarError| DEFAULT_SHELL_UNIX.to_string())
         };
         let mut cmd: Command = Command::new(&shell);
         if is_windows {
@@ -406,12 +406,12 @@ impl CicdService {
             )
         };
         let timeout_result: Result<
-            (StreamResult, StreamResult, std::io::Result<ExitStatus>),
+            (StreamResult, StreamResult, Result<ExitStatus, Error>),
             Elapsed,
         > = timeout(TASK_TIMEOUT, async move {
             let stdout_result: StreamResult = stdout_handle.await;
             let stderr_result: StreamResult = stderr_handle.await;
-            let exit_status: std::io::Result<ExitStatus> = child.wait().await;
+            let exit_status: Result<ExitStatus, Error> = child.wait().await;
             (stdout_result, stderr_result, exit_status)
         })
         .await;
@@ -425,9 +425,8 @@ impl CicdService {
                 output_builder.add_stdout(stdout);
                 output_builder.add_stderr(stderr);
                 let output: String = output_builder.build();
-                let status: ExitStatus = exit_status.map_err(|error: std::io::Error| {
-                    format!("Failed to wait shell process: {error}")
-                })?;
+                let status: ExitStatus = exit_status
+                    .map_err(|error: Error| format!("Failed to wait shell process: {error}"))?;
                 if !status.success() {
                     let exit_code: i32 = status.code().unwrap_or(-1);
                     if output == NO_OUTPUT_MESSAGE {
@@ -535,7 +534,7 @@ impl CicdService {
             let read_size: usize = reader
                 .read(&mut buffer)
                 .await
-                .map_err(|error: std::io::Error| format!("{error_message}: {error}"))?;
+                .map_err(|error: Error| format!("{error_message}: {error}"))?;
             if read_size == 0 {
                 break;
             }

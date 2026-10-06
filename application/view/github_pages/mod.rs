@@ -5,6 +5,8 @@ mod r#struct;
 
 pub use {r#const::*, r#fn::*, r#struct::*};
 
+use std::fs::{Metadata, metadata};
+
 use {super::*, service::github_pages::*};
 
 use {

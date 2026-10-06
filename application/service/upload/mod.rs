@@ -12,6 +12,7 @@ use {
 
 use hyperlane_config::application::{charset::*, upload::*};
 use std::{
-    io::{Read, Seek, SeekFrom},
+    fs::{File, Metadata, metadata},
+    io::{Error, Read, Seek, SeekFrom},
     num::ParseIntError,
 };

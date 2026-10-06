@@ -7,5 +7,5 @@ pub use {r#const::*, r#fn::*, r#struct::*};
 
 use super::*;
 
-use std::process::Output;
+use std::{io::Error, process::Output};
 use tokio::process::Command;

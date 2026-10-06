@@ -9,6 +9,7 @@ pub use {r#const::*, r#static::*, r#struct::*, r#type::*};
 use super::*;
 
 use std::{
+    collections::HashMap,
     env::{split_paths, temp_dir, var_os},
     ffi::{OsStr, OsString},
     fs::{
@@ -21,8 +22,9 @@ use std::{
     path::{Path, PathBuf},
     pin::Pin,
     process::{ExitStatus, Output, Stdio, id},
+    str::from_utf8,
     sync::{
-        LazyLock,
+        Arc, LazyLock,
         atomic::{AtomicU64, Ordering},
     },
     time::{Duration, SystemTime, UNIX_EPOCH},

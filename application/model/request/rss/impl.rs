@@ -1,7 +1,7 @@
 use super::*;
 
 /// Implementation of `Timezone` for `std::str::FromStr`.
-impl std::str::FromStr for Timezone {
+impl FromStr for Timezone {
     type Err = String;
 
     /// Parses the value from its textual form.

@@ -15,6 +15,7 @@ use {
 
 use hyperlane_config::application::charset::*;
 use std::{
+    num::ParseIntError,
     sync::{Arc, OnceLock},
     time::Instant,
 };

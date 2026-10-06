@@ -5,6 +5,8 @@ mod r#struct;
 
 pub use {r#const::*, r#struct::*};
 
+use std::time::Instant;
+
 use {
     super::*,
     model::{application::chat::*, request::chat::*, response::chat::*},

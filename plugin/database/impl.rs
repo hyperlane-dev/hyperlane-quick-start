@@ -47,7 +47,7 @@ impl FromStr for PluginType {
 }
 
 /// Implementation of `Display` for `AutoCreationError`, providing a human-readable error message.
-impl std::fmt::Display for AutoCreationError {
+impl Display for AutoCreationError {
     /// Formats the `AutoCreationError` as a human-readable error message string.
     ///
     /// # Arguments
@@ -73,7 +73,7 @@ impl std::fmt::Display for AutoCreationError {
 }
 
 /// Implementation of `std::error::Error` for `AutoCreationError`, enabling use with the standard error trait.
-impl std::error::Error for AutoCreationError {}
+impl Error for AutoCreationError {}
 
 /// Implementation of utility methods for `AutoCreationError`.
 impl AutoCreationError {

@@ -233,11 +233,11 @@ impl GithubPagesService {
         let cache_dir: String = CACHE_DIR.to_string();
         let mut owner_entries: fs::ReadDir = fs::read_dir(&cache_dir)
             .await
-            .map_err(|error: std::io::Error| error.to_string())?;
+            .map_err(|error: Error| error.to_string())?;
         while let Some(owner_entry) = owner_entries
             .next_entry()
             .await
-            .map_err(|error: std::io::Error| error.to_string())?
+            .map_err(|error: Error| error.to_string())?
         {
             let owner_name: String = owner_entry.file_name().to_string_lossy().to_string();
             if owner_name.starts_with('.') {
@@ -247,18 +247,18 @@ impl GithubPagesService {
             if !owner_entry
                 .file_type()
                 .await
-                .map(|ft: std::fs::FileType| ft.is_dir())
+                .map(|ft: FileType| ft.is_dir())
                 .unwrap_or(false)
             {
                 continue;
             }
             let mut repo_entries: fs::ReadDir = fs::read_dir(&owner_path)
                 .await
-                .map_err(|error: std::io::Error| error.to_string())?;
+                .map_err(|error: Error| error.to_string())?;
             while let Some(repo_entry) = repo_entries
                 .next_entry()
                 .await
-                .map_err(|error: std::io::Error| error.to_string())?
+                .map_err(|error: Error| error.to_string())?
             {
                 let repo_name: String = repo_entry.file_name().to_string_lossy().to_string();
                 if repo_name.starts_with('.') {
@@ -268,13 +268,10 @@ impl GithubPagesService {
                 let last_synced_at: String = fs::metadata(&repo_path)
                     .await
                     .ok()
-                    .and_then(|meta: std::fs::Metadata| meta.modified().ok())
-                    .and_then(|time: std::time::SystemTime| {
-                        time.duration_since(std::time::UNIX_EPOCH).ok()
-                    })
-                    .map(|duration: std::time::Duration| {
-                        let datetime: DateTime<Utc> =
-                            chrono::DateTime::from(std::time::UNIX_EPOCH + duration);
+                    .and_then(|meta: Metadata| meta.modified().ok())
+                    .and_then(|time: SystemTime| time.duration_since(UNIX_EPOCH).ok())
+                    .map(|duration: Duration| {
+                        let datetime: DateTime<Utc> = chrono::DateTime::from(UNIX_EPOCH + duration);
                         datetime.format(FORMAT_DATE_TIME).to_string()
                     })
                     .unwrap_or_default();
@@ -506,7 +503,7 @@ impl GithubPagesService {
             let _: Result<(), Error> = fs::remove_dir_all(&cache_dir).await;
             fs::rename(&temp_dir, &cache_dir)
                 .await
-                .map_err(|error: std::io::Error| {
+                .map_err(|error: Error| {
                     format!("Failed to finalize sync by moving temp to cache directory: {error}")
                 })?;
             // Warm OS disk cache: read all files in the new cache directory so that the
@@ -532,18 +529,18 @@ impl GithubPagesService {
             Err(_) => return,
         };
         while let Ok(Some(entry)) = entries.next_entry().await {
-            let entry_path: std::path::PathBuf = entry.path();
+            let entry_path: PathBuf = entry.path();
             if entry
                 .file_type()
                 .await
-                .map(|t: std::fs::FileType| t.is_dir())
+                .map(|t: FileType| t.is_dir())
                 .unwrap_or(false)
             {
                 Box::pin(Self::warm_cache_directory(&entry_path.to_string_lossy())).await;
             } else if entry
                 .file_type()
                 .await
-                .map(|t: std::fs::FileType| t.is_file())
+                .map(|t: FileType| t.is_file())
                 .unwrap_or(false)
             {
                 let _: Result<Vec<u8>, Error> = fs::read(&entry_path).await;
@@ -578,7 +575,7 @@ impl GithubPagesService {
         let raw_paths: Vec<String> = extract_resource_paths_by_extension(&text, extension);
         let current_dir: String = Path::new(current_path)
             .parent()
-            .map(|p: &std::path::Path| p.to_string_lossy().to_string())
+            .map(|p: &Path| p.to_string_lossy().to_string())
             .unwrap_or_default();
         raw_paths
             .into_iter()
@@ -669,8 +666,8 @@ impl GithubPagesService {
         if fs::metadata(&local_path).await.is_err() {
             let _: (Vec<u8>, String) = Self::fetch_resource(owner, repository, path).await?;
         }
-        let file_metadata: std::fs::Metadata =
-            std::fs::metadata(&local_path).map_err(|error: std::io::Error| error.to_string())?;
+        let file_metadata: Metadata =
+            metadata(&local_path).map_err(|error: Error| error.to_string())?;
         let total_size: u64 = file_metadata.len();
         let content_length: u64 = end - start + 1;
         let content: Vec<u8> = read_file_range(&local_path, start, content_length).await?;

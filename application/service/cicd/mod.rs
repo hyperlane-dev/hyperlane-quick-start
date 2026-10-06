@@ -9,8 +9,6 @@ pub use {r#const::*, r#fn::*, r#struct::*};
 use {r#static::*, r#type::*};
 
 use chrono::Utc;
-use serde_yaml::Error;
-
 use {
     super::*,
     mapper::cicd::{job::*, pipeline::*, run::*, step::*},
@@ -24,10 +22,11 @@ use {
 
 use std::{
     collections::{HashMap, HashSet},
+    env::{VarError, var},
+    io::Error,
     process::{ExitStatus, Stdio},
     sync::{Arc, OnceLock},
 };
-
 use tokio::{
     io::{AsyncRead, AsyncReadExt},
     process::{Child, ChildStderr, ChildStdout, Command},

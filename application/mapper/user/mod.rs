@@ -6,4 +6,6 @@ mod r#type;
 
 pub use {r#const::*, r#enum::*, r#struct::*, r#type::*};
 
+use std::str::FromStr;
+
 use super::*;

@@ -34,9 +34,9 @@ impl ServerHook for EuvPlaygroundProjectsListRoute {
         let Some(user_id) = EuvPlaygroundHelpers::require_user(ctx) else {
             return Status::Continue;
         };
-        let dir: std::path::PathBuf = EuvPlaygroundService::user_dir(user_id);
+        let dir: PathBuf = EuvPlaygroundService::user_dir(user_id);
         let mut items: Vec<EuvPlaygroundProjectListItem> = Vec::new();
-        let entries: std::fs::ReadDir = match std::fs::read_dir(&dir) {
+        let entries: ReadDir = match read_dir(&dir) {
             Ok(read_dir) => read_dir,
             Err(_) => {
                 let resp: ApiResponse<Vec<EuvPlaygroundProjectListItem>> =
@@ -46,13 +46,13 @@ impl ServerHook for EuvPlaygroundProjectsListRoute {
             }
         };
         for entry in entries.flatten() {
-            let path: std::path::PathBuf = entry.path();
+            let path: PathBuf = entry.path();
             if !path.is_dir() {
                 continue;
             }
             let id_str: &str = match path
                 .file_name()
-                .and_then(|os_name: &std::ffi::OsStr| os_name.to_str())
+                .and_then(|os_name: &OsStr| os_name.to_str())
             {
                 Some(file_name) => file_name,
                 None => continue,
@@ -68,8 +68,8 @@ impl ServerHook for EuvPlaygroundProjectsListRoute {
             };
             let (name, updated_at_ms): (String, i64) = EuvPlaygroundService::read_metadata(&path)
                 .unwrap_or_else(|| (CONTROLLER_UNTITLED_PROJECT_NAME.to_string(), 0));
-            let code_size: u64 = std::fs::metadata(path.join(EUV_PLAYGROUND_CODE_FILE))
-                .map(|metadata: std::fs::Metadata| metadata.len())
+            let code_size: u64 = metadata(path.join(EUV_PLAYGROUND_CODE_FILE))
+                .map(|metadata: Metadata| metadata.len())
                 .unwrap_or(0);
             let mut item: EuvPlaygroundProjectListItem = EuvPlaygroundProjectListItem::default();
             item.set_id(EuvPlaygroundService::encode_id(id))
@@ -136,7 +136,7 @@ impl ServerHook for EuvPlaygroundProjectsCreateRoute {
             }
         };
         let name: String = EuvPlaygroundService::normalize_name(request.get_name());
-        let user_root: std::path::PathBuf = EuvPlaygroundService::user_dir(user_id);
+        let user_root: PathBuf = EuvPlaygroundService::user_dir(user_id);
         match EuvPlaygroundService::project_name_exists(&user_root, &name) {
             Ok(true) => {
                 let error: String = format!(
@@ -160,7 +160,7 @@ impl ServerHook for EuvPlaygroundProjectsCreateRoute {
             }
         }
         let id: i64 = EuvPlaygroundService::next_project_id(&user_root);
-        let pdir: std::path::PathBuf = EuvPlaygroundService::project_dir(user_id, id);
+        let pdir: PathBuf = EuvPlaygroundService::project_dir(user_id, id);
         match EuvPlaygroundService::write_project(&pdir, &name, EUV_PLAYGROUND_DEFAULT_CODE) {
             Ok(ts) => {
                 let mut payload: EuvPlaygroundProjectMutationResponse =
@@ -245,7 +245,7 @@ impl ServerHook for EuvPlaygroundProjectsGetRoute {
                 return Status::Continue;
             }
         };
-        let pdir: std::path::PathBuf = EuvPlaygroundService::project_dir(user_id, id);
+        let pdir: PathBuf = EuvPlaygroundService::project_dir(user_id, id);
         if !pdir.exists() {
             let resp: ApiResponse<String> = ApiResponse::new(
                 ApiResponseStatus::ResourceNotFound,
@@ -354,7 +354,7 @@ impl ServerHook for EuvPlaygroundProjectsSaveRoute {
                 return Status::Continue;
             }
         };
-        let pdir: std::path::PathBuf = EuvPlaygroundService::project_dir(user_id, id);
+        let pdir: PathBuf = EuvPlaygroundService::project_dir(user_id, id);
         if !pdir.exists() {
             let resp: ApiResponse<String> = ApiResponse::new(
                 ApiResponseStatus::ResourceNotFound,
@@ -377,7 +377,7 @@ impl ServerHook for EuvPlaygroundProjectsSaveRoute {
         } else {
             EuvPlaygroundService::normalize_name(&name_trim)
         };
-        let user_root: std::path::PathBuf = EuvPlaygroundService::user_dir(user_id);
+        let user_root: PathBuf = EuvPlaygroundService::user_dir(user_id);
         match EuvPlaygroundService::project_name_exists_excluding(
             &user_root,
             &new_name,
@@ -518,7 +518,7 @@ impl ServerHook for EuvPlaygroundProjectsDeleteRoute {
                 return Status::Continue;
             }
         };
-        let pdir: std::path::PathBuf = EuvPlaygroundService::project_dir(user_id, id);
+        let pdir: PathBuf = EuvPlaygroundService::project_dir(user_id, id);
         if !pdir.exists() {
             let resp: ApiResponse<String> = ApiResponse::new(
                 ApiResponseStatus::ResourceNotFound,
@@ -534,7 +534,7 @@ impl ServerHook for EuvPlaygroundProjectsDeleteRoute {
                     EuvPlaygroundService::now_ms(),
                 )
             });
-        match std::fs::remove_dir_all(&pdir) {
+        match remove_dir_all(&pdir) {
             Ok(_) => {
                 let mut payload: EuvPlaygroundProjectMutationResponse =
                     EuvPlaygroundProjectMutationResponse::default();
@@ -659,7 +659,7 @@ impl ServerHook for EuvPlaygroundRunRoute {
                 return Status::Continue;
             }
         };
-        let pdir: std::path::PathBuf = EuvPlaygroundService::project_dir(user_id, project_id);
+        let pdir: PathBuf = EuvPlaygroundService::project_dir(user_id, project_id);
         if !pdir.exists() {
             let resp: ApiResponse<String> = ApiResponse::new(
                 ApiResponseStatus::ResourceNotFound,

@@ -207,10 +207,10 @@ impl EuvPlaygroundService {
     ///
     /// # Returns
     ///
-    /// - `std::io::Result<Output>` - The captured output plus exit status, or the underlying io
+    /// - `Result<Output, Error>` - The captured output plus exit status, or the underlying io
     ///     error.
     #[instrument_trace]
-    pub async fn wait_with_output(mut child: Child) -> std::io::Result<Output> {
+    pub async fn wait_with_output(mut child: Child) -> Result<Output, Error> {
         let stdout: Option<ChildStdout> = child.stdout.take();
         let stderr: Option<ChildStderr> = child.stderr.take();
         let stdout_task: Pin<Box<dyn Future<Output = Vec<u8>> + Send>> = Box::pin(async move {
@@ -227,11 +227,8 @@ impl EuvPlaygroundService {
             }
             buf
         });
-        let (status, stdout_bytes, stderr_bytes): (
-            Result<ExitStatus, std::io::Error>,
-            Vec<u8>,
-            Vec<u8>,
-        ) = tokio::join!(child.wait(), stdout_task, stderr_task,);
+        let (status, stdout_bytes, stderr_bytes): (Result<ExitStatus, Error>, Vec<u8>, Vec<u8>) =
+            tokio::join!(child.wait(), stdout_task, stderr_task,);
         let status: ExitStatus = status?;
         Ok(Output {
             status,
@@ -267,14 +264,14 @@ impl EuvPlaygroundService {
         let dir_path: PathBuf = temp_dir().join(&dir_name);
         let src_dir: PathBuf = dir_path.join(EUV_PLAYGROUND_SRC_DIR);
         let www_dir: PathBuf = dir_path.join(EUV_PLAYGROUND_WWW_DIR);
-        create_dir_all(&src_dir).map_err(|io_err: std::io::Error| {
+        create_dir_all(&src_dir).map_err(|io_err: Error| {
             format!("{ERROR_CREATE_SRC_DIR} {}: {io_err}", src_dir.display())
         })?;
-        create_dir_all(&www_dir).map_err(|io_err: std::io::Error| {
+        create_dir_all(&www_dir).map_err(|io_err: Error| {
             format!("{ERROR_CREATE_WWW_DIR} {}: {io_err}", www_dir.display())
         })?;
         let cargo_config_dir: PathBuf = dir_path.join(EUV_PLAYGROUND_BUILD_CARGO_DIR);
-        create_dir_all(&cargo_config_dir).map_err(|io_err: std::io::Error| {
+        create_dir_all(&cargo_config_dir).map_err(|io_err: Error| {
             format!(
                 "{ERROR_CREATE_CARGO_DIR} {}: {io_err}",
                 cargo_config_dir.display()
@@ -286,13 +283,13 @@ impl EuvPlaygroundService {
         let lib_rs_path: PathBuf = src_dir.join(EUV_PLAYGROUND_BUILD_LIB_RS_FILE);
         let index_html_path: PathBuf = www_dir.join(EUV_PLAYGROUND_BUILD_INDEX_HTML_FILE);
         write(&cargo_toml_path, EUV_PLAYGROUND_BUILD_CARGO_TOML)
-            .map_err(|io_err: std::io::Error| format!("{ERROR_WRITE_CARGO_TOML} {io_err}"))?;
+            .map_err(|io_err: Error| format!("{ERROR_WRITE_CARGO_TOML} {io_err}"))?;
         write(&cargo_config_path, EUV_PLAYGROUND_BUILD_CARGO_CONFIG)
-            .map_err(|io_err: std::io::Error| format!("{ERROR_WRITE_CARGO_CONFIG} {io_err}"))?;
+            .map_err(|io_err: Error| format!("{ERROR_WRITE_CARGO_CONFIG} {io_err}"))?;
         write(&lib_rs_path, code)
-            .map_err(|io_err: std::io::Error| format!("{ERROR_WRITE_LIB_RS} {io_err}"))?;
+            .map_err(|io_err: Error| format!("{ERROR_WRITE_LIB_RS} {io_err}"))?;
         write(&index_html_path, EUV_PLAYGROUND_BUILD_INDEX_HTML)
-            .map_err(|io_err: std::io::Error| format!("{ERROR_WRITE_INDEX_HTML} {io_err}"))?;
+            .map_err(|io_err: Error| format!("{ERROR_WRITE_INDEX_HTML} {io_err}"))?;
         let wasm_pack_binary: PathBuf = Self::resolve_wasm_pack_binary();
         let wasm_pack_display: String = wasm_pack_binary.display().to_string();
         let mut cmd: Command = Command::new(&wasm_pack_binary);
@@ -380,19 +377,18 @@ impl EuvPlaygroundService {
         ///
         /// - `Result<(), String>` - The dir recursive result, or an error message.
         fn copy_dir_recursive(src: &Path, dst: &Path) -> Result<(), String> {
-            create_dir_all(dst).map_err(|io_err: std::io::Error| {
-                format!("{ERROR_MKDIR} {}: {io_err}", dst.display())
-            })?;
-            for entry in read_dir(src).map_err(|io_err: std::io::Error| {
-                format!("{ERROR_READDIR} {}: {io_err}", src.display())
-            })? {
-                let entry: DirEntry = entry.map_err(|io_err: std::io::Error| io_err.to_string())?;
+            create_dir_all(dst)
+                .map_err(|io_err: Error| format!("{ERROR_MKDIR} {}: {io_err}", dst.display()))?;
+            for entry in read_dir(src)
+                .map_err(|io_err: Error| format!("{ERROR_READDIR} {}: {io_err}", src.display()))?
+            {
+                let entry: DirEntry = entry.map_err(|io_err: Error| io_err.to_string())?;
                 let from: PathBuf = entry.path();
                 let to: PathBuf = dst.join(entry.file_name());
                 if from.is_dir() {
                     copy_dir_recursive(&from, &to)?;
                 } else {
-                    copy(&from, &to).map_err(|io_err: std::io::Error| {
+                    copy(&from, &to).map_err(|io_err: Error| {
                         format!(
                             "{ERROR_COPY} {} -> {}: {io_err}",
                             from.display(),
@@ -508,13 +504,12 @@ impl EuvPlaygroundService {
         name: &str,
         excluded_project_dir: Option<&Path>,
     ) -> Result<bool, String> {
-        let entries: ReadDir = read_dir(user_dir).map_err(|error: std::io::Error| {
+        let entries: ReadDir = read_dir(user_dir).map_err(|error: Error| {
             format!("{ERROR_READ_PROJECT_DIR} {}: {error}", user_dir.display(),)
         })?;
         for entry_result in entries {
-            let entry: DirEntry = entry_result.map_err(|error: std::io::Error| {
-                format!("{ERROR_READ_PROJECT_DIR_ENTRY} {error}")
-            })?;
+            let entry: DirEntry = entry_result
+                .map_err(|error: Error| format!("{ERROR_READ_PROJECT_DIR_ENTRY} {error}"))?;
             let project_dir: PathBuf = entry.path();
             if !project_dir.is_dir()
                 || excluded_project_dir
@@ -543,7 +538,7 @@ impl EuvPlaygroundService {
     #[instrument_trace]
     pub fn read_code(project_dir: &Path) -> Result<String, String> {
         read_to_string(project_dir.join(EUV_PLAYGROUND_CODE_FILE))
-            .map_err(|io_err: std::io::Error| format!("{ERROR_READ_CODE} {io_err}"))
+            .map_err(|io_err: Error| format!("{ERROR_READ_CODE} {io_err}"))
     }
 
     /// Writes a project's `code.rs` and updates `metadata.json`'s
@@ -730,7 +725,7 @@ impl EuvPlaygroundService {
             created_at_ms: ts,
             updated_at_ms: ts,
         };
-        let job_arc: BuildJobSlot = std::sync::Arc::new(tokio::sync::RwLock::new(job));
+        let job_arc: BuildJobSlot = Arc::new(tokio::sync::RwLock::new(job));
         {
             let mut map: tokio::sync::RwLockWriteGuard<'_, BuildJobMap> =
                 BUILD_JOB_REGISTRY.write().await;
@@ -922,7 +917,7 @@ impl EuvPlaygroundService {
                 return;
             }
         };
-        let job_id: BuildJobId = match std::str::from_utf8(job_id_bytes)
+        let job_id: BuildJobId = match from_utf8(job_id_bytes)
             .ok()
             .and_then(|text: &str| text.parse::<BuildJobId>().ok())
         {
@@ -932,7 +927,7 @@ impl EuvPlaygroundService {
                 return;
             }
         };
-        let user_id: i32 = match std::str::from_utf8(user_id_bytes)
+        let user_id: i32 = match from_utf8(user_id_bytes)
             .ok()
             .and_then(|text: &str| text.parse::<i32>().ok())
         {
@@ -942,7 +937,7 @@ impl EuvPlaygroundService {
                 return;
             }
         };
-        let project_id: i64 = match std::str::from_utf8(project_id_bytes)
+        let project_id: i64 = match from_utf8(project_id_bytes)
             .ok()
             .and_then(|text: &str| text.parse::<i64>().ok())
         {

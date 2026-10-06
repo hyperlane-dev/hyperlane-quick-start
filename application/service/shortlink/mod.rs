@@ -4,6 +4,8 @@ mod r#struct;
 
 pub use {r#const::*, r#struct::*};
 
+use std::num::ParseIntError;
+
 use {
     super::*,
     mapper::shortlink::*,

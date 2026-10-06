@@ -15,7 +15,8 @@ use {
 
 use std::{
     env::var,
-    fmt,
+    error::Error,
+    fmt::{self, Display},
     str::FromStr,
     time::{Duration, Instant},
 };
