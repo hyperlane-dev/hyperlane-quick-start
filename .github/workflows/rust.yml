@@ -162,7 +162,7 @@ jobs:
         run: cargo generate-lockfile
       - name: Commit and push
         run: |
-          git config user.name "eastspire"
+          git config user.name "vshengbro"
           git config user.email "root@ltpp.vip"
           git add -A
           git diff --cached --quiet || git commit -m "chore: sync all package versions to ${{ needs.setup.outputs.version }}"
@@ -272,7 +272,7 @@ jobs:
       - name: Configure git
         if: steps.check_branch.outputs.skip == 'false'
         run: |
-          git config user.name "eastspire"
+          git config user.name "vshengbro"
           git config user.email "root@ltpp.vip"
       - name: Publish to crates.io
         id: publish
