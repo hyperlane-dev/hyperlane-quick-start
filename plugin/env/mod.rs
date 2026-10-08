@@ -7,7 +7,7 @@ pub use {r#const::*, r#struct::*};
 
 use {super::*, r#static::*};
 
-use hyperlane_resources::{docker::*, env::*};
+use hyperlane_resources::{docker::path::*, env::path::*};
 
 use std::{
     env::{VarError, var},

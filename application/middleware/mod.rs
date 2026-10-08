@@ -1,6 +1,5 @@
-mod request;
-mod response;
+/// # mod-visibility-allow: consumers reach these as `middleware::request::*` / `middleware::response::*`
+pub mod request;
+pub mod response;
 
-pub use {request::*, response::*};
-
-use {super::*, utils::*};
+use {super::*, utils::json::*};

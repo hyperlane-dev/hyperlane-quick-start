@@ -6,6 +6,6 @@ pub use r#struct::*;
 use super::*;
 
 use {
-    hyperlane_config::application::*,
+    hyperlane_config::application::logger::*,
     hyperlane_plugin::{common::*, env::*, logger::*},
 };
