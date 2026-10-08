@@ -65,11 +65,8 @@ serde = { version = "1.0.229", features = ["derive"] }
 rust_decimal = { version = "1.43.0", features = ["serde"] }
 utoipa-rapidoc = { version = "7.0.0", features = ["actix-web"] }
 utoipa = { version = "6.0.0", features = ["openapi_extensions"] }
-ed25519-dalek = { version = "3.0.0", features = [ "pkcs8", "rand_core" ] }
-utoipa-swagger-ui = { version = "10.0.1", features = [
-    "vendored",
-    "actix-web",
-] }
+ed25519-dalek = { version = "3.0.0", features = ["pkcs8", "rand_core"] }
+utoipa-swagger-ui = { version = "10.0.1", features = ["vendored", "actix-web"] }
 reqwest = { version = "0.13.5", features = [
     "gzip",
     "json",
@@ -79,7 +76,12 @@ reqwest = { version = "0.13.5", features = [
     "blocking",
     "multipart",
 ] }
-sea-orm = { version = "2.0.3", features = [ "sqlx-mysql", "sqlx-sqlite", "sqlx-postgres", "runtime-tokio-rustls" ] }
+sea-orm = { version = "2.0.3", features = [
+    "sqlx-mysql",
+    "sqlx-sqlite",
+    "sqlx-postgres",
+    "runtime-tokio-rustls",
+] }
 rsa = { version = "0.9.10", default-features = false, features = [
     "pem",
     "std",
