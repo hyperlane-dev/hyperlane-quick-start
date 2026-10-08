@@ -50,3 +50,17 @@ use {
     utoipa_rapidoc::RapiDoc,
     utoipa_swagger_ui::SwaggerUi,
 };
+
+// `hyperlane` 21.x and `hyperlane-utils` 33.x are two generations of the same
+// crate family and both re-export these attribute macros. Two glob imports of
+// one name in the same module is E0659, so every macro invocation in this crate
+// (`#[task_panic]`, `#[route]`, `#[request_middleware]`, `#[response_header]`,
+// ... including the `_*_data` / `_*_macros` helper attributes they expand to)
+// would fail to resolve. An explicit import outranks a glob import in Rust, so
+// naming them once here disambiguates them onto the `hyperlane` facade without
+// changing which implementation is used.
+use hyperlane::{
+    epilogue_macros, prologue_macros, request_error, request_error_data, request_middleware,
+    response_header, response_middleware, response_status_code, response_version, route,
+    task_panic, task_panic_data,
+};
