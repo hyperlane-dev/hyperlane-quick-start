@@ -691,11 +691,11 @@ dependencies = [
 
 [[package]]
 name = "color-output"
-version = "10.2.3"
+version = "10.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "74c3406a6daee96ea087dbe65a1974f00417564d64c837aa9d713bff7446cb9b"
+checksum = "b5ee12c6cbf6f0dde816417b88a1c39244a990986002b793c9be605449fdbc03"
 dependencies = [
- "lombok-macros 10.2.3",
+ "lombok-macros 10.2.4",
  "system-time",
 ]
 
@@ -1802,9 +1802,9 @@ dependencies = [
 
 [[package]]
 name = "http-compress"
-version = "21.12.0"
+version = "21.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "07913cd947fc740d3ad854fa7bc1bbcb1125ff0a51d53b70218f65670acd3442"
+checksum = "0caac62a77d958f86f2065035877ffbe51321cfa20a81ae33e7e4661bf520aef"
 dependencies = [
  "brotli",
  "flate2",
@@ -1813,20 +1813,20 @@ dependencies = [
 
 [[package]]
 name = "http-constant"
-version = "21.12.0"
+version = "21.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "57d04e200b250b28e65f18b35207aee90881d8b6ce18ec9ccba2f2dc1dc0f5ee"
+checksum = "0bef47cd37de7b3183956b47c6c8b65c6041b8b7becb54ec3dc7df762032f48a"
 
 [[package]]
 name = "http-type"
-version = "21.12.0"
+version = "21.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a84b95db26f3b593fdc8f3e3ade7c1a5381478ff2adc51dae361ed9800638c29"
+checksum = "418cf56d78aae01026366b8e1bfc058656765c99d74d461f5b5c598f7bb79713"
 dependencies = [
  "hex",
  "http-compress",
  "http-constant",
- "lombok-macros 10.2.3",
+ "lombok-macros 10.2.4",
  "serde",
  "serde-xml-rs",
  "serde_json",
@@ -1929,12 +1929,12 @@ dependencies = [
 
 [[package]]
 name = "hyperlane"
-version = "21.12.0"
+version = "21.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "24429d9e273b8638f13725b735bc5175923fede83be419595a6ec9cdd6651655"
+checksum = "caa57445f2a491bb5316d466b16fd9027733f6e1e7e7c7a100cc61dd128dbf0d"
 dependencies = [
  "hyperlane-core",
- "hyperlane-macros 21.12.0",
+ "hyperlane-macros 21.12.1",
 ]
 
 [[package]]
@@ -1950,13 +1950,13 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-core"
-version = "21.12.0"
+version = "21.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9ea0e5ab13f1ca74fb015d03e6ca3638a8aa049feb6138ffdd87c10134417c60"
+checksum = "13ae289cb7a5eb2b613f769c579e35a9524e78033fc0bbb86186503ba007ec63"
 dependencies = [
  "http-type",
  "inventory",
- "lombok-macros 10.2.3",
+ "lombok-macros 10.2.4",
  "regex",
  "serde",
 ]
@@ -1973,9 +1973,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-macros"
-version = "21.12.0"
+version = "21.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5cd4cf538c500bb5396815911ed998753d12a9071c32d11a5ecd76ab5e9cb4b2"
+checksum = "3a02714530c2c83f6a7431eff62d4c0c86d81ab890755daabd49b9b64bcfb3f8"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2660,9 +2660,9 @@ dependencies = [
 
 [[package]]
 name = "lombok-macros"
-version = "10.2.3"
+version = "10.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "32ee85ac6d974db9a53efa4556b36b6d647cd1d998ff5f1f3243202688c0359b"
+checksum = "36107a1b9e8235f303c4db63f7638d651f780fa426d4f7c2c5f29687eef9fe73"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -4850,9 +4850,9 @@ dependencies = [
 
 [[package]]
 name = "system-time"
-version = "10.2.3"
+version = "10.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "738cf6b2e4f67a2bcd65b94d3929f09b3aac9e8fe4247b79f573be4256b7c595"
+checksum = "fc81d1147621bdf92b3e989313f00491af71f1fa14b6f09a516a58c34c848329"
 
 [[package]]
 name = "tempfile"
@@ -5002,9 +5002,9 @@ dependencies = [
 
 [[package]]
 name = "tokio-util"
-version = "0.7.19"
+version = "0.7.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "494815d09bf52b5548659851081238f0ca39ff638363907596da739561c62c52"
+checksum = "e464cf451ba96ebfc6f9b6542f17ee8b8956e33f1e40d9690624e59d7a7f8a4b"
 dependencies = [
  "bytes",
  "futures-core",
