@@ -1,0 +1,120 @@
+# One-command deployment for Hyperlane Quick Start.
+#
+# The release stack with its paths rebased on the repository root, so
+# `docker compose up -d` works from a fresh clone without naming a file. It is the
+# same stack as resources/docker/release/server_docker_compose.yml, which keeps
+# working unchanged; if the two ever differ, this is the verified copy.
+#
+# The application image is built from source on first run, which takes roughly 25
+# minutes. Pull it instead to skip that:
+#
+#   server:
+#     image: hkccr.ccs.tencentyun.com/hyperlane-dev/hyperlane-quick-start:1.0.0
+#
+# That is the master tag; the playground branch publishes
+# hyperlane-quick-start-playground:1.0.0.
+#
+#   docker compose up -d
+#
+# The service is then on http://127.0.0.1:65002.
+
+services:
+  mysql:
+    image: mysql:latest
+    container_name: release_hyperlane_quick_start_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: hyperlane
+      MYSQL_DATABASE: hyperlane
+      MYSQL_USER: hyperlane
+      MYSQL_PASSWORD: hyperlane
+    expose:
+      - '3306'
+    volumes:
+      - ./data/release/mysql:/var/lib/mysql
+    networks:
+      - release_hyperlane_quick_start_network
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'mysqladmin',
+          'ping',
+          '-h',
+          'localhost',
+          '-u',
+          'root',
+          '-phyperlane',
+        ]
+      interval: 6s
+      timeout: 1s
+      retries: 6
+      start_period: 6s
+
+  postgresql:
+    image: postgres:latest
+    container_name: release_hyperlane_quick_start_postgresql
+    restart: always
+    environment:
+      POSTGRES_DB: hyperlane
+      POSTGRES_USER: hyperlane
+      POSTGRES_PASSWORD: hyperlane
+      POSTGRES_HOST_AUTH_METHOD: md5
+    expose:
+      - '5432'
+    volumes:
+      # Mounted at /var/lib/postgresql/data, not /var/lib/postgresql. The parent
+      # directory is not the PGDATA root, so mounting it leaves the real cluster
+      # in an anonymous volume and every `docker compose down` discards the data.
+      - ./data/release/postgres:/var/lib/postgresql/data
+    networks:
+      - release_hyperlane_quick_start_network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready']
+      interval: 6s
+      timeout: 1s
+      retries: 6
+      start_period: 6s
+
+  redis:
+    image: redis:latest
+    container_name: release_hyperlane_quick_start_redis
+    restart: always
+    command: redis-server --requirepass hyperlane
+    expose:
+      - '6379'
+    volumes:
+      - ./data/release/redis:/data
+    networks:
+      - release_hyperlane_quick_start_network
+    healthcheck:
+      test: ['CMD', 'redis-cli', '-a', 'hyperlane', 'ping']
+      interval: 6s
+      timeout: 1s
+      retries: 6
+      start_period: 6s
+
+  server:
+    build:
+      context: .
+      dockerfile: ./resources/docker/release/server.dockerfile
+    container_name: release_hyperlane_quick_start_server
+    restart: always
+    ports:
+      - '65002:65002'
+    networks:
+      - release_hyperlane_quick_start_network
+    depends_on:
+      mysql:
+        condition: service_healthy
+      postgresql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+networks:
+  # Declared here rather than marked external: an external network has to exist
+  # before `docker compose up`, which makes a one-command start a two-step
+  # ritual and fails outright on a machine that has never run this stack.
+  release_hyperlane_quick_start_network:
+    driver: bridge

@@ -1,4 +1,10 @@
-FROM rust:1.93-bookworm
+# This branch's lockfile pins sea-orm 1.1.20 and sqlx 0.8.6, which resolve
+# under 1.93; the playground branch moved to 1.99 because its lockfile requires
+# it. The two branches are allowed to differ here.
+ARG TARGETPLATFORM
+ARG RUST_VERSION=1.93
+FROM --platform=$TARGETPLATFORM rust:${RUST_VERSION}-bookworm
+
 
 RUN apt-get update -yqq && apt-get install -yqq cmake g++ binutils lld
 
@@ -11,8 +17,17 @@ RUN rustup target add wasm32-unknown-unknown
 RUN cargo install wasm-bindgen-cli --locked && \
     cargo install wasm-pack --locked
 
-RUN RUSTFLAGS='-C target-feature=-crt-static' cargo build --release --target x86_64-unknown-linux-gnu && \
-    cp -f /hyperlane-quick-start/target/x86_64-unknown-linux-gnu/release/hyperlane-quick-start /hyperlane-quick-start/hyperlane-quick-start
+# No --target: the base image matches the requested platform, so a plain build
+# produces a binary the container can actually run. Naming x86_64 here instead
+# made the build fail off an amd64 host with "can't find crate for `std`",
+# because the base had been pulled for the host's own architecture.
+RUN RUSTFLAGS='-C target-feature=-crt-static' cargo build --release && \
+    cp -f /hyperlane-quick-start/target/release/hyperlane-quick-start /hyperlane-quick-start/hyperlane-quick-start
+
+# The data directories the release env file points at. The server refuses to
+# start if its log or pid directory is missing, and neither exists in a fresh
+# image.
+RUN mkdir -p /hyperlane-quick-start/data/release/logs /hyperlane-quick-start/data/release/process
 
 EXPOSE 65002
 

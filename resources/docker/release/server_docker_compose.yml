@@ -43,7 +43,10 @@ services:
     expose:
       - '5432'
     volumes:
-      - ../../../data/release/postgres:/var/lib/postgresql
+      # Mounted at /var/lib/postgresql/data, not /var/lib/postgresql. The parent
+      # directory is not the PGDATA root, so mounting it leaves the real cluster
+      # in an anonymous volume and every `docker compose down` discards the data.
+      - ../../../data/release/postgres:/var/lib/postgresql/data
     networks:
       - release_hyperlane_quick_start_network
     healthcheck:
@@ -90,6 +93,8 @@ services:
         condition: service_healthy
 
 networks:
+  # Declared here rather than marked external: an external network has to exist
+  # before `docker compose up`, which makes a one-command start a two-step
+  # ritual and fails outright on a machine that has never run this stack.
   release_hyperlane_quick_start_network:
-    external: true
     driver: bridge
