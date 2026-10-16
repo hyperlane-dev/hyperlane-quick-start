@@ -1,4 +1,9 @@
-FROM rust:1.93-bookworm
+# sea-orm 2.0 and sqlx 0.9 declare rust-version 1.94, so a 1.93 base refuses to
+# resolve them and the image build dies partway through with
+# "rustc 1.93.1 is not supported by the following packages". The pin matches the
+# toolchain CI uses, which is stable rather than a fixed release.
+ARG RUST_VERSION=1.99
+FROM rust:${RUST_VERSION}-bookworm
 
 RUN apt-get update -yqq && apt-get install -yqq cmake g++ binutils lld
 
