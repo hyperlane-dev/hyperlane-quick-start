@@ -13,6 +13,20 @@ pub struct Topic {
     pub(super) sender: TopicSender,
     /// The current lifecycle state of the topic.
     pub(super) state: TopicState,
+    /// Messages published while the topic is paused, kept in publication order.
+    ///
+    /// The buffer never exceeds the capacity of the topic broadcast channel and
+    /// keeps only the most recent messages, so a long pause cannot grow memory
+    /// without bound.
+    #[get(skip)]
+    #[get_mut(skip)]
+    #[set(skip)]
+    pub(super) buffered: VecDeque<MessagePayload>,
+    /// The broadcast channel capacity of this topic, bounding the paused buffer.
+    #[get(skip)]
+    #[get_mut(skip)]
+    #[set(skip)]
+    pub(super) capacity: usize,
 }
 
 /// A consumer group bound to a specific topic, distributing messages among its members.

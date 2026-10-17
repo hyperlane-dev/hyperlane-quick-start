@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane_plugin"
-version = "23.0.42"
+version = "23.0.43"
 readme = "README.md"
 edition = "2024"
 authors = ["root@ltpp.vip"]
@@ -9,6 +9,7 @@ description = """A powerful and extensible plugin system for the hyperlane frame
 keywords = ["http", "request", "response", "tcp", "cross-platform"]
 repository = "https://github.com/hyperlane-dev/hyperlane-quick-start.git"
 categories = ["network-programming", "web-programming"]
+autotests = false
 exclude = [
     "data",
     "*.log",
@@ -22,6 +23,10 @@ exclude = [
 
 [lib]
 path = "lib.rs"
+
+[[test]]
+name = "integration"
+path = "tests/mod.rs"
 
 [dependencies]
 hyperlane_resources = { workspace = true }
@@ -43,3 +48,6 @@ hyperlane-core = { workspace = true }
 server-manager = { workspace = true }
 hyperlane-macros = { workspace = true }
 instrument-level = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }

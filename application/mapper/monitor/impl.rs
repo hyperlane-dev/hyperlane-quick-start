@@ -34,6 +34,9 @@ impl PerformanceRingBuffer {
     ///
     /// - `PerformanceDataPoint` - The data point to insert.
     pub fn push(&mut self, data_point: PerformanceDataPoint) {
+        if self.get_capacity() == 0 {
+            return;
+        }
         if self.get_buffer().len() < self.get_capacity() {
             self.get_mut_buffer().push(data_point);
         } else {

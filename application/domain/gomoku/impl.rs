@@ -98,6 +98,7 @@ impl GomokuDomain {
     #[instrument_trace]
     pub fn remove_user(room: &mut GomokuRoom, user_id: &str) -> bool {
         let mut removed: bool = false;
+        let mut removed_player: bool = false;
         if let Some(index) = room
             .get_players()
             .iter()
@@ -105,6 +106,7 @@ impl GomokuDomain {
         {
             room.get_mut_players().remove(index);
             removed = true;
+            removed_player = true;
         }
         if let Some(index) = room
             .get_spectators()
@@ -114,7 +116,7 @@ impl GomokuDomain {
             room.get_mut_spectators().remove(index);
             removed = true;
         }
-        if removed && room.get_status() == &GameStatus::InProgress {
+        if removed_player && room.get_status() == &GameStatus::InProgress {
             room.set_status(GameStatus::Finished);
             let winner: Option<StoneColor> = room
                 .get_players()

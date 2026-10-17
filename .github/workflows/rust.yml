@@ -182,7 +182,7 @@ jobs:
           toolchain: stable
           components: rustfmt
       - name: Format check
-        run: cargo fmt -- --check
+        run: cargo fmt --all -- --check
 
   tests:
     needs: sync_workspace_version
@@ -197,7 +197,7 @@ jobs:
         with:
           toolchain: stable
       - name: Run tests
-        run: cargo test --all-features -- --nocapture
+        run: cargo test --workspace --all-features -- --nocapture
 
   clippy:
     needs: sync_workspace_version
@@ -213,7 +213,7 @@ jobs:
           toolchain: stable
           components: clippy
       - name: Run clippy
-        run: cargo clippy --all-features
+        run: cargo clippy --workspace --all-targets --all-features -- -D warnings
 
   build:
     needs: sync_workspace_version
@@ -228,7 +228,7 @@ jobs:
         with:
           toolchain: stable
       - name: Build release
-        run: cargo check --release --all-features
+        run: cargo check --workspace --all-targets --release --all-features
 
   publish:
     permissions:
