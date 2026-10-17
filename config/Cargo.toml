@@ -28,5 +28,4 @@ log = { workspace = true }
 serde = { workspace = true }
 tracing = { workspace = true }
 hyperlane = { workspace = true }
-hyperlane-log = { workspace = true }
 instrument-level = { workspace = true }

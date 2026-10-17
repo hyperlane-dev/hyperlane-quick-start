@@ -342,7 +342,7 @@ impl MySqlAutoCreation {
             self.get_instance().get_database()
         );
         let statement: Statement = Statement::from_string(DatabaseBackend::MySql, query);
-        match connection.query_all(statement).await {
+        match connection.query_all_raw(statement).await {
             Ok(results) => Ok(!results.is_empty()),
             Err(error) => Err(AutoCreationError::DatabaseError(format!(
                 "Failed to check if database exists {error}"
@@ -377,7 +377,7 @@ impl MySqlAutoCreation {
             self.get_instance().get_database()
         );
         let statement: Statement = Statement::from_string(DatabaseBackend::MySql, create_query);
-        match connection.execute(statement).await {
+        match connection.execute_raw(statement).await {
             Ok(_) => {
                 AutoCreationLogger::log_database_created(
                     self.get_instance().get_database().as_str(),
@@ -461,7 +461,7 @@ impl MySqlAutoCreation {
             self.get_instance().get_database()
         );
         let statement: Statement = Statement::from_string(DatabaseBackend::MySql, query);
-        match connection.query_all(statement).await {
+        match connection.query_all_raw(statement).await {
             Ok(results) => Ok(!results.is_empty()),
             Err(error) => Err(AutoCreationError::DatabaseError(format!(
                 "Failed to check if table '{table_name_str}' exists {error}"
@@ -487,7 +487,7 @@ impl MySqlAutoCreation {
     ) -> Result<(), AutoCreationError> {
         let statement: Statement =
             Statement::from_string(DatabaseBackend::MySql, table.get_sql().clone());
-        match connection.execute(statement).await {
+        match connection.execute_raw(statement).await {
             Ok(_) => Ok(()),
             Err(error) => {
                 let error_msg: String = error.to_string();
@@ -530,7 +530,7 @@ impl MySqlAutoCreation {
         S: AsRef<str>,
     {
         let statement: Statement = Statement::from_string(DatabaseBackend::MySql, sql.as_ref());
-        match connection.execute(statement).await {
+        match connection.execute_raw(statement).await {
             Ok(_) => Ok(()),
             Err(error) => Err(AutoCreationError::DatabaseError(format!(
                 "Failed to execute SQL {error}"
@@ -717,7 +717,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
         })?;
         let statement: Statement =
             Statement::from_string(DatabaseBackend::MySql, CONNECTION_PROBE_QUERY.to_string());
-        match connection.query_all(statement).await {
+        match connection.query_all_raw(statement).await {
             Ok(_) => {
                 let _: Result<(), DbErr> = connection.close().await;
                 AutoCreationLogger::log_connection_verification(

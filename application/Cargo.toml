@@ -36,8 +36,6 @@ utoipa = { workspace = true }
 tracing = { workspace = true }
 hyperlane = { workspace = true }
 serde_with = { workspace = true }
-hyperlane-log = { workspace = true }
 lombok-macros = { workspace = true }
-hyperlane-core = { workspace = true }
 hyperlane-time = { workspace = true }
 instrument-level = { workspace = true }

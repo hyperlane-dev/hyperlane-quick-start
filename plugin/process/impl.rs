@@ -27,8 +27,10 @@ impl ProcessPlugin {
         trace!("Pid file path: {}", pid_path.as_ref());
         let mut manager: ServerManager = ServerManager::new();
         manager
-            .set_pid_file(pid_path.as_ref())
-            .set_server_hook(server_hook);
+            .set_pid_file(pid_path.as_ref().to_string())
+            .set_server_hook(Arc::new(move || {
+                Box::pin(server_hook()) as Pin<Box<dyn Future<Output = ()> + Send>>
+            }));
         let is_daemon: bool = args.len() >= 3 && args[2].to_lowercase() == DAEMON_FLAG;
         if args.len() < 2 {
             warn!("No additional command-line parameters, default startup");

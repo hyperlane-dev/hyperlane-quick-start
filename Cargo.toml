@@ -31,26 +31,24 @@ hyperlane_bootstrap = { path = "bootstrap", version = "23.0.36" }
 hyperlane_resources = { path = "resources", version = "23.0.36" }
 hyperlane_application = { path = "application", version = "23.0.36" }
 
-log = "0.4.33"
-redis = "0.32"
-utoipa = "5.5.0"
+log = "0.4.34"
+redis = "1.7.1"
+utoipa = "6.0.0"
 chrono = "0.4.45"
 dotenvy = "0.15.7"
-sea-orm = "1.1.20"
+sea-orm = "2.0.4"
 tracing = "0.1.44"
 num_cpus = "1.17.0"
-hyperlane = "21.12.1"
-serde_with = "3.21.0"
-serde_yaml = "0.9.34"
-color-output = "10.0.10"
-hyperlane-log = "4.0.16"
-lombok-macros = "10.2.6"
-file-operation = "0.8.32"
+hyperlane = "21.13.3"
+serde_with = "3.24.0"
+serde_yaml = "0.9.33"
+color-output = "10.2.7"
+lombok-macros = "10.2.7"
+file-operation = "10.2.7"
 hyperlane-time = "0.7.46"
-server-manager = "5.0.24"
-hyperlane-core = "21.12.1"
-instrument-level = "1.1.6"
-uuid = { version = "1.24.0", features = ["v4"] }
+server-manager = "10.2.7"
+instrument-level = "10.2.7"
+uuid = { version = "1.28.0", features = ["v4"] }
 serde = { version = "1.0.229", features = ["derive"] }
 
 [dependencies]
@@ -71,7 +69,6 @@ hyperlane = { workspace = true }
 serde_with = { workspace = true }
 serde_yaml = { workspace = true }
 color-output = { workspace = true }
-hyperlane-log = { workspace = true }
 lombok-macros = { workspace = true }
 file-operation = { workspace = true }
 hyperlane-time = { workspace = true }

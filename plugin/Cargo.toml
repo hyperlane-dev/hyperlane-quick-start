@@ -35,7 +35,6 @@ tracing = { workspace = true }
 hyperlane = { workspace = true }
 serde_yaml = { workspace = true }
 color-output = { workspace = true }
-hyperlane-log = { workspace = true }
 lombok-macros = { workspace = true }
 file-operation = { workspace = true }
 hyperlane-time = { workspace = true }
