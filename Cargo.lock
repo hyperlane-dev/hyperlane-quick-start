@@ -2122,7 +2122,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "23.0.42"
+version = "23.0.43"
 dependencies = [
  "bin-encode-decode",
  "chrono",
@@ -2153,7 +2153,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_application"
-version = "23.0.42"
+version = "23.0.43"
 dependencies = [
  "base64 0.22.1",
  "bin-encode-decode",
@@ -2201,7 +2201,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_bootstrap"
-version = "23.0.42"
+version = "23.0.43"
 dependencies = [
  "color-log",
  "color-output",
@@ -2227,7 +2227,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_config"
-version = "23.0.42"
+version = "23.0.43"
 dependencies = [
  "hyperlane",
  "hyperlane-core",
@@ -2240,7 +2240,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_plugin"
-version = "23.0.42"
+version = "23.0.43"
 dependencies = [
  "color-log",
  "color-output",
@@ -2265,7 +2265,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_resources"
-version = "23.0.42"
+version = "23.0.43"
 
 [[package]]
 name = "iana-time-zone"
@@ -3708,7 +3708,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys",
- "windows-sys 0.52.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -4666,7 +4666,7 @@ dependencies = [
  "getrandom 0.4.3",
  "once_cell",
  "rustix",
- "windows-sys 0.52.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
