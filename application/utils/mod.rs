@@ -1,4 +1,4 @@
-/// # mod-visibility-allow: consumers reach these as `utils::json::*` / `utils::send::*`
+pub mod brand_new_child;
 pub mod json;
 pub mod send;
 
