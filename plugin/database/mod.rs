@@ -5,7 +5,7 @@ mod r#struct;
 
 pub use {r#const::*, r#enum::*, r#struct::*};
 
-use {super::*, env::*, mysql::*, postgresql::*, redis::*};
+use {super::*, crate::redis::RedisPlugin, env::*, mysql::*, postgresql::*};
 
 use std::{
     env::var,

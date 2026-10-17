@@ -18,20 +18,20 @@ pub mod view;
 use {
     chrono::Utc,
     hyperlane::*,
-    hyperlane_utils::{log::*, *},
+    hyperlane_time::*,
+    instrument_level::*,
+    log::*,
+    lombok_macros::*,
     serde::{Deserialize, Serialize},
     serde_with::skip_serializing_none,
     utoipa::ToSchema,
 };
 
-// `hyperlane` 21.x and `hyperlane-utils` 33.x are two generations of the same
-// crate family and both re-export these attribute macros. Two glob imports of
-// one name in the same module is E0659, so every macro invocation in this crate
-// (`#[task_panic]`, `#[route]`, `#[request_middleware]`, `#[response_header]`,
-// ... including the `_*_data` / `_*_macros` helper attributes they expand to)
-// would fail to resolve. An explicit import outranks a glob import in Rust, so
-// naming them once here disambiguates them onto the `hyperlane` facade without
-// changing which implementation is used.
+// These attribute macros (`#[task_panic]`, `#[route]`, `#[request_middleware]`,
+// `#[response_header]`, and the `_*_data` / `_*_macros` helpers they expand to)
+// used to be re-exported by `hyperlane-utils` as well, so globbing both crates made
+// every invocation E0659. That crate is gone; naming them once here keeps them
+// resolving against the `hyperlane` facade regardless of the glob above.
 use hyperlane::{
     epilogue_macros, prologue_macros, request_error, request_error_data, request_middleware,
     response_header, response_middleware, response_status_code, response_version, route,

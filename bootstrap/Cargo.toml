@@ -28,8 +28,13 @@ hyperlane_config = { workspace = true }
 hyperlane_plugin = { workspace = true }
 hyperlane_application = { workspace = true }
 
+redis = "0.32"
+log = { workspace = true }
 serde = { workspace = true }
+sea-orm = { workspace = true }
 tracing = { workspace = true }
+num_cpus = { workspace = true }
 hyperlane = { workspace = true }
+hyperlane-log = { workspace = true }
+lombok-macros = { workspace = true }
 hyperlane-core = { workspace = true }
-hyperlane-utils = { workspace = true }

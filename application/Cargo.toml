@@ -28,8 +28,16 @@ hyperlane_config = { workspace = true }
 hyperlane_plugin = { workspace = true }
 hyperlane_resources = { workspace = true }
 
+log = { workspace = true }
+uuid = { workspace = true }
 serde = { workspace = true }
+chrono = { workspace = true }
+utoipa = { workspace = true }
 tracing = { workspace = true }
 hyperlane = { workspace = true }
+serde_with = { workspace = true }
+hyperlane-log = { workspace = true }
+lombok-macros = { workspace = true }
 hyperlane-core = { workspace = true }
-hyperlane-utils = { workspace = true }
+hyperlane-time = { workspace = true }
+instrument-level = { workspace = true }

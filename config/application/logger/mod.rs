@@ -2,4 +2,4 @@ mod r#const;
 
 pub use r#const::*;
 
-use super::*;
+use log::LevelFilter;

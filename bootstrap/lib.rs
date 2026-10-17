@@ -10,14 +10,10 @@ pub mod framework;
 
 use common::*;
 
-use {
-    hyperlane::*,
-    hyperlane_utils::{log::*, *},
-};
+use {hyperlane::*, hyperlane_log::*, log::*, lombok_macros::*};
 
-// `hyperlane` 21.x and `hyperlane-utils` 33.x are two generations of the same
-// crate family and both re-export the `hyperlane` attribute macro, so a glob
-// import of each makes every `#[hyperlane(...)]` invocation E0659. An explicit
-// import outranks a glob import, so naming it once resolves them onto the
-// `hyperlane` facade.
+// `hyperlane-utils` used to re-export this macro too, so globbing both crates made
+// every `#[hyperlane(...)]` invocation E0659 and this import had to disambiguate them.
+// That crate is gone; the explicit import keeps the macro resolving against the
+// `hyperlane` facade no matter what else a glob below brings in.
 use hyperlane::hyperlane;
