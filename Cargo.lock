@@ -284,9 +284,9 @@ dependencies = [
 
 [[package]]
 name = "color-output"
-version = "10.2.5"
+version = "10.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0219339bf71f3e98c9728bcdb1bf7d5fc1f2d8aaa948fad2a6258c40a7d4d9e7"
+checksum = "d64e7b55e22f136aaa18505d0fe9c534cc5dddf8eab0eb6c5c19a573171707db"
 dependencies = [
  "lombok-macros",
  "system-time",
@@ -2557,9 +2557,9 @@ dependencies = [
 
 [[package]]
 name = "system-time"
-version = "10.2.5"
+version = "10.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5d4fb4d599a7f984d61a40730dcb9753cea330e4c4070a272b9617adfa127009"
+checksum = "41448ca8627502416498794830838e5ae9a69a51fc14877dbf4af75f1f265fde"
 
 [[package]]
 name = "thiserror"
