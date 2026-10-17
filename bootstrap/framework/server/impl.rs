@@ -34,6 +34,7 @@ impl BootstrapAsyncInit for ServerBootstrap {
     ///
     /// - `Self` - The initialized `ServerBootstrap` instance.
     #[hyperlane(server: Server)]
+    #[import(hyperlane_application)]
     async fn init() -> Self {
         let config: ConfigBootstrap = ConfigBootstrap::init().await;
         server
