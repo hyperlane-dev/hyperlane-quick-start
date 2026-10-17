@@ -860,6 +860,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "fastrand"
+version = "2.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "da7c62ceae207dd37ea5b845da6a0696c799f85e97da1ab5b7910be3c1c80223"
+
+[[package]]
 name = "file-operation"
 version = "10.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1199,7 +1205,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "23.0.40"
+version = "23.0.41"
 dependencies = [
  "chrono",
  "color-output",
@@ -1232,7 +1238,7 @@ checksum = "e5480b89b70d89bc6d07bea700bf052bb00bea5e9175468a775128e174dfd614"
 
 [[package]]
 name = "hyperlane_application"
-version = "23.0.40"
+version = "23.0.41"
 dependencies = [
  "chrono",
  "hyperlane",
@@ -1252,7 +1258,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_bootstrap"
-version = "23.0.40"
+version = "23.0.41"
 dependencies = [
  "hyperlane",
  "hyperlane_application",
@@ -1269,7 +1275,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_config"
-version = "23.0.40"
+version = "23.0.41"
 dependencies = [
  "hyperlane",
  "instrument-level",
@@ -1280,7 +1286,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_plugin"
-version = "23.0.40"
+version = "23.0.41"
 dependencies = [
  "color-output",
  "dotenvy",
@@ -1296,12 +1302,13 @@ dependencies = [
  "serde",
  "serde_yaml",
  "server-manager",
+ "tempfile",
  "tracing",
 ]
 
 [[package]]
 name = "hyperlane_resources"
-version = "23.0.40"
+version = "23.0.41"
 
 [[package]]
 name = "iana-time-zone"
@@ -1638,6 +1645,12 @@ dependencies = [
  "pkg-config",
  "vcpkg",
 ]
+
+[[package]]
+name = "linux-raw-sys"
+version = "0.12.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "32a66949e030da00e8c7d4434b251670a91556f4144941d37452769c25d58a53"
 
 [[package]]
 name = "litemap"
@@ -2177,6 +2190,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cfcb3a22ef46e85b45de6ee7e79d063319ebb6594faafcf1c225ea92ab6e9b92"
 dependencies = [
  "semver",
+]
+
+[[package]]
+name = "rustix"
+version = "1.1.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "891efababe418670775f199f0d233d84843c227a0949a883ce15b37c78d6629d"
+dependencies = [
+ "bitflags 2.13.2",
+ "errno",
+ "libc",
+ "linux-raw-sys",
+ "windows-sys",
 ]
 
 [[package]]
@@ -2812,6 +2838,19 @@ name = "system-time"
 version = "10.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f51973f076e91f486f8b767ddd463b9dd7a0bf7f6ffe16c7f5c7583c5cfc94e1"
+
+[[package]]
+name = "tempfile"
+version = "3.27.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "32497e9a4c7b38532efcdebeef879707aa9f794296a4f0244f6f69e9bc8574bd"
+dependencies = [
+ "fastrand",
+ "getrandom 0.4.3",
+ "once_cell",
+ "rustix",
+ "windows-sys",
+]
 
 [[package]]
 name = "thiserror"
