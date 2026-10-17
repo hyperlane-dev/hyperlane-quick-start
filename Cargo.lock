@@ -1127,9 +1127,9 @@ dependencies = [
 
 [[package]]
 name = "http-compress"
-version = "21.13.3"
+version = "21.13.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b6ab487328ddbb7f388cf0034d20c78dbb39dc3d22abf5b4ffd8fdf9315f04ca"
+checksum = "45e94125b4314a557fbaaaf51d9bc7173163c1191929e90f8b366d004f4d62cb"
 dependencies = [
  "brotli",
  "flate2",
@@ -1138,15 +1138,15 @@ dependencies = [
 
 [[package]]
 name = "http-constant"
-version = "21.13.3"
+version = "21.13.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "772b086943c3adc62b376c956be78440e3527d46f17efeef468bca0f67584ced"
+checksum = "84221e41622669ddf3007437615bce6f4d834d41f07712e3c8f32b8daefed10c"
 
 [[package]]
 name = "http-type"
-version = "21.13.3"
+version = "21.13.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "44ffffa49c3c62378ff72f712213781ebef3a574f186378e5950763f4fbe114c"
+checksum = "70c4b55b0b2d62ad6402a842dd22f597847c5492e0430393c4f5f1e4deff3009"
 dependencies = [
  "hex",
  "http-compress",
@@ -1171,9 +1171,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane"
-version = "21.13.3"
+version = "21.13.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c9f02bcb7f445067fd90aa3eaaef3d87957a6a70509dace80455d9f0c742f46a"
+checksum = "443ecb42ae92c5e55081342376f94ac565644e01dabbde998ccf2628faaa3c95"
 dependencies = [
  "hyperlane-core",
  "hyperlane-macros",
@@ -1181,9 +1181,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-core"
-version = "21.13.3"
+version = "21.13.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "591d6aa98b30b5a169e8f84fa3a9644852f9972adbf9f2ddf7098c593e0a1216"
+checksum = "82345ca377f64caaca96c137c6ff5bd78e8ab58b90c262afdefdda72ff86d8e0"
 dependencies = [
  "http-type",
  "inventory",
@@ -1194,9 +1194,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-macros"
-version = "21.13.3"
+version = "21.13.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f9f10029053627f2b606a3e394f355453e61bd49f83b05d13ee5cc6a5591c65d"
+checksum = "d94c7cdb11c8989c75a16fbff1f287042b77e041925ce312213c8b492679c27e"
 dependencies = [
  "proc-macro2",
  "quote",
