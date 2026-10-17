@@ -32,14 +32,14 @@ names the three containers.
 **The first run takes 25 to 30 minutes** because it compiles from source. To skip
 that, pull the published image instead:
 
-| Branch | Image |
-| --- | --- |
-| `master` | `hkccr.ccs.tencentyun.com/hyperlane-dev/hyperlane-quick-start:1.0.0` |
+| Branch       | Image                                                                           |
+| ------------ | ------------------------------------------------------------------------------- |
+| `master`     | `hkccr.ccs.tencentyun.com/hyperlane-dev/hyperlane-quick-start:1.0.0`            |
 | `playground` | `hkccr.ccs.tencentyun.com/hyperlane-dev/hyperlane-quick-start-playground:1.0.0` |
 
 ```sh
-docker compose pull    # fetches the four services
-docker compose up -d
+docker compose pull;
+docker compose up -d;
 ```
 
 The server logs its own progress; this is what a healthy start looks like:
@@ -62,9 +62,9 @@ published to the host, so the stack does not collide with anything else already
 listening. To inspect one:
 
 ```sh
-docker compose exec postgresql psql -U hyperlane -d hyperlane
-docker compose exec mysql mysql -uhyperlane -phyperlane hyperlane
-docker compose exec redis redis-cli -a hyperlane ping
+docker compose exec postgresql psql -U hyperlane -d hyperlane;
+docker compose exec mysql mysql -uhyperlane -phyperlane hyperlane;
+docker compose exec redis redis-cli -a hyperlane ping;
 ```
 
 Add `-T` and a command when running these from a script, or they wait on stdin

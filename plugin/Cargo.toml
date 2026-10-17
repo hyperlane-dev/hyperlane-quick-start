@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane_plugin"
-version = "23.0.36"
+version = "23.0.38"
 readme = "README.md"
 edition = "2024"
 authors = ["root@ltpp.vip"]
@@ -35,7 +35,6 @@ tracing = { workspace = true }
 hyperlane = { workspace = true }
 serde_yaml = { workspace = true }
 color-output = { workspace = true }
-hyperlane-log = { workspace = true }
 lombok-macros = { workspace = true }
 file-operation = { workspace = true }
 hyperlane-time = { workspace = true }

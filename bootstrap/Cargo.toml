@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane_bootstrap"
-version = "23.0.36"
+version = "23.0.38"
 readme = "README.md"
 edition = "2024"
 authors = ["root@ltpp.vip"]
@@ -35,6 +35,4 @@ sea-orm = { workspace = true }
 tracing = { workspace = true }
 num_cpus = { workspace = true }
 hyperlane = { workspace = true }
-hyperlane-log = { workspace = true }
 lombok-macros = { workspace = true }
-hyperlane-core = { workspace = true }

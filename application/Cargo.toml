@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane_application"
-version = "23.0.36"
+version = "23.0.38"
 readme = "README.md"
 edition = "2024"
 authors = ["root@ltpp.vip"]
@@ -36,8 +36,6 @@ utoipa = { workspace = true }
 tracing = { workspace = true }
 hyperlane = { workspace = true }
 serde_with = { workspace = true }
-hyperlane-log = { workspace = true }
 lombok-macros = { workspace = true }
-hyperlane-core = { workspace = true }
 hyperlane-time = { workspace = true }
 instrument-level = { workspace = true }
