@@ -80,8 +80,8 @@ instrument-level = { workspace = true }
 [patch.crates-io]
 hyperlane_application = { path = "application" }
 hyperlane_bootstrap = { path = "bootstrap" }
-hyperlane_config = { path = "config" }
 hyperlane_plugin = { path = "plugin" }
+hyperlane_config = { path = "config" }
 
 [profile.dev]
 incremental = true
