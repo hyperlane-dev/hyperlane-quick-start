@@ -43,7 +43,7 @@ serde_with = "3.21.0"
 serde_yaml = "0.9.34"
 color-output = "10.0.10"
 hyperlane-log = "4.0.16"
-lombok-macros = "10.2.4"
+lombok-macros = "10.2.6"
 file-operation = "0.8.32"
 hyperlane-time = "0.7.46"
 server-manager = "5.0.24"
@@ -78,10 +78,10 @@ server-manager = { workspace = true }
 instrument-level = { workspace = true }
 
 [patch.crates-io]
-hyperlane_application = { path = "application" }
-hyperlane_bootstrap = { path = "bootstrap" }
-hyperlane_plugin = { path = "plugin" }
 hyperlane_config = { path = "config" }
+hyperlane_plugin = { path = "plugin" }
+hyperlane_bootstrap = { path = "bootstrap" }
+hyperlane_application = { path = "application" }
 
 [profile.dev]
 incremental = true

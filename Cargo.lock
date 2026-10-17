@@ -1337,9 +1337,9 @@ checksum = "f9f8bd3e56ce4dfc153cf470fffbfa98c7620958b312ca5c3a4b8d5181fd13c6"
 
 [[package]]
 name = "lombok-macros"
-version = "10.2.5"
+version = "10.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fd9dc233a4e7e18947d9a2e4555fd81dcc978f10670818b0beb9975921cd476b"
+checksum = "a2c2fd0d8f5ac532db66e540bb6b036a6feb1481d168a8d02a061522a07a1eda"
 dependencies = [
  "proc-macro2",
  "quote",
