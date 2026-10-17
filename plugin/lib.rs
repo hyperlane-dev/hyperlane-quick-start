@@ -6,7 +6,6 @@
 
 pub mod common;
 pub mod database;
-pub mod docker;
 pub mod env;
 pub mod logger;
 pub mod message_queue;
@@ -25,7 +24,6 @@ use std::{
 };
 
 use {
-    color_log::*,
     color_output::*,
     file_operation::*,
     hyperlane::*,

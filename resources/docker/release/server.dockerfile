@@ -1,10 +1,11 @@
-# sea-orm 2.0 and sqlx 0.9 declare rust-version 1.94, so a 1.93 base refuses to
-# resolve them and the image build dies partway through with
-# "rustc 1.93.1 is not supported by the following packages". The pin matches the
-# toolchain CI uses, which is stable rather than a fixed release.
+# sea-orm 2.0.4 and sqlx 0.9.0 declare rust-version 1.94, and this branch's
+# Cargo.lock pins both, so a 1.93 base refuses to resolve them and the build
+# stops with "rustc 1.93.1 is not supported by the following packages". The pin
+# matches the toolchain CI uses, which is stable rather than a fixed release.
 ARG TARGETPLATFORM
 ARG RUST_VERSION=1.99
 FROM --platform=$TARGETPLATFORM rust:${RUST_VERSION}-bookworm
+
 
 RUN apt-get update -yqq && apt-get install -yqq cmake g++ binutils lld
 

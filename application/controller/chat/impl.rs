@@ -114,6 +114,10 @@ impl ServerHook for ChatHistoryRoute {
     ///
     /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
+        let limit_opt: Option<String> =
+            limit_opt.and_then(|values: VecDeque<String>| values.front().cloned());
+        let before_id_opt: Option<String> =
+            before_id_opt.and_then(|values: VecDeque<String>| values.front().cloned());
         let before_id: Option<i64> = before_id_opt.and_then(|id: String| id.parse::<i64>().ok());
         let limit: u64 = limit_opt
             .and_then(|limit: String| limit.parse::<u64>().ok())

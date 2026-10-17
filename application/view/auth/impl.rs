@@ -29,6 +29,7 @@ impl ServerHook for AuthViewRoute {
         let querys: &RequestQuerys = ctx.get_request().get_querys();
         let location_target: String = querys
             .get(LOCATION)
+            .and_then(|values: &VecDeque<String>| values.front())
             .unwrap_or(&ROOT_PATH.to_string())
             .to_string();
         let is_authenticated: bool = ctx.get_request().try_get_cookie(TOKEN).is_some();

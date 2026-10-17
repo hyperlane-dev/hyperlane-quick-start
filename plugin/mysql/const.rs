@@ -34,8 +34,8 @@ pub const ERROR_MARKER_TIMEOUT: &str = "timeout";
 /// Substring marking a refused connection in a driver error.
 pub const ERROR_MARKER_CONNECTION_REFUSED: &str = "Connection refused";
 
-/// Statement executed to verify a database connection.
-pub const CONNECTION_VERIFICATION_SQL: &str = "SELECT 1";
+/// Probe statement executed to confirm the connection is alive.
+pub const CONNECTION_PROBE_QUERY: &str = "SELECT 1";
 
 /// Default name for the MySQL instance when no explicit name is provided.
 pub const DEFAULT_MYSQL_INSTANCE_NAME: &str = "mysql_default";

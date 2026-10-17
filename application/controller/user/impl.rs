@@ -59,11 +59,15 @@ impl ServerHook for UserListRoute {
         let user_role: UserRole = current_user.get_role().parse().unwrap_or_default();
         if user_role.is_admin() {
             let querys: &RequestQuerys = ctx.get_request().get_querys();
-            let keyword: Option<String> = querys.get(QUERY_KEY_KEYWORD).cloned();
-            let last_id: Option<String> = querys.get(QUERY_KEY_LAST_ID).cloned();
+            let keyword: Option<String> = querys
+                .get(QUERY_KEY_KEYWORD)
+                .and_then(|values: &VecDeque<String>| values.front().cloned());
+            let last_id: Option<String> = querys
+                .get(QUERY_KEY_LAST_ID)
+                .and_then(|values: &VecDeque<String>| values.front().cloned());
             let limit: Option<u64> = querys
                 .get(QUERY_KEY_LIMIT)
-                .and_then(|s: &String| s.parse().ok())
+                .and_then(|values: &VecDeque<String>| values.front()?.parse().ok())
                 .map(|l: u64| l.min(MAX_LIMIT));
             query
                 .set_keyword(keyword)

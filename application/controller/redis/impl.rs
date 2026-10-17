@@ -193,7 +193,10 @@ impl ServerHook for DeleteRecordRoute {
     /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let querys: &RequestQuerys = ctx.get_request().get_querys();
-        let key: &String = match querys.get("key") {
+        let key: &String = match querys
+            .get("key")
+            .and_then(|values: &VecDeque<String>| values.front())
+        {
             Some(k) => k,
             None => {
                 let response: ApiResponse<&str> = ApiResponse::new(

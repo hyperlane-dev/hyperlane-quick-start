@@ -43,8 +43,8 @@ pub const ERROR_MARKER_CONNECTION_REFUSED: &str = "Connection refused";
 /// Substring marking an already existing object in a PostgreSQL error.
 pub const ERROR_MARKER_ALREADY_EXISTS: &str = "already exists";
 
-/// Statement executed to verify a database connection.
-pub const CONNECTION_VERIFICATION_SQL: &str = "SELECT 1";
+/// Probe statement executed to confirm the connection is alive.
+pub const CONNECTION_PROBE_QUERY: &str = "SELECT 1";
 
 /// Default name for the PostgreSQL instance when no explicit name is provided.
 pub const DEFAULT_POSTGRESQL_INSTANCE_NAME: &str = "postgres_default";

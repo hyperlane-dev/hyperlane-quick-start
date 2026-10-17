@@ -140,7 +140,7 @@ impl ServerHook for GetPipelineRoute {
             .get_request()
             .get_querys()
             .get("id")
-            .and_then(|s: &String| s.parse().ok())
+            .and_then(|values: &VecDeque<String>| values.front()?.parse().ok())
         {
             Some(id) => id,
             None => {
@@ -267,14 +267,14 @@ impl ServerHook for ListRunsRoute {
         let querys: &RequestQuerys = ctx.get_request().get_querys();
         let page_size: Option<i32> = querys
             .get(QUERY_KEY_PAGE_SIZE)
-            .and_then(|s: &String| s.parse().ok())
+            .and_then(|values: &VecDeque<String>| values.front()?.parse().ok())
             .map(|p: i32| p.min(MAX_PAGE_SIZE));
         let last_id: Option<i32> = querys
             .get(QUERY_KEY_LAST_ID)
-            .and_then(|s: &String| s.parse().ok());
+            .and_then(|values: &VecDeque<String>| values.front()?.parse().ok());
         let pipeline_id: Option<i32> = querys
             .get(QUERY_KEY_PIPELINE_ID)
-            .and_then(|s: &String| s.parse().ok());
+            .and_then(|values: &VecDeque<String>| values.front()?.parse().ok());
         let mut param: QueryRunsParam = QueryRunsParam::default();
         param
             .set_pipeline_id(pipeline_id)
@@ -330,7 +330,10 @@ impl ServerHook for GetRunRoute {
     /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let querys: &RequestQuerys = ctx.get_request().get_querys();
-        let id: i32 = match querys.get("id").and_then(|s: &String| s.parse().ok()) {
+        let id: i32 = match querys
+            .get("id")
+            .and_then(|values: &VecDeque<String>| values.front()?.parse().ok())
+        {
             Some(id) => id,
             None => {
                 let response: ApiResponse<&str> = ApiResponse::new(
@@ -398,7 +401,7 @@ impl ServerHook for GetRunDetailRoute {
             .get_request()
             .get_querys()
             .get("id")
-            .and_then(|s: &String| s.parse().ok())
+            .and_then(|values: &VecDeque<String>| values.front()?.parse().ok())
         {
             Some(id) => id,
             None => {
@@ -582,7 +585,7 @@ impl ServerHook for GetIncrementalRunDetailRoute {
         let querys: &RequestQuerys = ctx.get_request().get_querys();
         let run_id: i32 = match querys
             .get(QUERY_KEY_RUN_ID)
-            .and_then(|s: &String| s.parse().ok())
+            .and_then(|values: &VecDeque<String>| values.front()?.parse().ok())
         {
             Some(id) => id,
             None => {
@@ -595,9 +598,13 @@ impl ServerHook for GetIncrementalRunDetailRoute {
             }
         };
         let step_offsets: Vec<StepOffsetParam> = match querys.get(QUERY_KEY_OFFSETS) {
-            Some(offsets_str) => {
-                serde_json::from_str::<Vec<StepOffsetParam>>(offsets_str).unwrap_or_default()
-            }
+            Some(offsets_str) => serde_json::from_str::<Vec<StepOffsetParam>>(
+                offsets_str
+                    .front()
+                    .map(|s: &String| s.as_str())
+                    .unwrap_or_default(),
+            )
+            .unwrap_or_default(),
             None => vec![],
         };
         match CicdService::get_incremental_run_detail(run_id, step_offsets).await {
@@ -694,7 +701,7 @@ impl ServerHook for RunLogsSseRoute {
         let querys: &RequestQuerys = ctx.get_request().get_querys();
         let run_id: i32 = match querys
             .get(QUERY_KEY_RUN_ID)
-            .and_then(|s: &String| s.parse().ok())
+            .and_then(|values: &VecDeque<String>| values.front()?.parse().ok())
         {
             Some(id) => id,
             None => {

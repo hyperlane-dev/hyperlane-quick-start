@@ -3,8 +3,6 @@ mod r#struct;
 
 pub use r#struct::*;
 
-use {
-    super::*,
-    config::*,
-    hyperlane_plugin::{common::GetOrInit, env::*, shutdown::*},
-};
+use {super::*, config::*};
+
+use hyperlane_plugin::{common::*, env::*, shutdown::*};

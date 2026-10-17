@@ -6,4 +6,4 @@ pub use r#struct::*;
 
 use {super::*, r#const::*};
 
-use std::{env::args, future::Future};
+use std::{env::args, future::Future, pin::Pin};

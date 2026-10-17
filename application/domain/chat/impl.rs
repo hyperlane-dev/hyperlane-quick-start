@@ -48,7 +48,9 @@ impl WebSocketReqData {
     pub async fn into_resp(&self, _stream: &mut Stream, ctx: &mut Context) -> WebSocketRespData {
         let uuid_opt: Option<RequestQuerysValue> =
             ctx.get_request().try_get_query(QUERY_PARAM_UUID);
-        let uuid: String = uuid_opt.unwrap_or_default();
+        let uuid_first: Option<String> =
+            uuid_opt.and_then(|values: VecDeque<String>| values.front().cloned());
+        let uuid: String = uuid_first.unwrap_or_default();
         let mut resp: WebSocketRespData = WebSocketRespData::default();
         resp.set_type(self.get_type())
             .set_name(uuid)
@@ -81,7 +83,9 @@ impl WebSocketRespData {
     ) -> Self {
         let uuid_opt: Option<RequestQuerysValue> =
             ctx.get_request().try_get_query(QUERY_PARAM_UUID);
-        let uuid: String = uuid_opt.unwrap_or_default();
+        let uuid_first: Option<String> =
+            uuid_opt.and_then(|values: VecDeque<String>| values.front().cloned());
+        let uuid: String = uuid_first.unwrap_or_default();
         let mut resp_data: Self = Self::default();
         resp_data
             .set_type(msg_type)

@@ -26,6 +26,8 @@ impl ServerHook for ChatConnectedHook {
     #[try_get_request_query("uuid" => uuid_opt)]
     #[instrument_trace]
     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
+        let uuid_opt: Option<String> =
+            uuid_opt.and_then(|values: VecDeque<String>| values.front().cloned());
         let websocket: &WebSocket = get_global_websocket();
         let path: String = ctx.get_request().get_path().clone();
         let key: BroadcastType<String> = BroadcastType::PointToGroup(path);
@@ -68,6 +70,8 @@ impl ServerHook for ChatRequestHook {
     #[try_get_request_query("uuid" => uuid_opt)]
     #[instrument_trace]
     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
+        let uuid_opt: Option<String> =
+            uuid_opt.and_then(|values: VecDeque<String>| values.front().cloned());
         let request: &Request = ctx.get_request();
         let req_data: WebSocketReqData = match request.try_get_body_json() {
             Ok(data) => data,
@@ -135,6 +139,8 @@ impl ServerHook for ChatSendedHook {
     #[try_get_request_query("uuid" => uuid_opt)]
     #[instrument_trace]
     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
+        let uuid_opt: Option<String> =
+            uuid_opt.and_then(|values: VecDeque<String>| values.front().cloned());
         let request: String = get_request_json(ctx).await;
         let response: String = get_response_json(ctx).await;
         info!("{request}{BR}{response}");
@@ -180,6 +186,8 @@ impl ServerHook for ChatClosedHook {
     #[try_get_request_query("uuid" => uuid_opt)]
     #[instrument_trace]
     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
+        let uuid_opt: Option<String> =
+            uuid_opt.and_then(|values: VecDeque<String>| values.front().cloned());
         let websocket: &WebSocket = get_global_websocket();
         let path: String = ctx.get_request().get_path().clone();
         let key: BroadcastType<String> = BroadcastType::PointToGroup(path.clone());
@@ -354,7 +362,9 @@ impl ChatService {
             if !response_content.is_empty() {
                 let uuid_opt: Option<RequestQuerysValue> =
                     ctx.get_request().try_get_query(CHAT_SESSION_ID_SCHEME);
-                let uuid_ctx: String = uuid_opt.unwrap_or_default();
+                let uuid_first: Option<String> =
+                    uuid_opt.and_then(|values: VecDeque<String>| values.front().cloned());
+                let uuid_ctx: String = uuid_first.unwrap_or_default();
                 let mut gpt_resp_data: WebSocketRespData = WebSocketRespData::default();
                 gpt_resp_data
                     .set_type(MessageType::GptResponse)

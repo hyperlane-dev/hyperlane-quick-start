@@ -15,7 +15,13 @@ pub fn build_auth_redirect_url(ctx: &Context) -> String {
     let querys: &RequestQuerys = ctx.get_request().get_querys();
     let query_parts: Vec<String> = querys
         .iter()
-        .map(|(key, value): (&String, &String)| format!("{key}={value}"))
+        .map(|(key, values): (&String, &VecDeque<String>)| {
+            values
+                .iter()
+                .map(|value: &String| format!("{key}={value}"))
+                .collect::<Vec<String>>()
+                .join("&")
+        })
         .collect();
     let query_string: String = query_parts.join("&");
     let full_path: String = if query_string.is_empty() {

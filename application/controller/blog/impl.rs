@@ -334,6 +334,14 @@ impl ServerHook for BlogPostListRoute {
     ///
     /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
+        let keyword_opt: Option<String> =
+            keyword_opt.and_then(|values: VecDeque<String>| values.front().cloned());
+        let is_published_opt: Option<String> =
+            is_published_opt.and_then(|values: VecDeque<String>| values.front().cloned());
+        let page_opt: Option<String> =
+            page_opt.and_then(|values: VecDeque<String>| values.front().cloned());
+        let limit_opt: Option<String> =
+            limit_opt.and_then(|values: VecDeque<String>| values.front().cloned());
         let current_user_id: Option<i32> = AuthService::extract_user_from_cookie(ctx).ok();
         let mut query: BlogPostListQueryRequest = BlogPostListQueryRequest::default();
         if let Some(keyword) = keyword_opt {
@@ -402,6 +410,12 @@ impl ServerHook for BlogPostMyListRoute {
     ///
     /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
+        let keyword_opt: Option<String> =
+            keyword_opt.and_then(|values: VecDeque<String>| values.front().cloned());
+        let page_opt: Option<String> =
+            page_opt.and_then(|values: VecDeque<String>| values.front().cloned());
+        let limit_opt: Option<String> =
+            limit_opt.and_then(|values: VecDeque<String>| values.front().cloned());
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
@@ -625,6 +639,10 @@ impl ServerHook for BlogPostFavoriteListRoute {
     ///
     /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
+        let page_opt: Option<String> =
+            page_opt.and_then(|values: VecDeque<String>| values.front().cloned());
+        let limit_opt: Option<String> =
+            limit_opt.and_then(|values: VecDeque<String>| values.front().cloned());
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {
@@ -840,6 +858,12 @@ impl ServerHook for BlogCommentListRoute {
     ///
     /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
+        let post_id_opt: Option<String> =
+            post_id_opt.and_then(|values: VecDeque<String>| values.front().cloned());
+        let page_opt: Option<String> =
+            page_opt.and_then(|values: VecDeque<String>| values.front().cloned());
+        let limit_opt: Option<String> =
+            limit_opt.and_then(|values: VecDeque<String>| values.front().cloned());
         let mut query: BlogCommentListQueryRequest = BlogCommentListQueryRequest::default();
         match post_id_opt {
             Some(post_id) => query.set_post_id(post_id),

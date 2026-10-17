@@ -100,6 +100,14 @@ impl ServerHook for NotificationListRoute {
     ///
     /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
+        let notification_type_opt: Option<String> =
+            notification_type_opt.and_then(|values: VecDeque<String>| values.front().cloned());
+        let is_read_opt: Option<String> =
+            is_read_opt.and_then(|values: VecDeque<String>| values.front().cloned());
+        let page_opt: Option<String> =
+            page_opt.and_then(|values: VecDeque<String>| values.front().cloned());
+        let limit_opt: Option<String> =
+            limit_opt.and_then(|values: VecDeque<String>| values.front().cloned());
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {

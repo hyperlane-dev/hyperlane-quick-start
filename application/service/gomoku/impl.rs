@@ -119,6 +119,8 @@ impl ServerHook for GomokuConnectedHook {
     #[try_get_request_query("uuid" => uuid_opt)]
     #[instrument_trace]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
+        let uuid_opt: Option<String> =
+            uuid_opt.and_then(|values: VecDeque<String>| values.front().cloned());
         let uuid: String = uuid_opt.unwrap_or_default();
         if uuid.is_empty() {
             return Status::Continue;
@@ -170,6 +172,8 @@ impl ServerHook for GomokuRequestHook {
     #[request_body_json_result(req_data_res: GomokuWsRequest)]
     #[instrument_trace]
     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
+        let uid_opt: Option<String> =
+            uid_opt.and_then(|values: VecDeque<String>| values.front().cloned());
         let req_data: GomokuWsRequest = req_data_res.unwrap();
         if GomokuWebSocketService::handle_ping_request(stream, ctx, &req_data).await {
             return Status::Continue;
@@ -247,6 +251,8 @@ impl ServerHook for GomokuClosedHook {
     #[try_get_request_query("uid" => uid_opt)]
     #[instrument_trace]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
+        let uid_opt: Option<String> =
+            uid_opt.and_then(|values: VecDeque<String>| values.front().cloned());
         let uid: String = uid_opt.unwrap_or_default();
         if uid.is_empty() {
             return Status::Continue;
@@ -274,10 +280,12 @@ impl GomokuWebSocketService {
     #[try_get_request_query("uid" => uid_opt)]
     #[instrument_trace]
     pub async fn handle_ping_request(
-        _stream: &mut Stream,
+        _: &mut Stream,
         ctx: &mut Context,
         req_data: &GomokuWsRequest,
     ) -> bool {
+        let uid_opt: Option<String> =
+            uid_opt.and_then(|values: VecDeque<String>| values.front().cloned());
         if req_data.get_type() == &GomokuMessageType::Ping {
             let uid: String = uid_opt.unwrap_or_default();
             let resp_body: ResponseBody = Self::build_response_body(

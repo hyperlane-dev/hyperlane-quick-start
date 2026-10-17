@@ -707,7 +707,7 @@ impl DatabaseAutoCreation for PostgreSqlAutoCreation {
         let connection: DatabaseConnection = self.create_target_connection().await?;
         let statement: Statement = Statement::from_string(
             DatabaseBackend::Postgres,
-            CONNECTION_VERIFICATION_SQL.to_string(),
+            CONNECTION_PROBE_QUERY.to_string(),
         );
         match connection.query_all_raw(statement).await {
             Ok(_) => {

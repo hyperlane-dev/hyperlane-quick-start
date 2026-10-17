@@ -148,6 +148,22 @@ impl ServerHook for RecordListRoute {
     ///
     /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
+        let user_id_opt: Option<String> =
+            user_id_opt.and_then(|values: VecDeque<String>| values.front().cloned());
+        let start_date_opt: Option<String> =
+            start_date_opt.and_then(|values: VecDeque<String>| values.front().cloned());
+        let end_date_opt: Option<String> =
+            end_date_opt.and_then(|values: VecDeque<String>| values.front().cloned());
+        let category_opt: Option<String> =
+            category_opt.and_then(|values: VecDeque<String>| values.front().cloned());
+        let transaction_type_opt: Option<String> =
+            transaction_type_opt.and_then(|values: VecDeque<String>| values.front().cloned());
+        let cache_id_opt: Option<String> =
+            cache_id_opt.and_then(|values: VecDeque<String>| values.front().cloned());
+        let page_opt: Option<String> =
+            page_opt.and_then(|values: VecDeque<String>| values.front().cloned());
+        let limit_opt: Option<String> =
+            limit_opt.and_then(|values: VecDeque<String>| values.front().cloned());
         let current_user_id: i32 = match AuthService::extract_user_from_cookie(ctx) {
             Ok(id) => id,
             Err(error) => {

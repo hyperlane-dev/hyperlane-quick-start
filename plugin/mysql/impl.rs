@@ -545,7 +545,7 @@ impl MySqlAutoCreation {
     /// - `&DatabaseSchema` - The database schema reference.
     #[instrument_trace]
     fn get_database_schema(&self) -> &DatabaseSchema {
-        &self.get_schema()
+        self.get_schema()
     }
 
     /// Creates indexes and constraints defined in the database schema on the target MySQL database.
@@ -637,7 +637,7 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
     async fn create_tables_if_not_exist(&self) -> Result<Vec<String>, AutoCreationError> {
         let connection: DatabaseConnection = self.create_target_connection().await?;
         let schema: &DatabaseSchema = self.get_database_schema();
-        let mut created_tables: Vec<String> = vec![];
+        let mut created_tables: Vec<String> = Vec::new();
         for table in schema.ordered_tables() {
             if !self.table_exists(&connection, table.get_name()).await? {
                 self.create_table(&connection, table).await?;
@@ -715,10 +715,8 @@ impl DatabaseAutoCreation for MySqlAutoCreation {
                 "Failed to verify MySQL connection {error}"
             ))
         })?;
-        let statement: Statement = Statement::from_string(
-            DatabaseBackend::MySql,
-            CONNECTION_VERIFICATION_SQL.to_string(),
-        );
+        let statement: Statement =
+            Statement::from_string(DatabaseBackend::MySql, CONNECTION_PROBE_QUERY.to_string());
         match connection.query_all_raw(statement).await {
             Ok(_) => {
                 let _: Result<(), DbErr> = connection.close().await;

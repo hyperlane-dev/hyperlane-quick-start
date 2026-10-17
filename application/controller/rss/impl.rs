@@ -41,6 +41,12 @@ impl ServerHook for RssFeedRoute {
     ///
     /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
+        let limit_opt: Option<String> =
+            limit_opt.and_then(|values: VecDeque<String>| values.front().cloned());
+        let offset_opt: Option<String> =
+            offset_opt.and_then(|values: VecDeque<String>| values.front().cloned());
+        let timezone_opt: Option<String> =
+            timezone_opt.and_then(|values: VecDeque<String>| values.front().cloned());
         let limit: Option<usize> = limit_opt
             .and_then(|limit: String| limit.parse().ok())
             .map(|limit: usize| limit.min(MAX_LIMIT));

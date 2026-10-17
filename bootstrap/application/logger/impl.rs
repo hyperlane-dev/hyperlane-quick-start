@@ -1,4 +1,8 @@
 use super::*;
+// `color_log` and `hyperlane_plugin::logger` both re-export a `FileLogger`, so
+// `super::*` leaves the name ambiguous (E0659). `Logger::init` takes the plugin
+// crate's own type, so name that one explicitly rather than color-log's.
+use hyperlane_plugin::logger::FileLogger;
 
 /// Implementation of `BootstrapSyncInit` for `LoggerBootstrap`, configuring and initializing the logger on startup.
 impl BootstrapSyncInit for LoggerBootstrap {
@@ -10,7 +14,7 @@ impl BootstrapSyncInit for LoggerBootstrap {
     fn init() -> Self {
         let env_config: &EnvConfig = EnvPlugin::get_or_init();
         let mut file_logger: FileLogger = FileLogger::default();
-        file_logger.set_path(env_config.get_server_log_dir());
+        file_logger.set_path(env_config.get_server_log_dir().to_string());
         file_logger.set_limit_file_size(env_config.get_server_log_size());
         Logger::init(LOG_LEVEL_FILTER, file_logger);
         Self

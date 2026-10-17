@@ -25,21 +25,29 @@ Then open <http://127.0.0.1:65002>.
 
 That is the whole procedure. `compose.yaml` in the repository root builds the
 server image from source, starts MySQL, PostgreSQL and Redis, waits for all three
-to report healthy, applies the schema and starts the server. Nothing has to be
-configured first — the release environment file is read automatically in a release
-build and already points at the three containers by name.
+to report healthy, and starts the server. Nothing has to be configured first — the
+release environment file is read automatically in a release build and already
+names the three containers.
 
 **The first run takes 25 to 30 minutes** because it compiles from source. To skip
 that, pull the published image instead:
 
-| Branch | Image |
-| --- | --- |
-| `master` | `hkccr.ccs.tencentyun.com/hyperlane-dev/hyperlane-quick-start:1.0.0` |
+| Branch       | Image                                                                           |
+| ------------ | ------------------------------------------------------------------------------- |
+| `master`     | `hkccr.ccs.tencentyun.com/hyperlane-dev/hyperlane-quick-start:1.0.0`            |
 | `playground` | `hkccr.ccs.tencentyun.com/hyperlane-dev/hyperlane-quick-start-playground:1.0.0` |
 
 ```sh
-docker compose pull    # fetches the four services
-docker compose up -d
+docker compose pull;
+docker compose up -d;
+```
+
+The server logs its own progress; this is what a healthy start looks like:
+
+```
+[AUTO-CREATION] Initialization complete MySQL (mysql_default) verified,
+PostgreSQL (postgres_default) verified, Redis (redis_default) verified
+Server listen in 0.0.0.0:65002
 ```
 
 ```sh
@@ -54,9 +62,9 @@ published to the host, so the stack does not collide with anything else already
 listening. To inspect one:
 
 ```sh
-docker compose exec postgresql psql -U hyperlane -d hyperlane
-docker compose exec mysql mysql -uhyperlane -phyperlane hyperlane
-docker compose exec redis redis-cli -a hyperlane ping
+docker compose exec postgresql psql -U hyperlane -d hyperlane;
+docker compose exec mysql mysql -uhyperlane -phyperlane hyperlane;
+docker compose exec redis redis-cli -a hyperlane ping;
 ```
 
 Add `-T` and a command when running these from a script, or they wait on stdin

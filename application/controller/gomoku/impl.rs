@@ -29,6 +29,8 @@ impl ServerHook for GomokuRoute {
     ///
     /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
+        let uid_opt: Option<String> =
+            uid_opt.and_then(|values: VecDeque<String>| values.front().cloned());
         let websocket: &WebSocket = get_global_websocket();
         let uid: String = uid_opt.unwrap_or_default();
         let key_value: String = if uid.trim().is_empty() {
