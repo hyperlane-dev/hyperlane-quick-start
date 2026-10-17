@@ -32,6 +32,7 @@ hyperlane_resources = { path = "resources", version = "23.0.36" }
 hyperlane_application = { path = "application", version = "23.0.36" }
 
 log = "0.4.33"
+redis = "0.32"
 utoipa = "5.5.0"
 chrono = "0.4.45"
 dotenvy = "0.15.7"
