@@ -7,7 +7,6 @@
 pub mod controller;
 pub mod domain;
 pub mod exception;
-pub mod header;
 pub mod mapper;
 pub mod middleware;
 pub mod model;
@@ -15,8 +14,6 @@ pub mod repository;
 pub mod service;
 pub mod utils;
 pub mod view;
-
-pub(crate) use header::*;
 
 use std::{
     collections::{HashMap, HashSet, VecDeque},

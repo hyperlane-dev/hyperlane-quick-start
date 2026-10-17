@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane-quick-start"
-version = "23.0.40"
+version = "23.0.41"
 readme = "README.md"
 edition = "2024"
 authors = ["root@ltpp.vip"]
@@ -25,11 +25,11 @@ resolver = "3"
 members = ["application", "bootstrap", "config", "plugin", "resources"]
 
 [workspace.dependencies]
-hyperlane_config = { path = "config", version = "23.0.40" }
-hyperlane_plugin = { path = "plugin", version = "23.0.40" }
-hyperlane_bootstrap = { path = "bootstrap", version = "23.0.40" }
-hyperlane_resources = { path = "resources", version = "23.0.40" }
-hyperlane_application = { path = "application", version = "23.0.40" }
+hyperlane_config = { path = "config", version = "23.0.41" }
+hyperlane_plugin = { path = "plugin", version = "23.0.41" }
+hyperlane_bootstrap = { path = "bootstrap", version = "23.0.41" }
+hyperlane_resources = { path = "resources", version = "23.0.41" }
+hyperlane_application = { path = "application", version = "23.0.41" }
 
 md5 = "0.8.1"
 log = "0.4.34"
@@ -45,7 +45,7 @@ num_cpus = "1.17.0"
 chunkify = "10.2.7"
 once_cell = "1.21.4"
 color-log = "10.2.7"
-hyperlane = "21.13.3"
+hyperlane = "21.13.4"
 serde_with = "3.24.0"
 serde_yaml = "0.9.33"
 urlencoding = "2.1.3"
@@ -53,13 +53,13 @@ jwt-service = "10.2.7"
 color-output = "10.2.7"
 lombok-macros = "10.2.7"
 file-operation = "10.2.7"
-hyperlane-core = "21.13.3"
+hyperlane-core = "21.13.4"
 server-manager = "10.2.7"
 hyperlane-macros = "23.0.21"
 instrument-level = "10.2.7"
 bin-encode-decode = "10.2.7"
 hyperlane-broadcast = "2.0.13"
-hyperlane-plugin-websocket = "21.7.8"
+hyperlane-plugin-websocket = "21.13.4"
 tokio = { version = "1.53.1", features = ["full"] }
 serde = { version = "1.0.229", features = ["derive"] }
 rust_decimal = { version = "1.43.0", features = ["serde"] }

@@ -1930,9 +1930,9 @@ dependencies = [
 
 [[package]]
 name = "http-compress"
-version = "21.13.3"
+version = "21.13.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b6ab487328ddbb7f388cf0034d20c78dbb39dc3d22abf5b4ffd8fdf9315f04ca"
+checksum = "45e94125b4314a557fbaaaf51d9bc7173163c1191929e90f8b366d004f4d62cb"
 dependencies = [
  "brotli",
  "flate2",
@@ -1941,15 +1941,15 @@ dependencies = [
 
 [[package]]
 name = "http-constant"
-version = "21.13.3"
+version = "21.13.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "772b086943c3adc62b376c956be78440e3527d46f17efeef468bca0f67584ced"
+checksum = "84221e41622669ddf3007437615bce6f4d834d41f07712e3c8f32b8daefed10c"
 
 [[package]]
 name = "http-type"
-version = "21.13.3"
+version = "21.13.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "44ffffa49c3c62378ff72f712213781ebef3a574f186378e5950763f4fbe114c"
+checksum = "70c4b55b0b2d62ad6402a842dd22f597847c5492e0430393c4f5f1e4deff3009"
 dependencies = [
  "hex",
  "http-compress",
@@ -2048,12 +2048,12 @@ dependencies = [
 
 [[package]]
 name = "hyperlane"
-version = "21.13.3"
+version = "21.13.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c9f02bcb7f445067fd90aa3eaaef3d87957a6a70509dace80455d9f0c742f46a"
+checksum = "443ecb42ae92c5e55081342376f94ac565644e01dabbde998ccf2628faaa3c95"
 dependencies = [
  "hyperlane-core",
- "hyperlane-macros 21.13.3",
+ "hyperlane-macros 21.13.4",
 ]
 
 [[package]]
@@ -2069,9 +2069,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-core"
-version = "21.13.3"
+version = "21.13.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "591d6aa98b30b5a169e8f84fa3a9644852f9972adbf9f2ddf7098c593e0a1216"
+checksum = "82345ca377f64caaca96c137c6ff5bd78e8ab58b90c262afdefdda72ff86d8e0"
 dependencies = [
  "http-type",
  "inventory",
@@ -2082,9 +2082,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-macros"
-version = "21.13.3"
+version = "21.13.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f9f10029053627f2b606a3e394f355453e61bd49f83b05d13ee5cc6a5591c65d"
+checksum = "d94c7cdb11c8989c75a16fbff1f287042b77e041925ce312213c8b492679c27e"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2105,9 +2105,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-plugin-websocket"
-version = "21.13.3"
+version = "21.13.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ca0f42472ddddbff1a354bc8f8741295c682df0b3eb1aea4917329c434dbbb7e"
+checksum = "0cca2b6b2f4cd84303655a968569a7d98f12efb4b9ea52d171cd2ebd65ad00d9"
 dependencies = [
  "hyperlane",
  "lombok-macros",
@@ -2116,7 +2116,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "23.0.40"
+version = "23.0.41"
 dependencies = [
  "bin-encode-decode",
  "chrono",
@@ -2147,7 +2147,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_application"
-version = "23.0.40"
+version = "23.0.41"
 dependencies = [
  "base64 0.22.1",
  "bin-encode-decode",
@@ -2194,7 +2194,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_bootstrap"
-version = "23.0.40"
+version = "23.0.41"
 dependencies = [
  "color-log",
  "color-output",
@@ -2220,7 +2220,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_config"
-version = "23.0.40"
+version = "23.0.41"
 dependencies = [
  "hyperlane",
  "hyperlane-core",
@@ -2233,7 +2233,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_plugin"
-version = "23.0.40"
+version = "23.0.41"
 dependencies = [
  "color-log",
  "color-output",
@@ -2257,7 +2257,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_resources"
-version = "23.0.40"
+version = "23.0.41"
 
 [[package]]
 name = "iana-time-zone"
@@ -2514,9 +2514,9 @@ dependencies = [
 
 [[package]]
 name = "jiff-tzdb"
-version = "0.1.9"
+version = "0.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fa8377070c6bae868759445e5a77f66d84f0b72f3a054bfb00e6d038b8282da7"
+checksum = "142bd39932ad231f10513df9ab62661fead8719872150b7ad02a2df79f4e141e"
 
 [[package]]
 name = "jiff-tzdb-platform"
@@ -3792,9 +3792,9 @@ dependencies = [
 
 [[package]]
 name = "schannel"
-version = "0.1.30"
+version = "0.1.29"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9cb23c424d8ee841bb4d813677ca237e2a610067d594fec130f87d6093495ab5"
+checksum = "91c1b7e4904c873ef0710c1f407dde2e6287de2bebc1bbbf7d430bb7cbffd939"
 dependencies = [
  "windows-sys 0.61.2",
 ]
