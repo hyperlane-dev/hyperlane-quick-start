@@ -1,8 +1,9 @@
-# This branch's lockfile pins sea-orm 1.1.20 and sqlx 0.8.6, which resolve
-# under 1.93; the playground branch moved to 1.99 because its lockfile requires
-# it. The two branches are allowed to differ here.
+# sea-orm 2.0.4 and sqlx 0.9.0 declare rust-version 1.94, and this branch's
+# Cargo.lock pins both, so a 1.93 base refuses to resolve them and the build
+# stops with "rustc 1.93.1 is not supported by the following packages". The pin
+# matches the toolchain CI uses, which is stable rather than a fixed release.
 ARG TARGETPLATFORM
-ARG RUST_VERSION=1.93
+ARG RUST_VERSION=1.99
 FROM --platform=$TARGETPLATFORM rust:${RUST_VERSION}-bookworm
 
 
