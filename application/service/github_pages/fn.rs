@@ -669,6 +669,10 @@ fn read_string_literal(bytes: &[u8], position: usize) -> Option<String> {
 /// # Returns
 ///
 /// - `Result<(u64, u64), String>` - The resolved (start, end) byte range, or an error message.
+///
+/// A zero-length representation is rejected for every range form: the inclusive `(start, end)`
+/// tuple returned here cannot express a range covering no octets, so the caller falls back to
+/// serving the whole resource.
 pub fn parse_range_header(range_header: &str, file_size: u64) -> Result<(u64, u64), String> {
     if !range_header.starts_with(RANGE_HEADER_PREFIX) {
         return Err(ERROR_INVALID_RANGE_HEADER_FORMAT.to_string());
@@ -683,23 +687,43 @@ pub fn parse_range_header(range_header: &str, file_size: u64) -> Result<(u64, u6
     if start_str.is_empty() && end_str.is_empty() {
         return Err(ERROR_INVALID_RANGE_SPECIFICATION.to_string());
     }
-    let start: u64 = if start_str.is_empty() {
+    let is_digit_sequence: fn(&str) -> bool = |value: &str| -> bool {
+        !value.is_empty() && value.bytes().all(|byte: u8| byte.is_ascii_digit())
+    };
+    if file_size == 0 {
+        return Err(ERROR_RANGE_START_EXCEEDS_FILE_SIZE.to_string());
+    }
+    let last_byte_index: u64 = file_size - 1;
+    let is_suffix_range: bool = start_str.is_empty();
+    let start: u64 = if is_suffix_range {
+        if !is_digit_sequence(end_str) {
+            return Err(ERROR_INVALID_RANGE_SPECIFICATION.to_string());
+        }
         let suffix_length: u64 = end_str
             .parse()
             .map_err(|_| ERROR_INVALID_RANGE_SPECIFICATION.to_string())?;
-        file_size.saturating_sub(suffix_length)
+        if suffix_length == 0 {
+            return Err(ERROR_INVALID_RANGE_SPECIFICATION.to_string());
+        }
+        file_size - suffix_length.min(file_size)
     } else {
+        if !is_digit_sequence(start_str) {
+            return Err(ERROR_INVALID_RANGE_SPECIFICATION.to_string());
+        }
         start_str
             .parse()
             .map_err(|_| ERROR_INVALID_RANGE_SPECIFICATION.to_string())?
     };
-    let end: u64 = if end_str.is_empty() {
-        file_size - 1
+    let end: u64 = if end_str.is_empty() || is_suffix_range {
+        last_byte_index
     } else {
-        let parsed_end: u64 = end_str
-            .parse()
-            .map_err(|_| ERROR_INVALID_RANGE_SPECIFICATION.to_string())?;
-        parsed_end.min(file_size - 1)
+        if !is_digit_sequence(end_str) {
+            return Err(ERROR_INVALID_RANGE_SPECIFICATION.to_string());
+        }
+        end_str
+            .parse::<u64>()
+            .map_err(|_| ERROR_INVALID_RANGE_SPECIFICATION.to_string())?
+            .min(last_byte_index)
     };
     if start >= file_size {
         return Err(ERROR_RANGE_START_EXCEEDS_FILE_SIZE.to_string());

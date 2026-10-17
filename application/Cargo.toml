@@ -19,9 +19,14 @@ exclude = [
     "node_modules",
     "Cargo.lock",
 ]
+autotests = false
 
 [lib]
 path = "lib.rs"
+
+[[test]]
+name = "integration"
+path = "tests/mod.rs"
 
 [dependencies]
 hyperlane_config = { workspace = true }
@@ -66,3 +71,6 @@ bin-encode-decode = { workspace = true }
 utoipa-swagger-ui = { workspace = true }
 hyperlane-broadcast = { workspace = true }
 hyperlane-plugin-websocket = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }

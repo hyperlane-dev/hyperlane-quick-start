@@ -345,12 +345,16 @@ impl UploadService {
     ///
     /// - `Result<RangeRequest, String>` - The parsed range request, or an error if the format is
     ///     invalid.
+    ///
+    /// A zero-length representation is rejected for every range form: the inclusive
+    /// `(start, end)` representation used here cannot express a range covering no octets, so
+    /// the caller falls back to serving the whole resource.
     #[instrument_trace]
     pub fn parse_range_header(range_header: &str, file_size: u64) -> Result<RangeRequest, String> {
         if !range_header.starts_with(RANGE_HEADER_PREFIX) {
             return Err(ERROR_INVALID_RANGE_HEADER_FORMAT.to_string());
         }
-        let range_spec: &str = &range_header[6..];
+        let range_spec: &str = &range_header[RANGE_HEADER_PREFIX.len()..];
         let parts: Vec<&str> = range_spec.split('-').collect();
         if parts.len() != 2 {
             return Err(ERROR_INVALID_RANGE_SPECIFICATION.to_string());
@@ -360,30 +364,58 @@ impl UploadService {
         if start_str.is_empty() && end_str.is_empty() {
             return Err(ERROR_INVALID_RANGE_BOTH_EMPTY.to_string());
         }
-        let start: u64 = if start_str.is_empty() {
+        if file_size == 0 {
+            return Err(ERROR_RANGE_START_EXCEEDS_FILE_SIZE.to_string());
+        }
+        let is_digit_sequence: fn(&str) -> bool = |value: &str| -> bool {
+            !value.is_empty() && value.bytes().all(|byte: u8| byte.is_ascii_digit())
+        };
+        let last_byte_index: u64 = file_size - 1;
+        let is_suffix_range: bool = start_str.is_empty();
+        let start: u64 = if is_suffix_range {
+            if !is_digit_sequence(end_str) {
+                return Err(ERROR_INVALID_END_RANGE.to_string());
+            }
             let suffix_length: u64 = end_str
                 .parse()
                 .map_err(|_: ParseIntError| ERROR_INVALID_END_RANGE)?;
-            file_size.saturating_sub(suffix_length)
+            if suffix_length == 0 {
+                return Err(ERROR_INVALID_RANGE_ZERO_LENGTH_SUFFIX.to_string());
+            }
+            file_size - suffix_length.min(file_size)
         } else {
+            if !is_digit_sequence(start_str) {
+                return Err(ERROR_INVALID_START_RANGE.to_string());
+            }
             start_str
                 .parse()
                 .map_err(|_: ParseIntError| ERROR_INVALID_START_RANGE)?
         };
-        let end: Option<u64> = if end_str.is_empty() {
-            None
+        let resolved_end: u64 = if end_str.is_empty() || is_suffix_range {
+            last_byte_index
         } else {
-            Some(
-                end_str
-                    .parse()
-                    .map_err(|_: ParseIntError| ERROR_INVALID_END_RANGE)?,
-            )
+            if !is_digit_sequence(end_str) {
+                return Err(ERROR_INVALID_END_RANGE.to_string());
+            }
+            end_str
+                .parse::<u64>()
+                .map_err(|_: ParseIntError| ERROR_INVALID_END_RANGE)?
+                .min(last_byte_index)
         };
         if start >= file_size {
             return Err(ERROR_RANGE_START_EXCEEDS_FILE_SIZE.to_string());
         }
+        if start > resolved_end {
+            return Err(ERROR_INVALID_RANGE_START_GREATER_THAN_END.to_string());
+        }
         let mut range_request: RangeRequest = RangeRequest::default();
-        range_request.set_start(start).set_end(end);
+        range_request
+            .set_start(start)
+            .set_end(if end_str.is_empty() && !is_suffix_range {
+                None
+            } else {
+                Some(resolved_end)
+            });
         Ok(range_request)
     }
 

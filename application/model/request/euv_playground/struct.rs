@@ -33,21 +33,3 @@ pub struct EuvPlaygroundRunRequest {
     /// explicit save).
     pub(super) code: Option<String>,
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    /// Verifies that the run request accepts the encoded project identifier
-    /// returned by the project APIs.
-    #[test]
-    fn deserialize_run_request_with_encoded_project_id() {
-        let result: Result<EuvPlaygroundRunRequest, serde_json::Error> =
-            serde_json::from_str(r#"{"project_id":"aaaZ","code":"fn app() {}"}"#);
-        let request: EuvPlaygroundRunRequest = match result {
-            Ok(request) => request,
-            Err(error) => panic!("encoded project id should deserialize: {error}"),
-        };
-        assert_eq!(request.get_project_id(), "aaaZ");
-    }
-}
