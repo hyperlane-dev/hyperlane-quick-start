@@ -30,14 +30,11 @@ release environment file is read automatically in a release build and already
 names the three containers.
 
 The first run compiles from source and can take a long time on a small machine.
-The repository builds serially by default (`.cargo/config.toml` sets
-`build.jobs = 1`) and the release profile has no LTO, which lowers the peak
-memory a build needs rather than fixing a floor every machine clears. CI
-compiles the tree inside a container capped at 2 CPUs and 4 GiB with no swap and
-prints the peak that run actually reached, so the number to compare against is
-in the job log rather than in this file. On a stronger machine, raise
-parallelism explicitly with `cargo build --release -j <N>`. To skip the build
-entirely, pull the published image instead:
+The repository leaves build parallelism to Cargo's defaults. Set it explicitly
+with `cargo build --release -j <N>` when needed. The release profile disables
+LTO to reduce build-time memory pressure. CI compiles the tree inside a
+container capped at 2 CPUs and 4 GiB with no swap and prints the measured peak
+in the job log. To skip the build entirely, pull the published image instead:
 
 | Branch       | Image                                                                           |
 | ------------ | ------------------------------------------------------------------------------- |
