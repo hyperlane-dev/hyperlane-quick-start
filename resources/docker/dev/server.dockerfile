@@ -7,6 +7,8 @@ ARG RUST_VERSION=1.99
 FROM --platform=$TARGETPLATFORM rust:${RUST_VERSION}-bookworm
 
 
+ENV CARGO_BUILD_JOBS=1
+
 RUN apt-get update -yqq && apt-get install -yqq cmake g++ binutils lld
 
 WORKDIR /hyperlane-quick-start
