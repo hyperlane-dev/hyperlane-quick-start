@@ -227,8 +227,28 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
-      - name: Build release
-        run: cargo check --release --all-features
+      - name: Release check
+        run: cargo check --release --all-features --locked
+      - name: Build release under 2 CPU and 4 GiB
+        run: |
+          set -euo pipefail
+          docker run --rm \
+            --cpus=2 \
+            --memory=4g \
+            --memory-swap=4g \
+            -v "$PWD:/workspace" \
+            -w /workspace \
+            rust:1.99-bookworm \
+            bash -c '
+              set -euo pipefail
+              cargo build --release --all-features --locked
+              echo "---- cgroup memory.peak ----"
+              cat /sys/fs/cgroup/memory.peak
+              echo "---- cgroup memory.events ----"
+              cat /sys/fs/cgroup/memory.events
+              echo "---- cgroup memory.max ----"
+              cat /sys/fs/cgroup/memory.max
+            '
 
   publish:
     permissions:

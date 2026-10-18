@@ -29,8 +29,12 @@ to report healthy, and starts the server. Nothing has to be configured first —
 release environment file is read automatically in a release build and already
 names the three containers.
 
-**The first run takes 25 to 30 minutes** because it compiles from source. To skip
-that, pull the published image instead:
+The first run compiles from source and can take a long time on a small machine.
+The repository builds serially by default (`.cargo/config.toml` sets
+`build.jobs = 1`) and the release profile has no LTO, so it stays within reach of
+a 2-core / 4 GiB box instead of exhausting it. On a stronger machine, raise
+parallelism explicitly with `cargo build --release -j <N>`. To skip the build
+entirely, pull the published image instead:
 
 | Branch       | Image                                                                           |
 | ------------ | ------------------------------------------------------------------------------- |
