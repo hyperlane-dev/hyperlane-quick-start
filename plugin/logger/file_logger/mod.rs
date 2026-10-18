@@ -4,8 +4,8 @@ mod r#impl;
 mod r#struct;
 
 #[cfg(test)]
-#[path = "../../tests/file_logger/fn.rs"]
-mod r#fn_tests;
+#[path = "../../tests/logger/fn.rs"]
+mod r#tests;
 
 pub use r#struct::*;
 
