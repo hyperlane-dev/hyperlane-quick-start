@@ -236,18 +236,29 @@ jobs:
             --cpus=2 \
             --memory=4g \
             --memory-swap=4g \
+            -e CARGO_TARGET_DIR=/tmp/hqs-low-memory-target \
             -v "$PWD:/workspace" \
             -w /workspace \
             rust:1.99-bookworm \
             bash -c '
               set -euo pipefail
-              cargo build --release --all-features --locked
+              build_status=0
+              cargo build --release --all-features --locked || build_status=$?
+              echo "---- cgroup cpu.max ----"
+              cat /sys/fs/cgroup/cpu.max
+              echo "---- cgroup memory.max ----"
+              cat /sys/fs/cgroup/memory.max
+              echo "---- cgroup memory.swap.max ----"
+              cat /sys/fs/cgroup/memory.swap.max
               echo "---- cgroup memory.peak ----"
               cat /sys/fs/cgroup/memory.peak
               echo "---- cgroup memory.events ----"
               cat /sys/fs/cgroup/memory.events
-              echo "---- cgroup memory.max ----"
-              cat /sys/fs/cgroup/memory.max
+              if [ "$build_status" -ne 0 ]; then
+                echo "cargo build exited $build_status under the memory cap"
+                exit "$build_status"
+              fi
+              test -x "$CARGO_TARGET_DIR/release/hyperlane-quick-start"
             '
 
   publish:
