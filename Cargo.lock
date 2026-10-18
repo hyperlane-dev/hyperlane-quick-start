@@ -1205,7 +1205,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "23.0.43"
+version = "23.0.44"
 dependencies = [
  "chrono",
  "color-output",
@@ -1238,7 +1238,7 @@ checksum = "e5480b89b70d89bc6d07bea700bf052bb00bea5e9175468a775128e174dfd614"
 
 [[package]]
 name = "hyperlane_application"
-version = "23.0.43"
+version = "23.0.44"
 dependencies = [
  "chrono",
  "hyperlane",
@@ -1258,7 +1258,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_bootstrap"
-version = "23.0.43"
+version = "23.0.44"
 dependencies = [
  "hyperlane",
  "hyperlane_application",
@@ -1275,7 +1275,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_config"
-version = "23.0.43"
+version = "23.0.44"
 dependencies = [
  "hyperlane",
  "instrument-level",
@@ -1286,7 +1286,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_plugin"
-version = "23.0.43"
+version = "23.0.44"
 dependencies = [
  "color-output",
  "dotenvy",
@@ -1308,7 +1308,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_resources"
-version = "23.0.43"
+version = "23.0.44"
 
 [[package]]
 name = "iana-time-zone"
