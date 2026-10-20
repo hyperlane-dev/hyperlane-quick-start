@@ -587,9 +587,9 @@ dependencies = [
 
 [[package]]
 name = "bin-encode-decode"
-version = "10.2.7"
+version = "10.2.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "44c25d1f444e5716c48a6b34736319c15caf1da0e3cb5b1ade7705dee47f6fbb"
+checksum = "e55f00ae2a3eaacee7cf6acb4f59a2aae913e5016043502343fefca41f912974"
 
 [[package]]
 name = "bitflags"
@@ -745,9 +745,9 @@ dependencies = [
 
 [[package]]
 name = "cc"
-version = "1.8.0"
+version = "1.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6651c9ed80effdc7db0ff72512157f901af5e3549e341e24b1dd4887d836d838"
+checksum = "877bf67ac8e52449eb2f9e98a344ea163beb70dd1f9eebe3cc5357dcfeaee4df"
 dependencies = [
  "find-msvc-tools",
  "jobserver",
@@ -794,9 +794,9 @@ dependencies = [
 
 [[package]]
 name = "chunkify"
-version = "10.2.7"
+version = "10.2.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1ccde49a0ec6c5dd5205ecda52f0f63302753267b4a8604e18501c75e3b17223"
+checksum = "c5b787efd776883f03587ef7f34df77029c6ce78e86afcb52968179134e9ce8b"
 dependencies = [
  "dashmap",
  "file-operation",
@@ -833,9 +833,9 @@ checksum = "0c9ea0ac24bc397ab3c98583a3c9ba74fa56b09a4449bbe172b9b1ddb016027a"
 
 [[package]]
 name = "color-log"
-version = "10.2.7"
+version = "10.2.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e27f6911ec6576b391fa691b9a35e3664872637ee5faf34b11ad2aa05de10e75"
+checksum = "3f8c056417e863a326951ec59805c02774401a00a95c3990fd8739ed9f8b9af3"
 dependencies = [
  "file-operation",
  "lombok-macros",
@@ -844,9 +844,9 @@ dependencies = [
 
 [[package]]
 name = "color-output"
-version = "10.2.7"
+version = "10.2.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0abccdeb06e8c8d8d479085fec479cbc54d9eb1f3da8448e272447db59515faf"
+checksum = "658f6c383ec7430705fd1b090ec373b932f227f4daa8bbcfc39b533371b93c10"
 dependencies = [
  "lombok-macros",
  "system-time",
@@ -1539,18 +1539,18 @@ checksum = "64cd1e32ddd350061ae6edb1b082d7c54915b5c672c389143b9a63403a109f24"
 
 [[package]]
 name = "file-operation"
-version = "10.2.7"
+version = "10.2.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5398ce53ae13bd2eac7f01ca6443105fd7eb24c97ccb779ee98dd11de06da098"
+checksum = "f21e62a338fa240fb9aec64b8d5a48a08ef20a7a0fcf3fb802af47eeddfb5be6"
 dependencies = [
  "tokio",
 ]
 
 [[package]]
 name = "find-msvc-tools"
-version = "0.1.14"
+version = "0.1.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aedcfb3409746eddb02b9e19ebda1c3394f759a152e48ee875a0844d1b955484"
+checksum = "1c66915cc5391097de7a2b0b972e8505aa33c0df401fd3a6811dbdb32881ba48"
 
 [[package]]
 name = "flate2"
@@ -1781,6 +1781,34 @@ dependencies = [
 ]
 
 [[package]]
+name = "h3"
+version = "0.0.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "10872b55cfb02a821b69dc7cf8dc6a71d6af25eb9a79662bec4a9d016056b3be"
+dependencies = [
+ "bytes",
+ "fastrand",
+ "futures-util",
+ "http 1.5.0",
+ "pin-project-lite",
+ "tokio",
+]
+
+[[package]]
+name = "h3-quinn"
+version = "0.0.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8b2e732c8d91a74731663ac8479ab505042fbf547b9a207213ab7fbcbfc4f8b4"
+dependencies = [
+ "bytes",
+ "futures",
+ "h3",
+ "quinn",
+ "tokio",
+ "tokio-util",
+]
+
+[[package]]
 name = "half"
 version = "2.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1936,9 +1964,9 @@ dependencies = [
 
 [[package]]
 name = "http-compress"
-version = "21.13.4"
+version = "21.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "45e94125b4314a557fbaaaf51d9bc7173163c1191929e90f8b366d004f4d62cb"
+checksum = "88db3d47e7b3d7f9a871b9bdc39e738f3f9a93bcfb4dbec1a35ee3d75770d862"
 dependencies = [
  "brotli",
  "flate2",
@@ -1947,15 +1975,15 @@ dependencies = [
 
 [[package]]
 name = "http-constant"
-version = "21.13.4"
+version = "21.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "84221e41622669ddf3007437615bce6f4d834d41f07712e3c8f32b8daefed10c"
+checksum = "e1590d10c6cc4904cc25092d641b76381ed6d80b6c8bafcb7ec1e97b8840842c"
 
 [[package]]
 name = "http-type"
-version = "21.13.4"
+version = "21.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "70c4b55b0b2d62ad6402a842dd22f597847c5492e0430393c4f5f1e4deff3009"
+checksum = "b53f345b6585b8b38b62e0a6395283fe5783d083ee1b31b3c1cbea2b440395e4"
 dependencies = [
  "hex",
  "http-compress",
@@ -2054,12 +2082,12 @@ dependencies = [
 
 [[package]]
 name = "hyperlane"
-version = "21.13.4"
+version = "21.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "443ecb42ae92c5e55081342376f94ac565644e01dabbde998ccf2628faaa3c95"
+checksum = "dddc39f4fdf166d45f9da9924b33c1a346cc26d8389a56f685c0abc6389324ee"
 dependencies = [
  "hyperlane-core",
- "hyperlane-macros 21.13.4",
+ "hyperlane-macros 21.14.0",
 ]
 
 [[package]]
@@ -2075,22 +2103,33 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-core"
-version = "21.13.4"
+version = "21.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "82345ca377f64caaca96c137c6ff5bd78e8ab58b90c262afdefdda72ff86d8e0"
+checksum = "0741c41773ff486dd9ea0c9f60e09444447699e588aeaff36f269fcf70341b74"
 dependencies = [
+ "bytes",
+ "futures",
+ "h2",
+ "h3",
+ "h3-quinn",
+ "http 1.5.0",
  "http-type",
  "inventory",
  "lombok-macros",
+ "quinn",
  "regex",
+ "rustls",
+ "rustls-pki-types",
  "serde",
+ "tokio",
+ "tokio-rustls",
 ]
 
 [[package]]
 name = "hyperlane-macros"
-version = "21.13.4"
+version = "21.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d94c7cdb11c8989c75a16fbff1f287042b77e041925ce312213c8b492679c27e"
+checksum = "cd47cd88f04733d753ccb73e5d7eb6d95f2d8ed85b451750c92d70ab7fa7749d"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2111,9 +2150,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-plugin-websocket"
-version = "21.13.4"
+version = "21.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0cca2b6b2f4cd84303655a968569a7d98f12efb4b9ea52d171cd2ebd65ad00d9"
+checksum = "b7cb2c8442a96b7b42eaf6d1fdea9405e5456d7c3b48e396a0cdf3b081c78765"
 dependencies = [
  "hyperlane",
  "lombok-macros",
@@ -2153,7 +2192,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_application"
-version = "23.0.44"
+version = "23.0.45"
 dependencies = [
  "base64 0.22.1",
  "bin-encode-decode",
@@ -2200,7 +2239,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_bootstrap"
-version = "23.0.44"
+version = "23.0.45"
 dependencies = [
  "color-log",
  "color-output",
@@ -2226,7 +2265,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_config"
-version = "23.0.44"
+version = "23.0.45"
 dependencies = [
  "hyperlane",
  "hyperlane-core",
@@ -2239,7 +2278,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_plugin"
-version = "23.0.44"
+version = "23.0.45"
 dependencies = [
  "color-log",
  "color-output",
@@ -2264,7 +2303,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_resources"
-version = "23.0.44"
+version = "23.0.45"
 
 [[package]]
 name = "iana-time-zone"
@@ -2441,9 +2480,9 @@ dependencies = [
 
 [[package]]
 name = "instrument-level"
-version = "10.2.7"
+version = "10.2.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "79bf03f9dbb5695e5b3d6c50879e5eae08b7fffd0e6a8e65b4b970e870eed7a7"
+checksum = "68c52aa3189227a79297d00722ea77219566b3b544521f8f99107c49cebd1fc2"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2630,9 +2669,9 @@ dependencies = [
 
 [[package]]
 name = "jwt-service"
-version = "10.2.7"
+version = "10.2.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "41b397bb5b879e39111c020e48fdc8d99ba23b1aeebb9248f7b20e826137ee31"
+checksum = "d7fdeac66eea8b76d5f02cafb6a7a0078e78ad5eb2c7aa799255fb445372d38d"
 dependencies = [
  "jsonwebtoken",
  "lombok-macros",
@@ -2776,9 +2815,9 @@ checksum = "f9f8bd3e56ce4dfc153cf470fffbfa98c7620958b312ca5c3a4b8d5181fd13c6"
 
 [[package]]
 name = "lombok-macros"
-version = "10.2.7"
+version = "10.2.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "40ff1072d9e4195f46d6f75a44ce5baa848c0e537dfc34b7bf81b70a9a116c63"
+checksum = "07402745f3647c6d78259f263ed8ac49ce94c80bf6504ccca6e03727def4004a"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3334,6 +3373,7 @@ checksum = "4051e23e9185c255a7e33ef59cdbca87a22d359052eecd22fc6b901fb37d9d11"
 dependencies = [
  "bytes",
  "cfg_aliases",
+ "futures-io",
  "pin-project-lite",
  "quinn-proto",
  "quinn-udp",
@@ -4164,9 +4204,9 @@ dependencies = [
 
 [[package]]
 name = "server-manager"
-version = "10.2.7"
+version = "10.2.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "08e9f735e8887e09a671860c306b0d8ca53da1c640e2fa486d4ebd3945e8adb0"
+checksum = "7f761815fa6c9cceae2088110770723ad1e5191ceae3d82c4d918147de5b01ec"
 dependencies = [
  "lombok-macros",
  "tokio",
@@ -4651,9 +4691,9 @@ dependencies = [
 
 [[package]]
 name = "system-time"
-version = "10.2.7"
+version = "10.2.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f51973f076e91f486f8b767ddd463b9dd7a0bf7f6ffe16c7f5c7583c5cfc94e1"
+checksum = "d882d7463594c377f4fd4ef27871bb8acbf7f83c73936d70a8cd9ab8dcb430af"
 
 [[package]]
 name = "tempfile"
@@ -4745,9 +4785,9 @@ checksum = "fd3ca314f692efd6c868f8408f53fe444634a845f96c028b97d35f6a1f79f0ee"
 
 [[package]]
 name = "tokio"
-version = "1.53.3"
+version = "1.54.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ce3335fa71841cda333a58d7615b03901380ecf09d59b3296d21f8bbac0dde4e"
+checksum = "a0c168a474b95bfecfe908a65d4bdffc523144b649a74c09c286afb35d53e0bc"
 dependencies = [
  "bytes",
  "libc",
@@ -4762,9 +4802,9 @@ dependencies = [
 
 [[package]]
 name = "tokio-broadcast"
-version = "10.2.7"
+version = "10.2.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d2b0bdb9e984aa1e406a4df18091bd30b1ea8dc2de2c305214ef0af993767dc6"
+checksum = "714c61113da6d861ef39c47dec6a1941bdb1275fb0b59ae91e20fd70319b5e47"
 dependencies = [
  "dashmap",
  "tokio",
@@ -4946,9 +4986,9 @@ dependencies = [
 
 [[package]]
 name = "typed-path"
-version = "0.12.3"
+version = "0.12.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8e28f89b80c87b8fb0cf04ab448d5dd0dd0ade2f8891bae878de66a75a28600e"
+checksum = "54ec2755506471f54baf5e4bb5499d8e510cc1caf271270e778a736bd2d7336c"
 
 [[package]]
 name = "typenum"
@@ -5266,18 +5306,18 @@ dependencies = [
 
 [[package]]
 name = "webpki-root-certs"
-version = "1.0.9"
+version = "1.0.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b96554aa2acc8ccdb7e1c9a58a7a68dd5d13bccc69cd124cb09406db612a1c9b"
+checksum = "58ec80e73fd8baf57bf0d9615554c75348bda990d6d5bbeab964dd068319fecb"
 dependencies = [
  "rustls-pki-types",
 ]
 
 [[package]]
 name = "webpki-roots"
-version = "1.0.9"
+version = "1.0.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7dcd9d09a39985f5344844e66b0c530a33843579125f23e21e9f0f220850f22a"
+checksum = "1c1c8e20c8a38fc7d65abfe74eb7280e4aa667e8eec8bc84996d2874810748d9"
 dependencies = [
  "rustls-pki-types",
 ]
