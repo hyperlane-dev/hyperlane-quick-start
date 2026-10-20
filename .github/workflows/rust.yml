@@ -216,7 +216,7 @@ jobs:
         run: cargo clippy --all-features
 
   build:
-    needs: sync_workspace_version
+    needs: [setup, sync_workspace_version]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -229,7 +229,7 @@ jobs:
           toolchain: stable
       - name: Release check
         run: cargo check --release --all-features --locked
-      - name: Build release under 2 CPU and 4 GiB
+      - name: Build static release under 2 CPU and 4 GiB
         run: |
           set -euo pipefail
           docker run --rm \
@@ -239,9 +239,10 @@ jobs:
             -e CARGO_TARGET_DIR=/tmp/hqs-low-memory-target \
             -v "$PWD:/workspace" \
             -w /workspace \
-            rust:1.99-bookworm \
-            bash -c '
+            rust:1.99-alpine \
+            sh -c '
               set -euo pipefail
+              apk add --no-cache build-base cmake perl linux-headers file
               build_status=0
               cargo build --release --all-features --locked || build_status=$?
               echo "---- cgroup cpu.max ----"
@@ -259,7 +260,23 @@ jobs:
                 exit "$build_status"
               fi
               test -x "$CARGO_TARGET_DIR/release/hyperlane-quick-start"
+              file "$CARGO_TARGET_DIR/release/hyperlane-quick-start" | grep -Eq "static-pie linked|statically linked"
+              # The build intermediates are removed: the target tree is several
+              # gigabytes of object files, and only the linked executable is
+              # ever shipped. The executable is copied out first, so it
+              # survives the cleanup.
+              mkdir -p /workspace/dist
+              cp -f "$CARGO_TARGET_DIR/release/hyperlane-quick-start" /workspace/dist/hyperlane-quick-start
+              rm -rf "$CARGO_TARGET_DIR"
             '
+          file dist/hyperlane-quick-start
+      - name: Upload the static binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: hyperlane-quick-start-${{ needs.setup.outputs.version }}-${{ needs.setup.outputs.branch_name }}
+          path: dist/hyperlane-quick-start
+          if-no-files-found: error
+          retention-days: 30
 
   publish:
     permissions:
@@ -439,6 +456,11 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Download the static binary built by the build job
+        uses: actions/download-artifact@v4
+        with:
+          name: hyperlane-quick-start-${{ needs.setup.outputs.version }}-${{ needs.setup.outputs.branch_name }}
+          path: dist
       - name: Create or update release
         id: release
         run: |
@@ -450,6 +472,16 @@ jobs:
           echo "📦 Building source archives..."
           git archive --format=zip --prefix="${PACKAGE_NAME}-${VERSION}/" HEAD > "${PACKAGE_NAME}-${VERSION}.zip"
           git archive --format=tar.gz --prefix="${PACKAGE_NAME}-${VERSION}/" HEAD > "${PACKAGE_NAME}-${VERSION}.tar.gz"
+          # The static binary built by the build job is shipped with the
+          # release, so a user can download one executable and run it
+          # without a container, a libc or the source tree. The artifact
+          # download does not carry the executable bit, so it is set here.
+          STATIC_BINARY="dist/hyperlane-quick-start"
+          test -f "$STATIC_BINARY"
+          chmod 0755 "$STATIC_BINARY"
+          file "$STATIC_BINARY" | grep -Eq "static-pie linked|statically linked"
+          cp -f "$STATIC_BINARY" "${PACKAGE_NAME}-${VERSION}-linux-x86_64"
+          chmod 0755 "${PACKAGE_NAME}-${VERSION}-linux-x86_64"
           if [ "${{ steps.check_release.outputs.release_exists }}" = "true" ]; then
             echo "🔄 Updating existing release: $TAG"
             gh release view "$TAG" --json assets --jq '.assets[].name' | while read asset; do
@@ -471,7 +503,7 @@ jobs:
             📦 [Crate on crates.io](https://crates.io/crates/$PACKAGE_NAME/$VERSION)
             📚 [Documentation on docs.rs](https://docs.rs/$PACKAGE_NAME/$VERSION)
             📋 [Commit History](https://github.com/${{ github.repository }}/commits/$TAG)" && \
-               gh release upload "$TAG" "${PACKAGE_NAME}-${VERSION}.zip" "${PACKAGE_NAME}-${VERSION}.tar.gz" --clobber; then
+               gh release upload "$TAG" "${PACKAGE_NAME}-${VERSION}.zip" "${PACKAGE_NAME}-${VERSION}.tar.gz" "${PACKAGE_NAME}-${VERSION}-linux-x86_64" --clobber; then
               echo "released=true" >> $GITHUB_OUTPUT
               echo "✅ Updated release $TAG"
               echo "🔖 Tag: $TAG"
@@ -500,7 +532,7 @@ jobs:
             📚 [Documentation on docs.rs](https://docs.rs/$PACKAGE_NAME/$VERSION)
             📋 [Commit History](https://github.com/${{ github.repository }}/commits/$TAG)" \
               --latest && \
-               gh release upload "$TAG" "${PACKAGE_NAME}-${VERSION}.zip" "${PACKAGE_NAME}-${VERSION}.tar.gz"; then
+               gh release upload "$TAG" "${PACKAGE_NAME}-${VERSION}.zip" "${PACKAGE_NAME}-${VERSION}.tar.gz" "${PACKAGE_NAME}-${VERSION}-linux-x86_64"; then
               echo "released=true" >> $GITHUB_OUTPUT
               echo "✅ Created release $TAG"
               echo "🔖 Tag: $TAG"

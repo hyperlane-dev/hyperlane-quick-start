@@ -46,6 +46,30 @@ docker compose pull;
 docker compose up -d;
 ```
 
+The image is a two-stage build: the builder stage compiles a statically linked
+binary and the runtime stage keeps only that executable plus the static assets
+the server serves. The Rust toolchain, the crate registry and the whole build
+directory are discarded with the builder stage, so the published image carries
+no compiler and no intermediate objects.
+
+## Run the binary directly
+
+Every release also ships the static binary as a release asset, so the server
+can run without a container and without a libc:
+
+```sh
+curl -L -o hyperlane-quick-start \
+  https://github.com/hyperlane-dev/hyperlane-quick-start/releases/latest/download/hyperlane-quick-start-<version>-linux-x86_64
+chmod +x hyperlane-quick-start
+./hyperlane-quick-start
+```
+
+The binary is built for `x86_64-unknown-linux-musl` and is statically linked,
+so it runs on any Linux distribution and needs no shared library. It does need
+the repository next to it, because the server reads `./resources/env` and
+serves `./resources/static`; a clone of this repository is the simplest way to
+provide them.
+
 The server logs its own progress; this is what a healthy start looks like:
 
 ```
