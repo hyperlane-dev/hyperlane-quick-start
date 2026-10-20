@@ -1205,7 +1205,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "23.0.44"
+version = "23.0.45"
 dependencies = [
  "chrono",
  "color-output",
