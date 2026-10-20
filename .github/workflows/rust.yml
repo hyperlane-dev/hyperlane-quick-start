@@ -482,6 +482,16 @@ jobs:
           file "$STATIC_BINARY" | grep -Eq "static-pie linked|statically linked"
           cp -f "$STATIC_BINARY" "${PACKAGE_NAME}-${VERSION}-linux-x86_64"
           chmod 0755 "${PACKAGE_NAME}-${VERSION}-linux-x86_64"
+          # Only the master release is marked as the latest one. A branch
+          # release that takes the flag would move the "latest" download
+          # URL away from the master artifacts.
+          BRANCH_NAME="${{ steps.package_info.outputs.branch_name }}"
+          if [ "$BRANCH_NAME" = "master" ]; then
+            LATEST_FLAG="--latest"
+          else
+            LATEST_FLAG="--latest=false"
+          fi
+          echo "🔖 Latest flag: $LATEST_FLAG"
           if [ "${{ steps.check_release.outputs.release_exists }}" = "true" ]; then
             echo "🔄 Updating existing release: $TAG"
             gh release view "$TAG" --json assets --jq '.assets[].name' | while read asset; do
@@ -494,6 +504,7 @@ jobs:
           TITLE="[$BRANCH_NAME]($TAG updated $(date '+%Y-%m-%d %H:%M:%S'))"
           if gh release edit "$TAG" \
               --title "$TITLE" \
+              ${LATEST_FLAG} \
               --notes "[$BRANCH_NAME] - release $TAG updated at $(date '+%Y-%m-%d %H:%M:%S UTC')
             ## Changes
             - Branch: $BRANCH_NAME
@@ -531,7 +542,7 @@ jobs:
             📦 [Crate on crates.io](https://crates.io/crates/$PACKAGE_NAME/$VERSION)
             📚 [Documentation on docs.rs](https://docs.rs/$PACKAGE_NAME/$VERSION)
             📋 [Commit History](https://github.com/${{ github.repository }}/commits/$TAG)" \
-              --latest && \
+              ${LATEST_FLAG} && \
                gh release upload "$TAG" "${PACKAGE_NAME}-${VERSION}.zip" "${PACKAGE_NAME}-${VERSION}.tar.gz" "${PACKAGE_NAME}-${VERSION}-linux-x86_64"; then
               echo "released=true" >> $GITHUB_OUTPUT
               echo "✅ Created release $TAG"
