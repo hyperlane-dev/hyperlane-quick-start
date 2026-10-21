@@ -151,10 +151,14 @@ pub fn split_view(node: VirtualNode<DiffPageProps>) -> VirtualNode {
                         LABEL_ORIGINAL
                     }
                 }
-                for row in { rows } {
-                    diff_cell {
-                        row: row.clone()
-                        side: DiffSide::Original
+                for (index, row) in { rows.get().into_iter().enumerate() } {
+                    div {
+                        key: format!("original-{index}")
+                        class: c_diff_cell()
+                        diff_cell {
+                            row: row
+                            side: DiffSide::Original
+                        }
                     }
                 }
             }
@@ -171,10 +175,14 @@ pub fn split_view(node: VirtualNode<DiffPageProps>) -> VirtualNode {
                         LABEL_MODIFIED
                     }
                 }
-                for row in { rows } {
-                    diff_cell {
-                        row: row.clone()
-                        side: DiffSide::Modified
+                for (index, row) in { rows.get().into_iter().enumerate() } {
+                    div {
+                        key: format!("modified-{index}")
+                        class: c_diff_cell()
+                        diff_cell {
+                            row: row
+                            side: DiffSide::Modified
+                        }
                     }
                 }
             }
@@ -182,10 +190,11 @@ pub fn split_view(node: VirtualNode<DiffPageProps>) -> VirtualNode {
     }
 }
 
-/// Renders one cell of the split view.
+/// Renders the line of one cell of the split view.
 ///
 /// A cell holds the line of one side of the result; the cell of the other
-/// side is rendered from the same row.
+/// side is rendered from the same row. The line is the root of the cell,
+/// because the row that holds the cell carries the key of the comparison.
 ///
 /// # Arguments
 ///
@@ -193,7 +202,7 @@ pub fn split_view(node: VirtualNode<DiffPageProps>) -> VirtualNode {
 ///
 /// # Returns
 ///
-/// - `VirtualNode` - The cell tree.
+/// - `VirtualNode` - The line tree.
 #[component]
 pub fn diff_cell(node: VirtualNode<DiffRowProps>) -> VirtualNode {
     let DiffRowProps { row, side }: DiffRowProps = node.try_get_props().unwrap_or_default();
@@ -204,12 +213,9 @@ pub fn diff_cell(node: VirtualNode<DiffRowProps>) -> VirtualNode {
     };
     html! {
         div {
-            class: c_diff_cell()
-            div {
-                class: diff_row_class(kind, side)
-                diff_segments {
-                    parts: parts
-                }
+            class: diff_row_class(kind, side)
+            diff_segments {
+                parts: parts
             }
         }
     }

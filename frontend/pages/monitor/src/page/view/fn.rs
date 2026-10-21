@@ -180,6 +180,7 @@ pub fn monitor_page(node: VirtualNode<MonitorPageProps>) -> VirtualNode {
                             tbody {
                                 for point in { history } {
                                     tr {
+                                        key: point.timestamp.to_string()
                                         class: c_monitor_table_row()
                                         td {
                                             class: c_monitor_table_cell()

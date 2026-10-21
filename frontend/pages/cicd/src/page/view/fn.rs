@@ -186,6 +186,7 @@ pub fn pipeline_row(node: VirtualNode<PipelineRowProps>) -> VirtualNode {
     let created: String = format_moment(pipeline.created_at);
     html! {
         div {
+            key: pipeline.id.to_string()
             class: c_cicd_item()
             div {
                 class: c_cicd_item_header()
@@ -238,6 +239,7 @@ pub fn run_row(node: VirtualNode<RunRowProps>) -> VirtualNode {
     let status: String = run.status.to_string();
     html! {
         div {
+            key: run.id.to_string()
             class: c_cicd_item()
             div {
                 class: c_cicd_item_header()

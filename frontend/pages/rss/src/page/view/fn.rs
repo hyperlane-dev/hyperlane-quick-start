@@ -137,40 +137,43 @@ pub fn rss_item(node: VirtualNode<RssItemProps>) -> VirtualNode {
     };
     let has_download: bool = !download.is_empty();
     html! {
-        euv_card {
-            div {
-                class: c_rss_item()
-                a {
-                    class: c_rss_item_title()
-                    href: link.clone()
-                    target: TARGET_BLANK
-                    title.as_str()
-                }
-                p {
-                    class: c_rss_item_description()
-                    description.as_str()
-                }
+        div {
+            key: link.clone()
+            euv_card {
                 div {
-                    class: c_rss_item_meta()
-                    span {
-                        class: c_rss_item_date()
-                        pub_date.as_str()
-                    }
-                    span {
-                        class: c_rss_item_size()
-                        size.as_str()
-                    }
-                    span {
-                        class: c_rss_item_type()
-                        file_type.as_str()
-                    }
-                }
-                if has_download == true {
+                    class: c_rss_item()
                     a {
-                        class: c_rss_item_download()
-                        href: download.clone()
+                        class: c_rss_item_title()
+                        href: link.clone()
                         target: TARGET_BLANK
-                        LABEL_DOWNLOAD
+                        title.as_str()
+                    }
+                    p {
+                        class: c_rss_item_description()
+                        description.as_str()
+                    }
+                    div {
+                        class: c_rss_item_meta()
+                        span {
+                            class: c_rss_item_date()
+                            pub_date.as_str()
+                        }
+                        span {
+                            class: c_rss_item_size()
+                            size.as_str()
+                        }
+                        span {
+                            class: c_rss_item_type()
+                            file_type.as_str()
+                        }
+                    }
+                    if has_download == true {
+                        a {
+                            class: c_rss_item_download()
+                            href: download.clone()
+                            target: TARGET_BLANK
+                            LABEL_DOWNLOAD
+                        }
                     }
                 }
             }

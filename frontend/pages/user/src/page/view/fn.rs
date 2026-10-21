@@ -193,6 +193,7 @@ pub fn user_row(node: VirtualNode<UserRowProps>) -> VirtualNode {
     let rejectable: bool = can_reject(&user);
     html! {
         div {
+            key: user_id.clone()
             class: c_user_card()
             euv_avatar {
                 initials: initials

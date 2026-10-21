@@ -36,6 +36,7 @@ pub fn not_found_page(node: VirtualNode<NotFoundPageProps>) -> VirtualNode {
                         class: c_not_found_actions()
                         for link in { links } {
                             a {
+                                key: link.url.to_string()
                                 class: c_not_found_link()
                                 href: link.url.as_str()
                                 target: link.target.as_str()

@@ -751,6 +751,7 @@ pub fn record_row(node: VirtualNode<RecordRowProps>) -> VirtualNode {
     let date: String = record.bill_date.to_string();
     html! {
         div {
+            key: record.id.to_string()
             class: c_order_record()
             div {
                 class: c_order_record_header()
@@ -812,6 +813,7 @@ pub fn user_row(node: VirtualNode<UserRowProps>) -> VirtualNode {
     let email: String = user.email.clone().unwrap_or_default();
     html! {
         div {
+            key: user.id.to_string()
             class: c_order_user()
             div {
                 class: c_order_user_details()

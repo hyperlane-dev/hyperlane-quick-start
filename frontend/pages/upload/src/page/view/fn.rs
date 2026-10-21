@@ -143,6 +143,7 @@ pub fn upload_row(node: VirtualNode<UploadRowProps>) -> VirtualNode {
     let _state: UploadState = state;
     html! {
         div {
+            key: entry.id.clone()
             class: c_upload_item()
             div {
                 class: c_upload_item_header()
@@ -219,6 +220,7 @@ pub fn upload_history_row(node: VirtualNode<UploadHistoryProps>) -> VirtualNode 
     let _state: UploadState = state;
     html! {
         div {
+            key: item.id.clone()
             class: c_upload_item()
             div {
                 class: c_upload_item_header()

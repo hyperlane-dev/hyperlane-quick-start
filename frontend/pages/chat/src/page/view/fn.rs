@@ -159,6 +159,7 @@ pub fn chat_message_row(node: VirtualNode<ChatMessageProps>) -> VirtualNode {
     let time: String = format_time(message.time);
     html! {
         div {
+            key: message.id.to_string()
             class: c_chat_message()
             class: if message.own {
                 c_chat_message_own()
@@ -198,10 +199,14 @@ pub fn mention_row(node: VirtualNode<MentionProps>) -> VirtualNode {
     let MentionProps { state, user }: MentionProps = node.try_get_props().unwrap_or_default();
     let name: String = user.username.clone();
     html! {
-        euv_button {
-            variant: VARIANT_OUTLINE
-            onclick: mention_handler(state, name.clone())
-            name.as_str()
+        div {
+            key: user.username.clone()
+            class: c_euv_display_contents()
+            euv_button {
+                variant: VARIANT_OUTLINE
+                onclick: mention_handler(state, name.clone())
+                name.as_str()
+            }
         }
     }
 }

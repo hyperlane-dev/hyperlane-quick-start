@@ -303,6 +303,7 @@ pub fn notification_row(node: VirtualNode<NotificationRowProps>) -> VirtualNode 
     let unread: bool = !notification.is_read;
     html! {
         div {
+            key: notification.id.to_string()
             class: c_notification_item()
             div {
                 class: c_notification_icon()

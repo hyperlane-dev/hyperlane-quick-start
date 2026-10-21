@@ -149,6 +149,7 @@ pub fn gomoku_page(node: VirtualNode<GomokuPageProps>) -> VirtualNode {
                         class: c_gomoku_board()
                         for cell in { cells } {
                             div {
+                                key: format!("{}-{}", cell.x, cell.y)
                                 class: c_gomoku_cell()
                                 onclick: place_stone_handler(state, cell.x, cell.y)
                                 if cell.value == STONE_BLACK {
@@ -176,6 +177,7 @@ pub fn gomoku_page(node: VirtualNode<GomokuPageProps>) -> VirtualNode {
                         }
                         for player in { players } {
                             div {
+                                key: player.user_id.to_string()
                                 class: c_gomoku_list_item()
                                 span {
                                     class: c_gomoku_list_name()
@@ -204,6 +206,7 @@ pub fn gomoku_page(node: VirtualNode<GomokuPageProps>) -> VirtualNode {
                         }
                         for spectator in { spectators } {
                             div {
+                                key: spectator.to_string()
                                 class: c_gomoku_list_item()
                                 spectator.as_str()
                             }
@@ -223,10 +226,9 @@ pub fn gomoku_page(node: VirtualNode<GomokuPageProps>) -> VirtualNode {
                         }
                         for entry in { moves } {
                             div {
+                                key: entry.step.to_string()
                                 class: c_gomoku_list_item()
-                                {
-                                    move_label(&entry)
-                                }
+                                move_label(&entry)
                             }
                         }
                     }

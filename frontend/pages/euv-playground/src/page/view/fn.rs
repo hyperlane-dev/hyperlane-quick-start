@@ -76,6 +76,7 @@ pub fn playground_page(node: VirtualNode<PlaygroundPageProps>) -> VirtualNode {
                         } else {
                             for project in { projects } {
                                 div {
+                                    key: project.id.to_string()
                                     class: c_playground_project()
                                     onclick: open_handler(state, project.id.clone())
                                     span {

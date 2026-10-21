@@ -147,6 +147,7 @@ pub fn tracking_page(node: VirtualNode<TrackingPageProps>) -> VirtualNode {
                             tbody {
                                 for record in { records } {
                                     tr {
+                                        key: record.id.to_string()
                                         class: c_tracking_table_row()
                                         td {
                                             class: c_tracking_table_cell()

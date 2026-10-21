@@ -127,6 +127,7 @@ pub fn qrcode_entry(node: VirtualNode<QrcodeEntryProps>) -> VirtualNode {
     draw_code(&painted_canvas, &painted_text, level);
     html! {
         div {
+            key: index.to_string()
             class: c_qrcode_item()
             div {
                 class: c_qrcode_item_header()
@@ -154,7 +155,7 @@ pub fn qrcode_entry(node: VirtualNode<QrcodeEntryProps>) -> VirtualNode {
             if is_link(&text) {
                 euv_button {
                     variant: VARIANT_PRIMARY
-                    onclick: open_handler(text.clone())
+                    onclick: open_handler(state, index)
                     LABEL_OPEN
                 }
             }
@@ -298,20 +299,28 @@ fn import_handler(state: QrcodeState) -> Option<Rc<dyn Fn(Event)>> {
 
 /// Builds the handler that opens the link of one entry.
 ///
+/// The entry is read out of the state when the handler runs, because the
+/// list of the entries changes while the page is open and the row of an
+/// entry keeps its place in the list.
+///
 /// # Arguments
 ///
-/// - `String` - The text of the entry.
+/// - `QrcodeState` - The state of the page.
+/// - `usize` - The place of the entry in the list.
 ///
 /// # Returns
 ///
 /// - `Option<Rc<dyn Fn(Event)>>` - The click handler.
-fn open_handler(text: String) -> Option<Rc<dyn Fn(Event)>> {
+fn open_handler(state: QrcodeState, index: usize) -> Option<Rc<dyn Fn(Event)>> {
     Some(Rc::new(move |_: Event| {
+        let Some(entry): Option<QrEntry> = state.get_entries().get().get(index).cloned() else {
+            return;
+        };
         let Some(window): Option<Window> = window() else {
             return;
         };
         let _opened: Result<Option<Window>, JsValue> =
-            window.open_with_url_and_target_and_features(&text, "_blank", "");
+            window.open_with_url_and_target_and_features(&entry.text, "_blank", "");
     }))
 }
 

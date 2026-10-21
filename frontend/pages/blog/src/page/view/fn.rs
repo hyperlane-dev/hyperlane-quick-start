@@ -192,6 +192,7 @@ pub fn post_row(node: VirtualNode<PostRowProps>) -> VirtualNode {
     let time: String = relative_time(post.created_at);
     html! {
         div {
+            key: post.id.to_string()
             class: c_blog_post()
             div {
                 class: c_blog_post_header()
@@ -383,6 +384,7 @@ pub fn post_detail(node: VirtualNode<PostDetailProps>) -> VirtualNode {
                 class: c_blog_comments()
                 for comment in { comments } {
                     div {
+                        key: comment.id.to_string()
                         class: c_blog_comment()
                         span {
                             class: c_blog_post_author()

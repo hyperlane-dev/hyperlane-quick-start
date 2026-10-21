@@ -145,6 +145,7 @@ pub fn record_row(node: VirtualNode<RecordProps>) -> VirtualNode {
     let value: String = record.value.clone();
     html! {
         div {
+            key: record.key.clone()
             class: c_redis_record()
             div {
                 class: c_redis_record_info()
