@@ -70,19 +70,22 @@ pub fn json_page(node: VirtualNode<JsonPageProps>) -> VirtualNode {
                     class: c_json_count()
                     top_level_text(&state).as_str()
                 }
-                if { state.get_nodes().get().is_empty() } {
-                    euv_result {
-                        code: "0"
-                        title: TITLE_TREE
-                        description: TEXT_EMPTY_TREE
+                match { state.get_nodes().get().is_empty() } {
+                    true => {
+                        euv_result {
+                            code: "0"
+                            title: TITLE_TREE
+                            description: TEXT_EMPTY_TREE
+                        }
                     }
-                } else {
-                    div {
-                        class: c_json_tree()
-                        for node in { nodes } {
-                            json_row {
-                                state: state
-                                node: node
+                    _ => {
+                        div {
+                            class: c_json_tree()
+                            for node in { nodes } {
+                                json_row {
+                                    state: state
+                                    node: node
+                                }
                             }
                         }
                     }
@@ -124,11 +127,11 @@ pub fn json_row(node: VirtualNode<JsonRowProps>) -> VirtualNode {
         div {
             class: c_json_row()
             style: indent
-            if { node.container == true } {
+            if node.container == true {
                 euv_button {
                     variant: EuvButtonVariant::Outline
                     onclick: toggle_handler(state, path.clone())
-                    if { node.expanded == true } {
+                    if node.expanded == true {
                         GLYPH_OPEN
                     } else {
                         GLYPH_CLOSED

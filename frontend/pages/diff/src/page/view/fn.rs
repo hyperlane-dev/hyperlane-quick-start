@@ -235,7 +235,7 @@ pub fn inline_view(node: VirtualNode<DiffPageProps>) -> VirtualNode {
         div {
             class: c_diff_inline()
             for row in { rows } {
-                if { row.kind == DiffRowKind::Unchanged } {
+                if row.kind == DiffRowKind::Unchanged {
                     div {
                         class: c_diff_inline_row()
                         div {
@@ -249,7 +249,7 @@ pub fn inline_view(node: VirtualNode<DiffPageProps>) -> VirtualNode {
                             }
                         }
                     }
-                } else if { row.kind == DiffRowKind::Changed } {
+                } else if row.kind == DiffRowKind::Changed {
                     div {
                         class: c_diff_inline_row()
                         div {
@@ -276,7 +276,7 @@ pub fn inline_view(node: VirtualNode<DiffPageProps>) -> VirtualNode {
                             }
                         }
                     }
-                } else if { row.kind == DiffRowKind::Removed } {
+                } else if row.kind == DiffRowKind::Removed {
                     div {
                         class: c_diff_inline_row()
                         div {
@@ -290,7 +290,7 @@ pub fn inline_view(node: VirtualNode<DiffPageProps>) -> VirtualNode {
                             }
                         }
                     }
-                } else if { row.kind == DiffRowKind::Added } {
+                } else if row.kind == DiffRowKind::Added {
                     div {
                         class: c_diff_inline_row()
                         div {

@@ -151,11 +151,11 @@ pub fn gomoku_page(node: VirtualNode<GomokuPageProps>) -> VirtualNode {
                             div {
                                 class: c_gomoku_cell()
                                 onclick: place_stone_handler(state, cell.x, cell.y)
-                                if { cell.value == STONE_BLACK } {
+                                if cell.value == STONE_BLACK {
                                     div {
                                         class: c_gomoku_stone_black()
                                     }
-                                } else if { cell.value == STONE_WHITE } {
+                                } else if cell.value == STONE_WHITE {
                                     div {
                                         class: c_gomoku_stone_white()
                                     }

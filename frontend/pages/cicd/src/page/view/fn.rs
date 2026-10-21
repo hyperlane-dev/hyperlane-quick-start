@@ -41,72 +41,75 @@ pub fn cicd_page(node: VirtualNode<CicdPageProps>) -> VirtualNode {
                 items: TAB_ITEMS.to_vec()
                 active: state.get_tab()
             }
-            if { state.get_tab().get() == TAB_PIPELINES } {
-                euv_card {
-                    title: TITLE_PIPELINES
-                    div {
-                        class: c_cicd_toolbar()
-                        euv_button {
-                            variant: VARIANT_PRIMARY
-                            onclick: open_create_handler(state)
-                            LABEL_CREATE
-                        }
-                        euv_button {
-                            variant: VARIANT_OUTLINE
-                            onclick: reload_handler(state)
-                            LABEL_RELOAD
-                        }
-                    }
-                    if { state.get_loading().get() } {
-                        euv_loading {
-                            title: TITLE_PIPELINES
-                        }
-                    } else if { pipelines.get().is_empty() } {
-                        euv_result {
-                            code: "0"
-                            title: TITLE_EMPTY_PIPELINES
-                            description: TEXT_EMPTY_PIPELINES
-                        }
-                    } else {
+            match { state.get_tab().get() } {
+                tab if tab == TAB_PIPELINES => {
+                    euv_card {
+                        title: TITLE_PIPELINES
                         div {
-                            class: c_cicd_list()
-                            for pipeline in { pipelines } {
-                                pipeline_row {
-                                    state: state
-                                    pipeline: pipeline
+                            class: c_cicd_toolbar()
+                            euv_button {
+                                variant: VARIANT_PRIMARY
+                                onclick: open_create_handler(state)
+                                LABEL_CREATE
+                            }
+                            euv_button {
+                                variant: VARIANT_OUTLINE
+                                onclick: reload_handler(state)
+                                LABEL_RELOAD
+                            }
+                        }
+                        if { state.get_loading().get() } {
+                            euv_loading {
+                                title: TITLE_PIPELINES
+                            }
+                        } else if { pipelines.get().is_empty() } {
+                            euv_result {
+                                code: "0"
+                                title: TITLE_EMPTY_PIPELINES
+                                description: TEXT_EMPTY_PIPELINES
+                            }
+                        } else {
+                            div {
+                                class: c_cicd_list()
+                                for pipeline in { pipelines } {
+                                    pipeline_row {
+                                        state: state
+                                        pipeline: pipeline
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            } else {
-                euv_card {
-                    title: TITLE_RUNS
-                    div {
-                        class: c_cicd_toolbar()
-                        euv_button {
-                            variant: VARIANT_OUTLINE
-                            onclick: reload_handler(state)
-                            LABEL_RELOAD
-                        }
-                    }
-                    if { state.get_loading().get() } {
-                        euv_loading {
-                            title: TITLE_RUNS
-                        }
-                    } else if { runs.get().is_empty() } {
-                        euv_result {
-                            code: "0"
-                            title: TITLE_EMPTY_RUNS
-                            description: TEXT_EMPTY_RUNS
-                        }
-                    } else {
+                _ => {
+                    euv_card {
+                        title: TITLE_RUNS
                         div {
-                            class: c_cicd_list()
-                            for run in { runs } {
-                                run_row {
-                                    state: state
-                                    run: run
+                            class: c_cicd_toolbar()
+                            euv_button {
+                                variant: VARIANT_OUTLINE
+                                onclick: reload_handler(state)
+                                LABEL_RELOAD
+                            }
+                        }
+                        if { state.get_loading().get() } {
+                            euv_loading {
+                                title: TITLE_RUNS
+                            }
+                        } else if { runs.get().is_empty() } {
+                            euv_result {
+                                code: "0"
+                                title: TITLE_EMPTY_RUNS
+                                description: TEXT_EMPTY_RUNS
+                            }
+                        } else {
+                            div {
+                                class: c_cicd_list()
+                                for run in { runs } {
+                                    run_row {
+                                        state: state
+                                        run: run
+                                    }
                                 }
                             }
                         }
@@ -195,13 +198,13 @@ pub fn pipeline_row(node: VirtualNode<PipelineRowProps>) -> VirtualNode {
                     created.as_str()
                 }
             }
-            if { !description.is_empty() } {
+            if !description.is_empty() {
                 p {
                     class: c_cicd_item_text()
                     description.as_str()
                 }
             }
-            if { !config.is_empty() } {
+            if !config.is_empty() {
                 pre {
                     class: c_cicd_item_config()
                     config.as_str()
@@ -228,7 +231,7 @@ pub fn pipeline_row(node: VirtualNode<PipelineRowProps>) -> VirtualNode {
 #[component]
 pub fn run_row(node: VirtualNode<RunRowProps>) -> VirtualNode {
     let RunRowProps { state, run }: RunRowProps = node.try_get_props().unwrap_or_default();
-    let pipeline: String = run.pipeline_name.clone().unwrap_or_default();
+    let pipeline: String = pipeline_name(state, run.pipeline_id);
     let triggered: String = run.triggered_by.clone().unwrap_or_default();
     let duration: String = format_duration(run.duration_ms);
     let started: String = format_moment(run.started_at);
@@ -294,7 +297,7 @@ pub fn run_detail(node: VirtualNode<RunDetailProps>) -> VirtualNode {
             }
         };
     };
-    let pipeline: String = detail.run.pipeline_name.clone().unwrap_or_default();
+    let pipeline: String = pipeline_name(state, detail.run.pipeline_id);
     let triggered: String = detail.run.triggered_by.clone().unwrap_or_default();
     let duration: String = format_duration(detail.run.duration_ms);
     let started: String = format_moment(detail.run.started_at);
@@ -348,7 +351,7 @@ pub fn run_detail(node: VirtualNode<RunDetailProps>) -> VirtualNode {
                 class: c_cicd_detail_title()
                 TITLE_JOBS
             }
-            for job in { detail.jobs.clone() } {
+            for job in detail.jobs.clone() {
                 div {
                     class: c_cicd_job()
                     div {
@@ -366,31 +369,11 @@ pub fn run_detail(node: VirtualNode<RunDetailProps>) -> VirtualNode {
                         class: c_cicd_detail_title()
                         TITLE_STEPS
                     }
-                    for step in { job.steps.clone() } {
-                        div {
-                            class: c_cicd_step()
-                            div {
-                                class: c_cicd_item_header()
-                                span {
-                                    class: c_cicd_item_meta()
-                                    step.name.as_str()
-                                }
-                                span {
-                                    class: c_cicd_item_status()
-                                    step.status.to_string().as_str()
-                                }
-                            }
-                            if { step.command.is_some() } {
-                                span {
-                                    class: c_cicd_item_meta()
-                                    format!("{LABEL_COMMAND}: {}", step.command.clone().unwrap_or_default()).as_str()
-                                }
-                            }
-                            euv_button {
-                                variant: VARIANT_OUTLINE
-                                onclick: tail_handler(state, detail.run.id)
-                                LABEL_TAIL
-                            }
+                    for step in job.steps.clone() {
+                        step_block {
+                            state: state
+                            run_id: detail.run.id
+                            step: step
                         }
                     }
                 }
@@ -399,6 +382,85 @@ pub fn run_detail(node: VirtualNode<RunDetailProps>) -> VirtualNode {
                 state: state
             }
         }
+    }
+}
+
+/// Renders one step of a job of a run.
+///
+/// The block shows the command the step carries out and the output the step
+/// wrote, so a finished run keeps the evidence of what it did.
+///
+/// # Arguments
+///
+/// - `VirtualNode<StepBlockProps>` - The props node carrying the step.
+///
+/// # Returns
+///
+/// - `VirtualNode` - The step tree.
+#[component]
+pub fn step_block(node: VirtualNode<StepBlockProps>) -> VirtualNode {
+    let StepBlockProps { state, run_id, step }: StepBlockProps =
+        node.try_get_props().unwrap_or_default();
+    let command: String = step.command.clone().unwrap_or_default();
+    let output: String = step.output.clone().unwrap_or_default();
+    html! {
+        div {
+            class: c_cicd_step()
+            div {
+                class: c_cicd_item_header()
+                span {
+                    class: c_cicd_item_meta()
+                    step.name.as_str()
+                }
+                span {
+                    class: c_cicd_item_status()
+                    step.status.to_string().as_str()
+                }
+            }
+            if !command.is_empty() {
+                span {
+                    class: c_cicd_item_meta()
+                    format!("{LABEL_COMMAND}: {command}").as_str()
+                }
+            }
+            if !output.is_empty() {
+                pre {
+                    class: c_cicd_log_body()
+                    output.as_str()
+                }
+            }
+            euv_button {
+                variant: VARIANT_OUTLINE
+                onclick: tail_handler(state, run_id)
+                LABEL_TAIL
+            }
+        }
+    }
+}
+
+/// Returns the name of the pipeline of a run.
+///
+/// The server leaves the name of the pipeline out of the run, so the name is
+/// looked up in the pipelines the page has loaded.
+///
+/// # Arguments
+///
+/// - `CicdState` - The state of the page.
+/// - `i32` - The identifier of the pipeline.
+///
+/// # Returns
+///
+/// - `String` - The name of the pipeline, empty when the page does not know
+///   the pipeline.
+pub fn pipeline_name(state: CicdState, pipeline_id: i32) -> String {
+    let pipelines: Signal<Vec<Pipeline>> = state.get_pipelines();
+    let found: Option<Pipeline> = pipelines
+        .get()
+        .into_iter()
+        .find(|pipeline: &Pipeline| pipeline.id == pipeline_id);
+    match found {
+        Some(pipeline) => pipeline.name,
+        None => String::new(),
     }
 }
 
@@ -443,7 +505,7 @@ pub fn run_log(node: VirtualNode<RunLogProps>) -> VirtualNode {
                     class: c_cicd_log_body()
                     for entry in { logs } {
                         span {
-                            class: if { entry.is_stderr } {
+                            class: if entry.is_stderr {
                                 c_cicd_log_line_error()
                             } else {
                                 c_cicd_log_line()

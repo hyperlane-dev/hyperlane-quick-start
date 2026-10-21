@@ -151,7 +151,7 @@ pub fn qrcode_entry(node: VirtualNode<QrcodeEntryProps>) -> VirtualNode {
                 class: c_qrcode_canvas()
                 ref: canvas
             }
-            if { is_link(&text) } {
+            if is_link(&text) {
                 euv_button {
                     variant: VARIANT_PRIMARY
                     onclick: open_handler(text.clone())

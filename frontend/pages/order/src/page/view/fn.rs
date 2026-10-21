@@ -376,7 +376,7 @@ pub fn users_panel(node: VirtualNode<PanelProps>) -> VirtualNode {
                     LABEL_SEARCH_BUTTON
                 }
             }
-            if { admin == false } {
+            if admin == false {
                 euv_result {
                     code: "403"
                     title: TITLE_EMPTY
@@ -624,7 +624,7 @@ pub fn record_form(node: VirtualNode<RecordFormProps>) -> VirtualNode {
                 value: state.get_record_bill_date()
                 oninput: record_bill_date_handler(state)
             }
-            if { admin == true } {
+            if admin == true {
                 euv_field {
                     id: ID_TARGET_USER
                     label: LABEL_TARGET_USER
@@ -681,7 +681,7 @@ pub fn stat_tile(node: VirtualNode<StatTileProps>) -> VirtualNode {
                 class: c_hls_stat_label()
                 label
             }
-            if { !hint.is_empty() } {
+            if !hint.is_empty() {
                 div {
                     class: c_order_stat_hint()
                     hint.as_str()
@@ -714,7 +714,7 @@ pub fn filter_button(node: VirtualNode<FilterButtonProps>) -> VirtualNode {
     let active: bool = filter_of(&state, kind) == value;
     let handler: Option<Rc<dyn Fn(Event)>> = filter_handler(state, kind.to_string(), value.to_string());
     html! {
-        if { active == true } {
+        if active == true {
             euv_button {
                 variant: EuvButtonVariant::Primary
                 onclick: handler.clone()
@@ -773,7 +773,7 @@ pub fn record_row(node: VirtualNode<RecordRowProps>) -> VirtualNode {
                     class: c_order_record_tag()
                     category.as_str()
                 }
-                if { !owner.is_empty() } {
+                if !owner.is_empty() {
                     span {
                         class: c_order_record_owner()
                         owner.as_str()
@@ -784,7 +784,7 @@ pub fn record_row(node: VirtualNode<RecordRowProps>) -> VirtualNode {
                     date.as_str()
                 }
             }
-            if { !description.is_empty() } {
+            if !description.is_empty() {
                 p {
                     class: c_order_record_description()
                     description.as_str()

@@ -83,7 +83,8 @@ pub const EUV_PLAYGROUND_SEQ_FILE: &str = "_seq";
 /// count and Add / Reset buttons. Two handlers demonstrate the
 /// multi-event pattern. We use `r##"..."##` because the body contains
 /// `App::mount("#app", ...)`.
-pub const EUV_PLAYGROUND_DEFAULT_CODE: &str = r##"use {euv::*, euv_ui::*, wasm_bindgen::prelude::*, web_sys::*};
+pub const EUV_PLAYGROUND_DEFAULT_CODE: &str = r##"use {euv::*, euv_ui::*};
+use std::rc::Rc;
 
 class! {
     c_euv_playground_root {
@@ -99,11 +100,25 @@ class! {
         color: var!(foreground);
         text-align: "center";
     }
+}
 
-    c_euv_card {
-        c_card();
-        width: "168px";
-    }
+/// Renders the content inside a reactive scope.
+///
+/// The framework renders the root of the application without a scope of its
+/// own, so a signal the content reads in plain Rust code is not tracked and
+/// the value the content read stays the one of the first render. The scope
+/// gives the content a scope of its own, so the content renders again when
+/// the signal changes.
+///
+/// # Arguments
+///
+/// - `Rc<dyn Fn() -> VirtualNode>` - The content of the scope.
+///
+/// # Returns
+///
+/// - `VirtualNode` - The content inside its scope.
+fn scope(content: Rc<dyn Fn() -> VirtualNode>) -> VirtualNode {
+    VirtualNode::create_dynamic(move |_: &mut HookContext| content())
 }
 
 /// Builds the shared application instance.
@@ -114,33 +129,25 @@ class! {
 fn app() -> VirtualNode {
     let count: Signal<i32> = App::use_signal(|| 0);
 
-    let add_event = move |_: Event| {
+    let add_event: Option<Rc<dyn Fn(Event)>> = Some(Rc::new(move |_: Event| {
         count.set(count.get() + 1);
-    };
+    }));
 
     html! {
         div {
             class: c_euv_playground_root()
-            div {
-                class: c_euv_card()
-                h3 {
-                    class: c_card_title()
-                    "Hello euv playground"
-                }
-                div {
-                    class: c_info_row()
-                    span {
-                        class: c_info_label()
-                        "Count: " count
+            euv_card {
+                title: "Hello euv playground"
+                scope(Rc::new(move || html! {
+                    euv_info {
+                        label: "Count"
+                        count.get().to_string()
                     }
-                }
-                div {
-                    class: c_button_controls()
-                    button {
-                        class: c_euv_button_primary_md()
-                        onclick: add_event
-                        "Add"
-                    }
+                }))
+                euv_button {
+                    variant: EuvButtonVariant::Primary
+                    onclick: add_event
+                    "Add"
                 }
             }
         }

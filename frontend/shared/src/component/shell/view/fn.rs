@@ -81,7 +81,7 @@ pub fn app_shell(node: VirtualNode<AppShellProps>) -> VirtualNode {
                 }
             }
             main {
-                class: if { mobile } {
+                class: if mobile.get() {
                     c_mobile_main()
                 } else {
                     c_app_main()
@@ -89,7 +89,7 @@ pub fn app_shell(node: VirtualNode<AppShellProps>) -> VirtualNode {
                 content
             }
             div {
-                class: if { drawer_open } {
+                class: if drawer_open.get() {
                     c_mobile_overlay().get_name().to_string()
                 } else {
                     format!("{} {}", c_mobile_overlay().get_name(), c_mobile_overlay_hidden().get_name())
@@ -97,7 +97,7 @@ pub fn app_shell(node: VirtualNode<AppShellProps>) -> VirtualNode {
                 onclick: drawer_close(drawer_open)
             }
             nav {
-                class: if { drawer_open } {
+                class: if drawer_open.get() {
                     c_mobile_nav_drawer().get_name().to_string()
                 } else {
                     format!("{} {}", c_mobile_nav_drawer().get_name(), c_mobile_nav_drawer_closed().get_name())
@@ -142,7 +142,7 @@ pub fn nav_entries(node: VirtualNode<NavEntriesProps>) -> VirtualNode {
             class: c_hls_nav_entries()
             for &(icon, label, path) in NAV_ITEMS {
                 a {
-                    class: if { path == current_path } {
+                    class: if path == current_path {
                         c_hls_nav_link_active()
                     } else {
                         c_hls_nav_link()

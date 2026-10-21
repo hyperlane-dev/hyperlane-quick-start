@@ -162,13 +162,13 @@ pub fn upload_row(node: VirtualNode<UploadRowProps>) -> VirtualNode {
             upload_progress {
                 percent: entry.progress
             }
-            if { !entry.error.is_empty() } {
+            if !entry.error.is_empty() {
                 span {
                     class: c_upload_item_error()
                     entry.error.as_str()
                 }
             }
-            if { !entry.url.is_empty() } {
+            if !entry.url.is_empty() {
                 a {
                     class: c_upload_item_url()
                     href: entry.url.clone()
@@ -235,7 +235,7 @@ pub fn upload_history_row(node: VirtualNode<UploadHistoryProps>) -> VirtualNode 
                     item.upload_time.as_str()
                 }
             }
-            if { !item.url.is_empty() } {
+            if !item.url.is_empty() {
                 a {
                     class: c_upload_item_url()
                     href: item.url.clone()

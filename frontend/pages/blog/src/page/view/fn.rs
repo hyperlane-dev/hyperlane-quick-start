@@ -208,7 +208,7 @@ pub fn post_row(node: VirtualNode<PostRowProps>) -> VirtualNode {
                 class: c_blog_post_title()
                 post.title.as_str()
             }
-            if { !summary.is_empty() } {
+            if !summary.is_empty() {
                 p {
                     class: c_blog_post_summary()
                     summary.as_str()

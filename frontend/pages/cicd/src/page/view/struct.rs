@@ -32,6 +32,17 @@ pub struct RunDetailProps {
     pub state: CicdState,
 }
 
+/// The props of one step of a job of a run.
+#[derive(Clone, Debug, Default)]
+pub struct StepBlockProps {
+    /// The state the page renders from.
+    pub state: CicdState,
+    /// The identifier of the run the step belongs to.
+    pub run_id: i32,
+    /// The step the block shows.
+    pub step: Step,
+}
+
 /// The props of the log of one run.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct RunLogProps {

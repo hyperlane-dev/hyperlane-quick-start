@@ -165,7 +165,7 @@ pub fn rss_item(node: VirtualNode<RssItemProps>) -> VirtualNode {
                         file_type.as_str()
                     }
                 }
-                if { has_download == true } {
+                if has_download == true {
                     a {
                         class: c_rss_item_download()
                         href: download.clone()

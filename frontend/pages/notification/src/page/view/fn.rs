@@ -230,7 +230,7 @@ pub fn filter_button(node: VirtualNode<FilterButtonProps>) -> VirtualNode {
     let active: bool = filter_of(&state, kind) == value;
     let handler: Option<Rc<dyn Fn(Event)>> = filter_handler(state, kind.to_string(), value.to_string());
     html! {
-        if { active == true } {
+        if active == true {
             euv_button {
                 variant: EuvButtonVariant::Primary
                 onclick: handler.clone()
@@ -333,7 +333,7 @@ pub fn notification_row(node: VirtualNode<NotificationRowProps>) -> VirtualNode 
             }
             div {
                 class: c_notification_item_actions()
-                if { unread == true } {
+                if unread == true {
                     euv_button {
                         variant: EuvButtonVariant::Outline
                         onclick: mark_read_handler(state, read_id.clone())
@@ -439,7 +439,7 @@ pub fn notification_detail(node: VirtualNode<NotificationDetailProps>) -> Virtua
                 }
                 span {
                     class: c_info_value()
-                    if { read == true } {
+                    if read == true {
                         TEXT_DETAIL_READ
                     } else {
                         TEXT_DETAIL_UNREAD

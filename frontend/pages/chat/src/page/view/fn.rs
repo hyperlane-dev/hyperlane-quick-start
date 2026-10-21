@@ -160,7 +160,7 @@ pub fn chat_message_row(node: VirtualNode<ChatMessageProps>) -> VirtualNode {
     html! {
         div {
             class: c_chat_message()
-            class: if { message.own } {
+            class: if message.own {
                 c_chat_message_own()
             } else {
                 c_chat_message_other()

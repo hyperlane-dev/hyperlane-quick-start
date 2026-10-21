@@ -228,14 +228,14 @@ pub fn user_row(node: VirtualNode<UserRowProps>) -> VirtualNode {
                     onclick: open_user_handler(state, user_id.clone())
                     LABEL_OPEN
                 }
-                if { approvable == true } {
+                if approvable == true {
                     euv_button {
                         variant: EuvButtonVariant::Primary
                         onclick: approve_handler(state, approve_id.clone())
                         LABEL_APPROVE
                     }
                 }
-                if { rejectable == true } {
+                if rejectable == true {
                     euv_button {
                         variant: EuvButtonVariant::Outline
                         onclick: reject_handler(state, reject_id.clone())
@@ -309,7 +309,7 @@ pub fn user_detail(node: VirtualNode<UserDetailProps>) -> VirtualNode {
     html! {
         div {
             class: c_user_form()
-            if { mode == MODE_VIEW } {
+            if mode == MODE_VIEW {
                 div {
                     class: c_info_row()
                     span {
@@ -400,7 +400,7 @@ pub fn user_detail(node: VirtualNode<UserDetailProps>) -> VirtualNode {
                         LABEL_PASSWORD
                     }
                 }
-            } else if { mode == MODE_EDIT } {
+            } else if mode == MODE_EDIT {
                 euv_field {
                     id: ID_EMAIL
                     label: LABEL_EMAIL
