@@ -6,7 +6,7 @@ pub(crate) const SUBTITLE_HOME: &str =
     "A lightweight rust http server with middleware, websocket, sse and tcp support.";
 
 /// The label of the badge that carries the moment the page was served.
-pub(crate) const LABEL_BADGE_TIME: &str = "Served at";
+pub(crate) const LABEL_BADGE_TIME: &str = "Served at (UTC)";
 
 /// The label of the button that opens the repository.
 pub(crate) const LABEL_REPOSITORY: &str = "Server: Hyperlane";
