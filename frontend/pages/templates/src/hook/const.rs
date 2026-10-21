@@ -1,17 +1,8 @@
-/// The label of the moment the card shows.
-pub(crate) const LABEL_TIME: &str = "The page was served at";
+/// The number of seconds in a minute.
+pub(crate) const SECONDS_PER_MINUTE: i64 = 60;
 
-/// The address of the repository the page links to.
-pub(crate) const URL_REPOSITORY: &str = "https://github.com/hyperlane-dev/hyperlane";
+/// The number of minutes in an hour.
+pub(crate) const MINUTES_PER_HOUR: i64 = 60;
 
-/// The address of the home page the page links to.
-pub(crate) const URL_HOME: &str = "/";
-
-/// The label of the repository link.
-pub(crate) const LABEL_REPOSITORY: &str = "Server: Hyperlane";
-
-/// The label of the home link.
-pub(crate) const LABEL_HOME: &str = "Back to Home";
-
-/// The target a link that opens another tab uses.
-pub(crate) const TARGET_BLANK: &str = "_blank";
+/// The number of hours in a day.
+pub(crate) const HOURS_PER_DAY: i64 = 24;

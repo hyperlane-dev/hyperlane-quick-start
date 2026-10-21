@@ -359,13 +359,13 @@ pub fn diff_stat(node: VirtualNode<DiffStatProps>) -> VirtualNode {
     let DiffStatProps { label, value }: DiffStatProps = node.try_get_props().unwrap_or_default();
     html! {
         div {
-            class: c_home_stat_card()
+            class: c_hls_stat_card()
             div {
-                class: c_home_stat_value()
+                class: c_hls_stat_value()
                 value
             }
             div {
-                class: c_home_stat_label()
+                class: c_hls_stat_label()
                 label
             }
         }

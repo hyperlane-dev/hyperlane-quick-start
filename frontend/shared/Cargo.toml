@@ -10,8 +10,8 @@ description = """Shared frontend building blocks for the Hyperlane Quick Start p
 
 [dependencies]
 euv = { workspace = true }
-euv-ui = { workspace = true }
 serde = { workspace = true }
+euv-ui = { workspace = true }
+web-sys = { workspace = true }
 serde_json = { workspace = true }
 wasm-bindgen-futures = { workspace = true }
-web-sys = { workspace = true }

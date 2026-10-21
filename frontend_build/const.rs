@@ -22,6 +22,9 @@ pub(crate) const PROFILE_DEV: &str = "dev";
 /// The directory the frontend workspace lives in.
 pub(crate) const FRONTEND_DIR: &str = "frontend";
 
+/// The directory the shared package lives in.
+pub(crate) const SHARED_DIR: &str = "shared";
+
 /// The directory the page packages live in.
 pub(crate) const PAGES_DIR: &str = "pages";
 

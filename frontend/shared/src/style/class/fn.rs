@@ -2,6 +2,39 @@ use super::*;
 
 class! {
     // ═══════════════════════════════════════════════════════════════════════════
+    // Metric Tiles
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    // The tile of one metric of a page.
+    pub c_hls_stat_card {
+        display: "flex";
+        flex-direction: "column";
+        align-items: "center";
+        justify-content: "center";
+        gap: var!(space-xs);
+    }
+
+    // The glyph of one metric.
+    pub c_hls_stat_icon {
+        font-size: var!(font-2xl);
+    }
+
+    // The value of one metric.
+    pub c_hls_stat_value {
+        font-size: var!(font-xl);
+        font-weight: "800";
+        color: var!(foreground);
+        letter-spacing: "-0.01em";
+    }
+
+    // The name of one metric.
+    pub c_hls_stat_label {
+        font-size: var!(font-sm);
+        color: var!(muted-foreground);
+        font-weight: "500";
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
     // Application Shell
     // ═══════════════════════════════════════════════════════════════════════════
 

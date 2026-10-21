@@ -118,7 +118,8 @@ fn build_page(
     };
     let output_dir: PathBuf = manifest_dir.join(STATIC_DIR).join(&name);
     let mode: &str = if release { PROFILE_RELEASE } else { PROFILE_DEV };
-    if is_fresh(package, &output_dir, mode) {
+    let shared_dir: PathBuf = manifest_dir.join(FRONTEND_DIR).join(SHARED_DIR);
+    if is_fresh(package, &shared_dir, &output_dir, mode) {
         println!("cargo:warning=the page {name} is up to date");
         return Ok(());
     }
@@ -135,7 +136,7 @@ fn build_page(
     command.env(ENV_TARGET_DIR, frontend_target_dir(manifest_dir));
     command.env_remove(ENV_ENCODED_RUSTFLAGS);
     command.env_remove(ENV_RUSTFLAGS);
-    redirect_output(&mut command);
+    redirect_output(&mut command, &name);
     let status: std::process::ExitStatus = command.status().map_err(|_| MESSAGE_NO_CLI)?;
     if !status.success() {
         return Err(format!(
@@ -178,8 +179,14 @@ fn frontend_target_dir(manifest_dir: &Path) -> PathBuf {
 /// # Arguments
 ///
 /// - `&mut Command` - The command the output is redirected away from.
-fn redirect_output(command: &mut Command) {
-    match File::create(log_path()) {
+/// - `&str` - The name of the page that is built.
+fn redirect_output(command: &mut Command, name: &str) {
+    let log_file: PathBuf = log_path(name);
+    if let Some(parent) = log_file.parent() {
+        let created: std::io::Result<()> = create_dir_all(parent);
+        let _: std::io::Result<()> = created;
+    }
+    match File::create(log_file) {
         Ok(log) => match log.try_clone() {
             Ok(errors) => {
                 command.stdout(Stdio::from(log));
@@ -199,12 +206,16 @@ fn redirect_output(command: &mut Command) {
 
 /// Returns the path of the log the frontend build writes to.
 ///
+/// # Arguments
+///
+/// - `&str` - The name of the page that is built.
+///
 /// # Returns
 ///
 /// - `PathBuf` - The path of the log.
-fn log_path() -> PathBuf {
+fn log_path(name: &str) -> PathBuf {
     let out_dir: PathBuf = PathBuf::from(var(ENV_OUT_DIR).unwrap_or_default());
-    out_dir.join(LOG_NAME)
+    out_dir.join(STAMP_DIR).join(name).join(LOG_NAME)
 }
 
 /// Returns the command line interface binary that builds the pages.
@@ -222,16 +233,20 @@ fn cli_binary() -> String {
 
 /// Reports whether the artifacts of a page are newer than its sources.
 ///
+/// The sources of the shared crate are part of every page, so a change in
+/// them rebuilds every page as well.
+///
 /// # Arguments
 ///
 /// - `&Path` - The package directory of the page.
+/// - `&Path` - The directory of the shared package.
 /// - `&Path` - The directory the artifacts were written to.
 /// - `&str` - The profile the artifacts were built with.
 ///
 /// # Returns
 ///
 /// - `bool` - Whether the page can be left alone.
-fn is_fresh(package: &Path, output_dir: &Path, mode: &str) -> bool {
+fn is_fresh(package: &Path, shared: &Path, output_dir: &Path, mode: &str) -> bool {
     let index: PathBuf = output_dir.join(INDEX_NAME);
     let Ok(built_at) = index.metadata().and_then(|meta: fs::Metadata| meta.modified()) else {
         return false;
@@ -239,9 +254,13 @@ fn is_fresh(package: &Path, output_dir: &Path, mode: &str) -> bool {
     if stamp_mode(package).as_deref() != Some(mode) {
         return false;
     }
-    match newest_source_time(package) {
-        Some(source_at) => source_at <= built_at,
-        None => false,
+    let page_at: Option<SystemTime> = newest_source_time(package);
+    let shared_at: Option<SystemTime> = newest_source_time(shared);
+    match (page_at, shared_at) {
+        (Some(page_at), Some(shared_at)) => page_at.max(shared_at) <= built_at,
+        (Some(page_at), None) => page_at <= built_at,
+        (None, Some(shared_at)) => shared_at <= built_at,
+        (None, None) => false,
     }
 }
 
