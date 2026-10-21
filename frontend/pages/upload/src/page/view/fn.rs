@@ -141,6 +141,8 @@ pub fn upload_page(node: VirtualNode<UploadPageProps>) -> VirtualNode {
 pub fn upload_row(node: VirtualNode<UploadRowProps>) -> VirtualNode {
     let UploadRowProps { state, entry }: UploadRowProps = node.try_get_props().unwrap_or_default();
     let _state: UploadState = state;
+    let percent: Signal<f64> = Signal::create(entry.progress);
+    let active: Signal<bool> = Signal::create(entry.status == UploadStatus::Uploading);
     html! {
         div {
             key: entry.id.clone()
@@ -160,8 +162,10 @@ pub fn upload_row(node: VirtualNode<UploadRowProps>) -> VirtualNode {
                     entry.status.to_string()
                 }
             }
-            upload_progress {
-                percent: entry.progress
+            euv_progress {
+                percent: percent
+                label: ""
+                active: active
             }
             if !entry.error.is_empty() {
                 span {
@@ -176,30 +180,6 @@ pub fn upload_row(node: VirtualNode<UploadRowProps>) -> VirtualNode {
                     target: "_blank"
                     entry.url.as_str()
                 }
-            }
-        }
-    }
-}
-
-/// Renders the progress bar of one file of the upload list.
-///
-/// # Arguments
-///
-/// - `VirtualNode<UploadProgressProps>` - The props node carrying the share.
-///
-/// # Returns
-///
-/// - `VirtualNode` - The progress bar tree.
-#[component]
-pub fn upload_progress(node: VirtualNode<UploadProgressProps>) -> VirtualNode {
-    let UploadProgressProps { percent }: UploadProgressProps = node.try_get_props().unwrap_or_default();
-    let width: String = format!("width: {percent}%;");
-    html! {
-        div {
-            class: c_upload_progress()
-            div {
-                class: c_upload_progress_fill()
-                style: width.as_str()
             }
         }
     }

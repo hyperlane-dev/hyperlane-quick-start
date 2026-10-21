@@ -127,18 +127,4 @@ class! {
     // ═══════════════════════════════════════════════════════════════════════════
     // Progress
     // ═══════════════════════════════════════════════════════════════════════════
-
-    // The track of the progress bar of one file.
-    pub c_upload_progress {
-        width: "100%";
-        height: var!(space-sm);
-        background: var!(accent-muted);
-        border: format!("1px solid {}", var!(border));
-    }
-
-    // The fill of the progress bar of one file.
-    pub c_upload_progress_fill {
-        height: "100%";
-        background: var!(foreground);
-    }
 }

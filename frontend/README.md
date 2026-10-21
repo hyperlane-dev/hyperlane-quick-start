@@ -79,6 +79,17 @@ euv fmt --check
 - Every component comes from `euv-ui`. A page that needs a style of its own
   adds a class to the class registry of its own package, never a hand rolled
   element.
+
+  The few native elements the pages still use are the ones the library has no
+  component for, or a component that cannot carry what the page needs:
+  the `<textarea>` (the library has no text area component), the `<select>` of
+  the page size (the library has a dropdown, not a select), the hidden file
+  input of the pickers (the upload component hands the caller a display
+  string, not the files), the read only fields of the JSON editor (the input
+  component has no read only mode), the tables of the monitor and the tracking
+  page (the table component takes static cell texts, the pages show the
+  values of the running server) and the `<nav>` of the shell (the navbar of
+  the library is a horizontal bar, the shell carries a sidebar).
 - A class is written with the design tokens of the framework (`var!(…)`),
   never with a hard coded colour or spacing.
 - The pages hold their state in signals, and every piece of state that a
