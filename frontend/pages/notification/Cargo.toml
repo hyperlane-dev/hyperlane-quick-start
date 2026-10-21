@@ -12,7 +12,7 @@ description = """The notification page of the Hyperlane Quick Start server, buil
 crate-type = ["cdylib"]
 
 [dependencies]
-hyperlane_frontend_shared = { path = "../../shared" }
+hyperlane_frontend_shared = { workspace = true }
 
 euv = { workspace = true }
 serde = { workspace = true }

@@ -12,7 +12,7 @@ description = """The euv playground page of the Hyperlane Quick Start server, bu
 crate-type = ["cdylib"]
 
 [dependencies]
-hyperlane_frontend_shared = { path = "../../shared" }
+hyperlane_frontend_shared = { workspace = true }
 
 euv = { workspace = true }
 serde = { workspace = true }
