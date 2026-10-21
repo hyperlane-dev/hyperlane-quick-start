@@ -65,8 +65,31 @@ RUN cargo fetch
 COPY . .
 
 # The wasm target is needed to compile the playground's user code to
-# WebAssembly.
+# WebAssembly, and the frontend pages of the repository to WebAssembly.
 RUN rustup target add wasm32-unknown-unknown
+
+# wasm-pack compiles the pages of the frontend workspace. It is taken from
+# the prebuilt musl release, so it does not need a Rust build of its own in
+# the image.
+RUN set -eux; \
+    arch="$(uname -m)"; \
+    case "$arch" in \
+        x86_64) wasm_arch="x86_64" ;; \
+        aarch64) wasm_arch="aarch64" ;; \
+        *) echo "unsupported architecture: $arch" >&2; exit 1 ;; \
+    esac; \
+    cd /tmp; \
+    curl -sSfL -o wasm-pack.tar.gz \
+      "https://github.com/rustwasm/wasm-pack/releases/download/v${WASM_PACK_VERSION}/wasm-pack-v${WASM_PACK_VERSION}-${wasm_arch}-unknown-linux-musl.tar.gz"; \
+    tar xzf wasm-pack.tar.gz; \
+    cp -f "wasm-pack-v${WASM_PACK_VERSION}-${wasm_arch}-unknown-linux-musl/wasm-pack" /usr/local/bin/wasm-pack; \
+    chmod 0755 /usr/local/bin/wasm-pack; \
+    rm -rf /tmp/wasm-pack.tar.gz /tmp/wasm-pack-v*
+
+# The euv command line interface builds the pages of the frontend workspace.
+# The build script of the server package drives it, so the pages are part of
+# the build of the server itself.
+RUN cargo install euv-cli --version 0.31.3 --locked
 
 # The build itself runs on the Alpine (musl) toolchain, so the produced
 # binary is statically linked against musl and needs no shared library
@@ -126,6 +149,11 @@ WORKDIR /hyperlane-quick-start
 # COPY of a missing path fails the build.
 COPY resources ./resources
 RUN mkdir -p ./resources/static
+
+# The browser assets of the pages are built by the build script of the server
+# package, so they are taken from the builder stage instead of the checkout:
+# the build writes them into the static resource directory of the source tree.
+COPY --from=builder /hyperlane-quick-start/resources/static ./resources/static
 
 # The single build output. The server's own build tree - the crate
 # registry and the whole target/ directory - is not copied over; only the

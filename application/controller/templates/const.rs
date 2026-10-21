@@ -16,5 +16,5 @@ pub const OPENAPI_PARAM_DESCRIPTION_TRACE_ID: &str = "Trace ID";
 /// OpenAPI route path for the templates endpoint.
 pub const OPENAPI_PATH_TEMPLATES: &str = "/templates";
 
-/// Template placeholder replaced with the current server time.
-pub const TEMPLATE_PLACEHOLDER_TIME: &str = "{{ time }}";
+/// Directory path for the landing page redirect path.
+pub(crate) const TEMPLATES_VIEW_REDIRECT_PATH: &str = "/static/templates/index.html";

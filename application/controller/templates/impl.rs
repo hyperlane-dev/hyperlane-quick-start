@@ -14,12 +14,13 @@ impl ServerHook for TemplatesRoute {
     }
 
     #[prologue_macros(
-        is_get_method,
-        response_body(TEMPLATES_INDEX_HTML.replace(TEMPLATE_PLACEHOLDER_TIME, &time()))
+      methods(get, post),
+      response_status_code(302),
+      response_header(LOCATION => TEMPLATES_VIEW_REDIRECT_PATH)
     )]
     #[instrument_trace]
-    /// Handles the `TemplatesRoute` route request and writes the JSON
-    /// response envelope into the request context.
+    /// Handles the `TemplatesRoute` route request and redirects to the
+    /// landing page.
     ///
     /// # Arguments
     ///
@@ -30,7 +31,7 @@ impl ServerHook for TemplatesRoute {
     /// # Returns
     ///
     /// - `Status` - The hook status that tells the server how to continue.
-    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
+    async fn handle(self, _stream: &mut Stream, _ctx: &mut Context) -> Status {
         Status::Continue
     }
 }

@@ -1,0 +1,75 @@
+use super::*;
+
+class! {
+    // ═══════════════════════════════════════════════════════════════════════════
+    // List
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    // The toolbar above the list of the codes.
+    pub c_qrcode_toolbar {
+        display: "flex";
+        align-items: "center";
+        gap: var!(gap-inline);
+        flex-wrap: "wrap";
+        margin-bottom: var!(gap-element);
+    }
+
+    // The zone the file of the codes is picked in.
+    pub c_qrcode_import {
+        display: "flex";
+        align-items: "center";
+        gap: var!(gap-inline);
+        padding: var!(space-sm) var!(space-lg);
+        border: format!("1px solid {}", var!(border));
+        cursor: "pointer";
+    }
+
+    // The label of the file picker of the codes.
+    pub c_qrcode_import_label {
+        font-size: var!(font-sm);
+        font-weight: "600";
+        color: var!(foreground);
+    }
+
+    // The list of the codes.
+    pub c_qrcode_list {
+        display: "flex";
+        flex-direction: "column";
+        gap: var!(gap-element);
+    }
+
+    // One code of the list.
+    pub c_qrcode_item {
+        display: "flex";
+        flex-direction: "column";
+        align-items: "flex-start";
+        gap: var!(gap-element);
+        padding: var!(space-lg);
+        border: format!("1px solid {}", var!(border));
+    }
+
+    // The header of one code of the list.
+    pub c_qrcode_item_header {
+        display: "flex";
+        align-items: "center";
+        justify-content: "space-between";
+        gap: var!(gap-inline);
+        width: "100%";
+    }
+
+    // The title of one code of the list.
+    pub c_qrcode_item_title {
+        font-size: var!(font-sm);
+        font-weight: "600";
+        color: var!(foreground);
+    }
+
+    // The canvas one code of the list is drawn into.
+    pub c_qrcode_canvas {
+        width: "100%";
+        max-width: var!(min-height-base);
+        height: "auto";
+        border: format!("1px solid {}", var!(border));
+        background: var!(background);
+    }
+}

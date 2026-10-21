@@ -18,11 +18,15 @@ exclude = [
     ".vscode",
     "node_modules",
     "Cargo.lock",
+    "frontend",
+    "resources/static/*/index.html",
+    "resources/static/*/pkg",
 ]
 
 [workspace]
 resolver = "3"
 members = ["application", "bootstrap", "config", "plugin", "resources"]
+exclude = ["frontend"]
 
 [workspace.dependencies]
 hyperlane_config = { path = "config", version = "23.0.45" }
