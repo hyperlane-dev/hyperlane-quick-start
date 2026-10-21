@@ -40,8 +40,9 @@ class! {
 
     // Hides the element on the desktop layout, where the sidebar replaces it.
     pub c_hls_mobile_only {
-        @media ((min-width: 768px)) {
-            display: "none";
+        display: "none";
+        @media ((max-width: 767px)) {
+            display: "flex";
         }
     }
 

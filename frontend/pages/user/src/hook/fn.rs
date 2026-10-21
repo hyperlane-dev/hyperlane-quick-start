@@ -16,6 +16,7 @@ pub fn use_user_state() -> UserState {
     let cursors: Signal<Vec<String>> = App::use_signal(Vec::new);
     let page: Signal<i32> = App::use_signal(|| PAGE_FIRST);
     let keyword: Signal<String> = App::use_signal(|| EMPTY.to_string());
+    let square: Signal<bool> = App::use_signal(|| false);
     let pending: Signal<bool> = App::use_signal(|| false);
     let loading: Signal<bool> = App::use_signal(|| true);
     let error: Signal<String> = App::use_signal(|| EMPTY.to_string());
@@ -33,6 +34,7 @@ pub fn use_user_state() -> UserState {
         has_more,
         cursors,
         page,
+        square,
         keyword,
         pending,
         loading,

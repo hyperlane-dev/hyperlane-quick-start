@@ -44,21 +44,6 @@ class! {
         }
     }
 
-    // The avatar of a user.
-    pub c_user_avatar {
-        display: "flex";
-        align-items: "center";
-        justify-content: "center";
-        flex-shrink: "0";
-        width: var!(space-4xl);
-        height: var!(space-4xl);
-        border-radius: var!(space-2xl);
-        background: var!(accent);
-        color: var!(text-on-accent);
-        font-size: var!(font-sm);
-        font-weight: "600";
-    }
-
     // The name and the contact fields of a user.
     pub c_user_details {
         display: "flex";

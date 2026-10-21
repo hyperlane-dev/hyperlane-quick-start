@@ -11,7 +11,7 @@ class! {
         grid-template-columns: "minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr)";
         gap: var!(gap-component);
         align-items: "start";
-        @media ((max-width: 1023px)) {
+        @media ((max-width: 767px)) {
             grid-template-columns: "1fr";
         }
     }
@@ -40,7 +40,6 @@ class! {
     pub c_gomoku_status_dot {
         width: var!(space-sm);
         height: var!(space-sm);
-        border-radius: var!(space-sm);
         background: var!(muted-foreground);
     }
 
@@ -110,7 +109,6 @@ class! {
     pub c_gomoku_stone_black {
         width: "80%";
         height: "80%";
-        border-radius: var!(space-sm);
         background: var!(foreground);
     }
 
@@ -118,7 +116,6 @@ class! {
     pub c_gomoku_stone_white {
         width: "80%";
         height: "80%";
-        border-radius: var!(space-sm);
         background: var!(background);
         border: format!("1px solid {}", var!(border));
     }

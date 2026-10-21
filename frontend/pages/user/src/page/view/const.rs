@@ -157,3 +157,9 @@ pub(crate) const ACTION_REJECT: &str = "reject";
 
 /// The name of the action that removes a user.
 pub(crate) const ACTION_DELETE: &str = "delete";
+
+/// The mark of an administrator.
+pub(crate) const MARK_ADMIN: &str = "A";
+
+/// The mark of a visitor.
+pub(crate) const MARK_USER: &str = "U";

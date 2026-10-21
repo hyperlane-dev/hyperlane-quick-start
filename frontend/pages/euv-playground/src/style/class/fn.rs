@@ -32,7 +32,7 @@ class! {
         grid-template-columns: "minmax(0, 1fr) minmax(0, 2fr) minmax(0, 2fr)";
         gap: var!(gap-component);
         align-items: "start";
-        @media ((max-width: 1279px)) {
+        @media ((max-width: 767px)) {
             grid-template-columns: "1fr";
         }
     }

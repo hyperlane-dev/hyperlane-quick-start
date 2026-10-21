@@ -27,6 +27,9 @@ pub struct UserState {
     /// The page being displayed.
     #[get(type(copy))]
     pub page: Signal<i32>,
+    /// Whether the avatar of a user stays a square.
+    #[get(type(copy))]
+    pub square: Signal<bool>,
     /// The keyword the list is filtered by.
     #[get(type(copy))]
     pub keyword: Signal<String>,

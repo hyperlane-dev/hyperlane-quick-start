@@ -188,15 +188,16 @@ pub fn user_row(node: VirtualNode<UserRowProps>) -> VirtualNode {
     let approve_id: String = user.id.clone();
     let reject_id: String = user.id.clone();
     let contact: String = contact_of(&user);
-    let initials: String = initials_of(&user.username);
+    let initials: &'static str = initials_of(&user.role);
     let approvable: bool = can_approve(&user);
     let rejectable: bool = can_reject(&user);
     html! {
         div {
             class: c_user_card()
-            div {
-                class: c_user_avatar()
-                initials.as_str()
+            euv_avatar {
+                initials: initials
+                size: EuvAvatarSize::Medium
+                square: state.get_square()
             }
             div {
                 class: c_user_details()
@@ -579,21 +580,23 @@ fn contact_of(user: &UserProfile) -> String {
     }
 }
 
-/// Builds the initials of a user.
+/// Builds the mark of the role of a user.
+///
+/// The avatar of the component library takes a static text, so the mark
+/// names the role of the user instead of the initials of the name.
 ///
 /// # Arguments
 ///
-/// - `&str` - The name of the user.
+/// - `&str` - The role of the user.
 ///
 /// # Returns
 ///
-/// - `String` - The initials of the name.
-fn initials_of(username: &str) -> String {
-    let initials: String = username.chars().take(2).collect::<String>().to_uppercase();
-    if initials.is_empty() {
-        return "??".to_string();
+/// - `&'static str` - The mark of the role.
+fn initials_of(role: &str) -> &'static str {
+    if role == ROLE_ADMIN {
+        return MARK_ADMIN;
     }
-    initials
+    MARK_USER
 }
 
 /// Builds the moment a user was created.

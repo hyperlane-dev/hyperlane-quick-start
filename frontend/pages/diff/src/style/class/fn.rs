@@ -82,7 +82,6 @@ class! {
         justify-content: "center";
         width: var!(space-lg);
         height: var!(space-lg);
-        border-radius: var!(space-sm);
         font-size: var!(font-xs);
         font-weight: "700";
     }
