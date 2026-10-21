@@ -83,6 +83,10 @@ pub async fn request_envelope<T: DeserializeOwned>(
 /// [`ApiError`] carrying the status code and the server message, so a page
 /// only has to handle the happy path and the failure.
 ///
+/// The envelope is read before its payload: a failing call carries the
+/// reason of the failure in the payload, and reading the payload as the type
+/// of the page would report a parse failure instead of the reason.
+///
 /// # Arguments
 ///
 /// - `HttpMethod` - The method the request is issued with.
@@ -97,16 +101,20 @@ pub async fn request_json<T: DeserializeOwned>(
     path: &str,
     body: Option<String>,
 ) -> Result<T, ApiError> {
-    let envelope: ApiResponse<T> = request_envelope(method, path, body).await?;
+    let envelope: ApiResponse<serde_json::Value> = request_envelope(method, path, body).await?;
     if envelope.code != STATUS_SUCCESS {
         return Err(ApiError {
             code: envelope.code,
             message: envelope.message,
         });
     }
-    envelope.data.ok_or(ApiError {
+    let data: serde_json::Value = envelope.data.ok_or(ApiError {
         code: envelope.code,
         message: envelope.message,
+    })?;
+    serde_json::from_value::<T>(data).map_err(|error: serde_json::Error| ApiError {
+        code: 0,
+        message: format!("{MESSAGE_INVALID_PAYLOAD}{MESSAGE_SEPARATOR}{error}"),
     })
 }
 

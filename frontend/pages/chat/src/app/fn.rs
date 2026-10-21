@@ -19,8 +19,12 @@ pub(crate) fn app() -> VirtualNode {
             theme: shell.get_theme()
             root_class: shell.get_root_class()
             drawer_open: shell.get_drawer_open()
-            chat_page {
-                state: state
+            reactive_scope {
+                content: Rc::new(move || html! {
+                    chat_page {
+                        state: state
+                    }
+                })
             }
         }
     }
