@@ -95,7 +95,7 @@ class! {
     // The icon of a navigation entry.
     pub c_hls_nav_link_icon {
         flex-shrink: "0";
-        width: "20px";
+        width: var!(space-lg);
         text-align: "center";
     }
 
