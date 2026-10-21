@@ -92,6 +92,25 @@ RUN set -eux; \
     chmod 0755 /usr/local/bin/wasm-pack; \
     rm -rf /tmp/wasm-pack.tar.gz /tmp/wasm-pack-v*
 
+# The wasm-bindgen command line interface is taken from the prebuilt musl
+# release as well. wasm-pack installs it on its own when it does not find it
+# in the path, and that install needs a release of the architecture of the
+# builder, which the image does not always have.
+RUN set -eux; \
+    arch="$(uname -m)"; \
+    case "$arch" in \
+        x86_64) wasm_arch="x86_64" ;; \
+        aarch64) wasm_arch="aarch64" ;; \
+        *) echo "unsupported architecture: $arch" >&2; exit 1 ;; \
+    esac; \
+    cd /tmp; \
+    curl -sSfL -o wasm-bindgen.tar.gz \
+      "https://github.com/rustwasm/wasm-bindgen/releases/download/${WASM_BINDGEN_VERSION}/wasm-bindgen-${WASM_BINDGEN_VERSION}-${wasm_arch}-unknown-linux-musl.tar.gz"; \
+    tar xzf wasm-bindgen.tar.gz; \
+    cp -f "wasm-bindgen-${WASM_BINDGEN_VERSION}-${wasm_arch}-unknown-linux-musl/wasm-bindgen" /usr/local/bin/wasm-bindgen; \
+    chmod 0755 /usr/local/bin/wasm-bindgen; \
+    rm -rf /tmp/wasm-bindgen.tar.gz /tmp/wasm-bindgen-${WASM_BINDGEN_VERSION}-*
+
 # The euv command line interface builds the pages of the frontend workspace.
 # The build script of the server package drives it, so the pages are part of
 # the build of the server itself.
