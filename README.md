@@ -98,6 +98,29 @@ docker compose exec redis redis-cli -a hyperlane ping;
 Add `-T` and a command when running these from a script, or they wait on stdin
 forever.
 
+## Frontend
+
+The browser pages of the server are WebAssembly applications of the
+[euv](https://crates.io/crates/euv) framework that render with the components
+of the [euv-ui](https://crates.io/crates/euv-ui) library. They live in their
+own workspace under `frontend/`, one package per page, and the build script of
+the server package builds every page with the
+[euv](https://crates.io/crates/euv-cli) command line interface and writes the
+artifacts into `resources/static/`, the directory the server serves them
+from.
+
+The build needs the `wasm32-unknown-unknown` target, `wasm-pack` and the
+command line interface of the framework:
+
+```sh
+rustup target add wasm32-unknown-unknown
+cargo install wasm-pack
+cargo install euv-cli --version 0.31.3
+```
+
+See the [frontend readme](frontend/README.md) for the layout of the
+workspace and for the rules the pages follow.
+
 ## Api Docs
 
 - [Api Docs](https://docs.rs/hyperlane/latest/)
