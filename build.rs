@@ -145,6 +145,7 @@ fn build_page(
     redirect_output(&mut command, &name);
     let status: std::process::ExitStatus = command.status().map_err(|_| MESSAGE_NO_CLI)?;
     if !status.success() {
+        report_build_log(&name);
         return Err(format!("the page {name} could not be built by the {CLI_NAME} command").into());
     }
     check_cli_version(&name)?;
@@ -154,6 +155,31 @@ fn build_page(
         output_dir.display()
     );
     Ok(())
+}
+
+/// Prints the tail of the log of a page that could not be built.
+///
+/// The output of the command line interface goes into the log of the page,
+/// so a build that fails without a reason is reported with the last lines
+/// of that log.
+///
+/// # Arguments
+///
+/// - `&str` - The name of the page that could not be built.
+///
+/// # Returns
+///
+/// - `()` - The tail of the log is printed.
+fn report_build_log(name: &str) {
+    let log_file: PathBuf = log_path(name);
+    let Ok(log) = fs::read_to_string(&log_file) else {
+        return;
+    };
+    let lines: Vec<&str> = log.lines().collect();
+    let start: usize = lines.len().saturating_sub(LOG_TAIL_LINES);
+    for line in &lines[start..] {
+        println!("cargo:warning={name}: {line}");
+    }
 }
 
 /// Checks that the command line interface that built a page is the version

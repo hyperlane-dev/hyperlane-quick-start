@@ -30,10 +30,16 @@ ARG WASM_PACK_VERSION=0.15.0
 ARG WASM_BINDGEN_VERSION=0.2.129
 FROM --platform=$TARGETPLATFORM rust:${RUST_VERSION}-alpine AS builder
 
+# A build argument is only visible in the stage that declares it, so the
+# version of the wasm tools is repeated here for the builder stage; without
+# it the download of wasm-pack would look for a release without a version.
+ARG WASM_PACK_VERSION
+ARG WASM_BINDGEN_VERSION
+
 # Alpine's apk is the build toolchain for the musl target: build-base
 # provides the C compiler and linker that the aws-lc-sys, ring and sqlx
 # build scripts drive, and cmake is required by aws-lc-sys.
-RUN apk add --no-cache build-base cmake perl linux-headers file
+RUN apk add --no-cache build-base cmake perl linux-headers file curl
 
 WORKDIR /hyperlane-quick-start
 

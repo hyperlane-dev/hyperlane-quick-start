@@ -3,5 +3,6 @@
 *.pid
 /data
 /target
+/frontend/target
 /.vscode
 node_modules

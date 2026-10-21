@@ -52,6 +52,10 @@ pub(crate) const TARGET_DIR: &str = "target";
 /// The name of the log the frontend build writes to.
 pub(crate) const LOG_NAME: &str = "frontend-build.log";
 
+/// The number of lines of the log of a page that are printed when the page
+/// could not be built.
+pub(crate) const LOG_TAIL_LINES: usize = 40;
+
 /// The name of the page the server serves.
 pub(crate) const INDEX_NAME: &str = "index.html";
 
