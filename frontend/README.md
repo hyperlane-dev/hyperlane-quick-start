@@ -41,6 +41,16 @@ cargo install wasm-pack
 cargo install euv-cli --version 0.31.3
 ```
 
+The build uses the command line interface of the version the project pins, and
+it stops when another version answers, because the artifacts of another version
+are not the ones the pipeline and the images of the server produce. A machine
+that keeps the tool outside its path points the build at the binary of the
+pinned version:
+
+```bash
+EUV_CLI=/path/to/euv cargo build --release
+```
+
 A package is only rebuilt when its sources are newer than its artifacts, so
 a rebuild of the server alone does not rebuild the browser assets. The
 `EUV_FRONTEND_SKIP` environment variable turns the frontend build off
@@ -73,3 +83,16 @@ euv fmt --check
   never with a hard coded colour or spacing.
 - The pages hold their state in signals, and every piece of state that a
   user can change lives in a hook of the package.
+- The dependencies of a manifest follow the order of the project: the crate of
+  the workspace first, a blank line, then the crates of the registry by the
+  length of their entry. The shared crate is declared in the workspace
+  dependencies of `frontend/Cargo.toml` and the pages inherit it, the way the
+  other packages of the repository inherit theirs.
+
+  The check of the project reads a single manifest on its own, and a manifest
+  that is read on its own does not name the members of its workspace, so the
+  shared crate looks like a crate of the registry to it and the order of the
+  entries looks wrong. The order of the entries is right: the check of the
+  workspace
+  (`verify_dep_order.py frontend`) passes, and the manifests of the server
+  itself are written the same way.

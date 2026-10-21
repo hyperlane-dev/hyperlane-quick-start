@@ -206,7 +206,7 @@ jobs:
       - name: Check the format of the pages
         run: |
           set -euo pipefail
-          for page in frontend/pages/*/; do
+          for page in frontend/pages/*/ frontend/shared/; do
             echo "---- ${page} ----"
             (cd "${page}" && euv fmt --check)
           done

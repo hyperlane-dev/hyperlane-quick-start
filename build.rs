@@ -117,7 +117,11 @@ fn build_page(
         None => return Ok(()),
     };
     let output_dir: PathBuf = manifest_dir.join(STATIC_DIR).join(&name);
-    let mode: &str = if release { PROFILE_RELEASE } else { PROFILE_DEV };
+    let mode: &str = if release {
+        PROFILE_RELEASE
+    } else {
+        PROFILE_DEV
+    };
     let shared_dir: PathBuf = manifest_dir.join(FRONTEND_DIR).join(SHARED_DIR);
     if is_fresh(package, &shared_dir, &output_dir, mode) {
         println!("cargo:warning=the page {name} is up to date");
@@ -126,7 +130,9 @@ fn build_page(
     let mut command: Command = Command::new(cli_binary());
     command.arg(CLI_BUILD);
     command.arg(ARG_CRATE_PATH).arg(package);
-    command.arg(ARG_WWW_DIR).arg(relative_output_dir(manifest_dir, package, &output_dir));
+    command
+        .arg(ARG_WWW_DIR)
+        .arg(relative_output_dir(manifest_dir, package, &output_dir));
     if release {
         command.arg(ARG_RELEASE);
     } else {
@@ -139,16 +145,56 @@ fn build_page(
     redirect_output(&mut command, &name);
     let status: std::process::ExitStatus = command.status().map_err(|_| MESSAGE_NO_CLI)?;
     if !status.success() {
-        return Err(format!(
-            "the page {name} could not be built by the {CLI_NAME} command"
-        )
-        .into());
+        return Err(format!("the page {name} could not be built by the {CLI_NAME} command").into());
     }
+    check_cli_version(&name)?;
     write_stamp(&name, mode);
     println!(
         "cargo:warning=the page {name} was built into {}",
         output_dir.display()
     );
+    Ok(())
+}
+
+/// Checks that the command line interface that built a page is the version
+/// the project expects.
+///
+/// The command line interface writes the path of its own sources into its
+/// log, and that path carries the version of the crate it was built from.
+/// A build with another version would produce artifacts that the pipeline
+/// and the images of the server do not produce, so the build stops and says
+/// which binary to point at.
+///
+/// # Arguments
+///
+/// - `&str` - The name of the page that was built.
+///
+/// # Returns
+///
+/// - `Result<(), Box<dyn std::error::Error>>` - The version of the command
+///   line interface is the expected one, or the build stops.
+fn check_cli_version(name: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let log_file: PathBuf = log_path(name);
+    let Ok(log) = fs::read_to_string(&log_file) else {
+        return Ok(());
+    };
+    let mut versions: Vec<String> = Vec::new();
+    let mut rest: &str = log.as_str();
+    while let Some(index) = rest.find(CLI_VERSION_PATTERN) {
+        rest = &rest[index + CLI_VERSION_PATTERN.len()..];
+        let end: usize = rest
+            .find(|c: char| !c.is_ascii_digit() && c != '.')
+            .unwrap_or(rest.len());
+        let version: String = rest[..end].to_string();
+        if !version.is_empty() && !versions.contains(&version) {
+            versions.push(version);
+        }
+    }
+    for version in versions {
+        if version != CLI_VERSION {
+            return Err(MESSAGE_CLI_VERSION.into());
+        }
+    }
     Ok(())
 }
 
@@ -248,7 +294,10 @@ fn cli_binary() -> String {
 /// - `bool` - Whether the page can be left alone.
 fn is_fresh(package: &Path, shared: &Path, output_dir: &Path, mode: &str) -> bool {
     let index: PathBuf = output_dir.join(INDEX_NAME);
-    let Ok(built_at) = index.metadata().and_then(|meta: fs::Metadata| meta.modified()) else {
+    let Ok(built_at) = index
+        .metadata()
+        .and_then(|meta: fs::Metadata| meta.modified())
+    else {
         return false;
     };
     if stamp_mode(package).as_deref() != Some(mode) {
@@ -338,7 +387,11 @@ fn newest_source_time(package: &Path) -> Option<SystemTime> {
                 continue;
             };
             if metadata.is_dir() {
-                if path.file_name().and_then(|name: &std::ffi::OsStr| name.to_str()) == Some("target") {
+                if path
+                    .file_name()
+                    .and_then(|name: &std::ffi::OsStr| name.to_str())
+                    == Some("target")
+                {
                     continue;
                 }
                 stack.push(path);
