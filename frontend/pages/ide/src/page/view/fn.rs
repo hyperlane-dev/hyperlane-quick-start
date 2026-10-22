@@ -39,11 +39,11 @@ pub fn ide_page(node: VirtualNode<IdePageProps>) -> VirtualNode {
                     }
                 }
                 div {
-                    class: c_button_controls()
+                    class: c_hls_button_row()
                     div {
                         class: c_hls_button_row()
                         euv_button {
-                            variant: EuvButtonVariant::Outline
+                            variant: EuvButtonVariant::Primary
                             onclick: copy_handler(state)
                             LABEL_COPY
                         }

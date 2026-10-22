@@ -12,11 +12,16 @@ thread_local! {
 /// at the size of their label. The `html body` prefix raises the specificity
 /// and the `!important` flag makes the override win over the rule of the
 /// library, whatever order the two rules end up in.
-const SHARED_CSS: &str = "html body .c_hls_button_row button { flex: 0 0 auto !important; }";
+const SHARED_CSS: &str =
+    "html body .c_hls_button_row button { flex: 0 0 auto !important; }";
 
 /// Injects the stylesheet of the shared crate into the document.
 ///
 /// The document keeps the sheet, so the function does the work once.
+///
+/// # Returns
+///
+/// - `()` - The stylesheet is in the document.
 pub fn inject_shared_css() {
     let injected: bool = CSS_INJECTED.with(|flag: &Cell<bool>| flag.replace(true));
     if injected {

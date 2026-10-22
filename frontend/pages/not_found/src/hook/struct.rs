@@ -6,7 +6,4 @@ pub struct NotFoundState {
     /// The status code the page reports.
     #[get(type(copy))]
     pub code: Signal<String>,
-    /// The links the card offers.
-    #[get(type(copy))]
-    pub links: Signal<Vec<NotFoundLink>>,
 }

@@ -66,7 +66,7 @@ pub fn gomoku_page(node: VirtualNode<GomokuPageProps>) -> VirtualNode {
                                 oninput: room_handler(state)
                             }
                             div {
-                                class: format!("{} {}", c_button_controls().get_name(), c_hls_button_row().get_name())
+                                class: c_hls_button_row()
                                 euv_button {
                                     variant: EuvButtonVariant::Primary
                                     onclick: create_handler(state)
@@ -150,20 +150,31 @@ pub fn gomoku_page(node: VirtualNode<GomokuPageProps>) -> VirtualNode {
                     class: c_gomoku_board_card()
                     euv_card {
                         title: TITLE_BOARD
-                        div {
-                            class: c_gomoku_board()
-                            for cell in { cells } {
+                        match { cells.get().is_empty() } {
+                            true => {
+                                euv_result {
+                                    code: "0"
+                                    title: TITLE_EMPTY_BOARD
+                                    description: TEXT_EMPTY_BOARD
+                                }
+                            }
+                            false => {
                                 div {
-                                    key: format!("{}-{}", cell.x, cell.y)
-                                    class: c_gomoku_cell()
-                                    onclick: place_stone_handler(state, cell.x, cell.y)
-                                    if cell.value == STONE_BLACK {
+                                    class: c_gomoku_board()
+                                    for cell in { cells } {
                                         div {
-                                            class: c_gomoku_stone_black()
-                                        }
-                                    } else if cell.value == STONE_WHITE {
-                                        div {
-                                            class: c_gomoku_stone_white()
+                                            key: format!("{}-{}", cell.x, cell.y)
+                                            class: c_gomoku_cell()
+                                            onclick: place_stone_handler(state, cell.x, cell.y)
+                                            if cell.value == STONE_BLACK {
+                                                div {
+                                                    class: c_gomoku_stone_black()
+                                                }
+                                            } else if cell.value == STONE_WHITE {
+                                                div {
+                                                    class: c_gomoku_stone_white()
+                                                }
+                                            }
                                         }
                                     }
                                 }

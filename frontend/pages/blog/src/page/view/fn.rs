@@ -361,7 +361,7 @@ pub fn write_panel(node: VirtualNode<WritePanelProps>) -> VirtualNode {
                     oninput: draft_content_handler(state)
                 }
                 div {
-                    class: c_button_controls()
+                    class: c_hls_button_row()
                     euv_switch {
                         id: ID_PUBLISHED
                         label: LABEL_PUBLISHED
@@ -451,7 +451,7 @@ pub fn post_detail(node: VirtualNode<PostDetailProps>) -> VirtualNode {
                     oninput: comment_handler(state)
                 }
                 div {
-                    class: c_button_controls()
+                    class: c_hls_button_row()
                     euv_button {
                         variant: EuvButtonVariant::Primary
                         onclick: send_comment_handler(state)

@@ -38,17 +38,19 @@ class! {
     // Button Row
     // ═══════════════════════════════════════════════════════════════════════════
 
+    // ═══════════════════════════════════════════════════════════════════════════
+    // Button Row
+    // ═══════════════════════════════════════════════════════════════════════════
+
     // The row of the action buttons of a page.
     //
-    // The buttons of the library carry `flex: 1 1 120px`, so a button grows
-    // into the whole row it sits in and a button that sits in a column takes
-    // the basis as its height. The row keeps the buttons on one line, and the
-    // stylesheet of the shared crate keeps them at the size of their label.
+    // The row is the row of buttons of the library, without the space it
+    // keeps above and below itself, so a row of buttons that stands beside
+    // other content does not push that content away.
     pub c_hls_button_row {
-        display: "flex";
-        flex-wrap: "wrap";
-        align-items: "center";
-        gap: var!(gap-element);
+        c_button_controls();
+        margin-top: "0px";
+        margin-bottom: "0px";
     }
 
     // ═══════════════════════════════════════════════════════════════════════════

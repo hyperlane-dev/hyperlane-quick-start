@@ -12,7 +12,7 @@ class! {
         gap: var!(page-block-gap);
         margin-bottom: var!(page-block-gap);
         @media ((max-width: 767px)) {
-            grid-template-columns: "repeat(1, 1fr)";
+            grid-template-columns: "repeat(2, 1fr)";
         }
     }
 
@@ -28,7 +28,7 @@ class! {
     pub c_blog_posts {
         display: "flex";
         flex-direction: "column";
-        gap: var!(gap-component);
+        gap: var!(page-block-gap);
     }
 
     // One post of the list.
@@ -37,7 +37,6 @@ class! {
         flex-direction: "column";
         gap: var!(gap-element);
         padding: var!(space-lg);
-        border: format!("1px solid {}", var!(border));
     }
 
     // The header of a post, holding its author and its time.

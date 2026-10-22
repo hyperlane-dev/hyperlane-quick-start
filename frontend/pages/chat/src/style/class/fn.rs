@@ -31,7 +31,7 @@ class! {
     pub c_chat_messages {
         display: "flex";
         flex-direction: "column";
-        gap: var!(gap-element);
+        gap: var!(page-block-gap);
         // The room scrolls, but it has to show a conversation, and no size
         // token covers a scrollable list.
         max-height: "420px";
@@ -44,7 +44,6 @@ class! {
         flex-direction: "column";
         gap: var!(space-2xs);
         padding: var!(space-md);
-        border: format!("1px solid {}", var!(border));
     }
 
     // The message the visitor of the page wrote.

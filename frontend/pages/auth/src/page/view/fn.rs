@@ -98,7 +98,7 @@ pub fn login_form(node: VirtualNode<AuthFormProps>) -> VirtualNode {
                     oninput: login_password_handler(state)
                 }
                 div {
-                    class: c_button_controls()
+                    class: c_hls_button_row()
                     euv_button {
                         variant: EuvButtonVariant::Primary
                         disabled: state.get_loading()
@@ -161,7 +161,7 @@ pub fn register_form(node: VirtualNode<AuthFormProps>) -> VirtualNode {
                     oninput: register_phone_handler(state)
                 }
                 div {
-                    class: c_button_controls()
+                    class: c_hls_button_row()
                     euv_button {
                         variant: EuvButtonVariant::Primary
                         disabled: state.get_loading()

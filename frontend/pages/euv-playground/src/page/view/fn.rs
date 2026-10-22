@@ -39,7 +39,7 @@ pub fn playground_page(node: VirtualNode<PlaygroundPageProps>) -> VirtualNode {
                 }
             }
             div {
-                class: format!("{} {}", c_button_controls().get_name(), c_hls_button_row().get_name())
+                class: c_hls_button_row()
                 euv_button {
                     variant: EuvButtonVariant::Outline
                     onclick: new_handler(state)
@@ -160,7 +160,7 @@ pub fn playground_page(node: VirtualNode<PlaygroundPageProps>) -> VirtualNode {
                         oninput: name_handler(state)
                     }
                     div {
-                        class: c_button_controls()
+                        class: c_hls_button_row()
                         euv_button {
                             variant: EuvButtonVariant::Outline
                             onclick: cancel_handler(state)

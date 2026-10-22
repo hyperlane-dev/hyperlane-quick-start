@@ -41,7 +41,7 @@ pub fn shortlink_page(node: VirtualNode<ShortlinkPageProps>) -> VirtualNode {
                         HINT_URL
                     }
                     div {
-                        class: c_button_controls()
+                        class: c_hls_button_row()
                         euv_button {
                             variant: VARIANT_PRIMARY
                             onclick: generate_handler(state)

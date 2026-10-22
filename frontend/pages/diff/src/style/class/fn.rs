@@ -34,7 +34,7 @@ class! {
         flex: "1";
         min-width: "0";
         @media ((max-width: 767px)) {
-            grid-template-columns: "1fr";
+            grid-template-columns: "repeat(2, 1fr)";
         }
     }
 

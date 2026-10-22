@@ -64,7 +64,7 @@ pub fn redis_page(node: VirtualNode<RedisPageProps>) -> VirtualNode {
                         oninput: create_value_handler(state)
                     }
                     div {
-                        class: c_button_controls()
+                        class: c_hls_button_row()
                         euv_button {
                             variant: EuvButtonVariant::Primary
                             onclick: create_handler(state)
@@ -134,7 +134,7 @@ pub fn redis_page(node: VirtualNode<RedisPageProps>) -> VirtualNode {
                             oninput: edit_value_handler(state)
                         }
                         div {
-                            class: c_button_controls()
+                            class: c_hls_button_row()
                             euv_button {
                                 variant: EuvButtonVariant::Outline
                                 onclick: close_handler(state)

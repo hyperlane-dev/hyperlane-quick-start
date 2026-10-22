@@ -88,7 +88,6 @@ class! {
         flex-direction: "column";
         gap: var!(space-2xs);
         padding: var!(space-lg);
-        border: format!("1px solid {}", var!(border));
     }
 
     // The number and the amount of a record.

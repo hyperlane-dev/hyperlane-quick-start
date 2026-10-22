@@ -103,7 +103,7 @@ pub fn cicd_page(node: VirtualNode<CicdPageProps>) -> VirtualNode {
                             div {
                                 class: c_hls_button_row()
                                 euv_button {
-                                    variant: VARIANT_OUTLINE
+                                    variant: VARIANT_PRIMARY
                                     onclick: reload_handler(state)
                                     LABEL_RELOAD
                                 }
@@ -173,7 +173,7 @@ pub fn cicd_page(node: VirtualNode<CicdPageProps>) -> VirtualNode {
                             oninput: config_handler(state)
                         }
                         div {
-                            class: c_button_controls()
+                            class: c_hls_button_row()
                             euv_button {
                                 variant: VARIANT_PRIMARY
                                 onclick: create_handler(state)
@@ -465,7 +465,7 @@ pub fn step_block(node: VirtualNode<StepBlockProps>) -> VirtualNode {
             div {
                 class: c_hls_button_row()
                 euv_button {
-                    variant: VARIANT_OUTLINE
+                    variant: VARIANT_PRIMARY
                     onclick: tail_handler(state, run_id)
                     LABEL_TAIL
                 }

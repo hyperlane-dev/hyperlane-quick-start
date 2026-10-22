@@ -428,7 +428,7 @@ pub fn user_detail(node: VirtualNode<UserDetailProps>) -> VirtualNode {
                     }
                 }
                 div {
-                    class: c_button_controls()
+                    class: c_hls_button_row()
                     euv_button {
                         variant: EuvButtonVariant::Primary
                         onclick: edit_mode_handler(state)
@@ -458,7 +458,7 @@ pub fn user_detail(node: VirtualNode<UserDetailProps>) -> VirtualNode {
                     oninput: edit_phone_handler(state)
                 }
                 div {
-                    class: c_button_controls()
+                    class: c_hls_button_row()
                     euv_button {
                         variant: EuvButtonVariant::Outline
                         onclick: view_mode_handler(state)
@@ -488,7 +488,7 @@ pub fn user_detail(node: VirtualNode<UserDetailProps>) -> VirtualNode {
                     oninput: new_password_handler(state)
                 }
                 div {
-                    class: c_button_controls()
+                    class: c_hls_button_row()
                     euv_button {
                         variant: EuvButtonVariant::Outline
                         onclick: view_mode_handler(state)
@@ -526,7 +526,7 @@ pub fn confirm_panel(node: VirtualNode<UserListProps>) -> VirtualNode {
                 text.as_str()
             }
             div {
-                class: c_button_controls()
+                class: c_hls_button_row()
                 euv_button {
                     variant: EuvButtonVariant::Outline
                     onclick: close_confirm_handler(state)

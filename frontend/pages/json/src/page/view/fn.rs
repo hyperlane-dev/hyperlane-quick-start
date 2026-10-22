@@ -40,7 +40,7 @@ pub fn json_page(node: VirtualNode<JsonPageProps>) -> VirtualNode {
                         oninput: input_handler(state)
                     }
                     div {
-                        class: c_button_controls()
+                        class: c_hls_button_row()
                         euv_button {
                             variant: EuvButtonVariant::Primary
                             onclick: parse_handler(state)
@@ -229,7 +229,7 @@ pub fn json_editor(node: VirtualNode<JsonEditorProps>) -> VirtualNode {
                 oninput: edit_value_handler(state)
             }
             div {
-                class: c_button_controls()
+                class: c_hls_button_row()
                 euv_button {
                     variant: EuvButtonVariant::Outline
                     onclick: close_editor_handler(state)

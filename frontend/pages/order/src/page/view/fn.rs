@@ -332,7 +332,7 @@ pub fn records_panel(node: VirtualNode<PanelProps>) -> VirtualNode {
                     }
                 }
                 div {
-                    class: c_button_controls()
+                    class: c_hls_button_row()
                     euv_button {
                         variant: EuvButtonVariant::Primary
                         onclick: open_record_handler(state)
@@ -504,7 +504,7 @@ pub fn profile_panel(node: VirtualNode<PanelProps>) -> VirtualNode {
                     oninput: profile_phone_handler(state)
                 }
                 div {
-                    class: c_button_controls()
+                    class: c_hls_button_row()
                     euv_button {
                         variant: EuvButtonVariant::Primary
                         onclick: save_profile_handler(state)
@@ -534,7 +534,7 @@ pub fn profile_panel(node: VirtualNode<PanelProps>) -> VirtualNode {
                     oninput: new_password_handler(state)
                 }
                 div {
-                    class: c_button_controls()
+                    class: c_hls_button_row()
                     euv_button {
                         variant: EuvButtonVariant::Primary
                         onclick: save_password_handler(state)
@@ -667,7 +667,7 @@ pub fn record_form(node: VirtualNode<RecordFormProps>) -> VirtualNode {
                 }
             }
             div {
-                class: c_button_controls()
+                class: c_hls_button_row()
                 euv_button {
                     variant: EuvButtonVariant::Outline
                     onclick: close_record_handler(state)

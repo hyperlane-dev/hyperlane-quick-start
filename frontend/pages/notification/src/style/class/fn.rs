@@ -12,7 +12,7 @@ class! {
         gap: var!(page-block-gap);
         margin-bottom: var!(page-block-gap);
         @media ((max-width: 767px)) {
-            grid-template-columns: "repeat(1, 1fr)";
+            grid-template-columns: "repeat(2, 1fr)";
         }
     }
 
@@ -70,7 +70,6 @@ class! {
         align-items: "flex-start";
         gap: var!(gap-inline);
         padding: var!(space-lg);
-        border: format!("1px solid {}", var!(border));
         @media ((max-width: 767px)) {
             flex-direction: "column";
         }

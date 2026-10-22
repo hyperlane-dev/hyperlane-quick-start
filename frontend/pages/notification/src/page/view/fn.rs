@@ -562,7 +562,7 @@ pub fn notification_form(node: VirtualNode<NotificationFormProps>) -> VirtualNod
                 }
             }
             div {
-                class: c_button_controls()
+                class: c_hls_button_row()
                 euv_button {
                     variant: EuvButtonVariant::Outline
                     onclick: close_create_handler(state)

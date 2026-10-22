@@ -4,6 +4,12 @@ pub(crate) const TITLE_ROOM: &str = "Room";
 /// The title of the card that holds the board.
 pub(crate) const TITLE_BOARD: &str = "Board";
 
+/// The title of the empty state of the board.
+pub(crate) const TITLE_EMPTY_BOARD: &str = "No board yet";
+
+/// The description of the empty state of the board.
+pub(crate) const TEXT_EMPTY_BOARD: &str = "Create a room or join one to see the board.";
+
 /// The title of the card that holds the players.
 pub(crate) const TITLE_PLAYERS: &str = "Players";
 

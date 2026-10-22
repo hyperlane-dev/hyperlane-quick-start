@@ -40,9 +40,9 @@ pub fn diff_page(node: VirtualNode<DiffPageProps>) -> VirtualNode {
                         oninput: original_handler(state)
                     }
                     div {
-                        class: c_button_controls()
+                        class: c_hls_button_row()
                         euv_button {
-                            variant: EuvButtonVariant::Outline
+                            variant: EuvButtonVariant::Primary
                             onclick: copy_original_handler(state)
                             LABEL_COPY
                         }
@@ -63,9 +63,9 @@ pub fn diff_page(node: VirtualNode<DiffPageProps>) -> VirtualNode {
                         oninput: modified_handler(state)
                     }
                     div {
-                        class: c_button_controls()
+                        class: c_hls_button_row()
                         euv_button {
-                            variant: EuvButtonVariant::Outline
+                            variant: EuvButtonVariant::Primary
                             onclick: copy_modified_handler(state)
                             LABEL_COPY
                         }

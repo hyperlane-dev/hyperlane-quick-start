@@ -35,7 +35,7 @@ pub fn trace_page(node: VirtualNode<TracePageProps>) -> VirtualNode {
                         oninput: trace_handler(state)
                     }
                     div {
-                        class: c_button_controls()
+                        class: c_hls_button_row()
                         euv_button {
                             variant: EuvButtonVariant::Primary
                             onclick: search_handler(state)

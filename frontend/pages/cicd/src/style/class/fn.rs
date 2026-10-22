@@ -18,7 +18,7 @@ class! {
     pub c_cicd_list {
         display: "flex";
         flex-direction: "column";
-        gap: var!(gap-element);
+        gap: var!(page-block-gap);
     }
 
     // One pipeline or one run of the lists.
@@ -27,7 +27,6 @@ class! {
         flex-direction: "column";
         gap: var!(gap-element);
         padding: var!(space-lg);
-        border: format!("1px solid {}", var!(border));
     }
 
     // The header of one pipeline or one run.
@@ -121,7 +120,6 @@ class! {
         flex-direction: "column";
         gap: var!(gap-element);
         padding: var!(space-md);
-        border: format!("1px solid {}", var!(border));
     }
 
     // One step of a job.
@@ -143,7 +141,6 @@ class! {
         flex-direction: "column";
         gap: var!(gap-element);
         padding: var!(space-md);
-        border: format!("1px solid {}", var!(border));
     }
 
     // The body of the log of a run.
