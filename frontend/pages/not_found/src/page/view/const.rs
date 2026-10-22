@@ -1,5 +1,5 @@
 /// The title of the card.
-pub(crate) const TITLE_CARD: &str = "Page Not Found";
+pub(crate) const TITLE_CARD: &str = "Error 404";
 
 /// The icon of the header of the page.
 pub(crate) const ICON_PAGE: &str = "🔍";
