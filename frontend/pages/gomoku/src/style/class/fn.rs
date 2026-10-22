@@ -37,6 +37,7 @@ class! {
         grid-row: "1";
         @media ((max-width: 767px)) {
             grid-column: "1";
+            grid-row: "auto";
         }
     }
 
