@@ -35,200 +35,209 @@ pub fn gomoku_page(node: VirtualNode<GomokuPageProps>) -> VirtualNode {
             }
             div {
                 class: c_gomoku_layout()
-                euv_card {
-                    title: TITLE_ROOM
-                    div {
-                        class: c_gomoku_panel()
+                div {
+                    class: c_gomoku_room_card()
+                    euv_card {
+                        title: TITLE_ROOM
                         div {
-                            class: c_gomoku_status()
-                            span {
-                                class: c_gomoku_status_dot()
-                            }
-                            span {
-                                class: c_gomoku_status_text()
-                                {
-                                    connection_label(state)
-                                }
-                            }
-                        }
-                        euv_field {
-                            id: ID_USER
-                            label: LABEL_USER
-                            value: state.get_user_id()
-                        }
-                        euv_field {
-                            id: ID_ROOM
-                            label: LABEL_ROOM
-                            placeholder: PLACEHOLDER_ROOM
-                            value: state.get_room_id()
-                            oninput: room_handler(state)
-                        }
-                        div {
-                            class: c_button_controls()
-                            euv_button {
-                                variant: EuvButtonVariant::Primary
-                                onclick: create_handler(state)
-                                LABEL_CREATE
-                            }
-                            euv_button {
-                                variant: EuvButtonVariant::Outline
-                                onclick: join_handler(state)
-                                LABEL_JOIN
-                            }
-                            euv_button {
-                                variant: EuvButtonVariant::Outline
-                                onclick: watch_handler(state)
-                                LABEL_WATCH
-                            }
-                            euv_button {
-                                variant: EuvButtonVariant::Outline
-                                onclick: leave_handler(state)
-                                LABEL_LEAVE
-                            }
-                        }
-                        div {
-                            class: c_gomoku_info()
+                            class: c_gomoku_panel()
                             div {
-                                class: c_gomoku_info_row()
+                                class: c_gomoku_status()
                                 span {
-                                    class: c_gomoku_info_label()
-                                    LABEL_CURRENT_ROOM
+                                    class: c_gomoku_status_dot()
                                 }
                                 span {
-                                    class: c_gomoku_info_value()
+                                    class: c_gomoku_status_text()
                                     {
-                                        room_label(state)
+                                        connection_label(state)
                                     }
                                 }
                             }
+                            euv_field {
+                                id: ID_USER
+                                label: LABEL_USER
+                                value: state.get_user_id()
+                            }
+                            euv_field {
+                                id: ID_ROOM
+                                label: LABEL_ROOM
+                                placeholder: PLACEHOLDER_ROOM
+                                value: state.get_room_id()
+                                oninput: room_handler(state)
+                            }
                             div {
-                                class: c_gomoku_info_row()
-                                span {
-                                    class: c_gomoku_info_label()
-                                    LABEL_ROLE
+                                class: c_button_controls()
+                                euv_button {
+                                    variant: EuvButtonVariant::Primary
+                                    onclick: create_handler(state)
+                                    LABEL_CREATE
                                 }
-                                span {
-                                    class: c_gomoku_info_value()
-                                    {
-                                        state.get_role().get()
-                                    }
+                                euv_button {
+                                    variant: EuvButtonVariant::Outline
+                                    onclick: join_handler(state)
+                                    LABEL_JOIN
+                                }
+                                euv_button {
+                                    variant: EuvButtonVariant::Outline
+                                    onclick: watch_handler(state)
+                                    LABEL_WATCH
+                                }
+                                euv_button {
+                                    variant: EuvButtonVariant::Outline
+                                    onclick: leave_handler(state)
+                                    LABEL_LEAVE
                                 }
                             }
                             div {
-                                class: c_gomoku_info_row()
-                                span {
-                                    class: c_gomoku_info_label()
-                                    LABEL_TURN
-                                }
-                                span {
-                                    class: c_gomoku_info_value()
-                                    {
-                                        turn_label(state)
+                                class: c_gomoku_info()
+                                div {
+                                    class: c_gomoku_info_row()
+                                    span {
+                                        class: c_gomoku_info_label()
+                                        LABEL_CURRENT_ROOM
+                                    }
+                                    span {
+                                        class: c_gomoku_info_value()
+                                        {
+                                            room_label(state)
+                                        }
                                     }
                                 }
-                            }
-                            div {
-                                class: c_gomoku_info_row()
-                                span {
-                                    class: c_gomoku_info_label()
-                                    LABEL_STATUS
+                                div {
+                                    class: c_gomoku_info_row()
+                                    span {
+                                        class: c_gomoku_info_label()
+                                        LABEL_ROLE
+                                    }
+                                    span {
+                                        class: c_gomoku_info_value()
+                                        {
+                                            state.get_role().get()
+                                        }
+                                    }
                                 }
-                                span {
-                                    class: c_gomoku_info_value()
-                                    {
-                                        status_label(state)
+                                div {
+                                    class: c_gomoku_info_row()
+                                    span {
+                                        class: c_gomoku_info_label()
+                                        LABEL_TURN
+                                    }
+                                    span {
+                                        class: c_gomoku_info_value()
+                                        {
+                                            turn_label(state)
+                                        }
+                                    }
+                                }
+                                div {
+                                    class: c_gomoku_info_row()
+                                    span {
+                                        class: c_gomoku_info_label()
+                                        LABEL_STATUS
+                                    }
+                                    span {
+                                        class: c_gomoku_info_value()
+                                        {
+                                            status_label(state)
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
-                euv_card {
-                    title: TITLE_BOARD
-                    div {
-                        class: c_gomoku_board()
-                        for cell in { cells } {
-                            div {
-                                key: format!("{}-{}", cell.x, cell.y)
-                                class: c_gomoku_cell()
-                                onclick: place_stone_handler(state, cell.x, cell.y)
-                                if cell.value == STONE_BLACK {
-                                    div {
-                                        class: c_gomoku_stone_black()
-                                    }
-                                } else if cell.value == STONE_WHITE {
-                                    div {
-                                        class: c_gomoku_stone_white()
+                div {
+                    class: c_gomoku_board_card()
+                    euv_card {
+                        title: TITLE_BOARD
+                        div {
+                            class: c_gomoku_board()
+                            for cell in { cells } {
+                                div {
+                                    key: format!("{}-{}", cell.x, cell.y)
+                                    class: c_gomoku_cell()
+                                    onclick: place_stone_handler(state, cell.x, cell.y)
+                                    if cell.value == STONE_BLACK {
+                                        div {
+                                            class: c_gomoku_stone_black()
+                                        }
+                                    } else if cell.value == STONE_WHITE {
+                                        div {
+                                            class: c_gomoku_stone_white()
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
-                euv_card {
-                    title: TITLE_PLAYERS
-                    div {
-                        class: c_gomoku_list()
-                        if { state.get_players().get().is_empty() } {
-                            div {
-                                class: c_gomoku_list_item()
-                                TEXT_NONE
-                            }
-                        }
-                        for player in { players } {
-                            div {
-                                key: player.user_id.to_string()
-                                class: c_gomoku_list_item()
-                                span {
-                                    class: c_gomoku_list_name()
-                                    player.user_id.as_str()
+                div {
+                    class: c_gomoku_players_card()
+                    euv_card {
+                        title: TITLE_PLAYERS
+                        div {
+                            class: c_gomoku_list()
+                            if { state.get_players().get().is_empty() } {
+                                div {
+                                    class: c_gomoku_list_item()
+                                    TEXT_NONE
                                 }
-                                span {
-                                    class: c_gomoku_list_value()
-                                    {
-                                        stone_label(player.color)
+                            }
+                            for player in { players } {
+                                div {
+                                    key: player.user_id.to_string()
+                                    class: c_gomoku_list_item()
+                                    span {
+                                        class: c_gomoku_list_name()
+                                        player.user_id.as_str()
+                                    }
+                                    span {
+                                        class: c_gomoku_list_value()
+                                        {
+                                            stone_label(player.color)
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                    div {
-                        class: c_gomoku_section_title()
-                        TITLE_SPECTATORS
-                    }
-                    div {
-                        class: c_gomoku_list()
-                        if { state.get_spectators().get().is_empty() } {
-                            div {
-                                class: c_gomoku_list_item()
-                                TEXT_NONE
+                        div {
+                            class: c_gomoku_section_title()
+                            TITLE_SPECTATORS
+                        }
+                        div {
+                            class: c_gomoku_list()
+                            if { state.get_spectators().get().is_empty() } {
+                                div {
+                                    class: c_gomoku_list_item()
+                                    TEXT_NONE
+                                }
+                            }
+                            for spectator in { spectators } {
+                                div {
+                                    key: spectator.to_string()
+                                    class: c_gomoku_list_item()
+                                    spectator.as_str()
+                                }
                             }
                         }
-                        for spectator in { spectators } {
-                            div {
-                                key: spectator.to_string()
-                                class: c_gomoku_list_item()
-                                spectator.as_str()
-                            }
+                        div {
+                            class: c_gomoku_section_title()
+                            TITLE_MOVES
                         }
-                    }
-                    div {
-                        class: c_gomoku_section_title()
-                        TITLE_MOVES
-                    }
-                    div {
-                        class: c_gomoku_list()
-                        if { state.get_moves().get().is_empty() } {
-                            div {
-                                class: c_gomoku_list_item()
-                                TEXT_NONE
+                        div {
+                            class: c_gomoku_list()
+                            if { state.get_moves().get().is_empty() } {
+                                div {
+                                    class: c_gomoku_list_item()
+                                    TEXT_NONE
+                                }
                             }
-                        }
-                        for entry in { moves } {
-                            div {
-                                key: entry.step.to_string()
-                                class: c_gomoku_list_item()
-                                move_label(&entry)
+                            for entry in { moves } {
+                                div {
+                                    key: entry.step.to_string()
+                                    class: c_gomoku_list_item()
+                                    move_label(&entry)
+                                }
                             }
                         }
                     }

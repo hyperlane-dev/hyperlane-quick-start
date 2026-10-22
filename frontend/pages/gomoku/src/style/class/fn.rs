@@ -8,11 +8,45 @@ class! {
     // The row of the panel, of the board and of the lists.
     pub c_gomoku_layout {
         display: "grid";
-        grid-template-columns: "minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr)";
+        // The room panel carries a field that holds a long identifier, so it
+        // needs a column of its own and the board takes the rest.
+        grid-template-columns: "minmax(0, 1.15fr) minmax(0, 1fr)";
         gap: var!(gap-component);
         align-items: "start";
         @media ((max-width: 767px)) {
             grid-template-columns: "1fr";
+        }
+    }
+
+    // The card of the room.
+    //
+    // The card keeps the first column of the layout and spans both of its
+    // rows, so the board and the list of the players share the second one.
+    pub c_gomoku_room_card {
+        grid-column: "1";
+        grid-row: "1";
+        grid-row-end: "span 2";
+        @media ((max-width: 767px)) {
+            grid-row-end: "auto";
+        }
+    }
+
+    // The card of the board.
+    pub c_gomoku_board_card {
+        grid-column: "2";
+        grid-row: "1";
+        @media ((max-width: 767px)) {
+            grid-column: "1";
+        }
+    }
+
+    // The card of the players.
+    pub c_gomoku_players_card {
+        grid-column: "2";
+        grid-row: "2";
+        @media ((max-width: 767px)) {
+            grid-column: "1";
+            grid-row: "auto";
         }
     }
 
@@ -100,6 +134,10 @@ class! {
         background: var!(border);
         border: format!("1px solid {}", var!(border));
         aspect-ratio: "1";
+        // The board is a square, so it grows with the column of the layout
+        // until it is bigger than a board has to be.
+        max-width: "360px";
+        margin: "0px auto";
     }
 
     // One cell of the board.
