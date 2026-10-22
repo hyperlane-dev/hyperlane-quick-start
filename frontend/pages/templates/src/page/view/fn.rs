@@ -44,13 +44,13 @@ pub fn templates_page(node: VirtualNode<TemplatesPageProps>) -> VirtualNode {
                     div {
                         class: c_home_actions()
                         a {
-                            class: c_home_btn_primary()
+                            class: format!("{} {}", c_home_btn_primary().get_name(), c_templates_hero_button().get_name())
                             href: URL_REPOSITORY
                             target: TARGET_BLANK
                             LABEL_REPOSITORY
                         }
                         a {
-                            class: c_home_btn_secondary()
+                            class: format!("{} {}", c_home_btn_secondary().get_name(), c_templates_hero_button().get_name())
                             href: URL_PAGES
                             LABEL_PAGES
                         }

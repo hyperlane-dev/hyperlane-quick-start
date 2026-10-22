@@ -29,4 +29,13 @@ class! {
             grid-column-end: "auto";
         }
     }
+
+    // The buttons of the hero.
+    //
+    // The buttons of the landing page of the library keep their label on one
+    // line above the breakpoint and wrap it below, so the label of a button
+    // falls onto a second line on the phone.
+    pub c_templates_hero_button {
+        white-space: "nowrap";
+    }
 }

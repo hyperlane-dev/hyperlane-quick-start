@@ -78,49 +78,55 @@ pub fn rss_page(node: VirtualNode<RssPageProps>) -> VirtualNode {
             div {
                 class: c_rss_controls()
                 div {
-                    class: c_rss_page_size()
-                    label {
-                        class: format!("{} {}", c_form_label().get_name(), c_rss_page_size_label().get_name())
-                        LABEL_PAGE_SIZE
-                    }
-                    select {
-                        class: c_select_input()
-                        value: state.get_page_size().get().to_string()
-                        onchange: page_size_handler(state)
-                        for &size in PAGE_SIZES {
-                            option {
-                                value: size
-                                size
+                    class: c_rss_controls_group()
+                    div {
+                        class: c_rss_page_size()
+                        label {
+                            class: format!("{} {}", c_form_label().get_name(), c_rss_page_size_label().get_name())
+                            LABEL_PAGE_SIZE
+                        }
+                        select {
+                            class: c_select_input()
+                            value: state.get_page_size().get().to_string()
+                            onchange: page_size_handler(state)
+                            for &size in PAGE_SIZES {
+                                option {
+                                    value: size
+                                    size
+                                }
                             }
+                        }
+                    }
+                    div {
+                        class: c_hls_button_row()
+                        euv_button {
+                            variant: EuvButtonVariant::Outline
+                            onclick: refresh_handler(state)
+                            LABEL_REFRESH
                         }
                     }
                 }
                 div {
-                    class: c_hls_button_row()
-                    euv_button {
-                        variant: EuvButtonVariant::Outline
-                        onclick: refresh_handler(state)
-                        LABEL_REFRESH
+                    class: c_rss_controls_group()
+                    div {
+                        class: c_hls_button_row()
+                        euv_button {
+                            variant: EuvButtonVariant::Outline
+                            onclick: previous_page_handler(state)
+                            LABEL_PREVIOUS
+                        }
                     }
-                }
-                div {
-                    class: c_hls_button_row()
-                    euv_button {
-                        variant: EuvButtonVariant::Outline
-                        onclick: previous_page_handler(state)
-                        LABEL_PREVIOUS
+                    span {
+                        class: c_rss_pagination_info()
+                        state.get_page().get().to_string()
                     }
-                }
-                span {
-                    class: c_rss_pagination_info()
-                    state.get_page().get().to_string()
-                }
-                div {
-                    class: c_hls_button_row()
-                    euv_button {
-                        variant: EuvButtonVariant::Outline
-                        onclick: next_page_handler(state)
-                        LABEL_NEXT
+                    div {
+                        class: c_hls_button_row()
+                        euv_button {
+                            variant: EuvButtonVariant::Outline
+                            onclick: next_page_handler(state)
+                            LABEL_NEXT
+                        }
                     }
                 }
             }

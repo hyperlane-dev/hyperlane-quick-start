@@ -130,6 +130,16 @@ class! {
         margin-bottom: "0px";
     }
 
+    // One group of the control strip.
+    //
+    // The strip holds the page size and the pager, and both of them keep
+    // their own line when the column is too narrow for the whole strip.
+    pub c_rss_controls_group {
+        display: "flex";
+        align-items: "center";
+        gap: var!(gap-inline);
+    }
+
     // The page the feed is on.
     pub c_rss_pagination_info {
         font-size: var!(font-sm);
