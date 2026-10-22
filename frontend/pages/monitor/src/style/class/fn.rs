@@ -12,9 +12,6 @@ class! {
         justify-content: "space-between";
         gap: var!(gap-inline);
         margin-bottom: var!(page-block-gap);
-        button {
-            flex: "0 0 auto";
-        }
     }
 
     // The state of the live status stream.

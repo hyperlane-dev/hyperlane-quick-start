@@ -10,9 +10,6 @@ class! {
         display: "flex";
         flex-direction: "column";
         gap: var!(gap-element);
-        button {
-            flex: "0 0 auto";
-        }
     }
 
     // The key of the record being edited.

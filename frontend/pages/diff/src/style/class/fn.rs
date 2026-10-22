@@ -24,9 +24,6 @@ class! {
         flex-wrap: "wrap";
         gap: var!(gap-inline);
         margin-bottom: var!(gap-component);
-        button {
-            flex: "0 0 auto";
-        }
     }
 
     // The row of the counters.

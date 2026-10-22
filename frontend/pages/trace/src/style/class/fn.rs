@@ -10,9 +10,6 @@ class! {
         display: "flex";
         align-items: "flex-end";
         gap: var!(gap-inline);
-        button {
-            flex: "0 0 auto";
-        }
         @media ((max-width: 767px)) {
             flex-direction: "column";
             align-items: "stretch";

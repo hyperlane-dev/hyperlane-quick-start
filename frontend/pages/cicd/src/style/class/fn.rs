@@ -28,9 +28,6 @@ class! {
         gap: var!(gap-element);
         padding: var!(space-lg);
         border: format!("1px solid {}", var!(border));
-        button {
-            flex: "0 0 auto";
-        }
     }
 
     // The header of one pipeline or one run.
@@ -134,9 +131,6 @@ class! {
         gap: var!(space-2xs);
         padding: var!(space-md);
         border: format!("1px dashed {}", var!(border));
-        button {
-            flex: "0 0 auto";
-        }
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -150,9 +144,6 @@ class! {
         gap: var!(gap-element);
         padding: var!(space-md);
         border: format!("1px solid {}", var!(border));
-        button {
-            flex: "0 0 auto";
-        }
     }
 
     // The body of the log of a run.

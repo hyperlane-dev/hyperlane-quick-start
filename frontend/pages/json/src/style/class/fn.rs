@@ -38,9 +38,6 @@ class! {
         padding: var!(space-xs);
         border: format!("1px solid {}", var!(border));
         flex-wrap: "wrap";
-        button {
-            flex: "0 0 auto";
-        }
     }
 
     // The key of a node.
