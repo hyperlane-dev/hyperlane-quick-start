@@ -27,9 +27,13 @@ class! {
     // ═══════════════════════════════════════════════════════════════════════════
 
     // The row of the list of the projects, of the editor and of the preview.
+    //
+    // The list of the projects keeps the first column and the editor and the
+    // preview share the second one, so both of them have the room a working
+    // area needs. Below the breakpoint the three of them stack.
     pub c_playground_layout {
         display: "grid";
-        grid-template-columns: "minmax(0, 1fr) minmax(0, 2fr) minmax(0, 2fr)";
+        grid-template-columns: "minmax(0, 1fr) minmax(0, 2fr)";
         gap: var!(gap-component);
         align-items: "start";
         @media ((max-width: 767px)) {
@@ -97,6 +101,38 @@ class! {
         display: "flex";
         flex-direction: "column";
         gap: var!(gap-element);
+    }
+
+    // The card of the list of the projects.
+    //
+    // The card keeps the first column of the layout and spans both of its
+    // rows, so the editor and the preview share the second one.
+    pub c_playground_projects_card {
+        grid-column: "1";
+        grid-row: "1";
+        grid-row-end: "span 2";
+        @media ((max-width: 767px)) {
+            grid-row-end: "auto";
+        }
+    }
+
+    // The card of the editor.
+    pub c_playground_editor_card {
+        grid-column: "2";
+        grid-row: "1";
+        @media ((max-width: 767px)) {
+            grid-column: "1";
+        }
+    }
+
+    // The card of the preview.
+    pub c_playground_preview_card {
+        grid-column: "2";
+        grid-row: "2";
+        @media ((max-width: 767px)) {
+            grid-column: "1";
+            grid-row: "auto";
+        }
     }
 
     // The page the build produced.

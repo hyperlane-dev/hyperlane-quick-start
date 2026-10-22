@@ -38,6 +38,9 @@ class! {
         gap: var!(gap-inline);
         padding: var!(space-lg);
         border: format!("1px solid {}", var!(border));
+        // The badges and the actions of a row need more room than the name
+        // of the user, so the row wraps before the name is squeezed away.
+        flex-wrap: "wrap";
         @media ((max-width: 767px)) {
             flex-direction: "column";
             align-items: "flex-start";
@@ -49,8 +52,10 @@ class! {
         display: "flex";
         flex-direction: "column";
         gap: var!(space-2xs);
-        flex: "1";
-        min-width: "0";
+        // The name of the user keeps a column of its own, so the contact of
+        // the user does not wrap in the middle of a word.
+        flex: "1 1 160px";
+        min-width: "160px";
     }
 
     // The name of a user.
@@ -64,6 +69,9 @@ class! {
     pub c_user_meta {
         font-size: var!(font-sm);
         color: var!(muted-foreground);
+        // A mail address has no space to break at, so it needs to break
+        // anywhere or it runs over the badges of the row.
+        overflow-wrap: "anywhere";
     }
 
     // The badges of a user.
