@@ -158,7 +158,11 @@ pub fn handle_frame(state: ChatState, frame: ChatFrame) {
         spawn_local(load_online_users(state));
         return;
     }
-    let own: bool = frame.name == state.get_username().get();
+    // The room names the sender of a frame with the session of the visitor,
+    // so the frame of the visitor is the one that carries their own session.
+    let identity: String = state.get_uuid().get();
+    let name: String = state.get_username().get();
+    let own: bool = frame.name == identity || frame.name == name;
     let system: bool = frame.kind == FRAME_SYSTEM || frame.kind == FRAME_GPT_RESPONSE;
     let message: ChatMessage = ChatMessage {
         id: format!("{}-{}", frame.time, frame.name),
