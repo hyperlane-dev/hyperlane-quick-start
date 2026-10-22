@@ -13,4 +13,20 @@ class! {
     pub c_hls_home_stat_card {
         justify-content: "flex-start";
     }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // Features
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    // The card of the build script.
+    //
+    // The grid of the features holds two columns, so the last card takes both
+    // of them and the row keeps no hole next to it.
+    pub c_templates_feature_wide {
+        grid-column: "1";
+        grid-column-end: "-1";
+        @media ((max-width: 767px)) {
+            grid-column-end: "auto";
+        }
+    }
 }

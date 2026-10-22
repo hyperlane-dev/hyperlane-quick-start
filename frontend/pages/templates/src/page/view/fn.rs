@@ -133,24 +133,27 @@ pub fn templates_page(node: VirtualNode<TemplatesPageProps>) -> VirtualNode {
                             }
                         }
                     }
-                    euv_card {
-                        title: TITLE_FEATURE_BUILD
-                        div {
-                            class: c_feature_card()
+                    div {
+                        class: c_templates_feature_wide()
+                        euv_card {
+                            title: TITLE_FEATURE_BUILD
                             div {
-                                class: c_feature_header()
+                                class: c_feature_card()
                                 div {
-                                    class: c_feature_icon()
-                                    "⚙️"
+                                    class: c_feature_header()
+                                    div {
+                                        class: c_feature_icon()
+                                        "⚙️"
+                                    }
+                                    h4 {
+                                        class: c_feature_name()
+                                        NAME_FEATURE_BUILD
+                                    }
                                 }
-                                h4 {
-                                    class: c_feature_name()
-                                    NAME_FEATURE_BUILD
+                                p {
+                                    class: c_feature_desc()
+                                    DESCRIPTION_FEATURE_BUILD
                                 }
-                            }
-                            p {
-                                class: c_feature_desc()
-                                DESCRIPTION_FEATURE_BUILD
                             }
                         }
                     }
