@@ -298,7 +298,7 @@ pub fn run_row(node: VirtualNode<RunRowProps>) -> VirtualNode {
             div {
                 class: c_hls_button_row()
                 euv_button {
-                    variant: VARIANT_OUTLINE
+                    variant: VARIANT_PRIMARY
                     onclick: detail_handler(state, run.id)
                     LABEL_DETAIL
                 }

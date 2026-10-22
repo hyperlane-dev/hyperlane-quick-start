@@ -19,9 +19,17 @@ thread_local! {
 /// changes it, so the rule of the shared sheet is the only place where the
 /// colour can be taken away. `currentColor` makes the brackets take the ink
 /// of the theme, so they follow the page into the dark theme as well.
+///
+/// The alert of the library paints its background with the muted colour of the
+/// theme, which is the colour of the page, and it gives the text the weight of
+/// the body. A message that reports a failure then reads like the body text
+/// around it, and the reader does not see that something went wrong. The rule
+/// gives the alert the weight of a heading, which is the way the system
+/// expresses a level of a text.
 const SHARED_CSS: &str = concat!(
     "html body .c_hls_button_row button { flex: 0 0 auto !important; }",
     "html body .monaco-editor [class*=\"bracket-highlighting-\"] { color: currentColor !important; }",
+    "html body .c_error_box, html body .c_success_box { font-weight: 600; }",
 );
 
 /// Injects the stylesheet of the shared crate into the document.

@@ -169,7 +169,7 @@ pub fn tracking_page(node: VirtualNode<TrackingPageProps>) -> VirtualNode {
                                                     td {
                                                         class: c_tracking_table_cell()
                                                         euv_button {
-                                                            variant: EuvButtonVariant::Outline
+                                                            variant: EuvButtonVariant::Primary
                                                             onclick: detail_handler(state, record.id)
                                                             LABEL_DETAIL
                                                         }

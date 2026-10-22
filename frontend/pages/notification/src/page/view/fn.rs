@@ -371,7 +371,7 @@ pub fn notification_row(node: VirtualNode<NotificationRowProps>) -> VirtualNode 
                     div {
                         class: c_hls_button_row()
                         euv_button {
-                            variant: EuvButtonVariant::Outline
+                            variant: EuvButtonVariant::Primary
                             onclick: mark_read_handler(state, read_id.clone())
                             LABEL_MARK_READ
                         }

@@ -404,7 +404,7 @@ pub fn users_panel(node: VirtualNode<PanelProps>) -> VirtualNode {
                 div {
                     class: c_hls_button_row()
                     euv_button {
-                        variant: EuvButtonVariant::Outline
+                        variant: EuvButtonVariant::Primary
                         onclick: search_button_handler(state)
                         LABEL_SEARCH_BUTTON
                     }
