@@ -22,6 +22,12 @@ pub(crate) const TEXT_EMPTY: &str = "";
 /// The number of pixels one module of a QR code is drawn with.
 pub(crate) const MODULE_PIXELS: u32 = 8;
 
+/// The width of an empty canvas, the size the browser gives a canvas.
+pub(crate) const CANVAS_WIDTH: u32 = 300;
+
+/// The height of an empty canvas, the size the browser gives a canvas.
+pub(crate) const CANVAS_HEIGHT: u32 = 150;
+
 /// The name of the colour of the dark modules of the theme.
 pub(crate) const COLOR_DARK: &str = "--foreground";
 

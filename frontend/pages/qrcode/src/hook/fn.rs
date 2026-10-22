@@ -153,6 +153,8 @@ pub fn remove_entry(state: QrcodeState, index: usize) {
 pub fn clear_entries(state: QrcodeState) {
     state.get_entries().set(vec![QrEntry::default()]);
     store_entries(state);
+    state.get_message().set(TEXT_EMPTY.to_string());
+    state.get_failed().set(false);
 }
 
 /// Writes the text of one entry into the list of the QR codes.
@@ -247,6 +249,7 @@ pub fn import_entries(state: QrcodeState, content: &str) {
 /// - `bool` - Whether the code has been drawn.
 pub fn draw_code(canvas: &NodeRef<HtmlCanvasElement>, text: &str, level: QrErrorLevel) -> bool {
     if text.trim().is_empty() {
+        clear_code(canvas);
         return false;
     }
     let Some(code): Option<QrCode> = encode(text, level) else {
@@ -279,6 +282,26 @@ pub fn draw_code(canvas: &NodeRef<HtmlCanvasElement>, text: &str, level: QrError
         }
     }
     true
+}
+
+/// Clears the code of a canvas.
+///
+/// The canvas keeps the code it was given when the text of the entry is
+/// emptied, so the code of the entry has to be wiped from the canvas.
+///
+/// # Arguments
+///
+/// - `&NodeRef<HtmlCanvasElement>` - The canvas the code was drawn into.
+///
+/// # Returns
+///
+/// - `()` - The canvas is empty.
+fn clear_code(canvas: &NodeRef<HtmlCanvasElement>) {
+    let Some(element): Option<HtmlCanvasElement> = canvas.get_cloned() else {
+        return;
+    };
+    element.set_width(CANVAS_WIDTH);
+    element.set_height(CANVAS_HEIGHT);
 }
 
 /// Schedules the drawing of the QR code of one text.
