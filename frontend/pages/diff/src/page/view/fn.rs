@@ -36,6 +36,7 @@ pub fn diff_page(node: VirtualNode<DiffPageProps>) -> VirtualNode {
                         id: ID_ORIGINAL
                         placeholder: PLACEHOLDER_ORIGINAL
                         rows: ROWS_TEXT
+                        value: state.get_original().get()
                         oninput: original_handler(state)
                     }
                     div {
@@ -58,6 +59,7 @@ pub fn diff_page(node: VirtualNode<DiffPageProps>) -> VirtualNode {
                         id: ID_MODIFIED
                         placeholder: PLACEHOLDER_MODIFIED
                         rows: ROWS_TEXT
+                        value: state.get_modified().get()
                         oninput: modified_handler(state)
                     }
                     div {
