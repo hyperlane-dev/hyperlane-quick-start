@@ -107,3 +107,7 @@ euv fmt --check
   workspace
   (`verify_dep_order.py frontend`) passes, and the manifests of the server
   itself are written the same way.
+
+  The order of the manifests of this workspace is checked by the test
+  `dependency_order` of the server package, so the pipeline keeps the order
+  of the blocks in place.
