@@ -51,7 +51,6 @@ class! {
         flex-direction: "column";
         gap: var!(space-2xs);
         padding: var!(space-md);
-        border: format!("1px solid {}", var!(border));
     }
 
     // The name of one entry of the system overview.

@@ -85,7 +85,6 @@ class! {
         flex-direction: "column";
         gap: var!(gap-element);
         padding: var!(space-lg);
-        border: format!("1px solid {}", var!(border));
     }
 
     // The header of one file of the upload list.

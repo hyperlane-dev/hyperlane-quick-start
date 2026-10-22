@@ -64,7 +64,6 @@ class! {
         padding: format!("{} {}", var!(space-2xs), var!(space-sm));
         font-size: var!(font-xs);
         color: var!(foreground);
-        border: format!("1px solid {}", var!(border));
         cursor: "pointer";
         :hover {
             background: var!(accent-muted);

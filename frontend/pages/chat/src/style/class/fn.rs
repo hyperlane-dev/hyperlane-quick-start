@@ -148,9 +148,16 @@ class! {
     pub c_chat_attach {
         display: "flex";
         align-items: "center";
+        justify-content: "center";
         gap: var!(gap-inline);
-        padding: format!("{} {}", var!(space-sm), var!(space-lg));
+        // The picker is a button of the browser dressed as the button of the
+        // library, so the two of them stand at the same height.
+        height: "42px";
+        padding: format!("0px {}", var!(space-xl));
         border: format!("1px solid {}", var!(border));
+        font-size: var!(font-base);
+        font-weight: "500";
+        white-space: "nowrap";
         cursor: "pointer";
     }
 

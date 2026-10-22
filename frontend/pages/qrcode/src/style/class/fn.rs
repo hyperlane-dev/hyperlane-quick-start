@@ -52,7 +52,6 @@ class! {
         align-items: "flex-start";
         gap: var!(gap-element);
         padding: var!(space-lg);
-        border: format!("1px solid {}", var!(border));
     }
 
     // The header of one code of the list.

@@ -93,7 +93,7 @@ class! {
         flex-direction: "column";
         gap: var!(space-2xs);
         padding-top: var!(gap-element);
-        border-top: format!("1px solid {}", var!(border));
+        border-top: format!("1px dashed {}", var!(border));
     }
 
     // One fact of the room.
@@ -198,7 +198,6 @@ class! {
         padding: format!("{} {}", var!(space-2xs), var!(space-sm));
         font-size: var!(font-xs);
         color: var!(foreground);
-        border: format!("1px solid {}", var!(border));
     }
 
     // The name of one entry of one of the lists.

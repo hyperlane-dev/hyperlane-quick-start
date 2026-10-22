@@ -36,7 +36,6 @@ class! {
         align-items: "center";
         gap: var!(space-xs);
         padding: var!(space-xs);
-        border: format!("1px solid {}", var!(border));
         flex-wrap: "wrap";
     }
 
@@ -64,7 +63,9 @@ class! {
     // The preview of the value of a node.
     pub c_json_value {
         flex: "1";
-        min-width: "0";
+        // The preview keeps a column of its own, so it does not wrap into
+        // one word per line on the phone.
+        min-width: "160px";
         font-size: var!(font-sm);
         color: var!(foreground);
         word-break: "break-word";

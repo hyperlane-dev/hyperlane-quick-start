@@ -54,7 +54,7 @@ class! {
         // The name of the user keeps a column of its own, so the contact of
         // the user does not wrap in the middle of a word and the badges of
         // the row start at the same place in every row.
-        flex: "1 1 260px";
+        flex: "0 0 260px";
         min-width: "260px";
         @media ((max-width: 767px)) {
             flex-basis: "auto";

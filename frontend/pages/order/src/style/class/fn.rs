@@ -156,7 +156,6 @@ class! {
         justify-content: "space-between";
         gap: var!(gap-inline);
         padding: var!(space-lg);
-        border: format!("1px solid {}", var!(border));
         @media ((max-width: 767px)) {
             flex-direction: "column";
             align-items: "flex-start";

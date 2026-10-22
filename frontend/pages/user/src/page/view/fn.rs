@@ -248,7 +248,7 @@ pub fn user_row(node: VirtualNode<UserRowProps>) -> VirtualNode {
                 div {
                     class: c_hls_button_row()
                     euv_button {
-                        variant: EuvButtonVariant::Outline
+                        variant: EuvButtonVariant::Primary
                         onclick: open_user_handler(state, user_id.clone())
                         LABEL_OPEN
                     }
@@ -257,7 +257,7 @@ pub fn user_row(node: VirtualNode<UserRowProps>) -> VirtualNode {
                     div {
                         class: c_hls_button_row()
                         euv_button {
-                            variant: EuvButtonVariant::Primary
+                            variant: EuvButtonVariant::Outline
                             onclick: approve_handler(state, approve_id.clone())
                             LABEL_APPROVE
                         }
