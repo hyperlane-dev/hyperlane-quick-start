@@ -75,7 +75,7 @@ pub fn tracking_page(node: VirtualNode<TrackingPageProps>) -> VirtualNode {
                         oninput: body_content_handler(state)
                     }
                     div {
-                        class: c_button_controls()
+                        class: format!("{} {}", c_button_controls().get_name(), c_hls_button_row().get_name())
                         euv_button {
                             variant: EuvButtonVariant::Primary
                             onclick: search_handler(state)
