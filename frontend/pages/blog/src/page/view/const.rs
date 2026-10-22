@@ -81,7 +81,7 @@ pub(crate) const LABEL_CONTENT: &str = "Content";
 pub(crate) const PLACEHOLDER_CONTENT: &str = "The body of the post, written in Markdown";
 
 /// The number of rows of the content field.
-pub(crate) const ROWS_CONTENT: i32 = 12;
+pub(crate) const ROWS_CONTENT: &str = "12";
 
 /// The label of the publish switch.
 pub(crate) const LABEL_PUBLISHED: &str = "Publish";

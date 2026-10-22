@@ -113,7 +113,7 @@ pub(crate) const PLACEHOLDER_TITLE: &str = "Enter notification title";
 pub(crate) const PLACEHOLDER_CONTENT: &str = "Enter notification content";
 
 /// The number of rows of the body field.
-pub(crate) const ROWS_CONTENT: i32 = 4;
+pub(crate) const ROWS_CONTENT: &str = "4";
 
 /// The text shown when the list holds no notification.
 pub(crate) const TEXT_EMPTY: &str = "No notifications found";

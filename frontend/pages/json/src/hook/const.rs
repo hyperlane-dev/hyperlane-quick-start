@@ -29,10 +29,10 @@ pub(crate) const PREVIEW_LENGTH: usize = 60;
 pub(crate) const PREVIEW_SUFFIX: &str = "...";
 
 /// The number of rows of the field that holds the document.
-pub(crate) const ROWS_INPUT: i32 = 10;
+pub(crate) const ROWS_INPUT: &str = "10";
 
 /// The number of rows of the field that holds the value of a node.
-pub(crate) const ROWS_VALUE: i32 = 6;
+pub(crate) const ROWS_VALUE: &str = "6";
 
 /// The key of the value of a text that holds a number.
 pub(crate) const KEY_VALUE: &str = "_value";

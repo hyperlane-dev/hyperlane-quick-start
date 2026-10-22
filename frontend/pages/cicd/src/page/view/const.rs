@@ -85,7 +85,7 @@ pub(crate) const LABEL_CONFIG: &str = "Configuration";
 pub(crate) const PLACEHOLDER_CONFIG: &str = "The configuration of the pipeline";
 
 /// The number of rows of the configuration field.
-pub(crate) const ROWS_CONFIG: i32 = 8;
+pub(crate) const ROWS_CONFIG: &str = "8";
 
 /// The identifier of the configuration field.
 pub(crate) const ID_CONFIG: &str = "cicd-config";

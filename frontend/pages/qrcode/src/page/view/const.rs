@@ -79,7 +79,7 @@ pub(crate) const LABEL_CLEAR: &str = "Clear all";
 pub(crate) const PLACEHOLDER_TEXT: &str = "Enter the URL or the text to encode";
 
 /// The number of rows of the text field.
-pub(crate) const ROWS_TEXT: i32 = 2;
+pub(crate) const ROWS_TEXT: &str = "2";
 
 /// The label of the remove button.
 pub(crate) const LABEL_REMOVE: &str = "Remove";

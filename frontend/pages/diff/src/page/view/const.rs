@@ -55,7 +55,7 @@ pub(crate) const ID_ORIGINAL: &str = "diff-original";
 pub(crate) const ID_MODIFIED: &str = "diff-modified";
 
 /// The number of the rows of the two text areas.
-pub(crate) const ROWS_TEXT: i32 = 10;
+pub(crate) const ROWS_TEXT: &str = "10";
 
 /// The marker of a line that was removed.
 pub(crate) const MARK_REMOVED: &str = "−";

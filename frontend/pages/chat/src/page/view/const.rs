@@ -34,7 +34,7 @@ pub(crate) const LABEL_ONLINE: &str = "visitors online";
 pub(crate) const PLACEHOLDER_MESSAGE: &str = "Write a message, use @name to mention a visitor";
 
 /// The number of rows of the message field.
-pub(crate) const ROWS_MESSAGE: i32 = 3;
+pub(crate) const ROWS_MESSAGE: &str = "3";
 
 /// The label of the send button.
 pub(crate) const LABEL_SEND: &str = "Send";
