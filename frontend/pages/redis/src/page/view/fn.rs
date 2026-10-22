@@ -80,7 +80,7 @@ pub fn redis_page(node: VirtualNode<RedisPageProps>) -> VirtualNode {
                     div {
                         class: c_hls_button_row()
                         euv_button {
-                            variant: EuvButtonVariant::Outline
+                            variant: EuvButtonVariant::Primary
                             onclick: refresh_handler(state)
                             LABEL_REFRESH
                         }

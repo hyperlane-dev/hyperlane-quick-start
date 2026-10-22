@@ -100,7 +100,7 @@ pub fn rss_page(node: VirtualNode<RssPageProps>) -> VirtualNode {
                     div {
                         class: c_hls_button_row()
                         euv_button {
-                            variant: EuvButtonVariant::Outline
+                            variant: EuvButtonVariant::Primary
                             onclick: refresh_handler(state)
                             LABEL_REFRESH
                         }

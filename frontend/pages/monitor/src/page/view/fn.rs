@@ -32,7 +32,7 @@ pub fn monitor_page(node: VirtualNode<MonitorPageProps>) -> VirtualNode {
                 div {
                     class: c_hls_button_row()
                     euv_button {
-                        variant: EuvButtonVariant::Outline
+                        variant: EuvButtonVariant::Primary
                         onclick: refresh_handler(state)
                         LABEL_REFRESH
                     }
