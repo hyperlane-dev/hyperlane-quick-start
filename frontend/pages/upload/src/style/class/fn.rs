@@ -121,7 +121,13 @@ class! {
         font-size: var!(font-xs);
         color: var!(foreground);
         word-break: "break-all";
-        text-decoration: "none";
+        // The theme of the design system is monochrome, so the line under
+        // the link is what marks it, the way the library marks the links of
+        // a text.
+        text-decoration: "underline";
+        text-underline-offset: "3px";
+        text-decoration-style: "dashed";
+        text-decoration-color: var!(border);
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
