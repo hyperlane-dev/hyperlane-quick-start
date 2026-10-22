@@ -38,6 +38,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "cargo:rerun-if-changed={}",
         frontend_dir.join(PAGES_DIR).display()
     );
+    // Every page carries the shared package, so a change of the shared package
+    // changes every page. Without this the build script does not run again
+    // and the pages keep the code of the shared package they were built with.
+    println!(
+        "cargo:rerun-if-changed={}",
+        frontend_dir.join(SHARED_DIR).display()
+    );
     println!(
         "cargo:rerun-if-changed={}",
         frontend_dir.join("Cargo.toml").display()

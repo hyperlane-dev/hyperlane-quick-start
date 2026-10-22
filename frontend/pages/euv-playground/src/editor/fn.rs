@@ -170,16 +170,20 @@ fn start_editor() {
 /// Creates the editor of the page.
 ///
 /// The editor is created in the container of the page, with the language and
-/// the code the page handed over.
+/// the code the page handed over. The theme of the editor is the monochrome
+/// theme of the shared crate, so the code of the page carries no colour.
 ///
 /// # Returns
 ///
 /// - `()` - The editor is created, or the page refused the editor.
 fn create_editor() {
+    define_monaco_themes();
     let script: String = format!(
-        "(function () {{ var container = window.{GLOBAL_CONTAINER}; if (!container) {{ return; }}; if (window.{GLOBAL_EDITOR}) {{ window.{GLOBAL_EDITOR}.dispose(); window.{GLOBAL_EDITOR} = null; }}; window.{GLOBAL_EDITOR} = monaco.editor.create(container, {{ value: window.{GLOBAL_VALUE}, language: window.{GLOBAL_LANGUAGE}, fontSize: {FONT_SIZE}, tabSize: {TAB_SIZE}, automaticLayout: true, minimap: {{ enabled: false }}, scrollBeyondLastLine: false, theme: 'vs' }}); window.{GLOBAL_EDITOR}.onDidChangeModelContent(function () {{ if (window.{GLOBAL_CHANGE}) {{ window.{GLOBAL_CHANGE}(window.{GLOBAL_EDITOR}.getValue()); }}; }}); }})();"
+        "(function () {{ var container = window.{GLOBAL_CONTAINER}; if (!container) {{ return; }}; if (window.{GLOBAL_EDITOR}) {{ window.{GLOBAL_EDITOR}.dispose(); window.{GLOBAL_EDITOR} = null; }}; window.{GLOBAL_EDITOR} = monaco.editor.create(container, {{ value: window.{GLOBAL_VALUE}, language: window.{GLOBAL_LANGUAGE}, fontSize: {FONT_SIZE}, tabSize: {TAB_SIZE}, automaticLayout: true, minimap: {{ enabled: false }}, scrollBeyondLastLine: false, theme: window.__euv_monaco_theme ? window.__euv_monaco_theme() : 'euv-light' }}); window.{GLOBAL_EDITOR}.onDidChangeModelContent(function () {{ if (window.{GLOBAL_CHANGE}) {{ window.{GLOBAL_CHANGE}(window.{GLOBAL_EDITOR}.getValue()); }}; }}); }})();"
     );
     let _: Result<JsValue, JsValue> = js_sys::eval(&script);
+    let follow: String = monaco_theme_script();
+    let _: Result<JsValue, JsValue> = js_sys::eval(&follow);
 }
 
 /// Writes a text as a JavaScript string literal.

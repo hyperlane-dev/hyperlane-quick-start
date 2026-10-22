@@ -79,10 +79,21 @@ class! {
     }
 
     // The badges of a user.
+    //
+    // The group keeps a column of its own, so the badges of every row start
+    // at the same place. The row wraps before the name is squeezed away, and
+    // without a column of its own the group would sit at the end of the
+    // first line of a row whose badges are narrow, and at the start of the
+    // second line of a row whose badges are wide. The width covers the
+    // widest pair of badges, so the group never grows past its column.
     pub c_user_badges {
         display: "flex";
         align-items: "center";
         gap: var!(space-xs);
+        flex: "0 0 140px";
+        @media ((max-width: 767px)) {
+            flex-basis: "auto";
+        }
     }
 
     // One badge of a user.
