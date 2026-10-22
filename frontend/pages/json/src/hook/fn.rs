@@ -277,6 +277,25 @@ fn entries_of(value: &Value) -> Vec<(String, Value)> {
     }
 }
 
+/// Counts the fields of the document that are at the top of it.
+///
+/// The count comes from the parsed document and not from the tree, so it
+/// does not change when a node of the tree is opened or closed.
+///
+/// # Arguments
+///
+/// - `&JsonState` - The state the page renders from.
+///
+/// # Returns
+///
+/// - `usize` - The number of the fields at the top of the document.
+pub fn top_level_count(state: &JsonState) -> usize {
+    let Some(root): Option<Value> = state.get_root().get() else {
+        return 0;
+    };
+    entries_of(&root).len()
+}
+
 /// Returns the document a text holds.
 ///
 /// # Arguments

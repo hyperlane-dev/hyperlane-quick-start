@@ -36,6 +36,7 @@ pub fn json_page(node: VirtualNode<JsonPageProps>) -> VirtualNode {
                         class: c_textarea_input()
                         placeholder: PLACEHOLDER_DOCUMENT
                         rows: ROWS_INPUT
+                        value: state.get_input().get()
                         oninput: input_handler(state)
                     }
                     div {
@@ -168,12 +169,14 @@ pub fn json_row(node: VirtualNode<JsonRowProps>) -> VirtualNode {
                 class: c_json_value()
                 preview.as_str()
             }
-            div {
-                class: c_hls_button_row()
-                euv_button {
-                    variant: EuvButtonVariant::Outline
-                    onclick: edit_handler(state, edit_path.clone())
-                    LABEL_EDIT
+            if depth > 0 {
+                div {
+                    class: c_hls_button_row()
+                    euv_button {
+                        variant: EuvButtonVariant::Outline
+                        onclick: edit_handler(state, edit_path.clone())
+                        LABEL_EDIT
+                    }
                 }
             }
         }
@@ -222,6 +225,7 @@ pub fn json_editor(node: VirtualNode<JsonEditorProps>) -> VirtualNode {
             textarea {
                 class: c_textarea_input()
                 rows: ROWS_VALUE
+                value: state.get_edit_value().get()
                 oninput: edit_value_handler(state)
             }
             div {
@@ -251,12 +255,7 @@ pub fn json_editor(node: VirtualNode<JsonEditorProps>) -> VirtualNode {
 ///
 /// - `String` - The text of the number.
 fn top_level_text(state: &JsonState) -> String {
-    let count: usize = state
-        .get_nodes()
-        .get()
-        .iter()
-        .filter(|node: &&JsonNode| node.depth == 0)
-        .count();
+    let count: usize = top_level_count(state);
     format!("{count} {TEXT_TOP_LEVEL}")
 }
 
