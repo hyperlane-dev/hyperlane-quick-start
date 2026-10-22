@@ -53,15 +53,25 @@ pub fn json_page(node: VirtualNode<JsonPageProps>) -> VirtualNode {
                     }
                 }
             }
-            if { !state.get_notice().get().is_empty() } {
-                euv_alert {
-                    variant: AlertVariant::Success
-                    state.get_notice().get().as_str()
+            match { !state.get_notice().get().is_empty() } {
+                true => {
+                    euv_alert {
+                        variant: AlertVariant::Success
+                        state.get_notice().get().as_str()
+                    }
                 }
-            } else if { !state.get_error().get().is_empty() } {
-                euv_alert {
-                    variant: AlertVariant::Error
-                    state.get_error().get().as_str()
+                false => {
+                    match { !state.get_error().get().is_empty() } {
+                        true => {
+                            euv_alert {
+                                variant: AlertVariant::Error
+                                state.get_error().get().as_str()
+                            }
+                        }
+                        false => {
+                            ""
+                        }
+                    }
                 }
             }
             euv_card {
@@ -129,13 +139,16 @@ pub fn json_row(node: VirtualNode<JsonRowProps>) -> VirtualNode {
             class: c_json_row()
             style: indent
             if node.container == true {
-                euv_button {
-                    variant: EuvButtonVariant::Outline
-                    onclick: toggle_handler(state, path.clone())
-                    if node.expanded == true {
-                        GLYPH_OPEN
-                    } else {
-                        GLYPH_CLOSED
+                div {
+                    class: c_hls_button_row()
+                    euv_button {
+                        variant: EuvButtonVariant::Outline
+                        onclick: toggle_handler(state, path.clone())
+                        if node.expanded == true {
+                            GLYPH_OPEN
+                        } else {
+                            GLYPH_CLOSED
+                        }
                     }
                 }
             }
@@ -155,10 +168,13 @@ pub fn json_row(node: VirtualNode<JsonRowProps>) -> VirtualNode {
                 class: c_json_value()
                 preview.as_str()
             }
-            euv_button {
-                variant: EuvButtonVariant::Outline
-                onclick: edit_handler(state, edit_path.clone())
-                LABEL_EDIT
+            div {
+                class: c_hls_button_row()
+                euv_button {
+                    variant: EuvButtonVariant::Outline
+                    onclick: edit_handler(state, edit_path.clone())
+                    LABEL_EDIT
+                }
             }
         }
     }

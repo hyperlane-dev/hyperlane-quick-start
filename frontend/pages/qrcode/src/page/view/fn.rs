@@ -51,20 +51,29 @@ pub fn qrcode_page(node: VirtualNode<QrcodePageProps>) -> VirtualNode {
                             LABEL_IMPORT
                         }
                     }
-                    euv_button {
-                        variant: VARIANT_PRIMARY
-                        onclick: add_handler(state)
-                        LABEL_ADD
+                    div {
+                        class: c_hls_button_row()
+                        euv_button {
+                            variant: VARIANT_PRIMARY
+                            onclick: add_handler(state)
+                            LABEL_ADD
+                        }
                     }
-                    euv_button {
-                        variant: VARIANT_OUTLINE
-                        onclick: export_handler(state)
-                        LABEL_EXPORT
+                    div {
+                        class: c_hls_button_row()
+                        euv_button {
+                            variant: VARIANT_OUTLINE
+                            onclick: export_handler(state)
+                            LABEL_EXPORT
+                        }
                     }
-                    euv_button {
-                        variant: VARIANT_OUTLINE
-                        onclick: clear_handler(state)
-                        LABEL_CLEAR
+                    div {
+                        class: c_hls_button_row()
+                        euv_button {
+                            variant: VARIANT_OUTLINE
+                            onclick: clear_handler(state)
+                            LABEL_CLEAR
+                        }
                     }
                     euv_dropdown {
                         open: state.get_level_open()
@@ -77,20 +86,23 @@ pub fn qrcode_page(node: VirtualNode<QrcodePageProps>) -> VirtualNode {
                         }
                     }
                 }
-                if { entries.get().is_empty() } {
-                    euv_result {
-                        code: "0"
-                        title: TITLE_EMPTY
-                        description: TEXT_EMPTY_LIST
+                match { entries.get().is_empty() } {
+                    true => {
+                        euv_result {
+                            code: "0"
+                            title: TITLE_EMPTY
+                            description: TEXT_EMPTY_LIST
+                        }
                     }
-                } else {
-                    div {
-                        class: c_qrcode_list()
-                        for (index, entry) in { entries.get().iter().enumerate() } {
-                            qrcode_entry {
-                                state: state
-                                index: index
-                                text: entry.text.clone()
+                    false => {
+                        div {
+                            class: c_qrcode_list()
+                            for (index, entry) in { entries.get().iter().enumerate() } {
+                                qrcode_entry {
+                                    state: state
+                                    index: index
+                                    text: entry.text.clone()
+                                }
                             }
                         }
                     }
@@ -135,10 +147,13 @@ pub fn qrcode_entry(node: VirtualNode<QrcodeEntryProps>) -> VirtualNode {
                     class: c_qrcode_item_title()
                     format!("[{}]", index + 1).as_str()
                 }
-                euv_button {
-                    variant: VARIANT_OUTLINE
-                    onclick: remove_handler(state, index)
-                    LABEL_REMOVE
+                div {
+                    class: c_hls_button_row()
+                    euv_button {
+                        variant: VARIANT_OUTLINE
+                        onclick: remove_handler(state, index)
+                        LABEL_REMOVE
+                    }
                 }
             }
             textarea {
@@ -153,10 +168,13 @@ pub fn qrcode_entry(node: VirtualNode<QrcodeEntryProps>) -> VirtualNode {
                 ref: canvas
             }
             if is_link(&text) {
-                euv_button {
-                    variant: VARIANT_PRIMARY
-                    onclick: open_handler(state, index)
-                    LABEL_OPEN
+                div {
+                    class: c_hls_button_row()
+                    euv_button {
+                        variant: VARIANT_PRIMARY
+                        onclick: open_handler(state, index)
+                        LABEL_OPEN
+                    }
                 }
             }
         }

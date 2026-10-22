@@ -137,7 +137,9 @@ class! {
         display: "flex";
         flex-direction: "column";
         gap: var!(gap-element);
-        max-height: var!(min-height-base);
+        // The comments scroll, but they have to show a conversation, and no
+        // size token covers a scrollable list.
+        max-height: "320px";
         overflow-y: "auto";
     }
 

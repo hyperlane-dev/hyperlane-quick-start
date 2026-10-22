@@ -82,24 +82,36 @@ pub fn shortlink_page(node: VirtualNode<ShortlinkPageProps>) -> VirtualNode {
                         }
                         div {
                             class: c_shortlink_actions()
-                            euv_button {
-                                variant: VARIANT_PRIMARY
-                                onclick: copy_handler(state)
-                                if { state.get_copied().get() } {
-                                    LABEL_COPIED
-                                } else {
-                                    LABEL_COPY
+                            div {
+                                class: c_hls_button_row()
+                                euv_button {
+                                    variant: VARIANT_PRIMARY
+                                    onclick: copy_handler(state)
+                                    match { state.get_copied().get() } {
+                                        true => {
+                                            LABEL_COPIED
+                                        }
+                                        false => {
+                                            LABEL_COPY
+                                        }
+                                    }
                                 }
                             }
-                            euv_button {
-                                variant: VARIANT_OUTLINE
-                                onclick: open_handler(state)
-                                LABEL_OPEN
+                            div {
+                                class: c_hls_button_row()
+                                euv_button {
+                                    variant: VARIANT_OUTLINE
+                                    onclick: open_handler(state)
+                                    LABEL_OPEN
+                                }
                             }
-                            euv_button {
-                                variant: VARIANT_OUTLINE
-                                onclick: reset_handler(state)
-                                LABEL_RESET
+                            div {
+                                class: c_hls_button_row()
+                                euv_button {
+                                    variant: VARIANT_OUTLINE
+                                    onclick: reset_handler(state)
+                                    LABEL_RESET
+                                }
                             }
                         }
                     }

@@ -24,15 +24,25 @@ pub fn redis_page(node: VirtualNode<RedisPageProps>) -> VirtualNode {
                 title: TITLE_REDIS
                 subtitle: SUBTITLE_REDIS
             }
-            if { !state.get_notice().get().is_empty() } {
-                euv_alert {
-                    variant: AlertVariant::Success
-                    state.get_notice().get().as_str()
+            match { !state.get_notice().get().is_empty() } {
+                true => {
+                    euv_alert {
+                        variant: AlertVariant::Success
+                        state.get_notice().get().as_str()
+                    }
                 }
-            } else if { !state.get_error().get().is_empty() } {
-                euv_alert {
-                    variant: AlertVariant::Error
-                    state.get_error().get().as_str()
+                false => {
+                    match { !state.get_error().get().is_empty() } {
+                        true => {
+                            euv_alert {
+                                variant: AlertVariant::Error
+                                state.get_error().get().as_str()
+                            }
+                        }
+                        false => {
+                            ""
+                        }
+                    }
                 }
             }
             euv_card {
@@ -53,10 +63,13 @@ pub fn redis_page(node: VirtualNode<RedisPageProps>) -> VirtualNode {
                         value: state.get_create_value()
                         oninput: create_value_handler(state)
                     }
-                    euv_button {
-                        variant: EuvButtonVariant::Primary
-                        onclick: create_handler(state)
-                        LABEL_CREATE
+                    div {
+                        class: c_button_controls()
+                        euv_button {
+                            variant: EuvButtonVariant::Primary
+                            onclick: create_handler(state)
+                            LABEL_CREATE
+                        }
                     }
                 }
             }
@@ -64,29 +77,40 @@ pub fn redis_page(node: VirtualNode<RedisPageProps>) -> VirtualNode {
                 title: TITLE_RECORDS
                 div {
                     class: c_redis_toolbar()
-                    euv_button {
-                        variant: EuvButtonVariant::Outline
-                        onclick: refresh_handler(state)
-                        LABEL_REFRESH
+                    div {
+                        class: c_hls_button_row()
+                        euv_button {
+                            variant: EuvButtonVariant::Outline
+                            onclick: refresh_handler(state)
+                            LABEL_REFRESH
+                        }
                     }
                 }
-                if { state.get_loading().get() } {
-                    euv_loading {
-                        title: TITLE_LOADING
+                match { state.get_loading().get() } {
+                    true => {
+                        euv_loading {
+                            title: TITLE_LOADING
+                        }
                     }
-                } else if { records.get().is_empty() } {
-                    euv_result {
-                        code: CODE_EMPTY
-                        title: TITLE_EMPTY
-                        description: TEXT_NO_RECORD
-                    }
-                } else {
-                    div {
-                        class: c_redis_records()
-                        for record in { records } {
-                            record_row {
-                                state: state
-                                record: record
+                    false => {
+                        match { records.get().is_empty() } {
+                            true => {
+                                euv_result {
+                                    code: CODE_EMPTY
+                                    title: TITLE_EMPTY
+                                    description: TEXT_NO_RECORD
+                                }
+                            }
+                            false => {
+                                div {
+                                    class: c_redis_records()
+                                    for record in { records } {
+                                        record_row {
+                                            state: state
+                                            record: record
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -160,15 +184,21 @@ pub fn record_row(node: VirtualNode<RecordProps>) -> VirtualNode {
             }
             div {
                 class: c_redis_record_actions()
-                euv_button {
-                    variant: EuvButtonVariant::Outline
-                    onclick: edit_handler(state, key.clone(), value.clone())
-                    LABEL_EDIT
+                div {
+                    class: c_hls_button_row()
+                    euv_button {
+                        variant: EuvButtonVariant::Outline
+                        onclick: edit_handler(state, key.clone(), value.clone())
+                        LABEL_EDIT
+                    }
                 }
-                euv_button {
-                    variant: EuvButtonVariant::Outline
-                    onclick: delete_handler(state, key.clone())
-                    LABEL_DELETE
+                div {
+                    class: c_hls_button_row()
+                    euv_button {
+                        variant: EuvButtonVariant::Outline
+                        onclick: delete_handler(state, key.clone())
+                        LABEL_DELETE
+                    }
                 }
             }
         }

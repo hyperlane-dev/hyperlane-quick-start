@@ -37,10 +37,13 @@ pub fn chat_page(node: VirtualNode<ChatPageProps>) -> VirtualNode {
                     class: c_chat_status()
                     span {
                         class: c_chat_status_state()
-                        if { state.get_connected().get() } {
-                            LABEL_CONNECTED
-                        } else {
-                            LABEL_DISCONNECTED
+                        match { state.get_connected().get() } {
+                            true => {
+                                LABEL_CONNECTED
+                            }
+                            false => {
+                                LABEL_DISCONNECTED
+                            }
                         }
                     }
                     span {
@@ -52,19 +55,22 @@ pub fn chat_page(node: VirtualNode<ChatPageProps>) -> VirtualNode {
                         LABEL_ONLINE
                     }
                 }
-                if { messages.get().is_empty() } {
-                    euv_result {
-                        code: "0"
-                        title: TITLE_EMPTY
-                        description: TEXT_EMPTY_ROOM
+                match { messages.get().is_empty() } {
+                    true => {
+                        euv_result {
+                            code: "0"
+                            title: TITLE_EMPTY
+                            description: TEXT_EMPTY_ROOM
+                        }
                     }
-                } else {
-                    div {
-                        class: c_chat_messages()
-                        for message in { messages } {
-                            chat_message_row {
-                                state: state
-                                message: message
+                    false => {
+                        div {
+                            class: c_chat_messages()
+                            for message in { messages } {
+                                chat_message_row {
+                                    state: state
+                                    message: message
+                                }
                             }
                         }
                     }
@@ -87,16 +93,19 @@ pub fn chat_page(node: VirtualNode<ChatPageProps>) -> VirtualNode {
                             class: c_chat_mentions_title()
                             TITLE_MENTION
                         }
-                        if { candidates.get().is_empty() } {
-                            span {
-                                class: c_chat_mentions_empty()
-                                TEXT_EMPTY_MENTION
+                        match { candidates.get().is_empty() } {
+                            true => {
+                                span {
+                                    class: c_chat_mentions_empty()
+                                    TEXT_EMPTY_MENTION
+                                }
                             }
-                        } else {
-                            for user in { candidates } {
-                                mention_row {
-                                    state: state
-                                    user: user
+                            false => {
+                                for user in { candidates } {
+                                    mention_row {
+                                        state: state
+                                        user: user
+                                    }
                                 }
                             }
                         }
@@ -113,10 +122,13 @@ pub fn chat_page(node: VirtualNode<ChatPageProps>) -> VirtualNode {
                     }
                     div {
                         class: c_chat_actions()
-                        euv_button {
-                            variant: VARIANT_PRIMARY
-                            onclick: send_handler(state)
-                            LABEL_SEND
+                        div {
+                            class: c_hls_button_row()
+                            euv_button {
+                                variant: VARIANT_PRIMARY
+                                onclick: send_handler(state)
+                                LABEL_SEND
+                            }
                         }
                         label {
                             class: c_chat_attach()

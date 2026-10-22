@@ -48,20 +48,29 @@ pub fn notification_page(node: VirtualNode<NotificationPageProps>) -> VirtualNod
             }
             div {
                 class: c_notification_actions()
-                euv_button {
-                    variant: EuvButtonVariant::Primary
-                    onclick: open_create_handler(state)
-                    LABEL_NEW
+                div {
+                    class: c_hls_button_row()
+                    euv_button {
+                        variant: EuvButtonVariant::Primary
+                        onclick: open_create_handler(state)
+                        LABEL_NEW
+                    }
                 }
-                euv_button {
-                    variant: EuvButtonVariant::Outline
-                    onclick: mark_all_handler(state)
-                    LABEL_MARK_ALL
+                div {
+                    class: c_hls_button_row()
+                    euv_button {
+                        variant: EuvButtonVariant::Outline
+                        onclick: mark_all_handler(state)
+                        LABEL_MARK_ALL
+                    }
                 }
-                euv_button {
-                    variant: EuvButtonVariant::Outline
-                    onclick: refresh_handler(state)
-                    LABEL_REFRESH
+                div {
+                    class: c_hls_button_row()
+                    euv_button {
+                        variant: EuvButtonVariant::Outline
+                        onclick: refresh_handler(state)
+                        LABEL_REFRESH
+                    }
                 }
             }
             if { state.get_detail().get().is_some() } {
@@ -168,39 +177,57 @@ pub fn notification_list_panel(node: VirtualNode<NotificationListProps>) -> Virt
                     }
                 }
             }
-            if { !state.get_notice().get().is_empty() } {
-                euv_alert {
-                    variant: AlertVariant::Success
-                    state.get_notice().get().as_str()
+            match { !state.get_notice().get().is_empty() } {
+                true => {
+                    euv_alert {
+                        variant: AlertVariant::Success
+                        state.get_notice().get().as_str()
+                    }
                 }
-            } else if { !state.get_error().get().is_empty() } {
-                euv_alert {
-                    variant: AlertVariant::Error
-                    state.get_error().get().as_str()
-                }
-            }
-            if { state.get_loading().get() } {
-                euv_loading {
-                    title: "Loading the notifications"
-                }
-            } else if { state.get_notifications().get().is_empty() } {
-                euv_result {
-                    code: "0"
-                    title: TITLE_EMPTY
-                    description: TEXT_EMPTY
-                }
-            } else {
-                div {
-                    class: c_notification_list()
-                    for notification in { notifications } {
-                        notification_row {
-                            state: state
-                            notification: notification
+                false => {
+                    match { !state.get_error().get().is_empty() } {
+                        true => {
+                            euv_alert {
+                                variant: AlertVariant::Error
+                                state.get_error().get().as_str()
+                            }
+                        }
+                        false => {
+                            ""
                         }
                     }
                 }
-                pagination_bar {
-                    state: state
+            }
+            match { state.get_loading().get() } {
+                true => {
+                    euv_loading {
+                        title: "Loading the notifications"
+                    }
+                }
+                false => {
+                    match { state.get_notifications().get().is_empty() } {
+                        true => {
+                            euv_result {
+                                code: "0"
+                                title: TITLE_EMPTY
+                                description: TEXT_EMPTY
+                            }
+                        }
+                        false => {
+                            div {
+                                class: c_notification_list()
+                                for notification in { notifications } {
+                                    notification_row {
+                                        state: state
+                                        notification: notification
+                                    }
+                                }
+                            }
+                            pagination_bar {
+                                state: state
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -231,16 +258,22 @@ pub fn filter_button(node: VirtualNode<FilterButtonProps>) -> VirtualNode {
     let handler: Option<Rc<dyn Fn(Event)>> = filter_handler(state, kind.to_string(), value.to_string());
     html! {
         if active == true {
-            euv_button {
-                variant: EuvButtonVariant::Primary
-                onclick: handler.clone()
-                label
+            div {
+                class: c_hls_button_row()
+                euv_button {
+                    variant: EuvButtonVariant::Primary
+                    onclick: handler.clone()
+                    label
+                }
             }
         } else {
-            euv_button {
-                variant: EuvButtonVariant::Outline
-                onclick: handler.clone()
-                label
+            div {
+                class: c_hls_button_row()
+                euv_button {
+                    variant: EuvButtonVariant::Outline
+                    onclick: handler.clone()
+                    label
+                }
             }
         }
     }
@@ -335,16 +368,22 @@ pub fn notification_row(node: VirtualNode<NotificationRowProps>) -> VirtualNode 
             div {
                 class: c_notification_item_actions()
                 if unread == true {
-                    euv_button {
-                        variant: EuvButtonVariant::Outline
-                        onclick: mark_read_handler(state, read_id.clone())
-                        LABEL_MARK_READ
+                    div {
+                        class: c_hls_button_row()
+                        euv_button {
+                            variant: EuvButtonVariant::Outline
+                            onclick: mark_read_handler(state, read_id.clone())
+                            LABEL_MARK_READ
+                        }
                     }
                 }
-                euv_button {
-                    variant: EuvButtonVariant::Outline
-                    onclick: delete_handler(state, delete_id.clone())
-                    LABEL_DELETE
+                div {
+                    class: c_hls_button_row()
+                    euv_button {
+                        variant: EuvButtonVariant::Outline
+                        onclick: delete_handler(state, delete_id.clone())
+                        LABEL_DELETE
+                    }
                 }
             }
         }
@@ -367,19 +406,25 @@ pub fn pagination_bar(node: VirtualNode<NotificationListProps>) -> VirtualNode {
     html! {
         div {
             class: c_notification_pagination()
-            euv_button {
-                variant: EuvButtonVariant::Outline
-                onclick: previous_page_handler(state)
-                LABEL_PREVIOUS
+            div {
+                class: c_hls_button_row()
+                euv_button {
+                    variant: EuvButtonVariant::Outline
+                    onclick: previous_page_handler(state)
+                    LABEL_PREVIOUS
+                }
             }
             span {
                 class: c_notification_pagination_info()
                 state.get_page().get().to_string()
             }
-            euv_button {
-                variant: EuvButtonVariant::Outline
-                onclick: next_page_handler(state)
-                LABEL_NEXT
+            div {
+                class: c_hls_button_row()
+                euv_button {
+                    variant: EuvButtonVariant::Outline
+                    onclick: next_page_handler(state)
+                    LABEL_NEXT
+                }
             }
         }
     }

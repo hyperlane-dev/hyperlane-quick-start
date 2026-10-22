@@ -49,7 +49,7 @@ class! {
         display: "flex";
         align-items: "center";
         gap: var!(gap-inline);
-        padding: var!(space-sm) var!(space-lg);
+        padding: format!("{} {}", var!(space-sm), var!(space-lg));
         border: format!("1px solid {}", var!(border));
         cursor: "pointer";
     }

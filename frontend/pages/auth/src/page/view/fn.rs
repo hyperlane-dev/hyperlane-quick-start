@@ -27,24 +27,37 @@ pub fn auth_page(node: VirtualNode<AuthPageProps>) -> VirtualNode {
                 items: TAB_ITEMS.to_vec()
                 active: state.get_mode()
             }
-            if { !state.get_error().get().is_empty() } {
-                euv_alert {
-                    variant: AlertVariant::Error
-                    state.get_error().get().as_str()
+            match { !state.get_error().get().is_empty() } {
+                true => {
+                    euv_alert {
+                        variant: AlertVariant::Error
+                        state.get_error().get().as_str()
+                    }
                 }
-            } else if { !state.get_notice().get().is_empty() } {
-                euv_alert {
-                    variant: AlertVariant::Success
-                    state.get_notice().get().as_str()
+                false => {
+                    match { !state.get_notice().get().is_empty() } {
+                        true => {
+                            euv_alert {
+                                variant: AlertVariant::Success
+                                state.get_notice().get().as_str()
+                            }
+                        }
+                        false => {
+                            ""
+                        }
+                    }
                 }
             }
-            if { state.get_mode().get() == MODE_LOGIN } {
-                login_form {
-                    state: state
+            match { state.get_mode().get() == MODE_LOGIN } {
+                true => {
+                    login_form {
+                        state: state
+                    }
                 }
-            } else {
-                register_form {
-                    state: state
+                false => {
+                    register_form {
+                        state: state
+                    }
                 }
             }
         }

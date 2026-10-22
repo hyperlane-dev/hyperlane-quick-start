@@ -47,34 +47,48 @@ pub fn cicd_page(node: VirtualNode<CicdPageProps>) -> VirtualNode {
                         title: TITLE_PIPELINES
                         div {
                             class: c_cicd_toolbar()
-                            euv_button {
-                                variant: VARIANT_PRIMARY
-                                onclick: open_create_handler(state)
-                                LABEL_CREATE
+                            div {
+                                class: c_hls_button_row()
+                                euv_button {
+                                    variant: VARIANT_PRIMARY
+                                    onclick: open_create_handler(state)
+                                    LABEL_CREATE
+                                }
                             }
-                            euv_button {
-                                variant: VARIANT_OUTLINE
-                                onclick: reload_handler(state)
-                                LABEL_RELOAD
+                            div {
+                                class: c_hls_button_row()
+                                euv_button {
+                                    variant: VARIANT_OUTLINE
+                                    onclick: reload_handler(state)
+                                    LABEL_RELOAD
+                                }
                             }
                         }
-                        if { state.get_loading().get() } {
-                            euv_loading {
-                                title: TITLE_PIPELINES
+                        match { state.get_loading().get() } {
+                            true => {
+                                euv_loading {
+                                    title: TITLE_PIPELINES
+                                }
                             }
-                        } else if { pipelines.get().is_empty() } {
-                            euv_result {
-                                code: "0"
-                                title: TITLE_EMPTY_PIPELINES
-                                description: TEXT_EMPTY_PIPELINES
-                            }
-                        } else {
-                            div {
-                                class: c_cicd_list()
-                                for pipeline in { pipelines } {
-                                    pipeline_row {
-                                        state: state
-                                        pipeline: pipeline
+                            false => {
+                                match { pipelines.get().is_empty() } {
+                                    true => {
+                                        euv_result {
+                                            code: "0"
+                                            title: TITLE_EMPTY_PIPELINES
+                                            description: TEXT_EMPTY_PIPELINES
+                                        }
+                                    }
+                                    false => {
+                                        div {
+                                            class: c_cicd_list()
+                                            for pipeline in { pipelines } {
+                                                pipeline_row {
+                                                    state: state
+                                                    pipeline: pipeline
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -86,29 +100,40 @@ pub fn cicd_page(node: VirtualNode<CicdPageProps>) -> VirtualNode {
                         title: TITLE_RUNS
                         div {
                             class: c_cicd_toolbar()
-                            euv_button {
-                                variant: VARIANT_OUTLINE
-                                onclick: reload_handler(state)
-                                LABEL_RELOAD
+                            div {
+                                class: c_hls_button_row()
+                                euv_button {
+                                    variant: VARIANT_OUTLINE
+                                    onclick: reload_handler(state)
+                                    LABEL_RELOAD
+                                }
                             }
                         }
-                        if { state.get_loading().get() } {
-                            euv_loading {
-                                title: TITLE_RUNS
+                        match { state.get_loading().get() } {
+                            true => {
+                                euv_loading {
+                                    title: TITLE_RUNS
+                                }
                             }
-                        } else if { runs.get().is_empty() } {
-                            euv_result {
-                                code: "0"
-                                title: TITLE_EMPTY_RUNS
-                                description: TEXT_EMPTY_RUNS
-                            }
-                        } else {
-                            div {
-                                class: c_cicd_list()
-                                for run in { runs } {
-                                    run_row {
-                                        state: state
-                                        run: run
+                            false => {
+                                match { runs.get().is_empty() } {
+                                    true => {
+                                        euv_result {
+                                            code: "0"
+                                            title: TITLE_EMPTY_RUNS
+                                            description: TEXT_EMPTY_RUNS
+                                        }
+                                    }
+                                    false => {
+                                        div {
+                                            class: c_cicd_list()
+                                            for run in { runs } {
+                                                run_row {
+                                                    state: state
+                                                    run: run
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -211,10 +236,13 @@ pub fn pipeline_row(node: VirtualNode<PipelineRowProps>) -> VirtualNode {
                     config.as_str()
                 }
             }
-            euv_button {
-                variant: VARIANT_PRIMARY
-                onclick: trigger_handler(state, pipeline.id)
-                LABEL_TRIGGER
+            div {
+                class: c_hls_button_row()
+                euv_button {
+                    variant: VARIANT_PRIMARY
+                    onclick: trigger_handler(state, pipeline.id)
+                    LABEL_TRIGGER
+                }
             }
         }
     }
@@ -267,10 +295,13 @@ pub fn run_row(node: VirtualNode<RunRowProps>) -> VirtualNode {
                     started.as_str()
                 }
             }
-            euv_button {
-                variant: VARIANT_OUTLINE
-                onclick: detail_handler(state, run.id)
-                LABEL_DETAIL
+            div {
+                class: c_hls_button_row()
+                euv_button {
+                    variant: VARIANT_OUTLINE
+                    onclick: detail_handler(state, run.id)
+                    LABEL_DETAIL
+                }
             }
         }
     }
@@ -431,10 +462,13 @@ pub fn step_block(node: VirtualNode<StepBlockProps>) -> VirtualNode {
                     output.as_str()
                 }
             }
-            euv_button {
-                variant: VARIANT_OUTLINE
-                onclick: tail_handler(state, run_id)
-                LABEL_TAIL
+            div {
+                class: c_hls_button_row()
+                euv_button {
+                    variant: VARIANT_OUTLINE
+                    onclick: tail_handler(state, run_id)
+                    LABEL_TAIL
+                }
             }
         }
     }
@@ -490,37 +524,46 @@ pub fn run_log(node: VirtualNode<RunLogProps>) -> VirtualNode {
                 }
                 span {
                     class: c_cicd_item_meta()
-                    if { state.get_streaming().get() } {
-                        TEXT_STREAMING
-                    } else {
-                        TEXT_NOT_STREAMING
-                    }
-                }
-            }
-            if { logs.get().is_empty() } {
-                span {
-                    class: c_cicd_item_text()
-                    TEXT_NO_OUTPUT
-                }
-            } else {
-                pre {
-                    class: c_cicd_log_body()
-                    for entry in { logs } {
-                        span {
-                            class: if entry.is_stderr {
-                                c_cicd_log_line_error()
-                            } else {
-                                c_cicd_log_line()
-                            }
-                            entry.content.as_str()
+                    match { state.get_streaming().get() } {
+                        true => {
+                            TEXT_STREAMING
+                        }
+                        false => {
+                            TEXT_NOT_STREAMING
                         }
                     }
                 }
             }
-            euv_button {
-                variant: VARIANT_OUTLINE
-                onclick: stop_handler(state)
-                LABEL_STOP
+            match { logs.get().is_empty() } {
+                true => {
+                    span {
+                        class: c_cicd_item_text()
+                        TEXT_NO_OUTPUT
+                    }
+                }
+                false => {
+                    pre {
+                        class: c_cicd_log_body()
+                        for entry in { logs } {
+                            span {
+                                class: if entry.is_stderr {
+                                    c_cicd_log_line_error()
+                                } else {
+                                    c_cicd_log_line()
+                                }
+                                entry.content.as_str()
+                            }
+                        }
+                    }
+                }
+            }
+            div {
+                class: c_hls_button_row()
+                euv_button {
+                    variant: VARIANT_OUTLINE
+                    onclick: stop_handler(state)
+                    LABEL_STOP
+                }
             }
         }
     }

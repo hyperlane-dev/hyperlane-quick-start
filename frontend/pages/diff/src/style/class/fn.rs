@@ -24,6 +24,9 @@ class! {
         flex-wrap: "wrap";
         gap: var!(gap-inline);
         margin-bottom: var!(gap-component);
+        button {
+            flex: "0 0 auto";
+        }
     }
 
     // The row of the counters.
@@ -67,7 +70,7 @@ class! {
         display: "flex";
         align-items: "center";
         gap: var!(space-xs);
-        padding: var!(space-xs) var!(space-sm);
+        padding: format!("{} {}", var!(space-xs), var!(space-sm));
         background: var!(accent-muted);
         border-bottom: format!("1px solid {}", var!(border));
         font-size: var!(font-xs);
@@ -100,7 +103,7 @@ class! {
 
     // One line of the result.
     pub c_diff_line {
-        padding: var!(space-2xs) var!(space-sm);
+        padding: format!("{} {}", var!(space-2xs), var!(space-sm));
         font-size: var!(font-xs);
         white-space: "pre-wrap";
         word-break: "break-word";
@@ -109,7 +112,7 @@ class! {
 
     // One line of the result that was removed.
     pub c_diff_line_removed {
-        padding: var!(space-2xs) var!(space-sm);
+        padding: format!("{} {}", var!(space-2xs), var!(space-sm));
         font-size: var!(font-xs);
         white-space: "pre-wrap";
         word-break: "break-word";
@@ -119,7 +122,7 @@ class! {
 
     // One line of the result that was added.
     pub c_diff_line_added {
-        padding: var!(space-2xs) var!(space-sm);
+        padding: format!("{} {}", var!(space-2xs), var!(space-sm));
         font-size: var!(font-xs);
         white-space: "pre-wrap";
         word-break: "break-word";
@@ -129,7 +132,7 @@ class! {
 
     // One line of the result that has no counterpart.
     pub c_diff_line_empty {
-        padding: var!(space-2xs) var!(space-sm);
+        padding: format!("{} {}", var!(space-2xs), var!(space-sm));
         min-height: var!(min-height-base);
         background: var!(accent-muted);
     }
@@ -180,7 +183,7 @@ class! {
     pub c_diff_inline_marker {
         flex-shrink: "0";
         width: var!(space-xl);
-        padding: var!(space-2xs) var!(space-xs);
+        padding: format!("{} {}", var!(space-2xs), var!(space-xs));
         text-align: "center";
         font-size: var!(font-xs);
         color: var!(muted-foreground);
@@ -191,7 +194,7 @@ class! {
     // The content of one row of the inline view.
     pub c_diff_inline_content {
         flex: "1";
-        padding: var!(space-2xs) var!(space-sm);
+        padding: format!("{} {}", var!(space-2xs), var!(space-sm));
         font-size: var!(font-xs);
         white-space: "pre-wrap";
         word-break: "break-word";

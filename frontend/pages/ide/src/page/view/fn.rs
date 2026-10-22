@@ -40,15 +40,21 @@ pub fn ide_page(node: VirtualNode<IdePageProps>) -> VirtualNode {
                 }
                 div {
                     class: c_button_controls()
-                    euv_button {
-                        variant: EuvButtonVariant::Outline
-                        onclick: copy_handler(state)
-                        LABEL_COPY
+                    div {
+                        class: c_hls_button_row()
+                        euv_button {
+                            variant: EuvButtonVariant::Outline
+                            onclick: copy_handler(state)
+                            LABEL_COPY
+                        }
                     }
-                    euv_button {
-                        variant: EuvButtonVariant::Outline
-                        onclick: clear_handler(state)
-                        LABEL_CLEAR
+                    div {
+                        class: c_hls_button_row()
+                        euv_button {
+                            variant: EuvButtonVariant::Outline
+                            onclick: clear_handler(state)
+                            LABEL_CLEAR
+                        }
                     }
                 }
             }

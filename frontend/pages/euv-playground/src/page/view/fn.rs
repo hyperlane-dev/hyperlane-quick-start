@@ -63,30 +63,38 @@ pub fn playground_page(node: VirtualNode<PlaygroundPageProps>) -> VirtualNode {
                     title: TITLE_PROJECTS
                     div {
                         class: c_playground_projects()
-                        if { state.get_loading().get() } {
-                            euv_loading {
-                                title: "Loading the projects"
+                        match { state.get_loading().get() } {
+                            true => {
+                                euv_loading {
+                                    title: "Loading the projects"
+                                }
                             }
-                        } else if { projects.get().is_empty() } {
-                            euv_result {
-                                code: "0"
-                                title: TITLE_EMPTY_LIST
-                                description: TEXT_EMPTY_LIST
-                            }
-                        } else {
-                            for project in { projects } {
-                                div {
-                                    key: project.id.to_string()
-                                    class: c_playground_project()
-                                    onclick: open_handler(state, project.id.clone())
-                                    span {
-                                        class: c_playground_project_name()
-                                        project.name.as_str()
+                            false => {
+                                match { projects.get().is_empty() } {
+                                    true => {
+                                        euv_result {
+                                            code: "0"
+                                            title: TITLE_EMPTY_LIST
+                                            description: TEXT_EMPTY_LIST
+                                        }
                                     }
-                                    span {
-                                        class: c_playground_project_size()
-                                        {
-                                            size_label(project.code_size)
+                                    false => {
+                                        for project in { projects } {
+                                            div {
+                                                key: project.id.to_string()
+                                                class: c_playground_project()
+                                                onclick: open_handler(state, project.id.clone())
+                                                span {
+                                                    class: c_playground_project_name()
+                                                    project.name.as_str()
+                                                }
+                                                span {
+                                                    class: c_playground_project_size()
+                                                    {
+                                                        size_label(project.code_size)
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -104,17 +112,20 @@ pub fn playground_page(node: VirtualNode<PlaygroundPageProps>) -> VirtualNode {
                     title: TITLE_PREVIEW
                     div {
                         class: c_playground_preview()
-                        if { state.get_preview_url().get().is_empty() } {
-                            euv_result {
-                                code: "0"
-                                title: TITLE_PREVIEW
-                                description: TEXT_NO_PROJECT
+                        match { state.get_preview_url().get().is_empty() } {
+                            true => {
+                                euv_result {
+                                    code: "0"
+                                    title: TITLE_PREVIEW
+                                    description: TEXT_NO_PROJECT
+                                }
                             }
-                        } else {
-                            iframe {
-                                class: c_playground_frame()
-                                src: state.get_preview_url().get().as_str()
-                                sandbox: "allow-scripts allow-same-origin"
+                            false => {
+                                iframe {
+                                    class: c_playground_frame()
+                                    src: state.get_preview_url().get().as_str()
+                                    sandbox: "allow-scripts allow-same-origin"
+                                }
                             }
                         }
                         if { !state.get_stderr().get().is_empty() } {

@@ -24,6 +24,7 @@ pub fn app_shell(node: VirtualNode<AppShellProps>) -> VirtualNode {
         drawer_open,
     }: AppShellProps = node.try_get_props().unwrap_or_default();
     let content: VirtualNode = node.get_children().into();
+    inject_shared_css();
     html! {
         div {
             class: root_class
@@ -114,8 +115,11 @@ pub fn app_shell(node: VirtualNode<AppShellProps>) -> VirtualNode {
                     class: c_nav_section_label()
                     NAV_SECTION_LABEL
                 }
-                nav_entries {
-                    current_path: current_path
+                div {
+                    class: c_nav_items_scroll()
+                    nav_entries {
+                        current_path: current_path
+                    }
                 }
             }
         }

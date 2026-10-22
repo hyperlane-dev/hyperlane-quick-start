@@ -10,7 +10,7 @@ class! {
         display: "flex";
         flex-direction: "column";
         align-items: "center";
-        justify-content: "center";
+        justify-content: "flex-start";
         gap: var!(space-xs);
     }
 
@@ -32,6 +32,23 @@ class! {
         font-size: var!(font-sm);
         color: var!(muted-foreground);
         font-weight: "500";
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // Button Row
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    // The row of the action buttons of a page.
+    //
+    // The buttons of the library carry `flex: 1 1 120px`, so a button grows
+    // into the whole row it sits in and a button that sits in a column takes
+    // the basis as its height. The row keeps the buttons on one line, and the
+    // stylesheet of the shared crate keeps them at the size of their label.
+    pub c_hls_button_row {
+        display: "flex";
+        flex-wrap: "wrap";
+        align-items: "center";
+        gap: var!(gap-element);
     }
 
     // ═══════════════════════════════════════════════════════════════════════════

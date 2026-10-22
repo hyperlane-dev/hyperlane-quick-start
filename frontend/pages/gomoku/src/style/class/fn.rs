@@ -68,17 +68,23 @@ class! {
         justify-content: "space-between";
         gap: var!(gap-inline);
         font-size: var!(font-sm);
+        min-width: "0px";
     }
 
     // The name of one fact of the room.
     pub c_gomoku_info_label {
         color: var!(muted-foreground);
+        flex: "0 0 auto";
     }
 
     // The value of one fact of the room.
     pub c_gomoku_info_value {
         color: var!(foreground);
         font-weight: "600";
+        min-width: "0px";
+        overflow: "hidden";
+        text-overflow: "ellipsis";
+        white-space: "nowrap";
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -138,7 +144,9 @@ class! {
         display: "flex";
         flex-direction: "column";
         gap: var!(space-2xs);
-        max-height: var!(min-height-base);
+        // The list scrolls, but it has to show more than one entry, and no
+        // size token covers a scrollable list.
+        max-height: "240px";
         overflow-y: "auto";
     }
 
@@ -148,7 +156,7 @@ class! {
         align-items: "center";
         justify-content: "space-between";
         gap: var!(gap-inline);
-        padding: var!(space-2xs) var!(space-sm);
+        padding: format!("{} {}", var!(space-2xs), var!(space-sm));
         font-size: var!(font-xs);
         color: var!(foreground);
         border: format!("1px solid {}", var!(border));

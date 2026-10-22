@@ -115,6 +115,15 @@ class! {
         gap: var!(gap-inline);
     }
 
+    // The label of the page size of the feed.
+    //
+    // The select of the library fills its column, so the label has to keep
+    // its own width, and the row centres the two of them anyway.
+    pub c_rss_page_size_label {
+        flex: "0 0 auto";
+        margin-bottom: "0px";
+    }
+
     // The page the feed is on.
     pub c_rss_pagination_info {
         font-size: var!(font-sm);

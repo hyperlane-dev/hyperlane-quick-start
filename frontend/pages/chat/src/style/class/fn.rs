@@ -32,7 +32,9 @@ class! {
         display: "flex";
         flex-direction: "column";
         gap: var!(gap-element);
-        max-height: var!(min-height-base);
+        // The room scrolls, but it has to show a conversation, and no size
+        // token covers a scrollable list.
+        max-height: "420px";
         overflow-y: "auto";
     }
 
@@ -104,7 +106,9 @@ class! {
         padding: var!(space-md);
         border: format!("1px dashed {}", var!(border));
         margin-top: var!(gap-element);
-        max-height: var!(min-height-sm);
+        // The mentions scroll, but they have to show more than one line, and
+        // no size token covers a scrollable list.
+        max-height: "160px";
         overflow-y: "auto";
     }
 
@@ -146,7 +150,7 @@ class! {
         display: "flex";
         align-items: "center";
         gap: var!(gap-inline);
-        padding: var!(space-sm) var!(space-lg);
+        padding: format!("{} {}", var!(space-sm), var!(space-lg));
         border: format!("1px solid {}", var!(border));
         cursor: "pointer";
     }

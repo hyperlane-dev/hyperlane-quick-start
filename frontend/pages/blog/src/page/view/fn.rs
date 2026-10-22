@@ -27,21 +27,34 @@ pub fn blog_page(node: VirtualNode<BlogPageProps>) -> VirtualNode {
                 items: TAB_ITEMS.to_vec()
                 active: state.get_tab()
             }
-            if { state.get_tab().get() == TAB_EXPLORE } {
-                post_list_panel {
-                    state: state
+            match { state.get_tab().get() == TAB_EXPLORE } {
+                true => {
+                    post_list_panel {
+                        state: state
+                    }
                 }
-            } else if { state.get_tab().get() == TAB_MY_POSTS } {
-                post_list_panel {
-                    state: state
-                }
-            } else if { state.get_tab().get() == TAB_FAVORITES } {
-                post_list_panel {
-                    state: state
-                }
-            } else {
-                write_panel {
-                    state: state
+                false => {
+                    match { state.get_tab().get() == TAB_MY_POSTS } {
+                        true => {
+                            post_list_panel {
+                                state: state
+                            }
+                        }
+                        false => {
+                            match { state.get_tab().get() == TAB_FAVORITES } {
+                                true => {
+                                    post_list_panel {
+                                        state: state
+                                    }
+                                }
+                                false => {
+                                    write_panel {
+                                        state: state
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
             if { state.get_detail().get().is_some() } {
@@ -106,33 +119,46 @@ pub fn post_list_panel(node: VirtualNode<PostListPanelProps>) -> VirtualNode {
                     oninput: search_handler(state)
                 }
             }
-            if { state.get_loading().get() } {
-                euv_loading {
-                    title: "Loading the posts"
-                }
-            } else if { !state.get_error().get().is_empty() } {
-                euv_alert {
-                    variant: AlertVariant::Error
-                    state.get_error().get().as_str()
-                }
-            } else if { state.get_posts().get().is_empty() } {
-                euv_result {
-                    code: "0"
-                    title: TITLE_EMPTY
-                    description: TEXT_EMPTY
-                }
-            } else {
-                div {
-                    class: c_blog_posts()
-                    for post in { posts } {
-                        post_row {
-                            state: state
-                            post: post
-                        }
+            match { state.get_loading().get() } {
+                true => {
+                    euv_loading {
+                        title: "Loading the posts"
                     }
                 }
-                pagination_bar {
-                    state: state
+                false => {
+                    match { !state.get_error().get().is_empty() } {
+                        true => {
+                            euv_alert {
+                                variant: AlertVariant::Error
+                                state.get_error().get().as_str()
+                            }
+                        }
+                        false => {
+                            match { state.get_posts().get().is_empty() } {
+                                true => {
+                                    euv_result {
+                                        code: "0"
+                                        title: TITLE_EMPTY
+                                        description: TEXT_EMPTY
+                                    }
+                                }
+                                false => {
+                                    div {
+                                        class: c_blog_posts()
+                                        for post in { posts } {
+                                            post_row {
+                                                state: state
+                                                post: post
+                                            }
+                                        }
+                                    }
+                                    pagination_bar {
+                                        state: state
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -217,20 +243,29 @@ pub fn post_row(node: VirtualNode<PostRowProps>) -> VirtualNode {
             }
             div {
                 class: c_blog_post_stats()
-                euv_button {
-                    variant: EuvButtonVariant::Primary
-                    onclick: open_post_handler(state, post_id.clone())
-                    LABEL_OPEN
+                div {
+                    class: c_hls_button_row()
+                    euv_button {
+                        variant: EuvButtonVariant::Primary
+                        onclick: open_post_handler(state, post_id.clone())
+                        LABEL_OPEN
+                    }
                 }
-                euv_button {
-                    variant: EuvButtonVariant::Outline
-                    onclick: like_handler(state, post_id.clone())
-                    LABEL_LIKE
+                div {
+                    class: c_hls_button_row()
+                    euv_button {
+                        variant: EuvButtonVariant::Outline
+                        onclick: like_handler(state, post_id.clone())
+                        LABEL_LIKE
+                    }
                 }
-                euv_button {
-                    variant: EuvButtonVariant::Outline
-                    onclick: favorite_handler(state, post_id.clone())
-                    LABEL_FAVORITE
+                div {
+                    class: c_hls_button_row()
+                    euv_button {
+                        variant: EuvButtonVariant::Outline
+                        onclick: favorite_handler(state, post_id.clone())
+                        LABEL_FAVORITE
+                    }
                 }
                 span {
                     class: c_blog_post_count()
@@ -260,19 +295,25 @@ pub fn pagination_bar(node: VirtualNode<PostListPanelProps>) -> VirtualNode {
     html! {
         div {
             class: c_blog_pagination()
-            euv_button {
-                variant: EuvButtonVariant::Outline
-                onclick: previous_page_handler(state)
-                LABEL_PREVIOUS
+            div {
+                class: c_hls_button_row()
+                euv_button {
+                    variant: EuvButtonVariant::Outline
+                    onclick: previous_page_handler(state)
+                    LABEL_PREVIOUS
+                }
             }
             span {
                 class: c_blog_pagination_info()
                 state.get_page().get().to_string()
             }
-            euv_button {
-                variant: EuvButtonVariant::Outline
-                onclick: next_page_handler(state)
-                LABEL_NEXT
+            div {
+                class: c_hls_button_row()
+                euv_button {
+                    variant: EuvButtonVariant::Outline
+                    onclick: next_page_handler(state)
+                    LABEL_NEXT
+                }
             }
         }
     }

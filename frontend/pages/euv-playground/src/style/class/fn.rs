@@ -42,7 +42,9 @@ class! {
         display: "flex";
         flex-direction: "column";
         gap: var!(space-2xs);
-        max-height: var!(min-height-base);
+        // The list scrolls, but it has to show more than one project at a
+        // time, and no size token covers a scrollable list.
+        max-height: "220px";
         overflow-y: "auto";
     }
 
@@ -52,7 +54,7 @@ class! {
         align-items: "center";
         justify-content: "space-between";
         gap: var!(gap-inline);
-        padding: var!(space-2xs) var!(space-sm);
+        padding: format!("{} {}", var!(space-2xs), var!(space-sm));
         font-size: var!(font-xs);
         color: var!(foreground);
         border: format!("1px solid {}", var!(border));
@@ -83,7 +85,9 @@ class! {
     // The container of the editor.
     pub c_playground_editor {
         width: "100%";
-        min-height: var!(min-height-base);
+        // The editor is a working area, not a control: it needs a screen of
+        // its own to be usable, and no size token covers a working area.
+        min-height: "320px";
         border: format!("1px solid {}", var!(border));
         overflow: "hidden";
     }
@@ -98,7 +102,9 @@ class! {
     // The page the build produced.
     pub c_playground_frame {
         width: "100%";
-        min-height: var!(min-height-base);
+        // The frame shows a page: it keeps a screen of its own, and no size
+        // token covers a picture box.
+        min-height: "240px";
         border: format!("1px solid {}", var!(border));
         background: var!(background);
     }
@@ -112,7 +118,9 @@ class! {
         word-break: "break-word";
         border: format!("1px solid {}", var!(border));
         background: var!(accent-muted);
-        max-height: var!(min-height-base);
+        // The output scrolls, but it has to show more than one line at a
+        // time, and no size token covers a scrollable log.
+        max-height: "160px";
         overflow-y: "auto";
     }
 

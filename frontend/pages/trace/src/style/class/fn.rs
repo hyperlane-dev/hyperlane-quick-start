@@ -10,6 +10,9 @@ class! {
         display: "flex";
         align-items: "flex-end";
         gap: var!(gap-inline);
+        button {
+            flex: "0 0 auto";
+        }
         @media ((max-width: 767px)) {
             flex-direction: "column";
             align-items: "stretch";
@@ -26,7 +29,9 @@ class! {
         color: var!(foreground);
         white-space: "pre-wrap";
         word-break: "break-word";
-        max-height: var!(min-height-base);
+        // The answer scrolls, but it has to show more than one line, and no
+        // size token covers a scrollable body.
+        max-height: "240px";
         overflow-y: "auto";
     }
 }

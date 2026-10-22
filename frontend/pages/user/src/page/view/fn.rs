@@ -92,45 +92,66 @@ pub fn user_list_panel(node: VirtualNode<UserListProps>) -> VirtualNode {
                     value: state.get_keyword()
                     oninput: search_handler(state)
                 }
-                euv_button {
-                    variant: EuvButtonVariant::Outline
-                    onclick: search_button_handler(state)
-                    LABEL_SEARCH_BUTTON
-                }
-            }
-            if { !state.get_notice().get().is_empty() } {
-                euv_alert {
-                    variant: AlertVariant::Success
-                    state.get_notice().get().as_str()
-                }
-            } else if { !state.get_error().get().is_empty() } {
-                euv_alert {
-                    variant: AlertVariant::Error
-                    state.get_error().get().as_str()
-                }
-            }
-            if { state.get_loading().get() } {
-                euv_loading {
-                    title: "Loading the users"
-                }
-            } else if { state.get_users().get().is_empty() } {
-                euv_result {
-                    code: "0"
-                    title: TITLE_EMPTY
-                    description: TEXT_EMPTY
-                }
-            } else {
                 div {
-                    class: c_user_list()
-                    for user in { users } {
-                        user_row {
-                            state: state
-                            user: user
+                    class: c_hls_button_row()
+                    euv_button {
+                        variant: EuvButtonVariant::Outline
+                        onclick: search_button_handler(state)
+                        LABEL_SEARCH_BUTTON
+                    }
+                }
+            }
+            match { !state.get_notice().get().is_empty() } {
+                true => {
+                    euv_alert {
+                        variant: AlertVariant::Success
+                        state.get_notice().get().as_str()
+                    }
+                }
+                false => {
+                    match { !state.get_error().get().is_empty() } {
+                        true => {
+                            euv_alert {
+                                variant: AlertVariant::Error
+                                state.get_error().get().as_str()
+                            }
+                        }
+                        false => {
+                            ""
                         }
                     }
                 }
-                pagination_bar {
-                    state: state
+            }
+            match { state.get_loading().get() } {
+                true => {
+                    euv_loading {
+                        title: "Loading the users"
+                    }
+                }
+                false => {
+                    match { state.get_users().get().is_empty() } {
+                        true => {
+                            euv_result {
+                                code: "0"
+                                title: TITLE_EMPTY
+                                description: TEXT_EMPTY
+                            }
+                        }
+                        false => {
+                            div {
+                                class: c_user_list()
+                                for user in { users } {
+                                    user_row {
+                                        state: state
+                                        user: user
+                                    }
+                                }
+                            }
+                            pagination_bar {
+                                state: state
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -224,29 +245,41 @@ pub fn user_row(node: VirtualNode<UserRowProps>) -> VirtualNode {
             }
             div {
                 class: c_user_actions()
-                euv_button {
-                    variant: EuvButtonVariant::Outline
-                    onclick: open_user_handler(state, user_id.clone())
-                    LABEL_OPEN
+                div {
+                    class: c_hls_button_row()
+                    euv_button {
+                        variant: EuvButtonVariant::Outline
+                        onclick: open_user_handler(state, user_id.clone())
+                        LABEL_OPEN
+                    }
                 }
                 if approvable == true {
-                    euv_button {
-                        variant: EuvButtonVariant::Primary
-                        onclick: approve_handler(state, approve_id.clone())
-                        LABEL_APPROVE
+                    div {
+                        class: c_hls_button_row()
+                        euv_button {
+                            variant: EuvButtonVariant::Primary
+                            onclick: approve_handler(state, approve_id.clone())
+                            LABEL_APPROVE
+                        }
                     }
                 }
                 if rejectable == true {
-                    euv_button {
-                        variant: EuvButtonVariant::Outline
-                        onclick: reject_handler(state, reject_id.clone())
-                        LABEL_REJECT
+                    div {
+                        class: c_hls_button_row()
+                        euv_button {
+                            variant: EuvButtonVariant::Outline
+                            onclick: reject_handler(state, reject_id.clone())
+                            LABEL_REJECT
+                        }
                     }
                 }
-                euv_button {
-                    variant: EuvButtonVariant::Outline
-                    onclick: delete_handler(state, user_id.clone())
-                    LABEL_DELETE
+                div {
+                    class: c_hls_button_row()
+                    euv_button {
+                        variant: EuvButtonVariant::Outline
+                        onclick: delete_handler(state, user_id.clone())
+                        LABEL_DELETE
+                    }
                 }
             }
         }
@@ -268,19 +301,25 @@ pub fn pagination_bar(node: VirtualNode<UserListProps>) -> VirtualNode {
     html! {
         div {
             class: c_user_pagination()
-            euv_button {
-                variant: EuvButtonVariant::Outline
-                onclick: previous_page_handler(state)
-                LABEL_PREVIOUS
+            div {
+                class: c_hls_button_row()
+                euv_button {
+                    variant: EuvButtonVariant::Outline
+                    onclick: previous_page_handler(state)
+                    LABEL_PREVIOUS
+                }
             }
             span {
                 class: c_user_pagination_info()
                 state.get_page().get().to_string()
             }
-            euv_button {
-                variant: EuvButtonVariant::Outline
-                onclick: next_page_handler(state)
-                LABEL_NEXT
+            div {
+                class: c_hls_button_row()
+                euv_button {
+                    variant: EuvButtonVariant::Outline
+                    onclick: next_page_handler(state)
+                    LABEL_NEXT
+                }
             }
         }
     }

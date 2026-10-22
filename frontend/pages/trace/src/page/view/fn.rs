@@ -34,10 +34,13 @@ pub fn trace_page(node: VirtualNode<TracePageProps>) -> VirtualNode {
                         value: state.get_trace()
                         oninput: trace_handler(state)
                     }
-                    euv_button {
-                        variant: EuvButtonVariant::Primary
-                        onclick: search_handler(state)
-                        LABEL_SEARCH
+                    div {
+                        class: c_button_controls()
+                        euv_button {
+                            variant: EuvButtonVariant::Primary
+                            onclick: search_handler(state)
+                            LABEL_SEARCH
+                        }
                     }
                 }
             }
@@ -49,20 +52,28 @@ pub fn trace_page(node: VirtualNode<TracePageProps>) -> VirtualNode {
                         state.get_error().get().as_str()
                     }
                 }
-                if { state.get_loading().get() } {
-                    euv_loading {
-                        title: TITLE_LOADING
+                match { state.get_loading().get() } {
+                    true => {
+                        euv_loading {
+                            title: TITLE_LOADING
+                        }
                     }
-                } else if { !state.get_searched().get() } {
-                    euv_result {
-                        code: CODE_EMPTY
-                        title: TITLE_EMPTY
-                        description: TEXT_IDLE
-                    }
-                } else {
-                    pre {
-                        class: c_trace_output()
-                        state.get_result().get().as_str()
+                    false => {
+                        match { !state.get_searched().get() } {
+                            true => {
+                                euv_result {
+                                    code: CODE_EMPTY
+                                    title: TITLE_EMPTY
+                                    description: TEXT_IDLE
+                                }
+                            }
+                            false => {
+                                pre {
+                                    class: c_trace_output()
+                                    state.get_result().get().as_str()
+                                }
+                            }
+                        }
                     }
                 }
             }

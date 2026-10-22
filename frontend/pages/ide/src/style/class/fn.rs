@@ -42,7 +42,9 @@ class! {
     // The container of the editor.
     pub c_ide_editor {
         width: "100%";
-        min-height: var!(min-height-base);
+        // The editor is a working area, not a control: it needs a screen of
+        // its own to be usable, and no size token covers a working area.
+        min-height: "320px";
         border: format!("1px solid {}", var!(border));
         overflow: "hidden";
     }

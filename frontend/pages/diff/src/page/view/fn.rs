@@ -87,10 +87,13 @@ pub fn diff_page(node: VirtualNode<DiffPageProps>) -> VirtualNode {
                         value: state.get_unchanged().get().to_string()
                     }
                 }
-                euv_button {
-                    variant: EuvButtonVariant::Outline
-                    onclick: clear_handler(state)
-                    LABEL_CLEAR
+                div {
+                    class: c_hls_button_row()
+                    euv_button {
+                        variant: EuvButtonVariant::Outline
+                        onclick: clear_handler(state)
+                        LABEL_CLEAR
+                    }
                 }
             }
             euv_card {
@@ -99,19 +102,27 @@ pub fn diff_page(node: VirtualNode<DiffPageProps>) -> VirtualNode {
                     items: VIEW_ITEMS.to_vec()
                     active: state.get_view()
                 }
-                if { state.get_original().get().is_empty() && state.get_modified().get().is_empty() } {
-                    euv_result {
-                        code: "0"
-                        title: TITLE_EMPTY
-                        description: TEXT_EMPTY_RESULT
+                match { state.get_original().get().is_empty() && state.get_modified().get().is_empty() } {
+                    true => {
+                        euv_result {
+                            code: "0"
+                            title: TITLE_EMPTY
+                            description: TEXT_EMPTY_RESULT
+                        }
                     }
-                } else if { state.get_view().get() == VIEW_SPLIT } {
-                    split_view {
-                        state: state
-                    }
-                } else {
-                    inline_view {
-                        state: state
+                    false => {
+                        match { state.get_view().get() == VIEW_SPLIT } {
+                            true => {
+                                split_view {
+                                    state: state
+                                }
+                            }
+                            false => {
+                                inline_view {
+                                    state: state
+                                }
+                            }
+                        }
                     }
                 }
             }

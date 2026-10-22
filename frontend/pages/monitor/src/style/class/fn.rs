@@ -12,6 +12,9 @@ class! {
         justify-content: "space-between";
         gap: var!(gap-inline);
         margin-bottom: var!(page-block-gap);
+        button {
+            flex: "0 0 auto";
+        }
     }
 
     // The state of the live status stream.
@@ -91,7 +94,7 @@ class! {
 
     // A cell of the history table.
     pub c_monitor_table_cell {
-        padding: var!(space-xs) var!(space-sm);
+        padding: format!("{} {}", var!(space-xs), var!(space-sm));
         text-align: "left";
         color: var!(foreground);
         white-space: "nowrap";
@@ -99,7 +102,7 @@ class! {
 
     // A head cell of the history table.
     pub c_monitor_table_head {
-        padding: var!(space-xs) var!(space-sm);
+        padding: format!("{} {}", var!(space-xs), var!(space-sm));
         text-align: "left";
         font-size: var!(font-xs);
         color: var!(muted-foreground);

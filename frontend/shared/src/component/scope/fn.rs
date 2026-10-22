@@ -21,10 +21,13 @@ pub fn reactive_scope(node: VirtualNode<ReactiveScopeProps>) -> VirtualNode {
     let ReactiveScopeProps { content }: ReactiveScopeProps = node.try_get_props().unwrap_or_default();
     let active: Signal<bool> = Signal::create(true);
     html! {
-        if { active.get() } {
-            content()
-        } else {
-            ""
+        match { active.get() } {
+            true => {
+                content()
+            }
+            false => {
+                ""
+            }
         }
     }
 }

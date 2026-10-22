@@ -178,7 +178,7 @@ pub fn stat_tile(node: VirtualNode<StatTileProps>) -> VirtualNode {
     }: StatTileProps = node.try_get_props().unwrap_or_default();
     html! {
         div {
-            class: c_home_stat_card()
+            class: format!("{} {}", c_home_stat_card().get_name(), c_hls_home_stat_card().get_name())
             div {
                 class: c_home_stat_icon()
                 icon

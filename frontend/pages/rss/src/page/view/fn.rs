@@ -46,22 +46,30 @@ pub fn rss_page(node: VirtualNode<RssPageProps>) -> VirtualNode {
             }
             euv_card {
                 title: TITLE_ITEMS
-                if { state.get_loading().get() } {
-                    euv_loading {
-                        title: TITLE_LOADING
+                match { state.get_loading().get() } {
+                    true => {
+                        euv_loading {
+                            title: TITLE_LOADING
+                        }
                     }
-                } else if { items.get().is_empty() } {
-                    euv_result {
-                        code: CODE_EMPTY
-                        title: TITLE_EMPTY
-                        description: TEXT_NO_ITEM
-                    }
-                } else {
-                    div {
-                        class: c_rss_items()
-                        for item in { items } {
-                            rss_item {
-                                item: item
+                    false => {
+                        match { items.get().is_empty() } {
+                            true => {
+                                euv_result {
+                                    code: CODE_EMPTY
+                                    title: TITLE_EMPTY
+                                    description: TEXT_NO_ITEM
+                                }
+                            }
+                            false => {
+                                div {
+                                    class: c_rss_items()
+                                    for item in { items } {
+                                        rss_item {
+                                            item: item
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -72,7 +80,7 @@ pub fn rss_page(node: VirtualNode<RssPageProps>) -> VirtualNode {
                 div {
                     class: c_rss_page_size()
                     label {
-                        class: c_form_label()
+                        class: format!("{} {}", c_form_label().get_name(), c_rss_page_size_label().get_name())
                         LABEL_PAGE_SIZE
                     }
                     select {
@@ -87,24 +95,33 @@ pub fn rss_page(node: VirtualNode<RssPageProps>) -> VirtualNode {
                         }
                     }
                 }
-                euv_button {
-                    variant: EuvButtonVariant::Outline
-                    onclick: refresh_handler(state)
-                    LABEL_REFRESH
+                div {
+                    class: c_hls_button_row()
+                    euv_button {
+                        variant: EuvButtonVariant::Outline
+                        onclick: refresh_handler(state)
+                        LABEL_REFRESH
+                    }
                 }
-                euv_button {
-                    variant: EuvButtonVariant::Outline
-                    onclick: previous_page_handler(state)
-                    LABEL_PREVIOUS
+                div {
+                    class: c_hls_button_row()
+                    euv_button {
+                        variant: EuvButtonVariant::Outline
+                        onclick: previous_page_handler(state)
+                        LABEL_PREVIOUS
+                    }
                 }
                 span {
                     class: c_rss_pagination_info()
                     state.get_page().get().to_string()
                 }
-                euv_button {
-                    variant: EuvButtonVariant::Outline
-                    onclick: next_page_handler(state)
-                    LABEL_NEXT
+                div {
+                    class: c_hls_button_row()
+                    euv_button {
+                        variant: EuvButtonVariant::Outline
+                        onclick: next_page_handler(state)
+                        LABEL_NEXT
+                    }
                 }
             }
         }

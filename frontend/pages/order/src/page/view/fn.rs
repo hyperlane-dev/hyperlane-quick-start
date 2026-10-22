@@ -28,32 +28,55 @@ pub fn order_page(node: VirtualNode<OrderPageProps>) -> VirtualNode {
                 items: tab_items(&state)
                 active: state.get_tab()
             }
-            if { !state.get_notice().get().is_empty() } {
-                euv_alert {
-                    variant: AlertVariant::Success
-                    state.get_notice().get().as_str()
+            match { !state.get_notice().get().is_empty() } {
+                true => {
+                    euv_alert {
+                        variant: AlertVariant::Success
+                        state.get_notice().get().as_str()
+                    }
                 }
-            } else if { !state.get_error().get().is_empty() } {
-                euv_alert {
-                    variant: AlertVariant::Error
-                    state.get_error().get().as_str()
+                false => {
+                    match { !state.get_error().get().is_empty() } {
+                        true => {
+                            euv_alert {
+                                variant: AlertVariant::Error
+                                state.get_error().get().as_str()
+                            }
+                        }
+                        false => {
+                            ""
+                        }
+                    }
                 }
             }
-            if { state.get_tab().get() == TAB_DASHBOARD } {
-                dashboard_panel {
-                    state: state
+            match { state.get_tab().get() == TAB_DASHBOARD } {
+                true => {
+                    dashboard_panel {
+                        state: state
+                    }
                 }
-            } else if { state.get_tab().get() == TAB_RECORDS } {
-                records_panel {
-                    state: state
-                }
-            } else if { state.get_tab().get() == TAB_USERS } {
-                users_panel {
-                    state: state
-                }
-            } else {
-                profile_panel {
-                    state: state
+                false => {
+                    match { state.get_tab().get() == TAB_RECORDS } {
+                        true => {
+                            records_panel {
+                                state: state
+                            }
+                        }
+                        false => {
+                            match { state.get_tab().get() == TAB_USERS } {
+                                true => {
+                                    users_panel {
+                                        state: state
+                                    }
+                                }
+                                false => {
+                                    profile_panel {
+                                        state: state
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
             if { state.get_create_open().get() } {
@@ -317,27 +340,35 @@ pub fn records_panel(node: VirtualNode<PanelProps>) -> VirtualNode {
                     }
                 }
             }
-            if { state.get_loading().get() } {
-                euv_loading {
-                    title: "Loading the records"
-                }
-            } else if { state.get_records().get().is_empty() } {
-                euv_result {
-                    code: "0"
-                    title: TITLE_EMPTY
-                    description: TEXT_EMPTY_RECORDS
-                }
-            } else {
-                div {
-                    class: c_order_list()
-                    for record in { records } {
-                        record_row {
-                            record: record
-                        }
+            match { state.get_loading().get() } {
+                true => {
+                    euv_loading {
+                        title: "Loading the records"
                     }
                 }
-                pagination_bar {
-                    state: state
+                false => {
+                    match { state.get_records().get().is_empty() } {
+                        true => {
+                            euv_result {
+                                code: "0"
+                                title: TITLE_EMPTY
+                                description: TEXT_EMPTY_RECORDS
+                            }
+                        }
+                        false => {
+                            div {
+                                class: c_order_list()
+                                for record in { records } {
+                                    record_row {
+                                        record: record
+                                    }
+                                }
+                            }
+                            pagination_bar {
+                                state: state
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -370,10 +401,13 @@ pub fn users_panel(node: VirtualNode<PanelProps>) -> VirtualNode {
                     value: state.get_users_keyword()
                     oninput: search_handler(state)
                 }
-                euv_button {
-                    variant: EuvButtonVariant::Outline
-                    onclick: search_button_handler(state)
-                    LABEL_SEARCH_BUTTON
+                div {
+                    class: c_hls_button_row()
+                    euv_button {
+                        variant: EuvButtonVariant::Outline
+                        onclick: search_button_handler(state)
+                        LABEL_SEARCH_BUTTON
+                    }
                 }
             }
             if admin == false {
@@ -715,16 +749,22 @@ pub fn filter_button(node: VirtualNode<FilterButtonProps>) -> VirtualNode {
     let handler: Option<Rc<dyn Fn(Event)>> = filter_handler(state, kind.to_string(), value.to_string());
     html! {
         if active == true {
-            euv_button {
-                variant: EuvButtonVariant::Primary
-                onclick: handler.clone()
-                label
+            div {
+                class: c_hls_button_row()
+                euv_button {
+                    variant: EuvButtonVariant::Primary
+                    onclick: handler.clone()
+                    label
+                }
             }
         } else {
-            euv_button {
-                variant: EuvButtonVariant::Outline
-                onclick: handler.clone()
-                label
+            div {
+                class: c_hls_button_row()
+                euv_button {
+                    variant: EuvButtonVariant::Outline
+                    onclick: handler.clone()
+                    label
+                }
             }
         }
     }
@@ -856,19 +896,25 @@ pub fn pagination_bar(node: VirtualNode<PanelProps>) -> VirtualNode {
     html! {
         div {
             class: c_order_pagination()
-            euv_button {
-                variant: EuvButtonVariant::Outline
-                onclick: previous_page_handler(state)
-                LABEL_PREVIOUS
+            div {
+                class: c_hls_button_row()
+                euv_button {
+                    variant: EuvButtonVariant::Outline
+                    onclick: previous_page_handler(state)
+                    LABEL_PREVIOUS
+                }
             }
             span {
                 class: c_order_pagination_info()
                 state.get_page().get().to_string()
             }
-            euv_button {
-                variant: EuvButtonVariant::Outline
-                onclick: next_page_handler(state)
-                LABEL_NEXT
+            div {
+                class: c_hls_button_row()
+                euv_button {
+                    variant: EuvButtonVariant::Outline
+                    onclick: next_page_handler(state)
+                    LABEL_NEXT
+                }
             }
         }
     }
@@ -889,19 +935,25 @@ pub fn users_pagination(node: VirtualNode<PanelProps>) -> VirtualNode {
     html! {
         div {
             class: c_order_pagination()
-            euv_button {
-                variant: EuvButtonVariant::Outline
-                onclick: previous_users_handler(state)
-                LABEL_PREVIOUS
+            div {
+                class: c_hls_button_row()
+                euv_button {
+                    variant: EuvButtonVariant::Outline
+                    onclick: previous_users_handler(state)
+                    LABEL_PREVIOUS
+                }
             }
             span {
                 class: c_order_pagination_info()
                 state.get_users_page().get().to_string()
             }
-            euv_button {
-                variant: EuvButtonVariant::Outline
-                onclick: next_users_handler(state)
-                LABEL_NEXT
+            div {
+                class: c_hls_button_row()
+                euv_button {
+                    variant: EuvButtonVariant::Outline
+                    onclick: next_users_handler(state)
+                    LABEL_NEXT
+                }
             }
         }
     }

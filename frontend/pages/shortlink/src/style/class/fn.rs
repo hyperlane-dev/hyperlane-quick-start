@@ -40,9 +40,12 @@ class! {
     pub c_shortlink_link {
         font-size: var!(font-lg);
         font-weight: "700";
-        color: var!(foreground);
+        color: var!(accent);
         word-break: "break-all";
         text-decoration: "none";
+        :hover {
+            text-decoration: "underline";
+        }
     }
 
     // The actions of the result card.

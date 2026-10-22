@@ -19,7 +19,7 @@ pub fn not_found_page(node: VirtualNode<NotFoundPageProps>) -> VirtualNode {
     let links: Signal<Vec<NotFoundLink>> = state.get_links();
     html! {
         div {
-            class: c_page_container()
+            class: format!("{} {}", c_page_container().get_name(), c_not_found_page().get_name())
             div {
                 class: c_not_found_center()
                 euv_card {

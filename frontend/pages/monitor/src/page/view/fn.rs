@@ -29,28 +29,44 @@ pub fn monitor_page(node: VirtualNode<MonitorPageProps>) -> VirtualNode {
             }
             div {
                 class: c_monitor_toolbar()
-                euv_button {
-                    variant: EuvButtonVariant::Outline
-                    onclick: refresh_handler(state)
-                    LABEL_REFRESH
+                div {
+                    class: c_hls_button_row()
+                    euv_button {
+                        variant: EuvButtonVariant::Outline
+                        onclick: refresh_handler(state)
+                        LABEL_REFRESH
+                    }
                 }
                 span {
                     class: c_monitor_connection()
-                    if { state.get_connected().get() } {
-                        TEXT_CONNECTED
-                    } else {
-                        TEXT_DISCONNECTED
+                    match { state.get_connected().get() } {
+                        true => {
+                            TEXT_CONNECTED
+                        }
+                        false => {
+                            TEXT_DISCONNECTED
+                        }
                     }
                 }
             }
-            if { state.get_loading().get() } {
-                euv_loading {
-                    title: TITLE_LOADING
+            match { state.get_loading().get() } {
+                true => {
+                    euv_loading {
+                        title: TITLE_LOADING
+                    }
                 }
-            } else if { !state.get_error().get().is_empty() } {
-                euv_alert {
-                    variant: AlertVariant::Error
-                    state.get_error().get().as_str()
+                false => {
+                    match { !state.get_error().get().is_empty() } {
+                        true => {
+                            euv_alert {
+                                variant: AlertVariant::Error
+                                state.get_error().get().as_str()
+                            }
+                        }
+                        false => {
+                            ""
+                        }
+                    }
                 }
             }
             div {
@@ -138,73 +154,76 @@ pub fn monitor_page(node: VirtualNode<MonitorPageProps>) -> VirtualNode {
             }
             euv_card {
                 title: TITLE_HISTORY
-                if { history.get().is_empty() } {
-                    euv_result {
-                        code: CODE_EMPTY
-                        title: TITLE_EMPTY
-                        description: TEXT_NO_SAMPLE
+                match { history.get().is_empty() } {
+                    true => {
+                        euv_result {
+                            code: CODE_EMPTY
+                            title: TITLE_EMPTY
+                            description: TEXT_NO_SAMPLE
+                        }
                     }
-                } else {
-                    div {
-                        class: c_monitor_table_wrap()
-                        table {
-                            class: c_monitor_table()
-                            thead {
-                                tr {
-                                    th {
-                                        class: c_monitor_table_head()
-                                        HEAD_TIME
-                                    }
-                                    th {
-                                        class: c_monitor_table_head()
-                                        HEAD_CPU
-                                    }
-                                    th {
-                                        class: c_monitor_table_head()
-                                        HEAD_MEMORY
-                                    }
-                                    th {
-                                        class: c_monitor_table_head()
-                                        HEAD_DISK
-                                    }
-                                    th {
-                                        class: c_monitor_table_head()
-                                        HEAD_NETWORK
-                                    }
-                                    th {
-                                        class: c_monitor_table_head()
-                                        LABEL_CONNECTIONS
+                    false => {
+                        div {
+                            class: c_monitor_table_wrap()
+                            table {
+                                class: c_monitor_table()
+                                thead {
+                                    tr {
+                                        th {
+                                            class: c_monitor_table_head()
+                                            HEAD_TIME
+                                        }
+                                        th {
+                                            class: c_monitor_table_head()
+                                            HEAD_CPU
+                                        }
+                                        th {
+                                            class: c_monitor_table_head()
+                                            HEAD_MEMORY
+                                        }
+                                        th {
+                                            class: c_monitor_table_head()
+                                            HEAD_DISK
+                                        }
+                                        th {
+                                            class: c_monitor_table_head()
+                                            HEAD_NETWORK
+                                        }
+                                        th {
+                                            class: c_monitor_table_head()
+                                            LABEL_CONNECTIONS
+                                        }
                                     }
                                 }
-                            }
-                            tbody {
-                                for point in { history } {
-                                    tr {
-                                        key: point.timestamp.to_string()
-                                        class: c_monitor_table_row()
-                                        td {
-                                            class: c_monitor_table_cell()
-                                            format_time(point.timestamp as i64)
-                                        }
-                                        td {
-                                            class: c_monitor_table_cell()
-                                            format_percent(point.cpu_usage)
-                                        }
-                                        td {
-                                            class: c_monitor_table_cell()
-                                            format_percent(point.memory_usage)
-                                        }
-                                        td {
-                                            class: c_monitor_table_cell()
-                                            format_percent(point.disk_usage)
-                                        }
-                                        td {
-                                            class: c_monitor_table_cell()
-                                            format!("{}/{}", format_bytes(point.network_rx), format_bytes(point.network_tx))
-                                        }
-                                        td {
-                                            class: c_monitor_table_cell()
-                                            point.active_connections.to_string()
+                                tbody {
+                                    for point in { history } {
+                                        tr {
+                                            key: point.timestamp.to_string()
+                                            class: c_monitor_table_row()
+                                            td {
+                                                class: c_monitor_table_cell()
+                                                format_time(point.timestamp as i64)
+                                            }
+                                            td {
+                                                class: c_monitor_table_cell()
+                                                format_percent(point.cpu_usage)
+                                            }
+                                            td {
+                                                class: c_monitor_table_cell()
+                                                format_percent(point.memory_usage)
+                                            }
+                                            td {
+                                                class: c_monitor_table_cell()
+                                                format_percent(point.disk_usage)
+                                            }
+                                            td {
+                                                class: c_monitor_table_cell()
+                                                format!("{}/{}", format_bytes(point.network_rx), format_bytes(point.network_tx))
+                                            }
+                                            td {
+                                                class: c_monitor_table_cell()
+                                                point.active_connections.to_string()
+                                            }
                                         }
                                     }
                                 }

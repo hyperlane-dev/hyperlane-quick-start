@@ -57,19 +57,22 @@ pub fn upload_page(node: VirtualNode<UploadPageProps>) -> VirtualNode {
                         class: c_upload_hint()
                         HINT_PICK
                     }
-                    if { entries.get().is_empty() } {
-                        euv_result {
-                            code: "0"
-                            title: TITLE_EMPTY
-                            description: TEXT_EMPTY_LIST
+                    match { entries.get().is_empty() } {
+                        true => {
+                            euv_result {
+                                code: "0"
+                                title: TITLE_EMPTY
+                                description: TEXT_EMPTY_LIST
+                            }
                         }
-                    } else {
-                        div {
-                            class: c_upload_list()
-                            for entry in { entries } {
-                                upload_row {
-                                    state: state
-                                    entry: entry
+                        false => {
+                            div {
+                                class: c_upload_list()
+                                for entry in { entries } {
+                                    upload_row {
+                                        state: state
+                                        entry: entry
+                                    }
                                 }
                             }
                         }
@@ -82,10 +85,13 @@ pub fn upload_page(node: VirtualNode<UploadPageProps>) -> VirtualNode {
                     class: c_upload_form()
                     div {
                         class: c_upload_actions()
-                        euv_button {
-                            variant: VARIANT_PRIMARY
-                            onclick: export_handler(state)
-                            LABEL_EXPORT
+                        div {
+                            class: c_hls_button_row()
+                            euv_button {
+                                variant: VARIANT_PRIMARY
+                                onclick: export_handler(state)
+                                LABEL_EXPORT
+                            }
                         }
                         label {
                             class: c_upload_import()
@@ -105,19 +111,22 @@ pub fn upload_page(node: VirtualNode<UploadPageProps>) -> VirtualNode {
                         class: c_upload_hint()
                         HINT_IMPORT
                     }
-                    if { history.get().is_empty() } {
-                        euv_result {
-                            code: "0"
-                            title: TITLE_EMPTY_HISTORY
-                            description: TEXT_EMPTY_HISTORY
+                    match { history.get().is_empty() } {
+                        true => {
+                            euv_result {
+                                code: "0"
+                                title: TITLE_EMPTY_HISTORY
+                                description: TEXT_EMPTY_HISTORY
+                            }
                         }
-                    } else {
-                        div {
-                            class: c_upload_list()
-                            for item in { history } {
-                                upload_history_row {
-                                    state: state
-                                    item: item
+                        false => {
+                            div {
+                                class: c_upload_list()
+                                for item in { history } {
+                                    upload_history_row {
+                                        state: state
+                                        item: item
+                                    }
                                 }
                             }
                         }

@@ -109,73 +109,81 @@ pub fn tracking_page(node: VirtualNode<TrackingPageProps>) -> VirtualNode {
             }
             euv_card {
                 title: TITLE_RESULTS
-                if { state.get_loading().get() } {
-                    euv_loading {
-                        title: TITLE_LOADING
+                match { state.get_loading().get() } {
+                    true => {
+                        euv_loading {
+                            title: TITLE_LOADING
+                        }
                     }
-                } else if { records.get().is_empty() } {
-                    euv_result {
-                        code: CODE_EMPTY
-                        title: TITLE_EMPTY
-                        description: TEXT_NO_RECORD
-                    }
-                } else {
-                    div {
-                        class: c_tracking_table_wrap()
-                        table {
-                            class: c_tracking_table()
-                            thead {
-                                tr {
-                                    th {
-                                        class: c_tracking_table_head()
-                                        HEAD_ID
-                                    }
-                                    th {
-                                        class: c_tracking_table_head()
-                                        HEAD_TIMESTAMP
-                                    }
-                                    th {
-                                        class: c_tracking_table_head()
-                                        HEAD_CREATED_AT
-                                    }
-                                    th {
-                                        class: c_tracking_table_head()
-                                        HEAD_ACTION
-                                    }
+                    false => {
+                        match { records.get().is_empty() } {
+                            true => {
+                                euv_result {
+                                    code: CODE_EMPTY
+                                    title: TITLE_EMPTY
+                                    description: TEXT_NO_RECORD
                                 }
                             }
-                            tbody {
-                                for record in { records } {
-                                    tr {
-                                        key: record.id.to_string()
-                                        class: c_tracking_table_row()
-                                        td {
-                                            class: c_tracking_table_cell()
-                                            record.id.to_string()
+                            false => {
+                                div {
+                                    class: c_tracking_table_wrap()
+                                    table {
+                                        class: c_tracking_table()
+                                        thead {
+                                            tr {
+                                                th {
+                                                    class: c_tracking_table_head()
+                                                    HEAD_ID
+                                                }
+                                                th {
+                                                    class: c_tracking_table_head()
+                                                    HEAD_TIMESTAMP
+                                                }
+                                                th {
+                                                    class: c_tracking_table_head()
+                                                    HEAD_CREATED_AT
+                                                }
+                                                th {
+                                                    class: c_tracking_table_head()
+                                                    HEAD_ACTION
+                                                }
+                                            }
                                         }
-                                        td {
-                                            class: c_tracking_table_cell()
-                                            format_local_time(record.timestamp)
-                                        }
-                                        td {
-                                            class: c_tracking_table_cell()
-                                            format_local_time(record.created_at)
-                                        }
-                                        td {
-                                            class: c_tracking_table_cell()
-                                            euv_button {
-                                                variant: EuvButtonVariant::Outline
-                                                onclick: detail_handler(state, record.id)
-                                                LABEL_DETAIL
+                                        tbody {
+                                            for record in { records } {
+                                                tr {
+                                                    key: record.id.to_string()
+                                                    class: c_tracking_table_row()
+                                                    td {
+                                                        class: c_tracking_table_cell()
+                                                        record.id.to_string()
+                                                    }
+                                                    td {
+                                                        class: c_tracking_table_cell()
+                                                        format_local_time(record.timestamp)
+                                                    }
+                                                    td {
+                                                        class: c_tracking_table_cell()
+                                                        format_local_time(record.created_at)
+                                                    }
+                                                    td {
+                                                        class: c_tracking_table_cell()
+                                                        euv_button {
+                                                            variant: EuvButtonVariant::Outline
+                                                            onclick: detail_handler(state, record.id)
+                                                            LABEL_DETAIL
+                                                        }
+                                                    }
+                                                }
                                             }
                                         }
                                     }
                                 }
+                                pagination_bar {
+                                    state: state
+                                }
                             }
                         }
-                    }
-                    pagination_bar {
-                        state: state
                     }
                 }
             }
@@ -245,19 +253,25 @@ pub fn pagination_bar(node: VirtualNode<TrackingPageProps>) -> VirtualNode {
     html! {
         div {
             class: c_tracking_pagination()
-            euv_button {
-                variant: EuvButtonVariant::Outline
-                onclick: previous_page_handler(state)
-                LABEL_PREVIOUS
+            div {
+                class: c_hls_button_row()
+                euv_button {
+                    variant: EuvButtonVariant::Outline
+                    onclick: previous_page_handler(state)
+                    LABEL_PREVIOUS
+                }
             }
             span {
                 class: c_tracking_pagination_info()
                 format!("{page} / {}", total_pages(total, page_size))
             }
-            euv_button {
-                variant: EuvButtonVariant::Outline
-                onclick: next_page_handler(state)
-                LABEL_NEXT
+            div {
+                class: c_hls_button_row()
+                euv_button {
+                    variant: EuvButtonVariant::Outline
+                    onclick: next_page_handler(state)
+                    LABEL_NEXT
+                }
             }
         }
     }

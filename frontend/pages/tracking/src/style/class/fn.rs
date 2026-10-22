@@ -53,7 +53,7 @@ class! {
 
     // A cell of the table of the records.
     pub c_tracking_table_cell {
-        padding: var!(space-xs) var!(space-sm);
+        padding: format!("{} {}", var!(space-xs), var!(space-sm));
         text-align: "left";
         color: var!(foreground);
         white-space: "nowrap";
@@ -61,7 +61,7 @@ class! {
 
     // A head cell of the table of the records.
     pub c_tracking_table_head {
-        padding: var!(space-xs) var!(space-sm);
+        padding: format!("{} {}", var!(space-xs), var!(space-sm));
         text-align: "left";
         font-size: var!(font-xs);
         color: var!(muted-foreground);
@@ -110,7 +110,9 @@ class! {
         color: var!(foreground);
         white-space: "pre-wrap";
         word-break: "break-word";
-        max-height: var!(min-height-base);
+        // The detail scrolls, but it has to show more than one line, and no
+        // size token covers a scrollable body.
+        max-height: "200px";
         overflow-y: "auto";
     }
 }

@@ -19,7 +19,7 @@ class! {
         display: "flex";
         align-items: "center";
         gap: var!(gap-inline);
-        padding: var!(space-sm) var!(space-lg);
+        padding: format!("{} {}", var!(space-sm), var!(space-lg));
         border: format!("1px solid {}", var!(border));
         cursor: "pointer";
     }
@@ -67,7 +67,9 @@ class! {
     // The canvas one code of the list is drawn into.
     pub c_qrcode_canvas {
         width: "100%";
-        max-width: var!(min-height-base);
+        // The code is a picture: it keeps its own size whatever the column is,
+        // and no size token covers a picture box.
+        max-width: "240px";
         height: "auto";
         border: format!("1px solid {}", var!(border));
         background: var!(background);

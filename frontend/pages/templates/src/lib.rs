@@ -8,8 +8,9 @@
 mod app;
 mod hook;
 mod page;
+mod style;
 
-pub(crate) use {app::*, hook::*, page::*};
+pub(crate) use {app::*, hook::*, page::*, style::*};
 
 use {euv::*, euv_ui::*, hyperlane_frontend_shared::*};
 
