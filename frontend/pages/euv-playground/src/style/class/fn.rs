@@ -33,7 +33,10 @@ class! {
     // area needs. Below the breakpoint the three of them stack.
     pub c_playground_layout {
         display: "grid";
-        grid-template-columns: "minmax(0, 1fr) minmax(0, 2fr)";
+        // The list of the projects carries a name and the size of the code, so
+        // it needs a column of its own and the editor and the preview share
+        // the second one.
+        grid-template-columns: "minmax(0, 1.2fr) minmax(0, 2fr)";
         gap: var!(gap-component);
         align-items: "start";
         @media ((max-width: 767px)) {
