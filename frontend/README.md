@@ -94,6 +94,24 @@ euv fmt --check
   never with a hard coded colour or spacing.
 - The pages hold their state in signals, and every piece of state that a
   user can change lives in a hook of the package.
+- A conditional that swaps the content of a panel is written as a `match`,
+  not as an `if` with an else branch. The framework patches the two branches
+  of a conditional in place, so the branch that is left keeps the content of
+  the branch that stood there before, and the new content never mounts.
+- A button of a page sits in a row of its own (`div.c_hls_button_row`),
+  because the buttons of the library carry `flex: 1 1 120px`: a button that
+  grows inside a row fills the whole row, and a button that sits in a column
+  takes the basis as its height and turns into a slab of 120 pixels. The
+  stylesheet of the shared crate (`frontend/shared/src/style/css/fn.rs`)
+  keeps the buttons of such a row at the size of their label, and it is
+  injected once when the shell of the application is drawn.
+- A rule of a class holds one value. A value of more than one token (a
+  padding with two values, for example) keeps the first token and the
+  declaration that follows it is lost with it, so a rule of more than one
+  value is written with `format!("{} {}", …)`.
+- An attribute of a native element carries a text. The renderer of the
+  framework ignores the value a number becomes, so the rows of a text area
+  are written as a text (`"12"`) and not as a number.
 - The dependencies of a manifest follow the order of the project: the crate of
   the workspace first, a blank line, then the crates of the registry by the
   length of their entry. The shared crate is declared in the workspace
