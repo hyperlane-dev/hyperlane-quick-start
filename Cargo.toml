@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane-quick-start"
-version = "23.0.46"
+version = "23.2.0"
 readme = "README.md"
 edition = "2024"
 authors = ["root@devhub.vip"]
@@ -29,15 +29,15 @@ members = ["resources", "config", "plugin", "application", "bootstrap"]
 exclude = ["frontend"]
 
 [workspace.dependencies]
-hyperlane_config = { path = "config", version = "23.0.46" }
-hyperlane_plugin = { path = "plugin", version = "23.0.46" }
-hyperlane_bootstrap = { path = "bootstrap", version = "23.0.46" }
-hyperlane_resources = { path = "resources", version = "23.0.46" }
-hyperlane_application = { path = "application", version = "23.0.46" }
+hyperlane_config = { path = "config", version = "23.2.0" }
+hyperlane_plugin = { path = "plugin", version = "23.2.0" }
+hyperlane_bootstrap = { path = "bootstrap", version = "23.2.0" }
+hyperlane_resources = { path = "resources", version = "23.2.0" }
+hyperlane_application = { path = "application", version = "23.2.0" }
 
 md5 = "0.8.1"
 log = "0.4.34"
-redis = "1.7.1"
+redis = "1.8.0"
 regex = "1.13.1"
 base64 = "0.22.1"
 chrono = "0.4.45"
@@ -99,7 +99,7 @@ rsa = { version = "0.9.10", default-features = false, features = [
     "getrandom",
     "u64_digit",
 ] }
-uuid = { version = "1.28.0", features = [
+uuid = { version = "1.29.0", features = [
     "v1",
     "v3",
     "v4",

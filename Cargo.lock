@@ -2149,7 +2149,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "23.0.46"
+version = "23.2.0"
 dependencies = [
  "bin-encode-decode",
  "chrono",
@@ -2180,7 +2180,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_application"
-version = "23.0.46"
+version = "23.2.0"
 dependencies = [
  "base64 0.22.1",
  "bin-encode-decode",
@@ -2227,7 +2227,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_bootstrap"
-version = "23.0.46"
+version = "23.2.0"
 dependencies = [
  "color-log",
  "color-output",
@@ -2253,7 +2253,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_config"
-version = "23.0.46"
+version = "23.2.0"
 dependencies = [
  "hyperlane",
  "hyperlane-core",
@@ -2266,7 +2266,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_plugin"
-version = "23.0.46"
+version = "23.2.0"
 dependencies = [
  "color-log",
  "color-output",
@@ -2291,7 +2291,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_resources"
-version = "23.0.46"
+version = "23.2.0"
 
 [[package]]
 name = "iana-time-zone"
@@ -3519,9 +3519,9 @@ dependencies = [
 
 [[package]]
 name = "redis"
-version = "1.7.1"
+version = "1.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ed5b98ae99461e02895c3a96a25dbe4d852a3d5e5b815d31d5d9e4b5344d99e9"
+checksum = "7acd809e80afa754c63f586955699d8990efe1c4b6613183ee5f027a11fbc8b5"
 dependencies = [
  "arcstr",
  "combine",
@@ -5126,9 +5126,9 @@ checksum = "552a64d6a0d251ae28bc021838800943cce60c9ec2e60ff331f54e79f696268f"
 
 [[package]]
 name = "uuid"
-version = "1.28.0"
+version = "1.29.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7cc1186384beb7dd8eedea376413fd654937285ea6c9cfbb928dc3043ea4b606"
+checksum = "4a0e2d11620c50695fe12bbbfde96b3477fe606e7284c22d505c12ce51214514"
 dependencies = [
  "arbitrary",
  "atomic",
@@ -5148,9 +5148,9 @@ dependencies = [
 
 [[package]]
 name = "uuid-rng-internal"
-version = "1.28.0"
+version = "1.29.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1e1d7ccff5e453092983b2a5ec27ebdd52745f40bef229e92051a054a37c662b"
+checksum = "cdf60f3d36825d0911af7e102da39cc817280560cad48e81df1eb5c4d7400f76"
 dependencies = [
  "getrandom 0.4.3",
  "rand 0.10.3",
