@@ -23,13 +23,9 @@ impl ServerHook for QrcodeViewRoute {
     /// # Returns
     ///
     /// - `Status` - The handle result.
-    #[prologue_macros(
-        methods(get, post),
-        response_status_code(302),
-        response_header(LOCATION => QRCODE_VIEW_REDIRECT_PATH)
-    )]
+    #[prologue_macros(methods(get, post))]
     #[instrument_trace]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
-        Status::Continue
+        serve_page(ctx, QRCODE_VIEW_PAGE_NAME)
     }
 }

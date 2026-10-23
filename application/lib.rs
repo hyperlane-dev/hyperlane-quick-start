@@ -15,6 +15,8 @@ pub mod service;
 pub mod utils;
 pub mod view;
 
+pub use view::page::serve_page;
+
 use std::{
     collections::{HashMap, HashSet, VecDeque},
     sync::{Arc, OnceLock},

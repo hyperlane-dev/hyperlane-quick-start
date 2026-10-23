@@ -15,11 +15,8 @@ pub(crate) fn app() -> VirtualNode {
         reactive_scope {
             content: Rc::new(move || html! {
                 app_shell {
-                    current_path: PAGE_PATH
                     mobile: shell.get_mobile()
-                    theme: shell.get_theme()
                     root_class: shell.get_root_class()
-                    drawer_open: shell.get_drawer_open()
                     gomoku_page {
                         state: state
                     }

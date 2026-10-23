@@ -2,8 +2,8 @@ use super::*;
 
 /// Creates the reactive state the application shell renders from.
 ///
-/// The viewport width, the theme and the drawer state are hooks, so they are
-/// created once per application and handed to the shell as props.
+/// The viewport width and the theme are hooks, so they are created once per
+/// application and handed to the shell as props.
 ///
 /// # Returns
 ///
@@ -11,12 +11,9 @@ use super::*;
 pub fn use_app_shell() -> AppShellState {
     let mobile: Signal<bool> = use_resize();
     let theme_state: ThemeState = ThemeState::use_theme_state(mobile);
-    let drawer_open: Signal<bool> = App::use_signal(|| false);
     AppShellState {
         mobile,
-        theme: theme_state.get_theme(),
         root_class: theme_state.get_root_class(),
-        drawer_open,
     }
 }
 

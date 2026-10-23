@@ -13,11 +13,7 @@ impl ServerHook for TemplatesRoute {
         Self
     }
 
-    #[prologue_macros(
-      methods(get, post),
-      response_status_code(302),
-      response_header(LOCATION => TEMPLATES_VIEW_REDIRECT_PATH)
-    )]
+    #[prologue_macros(methods(get, post))]
     #[instrument_trace]
     /// Handles the `TemplatesRoute` route request and redirects to the
     /// landing page.
@@ -31,7 +27,7 @@ impl ServerHook for TemplatesRoute {
     /// # Returns
     ///
     /// - `Status` - The hook status that tells the server how to continue.
-    async fn handle(self, _stream: &mut Stream, _ctx: &mut Context) -> Status {
-        Status::Continue
+    async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
+        serve_page(ctx, TEMPLATES_VIEW_PAGE_NAME)
     }
 }

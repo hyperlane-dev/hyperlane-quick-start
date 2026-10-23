@@ -7,9 +7,6 @@ pub const SSE_CONNECTION_TIMEOUT_SECS: u64 = 3600;
 /// SSE idle sleep ms.
 pub const SSE_IDLE_SLEEP_MS: u64 = 10;
 
-/// Directory path for cicd view redirect path.
-pub const CICD_VIEW_REDIRECT_PATH: &str = "/static/cicd/index.html";
-
 /// SSE event log.
 pub const SSE_EVENT_LOG: &str = "log";
 
@@ -141,3 +138,6 @@ pub const QUERY_KEY_PIPELINE_ID: &str = "pipeline_id";
 
 /// Query parameter key for run id.
 pub const QUERY_KEY_RUN_ID: &str = "run_id";
+
+/// The name of the package of the page.
+pub(crate) const CICD_VIEW_PAGE_NAME: &str = "cicd";

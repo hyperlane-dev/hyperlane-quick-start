@@ -11,3 +11,6 @@ pub const HTTP_REASON_INTERNAL_SERVER_ERROR: &str = "Internal Server Error";
 
 /// OpenAPI tag grouping this route.
 pub const OPENAPI_TAG: &str = "euv_playground";
+
+/// The name of the package of the page.
+pub(crate) const EUV_PLAYGROUND_VIEW_PAGE_NAME: &str = "euv-playground";

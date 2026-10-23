@@ -17,6 +17,7 @@ pub mod monitor;
 pub mod notification;
 pub mod openapi;
 pub mod order;
+pub mod page;
 pub mod qrcode;
 pub mod redis;
 pub mod rss;
@@ -26,5 +27,7 @@ pub mod trace;
 pub mod tracking;
 pub mod upload;
 pub mod user;
+
+pub use page::serve_page;
 
 use super::*;

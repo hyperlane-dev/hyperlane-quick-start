@@ -29,18 +29,17 @@ impl ServerHook for EuvPlaygroundViewRoute {
     /// # Returns
     ///
     /// - `Status` - The handle result.
-    #[prologue_macros(
-        methods(get, post),
-        response_status_code(302),
-        response_header(LOCATION => EUV_PLAYGROUND_VIEW_REDIRECT_PATH)
-    )]
+    #[prologue_macros(methods(get, post))]
     #[instrument_trace]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let is_authenticated: bool = ctx.get_request().try_get_cookie(TOKEN).is_some();
         if !is_authenticated {
             let redirect_url: String = build_auth_redirect_url(ctx);
-            ctx.get_mut_response().set_header(LOCATION, redirect_url);
+            ctx.get_mut_response()
+                .set_status_code(302)
+                .set_header(LOCATION, &redirect_url);
+            return Status::Continue;
         }
-        Status::Continue
+        serve_page(ctx, EUV_PLAYGROUND_VIEW_PAGE_NAME)
     }
 }
