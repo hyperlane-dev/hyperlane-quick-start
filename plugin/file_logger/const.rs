@@ -13,15 +13,6 @@ pub(crate) const DEFAULT_LOG_FILE_SIZE: usize = 1_024_000_000;
 /// Special value indicating no size limit for log files.
 pub(crate) const DISABLE_LOG_FILE_SIZE: usize = 0;
 
-/// Root path symbol.
-pub(crate) const ROOT_PATH: &str = "/";
-
-/// Dot symbol.
-pub(crate) const POINT: &str = ".";
-
-/// Line break symbol.
-pub(crate) const BR: &str = "\n";
-
 /// Subdirectory name for trace logs.
 pub(crate) const TRACE_DIR: &str = "trace";
 

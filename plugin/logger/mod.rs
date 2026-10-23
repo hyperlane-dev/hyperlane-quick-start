@@ -1,9 +1,8 @@
-mod file_logger;
 mod r#impl;
 mod r#static;
 mod r#struct;
 
-pub use {file_logger::*, r#struct::*};
+pub use {r#struct::*, super::file_logger::*};
 
 use {super::*, r#static::*};
 

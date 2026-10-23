@@ -7,6 +7,7 @@
 pub mod common;
 pub mod database;
 pub mod env;
+pub mod file_logger;
 pub mod logger;
 pub mod message_queue;
 pub mod mysql;
