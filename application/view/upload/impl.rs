@@ -23,14 +23,10 @@ impl ServerHook for UploadViewRoute {
     /// # Returns
     ///
     /// - `Status` - The handle result.
-    #[prologue_macros(
-        methods(get, post),
-        response_status_code(302),
-        response_header(LOCATION => UPLOAD_VIEW_REDIRECT_PATH)
-    )]
+    #[prologue_macros(methods(get, post))]
     #[instrument_trace]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
-        Status::Continue
+        serve_page(ctx, UPLOAD_VIEW_PAGE_NAME)
     }
 }
 
@@ -105,6 +101,6 @@ impl ServerHook for UploadFileRoute {
                     );
             }
         }
-        Status::Continue
+        serve_page(ctx, UPLOAD_VIEW_PAGE_NAME)
     }
 }

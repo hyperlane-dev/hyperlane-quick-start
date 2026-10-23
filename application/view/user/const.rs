@@ -1,5 +1,3 @@
-/// Directory path for user view redirect path.
-pub const USER_VIEW_REDIRECT_PATH: &str = "/static/user/index.html";
 /// OpenAPI route path for the user view.
 pub const ROUTE_USER: &str = "/user";
 
@@ -14,3 +12,6 @@ pub const HTTP_REASON_NOT_FOUND: &str = "Not Found";
 
 /// Reason phrase for an unexpected server failure.
 pub const HTTP_REASON_INTERNAL_SERVER_ERROR: &str = "Internal Server Error";
+
+/// The name of the package of the page.
+pub(crate) const USER_VIEW_PAGE_NAME: &str = "user";

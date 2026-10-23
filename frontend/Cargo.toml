@@ -1,0 +1,54 @@
+[workspace]
+resolver = "3"
+members = [
+    "shared",
+    "pages/auth",
+    "pages/blog",
+    "pages/chat",
+    "pages/cicd",
+    "pages/diff",
+    "pages/euv-playground",
+    "pages/gomoku",
+    "pages/ide",
+    "pages/json",
+    "pages/monitor",
+    "pages/not_found",
+    "pages/notification",
+    "pages/order",
+    "pages/qrcode",
+    "pages/redis",
+    "pages/rss",
+    "pages/shortlink",
+    "pages/templates",
+    "pages/trace",
+    "pages/tracking",
+    "pages/upload",
+    "pages/user",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+authors = ["root@ltpp.vip"]
+license = "MIT"
+repository = "https://github.com/hyperlane-dev/hyperlane-quick-start.git"
+readme = "README.md"
+
+[workspace.dependencies]
+hyperlane_frontend_shared = { path = "shared", version = "0.1.0" }
+
+euv = "0.31.3"
+euv-ui = "0.31.3"
+serde_json = "1.0.145"
+wasm-bindgen = "0.2.129"
+wasm-bindgen-futures = "0.4.79"
+serde = { version = "1.0.229", features = ["derive"] }
+web-sys = { version = "0.3.106", features = [
+    "Window",
+    "Headers",
+    "Request",
+    "Response",
+    "RequestInit",
+    "RequestMode",
+    "RequestCredentials",
+] }

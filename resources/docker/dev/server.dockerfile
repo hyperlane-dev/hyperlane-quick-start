@@ -36,10 +36,16 @@ ARG WASM_PACK_VERSION=0.15.0
 ARG WASM_BINDGEN_VERSION=0.2.129
 FROM --platform=$TARGETPLATFORM rust:${RUST_VERSION}-alpine AS builder
 
+# A build argument is only visible in the stage that declares it, so the
+# version of the wasm tools is repeated here for the builder stage; without
+# it the download of wasm-pack would look for a release without a version.
+ARG WASM_PACK_VERSION
+ARG WASM_BINDGEN_VERSION
+
 # Alpine's apk is the build toolchain for the musl target: build-base
 # provides the C compiler and linker that the aws-lc-sys, ring and sqlx
 # build scripts drive, and cmake is required by aws-lc-sys.
-RUN apk add --no-cache build-base cmake perl linux-headers file
+RUN apk add --no-cache build-base cmake perl linux-headers file curl
 
 WORKDIR /hyperlane-quick-start
 
@@ -65,8 +71,50 @@ RUN cargo fetch
 COPY . .
 
 # The wasm target is needed to compile the playground's user code to
-# WebAssembly.
+# WebAssembly, and the frontend pages of the repository to WebAssembly.
 RUN rustup target add wasm32-unknown-unknown
+
+# wasm-pack compiles the pages of the frontend workspace. It is taken from
+# the prebuilt musl release, so it does not need a Rust build of its own in
+# the image.
+RUN set -eux; \
+    arch="$(uname -m)"; \
+    case "$arch" in \
+        x86_64) wasm_arch="x86_64" ;; \
+        aarch64) wasm_arch="aarch64" ;; \
+        *) echo "unsupported architecture: $arch" >&2; exit 1 ;; \
+    esac; \
+    cd /tmp; \
+    curl -sSfL -o wasm-pack.tar.gz \
+      "https://github.com/rustwasm/wasm-pack/releases/download/v${WASM_PACK_VERSION}/wasm-pack-v${WASM_PACK_VERSION}-${wasm_arch}-unknown-linux-musl.tar.gz"; \
+    tar xzf wasm-pack.tar.gz; \
+    cp -f "wasm-pack-v${WASM_PACK_VERSION}-${wasm_arch}-unknown-linux-musl/wasm-pack" /usr/local/bin/wasm-pack; \
+    chmod 0755 /usr/local/bin/wasm-pack; \
+    rm -rf /tmp/wasm-pack.tar.gz /tmp/wasm-pack-v*
+
+# The wasm-bindgen command line interface is taken from the prebuilt musl
+# release as well. wasm-pack installs it on its own when it does not find it
+# in the path, and that install needs a release of the architecture of the
+# builder, which the image does not always have.
+RUN set -eux; \
+    arch="$(uname -m)"; \
+    case "$arch" in \
+        x86_64) wasm_arch="x86_64" ;; \
+        aarch64) wasm_arch="aarch64" ;; \
+        *) echo "unsupported architecture: $arch" >&2; exit 1 ;; \
+    esac; \
+    cd /tmp; \
+    curl -sSfL -o wasm-bindgen.tar.gz \
+      "https://github.com/rustwasm/wasm-bindgen/releases/download/${WASM_BINDGEN_VERSION}/wasm-bindgen-${WASM_BINDGEN_VERSION}-${wasm_arch}-unknown-linux-musl.tar.gz"; \
+    tar xzf wasm-bindgen.tar.gz; \
+    cp -f "wasm-bindgen-${WASM_BINDGEN_VERSION}-${wasm_arch}-unknown-linux-musl/wasm-bindgen" /usr/local/bin/wasm-bindgen; \
+    chmod 0755 /usr/local/bin/wasm-bindgen; \
+    rm -rf /tmp/wasm-bindgen.tar.gz /tmp/wasm-bindgen-${WASM_BINDGEN_VERSION}-*
+
+# The euv command line interface builds the pages of the frontend workspace.
+# The build script of the server package drives it, so the pages are part of
+# the build of the server itself.
+RUN cargo install euv-cli --version 0.31.3 --locked
 
 # The build itself runs on the Alpine (musl) toolchain, so the produced
 # binary is statically linked against musl and needs no shared library
@@ -126,6 +174,11 @@ WORKDIR /hyperlane-quick-start
 # COPY of a missing path fails the build.
 COPY resources ./resources
 RUN mkdir -p ./resources/static
+
+# The browser assets of the pages are built by the build script of the server
+# package, so they are taken from the builder stage instead of the checkout:
+# the build writes them into the static resource directory of the source tree.
+COPY --from=builder /hyperlane-quick-start/resources/static ./resources/static
 
 # The single build output. The server's own build tree - the crate
 # registry and the whole target/ directory - is not copied over; only the

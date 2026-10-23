@@ -184,9 +184,41 @@ jobs:
       - name: Format check
         run: cargo fmt -- --check
 
+  frontend:
+    needs: [setup, sync_workspace_version]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+      - name: Setup rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          targets: wasm32-unknown-unknown
+      - name: Install wasm-pack
+        uses: jetli/wasm-pack-action@v0.4.0
+        with:
+          version: 0.15.0
+      - name: Install the euv command line interface
+        run: cargo install euv-cli --version 0.31.3 --locked
+      - name: Check the format of the pages
+        run: |
+          set -euo pipefail
+          for page in frontend/pages/*/ frontend/shared/; do
+            echo "---- ${page} ----"
+            (cd "${page}" && euv fmt --check)
+          done
+      - name: Check the pages
+        working-directory: frontend
+        run: cargo check --target wasm32-unknown-unknown --workspace --all-features
+
   tests:
     needs: sync_workspace_version
     runs-on: ubuntu-latest
+    env:
+      EUV_FRONTEND_SKIP: "1"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -202,6 +234,8 @@ jobs:
   clippy:
     needs: sync_workspace_version
     runs-on: ubuntu-latest
+    env:
+      EUV_FRONTEND_SKIP: "1"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -218,6 +252,8 @@ jobs:
   build:
     needs: [setup, sync_workspace_version]
     runs-on: ubuntu-latest
+    env:
+      EUV_FRONTEND_SKIP: "1"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -237,6 +273,7 @@ jobs:
             --memory=4g \
             --memory-swap=4g \
             -e CARGO_TARGET_DIR=/tmp/hqs-low-memory-target \
+            -e EUV_FRONTEND_SKIP=1 \
             -v "$PWD:/workspace" \
             -w /workspace \
             rust:1.99-alpine \
@@ -281,7 +318,7 @@ jobs:
   publish:
     permissions:
       contents: write
-    needs: [setup, sync_workspace_version, check, tests, clippy, build]
+    needs: [setup, sync_workspace_version, check, tests, clippy, frontend, build]
     if: needs.setup.outputs.tag != ''
     runs-on: ubuntu-latest
     outputs:

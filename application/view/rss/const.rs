@@ -14,3 +14,6 @@ pub const HTTP_REASON_NOT_FOUND: &str = "Not Found";
 
 /// Reason phrase for an unexpected server failure.
 pub const HTTP_REASON_INTERNAL_SERVER_ERROR: &str = "Internal Server Error";
+
+/// The name of the package of the page.
+pub(crate) const RSS_VIEW_PAGE_NAME: &str = "rss";

@@ -23,3 +23,6 @@ pub const ROUTE_PARAM_DESC_UPLOAD_DIR: &str = "Upload directory";
 
 /// Description of the uploaded file route parameter.
 pub const ROUTE_PARAM_DESC_UPLOAD_FILE: &str = "Upload file name";
+
+/// The name of the package of the page.
+pub(crate) const UPLOAD_VIEW_PAGE_NAME: &str = "upload";

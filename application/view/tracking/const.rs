@@ -1,5 +1,3 @@
-/// Directory path for tracking view redirect path.
-pub const TRACKING_VIEW_REDIRECT_PATH: &str = "/static/tracking/index.html";
 /// OpenAPI route path for the tracking view.
 pub const ROUTE_TRACKING: &str = "/tracking";
 
@@ -14,3 +12,6 @@ pub const HTTP_REASON_NOT_FOUND: &str = "Not Found";
 
 /// Reason phrase for an unexpected server failure.
 pub const HTTP_REASON_INTERNAL_SERVER_ERROR: &str = "Internal Server Error";
+
+/// The name of the package of the page.
+pub(crate) const TRACKING_VIEW_PAGE_NAME: &str = "tracking";

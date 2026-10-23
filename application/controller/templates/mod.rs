@@ -6,5 +6,3 @@ mod r#struct;
 pub use {r#const::*, r#fn::*};
 
 use {super::*, r#struct::*};
-
-use hyperlane_resources::*;
