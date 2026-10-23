@@ -1,4 +1,5 @@
 name: Rust
+
 on:
   push:
     branches:
@@ -163,7 +164,7 @@ jobs:
       - name: Commit and push
         run: |
           git config user.name "vshengbro"
-          git config user.email "root@ltpp.vip"
+          git config user.email "root@devhub.vip"
           git add -A
           git diff --cached --quiet || git commit -m "chore: sync all package versions to ${{ needs.setup.outputs.version }}"
           git push
@@ -218,7 +219,7 @@ jobs:
     needs: sync_workspace_version
     runs-on: ubuntu-latest
     env:
-      EUV_FRONTEND_SKIP: "1"
+      EUV_FRONTEND_SKIP: '1'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -235,7 +236,7 @@ jobs:
     needs: sync_workspace_version
     runs-on: ubuntu-latest
     env:
-      EUV_FRONTEND_SKIP: "1"
+      EUV_FRONTEND_SKIP: '1'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -253,7 +254,7 @@ jobs:
     needs: [setup, sync_workspace_version]
     runs-on: ubuntu-latest
     env:
-      EUV_FRONTEND_SKIP: "1"
+      EUV_FRONTEND_SKIP: '1'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -318,7 +319,8 @@ jobs:
   publish:
     permissions:
       contents: write
-    needs: [setup, sync_workspace_version, check, tests, clippy, frontend, build]
+    needs:
+      [setup, sync_workspace_version, check, tests, clippy, frontend, build]
     if: needs.setup.outputs.tag != ''
     runs-on: ubuntu-latest
     outputs:
@@ -358,7 +360,7 @@ jobs:
         if: steps.check_branch.outputs.skip == 'false'
         run: |
           git config user.name "vshengbro"
-          git config user.email "root@ltpp.vip"
+          git config user.email "root@devhub.vip"
       - name: Publish to crates.io
         id: publish
         if: steps.check_branch.outputs.skip == 'false'

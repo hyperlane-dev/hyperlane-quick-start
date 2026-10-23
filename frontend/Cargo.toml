@@ -29,7 +29,7 @@ members = [
 [workspace.package]
 version = "0.1.0"
 edition = "2024"
-authors = ["root@ltpp.vip"]
+authors = ["root@devhub.vip"]
 license = "MIT"
 repository = "https://github.com/hyperlane-dev/hyperlane-quick-start.git"
 readme = "README.md"
