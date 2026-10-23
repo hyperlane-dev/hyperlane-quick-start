@@ -14,6 +14,7 @@ pub mod gomoku;
 pub mod ide;
 pub mod json;
 pub mod monitor;
+pub mod not_found;
 pub mod notification;
 pub mod openapi;
 pub mod order;

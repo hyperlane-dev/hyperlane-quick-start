@@ -1,7 +1,9 @@
 mod r#const;
 mod r#fn;
 
-pub use {r#const::*, r#fn::*};
+pub use r#fn::*;
+
+pub(crate) use r#const::*;
 
 use std::{fs, path::PathBuf};
 

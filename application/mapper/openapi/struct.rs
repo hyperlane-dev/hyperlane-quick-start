@@ -105,6 +105,7 @@ use super::*;
         view::monitor::openapi_monitor_view,
         view::blog::openapi_blog_view,
         view::notification::openapi_notification_view,
+        view::not_found::openapi_not_found_view,
         view::openapi::openapi_openapi_view,
         view::order::openapi_order_view,
         view::user::openapi_user_view,
