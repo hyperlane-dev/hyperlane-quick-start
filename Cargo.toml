@@ -1,9 +1,9 @@
 [package]
 name = "hyperlane-quick-start"
-version = "23.0.45"
+version = "23.2.0"
 readme = "README.md"
 edition = "2024"
-authors = ["root@ltpp.vip"]
+authors = ["root@devhub.vip"]
 license = "MIT"
 description = """A lightweight rust http server with middleware, websocket, sse, and tcp support, built on tokio for cross-platform async networking, hyperlane simplifies modern web service development."""
 keywords = ["http", "request", "response", "tcp", "cross-platform"]
@@ -32,7 +32,7 @@ hyperlane_resources = { path = "resources", version = "23.0.45" }
 hyperlane_application = { path = "application", version = "23.0.45" }
 
 log = "0.4.34"
-redis = "1.7.1"
+redis = "1.8.0"
 utoipa = "6.0.0"
 chrono = "0.4.45"
 sea-orm = "2.0.4"
@@ -40,16 +40,16 @@ dotenvy = "0.15.7"
 tracing = "0.1.44"
 num_cpus = "1.17.0"
 tempfile = "3.27.0"
-hyperlane = "21.13.3"
+hyperlane = "22.0.2"
 serde_with = "3.24.0"
 serde_yaml = "0.9.33"
-color-output = "10.2.7"
-lombok-macros = "10.2.7"
-file-operation = "10.2.7"
+color-output = "10.2.11"
+lombok-macros = "10.2.11"
+file-operation = "10.2.11"
 hyperlane-time = "0.7.46"
-server-manager = "10.2.7"
-instrument-level = "10.2.7"
-uuid = { version = "1.28.0", features = ["v4"] }
+server-manager = "10.2.11"
+instrument-level = "10.2.11"
+uuid = { version = "1.29.0", features = ["v4"] }
 serde = { version = "1.0.229", features = ["derive"] }
 
 [dependencies]

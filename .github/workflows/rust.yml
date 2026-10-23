@@ -1,4 +1,5 @@
 name: Rust
+
 on:
   push:
     branches:
@@ -163,7 +164,7 @@ jobs:
       - name: Commit and push
         run: |
           git config user.name "vshengbro"
-          git config user.email "root@ltpp.vip"
+          git config user.email "root@devhub.vip"
           git add -A
           git diff --cached --quiet || git commit -m "chore: sync all package versions to ${{ needs.setup.outputs.version }}"
           git push
@@ -321,7 +322,7 @@ jobs:
         if: steps.check_branch.outputs.skip == 'false'
         run: |
           git config user.name "vshengbro"
-          git config user.email "root@ltpp.vip"
+          git config user.email "root@devhub.vip"
       - name: Publish to crates.io
         id: publish
         if: steps.check_branch.outputs.skip == 'false'

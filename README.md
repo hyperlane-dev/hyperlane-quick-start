@@ -112,4 +112,4 @@ Contributions are welcome! Please submit an issue or create a pull request.
 
 ## Contact
 
-If you have any questions, please contact the author: [root@ltpp.vip](mailto:root@ltpp.vip).
+If you have any questions, please contact the author: [root@devhub.vip](mailto:root@devhub.vip).
