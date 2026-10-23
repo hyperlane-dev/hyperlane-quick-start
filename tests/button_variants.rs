@@ -9,13 +9,28 @@ const ROW_CLASS: &str = "c_hls_button_row()";
 const PRIMARY_ACTIONS: [(&str, &str); 10] = [
     ("frontend/pages/chat/src/page/view/fn.rs", "LABEL_SEND"),
     ("frontend/pages/cicd/src/page/view/fn.rs", "LABEL_DETAIL"),
-    ("frontend/pages/monitor/src/page/view/fn.rs", "LABEL_REFRESH"),
-    ("frontend/pages/notification/src/page/view/fn.rs", "LABEL_MARK_READ"),
-    ("frontend/pages/order/src/page/view/fn.rs", "LABEL_SEARCH_BUTTON"),
+    (
+        "frontend/pages/monitor/src/page/view/fn.rs",
+        "LABEL_REFRESH",
+    ),
+    (
+        "frontend/pages/notification/src/page/view/fn.rs",
+        "LABEL_MARK_READ",
+    ),
+    (
+        "frontend/pages/order/src/page/view/fn.rs",
+        "LABEL_SEARCH_BUTTON",
+    ),
     ("frontend/pages/redis/src/page/view/fn.rs", "LABEL_REFRESH"),
     ("frontend/pages/rss/src/page/view/fn.rs", "LABEL_REFRESH"),
-    ("frontend/pages/tracking/src/page/view/fn.rs", "LABEL_DETAIL"),
-    ("frontend/pages/user/src/page/view/fn.rs", "LABEL_SEARCH_BUTTON"),
+    (
+        "frontend/pages/tracking/src/page/view/fn.rs",
+        "LABEL_DETAIL",
+    ),
+    (
+        "frontend/pages/user/src/page/view/fn.rs",
+        "LABEL_SEARCH_BUTTON",
+    ),
     ("frontend/pages/user/src/page/view/fn.rs", "LABEL_OPEN"),
 ];
 
@@ -138,7 +153,10 @@ fn a_row_of_buttons_holds_at_most_one_primary_button() {
             }
             if primaries.len() > 1 {
                 offenders
-                    .entry(format!("{}", file.strip_prefix(&root).unwrap_or(&file).display()))
+                    .entry(format!(
+                        "{}",
+                        file.strip_prefix(&root).unwrap_or(&file).display()
+                    ))
                     .or_default()
                     .extend(primaries);
             }

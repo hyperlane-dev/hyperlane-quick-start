@@ -19,15 +19,15 @@ use super::*;
 ///
 /// - `Status` - The handle result.
 pub fn serve_page(ctx: &mut Context, name: &str) -> Status {
-    let path: PathBuf = PathBuf::from(STATIC_RESOURCES_DIR).join(name).join(PAGE_INDEX_NAME);
+    let path: PathBuf = PathBuf::from(STATIC_RESOURCES_DIR)
+        .join(name)
+        .join(PAGE_INDEX_NAME);
     let Ok(content) = fs::read(&path) else {
         ctx.get_mut_response().set_status_code(404);
         return Status::Continue;
     };
     let document: String = String::from_utf8_lossy(&content).to_string();
-    let base: String = format!(
-        "{BASE_ELEMENT}{STATIC_URL_PREFIX}/{name}/{BASE_ELEMENT_END}"
-    );
+    let base: String = format!("{BASE_ELEMENT}{STATIC_URL_PREFIX}/{name}/{BASE_ELEMENT_END}");
     let document: String = document.replacen(HEAD_ELEMENT, &format!("{HEAD_ELEMENT}{base}"), 1);
     ctx.get_mut_response()
         .set_body(document.as_bytes())

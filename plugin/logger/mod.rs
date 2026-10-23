@@ -2,7 +2,7 @@ mod r#impl;
 mod r#static;
 mod r#struct;
 
-pub use {r#struct::*, super::file_logger::*};
+pub use {super::file_logger::*, r#struct::*};
 
 use {super::*, r#static::*};
 
