@@ -45,8 +45,7 @@ pub fn load_history(state: UploadState) {
     let Some(raw): Option<String> = storage.get_item(STORAGE_KEY).ok().flatten() else {
         return;
     };
-    let Ok(items): Result<Vec<UploadHistoryItem>, serde_json::Error> =
-        serde_json::from_str(&raw)
+    let Ok(items): Result<Vec<UploadHistoryItem>, serde_json::Error> = serde_json::from_str(&raw)
     else {
         return;
     };
@@ -113,8 +112,9 @@ pub async fn upload_files(state: UploadState, files: Vec<File>) {
 /// Uploads one file of the upload list.
 ///
 /// The file is registered first, then its chunks are stored one by one, and
-/// the merged file is fetched at the end. The address of the uploaded file
-/// is written into the entry and into the upload history.
+/// the merged file is fetched at the end. Every request carries a multipart
+/// body, so the name of the file travels with the body of the request and no
+/// request header carries any information about the file.
 ///
 /// # Arguments
 ///
@@ -129,47 +129,63 @@ pub async fn upload_file(state: UploadState, id: String, file: File) {
     set_entry_status(state, &id, UploadStatus::Uploading, 0.0);
     let total_chunks: i32 = (file.size() / CHUNK_SIZE as f64).ceil() as i32;
     let total_chunks: i32 = total_chunks.max(1);
-    let encoded_name: String = encode_uri_component(&file.name())
-        .as_string()
-        .unwrap_or_default();
     let total_chunks_text: String = total_chunks.to_string();
-    let register_headers: Vec<(&str, &str)> = vec![
-        (HEADER_FILE_ID, id.as_str()),
-        (HEADER_TOTAL_CHUNKS, total_chunks_text.as_str()),
-        (HEADER_FILE_NAME, encoded_name.as_str()),
-    ];
-    if let Err(error) =
-        upload_request(METHOD_POST, PATH_REGISTER, &register_headers, None).await
-    {
+    let descriptor: Blob = match try_file_descriptor(&file) {
+        Ok(blob) => blob,
+        Err(error) => {
+            fail_entry(state, &id, error.message);
+            return;
+        }
+    };
+    let register_form: FormData = match try_register_form(&id, &total_chunks_text) {
+        Ok(form) => form,
+        Err(error) => {
+            fail_entry(state, &id, error.message);
+            return;
+        }
+    };
+    if let Err(error) = try_append_file(&register_form, &descriptor, &file.name()) {
+        fail_entry(state, &id, error.message);
+        return;
+    }
+    if let Err(error) = upload_request(METHOD_POST, PATH_REGISTER, register_form).await {
         fail_entry(state, &id, error.message);
         return;
     }
     for index in 0..total_chunks {
         let start: i32 = index * CHUNK_SIZE;
         let end: i32 = start + CHUNK_SIZE;
-        let chunk: Blob = match file.slice_with_i32_and_i32(start, end) {
-            Ok(chunk) => chunk,
-            Err(_) => {
-                fail_entry(state, &id, "The file could not be read".to_string());
+        let chunk: Blob = match try_file_slice(&file, start, end) {
+            Ok(blob) => blob,
+            Err(error) => {
+                fail_entry(state, &id, error.message);
                 return;
             }
         };
         let chunk_index_text: String = index.to_string();
-        let chunk_headers: Vec<(&str, &str)> = vec![
-            (HEADER_FILE_ID, id.as_str()),
-            (HEADER_CHUNK_INDEX, chunk_index_text.as_str()),
-        ];
-        if let Err(error) =
-            upload_request(METHOD_POST, PATH_SAVE, &chunk_headers, Some(chunk)).await
+        let chunk_form: FormData = match try_save_form(&id, &chunk_index_text, &chunk, &file.name())
         {
+            Ok(form) => form,
+            Err(error) => {
+                fail_entry(state, &id, error.message);
+                return;
+            }
+        };
+        if let Err(error) = upload_request(METHOD_POST, PATH_SAVE, chunk_form).await {
             fail_entry(state, &id, error.message);
             return;
         }
         let progress: f64 = (index + 1) as f64 / total_chunks as f64 * PERCENT_FULL;
         set_entry_status(state, &id, UploadStatus::Uploading, progress);
     }
-    let merge_headers: Vec<(&str, &str)> = vec![(HEADER_FILE_ID, id.as_str())];
-    match upload_request(METHOD_POST, PATH_MERGE, &merge_headers, None).await {
+    let merge_form: FormData = match try_merge_form(&id) {
+        Ok(form) => form,
+        Err(error) => {
+            fail_entry(state, &id, error.message);
+            return;
+        }
+    };
+    match upload_request(METHOD_POST, PATH_MERGE, merge_form).await {
         Ok(response) => {
             let name: String = file.name();
             set_entry_url(state, &id, response.url.clone());
@@ -186,14 +202,15 @@ pub async fn upload_file(state: UploadState, id: String, file: File) {
 /// Sends one request to one of the upload endpoints.
 ///
 /// The upload endpoints answer with a flat object instead of the envelope of
-/// the other endpoints, so the body is read as text and parsed here.
+/// the other endpoints, so the body is read as text and parsed here. The
+/// content type of the request is left to the browser, which adds the
+/// boundary of the multipart body itself.
 ///
 /// # Arguments
 ///
 /// - `&str` - The HTTP method the request is issued with.
 /// - `&str` - The path the request is sent to.
-/// - `&[(&str, &str)]` - The headers the request carries.
-/// - `Option<Blob>` - The body the request carries.
+/// - `FormData` - The multipart body the request carries.
 ///
 /// # Returns
 ///
@@ -201,8 +218,7 @@ pub async fn upload_file(state: UploadState, id: String, file: File) {
 pub async fn upload_request(
     method: &str,
     path: &str,
-    headers: &[(&str, &str)],
-    body: Option<Blob>,
+    body: FormData,
 ) -> Result<UploadResponse, ApiError> {
     let Some(window): Option<Window> = window() else {
         return Err(ApiError {
@@ -210,21 +226,11 @@ pub async fn upload_request(
             message: MESSAGE_NO_WINDOW.to_string(),
         });
     };
-    let header_map: Headers =
-        Headers::new().map_err(|error: JsValue| transport_failure(error))?;
-    for (name, value) in headers {
-        header_map
-            .set(name, value)
-            .map_err(|error: JsValue| transport_failure(error))?;
-    }
     let init: RequestInit = RequestInit::new();
     init.set_method(method);
     init.set_mode(RequestMode::SameOrigin);
     init.set_credentials(RequestCredentials::Include);
-    init.set_headers(&JsValue::from(header_map));
-    if let Some(body) = body {
-        init.set_body(&JsValue::from(body));
-    }
+    init.set_body(&JsValue::from(body));
     let promise: Promise = window.fetch_with_str_and_init(path, &init);
     let value: JsValue = JsFuture::from(promise)
         .await
@@ -293,7 +299,10 @@ pub fn import_history(state: UploadState, content: &str) {
     };
     let mut merged: Vec<UploadHistoryItem> = state.get_history().get();
     for item in items {
-        if !merged.iter().any(|known: &UploadHistoryItem| known.id == item.id) {
+        if !merged
+            .iter()
+            .any(|known: &UploadHistoryItem| known.id == item.id)
+        {
             merged.push(item);
         }
     }
@@ -318,13 +327,7 @@ pub fn import_history(state: UploadState, content: &str) {
 /// # Returns
 ///
 /// - `()` - The record has been added.
-fn add_history(
-    state: UploadState,
-    id: String,
-    name: String,
-    size: f64,
-    url: String,
-) {
+fn add_history(state: UploadState, id: String, name: String, size: f64, url: String) {
     let mut history: Vec<UploadHistoryItem> = state.get_history().get();
     let item: UploadHistoryItem = UploadHistoryItem {
         id,
@@ -454,7 +457,10 @@ fn new_upload_id() -> String {
 ///
 /// - `String` - The current moment.
 fn current_time() -> String {
-    Date::new_0().to_iso_string().as_string().unwrap_or_default()
+    Date::new_0()
+        .to_iso_string()
+        .as_string()
+        .unwrap_or_default()
 }
 
 /// Builds the failure reported when the browser could not complete a request.

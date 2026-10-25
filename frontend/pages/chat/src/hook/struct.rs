@@ -1,7 +1,7 @@
 use super::*;
 
 /// The reactive state the chat page renders from.
-#[derive(Clone, Copy, CustomDebug, Data, Default, New)]
+#[derive(Clone, Copy, CustomDebug, Data, Default)]
 pub struct ChatState {
     /// The messages of the room.
     #[get(type(copy))]

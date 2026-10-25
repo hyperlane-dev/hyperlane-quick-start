@@ -1,10 +1,10 @@
 [package]
 name = "hyperlane_plugin"
-version = "23.0.45"
+version = "23.2.0"
 autotests = false
 readme = "README.md"
 edition = "2024"
-authors = ["root@ltpp.vip"]
+authors = ["root@devhub.vip"]
 license = "MIT"
 description = """A powerful and extensible plugin system for the hyperlane framework, providing modularity and customization capabilities."""
 keywords = ["http", "request", "response", "tcp", "cross-platform"]

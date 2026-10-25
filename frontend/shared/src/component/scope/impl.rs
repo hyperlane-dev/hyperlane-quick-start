@@ -9,7 +9,7 @@ impl Default for ReactiveScopeProps {
     /// - `ReactiveScopeProps` - The props of an empty scope.
     fn default() -> Self {
         Self {
-            content: Rc::new(|| VirtualNode::default()),
+            content: Rc::new(VirtualNode::default),
         }
     }
 }

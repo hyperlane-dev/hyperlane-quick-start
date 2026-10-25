@@ -1,9 +1,9 @@
 [package]
 name = "hyperlane_application"
-version = "23.0.45"
+version = "23.2.0"
 readme = "README.md"
 edition = "2024"
-authors = ["root@ltpp.vip"]
+authors = ["root@devhub.vip"]
 license = "MIT"
 description = """Hyperlane application module containing core application logic, controllers, services, and middleware components."""
 keywords = ["http", "request", "response", "tcp", "cross-platform"]
@@ -22,6 +22,13 @@ exclude = [
 
 [lib]
 path = "lib.rs"
+
+[[test]]
+name = "integration"
+path = "tests/mod.rs"
+
+[dev-dependencies]
+tempfile = { workspace = true }
 
 [dependencies]
 hyperlane_config = { workspace = true }

@@ -1,4 +1,5 @@
 name: Rust
+
 on:
   push:
     branches:
@@ -130,11 +131,11 @@ jobs:
           # Sync workspace.dependencies.<pkg_name>.version for all member packages using sed
           for pkg_name in $MEMBER_PKG_NAMES; do
             if grep -q "^${pkg_name}[[:space:]]*=" Cargo.toml && grep -q "^${pkg_name}[[:space:]]*=.*version" Cargo.toml; then
-              # ci-allow-version-write: mirrors the human-authored root version into [workspace.dependencies]; it never picks or increments a version, it only keeps the release train in lockstep so one tag matches every manifest.
+              # ci-allow-version-write: propagates the human-authored root version into each member manifest so the workspace publishes one coherent version; the number itself is committed by a human, never chosen here.
               sed -i -E "s|^(${pkg_name}[[:space:]]*=[[:space:]]*\{.*version[[:space:]]*=[[:space:]]*\")([^\"]+)(\".*)|\1${VERSION}\3|" Cargo.toml
               echo "🔧 workspace.dependencies.${pkg_name}.version -> $VERSION (inline)"
             elif grep -q "^\[workspace\.dependencies\.${pkg_name}\]" Cargo.toml; then
-              # ci-allow-version-write: mirrors the human-authored root version into [workspace.dependencies]; it never picks or increments a version, it only keeps the release train in lockstep so one tag matches every manifest.
+              # ci-allow-version-write: propagates the human-authored root version into each member manifest so the workspace publishes one coherent version; the number itself is committed by a human, never chosen here.
               sed -i -E "/^\[workspace\.dependencies\.${pkg_name}\]/,/^\[/ s|^(version[[:space:]]*=[[:space:]]*\")([^\"]+)(\")|\1${VERSION}\3|" Cargo.toml
               echo "🔧 workspace.dependencies.${pkg_name}.version -> $VERSION (sub-table)"
             else
@@ -163,7 +164,7 @@ jobs:
       - name: Commit and push
         run: |
           git config user.name "vshengbro"
-          git config user.email "root@ltpp.vip"
+          git config user.email "root@devhub.vip"
           git add -A
           git diff --cached --quiet || git commit -m "chore: sync all package versions to ${{ needs.setup.outputs.version }}"
           git push
@@ -218,7 +219,7 @@ jobs:
     needs: sync_workspace_version
     runs-on: ubuntu-latest
     env:
-      EUV_FRONTEND_SKIP: "1"
+      EUV_FRONTEND_SKIP: '1'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -235,7 +236,7 @@ jobs:
     needs: sync_workspace_version
     runs-on: ubuntu-latest
     env:
-      EUV_FRONTEND_SKIP: "1"
+      EUV_FRONTEND_SKIP: '1'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -253,7 +254,7 @@ jobs:
     needs: [setup, sync_workspace_version]
     runs-on: ubuntu-latest
     env:
-      EUV_FRONTEND_SKIP: "1"
+      EUV_FRONTEND_SKIP: '1'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -318,7 +319,8 @@ jobs:
   publish:
     permissions:
       contents: write
-    needs: [setup, sync_workspace_version, check, tests, clippy, frontend, build]
+    needs:
+      [setup, sync_workspace_version, check, tests, clippy, frontend, build]
     if: needs.setup.outputs.tag != ''
     runs-on: ubuntu-latest
     outputs:
@@ -358,7 +360,7 @@ jobs:
         if: steps.check_branch.outputs.skip == 'false'
         run: |
           git config user.name "vshengbro"
-          git config user.email "root@ltpp.vip"
+          git config user.email "root@devhub.vip"
       - name: Publish to crates.io
         id: publish
         if: steps.check_branch.outputs.skip == 'false'

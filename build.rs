@@ -10,8 +10,6 @@
 //! case for the published crate, and when `EUV_FRONTEND_SKIP` is set, which
 //! is the case for the pipeline jobs that do not ship the browser assets.
 
-mod frontend_build;
-
 use std::{
     env::var,
     fs::{self, File, create_dir_all, read_to_string, write},
@@ -20,7 +18,105 @@ use std::{
     time::SystemTime,
 };
 
-use crate::frontend_build::*;
+/// The environment variable that names the command line interface binary.
+pub(crate) const ENV_CLI: &str = "EUV_CLI";
+
+/// The environment variable that turns the frontend build off.
+pub(crate) const ENV_SKIP: &str = "EUV_FRONTEND_SKIP";
+
+/// The environment variable that carries the profile of the build.
+pub(crate) const ENV_PROFILE: &str = "PROFILE";
+
+/// The environment variable that carries the output directory of the build.
+pub(crate) const ENV_OUT_DIR: &str = "OUT_DIR";
+
+/// The environment variable that carries the directory of the package.
+pub(crate) const ENV_MANIFEST_DIR: &str = "CARGO_MANIFEST_DIR";
+
+/// The name of the release profile.
+pub(crate) const PROFILE_RELEASE: &str = "release";
+
+/// The name of the development profile.
+pub(crate) const PROFILE_DEV: &str = "dev";
+
+/// The directory the frontend workspace lives in.
+pub(crate) const FRONTEND_DIR: &str = "frontend";
+
+/// The directory the shared package lives in.
+pub(crate) const SHARED_DIR: &str = "shared";
+
+/// The directory the page packages live in.
+pub(crate) const PAGES_DIR: &str = "pages";
+
+/// The directory the browser assets are served from.
+pub(crate) const STATIC_DIR: &str = "resources/static";
+
+/// The directory the stamps of the finished builds live in.
+///
+/// The stamps sit in the directory of the frontend inside the output
+/// directory of the build, so it carries the name of the frontend.
+pub(crate) const STAMP_DIR: &str = FRONTEND_DIR;
+
+/// The name of the manifest of a package.
+pub(crate) const MANIFEST_NAME: &str = "Cargo.toml";
+
+/// The environment variable that carries the target directory of a build.
+pub(crate) const ENV_TARGET_DIR: &str = "CARGO_TARGET_DIR";
+
+/// The environment variable that carries the link flags of the host build.
+pub(crate) const ENV_ENCODED_RUSTFLAGS: &str = "CARGO_ENCODED_RUSTFLAGS";
+
+/// The environment variable that carries the link flags of a build.
+pub(crate) const ENV_RUSTFLAGS: &str = "RUSTFLAGS";
+
+/// The name of the target directory of the frontend workspace.
+pub(crate) const TARGET_DIR: &str = "target";
+
+/// The name of the log the frontend build writes to.
+pub(crate) const LOG_NAME: &str = "frontend-build.log";
+
+/// The number of lines of the log of a page that are printed when the page
+/// could not be built.
+pub(crate) const LOG_TAIL_LINES: usize = 40;
+
+/// The name of the page the server serves.
+pub(crate) const INDEX_NAME: &str = "index.html";
+
+/// The name of the command line interface of the framework.
+pub(crate) const CLI_NAME: &str = "euv";
+
+/// The version of the command line interface the build expects.
+///
+/// The pages of the frontend workspace are written against the components of
+/// the `euv-ui` crate of this version, and the continuous integration and the
+/// images of the server install the command line interface of this version,
+/// so a build with another version would produce artifacts that the pipeline
+/// does not produce.
+pub(crate) const CLI_VERSION: &str = "0.31.3";
+
+/// The pattern the log of the command line interface carries its version in.
+pub(crate) const CLI_VERSION_PATTERN: &str = "euv-cli-";
+
+/// The command of the command line interface that builds a package.
+pub(crate) const CLI_BUILD: &str = "build";
+
+/// The argument that names the package the command line interface builds.
+pub(crate) const ARG_CRATE_PATH: &str = "--crate-path";
+
+/// The argument that names the directory the artifacts are written to.
+pub(crate) const ARG_WWW_DIR: &str = "--www-dir";
+
+/// The argument that builds the release profile.
+pub(crate) const ARG_RELEASE: &str = "--release";
+
+/// The argument that builds the development profile.
+pub(crate) const ARG_DEV: &str = "--dev";
+
+/// The message reported when the command line interface is missing.
+pub(crate) const MESSAGE_NO_CLI: &str = "the euv command line interface is required to build the frontend pages; install it with `cargo install euv-cli --version 0.31.3`";
+
+/// The message reported when the command line interface is another version.
+pub(crate) const MESSAGE_CLI_VERSION: &str = "the euv command line interface of the version 0.31.3 is required to build the frontend pages; point the environment variable EUV_CLI at the binary of that version";
 
 /// Entry point of the build script.
 ///
@@ -47,7 +143,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     );
     println!(
         "cargo:rerun-if-changed={}",
-        frontend_dir.join("Cargo.toml").display()
+        frontend_dir.join(MANIFEST_NAME).display()
     );
     println!("cargo:rerun-if-env-changed={ENV_SKIP}");
     println!("cargo:rerun-if-env-changed={ENV_CLI}");
@@ -423,7 +519,7 @@ fn newest_source_time(package: &Path) -> Option<SystemTime> {
                 if path
                     .file_name()
                     .and_then(|name: &std::ffi::OsStr| name.to_str())
-                    == Some("target")
+                    == Some(TARGET_DIR)
                 {
                     continue;
                 }

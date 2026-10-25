@@ -51,12 +51,11 @@ fn package_name(text: &str) -> Option<String> {
             in_package = trimmed == "[package]";
             continue;
         }
-        if in_package {
-            if let Some(value) = trimmed.strip_prefix("name") {
-                if let Some(name) = value.split('=').nth(1) {
-                    return Some(name.trim().trim_matches('"').to_string());
-                }
-            }
+        if in_package
+            && let Some(value) = trimmed.strip_prefix("name")
+            && let Some(name) = value.split('=').nth(1)
+        {
+            return Some(name.trim().trim_matches('"').to_string());
         }
     }
     None
@@ -72,14 +71,12 @@ fn workspace_members(root: &Path, text: &str) -> Vec<String> {
             in_members = trimmed == "[workspace]";
             continue;
         }
-        if in_members {
-            if let Some(value) = trimmed.strip_prefix("members") {
-                let raw: &str = value.split('=').nth(1).unwrap_or_default();
-                for part in raw.split(',') {
-                    let member: &str = part.trim().trim_matches('"');
-                    if !member.is_empty() {
-                        members.push(member.to_string());
-                    }
+        if in_members && let Some(value) = trimmed.strip_prefix("members") {
+            let raw: &str = value.split('=').nth(1).unwrap_or_default();
+            for part in raw.split(',') {
+                let member: &str = part.trim().trim_matches('"');
+                if !member.is_empty() {
+                    members.push(member.to_string());
                 }
             }
         }

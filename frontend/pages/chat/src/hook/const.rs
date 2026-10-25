@@ -16,18 +16,6 @@ pub(crate) const PATH_UPLOAD_SAVE: &str = "/api/upload/save";
 /// The endpoint that merges the chunks of an upload session.
 pub(crate) const PATH_UPLOAD_MERGE: &str = "/api/upload/merge";
 
-/// The header carrying the identifier of the upload session.
-pub(crate) const HEADER_FILE_ID: &str = "x-file-id";
-
-/// The header carrying the number of chunks of the upload session.
-pub(crate) const HEADER_TOTAL_CHUNKS: &str = "x-total-chunks";
-
-/// The header carrying the name of the uploaded file.
-pub(crate) const HEADER_FILE_NAME: &str = "x-file-name";
-
-/// The header carrying the index of the stored chunk.
-pub(crate) const HEADER_CHUNK_INDEX: &str = "x-chunk-index";
-
 /// The size of one chunk of an upload.
 pub(crate) const CHUNK_SIZE: i32 = 512 * 1024;
 

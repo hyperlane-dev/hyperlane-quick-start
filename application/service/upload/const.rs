@@ -36,3 +36,36 @@ pub const RANGE_HEADER_PREFIX: &str = "bytes=";
 
 /// The unit string for HTTP Content-Range headers, always "bytes".
 pub const BYTES_UNIT: &str = "bytes";
+
+/// Error message when the request body carries no file identifier.
+pub(crate) const ERROR_MISSING_FILE_ID: &str = "Missing file id";
+
+/// Error message when the request body carries no number of chunks.
+pub(crate) const ERROR_MISSING_TOTAL_CHUNKS: &str = "Missing total chunks";
+
+/// Error message when the number of chunks of the request body is not a valid count.
+pub(crate) const ERROR_INVALID_TOTAL_CHUNKS: &str = "Invalid total chunks";
+
+/// Error message when the request body carries no file name.
+pub(crate) const ERROR_MISSING_FILE_NAME: &str = "Missing file name";
+
+/// Error message when the request body carries no chunk index.
+pub(crate) const ERROR_MISSING_CHUNK_INDEX: &str = "Missing chunk index";
+
+/// Error message when the chunk index of the request body is not a valid index.
+pub(crate) const ERROR_INVALID_CHUNK_INDEX: &str = "Invalid chunk index";
+
+/// Error message when the request body carries no uploaded file.
+pub(crate) const ERROR_MISSING_FILE_PART: &str = "Missing file";
+
+/// Media type accepted by the multipart upload endpoints.
+pub(crate) const UPLOAD_FORM_CONTENT_TYPE: &str = "multipart/form-data";
+
+/// Error message when the upload body cannot be parsed.
+pub(crate) const ERROR_INVALID_MULTIPART: &str = "Invalid multipart form data";
+
+/// Error message when the upload identifier is not a safe path component.
+pub(crate) const ERROR_INVALID_FILE_ID: &str = "Invalid file id";
+
+/// Error message when an upload session has not been registered.
+pub(crate) const ERROR_UPLOAD_NOT_REGISTERED: &str = "Upload session not registered";
