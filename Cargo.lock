@@ -2149,7 +2149,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "23.2.0"
+version = "23.2.1"
 dependencies = [
  "bin-encode-decode",
  "chrono",
@@ -2216,6 +2216,7 @@ dependencies = [
  "serde_yaml",
  "server-manager",
  "sysinfo",
+ "tempfile",
  "tokio",
  "tracing",
  "urlencoding",

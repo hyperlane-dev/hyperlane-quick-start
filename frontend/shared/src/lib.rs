@@ -9,8 +9,9 @@
 mod api;
 mod component;
 mod style;
+mod upload;
 
-pub use {api::*, component::*, style::*};
+pub use {api::*, component::*, style::*, upload::*};
 
 pub use std::{
     cell::Cell,

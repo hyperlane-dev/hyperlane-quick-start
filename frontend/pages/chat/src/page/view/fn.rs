@@ -363,11 +363,12 @@ fn textarea_cursor(event: &Event) -> usize {
 /// - `Option<usize>` - The position of the mention sign.
 fn mention_start(text: &str, cursor: usize) -> Option<usize> {
     let head: &str = text.get(..cursor)?;
-    let Some(at) = head.rfind('@') else {
-        return None;
-    };
+    let at: usize = head.rfind('@')?;
     let filter: &str = head.get(at + 1..)?;
-    if filter.chars().any(|character: char| character.is_whitespace()) {
+    if filter
+        .chars()
+        .any(|character: char| character.is_whitespace())
+    {
         return None;
     }
     Some(at)

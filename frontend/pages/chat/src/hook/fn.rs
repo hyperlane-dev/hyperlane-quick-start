@@ -54,20 +54,23 @@ pub fn use_chat_state() -> ChatState {
         spawn_local(load_online_users(state));
         true
     });
-    let _keep_alive: IntervalHandle =
-        App::use_interval(PING_INTERVAL, move || {
-            send_frame(FRAME_PING, TEXT_EMPTY);
-        });
-    watch!(users, mention_filter, |_users: Vec<OnlineUser>, _filter: String| {
-        let filter: String = _filter;
-        let candidates: Vec<OnlineUser> = _users
-            .into_iter()
-            .filter(|user: &OnlineUser| {
-                filter.is_empty() || user.username.to_lowercase().contains(&filter)
-            })
-            .collect();
-        state.get_candidates().set(candidates);
+    let _keep_alive: IntervalHandle = App::use_interval(PING_INTERVAL, move || {
+        send_frame(FRAME_PING, TEXT_EMPTY);
     });
+    watch!(
+        users,
+        mention_filter,
+        |_users: Vec<OnlineUser>, _filter: String| {
+            let filter: String = _filter;
+            let candidates: Vec<OnlineUser> = _users
+                .into_iter()
+                .filter(|user: &OnlineUser| {
+                    filter.is_empty() || user.username.to_lowercase().contains(&filter)
+                })
+                .collect();
+            state.get_candidates().set(candidates);
+        }
+    );
     state
 }
 
@@ -103,19 +106,16 @@ pub fn open_room(state: ChatState) {
     let on_error: Closure<dyn FnMut(Event)> = Closure::new(move |_: Event| {
         state.get_connected().set(false);
     });
-    let on_message: Closure<dyn FnMut(MessageEvent)> =
-        Closure::new(move |event: MessageEvent| {
-            let data: JsValue = event.data();
-            let Some(raw): Option<String> = data.as_string() else {
-                return;
-            };
-            let Ok(frame): Result<ChatFrame, serde_json::Error> =
-                serde_json::from_str(&raw)
-            else {
-                return;
-            };
-            handle_frame(state, frame);
-        });
+    let on_message: Closure<dyn FnMut(MessageEvent)> = Closure::new(move |event: MessageEvent| {
+        let data: JsValue = event.data();
+        let Some(raw): Option<String> = data.as_string() else {
+            return;
+        };
+        let Ok(frame): Result<ChatFrame, serde_json::Error> = serde_json::from_str(&raw) else {
+            return;
+        };
+        handle_frame(state, frame);
+    });
     socket.set_onopen(Some(on_open.as_ref().unchecked_ref()));
     socket.set_onclose(Some(on_close.as_ref().unchecked_ref()));
     socket.set_onerror(Some(on_error.as_ref().unchecked_ref()));
@@ -227,7 +227,8 @@ pub fn send_frame(kind: &str, data: &str) -> bool {
             return false;
         };
         chat.socket.send_with_str(&encoded).is_ok()
-    })}
+    })
+}
 
 /// Loads the history of the room and writes it into the state.
 ///
@@ -305,6 +306,10 @@ pub fn insert_mention(state: ChatState, username: &str) {
 
 /// Uploads a file and sends its address to the room.
 ///
+/// Every request carries a multipart body, so the name of the file travels
+/// with the body of the request and no request header carries any
+/// information about the file.
+///
 /// # Arguments
 ///
 /// - `ChatState` - The state the page renders from.
@@ -320,42 +325,60 @@ pub async fn upload_file(state: ChatState, file: File) {
     let total_chunks: i32 = (file.size() / CHUNK_SIZE as f64).ceil() as i32;
     let total_chunks: i32 = total_chunks.max(1);
     let total_chunks_text: String = total_chunks.to_string();
-    let encoded_name: String = encode_uri_component(&file.name())
-        .as_string()
-        .unwrap_or_default();
-    let register_headers: Vec<(&str, &str)> = vec![
-        (HEADER_FILE_ID, id.as_str()),
-        (HEADER_TOTAL_CHUNKS, total_chunks_text.as_str()),
-        (HEADER_FILE_NAME, encoded_name.as_str()),
-    ];
-    if let Err(error) = upload_request(METHOD_POST, PATH_UPLOAD_REGISTER, &register_headers, None).await {
+    let descriptor: Blob = match try_file_descriptor(&file) {
+        Ok(blob) => blob,
+        Err(error) => {
+            fail_upload(state, error.message);
+            return;
+        }
+    };
+    let register_form: FormData = match try_register_form(&id, &total_chunks_text) {
+        Ok(form) => form,
+        Err(error) => {
+            fail_upload(state, error.message);
+            return;
+        }
+    };
+    if let Err(error) = try_append_file(&register_form, &descriptor, &file.name()) {
+        fail_upload(state, error.message);
+        return;
+    }
+    if let Err(error) = upload_request(METHOD_POST, PATH_UPLOAD_REGISTER, register_form).await {
         fail_upload(state, error.message);
         return;
     }
     for index in 0..total_chunks {
         let start: i32 = index * CHUNK_SIZE;
         let end: i32 = start + CHUNK_SIZE;
-        let chunk: Blob = match file.slice_with_i32_and_i32(start, end) {
-            Ok(chunk) => chunk,
-            Err(_) => {
-                fail_upload(state, "The file could not be read".to_string());
+        let chunk: Blob = match try_file_slice(&file, start, end) {
+            Ok(blob) => blob,
+            Err(error) => {
+                fail_upload(state, error.message);
                 return;
             }
         };
         let chunk_index_text: String = index.to_string();
-        let chunk_headers: Vec<(&str, &str)> = vec![
-            (HEADER_FILE_ID, id.as_str()),
-            (HEADER_CHUNK_INDEX, chunk_index_text.as_str()),
-        ];
-        if let Err(error) =
-            upload_request(METHOD_POST, PATH_UPLOAD_SAVE, &chunk_headers, Some(chunk)).await
+        let chunk_form: FormData = match try_save_form(&id, &chunk_index_text, &chunk, &file.name())
         {
+            Ok(form) => form,
+            Err(error) => {
+                fail_upload(state, error.message);
+                return;
+            }
+        };
+        if let Err(error) = upload_request(METHOD_POST, PATH_UPLOAD_SAVE, chunk_form).await {
             fail_upload(state, error.message);
             return;
         }
     }
-    let merge_headers: Vec<(&str, &str)> = vec![(HEADER_FILE_ID, id.as_str())];
-    match upload_request(METHOD_POST, PATH_UPLOAD_MERGE, &merge_headers, None).await {
+    let merge_form: FormData = match try_merge_form(&id) {
+        Ok(form) => form,
+        Err(error) => {
+            fail_upload(state, error.message);
+            return;
+        }
+    };
+    match upload_request(METHOD_POST, PATH_UPLOAD_MERGE, merge_form).await {
         Ok(response) => {
             state.get_uploading().set(false);
             state
@@ -370,14 +393,15 @@ pub async fn upload_file(state: ChatState, file: File) {
 /// Sends one request to one of the upload endpoints.
 ///
 /// The upload endpoints answer with a flat object instead of the envelope of
-/// the other endpoints, so the body is read as text and parsed here.
+/// the other endpoints, so the body is read as text and parsed here. The
+/// content type of the request is left to the browser, which adds the
+/// boundary of the multipart body itself.
 ///
 /// # Arguments
 ///
 /// - `&str` - The HTTP method the request is issued with.
 /// - `&str` - The path the request is sent to.
-/// - `&[(&str, &str)]` - The headers the request carries.
-/// - `Option<Blob>` - The body the request carries.
+/// - `FormData` - The multipart body the request carries.
 ///
 /// # Returns
 ///
@@ -385,8 +409,7 @@ pub async fn upload_file(state: ChatState, file: File) {
 pub async fn upload_request(
     method: &str,
     path: &str,
-    headers: &[(&str, &str)],
-    body: Option<Blob>,
+    body: FormData,
 ) -> Result<UploadAnswer, ApiError> {
     let Some(window): Option<Window> = window() else {
         return Err(ApiError {
@@ -394,21 +417,11 @@ pub async fn upload_request(
             message: MESSAGE_NO_WINDOW.to_string(),
         });
     };
-    let header_map: Headers =
-        Headers::new().map_err(|error: JsValue| transport_failure(error))?;
-    for (name, value) in headers {
-        header_map
-            .set(name, value)
-            .map_err(|error: JsValue| transport_failure(error))?;
-    }
     let init: RequestInit = RequestInit::new();
     init.set_method(method);
     init.set_mode(RequestMode::SameOrigin);
     init.set_credentials(RequestCredentials::Include);
-    init.set_headers(&JsValue::from(header_map));
-    if let Some(body) = body {
-        init.set_body(&JsValue::from(body));
-    }
+    init.set_body(&JsValue::from(body));
     let promise: Promise = window.fetch_with_str_and_init(path, &init);
     let value: JsValue = JsFuture::from(promise)
         .await
@@ -530,10 +543,10 @@ pub fn visitor_uuid() -> String {
     let Some(storage): Option<Storage> = window.local_storage().ok().flatten() else {
         return new_upload_id();
     };
-    if let Some(known) = storage.get_item(STORAGE_UUID).ok().flatten() {
-        if !known.is_empty() {
-            return known;
-        }
+    if let Some(known) = storage.get_item(STORAGE_UUID).ok().flatten()
+        && !known.is_empty()
+    {
+        return known;
     }
     let identity: String = new_upload_id();
     let _stored: Result<(), JsValue> = storage.set_item(STORAGE_UUID, &identity);
