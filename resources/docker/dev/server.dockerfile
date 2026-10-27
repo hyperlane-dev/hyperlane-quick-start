@@ -85,7 +85,7 @@ RUN set -eux; \
         *) echo "unsupported architecture: $arch" >&2; exit 1 ;; \
     esac; \
     cd /tmp; \
-    curl -sSfL -o wasm-pack.tar.gz \
+    curl --http1.1 --retry 8 --retry-all-errors -sSfL -o wasm-pack.tar.gz \
       "https://github.com/rustwasm/wasm-pack/releases/download/v${WASM_PACK_VERSION}/wasm-pack-v${WASM_PACK_VERSION}-${wasm_arch}-unknown-linux-musl.tar.gz"; \
     tar xzf wasm-pack.tar.gz; \
     cp -f "wasm-pack-v${WASM_PACK_VERSION}-${wasm_arch}-unknown-linux-musl/wasm-pack" /usr/local/bin/wasm-pack; \
@@ -104,7 +104,7 @@ RUN set -eux; \
         *) echo "unsupported architecture: $arch" >&2; exit 1 ;; \
     esac; \
     cd /tmp; \
-    curl -sSfL -o wasm-bindgen.tar.gz \
+    curl --http1.1 --retry 8 --retry-all-errors -sSfL -o wasm-bindgen.tar.gz \
       "https://github.com/rustwasm/wasm-bindgen/releases/download/${WASM_BINDGEN_VERSION}/wasm-bindgen-${WASM_BINDGEN_VERSION}-${wasm_arch}-unknown-linux-musl.tar.gz"; \
     tar xzf wasm-bindgen.tar.gz; \
     cp -f "wasm-bindgen-${WASM_BINDGEN_VERSION}-${wasm_arch}-unknown-linux-musl/wasm-bindgen" /usr/local/bin/wasm-bindgen; \
@@ -153,12 +153,12 @@ RUN set -eux; \
         *) echo "unsupported architecture: $arch" >&2; exit 1 ;; \
     esac; \
     cd /tmp; \
-    curl -sSfL -o wasm-pack.tar.gz \
+    curl --http1.1 --retry 8 --retry-all-errors -sSfL -o wasm-pack.tar.gz \
       "https://github.com/rustwasm/wasm-pack/releases/download/v${WASM_PACK_VERSION}/wasm-pack-v${WASM_PACK_VERSION}-${wasm_arch}-unknown-linux-musl.tar.gz"; \
     tar xzf wasm-pack.tar.gz; \
     cp -f "wasm-pack-v${WASM_PACK_VERSION}-${wasm_arch}-unknown-linux-musl/wasm-pack" /usr/local/bin/wasm-pack; \
     chmod 0755 /usr/local/bin/wasm-pack; \
-    curl -sSfL -o wasm-bindgen.tar.gz \
+    curl --http1.1 --retry 8 --retry-all-errors -sSfL -o wasm-bindgen.tar.gz \
       "https://github.com/rustwasm/wasm-bindgen/releases/download/${WASM_BINDGEN_VERSION}/wasm-bindgen-${WASM_BINDGEN_VERSION}-${wasm_arch}-unknown-linux-musl.tar.gz"; \
     tar xzf wasm-bindgen.tar.gz; \
     cp -f "wasm-bindgen-${WASM_BINDGEN_VERSION}-${wasm_arch}-unknown-linux-musl/wasm-bindgen" /usr/local/bin/wasm-bindgen; \
