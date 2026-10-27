@@ -114,7 +114,7 @@ RUN set -eux; \
 # The euv command line interface builds the pages of the frontend workspace.
 # The build script of the server package drives it, so the pages are part of
 # the build of the server itself.
-RUN cargo install euv-cli --version 0.31.3 --locked
+RUN cargo install euv-cli --version 0.32.15 --locked
 
 # The build itself runs on the Alpine (musl) toolchain, so the produced
 # binary is statically linked against musl and needs no shared library

@@ -38,7 +38,7 @@ The build needs the `wasm32-unknown-unknown` target, `wasm-pack` and the
 ```bash
 rustup target add wasm32-unknown-unknown
 cargo install wasm-pack
-cargo install euv-cli --version 0.31.3
+cargo install euv-cli --version 0.32.15
 ```
 
 The build uses the command line interface of the version the project pins, and

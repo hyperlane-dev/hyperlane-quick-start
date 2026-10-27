@@ -115,7 +115,7 @@ command line interface of the framework:
 ```sh
 rustup target add wasm32-unknown-unknown
 cargo install wasm-pack
-cargo install euv-cli --version 0.31.3
+cargo install euv-cli --version 0.32.15
 ```
 
 See the [frontend readme](frontend/README.md) for the layout of the

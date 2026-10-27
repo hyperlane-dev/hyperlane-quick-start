@@ -203,7 +203,7 @@ jobs:
         with:
           version: 0.15.0
       - name: Install the euv command line interface
-        run: cargo install euv-cli --version 0.31.3 --locked
+        run: cargo install euv-cli --version 0.32.15 --locked
       - name: Check the format of the pages
         run: |
           set -euo pipefail

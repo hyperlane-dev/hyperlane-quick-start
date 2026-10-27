@@ -202,7 +202,7 @@ pub fn monitor_page(node: VirtualNode<MonitorPageProps>) -> VirtualNode {
                                             class: c_monitor_table_row()
                                             td {
                                                 class: c_monitor_table_cell()
-                                                format_time(point.timestamp as i64)
+                                                hook::format_time(point.timestamp as i64)
                                             }
                                             td {
                                                 class: c_monitor_table_cell()

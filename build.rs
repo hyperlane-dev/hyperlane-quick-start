@@ -92,7 +92,7 @@ pub(crate) const CLI_NAME: &str = "euv";
 /// images of the server install the command line interface of this version,
 /// so a build with another version would produce artifacts that the pipeline
 /// does not produce.
-pub(crate) const CLI_VERSION: &str = "0.31.3";
+pub(crate) const CLI_VERSION: &str = "0.32.15";
 
 /// The pattern the log of the command line interface carries its version in.
 pub(crate) const CLI_VERSION_PATTERN: &str = "euv-cli-";
@@ -113,10 +113,10 @@ pub(crate) const ARG_RELEASE: &str = "--release";
 pub(crate) const ARG_DEV: &str = "--dev";
 
 /// The message reported when the command line interface is missing.
-pub(crate) const MESSAGE_NO_CLI: &str = "the euv command line interface is required to build the frontend pages; install it with `cargo install euv-cli --version 0.31.3`";
+pub(crate) const MESSAGE_NO_CLI: &str = "the euv command line interface is required to build the frontend pages; install it with `cargo install euv-cli --version 0.32.15`";
 
 /// The message reported when the command line interface is another version.
-pub(crate) const MESSAGE_CLI_VERSION: &str = "the euv command line interface of the version 0.31.3 is required to build the frontend pages; point the environment variable EUV_CLI at the binary of that version";
+pub(crate) const MESSAGE_CLI_VERSION: &str = "the euv command line interface of the version 0.32.15 is required to build the frontend pages; point the environment variable EUV_CLI at the binary of that version";
 
 /// Entry point of the build script.
 ///

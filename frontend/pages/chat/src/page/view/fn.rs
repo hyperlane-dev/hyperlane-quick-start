@@ -168,7 +168,7 @@ pub fn chat_message_row(node: VirtualNode<ChatMessageProps>) -> VirtualNode {
     } else {
         message.sender.clone()
     };
-    let time: String = format_time(message.time);
+    let time: String = hook::format_time(message.time);
     html! {
         div {
             key: message.id.to_string()
