@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane-quick-start"
-version = "23.2.0"
+version = "23.2.2"
 readme = "README.md"
 edition = "2024"
 authors = ["root@devhub.vip"]
@@ -40,15 +40,15 @@ dotenvy = "0.15.7"
 tracing = "0.1.44"
 num_cpus = "1.17.0"
 tempfile = "3.27.0"
-hyperlane = "22.0.2"
+hyperlane = "22.0.10"
 serde_with = "3.24.0"
-serde_yaml = "0.9.33"
-color-output = "10.2.11"
-lombok-macros = "10.2.11"
-file-operation = "10.2.11"
+serde_yaml = "0.9.34"
+color-output = "10.3.1"
+lombok-macros = "10.3.1"
+file-operation = "10.3.0"
 hyperlane-time = "0.7.46"
-server-manager = "10.2.11"
-instrument-level = "10.2.11"
+server-manager = "10.3.0"
+instrument-level = "10.3.1"
 uuid = { version = "1.29.0", features = ["v4"] }
 serde = { version = "1.0.229", features = ["derive"] }
 
