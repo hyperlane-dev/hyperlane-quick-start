@@ -61,6 +61,12 @@ pub fn ide_page(node: VirtualNode<IdePageProps>) -> VirtualNode {
             ide_editor {
                 state: state
             }
+            if { !state.get_notice().get().is_empty() } {
+                euv_alert {
+                    variant: AlertVariant::Success
+                    state.get_notice().get().as_str()
+                }
+            }
             if { !state.get_error().get().is_empty() } {
                 euv_modal {
                     title: TITLE_ERROR
@@ -119,8 +125,7 @@ pub fn ide_editor(node: VirtualNode<IdeEditorProps>) -> VirtualNode {
 /// - `Option<Rc<dyn Fn(Event)>>` - The click handler.
 fn copy_handler(state: IdeState) -> Option<Rc<dyn Fn(Event)>> {
     Some(Rc::new(move |_: Event| {
-        let code: String = state.get_code().get();
-        copy_to_clipboard(&code);
+        spawn_local(copy_to_clipboard(state));
     }))
 }
 
@@ -137,6 +142,7 @@ fn clear_handler(state: IdeState) -> Option<Rc<dyn Fn(Event)>> {
     Some(Rc::new(move |_: Event| {
         keep_code(state, TEXT_EMPTY.to_string());
         set_editor_value(TEXT_EMPTY);
+        state.get_notice().set(TEXT_CLEARED.to_string());
     }))
 }
 
@@ -159,13 +165,28 @@ fn close_error_handler(state: IdeState) -> Option<Rc<dyn Fn(Event)>> {
 ///
 /// # Arguments
 ///
-/// - `&str` - The text to copy.
+/// - `IdeState` - The state carrying the code and clipboard feedback.
 ///
 /// # Returns
 ///
-/// - `()` - The text has been handed to the clipboard of the browser.
-fn copy_to_clipboard(text: &str) {
-    let encoded: String = serde_json::to_string(text).unwrap_or_default();
-    let script: String = format!("navigator.clipboard.writeText({encoded})");
-    let _: Result<JsValue, JsValue> = js_sys::eval(&script);
+/// - `()` - The clipboard result has been reported.
+async fn copy_to_clipboard(state: IdeState) {
+    state.get_notice().set(TEXT_EMPTY.to_string());
+    let text: String = state.get_code().get();
+    if text.is_empty() {
+        report_error(state, ERROR_EMPTY_COPY.to_string());
+        return;
+    }
+    let Some(window): Option<Window> = window() else {
+        report_error(state, ERROR_CLIPBOARD.to_string());
+        return;
+    };
+    if JsFuture::from(window.navigator().clipboard().write_text(&text))
+        .await
+        .is_err()
+    {
+        report_error(state, ERROR_CLIPBOARD.to_string());
+        return;
+    }
+    state.get_notice().set(TEXT_COPIED.to_string());
 }

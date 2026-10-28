@@ -4,7 +4,13 @@ use super::*;
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct WebSocketMessage {
     /// The name.
-    pub(super) name: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) name: String,
     /// The message.
-    pub(super) message: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) message: String,
 }

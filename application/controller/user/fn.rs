@@ -10,6 +10,7 @@ use super::*;
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_user_list` free function.
 #[instrument_trace]
 pub fn openapi_user_list() {}
 
@@ -27,6 +28,7 @@ pub fn openapi_user_list() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_user_get` free function.
 #[instrument_trace]
 pub fn openapi_user_get() {}
 
@@ -45,6 +47,7 @@ pub fn openapi_user_get() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_user_update` free function.
 #[instrument_trace]
 pub fn openapi_user_update() {}
 
@@ -62,6 +65,7 @@ pub fn openapi_user_update() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_user_change_password` free function.
 #[instrument_trace]
 pub fn openapi_user_change_password() {}
 
@@ -78,6 +82,7 @@ pub fn openapi_user_change_password() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_user_update_status` free function.
 #[instrument_trace]
 pub fn openapi_user_update_status() {}
 
@@ -95,5 +100,6 @@ pub fn openapi_user_update_status() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_user_delete` free function.
 #[instrument_trace]
 pub fn openapi_user_delete() {}

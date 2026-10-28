@@ -19,10 +19,7 @@ pub fn socket_url() -> String {
         "ws"
     };
     let host: String = location.host().unwrap_or_default();
-    format!(
-        "{protocol}://{host}{PATH_GOMOKU}?{QUERY_UID}={}",
-        user_id()
-    )
+    format!("{protocol}://{host}{PATH_GOMOKU}?{QUERY_UID}={}", user_id())
 }
 
 /// Returns the identifier of the visitor.
@@ -116,13 +113,13 @@ pub fn connect(on_frame: Rc<dyn Fn(GomokuFrame)>, on_connected: Rc<dyn Fn(bool)>
 ///
 /// - `&str` - The kind of the frame.
 /// - `&str` - The room the frame belongs to.
-/// - `serde_json::Value` - The payload of the frame.
+/// - `Value` - The payload of the frame.
 ///
 /// # Returns
 ///
 /// - `()` - The frame has been handed to the socket of the browser.
-pub fn send(kind: &str, room_id: &str, payload: serde_json::Value) {
-    let frame: serde_json::Value = serde_json::json!({
+pub fn send(kind: &str, room_id: &str, payload: Value) {
+    let frame: Value = serde_json::json!({
         "type": kind,
         "room_id": room_id,
         "payload": payload,
@@ -186,11 +183,7 @@ fn schedule_reconnect(on_frame: Rc<dyn Fn(GomokuFrame)>, on_connected: Rc<dyn Fn
 fn generated_user_id() -> String {
     let moment: u64 = js_sys::Date::now() as u64;
     let noise: u64 = (js_sys::Math::random() * 1_000_000.0) as u64;
-    format!(
-        "{PREFIX_USER_ID}{}_{}",
-        to_base(moment),
-        to_base(noise)
-    )
+    format!("{PREFIX_USER_ID}{}_{}", to_base(moment), to_base(noise))
 }
 
 /// Writes a number in the base the identifiers of the visitors use.

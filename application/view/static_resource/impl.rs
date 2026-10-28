@@ -35,9 +35,19 @@ impl ServerHook for StaticResourceRoute {
     /// - `Status` - The handle result.
     #[prologue_macros(
         methods(get),
-        try_get_route_param(PATH_KEY => path_opt),
+        try_get_route_param(path_key() => path_opt),
         try_get_request_header(RANGE => range_header_opt)
     )]
+    /// Implements the `handle` operation on [`StaticResourceRoute`].
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - Mutable reference to a `Stream` (mutated in place).
+    /// - `&mut Context` - Mutable reference to a `Context` (mutated in place).
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - A `Status` value.
     #[instrument_trace]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let path: String = path_opt.unwrap_or_default();
@@ -53,7 +63,7 @@ impl ServerHook for StaticResourceRoute {
                 return Status::Continue;
             }
         };
-        let base_canonical: PathBuf = match fs::canonicalize(STATIC_RESOURCES_DIR) {
+        let base_canonical: PathBuf = match fs::canonicalize(static_resources_dir()) {
             Ok(p) => p,
             Err(_) => {
                 ctx.get_mut_response().set_status_code(500);

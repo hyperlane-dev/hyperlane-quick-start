@@ -5,7 +5,8 @@ pub(crate) const ICON_JSON: &str = "🧾";
 pub(crate) const TITLE_HEADER: &str = "Hyperlane JSON Editor";
 
 /// The subtitle of the page header.
-pub(crate) const TEXT_HEADER: &str = "Parse, edit and format JSON with nested string deserialization";
+pub(crate) const TEXT_HEADER: &str =
+    "Parse, edit and format JSON with nested string deserialization";
 
 /// The title of the card that holds the document.
 pub(crate) const TITLE_INPUT: &str = "Enter JSON string with escaped content";

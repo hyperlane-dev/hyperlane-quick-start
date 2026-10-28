@@ -1,5 +1,28 @@
 use super::*;
 
+/// Renders the euv button with a signal-backed disabled attribute.
+///
+/// # Arguments
+///
+/// - `VirtualNode<EuvButtonProps>` - The feed control button properties.
+///
+/// # Returns
+///
+/// - `VirtualNode` - The euv button with reactive native disabled semantics.
+#[component]
+fn rss_control_button(node: VirtualNode<EuvButtonProps>) -> VirtualNode {
+    let disabled: Signal<bool> = node.try_get_props().unwrap_or_default().disabled;
+    let mut rendered: VirtualNode = euv_button(node);
+    if let VirtualNode::Element { attributes, .. } = &mut rendered {
+        for attribute in attributes.iter_mut() {
+            if attribute.get_name().as_ref() == ATTRIBUTE_DISABLED {
+                *attribute = AttributeEntry::new(attribute.get_name().clone(), disabled.into());
+            }
+        }
+    }
+    rendered
+}
+
 /// Renders the rss page.
 ///
 /// The page shows the channel of the feed, the items of the page being
@@ -81,26 +104,23 @@ pub fn rss_page(node: VirtualNode<RssPageProps>) -> VirtualNode {
                     class: c_rss_controls_group()
                     div {
                         class: c_rss_page_size()
-                        label {
-                            class: format!("{} {}", c_form_label().get_name(), c_rss_page_size_label().get_name())
-                            LABEL_PAGE_SIZE
-                        }
-                        select {
-                            class: c_select_input()
-                            value: state.get_page_size().get().to_string()
-                            onchange: page_size_handler(state)
-                            for &size in PAGE_SIZES {
-                                option {
-                                    value: size
-                                    size
-                                }
-                            }
+                        euv_select {
+                            label: LABEL_PAGE_SIZE
+                            value: state.get_page_size_value()
+                            disabled: state.get_loading().get()
+                            options: PAGE_SIZES.iter().map(|&size: &&str| EuvSelectOption {
+                                value: size,
+                                label: size,
+                                ..EuvSelectOption::default()
+                            }).collect::<Vec<EuvSelectOption>>()
+                            on_change: page_size_handler(state)
                         }
                     }
                     div {
                         class: c_hls_button_row()
-                        euv_button {
+                        rss_control_button {
                             variant: EuvButtonVariant::Primary
+                            disabled: state.get_loading()
                             onclick: refresh_handler(state)
                             LABEL_REFRESH
                         }
@@ -110,8 +130,9 @@ pub fn rss_page(node: VirtualNode<RssPageProps>) -> VirtualNode {
                     class: c_rss_controls_group()
                     div {
                         class: c_hls_button_row()
-                        euv_button {
+                        rss_control_button {
                             variant: EuvButtonVariant::Outline
+                            disabled: state.get_previous_disabled()
                             onclick: previous_page_handler(state)
                             LABEL_PREVIOUS
                         }
@@ -122,8 +143,9 @@ pub fn rss_page(node: VirtualNode<RssPageProps>) -> VirtualNode {
                     }
                     div {
                         class: c_hls_button_row()
-                        euv_button {
+                        rss_control_button {
                             variant: EuvButtonVariant::Outline
+                            disabled: state.get_next_disabled()
                             onclick: next_page_handler(state)
                             LABEL_NEXT
                         }
@@ -151,11 +173,7 @@ pub fn rss_item(node: VirtualNode<RssItemProps>) -> VirtualNode {
     let description: String = item.description.clone();
     let pub_date: String = item.pub_date.clone();
     let (download, size, file_type) = match item.enclosure.clone() {
-        Some(enclosure) => (
-            enclosure.url,
-            enclosure.length,
-            enclosure.file_type,
-        ),
+        Some(enclosure) => (enclosure.url, enclosure.length, enclosure.file_type),
         None => (String::new(), String::new(), String::new()),
     };
     let has_download: bool = !download.is_empty();
@@ -190,7 +208,7 @@ pub fn rss_item(node: VirtualNode<RssItemProps>) -> VirtualNode {
                             file_type.as_str()
                         }
                     }
-                    if has_download == true {
+                    if has_download {
                         a {
                             class: c_rss_item_download()
                             href: download.clone()
@@ -212,10 +230,9 @@ pub fn rss_item(node: VirtualNode<RssItemProps>) -> VirtualNode {
 ///
 /// # Returns
 ///
-/// - `Option<Rc<dyn Fn(Event)>>` - The change handler.
-fn page_size_handler(state: RssState) -> Option<Rc<dyn Fn(Event)>> {
-    Some(Rc::new(move |event: Event| {
-        let value: String = select_value(&event);
+/// - `Option<Rc<dyn Fn(&'static str)>>` - The change handler.
+fn page_size_handler(state: RssState) -> Option<Rc<dyn Fn(&'static str)>> {
+    Some(Rc::new(move |value: &'static str| {
         let Ok(size) = value.parse::<i32>() else {
             return;
         };
@@ -276,23 +293,4 @@ fn next_page_handler(state: RssState) -> Option<Rc<dyn Fn(Event)>> {
             spawn_local(load_feed(state));
         }
     }))
-}
-
-/// Reads the value of the select the event came from.
-///
-/// # Arguments
-///
-/// - `&Event` - The event the value is read from.
-///
-/// # Returns
-///
-/// - `String` - The value of the select, empty when the event carried none.
-fn select_value(event: &Event) -> String {
-    let Some(target): Option<EventTarget> = event.target() else {
-        return String::new();
-    };
-    let Ok(element): Result<HtmlSelectElement, EventTarget> = target.dyn_into() else {
-        return String::new();
-    };
-    element.value()
 }

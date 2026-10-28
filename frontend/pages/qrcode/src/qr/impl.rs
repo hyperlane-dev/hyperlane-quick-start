@@ -31,6 +31,7 @@ impl QrErrorLevel {
     }
 }
 
+/// Inherent implementation of [`QrBuilder`].
 impl QrBuilder {
     /// Creates the builder of one matrix.
     ///
@@ -186,11 +187,7 @@ impl QrBuilder {
         for dy in -2i32..=2 {
             for dx in -2i32..=2 {
                 let dark: bool = dx.abs().max(dy.abs()) != 1;
-                self.mark_function(
-                    (x as i32 + dx) as usize,
-                    (y as i32 + dy) as usize,
-                    dark,
-                );
+                self.mark_function((x as i32 + dx) as usize, (y as i32 + dy) as usize, dark);
             }
         }
     }
@@ -351,13 +348,17 @@ impl QrBuilder {
         }
         score += self.finder_penalty();
         let total: u32 = (self.get_size() * self.get_size()) as u32;
-        let dark: u32 = self.get_modules().iter().filter(|module: &&bool| **module).count() as u32;
+        let dark: u32 = self
+            .get_modules()
+            .iter()
+            .filter(|module: &&bool| **module)
+            .count() as u32;
         let step: u32 = total / 20;
         let deviation: u32 = (2 * dark).abs_diff(total);
         let steps: u32 = if deviation <= step {
             0
         } else {
-            (deviation - step + step - 1) / step
+            (deviation - step).div_ceil(step)
         };
         score += steps * PENALTY_N4;
         score
@@ -432,8 +433,8 @@ impl QrBuilder {
             }
         }
         let before: bool = x >= 4 && (0..4).all(|offset: usize| !self.get(x - 4 + offset, y));
-        let after: bool = x + 11 <= self.get_size()
-            && (0..4).all(|offset: usize| !self.get(x + 7 + offset, y));
+        let after: bool =
+            x + 11 <= self.get_size() && (0..4).all(|offset: usize| !self.get(x + 7 + offset, y));
         before || after
     }
 
@@ -455,8 +456,8 @@ impl QrBuilder {
             }
         }
         let before: bool = y >= 4 && (0..4).all(|offset: usize| !self.get(x, y - 4 + offset));
-        let after: bool = y + 11 <= self.get_size()
-            && (0..4).all(|offset: usize| !self.get(x, y + 7 + offset));
+        let after: bool =
+            y + 11 <= self.get_size() && (0..4).all(|offset: usize| !self.get(x, y + 7 + offset));
         before || after
     }
 

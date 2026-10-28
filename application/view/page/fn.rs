@@ -19,7 +19,7 @@ use super::*;
 ///
 /// - `Status` - The handle result.
 pub fn serve_page(ctx: &mut Context, name: &str) -> Status {
-    let path: PathBuf = PathBuf::from(STATIC_RESOURCES_DIR)
+    let path: PathBuf = PathBuf::from(static_resources_dir())
         .join(name)
         .join(PAGE_INDEX_NAME);
     let Ok(content) = fs::read(&path) else {

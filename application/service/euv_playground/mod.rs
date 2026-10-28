@@ -1,13 +1,16 @@
 mod r#const;
+mod r#fn;
 mod r#impl;
 mod r#static;
 mod r#struct;
 mod r#type;
 
-pub use {r#const::*, r#static::*, r#struct::*, r#type::*};
+pub use r#fn::*;
+pub use {r#struct::*, r#type::*};
+
+pub(crate) use {r#const::*, r#static::*};
 
 use super::*;
-
 use std::{
     collections::HashMap,
     env::{split_paths, temp_dir, var_os},

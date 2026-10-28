@@ -17,7 +17,7 @@ pub(crate) const DESCRIPTION: &str = "The page you are looking for might have be
 pub(crate) const LABEL_HOME: &str = "Back to Home";
 
 /// The address of the home page of the server.
-pub(crate) const URL_HOME: &str = "/";
+pub(crate) const URL_HOME: &str = "/templates";
 
 /// The label of the link to the repository of the server.
 pub(crate) const LABEL_REPOSITORY: &str = "Hyperlane repository";

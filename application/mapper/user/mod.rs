@@ -4,8 +4,9 @@ mod r#impl;
 mod r#struct;
 mod r#type;
 
-pub use {r#const::*, r#enum::*, r#struct::*, r#type::*};
+pub use {r#enum::*, r#struct::*, r#type::*};
 
-use std::str::FromStr;
+pub(crate) use r#const::*;
 
 use super::*;
+use std::str::FromStr;

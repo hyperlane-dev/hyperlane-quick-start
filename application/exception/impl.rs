@@ -35,6 +35,16 @@ impl ServerHook for TaskPanicHook {
         response_header(SERVER => HYPERLANE),
         response_header(CONTENT_TYPE, &self.get_content_type()),
     )]
+    /// Implements the `handle` operation on [`TaskPanicHook`].
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - Mutable reference to a `Stream` (mutated in place).
+    /// - `&mut Context` - Mutable reference to a `Context` (mutated in place).
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - A `Status` value.
     #[epilogue_macros(response_body(&response_body), try_send)]
     #[instrument_trace]
     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
@@ -87,6 +97,16 @@ impl ServerHook for RequestErrorHook {
         response_header(CONTENT_TYPE, &self.get_content_type()),
         response_header(TRACE => uuid::Uuid::new_v4().to_string()),
     )]
+    /// Implements the `handle` operation on [`RequestErrorHook`].
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - Mutable reference to a `Stream` (mutated in place).
+    /// - `&mut Context` - Mutable reference to a `Context` (mutated in place).
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - A `Status` value.
     #[epilogue_macros(response_body(&response_body), try_send)]
     #[instrument_trace]
     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {

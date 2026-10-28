@@ -119,8 +119,12 @@ pub fn use_order_state() -> OrderState {
 pub async fn load_current_user(state: OrderState) {
     match get_json::<UserProfile>(PATH_USER_INFO).await {
         Ok(user) => {
-            state.get_profile_email().set(user.email.clone().unwrap_or_default());
-            state.get_profile_phone().set(user.phone.clone().unwrap_or_default());
+            state
+                .get_profile_email()
+                .set(user.email.clone().unwrap_or_default());
+            state
+                .get_profile_phone()
+                .set(user.phone.clone().unwrap_or_default());
             state.get_current_user().set(Some(user));
             state.get_error().set(EMPTY.to_string());
         }
@@ -178,7 +182,10 @@ pub async fn load_records(state: OrderState) {
         path.push_str(&format!("&category={}", encode_uri_component(&category)));
     }
     if !kind.is_empty() {
-        path.push_str(&format!("&transaction_type={}", encode_uri_component(&kind)));
+        path.push_str(&format!(
+            "&transaction_type={}",
+            encode_uri_component(&kind)
+        ));
     }
     match get_json::<RecordList>(&path).await {
         Ok(list) => {

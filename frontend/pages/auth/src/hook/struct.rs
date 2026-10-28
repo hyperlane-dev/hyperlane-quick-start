@@ -1,7 +1,7 @@
 use super::*;
 
 /// The reactive state the authentication page renders from.
-#[derive(Clone, Copy, CustomDebug, Data, Default, New)]
+#[derive(Clone, Copy, CustomDebug, Data, Default)]
 pub struct AuthState {
     /// The form being displayed.
     #[get(type(copy))]

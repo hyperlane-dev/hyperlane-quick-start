@@ -2,8 +2,9 @@ mod r#const;
 mod r#enum;
 mod r#impl;
 
-pub use {r#const::*, r#enum::*};
+pub use r#enum::*;
 
-use std::fmt::Display;
+pub(crate) use r#const::*;
 
 use super::*;
+use std::fmt::Display;

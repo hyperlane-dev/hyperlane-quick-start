@@ -25,8 +25,11 @@ pub fn notification_page(node: VirtualNode<NotificationPageProps>) -> VirtualNod
                 title: TITLE_HEADER
                 subtitle: TEXT_HEADER
             }
-            div {
-                class: c_notification_stats()
+            euv_grid {
+                cols: vec![EuvGridCol {
+                    span: 8, offset: 0
+                }; 3]
+                gutter: true
                 stat_tile {
                     label: LABEL_TOTAL
                     value: state.get_total().get().to_string()
@@ -255,9 +258,10 @@ pub fn filter_button(node: VirtualNode<FilterButtonProps>) -> VirtualNode {
         label,
     }: FilterButtonProps = node.try_get_props().unwrap_or_default();
     let active: bool = filter_of(&state, kind) == value;
-    let handler: Option<Rc<dyn Fn(Event)>> = filter_handler(state, kind.to_string(), value.to_string());
+    let handler: Option<Rc<dyn Fn(Event)>> =
+        filter_handler(state, kind.to_string(), value.to_string());
     html! {
-        if active == true {
+        if active {
             div {
                 class: c_hls_button_row()
                 euv_button {
@@ -290,11 +294,8 @@ pub fn filter_button(node: VirtualNode<FilterButtonProps>) -> VirtualNode {
 /// - `VirtualNode` - The metric tile tree.
 #[component]
 pub fn stat_tile(node: VirtualNode<StatTileProps>) -> VirtualNode {
-    let StatTileProps {
-        label,
-        value,
-        icon,
-    }: StatTileProps = node.try_get_props().unwrap_or_default();
+    let StatTileProps { label, value, icon }: StatTileProps =
+        node.try_get_props().unwrap_or_default();
     html! {
         div {
             class: c_hls_stat_card()
@@ -325,8 +326,10 @@ pub fn stat_tile(node: VirtualNode<StatTileProps>) -> VirtualNode {
 /// - `VirtualNode` - The notification row tree.
 #[component]
 pub fn notification_row(node: VirtualNode<NotificationRowProps>) -> VirtualNode {
-    let NotificationRowProps { state, notification }: NotificationRowProps =
-        node.try_get_props().unwrap_or_default();
+    let NotificationRowProps {
+        state,
+        notification,
+    }: NotificationRowProps = node.try_get_props().unwrap_or_default();
     let notification_id: String = notification.id.clone();
     let read_id: String = notification.id.clone();
     let delete_id: String = notification.id.clone();
@@ -367,7 +370,7 @@ pub fn notification_row(node: VirtualNode<NotificationRowProps>) -> VirtualNode 
             }
             div {
                 class: c_notification_item_actions()
-                if unread == true {
+                if unread {
                     div {
                         class: c_hls_button_row()
                         euv_button {
@@ -485,7 +488,7 @@ pub fn notification_detail(node: VirtualNode<NotificationDetailProps>) -> Virtua
                 }
                 span {
                     class: c_info_value()
-                    if read == true {
+                    if read {
                         TEXT_DETAIL_READ
                     } else {
                         TEXT_DETAIL_UNREAD
@@ -538,6 +541,7 @@ pub fn notification_form(node: VirtualNode<NotificationFormProps>) -> VirtualNod
                 class: c_textarea_input()
                 placeholder: PLACEHOLDER_CONTENT
                 rows: ROWS_CONTENT
+                value: state.get_create_content()
                 oninput: create_content_handler(state)
             }
             div {

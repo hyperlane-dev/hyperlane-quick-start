@@ -59,7 +59,7 @@ pub struct GomokuFrame {
     /// The identifier of the sender of the frame.
     pub sender_id: String,
     /// The payload of the frame.
-    pub payload: serde_json::Value,
+    pub payload: Value,
     /// The moment the frame was sent.
     pub time: i64,
 }

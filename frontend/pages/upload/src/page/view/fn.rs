@@ -205,7 +205,8 @@ pub fn upload_row(node: VirtualNode<UploadRowProps>) -> VirtualNode {
 /// - `VirtualNode` - The row tree.
 #[component]
 pub fn upload_history_row(node: VirtualNode<UploadHistoryProps>) -> VirtualNode {
-    let UploadHistoryProps { state, item }: UploadHistoryProps = node.try_get_props().unwrap_or_default();
+    let UploadHistoryProps { state, item }: UploadHistoryProps =
+        node.try_get_props().unwrap_or_default();
     let _state: UploadState = state;
     html! {
         div {
@@ -334,7 +335,8 @@ fn picked_files(event: &Event) -> Option<Vec<File>> {
 /// - `()` - The history has been imported.
 async fn read_and_import(state: UploadState, file: File) {
     let promise: Promise = file.text();
-    let Ok(value): Result<JsValue, JsValue> = euv::wasm_bindgen_futures::JsFuture::from(promise).await
+    let Ok(value): Result<JsValue, JsValue> =
+        euv::wasm_bindgen_futures::JsFuture::from(promise).await
     else {
         return;
     };

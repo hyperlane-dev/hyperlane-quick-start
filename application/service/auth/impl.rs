@@ -69,9 +69,7 @@ impl AuthService {
             && cache.created_at.elapsed().as_secs() < RSA_KEY_CACHE_TTL_SECS
         {
             let response: RsaPublicKeyResponse = serde_json::from_str(&cache.response_json)
-                .map_err(|error: serde_json::Error| {
-                    format!("Failed to parse cached key: {}", error)
-                })?;
+                .map_err(|error: Error| format!("Failed to parse cached key: {}", error))?;
             return Ok(response);
         }
         let (private_key, public_key): (RsaPrivateKey, rsa::RsaPublicKey) =
@@ -81,7 +79,7 @@ impl AuthService {
         let mut response: RsaPublicKeyResponse = RsaPublicKeyResponse::default();
         response.set_modulus(n_b64).set_exponent(e_b64);
         let response_json: String = serde_json::to_string(&response)
-            .map_err(|error: serde_json::Error| format!("Failed to serialize key: {}", error))?;
+            .map_err(|error: Error| format!("Failed to serialize key: {}", error))?;
         let cache: RsaKeyCache = RsaKeyCache {
             response_json,
             created_at: Instant::now(),
@@ -123,7 +121,7 @@ impl AuthService {
     /// - `Result<String, String>` - The encoded string, or an error if encoding fails.
     #[instrument_trace]
     pub fn encode_id(id: i32) -> Result<String, String> {
-        Encode::execute(CHARSETS, &id.to_string())
+        Encode::execute(charsets(), &id.to_string())
             .map_err(|_: EncodeError| ERROR_FAILED_TO_ENCODE_ID.to_string())
     }
 
@@ -138,7 +136,7 @@ impl AuthService {
     /// - `Result<i32, String>` - The decoded numeric ID, or an error if the format is invalid.
     #[instrument_trace]
     pub fn decode_id(encoded_id: &str) -> Result<i32, String> {
-        Decode::execute(CHARSETS, encoded_id)
+        Decode::execute(charsets(), encoded_id)
             .map_err(|_: DecodeError| ERROR_INVALID_ID_FORMAT.to_string())?
             .parse::<i32>()
             .map_err(|_: ParseIntError| ERROR_INVALID_ID_FORMAT.to_string())
@@ -166,16 +164,15 @@ impl AuthService {
             JwtConfigEnum::Issuer.to_string(),
         );
         let jwt_service: JwtService = JwtService::from(jwt_config);
-        let user_id_value: serde_json::Value =
-            match jwt_service.get_from_token(&token, JWT_CLAIM_USER_ID) {
-                Ok(Some(value)) => value,
-                Ok(None) => {
-                    return Err(ERROR_USER_ID_NOT_FOUND_IN_TOKEN.to_string());
-                }
-                Err(_e) => {
-                    return Err(ERROR_INVALID_TOKEN.to_string());
-                }
-            };
+        let user_id_value: Value = match jwt_service.get_from_token(&token, JWT_CLAIM_USER_ID) {
+            Ok(Some(value)) => value,
+            Ok(None) => {
+                return Err(ERROR_USER_ID_NOT_FOUND_IN_TOKEN.to_string());
+            }
+            Err(_e) => {
+                return Err(ERROR_INVALID_TOKEN.to_string());
+            }
+        };
         let user_id: i32 = match user_id_value.as_i64() {
             Some(id) => id as i32,
             None => return Err(ERROR_INVALID_USER_ID_FORMAT_IN_TOKEN.to_string()),

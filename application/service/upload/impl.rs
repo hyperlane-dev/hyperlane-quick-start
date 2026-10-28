@@ -425,8 +425,8 @@ impl UploadService {
     /// - `Result<(Vec<u8>, String), String>` - The file data bytes and content type, or an error.
     #[instrument_trace]
     pub async fn serve_static_file(dir: &str, file: &str) -> Result<(Vec<u8>, String), String> {
-        let decode_dir: String = Decode::execute(CHARSETS, dir).unwrap_or_default();
-        let decode_file: String = Decode::execute(CHARSETS, file).unwrap_or_default();
+        let decode_dir: String = Decode::execute(charsets(), dir).unwrap_or_default();
+        let decode_file: String = Decode::execute(charsets(), file).unwrap_or_default();
         if decode_dir.is_empty() || decode_file.is_empty() {
             return Err(ERROR_INVALID_DIRECTORY_OR_FILE_NAME.to_string());
         }
@@ -531,8 +531,8 @@ impl UploadService {
     ///     error.
     #[instrument_trace]
     fn validate_file_paths(dir: &str, file: &str) -> Result<(String, String), String> {
-        let decode_dir: String = Decode::execute(CHARSETS, dir).unwrap_or_default();
-        let decode_file: String = Decode::execute(CHARSETS, file).unwrap_or_default();
+        let decode_dir: String = Decode::execute(charsets(), dir).unwrap_or_default();
+        let decode_file: String = Decode::execute(charsets(), file).unwrap_or_default();
         if decode_dir.is_empty() || decode_file.is_empty() {
             return Err(ERROR_INVALID_DIRECTORY_OR_FILE_NAME.to_string());
         }
@@ -735,9 +735,9 @@ impl UploadService {
         )
         .map_err(|error: ChunkStrategyError| error.to_string())?;
         let url_encode_dir: String =
-            Encode::execute(CHARSETS, &format!("{base_file_dir}/{file_id}")).unwrap_or_default();
+            Encode::execute(charsets(), &format!("{base_file_dir}/{file_id}")).unwrap_or_default();
         let url_encode_dir_file_name: String =
-            Encode::execute(CHARSETS, file_name).unwrap_or_default();
+            Encode::execute(charsets(), file_name).unwrap_or_default();
         let url: String = format!("/{STATIC_ROUTE}/{url_encode_dir}/{url_encode_dir_file_name}");
         upload_strategy
             .merge_chunks()

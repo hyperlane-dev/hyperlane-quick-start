@@ -61,6 +61,9 @@ pub(crate) const USER_NAME_PREFIX: &str = "User";
 /// The empty text of the page.
 pub(crate) const TEXT_EMPTY: &str = "";
 
+/// The feedback reported when an empty message is submitted.
+pub(crate) const MESSAGE_EMPTY_DRAFT: &str = "Enter a message before sending.";
+
 /// The HTTP method name of a create request.
 pub(crate) const METHOD_POST: &str = "POST";
 

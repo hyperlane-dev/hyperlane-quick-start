@@ -75,8 +75,9 @@ fn rows_of(source: &str) -> Vec<Vec<(String, String)>> {
             None => after.len(),
         };
         let chunk: &str = &after[..end];
+        let normalized: String = chunk.replace("rss_control_button {", "euv_button {");
         let mut buttons: Vec<(String, String)> = Vec::new();
-        for piece in chunk.split("euv_button {").skip(1) {
+        for piece in normalized.split("euv_button {").skip(1) {
             let variant: String = piece
                 .lines()
                 .find(|line: &&str| line.trim_start().starts_with("variant:"))
@@ -105,7 +106,8 @@ fn rows_of(source: &str) -> Vec<Vec<(String, String)>> {
 
 fn buttons_of(source: &str) -> Vec<(String, String)> {
     let mut buttons: Vec<(String, String)> = Vec::new();
-    for piece in source.split("euv_button {").skip(1) {
+    let normalized: String = source.replace("rss_control_button {", "euv_button {");
+    for piece in normalized.split("euv_button {").skip(1) {
         let variant: String = piece
             .lines()
             .find(|line: &&str| line.trim_start().starts_with("variant:"))
@@ -198,4 +200,32 @@ fn the_action_of_a_row_wears_the_primary_variant() {
         offenders.is_empty(),
         "the action of a row must wear the primary variant: {offenders:?}"
     );
+}
+
+#[test]
+fn the_rss_adapter_remains_subject_to_action_variant_checks() {
+    let primary: Vec<(String, String)> =
+        buttons_of("rss_control_button {\nvariant: EuvButtonVariant::Primary\nLABEL_REFRESH\n}");
+    let outline: Vec<(String, String)> =
+        buttons_of("rss_control_button {\nvariant: EuvButtonVariant::Outline\nLABEL_REFRESH\n}");
+    assert_eq!(primary.len(), 1);
+    assert_eq!(outline.len(), 1);
+    assert_eq!(primary[0].1, "LABEL_REFRESH");
+    assert_eq!(outline[0].1, "LABEL_REFRESH");
+    assert!(is_primary(&primary[0].0));
+    assert!(!is_primary(&outline[0].0));
+}
+
+#[test]
+fn a_row_counts_primary_buttons_inside_the_rss_adapter() {
+    let rows: Vec<Vec<(String, String)>> = rows_of(
+        "class: c_hls_button_row()\neuv_button {\nvariant: Primary\nLABEL_REFRESH\n}\nrss_control_button {\nvariant: Primary\nLABEL_NEXT\n}",
+    );
+    assert_eq!(rows.len(), 1);
+    assert_eq!(rows[0].len(), 2);
+    let primary_count: usize = rows[0]
+        .iter()
+        .filter(|button: &&(String, String)| is_primary(&button.0))
+        .count();
+    assert_eq!(primary_count, 2);
 }

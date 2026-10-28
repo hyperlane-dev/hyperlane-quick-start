@@ -18,6 +18,7 @@ use {
     euv_ui::*,
     hyperlane_frontend_shared::*,
     serde::{Deserialize, Serialize},
+    serde_json::Value,
 };
 
 /// Mounts the tracking page into the document.

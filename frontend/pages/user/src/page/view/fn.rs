@@ -24,8 +24,11 @@ pub fn user_page(node: VirtualNode<UserPageProps>) -> VirtualNode {
                 title: TITLE_HEADER
                 subtitle: TEXT_HEADER
             }
-            div {
-                class: c_user_stats()
+            euv_grid {
+                cols: vec![EuvGridCol {
+                    span: 8, offset: 0
+                }; 3]
+                gutter: true
                 stat_tile {
                     label: LABEL_TOTAL
                     value: state.get_total().get().to_string()
@@ -169,11 +172,8 @@ pub fn user_list_panel(node: VirtualNode<UserListProps>) -> VirtualNode {
 /// - `VirtualNode` - The metric tile tree.
 #[component]
 pub fn stat_tile(node: VirtualNode<StatTileProps>) -> VirtualNode {
-    let StatTileProps {
-        label,
-        value,
-        icon,
-    }: StatTileProps = node.try_get_props().unwrap_or_default();
+    let StatTileProps { label, value, icon }: StatTileProps =
+        node.try_get_props().unwrap_or_default();
     html! {
         div {
             class: c_hls_stat_card()
@@ -253,7 +253,7 @@ pub fn user_row(node: VirtualNode<UserRowProps>) -> VirtualNode {
                         LABEL_OPEN
                     }
                 }
-                if approvable == true {
+                if approvable {
                     div {
                         class: c_hls_button_row()
                         euv_button {
@@ -263,7 +263,7 @@ pub fn user_row(node: VirtualNode<UserRowProps>) -> VirtualNode {
                         }
                     }
                 }
-                if rejectable == true {
+                if rejectable {
                     div {
                         class: c_hls_button_row()
                         euv_button {
@@ -740,12 +740,10 @@ fn open_user_handler(state: UserState, id: String) -> Option<Rc<dyn Fn(Event)>> 
 /// - `Option<Rc<dyn Fn(Event)>>` - The click handler.
 fn approve_handler(state: UserState, id: String) -> Option<Rc<dyn Fn(Event)>> {
     Some(Rc::new(move |_: Event| {
-        state
-            .get_confirm()
-            .set(Some(PendingAction {
-                kind: ACTION_APPROVE.to_string(),
-                id: id.clone(),
-            }));
+        state.get_confirm().set(Some(PendingAction {
+            kind: ACTION_APPROVE.to_string(),
+            id: id.clone(),
+        }));
     }))
 }
 
@@ -761,12 +759,10 @@ fn approve_handler(state: UserState, id: String) -> Option<Rc<dyn Fn(Event)>> {
 /// - `Option<Rc<dyn Fn(Event)>>` - The click handler.
 fn reject_handler(state: UserState, id: String) -> Option<Rc<dyn Fn(Event)>> {
     Some(Rc::new(move |_: Event| {
-        state
-            .get_confirm()
-            .set(Some(PendingAction {
-                kind: ACTION_REJECT.to_string(),
-                id: id.clone(),
-            }));
+        state.get_confirm().set(Some(PendingAction {
+            kind: ACTION_REJECT.to_string(),
+            id: id.clone(),
+        }));
     }))
 }
 
@@ -782,12 +778,10 @@ fn reject_handler(state: UserState, id: String) -> Option<Rc<dyn Fn(Event)>> {
 /// - `Option<Rc<dyn Fn(Event)>>` - The click handler.
 fn delete_handler(state: UserState, id: String) -> Option<Rc<dyn Fn(Event)>> {
     Some(Rc::new(move |_: Event| {
-        state
-            .get_confirm()
-            .set(Some(PendingAction {
-                kind: ACTION_DELETE.to_string(),
-                id: id.clone(),
-            }));
+        state.get_confirm().set(Some(PendingAction {
+            kind: ACTION_DELETE.to_string(),
+            id: id.clone(),
+        }));
     }))
 }
 

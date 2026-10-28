@@ -16,6 +16,9 @@ pub(crate) const PAGE_SIZE: i32 = 10;
 /// The first page of a list.
 pub(crate) const PAGE_FIRST: i32 = 1;
 
+/// The feedback reported when an empty comment is submitted.
+pub(crate) const MESSAGE_EMPTY_COMMENT: &str = "Enter a comment before sending.";
+
 /// The endpoint of the published posts.
 pub(crate) const PATH_POST_LIST: &str = "/api/blog/post/list";
 

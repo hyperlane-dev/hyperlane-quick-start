@@ -23,8 +23,23 @@ pub fn diff_page(node: VirtualNode<DiffPageProps>) -> VirtualNode {
                 title: "Smart Text Diff Tool"
                 subtitle: "Compare two texts and see the lines and the words that changed."
             }
-            div {
-                class: c_diff_panes()
+            if { !state.get_error().get().is_empty() } {
+                euv_alert {
+                    variant: AlertVariant::Error
+                    state.get_error().get().as_str()
+                }
+            }
+            if { !state.get_notice().get().is_empty() } {
+                euv_alert {
+                    variant: AlertVariant::Success
+                    state.get_notice().get().as_str()
+                }
+            }
+            euv_grid {
+                cols: vec![EuvGridCol {
+                    span: 12, offset: 0
+                }; 2]
+                gutter: true
                 euv_card {
                     title: TITLE_ORIGINAL
                     div {
@@ -74,8 +89,11 @@ pub fn diff_page(node: VirtualNode<DiffPageProps>) -> VirtualNode {
             }
             div {
                 class: c_diff_toolbar()
-                div {
-                    class: c_diff_stats()
+                euv_grid {
+                    cols: vec![EuvGridCol {
+                        span: 8, offset: 0
+                    }; 3]
+                    gutter: true
                     diff_stat {
                         label: LABEL_ADDED
                         value: state.get_added().get().to_string()
@@ -91,6 +109,16 @@ pub fn diff_page(node: VirtualNode<DiffPageProps>) -> VirtualNode {
                 }
                 div {
                     class: c_hls_button_row()
+                    euv_button {
+                        variant: EuvButtonVariant::Primary
+                        onclick: Some(Rc::new(move |_: Event| load_example(state)))
+                        "Load example"
+                    }
+                    euv_button {
+                        variant: EuvButtonVariant::Outline
+                        onclick: Some(Rc::new(move |_: Event| swap_texts(state)))
+                        "Swap texts"
+                    }
                     euv_button {
                         variant: EuvButtonVariant::Outline
                         onclick: clear_handler(state)
@@ -479,8 +507,7 @@ fn modified_handler(state: DiffState) -> Option<Rc<dyn Fn(Event)>> {
 /// - `Option<Rc<dyn Fn(Event)>>` - The click handler.
 fn copy_original_handler(state: DiffState) -> Option<Rc<dyn Fn(Event)>> {
     Some(Rc::new(move |_: Event| {
-        let text: String = state.get_original().get();
-        copy_to_clipboard(&text);
+        spawn_local(copy_text(state, true));
     }))
 }
 
@@ -495,8 +522,7 @@ fn copy_original_handler(state: DiffState) -> Option<Rc<dyn Fn(Event)>> {
 /// - `Option<Rc<dyn Fn(Event)>>` - The click handler.
 fn copy_modified_handler(state: DiffState) -> Option<Rc<dyn Fn(Event)>> {
     Some(Rc::new(move |_: Event| {
-        let text: String = state.get_modified().get();
-        copy_to_clipboard(&text);
+        spawn_local(copy_text(state, false));
     }))
 }
 
@@ -513,21 +539,8 @@ fn clear_handler(state: DiffState) -> Option<Rc<dyn Fn(Event)>> {
     Some(Rc::new(move |_: Event| {
         state.get_original().set(TEXT_EMPTY.to_string());
         state.get_modified().set(TEXT_EMPTY.to_string());
+        state.get_error().set(TEXT_EMPTY.to_string());
+        state.get_notice().set(TEXT_EMPTY.to_string());
         recompute(state);
     }))
-}
-
-/// Copies a text into the clipboard of the browser.
-///
-/// # Arguments
-///
-/// - `&str` - The text to copy.
-///
-/// # Returns
-///
-/// - `()` - The text has been handed to the clipboard of the browser.
-fn copy_to_clipboard(text: &str) {
-    let encoded: String = serde_json::to_string(text).unwrap_or_default();
-    let script: String = format!("navigator.clipboard.writeText({encoded})");
-    let _: Result<JsValue, JsValue> = js_sys::eval(&script);
 }

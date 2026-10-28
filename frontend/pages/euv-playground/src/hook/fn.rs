@@ -144,9 +144,7 @@ pub async fn create_project(state: PlaygroundState) {
     let name: String = state.get_new_name().get();
     let name: String = name.trim().to_string();
     if name.is_empty() {
-        state
-            .get_error()
-            .set(MESSAGE_NAME_REQUIRED.to_string());
+        state.get_error().set(MESSAGE_NAME_REQUIRED.to_string());
         return;
     }
     let body: PlaygroundCreateRequest = PlaygroundCreateRequest { name };
@@ -274,9 +272,7 @@ pub async fn run_project(state: PlaygroundState) {
         return;
     }
     let Some(current) = state.get_current().get() else {
-        state
-            .get_error()
-            .set(MESSAGE_NO_PROJECT.to_string());
+        state.get_error().set(MESSAGE_NO_PROJECT.to_string());
         return;
     };
     if state.get_dirty().get() {
@@ -334,39 +330,37 @@ async fn follow_build(state: PlaygroundState, job_id: String, started_at: i64) {
         }
         let elapsed: i64 = (now_millis() - started_at) / MILLIS_SECOND;
         match get_json::<PlaygroundBuildStatus>(&path).await {
-            Ok(build) => {
-                match build.status.as_str() {
-                    STATUS_PENDING => {
-                        state
-                            .get_status()
-                            .set(format!("{MESSAGE_QUEUED} ({elapsed}s)"));
-                    }
-                    STATUS_RUNNING => {
-                        state
-                            .get_status()
-                            .set(format!("{MESSAGE_BUILDING} ({elapsed}s)"));
-                    }
-                    STATUS_SUCCESS => {
-                        state.get_running().set(false);
-                        state.get_status().set(MESSAGE_RUNNING.to_string());
-                        state.get_preview_url().set(build.build_url);
-                        return;
-                    }
-                    STATUS_FAILED => {
-                        state.get_running().set(false);
-                        state.get_status().set(MESSAGE_BUILD_FAILED.to_string());
-                        state.get_stderr().set(failure_text(&build.stderr));
-                        return;
-                    }
-                    _ => {
-                        state.get_running().set(false);
-                        state
-                            .get_status()
-                            .set(format!("{MESSAGE_UNKNOWN_STATUS} {}", build.status));
-                        return;
-                    }
+            Ok(build) => match build.status.as_str() {
+                STATUS_PENDING => {
+                    state
+                        .get_status()
+                        .set(format!("{MESSAGE_QUEUED} ({elapsed}s)"));
                 }
-            }
+                STATUS_RUNNING => {
+                    state
+                        .get_status()
+                        .set(format!("{MESSAGE_BUILDING} ({elapsed}s)"));
+                }
+                STATUS_SUCCESS => {
+                    state.get_running().set(false);
+                    state.get_status().set(MESSAGE_RUNNING.to_string());
+                    state.get_preview_url().set(build.build_url);
+                    return;
+                }
+                STATUS_FAILED => {
+                    state.get_running().set(false);
+                    state.get_status().set(MESSAGE_BUILD_FAILED.to_string());
+                    state.get_stderr().set(failure_text(&build.stderr));
+                    return;
+                }
+                _ => {
+                    state.get_running().set(false);
+                    state
+                        .get_status()
+                        .set(format!("{MESSAGE_UNKNOWN_STATUS} {}", build.status));
+                    return;
+                }
+            },
             Err(error) => {
                 state.get_error().set(error.message);
             }
@@ -420,10 +414,12 @@ fn schedule_save(state: PlaygroundState) {
     let closure: Closure<dyn FnMut()> = Closure::wrap(Box::new(move || {
         spawn_local(save_project(state));
     }));
-    let Ok(handle): Result<i32, JsValue> = window.set_timeout_with_callback_and_timeout_and_arguments_0(
-        closure.as_ref().unchecked_ref(),
-        SAVE_DELAY_MS,
-    ) else {
+    let Ok(handle): Result<i32, JsValue> = window
+        .set_timeout_with_callback_and_timeout_and_arguments_0(
+            closure.as_ref().unchecked_ref(),
+            SAVE_DELAY_MS,
+        )
+    else {
         return;
     };
     closure.forget();
@@ -487,16 +483,18 @@ fn now_millis() -> i64 {
 async fn sleep(millis: i32) {
     let promise: js_sys::Promise = js_sys::Promise::new(
         &mut |resolve: js_sys::Function, _reject: js_sys::Function| {
-        let Some(window): Option<Window> = window() else {
-            return;
-        };
-        let closure: JsValue = Closure::once_into_js(move || {
-            let _: Result<JsValue, JsValue> = resolve.call0(&JsValue::NULL);
-        });
-        let _: Result<i32, JsValue> = window.set_timeout_with_callback_and_timeout_and_arguments_0(
-            closure.as_ref().unchecked_ref(),
-            millis,
-        );
-    });
+            let Some(window): Option<Window> = window() else {
+                return;
+            };
+            let closure: JsValue = Closure::once_into_js(move || {
+                let _: Result<JsValue, JsValue> = resolve.call0(&JsValue::NULL);
+            });
+            let _: Result<i32, JsValue> = window
+                .set_timeout_with_callback_and_timeout_and_arguments_0(
+                    closure.as_ref().unchecked_ref(),
+                    millis,
+                );
+        },
+    );
     let _: Result<JsValue, JsValue> = JsFuture::from(promise).await;
 }

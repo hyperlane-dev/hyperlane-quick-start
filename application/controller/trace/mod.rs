@@ -3,10 +3,10 @@ mod r#fn;
 mod r#impl;
 mod r#struct;
 
-pub use {r#const::*, r#fn::*};
+pub use r#fn::*;
+
+pub(crate) use r#const::*;
 
 use std::string::FromUtf8Error;
-
-use {super::*, service::trace::*, r#struct::*};
-
 use urlencoding::decode;
+use {super::*, service::trace::*, r#struct::*};

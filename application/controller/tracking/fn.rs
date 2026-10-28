@@ -11,6 +11,7 @@ use super::*;
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_tracking_report` free function.
 #[instrument_trace]
 pub fn openapi_tracking_report() {}
 
@@ -25,5 +26,6 @@ pub fn openapi_tracking_report() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_tracking_query` free function.
 #[instrument_trace]
 pub fn openapi_tracking_query() {}

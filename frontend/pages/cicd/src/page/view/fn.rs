@@ -170,6 +170,7 @@ pub fn cicd_page(node: VirtualNode<CicdPageProps>) -> VirtualNode {
                             class: c_textarea_input()
                             placeholder: PLACEHOLDER_CONFIG
                             rows: ROWS_CONFIG
+                            value: state.get_draft_config()
                             oninput: config_handler(state)
                         }
                         div {
@@ -432,8 +433,11 @@ pub fn run_detail(node: VirtualNode<RunDetailProps>) -> VirtualNode {
 /// - `VirtualNode` - The step tree.
 #[component]
 pub fn step_block(node: VirtualNode<StepBlockProps>) -> VirtualNode {
-    let StepBlockProps { state, run_id, step }: StepBlockProps =
-        node.try_get_props().unwrap_or_default();
+    let StepBlockProps {
+        state,
+        run_id,
+        step,
+    }: StepBlockProps = node.try_get_props().unwrap_or_default();
     let command: String = step.command.clone().unwrap_or_default();
     let output: String = step.output.clone().unwrap_or_default();
     html! {

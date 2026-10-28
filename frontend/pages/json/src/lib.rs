@@ -15,12 +15,12 @@ pub(crate) use {app::*, hook::*, model::*, page::*, style::*};
 
 use {
     euv::{
-        wasm_bindgen_futures::{spawn_local, JsFuture},
+        wasm_bindgen_futures::{JsFuture, spawn_local},
         *,
     },
     euv_ui::*,
     hyperlane_frontend_shared::*,
-    serde_json::Value,
+    serde_json::{Error, Value},
 };
 
 /// Mounts the JSON editor page into the document.

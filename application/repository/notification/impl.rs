@@ -16,7 +16,7 @@ impl NotificationRepository {
         active_model: NotificationActiveModel,
     ) -> Result<NotificationModel, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: NotificationModel = active_model
             .insert(&db)
             .await
@@ -36,7 +36,7 @@ impl NotificationRepository {
     #[instrument_trace]
     pub async fn find_by_id(id: i32) -> Result<Option<NotificationModel>, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: Option<NotificationModel> = NotificationEntity::find_by_id(id)
             .filter(NotificationColumn::IsDeleted.eq(false))
             .one(&db)
@@ -59,7 +59,7 @@ impl NotificationRepository {
         query: NotificationQuery,
     ) -> Result<(Vec<NotificationModel>, i64), String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let mut base_select: sea_orm::Select<NotificationEntity> = NotificationEntity::find();
         if let Some(user_id) = query.try_get_user_id() {
             base_select = base_select.filter(NotificationColumn::UserId.eq(user_id));
@@ -100,7 +100,7 @@ impl NotificationRepository {
     #[instrument_trace]
     pub async fn update_read_status(id: i32, is_read: bool) -> Result<(), String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let notification: NotificationModel = NotificationEntity::find_by_id(id)
             .one(&db)
             .await
@@ -127,7 +127,7 @@ impl NotificationRepository {
     #[instrument_trace]
     pub async fn soft_delete_by_id(id: i32) -> Result<(), String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let notification: NotificationModel = NotificationEntity::find_by_id(id)
             .filter(NotificationColumn::IsDeleted.eq(false))
             .one(&db)
@@ -155,7 +155,7 @@ impl NotificationRepository {
     #[instrument_trace]
     pub async fn count_unread(user_id: i32) -> Result<i64, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let count: i64 = NotificationEntity::find()
             .filter(NotificationColumn::UserId.eq(user_id))
             .filter(NotificationColumn::IsRead.eq(false))

@@ -11,6 +11,7 @@ use super::*;
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_shortlink_query` free function.
 #[instrument_trace]
 pub fn openapi_shortlink_query() {}
 
@@ -25,5 +26,6 @@ pub fn openapi_shortlink_query() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_shortlink_insert` free function.
 #[instrument_trace]
 pub fn openapi_shortlink_insert() {}

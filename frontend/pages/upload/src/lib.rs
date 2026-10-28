@@ -15,13 +15,14 @@ pub(crate) use {app::*, hook::*, model::*, page::*, style::*};
 
 use {
     euv::{
-        js_sys::{Date, Math, Reflect},
+        js_sys::{Array, Date, Math, Reflect},
         wasm_bindgen_futures::{JsFuture, spawn_local},
         *,
     },
     euv_ui::*,
     hyperlane_frontend_shared::*,
     serde::{Deserialize, Serialize},
+    serde_json::Error,
 };
 
 /// Mounts the upload page into the document.

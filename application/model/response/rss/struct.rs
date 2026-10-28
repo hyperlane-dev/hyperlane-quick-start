@@ -4,14 +4,29 @@ use super::*;
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct RssChannel {
     /// The title.
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
     pub(crate) title: String,
     /// The link.
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
     pub(crate) link: String,
     /// The description.
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
     pub(crate) description: String,
     /// The language.
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
     pub(crate) language: String,
     /// The items.
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
     pub(crate) items: Vec<RssItem>,
 }
 
@@ -19,16 +34,34 @@ pub struct RssChannel {
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct RssItem {
     /// The title.
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
     pub(crate) title: String,
     /// The link.
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
     pub(crate) link: String,
     /// The description.
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
     pub(crate) description: String,
     /// The pub date.
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
     pub(crate) pub_date: String,
     /// The guid.
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
     pub(crate) guid: String,
     /// The enclosure.
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
     pub(crate) enclosure: Option<RssEnclosure>,
 }
 
@@ -36,9 +69,17 @@ pub struct RssItem {
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct RssEnclosure {
     /// The url.
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
     pub(crate) url: String,
     /// The length.
-    #[get(type(copy))]
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
     pub(crate) length: u64,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
     pub(crate) r#type: String,
 }

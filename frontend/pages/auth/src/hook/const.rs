@@ -25,6 +25,15 @@ pub(crate) const QUERY_LOCATION: &str = "location";
 /// The page a visitor lands on when no return page is requested.
 pub(crate) const DEFAULT_LOCATION: &str = "/";
 
+/// The prefix required for a same-site return path.
+pub(crate) const RETURN_PATH_PREFIX: &str = "/";
+
+/// The prefix of a scheme-relative external address.
+pub(crate) const EXTERNAL_PATH_PREFIX: &str = "//";
+
+/// The separator browsers may normalize into a URL slash.
+pub(crate) const RETURN_PATH_BACKSLASH: char = '\\';
+
 /// The failure reported when a required field is empty.
 pub(crate) const ERROR_EMPTY_FIELDS: &str = "Please fill in all fields";
 

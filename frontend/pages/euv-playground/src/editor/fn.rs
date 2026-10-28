@@ -29,20 +29,14 @@ pub fn mount_editor(
     let change: Closure<dyn FnMut(String)> = Closure::wrap(Box::new(move |code: String| {
         on_change(code);
     }));
-    let _: Result<bool, JsValue> = js_sys::Reflect::set(
-        &window,
-        &JsValue::from_str(GLOBAL_CHANGE),
-        change.as_ref(),
-    );
+    let _: Result<bool, JsValue> =
+        js_sys::Reflect::set(&window, &JsValue::from_str(GLOBAL_CHANGE), change.as_ref());
     change.forget();
     let pending: JsValue = Closure::once_into_js(move || {
         create_editor();
     });
-    let _: Result<bool, JsValue> = js_sys::Reflect::set(
-        &window,
-        &JsValue::from_str(GLOBAL_PENDING),
-        &pending,
-    );
+    let _: Result<bool, JsValue> =
+        js_sys::Reflect::set(&window, &JsValue::from_str(GLOBAL_PENDING), &pending);
     let container: NodeRef<HtmlElement> = container.clone();
     let deferred: Closure<dyn FnMut()> = Closure::wrap(Box::new(move || {
         prepare(container.clone(), language.clone(), value.clone());
@@ -100,11 +94,8 @@ fn prepare(container: NodeRef<HtmlElement>, language: String, value: String) {
     let Some(element): Option<HtmlElement> = container.get_cloned() else {
         return;
     };
-    let _: Result<bool, JsValue> = js_sys::Reflect::set(
-        &window,
-        &JsValue::from_str(GLOBAL_CONTAINER),
-        &element,
-    );
+    let _: Result<bool, JsValue> =
+        js_sys::Reflect::set(&window, &JsValue::from_str(GLOBAL_CONTAINER), &element);
     let _: Result<bool, JsValue> = js_sys::Reflect::set(
         &window,
         &JsValue::from_str(GLOBAL_LANGUAGE),
@@ -144,7 +135,8 @@ fn ensure_loader() {
     let on_load: Closure<dyn FnMut(Event)> = Closure::wrap(Box::new(move |_: Event| {
         start_editor();
     }));
-    let _: Result<(), JsValue> = script.add_event_listener_with_callback(EVENT_LOAD, on_load.as_ref().unchecked_ref());
+    let _: Result<(), JsValue> =
+        script.add_event_listener_with_callback(EVENT_LOAD, on_load.as_ref().unchecked_ref());
     on_load.forget();
     let Some(body): Option<HtmlElement> = document.body() else {
         return;
@@ -179,7 +171,7 @@ fn start_editor() {
 fn create_editor() {
     define_monaco_themes();
     let script: String = format!(
-        "(function () {{ var container = window.{GLOBAL_CONTAINER}; if (!container) {{ return; }}; if (window.{GLOBAL_EDITOR}) {{ window.{GLOBAL_EDITOR}.dispose(); window.{GLOBAL_EDITOR} = null; }}; window.{GLOBAL_EDITOR} = monaco.editor.create(container, {{ value: window.{GLOBAL_VALUE}, language: window.{GLOBAL_LANGUAGE}, fontSize: {FONT_SIZE}, tabSize: {TAB_SIZE}, automaticLayout: true, minimap: {{ enabled: false }}, scrollBeyondLastLine: false, theme: window.__euv_monaco_theme ? window.__euv_monaco_theme() : 'euv-light' }}); window.{GLOBAL_EDITOR}.onDidChangeModelContent(function () {{ if (window.{GLOBAL_CHANGE}) {{ window.{GLOBAL_CHANGE}(window.{GLOBAL_EDITOR}.getValue()); }}; }}); }})();"
+        "(function () {{ var container = window.{GLOBAL_CONTAINER}; if (!container) {{ return; }}; if (window.{GLOBAL_EDITOR}) {{ window.{GLOBAL_EDITOR}.dispose(); window.{GLOBAL_EDITOR} = null; }}; window.{GLOBAL_EDITOR} = monaco.editor.create(container, {{ value: window.{GLOBAL_VALUE}, language: window.{GLOBAL_LANGUAGE}, fontSize: {FONT_SIZE}, tabSize: {TAB_SIZE}, automaticLayout: true, wordWrap: 'on', minimap: {{ enabled: false }}, scrollBeyondLastLine: false, theme: window.__euv_monaco_theme ? window.__euv_monaco_theme() : 'euv-light' }}); window.{GLOBAL_EDITOR}.onDidChangeModelContent(function () {{ if (window.{GLOBAL_CHANGE}) {{ window.{GLOBAL_CHANGE}(window.{GLOBAL_EDITOR}.getValue()); }}; }}); }})();"
     );
     let _: Result<JsValue, JsValue> = js_sys::eval(&script);
     let follow: String = monaco_theme_script();

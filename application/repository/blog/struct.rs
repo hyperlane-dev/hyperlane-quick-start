@@ -24,19 +24,30 @@ pub struct BlogImageRepository;
 #[derive(Clone, Data, Debug, Default)]
 pub struct BlogPostQuery {
     /// The user id.
-    #[get(type(copy))]
-    pub(super) user_id: Option<i32>,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) user_id: Option<i32>,
     /// The keyword.
-    pub(super) keyword: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) keyword: Option<String>,
     /// The is published.
-    #[get(type(copy))]
-    pub(super) is_published: Option<bool>,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) is_published: Option<bool>,
     /// The page.
-    #[get(type(copy))]
-    pub(super) page: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) page: i32,
     /// The limit.
-    #[get(type(copy))]
-    pub(super) limit: u64,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) limit: u64,
 }
 
 /// blog comment query.

@@ -111,7 +111,7 @@ pub fn open_room(state: ChatState) {
         let Some(raw): Option<String> = data.as_string() else {
             return;
         };
-        let Ok(frame): Result<ChatFrame, serde_json::Error> = serde_json::from_str(&raw) else {
+        let Ok(frame): Result<ChatFrame, Error> = serde_json::from_str(&raw) else {
             return;
         };
         handle_frame(state, frame);
@@ -188,6 +188,7 @@ pub fn send_message(state: ChatState) {
     let draft: String = state.get_draft().get();
     let content: String = draft.trim().to_string();
     if content.is_empty() {
+        state.get_error().set(MESSAGE_EMPTY_DRAFT.to_string());
         return;
     }
     if !state.get_connected().get() {
@@ -218,7 +219,7 @@ pub fn send_frame(kind: &str, data: &str) -> bool {
         kind: kind.to_string(),
         data: data.to_string(),
     };
-    let Ok(encoded): Result<String, serde_json::Error> = serde_json::to_string(&frame) else {
+    let Ok(encoded): Result<String, Error> = serde_json::to_string(&frame) else {
         return false;
     };
     CHAT_CONNECTION.with(|connection: &RefCell<Option<ChatConnection>>| {
@@ -436,11 +437,10 @@ pub async fn upload_request(
         .await
         .map_err(|error: JsValue| transport_failure(error))?;
     let raw: String = answer.as_string().unwrap_or_default();
-    let parsed: UploadAnswer =
-        serde_json::from_str(&raw).map_err(|error: serde_json::Error| ApiError {
-            code: 0,
-            message: format!("{MESSAGE_INVALID_PAYLOAD}{MESSAGE_SEPARATOR}{error}"),
-        })?;
+    let parsed: UploadAnswer = serde_json::from_str(&raw).map_err(|error: Error| ApiError {
+        code: 0,
+        message: format!("{MESSAGE_INVALID_PAYLOAD}{MESSAGE_SEPARATOR}{error}"),
+    })?;
     if parsed.code != STATUS_SUCCESS {
         return Err(ApiError {
             code: parsed.code,

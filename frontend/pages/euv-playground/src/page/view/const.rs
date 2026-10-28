@@ -37,6 +37,9 @@ pub(crate) const LABEL_CREATE: &str = "Create project";
 /// The text shown when the visitor holds no project.
 pub(crate) const TEXT_NO_PROJECT: &str = "no project";
 
+/// The instruction shown before a selected project has a compiled preview.
+pub(crate) const TEXT_NO_PREVIEW: &str = "Run the project to build a preview.";
+
 /// The text shown when the visitor holds no project yet.
 pub(crate) const TEXT_EMPTY_LIST: &str = "No project yet";
 

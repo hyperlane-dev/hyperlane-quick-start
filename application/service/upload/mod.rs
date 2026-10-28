@@ -10,7 +10,7 @@ use {
     repository::upload::*,
 };
 
-use hyperlane_config::application::{charset::*, upload::*};
+use hyperlane_config::application::charset::*;
 use std::{
     fs::{File, Metadata, metadata},
     io::{Error, Read, Seek, SeekFrom},

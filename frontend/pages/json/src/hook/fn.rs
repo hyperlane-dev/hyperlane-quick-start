@@ -100,7 +100,9 @@ pub fn open_editor(state: JsonState, path: Vec<String>) {
     let Some(value) = value_of(&state.get_root().get(), &path) else {
         return;
     };
-    state.get_edit_key().set(path.last().cloned().unwrap_or_default());
+    state
+        .get_edit_key()
+        .set(path.last().cloned().unwrap_or_default());
     state.get_edit_type().set(kind_of(&value));
     state.get_edit_value().set(edit_text(&value));
     state.get_edit_path().set(path);
@@ -424,7 +426,7 @@ fn edit_text(value: &Value) -> String {
 fn parse_value(kind: &str, raw: &str) -> Result<Value, String> {
     match kind {
         KIND_OBJECT | KIND_ARRAY => serde_json::from_str::<Value>(raw)
-            .map_err(|error: serde_json::Error| format!("{ERROR_VALUE}: {error}")),
+            .map_err(|error: Error| format!("{ERROR_VALUE}: {error}")),
         KIND_NUMBER => raw
             .trim()
             .parse::<f64>()

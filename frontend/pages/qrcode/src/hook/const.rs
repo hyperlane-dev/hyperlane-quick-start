@@ -4,6 +4,12 @@ pub(crate) const STORAGE_KEY: &str = "qrcode";
 /// The name of the file the list of the QR codes is written to.
 pub(crate) const EXPORT_FILE_NAME: &str = "qrcode.json";
 
+/// The feedback reported after the browser accepts a QR export.
+pub(crate) const MESSAGE_EXPORT_SUCCESS: &str = "The list of the QR codes has been exported";
+
+/// The feedback reported when a QR export cannot be created.
+pub(crate) const MESSAGE_EXPORT_FAILED: &str = "Could not export the QR codes. Please try again.";
+
 /// The value of the low error correction level.
 pub(crate) const LEVEL_LOW: &str = "low";
 

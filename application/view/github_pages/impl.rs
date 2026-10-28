@@ -193,9 +193,19 @@ impl ServerHook for GithubPagesProxyRootRoute {
     /// - `Status` - The handle result.
     #[prologue_macros(
         methods(get),
-        try_get_route_param(OWNER_KEY => owner_opt),
-        try_get_route_param(REPOSITORY_KEY => repository_opt)
+        try_get_route_param(owner_key() => owner_opt),
+        try_get_route_param(repository_key() => repository_opt)
     )]
+    /// Implements the `handle` operation on [`GithubPagesProxyRootRoute`].
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - Mutable reference to a `Stream` (mutated in place).
+    /// - `&mut Context` - Mutable reference to a `Context` (mutated in place).
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - A `Status` value.
     #[instrument_trace]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let owner: String = owner_opt.unwrap_or_default();
@@ -234,11 +244,21 @@ impl ServerHook for GithubPagesProxyRoute {
     /// - `Status` - The handle result.
     #[prologue_macros(
         methods(get),
-        try_get_route_param(OWNER_KEY => owner_opt),
-        try_get_route_param(REPOSITORY_KEY => repository_opt),
-        try_get_route_param(PATH_KEY => path_opt),
+        try_get_route_param(owner_key() => owner_opt),
+        try_get_route_param(repository_key() => repository_opt),
+        try_get_route_param(path_key() => path_opt),
         try_get_request_header(RANGE => range_header_opt)
     )]
+    /// Implements the `handle` operation on [`GithubPagesProxyRoute`].
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - Mutable reference to a `Stream` (mutated in place).
+    /// - `&mut Context` - Mutable reference to a `Context` (mutated in place).
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - A `Status` value.
     #[instrument_trace]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         let owner: String = owner_opt.unwrap_or_default();

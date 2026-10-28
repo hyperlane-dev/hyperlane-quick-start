@@ -11,6 +11,7 @@ use super::*;
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_monitor_status_sse` free function.
 #[instrument_trace]
 pub fn openapi_monitor_status_sse() {}
 
@@ -25,6 +26,7 @@ pub fn openapi_monitor_status_sse() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_monitor_system_info` free function.
 #[instrument_trace]
 pub fn openapi_monitor_system_info() {}
 
@@ -39,6 +41,7 @@ pub fn openapi_monitor_system_info() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_monitor_network_capture_data` free function.
 #[instrument_trace]
 pub fn openapi_monitor_network_capture_data() {}
 
@@ -53,6 +56,7 @@ pub fn openapi_monitor_network_capture_data() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_monitor_network_capture_stream` free function.
 #[instrument_trace]
 pub fn openapi_monitor_network_capture_stream() {}
 
@@ -71,5 +75,6 @@ pub fn openapi_monitor_network_capture_stream() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_monitor_performance_history` free function.
 #[instrument_trace]
 pub fn openapi_monitor_performance_history() {}

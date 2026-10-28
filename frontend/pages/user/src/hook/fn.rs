@@ -115,8 +115,12 @@ pub async fn open_user(state: UserState, id: String) {
     let path: String = format!("{PATH_GET}/{id}");
     match get_json::<UserProfile>(&path).await {
         Ok(user) => {
-            state.get_edit_email().set(user.email.clone().unwrap_or_default());
-            state.get_edit_phone().set(user.phone.clone().unwrap_or_default());
+            state
+                .get_edit_email()
+                .set(user.email.clone().unwrap_or_default());
+            state
+                .get_edit_phone()
+                .set(user.phone.clone().unwrap_or_default());
             state.get_detail_mode().set(MODE_VIEW.to_string());
             state.get_detail().set(Some(user));
         }
@@ -150,7 +154,9 @@ pub async fn save_contact(state: UserState) {
         Ok(updated) => {
             state.get_detail().set(Some(updated));
             state.get_detail_mode().set(MODE_VIEW.to_string());
-            state.get_notice().set("User updated successfully".to_string());
+            state
+                .get_notice()
+                .set("User updated successfully".to_string());
             load_users(state).await;
         }
         Err(error) => {
@@ -188,7 +194,9 @@ pub async fn save_password(state: UserState) {
             state.get_old_password().set(EMPTY.to_string());
             state.get_new_password().set(EMPTY.to_string());
             state.get_detail_mode().set(MODE_VIEW.to_string());
-            state.get_notice().set("Password changed successfully".to_string());
+            state
+                .get_notice()
+                .set("Password changed successfully".to_string());
         }
         Err(error) => {
             state.get_error().set(error.message);
@@ -212,9 +220,14 @@ pub async fn set_status(state: UserState, id: String, approved: bool) {
     let path: String = format!("{PATH_UPDATE_STATUS}/{id}");
     match post_json::<UserProfile, UpdateStatusRequest>(&path, &body).await {
         Ok(_) => {
-            state
-                .get_notice()
-                .set(if approved { "User approved" } else { "User rejected" }.to_string());
+            state.get_notice().set(
+                if approved {
+                    "User approved"
+                } else {
+                    "User rejected"
+                }
+                .to_string(),
+            );
             load_users(state).await;
         }
         Err(error) => {
@@ -237,7 +250,9 @@ pub async fn delete_user(state: UserState, id: String) {
     let path: String = format!("{PATH_DELETE}/{id}");
     match request_json::<serde_json::Value>(HttpMethod::Post, &path, None).await {
         Ok(_) => {
-            state.get_notice().set("User deleted successfully".to_string());
+            state
+                .get_notice()
+                .set("User deleted successfully".to_string());
             load_users(state).await;
         }
         Err(error) => {

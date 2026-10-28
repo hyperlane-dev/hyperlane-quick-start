@@ -11,6 +11,7 @@ use super::*;
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_notification_create` free function.
 #[instrument_trace]
 pub fn openapi_notification_create() {}
 
@@ -24,6 +25,7 @@ pub fn openapi_notification_create() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_notification_list` free function.
 #[instrument_trace]
 pub fn openapi_notification_list() {}
 
@@ -41,6 +43,7 @@ pub fn openapi_notification_list() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_notification_get` free function.
 #[instrument_trace]
 pub fn openapi_notification_get() {}
 
@@ -58,6 +61,7 @@ pub fn openapi_notification_get() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_notification_read` free function.
 #[instrument_trace]
 pub fn openapi_notification_read() {}
 
@@ -71,6 +75,7 @@ pub fn openapi_notification_read() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_notification_read_all` free function.
 #[instrument_trace]
 pub fn openapi_notification_read_all() {}
 
@@ -88,6 +93,7 @@ pub fn openapi_notification_read_all() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_notification_delete` free function.
 #[instrument_trace]
 pub fn openapi_notification_delete() {}
 
@@ -101,5 +107,6 @@ pub fn openapi_notification_delete() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_notification_unread_count` free function.
 #[instrument_trace]
 pub fn openapi_notification_unread_count() {}

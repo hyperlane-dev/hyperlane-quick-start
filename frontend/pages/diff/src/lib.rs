@@ -14,7 +14,14 @@ mod style;
 
 pub(crate) use {app::*, diff::*, hook::*, model::*, page::*, style::*};
 
-use {euv::*, euv_ui::*, hyperlane_frontend_shared::*};
+use {
+    euv::{
+        wasm_bindgen_futures::{JsFuture, spawn_local},
+        *,
+    },
+    euv_ui::*,
+    hyperlane_frontend_shared::*,
+};
 
 /// Mounts the diff page into the document.
 ///

@@ -127,6 +127,7 @@ class! {
     // The actions of a user.
     pub c_user_actions {
         display: "flex";
+        width: "100%";
         align-items: "center";
         gap: var!(space-xs);
         flex-wrap: "wrap";

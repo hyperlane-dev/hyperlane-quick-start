@@ -16,25 +16,53 @@ use super::*;
 pub struct Model {
     /// Unique primary key identifier for the record.
     #[sea_orm(primary_key, auto_increment = true)]
-    #[get(type(copy))]
-    pub(super) id: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) id: i32,
     /// The unique bill number generated for this transaction.
-    pub(super) bill_no: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) bill_no: String,
     /// The foreign key referencing the user who created the record.
-    #[get(type(copy))]
-    pub(super) user_id: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) user_id: i32,
     /// The monetary amount of the transaction.
-    pub(super) amount: Decimal,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) amount: Decimal,
     /// The category classification of the transaction (e.g., "food", "transport").
-    pub(super) category: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) category: String,
     /// The type of the transaction (e.g., "income", "expense").
-    pub(super) transaction_type: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) transaction_type: String,
     /// The optional description or note for the transaction.
-    pub(super) description: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) description: Option<String>,
     /// The date on which the transaction occurred.
-    pub(super) bill_date: NaiveDate,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) bill_date: NaiveDate,
     /// The timestamp when the record was created.
-    pub(super) created_at: Option<NaiveDateTime>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) created_at: Option<NaiveDateTime>,
     /// The timestamp when the record was last updated.
-    pub(super) updated_at: Option<NaiveDateTime>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) updated_at: Option<NaiveDateTime>,
 }

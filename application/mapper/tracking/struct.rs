@@ -9,15 +9,28 @@ pub struct TrackingMapper;
 pub struct Model {
     /// Unique primary key identifier for the tracking record.
     #[sea_orm(primary_key, auto_increment = true)]
-    #[get(type(copy))]
-    pub(super) id: i64,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) id: i64,
     /// The serialized HTTP headers of the tracked request.
-    pub(super) headers: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) headers: String,
     /// The serialized HTTP body content of the tracked request.
-    pub(super) body: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) body: String,
     /// The Unix timestamp (in milliseconds) when the request was received.
-    #[get(type(copy))]
-    pub(super) timestamp: i64,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) timestamp: i64,
     /// The timestamp when the tracking record was created.
-    pub(super) created_at: Option<NaiveDateTime>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) created_at: Option<NaiveDateTime>,
 }

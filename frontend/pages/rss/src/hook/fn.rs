@@ -13,8 +13,11 @@ pub fn use_rss_state() -> RssState {
     let description: Signal<String> = App::use_signal(|| TEXT_EMPTY.to_string());
     let page: Signal<i32> = App::use_signal(|| PAGE_FIRST);
     let page_size: Signal<i32> = App::use_signal(|| PAGE_SIZE);
+    let page_size_value: Signal<String> = App::use_signal(|| PAGE_SIZE.to_string());
     let has_more: Signal<bool> = App::use_signal(|| false);
     let loading: Signal<bool> = App::use_signal(|| true);
+    let previous_disabled: Signal<bool> = App::use_signal(|| true);
+    let next_disabled: Signal<bool> = App::use_signal(|| true);
     let error: Signal<String> = App::use_signal(|| TEXT_EMPTY.to_string());
     let state: RssState = RssState {
         items,
@@ -22,8 +25,11 @@ pub fn use_rss_state() -> RssState {
         description,
         page,
         page_size,
+        page_size_value,
         has_more,
         loading,
+        previous_disabled,
+        next_disabled,
         error,
     };
     let _started: Signal<bool> = App::use_signal(|| {
@@ -47,6 +53,8 @@ pub fn use_rss_state() -> RssState {
 /// - `()` - The items have been written into the state.
 pub async fn load_feed(state: RssState) {
     state.get_loading().set(true);
+    state.get_previous_disabled().set(true);
+    state.get_next_disabled().set(true);
     let page: i32 = state.get_page().get();
     let page_size: i32 = state.get_page_size().get();
     let limit: i32 = page_size + 1;
@@ -71,4 +79,8 @@ pub async fn load_feed(state: RssState) {
         Err(error) => state.get_error().set(error.message),
     }
     state.get_loading().set(false);
+    state
+        .get_previous_disabled()
+        .set(state.get_page().get() <= PAGE_FIRST);
+    state.get_next_disabled().set(!state.get_has_more().get());
 }

@@ -122,8 +122,11 @@ pub fn dashboard_panel(node: VirtualNode<PanelProps>) -> VirtualNode {
     html! {
         euv_card {
             title: TITLE_DASHBOARD
-            div {
-                class: c_order_stats()
+            euv_grid {
+                cols: vec![EuvGridCol {
+                    span: 6, offset: 0
+                }; 4]
+                gutter: true
                 stat_tile {
                     label: LABEL_TRANSACTIONS
                     value: today.transactions.to_string()
@@ -149,8 +152,11 @@ pub fn dashboard_panel(node: VirtualNode<PanelProps>) -> VirtualNode {
                     hint: change_text(changes.new_users_change)
                 }
             }
-            div {
-                class: c_order_stats()
+            euv_grid {
+                cols: vec![EuvGridCol {
+                    span: 6, offset: 0
+                }; 5]
+                gutter: true
                 stat_tile {
                     label: LABEL_AVG_INCOME
                     value: averages.avg_income_per_transaction.clone()
@@ -200,8 +206,11 @@ pub fn records_panel(node: VirtualNode<PanelProps>) -> VirtualNode {
     let PanelProps { state }: PanelProps = node.try_get_props().unwrap_or_default();
     let records: Signal<Vec<RecordItem>> = state.get_records();
     html! {
-        div {
-            class: c_order_stats()
+        euv_grid {
+            cols: vec![EuvGridCol {
+                span: 6, offset: 0
+            }; 4]
+            gutter: true
             stat_tile {
                 label: LABEL_TOTAL_INCOME
                 value: state.get_total_income().get()
@@ -410,7 +419,7 @@ pub fn users_panel(node: VirtualNode<PanelProps>) -> VirtualNode {
                     }
                 }
             }
-            if admin == false {
+            if !admin {
                 euv_result {
                     code: "403"
                     title: TITLE_EMPTY
@@ -658,7 +667,7 @@ pub fn record_form(node: VirtualNode<RecordFormProps>) -> VirtualNode {
                 value: state.get_record_bill_date()
                 oninput: record_bill_date_handler(state)
             }
-            if admin == true {
+            if admin {
                 euv_field {
                     id: ID_TARGET_USER
                     label: LABEL_TARGET_USER
@@ -746,9 +755,10 @@ pub fn filter_button(node: VirtualNode<FilterButtonProps>) -> VirtualNode {
         label,
     }: FilterButtonProps = node.try_get_props().unwrap_or_default();
     let active: bool = filter_of(&state, kind) == value;
-    let handler: Option<Rc<dyn Fn(Event)>> = filter_handler(state, kind.to_string(), value.to_string());
+    let handler: Option<Rc<dyn Fn(Event)>> =
+        filter_handler(state, kind.to_string(), value.to_string());
     html! {
-        if active == true {
+        if active {
             div {
                 class: c_hls_button_row()
                 euv_button {
@@ -1039,11 +1049,7 @@ fn change_text(change: Option<f64>) -> String {
 /// # Returns
 ///
 /// - `Option<Rc<dyn Fn(Event)>>` - The click handler.
-fn filter_handler(
-    state: OrderState,
-    kind: String,
-    value: String,
-) -> Option<Rc<dyn Fn(Event)>> {
+fn filter_handler(state: OrderState, kind: String, value: String) -> Option<Rc<dyn Fn(Event)>> {
     Some(Rc::new(move |_: Event| {
         if kind == FILTER_KIND_TYPE {
             state.get_filter_type().set(value.clone());

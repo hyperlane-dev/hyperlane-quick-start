@@ -23,9 +23,14 @@ pub fn blog_page(node: VirtualNode<BlogPageProps>) -> VirtualNode {
                 title: "Hyperlane Blog"
                 subtitle: "Publish, read and discuss posts."
             }
-            euv_tabs {
-                items: TAB_ITEMS.to_vec()
-                active: state.get_tab()
+            div {
+                onclick: move |_: Event| {
+                    state.get_error().set(String::new());
+                }
+                euv_tabs {
+                    items: TAB_ITEMS.to_vec()
+                    active: state.get_tab()
+                }
             }
             match { state.get_tab().get() == TAB_EXPLORE } {
                 true => {
@@ -87,9 +92,12 @@ pub fn post_list_panel(node: VirtualNode<PostListPanelProps>) -> VirtualNode {
     let PostListPanelProps { state }: PostListPanelProps = node.try_get_props().unwrap_or_default();
     let posts: Signal<Vec<BlogPost>> = state.get_posts();
     html! {
-        div {
-            class: c_blog_stats()
-            if { !state.get_posts().get().is_empty() } {
+        if { !state.get_posts().get().is_empty() } {
+            euv_grid {
+                cols: vec![EuvGridCol {
+                    span: 8, offset: 0
+                }; 3]
+                gutter: true
                 stat_tile {
                     label: LABEL_POSTS
                     value: state.get_total().get().to_string()
@@ -176,11 +184,8 @@ pub fn post_list_panel(node: VirtualNode<PostListPanelProps>) -> VirtualNode {
 /// - `VirtualNode` - The metric tile tree.
 #[component]
 pub fn stat_tile(node: VirtualNode<StatTileProps>) -> VirtualNode {
-    let StatTileProps {
-        label,
-        value,
-        icon,
-    }: StatTileProps = node.try_get_props().unwrap_or_default();
+    let StatTileProps { label, value, icon }: StatTileProps =
+        node.try_get_props().unwrap_or_default();
     html! {
         div {
             class: c_hls_stat_card()
@@ -250,17 +255,11 @@ pub fn post_row(node: VirtualNode<PostRowProps>) -> VirtualNode {
                         onclick: open_post_handler(state, post_id.clone())
                         LABEL_OPEN
                     }
-                }
-                div {
-                    class: c_hls_button_row()
                     euv_button {
                         variant: EuvButtonVariant::Outline
                         onclick: like_handler(state, post_id.clone())
                         LABEL_LIKE
                     }
-                }
-                div {
-                    class: c_hls_button_row()
                     euv_button {
                         variant: EuvButtonVariant::Outline
                         onclick: favorite_handler(state, post_id.clone())
@@ -269,10 +268,14 @@ pub fn post_row(node: VirtualNode<PostRowProps>) -> VirtualNode {
                 }
                 span {
                     class: c_blog_post_count()
+                    LABEL_LIKES
+                    " "
                     post.like_count
                 }
                 span {
                     class: c_blog_post_count()
+                    LABEL_COMMENTS
+                    " "
                     post.comment_count
                 }
             }
@@ -334,6 +337,12 @@ pub fn write_panel(node: VirtualNode<WritePanelProps>) -> VirtualNode {
     html! {
         euv_card {
             title: TITLE_WRITE
+            if { !state.get_error().get().is_empty() } {
+                euv_alert {
+                    variant: AlertVariant::Error
+                    state.get_error().get().as_str()
+                }
+            }
             div {
                 class: c_blog_form()
                 euv_field {
@@ -358,6 +367,7 @@ pub fn write_panel(node: VirtualNode<WritePanelProps>) -> VirtualNode {
                     class: c_textarea_input()
                     placeholder: PLACEHOLDER_CONTENT
                     rows: ROWS_CONTENT
+                    value: state.get_draft_content()
                     oninput: draft_content_handler(state)
                 }
                 div {
@@ -448,7 +458,14 @@ pub fn post_detail(node: VirtualNode<PostDetailProps>) -> VirtualNode {
                     id: ID_COMMENT
                     class: c_textarea_input()
                     placeholder: PLACEHOLDER_COMMENT
+                    value: state.get_comment_body()
                     oninput: comment_handler(state)
+                }
+                if { !state.get_error().get().is_empty() } {
+                    euv_alert {
+                        variant: AlertVariant::Error
+                        state.get_error().get().as_str()
+                    }
                 }
                 div {
                     class: c_hls_button_row()

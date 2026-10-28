@@ -2,12 +2,13 @@ mod r#const;
 mod r#impl;
 mod r#struct;
 
-pub use {r#const::*, r#struct::*};
+pub use r#struct::*;
 
+pub(crate) use r#const::*;
+
+use hyperlane_plugin::{common::*, postgresql::*};
+use sea_orm::ActiveValue;
 use {
     super::*,
     mapper::blog::{comment::*, favorite::*, image::*, like::*, post::*},
 };
-
-use hyperlane_plugin::{common::*, postgresql::*};
-use sea_orm::ActiveValue;

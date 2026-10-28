@@ -27,8 +27,18 @@ impl ServerHook for FaviconRoute {
     #[prologue_macros(
         is_get_method,
         response_status_code(302),
-        response_header(LOCATION => LOGO_IMG_URL)
+        response_header(LOCATION => logo_img_url())
     )]
+    /// Implements the `handle` operation on [`FaviconRoute`].
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - Mutable reference to a `Stream` (mutated in place).
+    /// - `&mut Context` - Mutable reference to a `Context` (mutated in place).
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - A `Status` value.
     #[instrument_trace]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue

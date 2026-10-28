@@ -1,8 +1,8 @@
 /// Title advertised in the generated OpenAPI document.
-pub const OPENAPI_INFO_TITLE: &str = "Hyperlane";
+pub(crate) const OPENAPI_INFO_TITLE: &str = "Hyperlane";
 
 /// Description advertised in the generated OpenAPI document.
-pub const OPENAPI_INFO_DESCRIPTION: &str = concat!(
+pub(crate) const OPENAPI_INFO_DESCRIPTION: &str = concat!(
     "A lightweight, high-performance, and cross-platform Rust HTTP server library built on Tokio. ",
     "It simplifies modern web service development by providing built-in support for ",
     "middleware, WebSocket, Server-Sent Events (SSE), and raw TCP communication. ",

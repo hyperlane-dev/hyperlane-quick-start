@@ -1,12 +1,12 @@
 use super::*;
 
 /// The reactive state the diff page renders from.
-#[derive(Clone, Copy, CustomDebug, Data, Default, New)]
+#[derive(Clone, Copy, CustomDebug, Data, Default)]
 pub struct DiffState {
     /// The original text.
     #[get(type(copy))]
     pub original: Signal<String>,
-    /// The modified text.
+    /// The comparison text.
     #[get(type(copy))]
     pub modified: Signal<String>,
     /// The view the result is rendered in.
@@ -24,4 +24,14 @@ pub struct DiffState {
     /// The number of the lines the comparison kept.
     #[get(type(copy))]
     pub unchanged: Signal<usize>,
+    /// The notice reported after the last call.
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) notice: Signal<String>,
+    /// The failure reported by the last call.
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) error: Signal<String>,
 }

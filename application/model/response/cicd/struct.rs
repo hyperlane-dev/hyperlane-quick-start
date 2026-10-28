@@ -4,198 +4,348 @@ use super::*;
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct PipelineDto {
     /// The id.
-    #[get(type(copy))]
-    pub(super) id: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) id: i32,
     /// The name.
-    pub(super) name: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) name: String,
     /// The description.
-    pub(super) description: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) description: Option<String>,
     /// The config content.
-    pub(super) config_content: Option<String>,
-    #[get(type(copy))]
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) config_content: Option<String>,
+    #[get(pub(crate), type(copy))]
     /// The created at.
-    pub(super) created_at: Option<i64>,
-    #[get(type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) created_at: Option<i64>,
+    #[get(pub(crate), type(copy))]
     /// The updated at.
-    pub(super) updated_at: Option<i64>,
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) updated_at: Option<i64>,
 }
 
 /// Represents a CI/CD pipeline run data transfer object.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct RunDto {
     /// The id.
-    #[get(type(copy))]
-    pub(super) id: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) id: i32,
     /// The pipeline id.
-    #[get(type(copy))]
-    pub(super) pipeline_id: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) pipeline_id: i32,
     /// The pipeline name.
-    pub(super) pipeline_name: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) pipeline_name: Option<String>,
     /// The run number.
-    #[get(type(copy))]
-    pub(super) run_number: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) run_number: i32,
     /// The status.
-    pub(super) status: CicdStatus,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) status: CicdStatus,
     /// The triggered by.
-    pub(super) triggered_by: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) triggered_by: Option<String>,
     /// The commit hash.
-    pub(super) commit_hash: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) commit_hash: Option<String>,
     /// The commit message.
-    pub(super) commit_message: Option<String>,
-    #[get(type(copy))]
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) commit_message: Option<String>,
+    #[get(pub(crate), type(copy))]
     /// The started at.
-    pub(super) started_at: Option<i64>,
-    #[get(type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) started_at: Option<i64>,
+    #[get(pub(crate), type(copy))]
     /// The completed at.
-    pub(super) completed_at: Option<i64>,
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) completed_at: Option<i64>,
     /// The duration ms.
-    #[get(type(copy))]
-    pub(super) duration_ms: i32,
-    #[get(type(copy))]
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) duration_ms: i32,
+    #[get(pub(crate), type(copy))]
     /// The created at.
-    pub(super) created_at: Option<i64>,
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) created_at: Option<i64>,
 }
 
 /// Represents a CI/CD job data transfer object with step information.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct JobDto {
     /// The id.
-    #[get(type(copy))]
-    pub(super) id: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) id: i32,
     /// The run id.
-    #[get(type(copy))]
-    pub(super) run_id: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) run_id: i32,
     /// The name.
-    pub(super) name: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) name: String,
     /// The status.
-    pub(super) status: CicdStatus,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) status: CicdStatus,
     /// The runner.
-    pub(super) runner: Option<String>,
-    #[get(type(copy))]
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) runner: Option<String>,
+    #[get(pub(crate), type(copy))]
     /// The started at.
-    pub(super) started_at: Option<i64>,
-    #[get(type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) started_at: Option<i64>,
+    #[get(pub(crate), type(copy))]
     /// The completed at.
-    pub(super) completed_at: Option<i64>,
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) completed_at: Option<i64>,
     /// The duration ms.
-    #[get(type(copy))]
-    pub(super) duration_ms: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) duration_ms: i32,
 }
 
 /// Represents a CI/CD step data transfer object with log output.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct StepDto {
     /// The id.
-    #[get(type(copy))]
-    pub(super) id: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) id: i32,
     /// The job id.
-    #[get(type(copy))]
-    pub(super) job_id: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) job_id: i32,
     /// The name.
-    pub(super) name: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) name: String,
     /// The command.
-    pub(super) command: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) command: Option<String>,
     /// The status.
-    pub(super) status: CicdStatus,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) status: CicdStatus,
     /// The output.
-    pub(super) output: Option<String>,
-    #[get(type(copy))]
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) output: Option<String>,
+    #[get(pub(crate), type(copy))]
     /// The started at.
-    pub(super) started_at: Option<i64>,
-    #[get(type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) started_at: Option<i64>,
+    #[get(pub(crate), type(copy))]
     /// The completed at.
-    pub(super) completed_at: Option<i64>,
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) completed_at: Option<i64>,
     /// The duration ms.
-    #[get(type(copy))]
-    pub(super) duration_ms: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) duration_ms: i32,
 }
 
 /// Represents a detailed pipeline response with associated runs.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct PipelineDetailDto {
     /// The pipeline.
-    pub(super) pipeline: PipelineDto,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) pipeline: PipelineDto,
     /// The runs.
-    pub(super) runs: Vec<RunDto>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) runs: Vec<RunDto>,
 }
 
 /// Represents a detailed run response with associated jobs.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct RunDetailDto {
     /// The run.
-    pub(super) run: RunDto,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) run: RunDto,
     /// The jobs.
-    pub(super) jobs: Vec<JobWithStepsDto>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) jobs: Vec<JobWithStepsDto>,
 }
 
 /// Represents a job response with its associated steps.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct JobWithStepsDto {
     /// The job.
-    pub(super) job: JobDto,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) job: JobDto,
     /// The steps.
-    pub(super) steps: Vec<StepDto>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) steps: Vec<StepDto>,
 }
 
 /// Represents a paginated list of pipeline run data transfer objects.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct PaginatedRunsDto {
     /// The total.
-    #[get(type(copy))]
-    pub(super) total: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) total: i32,
     /// The runs.
-    pub(super) runs: Vec<RunDto>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) runs: Vec<RunDto>,
     /// The has more.
-    #[get(type(copy))]
-    pub(super) has_more: bool,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) has_more: bool,
 }
 
 /// Represents a step log data transfer object with output content.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct StepLogDto {
     /// The step id.
-    #[get(type(copy))]
-    pub(super) step_id: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) step_id: i32,
     /// The step name.
-    pub(super) step_name: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) step_name: String,
     /// The status.
-    pub(super) status: CicdStatus,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) status: CicdStatus,
     /// The output.
-    pub(super) output: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) output: Option<String>,
     /// The output length.
-    #[get(type(copy))]
-    pub(super) output_length: usize,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) output_length: usize,
     /// The new output.
-    pub(super) new_output: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) new_output: Option<String>,
     /// The output offset.
-    #[get(type(copy))]
-    pub(super) output_offset: usize,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) output_offset: usize,
     /// The stderr output.
-    pub(super) stderr_output: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) stderr_output: Option<String>,
     /// The stderr length.
-    #[get(type(copy))]
-    pub(super) stderr_length: usize,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) stderr_length: usize,
     /// The new stderr.
-    pub(super) new_stderr: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) new_stderr: Option<String>,
     /// The stderr offset.
-    #[get(type(copy))]
-    pub(super) stderr_offset: usize,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) stderr_offset: usize,
 }
 
 /// incremental run detail dto.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct IncrementalRunDetailDto {
     /// The run.
-    pub(super) run: RunDto,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) run: RunDto,
     /// The jobs.
-    pub(super) jobs: Vec<JobWithIncrementalStepsDto>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) jobs: Vec<JobWithIncrementalStepsDto>,
 }
 
 /// job with incremental steps dto.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct JobWithIncrementalStepsDto {
     /// The job.
-    pub(super) job: JobDto,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) job: JobDto,
     /// The steps.
-    pub(super) steps: Vec<StepLogDto>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) steps: Vec<StepLogDto>,
 }

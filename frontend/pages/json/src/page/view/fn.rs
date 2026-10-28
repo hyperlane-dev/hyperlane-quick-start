@@ -133,19 +133,19 @@ pub fn json_row(node: VirtualNode<JsonRowProps>) -> VirtualNode {
     let kind: String = node.kind.clone();
     let preview: String = node.preview.clone();
     let depth: usize = node.depth;
-    let indent: String = format!("padding-left: calc({} * {depth})", var!(space-md));
+    let indent: String = format!("padding-left: calc({} * {depth})", var!(space - md));
     html! {
         div {
             key: format!("{path:?}")
             class: c_json_row()
             style: indent
-            if node.container == true {
+            if node.container {
                 div {
                     class: c_hls_button_row()
                     euv_button {
                         variant: EuvButtonVariant::Outline
                         onclick: toggle_handler(state, path.clone())
-                        if node.expanded == true {
+                        if node.expanded {
                             GLYPH_OPEN
                         } else {
                             GLYPH_CLOSED

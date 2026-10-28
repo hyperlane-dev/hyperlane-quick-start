@@ -11,5 +11,6 @@ use super::*;
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_online_docs` free function.
 #[instrument_trace]
 pub fn openapi_online_docs() {}

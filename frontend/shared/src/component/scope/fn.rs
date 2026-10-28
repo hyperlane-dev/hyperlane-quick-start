@@ -18,7 +18,8 @@ use super::*;
 /// - `VirtualNode` - The content inside its scope.
 #[component]
 pub fn reactive_scope(node: VirtualNode<ReactiveScopeProps>) -> VirtualNode {
-    let ReactiveScopeProps { content }: ReactiveScopeProps = node.try_get_props().unwrap_or_default();
+    let ReactiveScopeProps { content }: ReactiveScopeProps =
+        node.try_get_props().unwrap_or_default();
     let active: Signal<bool> = Signal::create(true);
     html! {
         match { active.get() } {

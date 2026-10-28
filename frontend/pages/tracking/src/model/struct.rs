@@ -7,7 +7,7 @@ pub struct TrackingRecord {
     /// The identifier of the record.
     pub id: i64,
     /// The headers of the request, as the server stored them.
-    pub headers: serde_json::Value,
+    pub headers: Value,
     /// The body of the request.
     pub body: String,
     /// The moment the request was received, in milliseconds since the Unix epoch.

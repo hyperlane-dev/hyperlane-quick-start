@@ -4,7 +4,13 @@ use super::*;
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct RedisRecord {
     /// The key.
-    pub(super) key: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) key: String,
     /// The value.
-    pub(super) value: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) value: String,
 }

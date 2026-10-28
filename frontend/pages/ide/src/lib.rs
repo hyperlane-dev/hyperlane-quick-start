@@ -15,7 +15,10 @@ mod style;
 pub(crate) use {app::*, editor::*, hook::*, model::*, page::*, style::*};
 
 use {
-    euv::*,
+    euv::{
+        wasm_bindgen_futures::{JsFuture, spawn_local},
+        *,
+    },
     euv_ui::*,
     hyperlane_frontend_shared::*,
     std::cell::Cell,

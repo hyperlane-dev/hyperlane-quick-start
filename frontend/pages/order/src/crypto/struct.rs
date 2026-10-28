@@ -10,7 +10,8 @@ pub struct BigUint {
     /// The limbs of the number, the least significant one first.
     #[get(pub(super))]
     #[get_mut(pub(super))]
-    pub(super) limbs: Vec<u32>,
+    #[set(pub(crate))]
+    pub(crate) limbs: Vec<u32>,
 }
 
 /// The public key the credentials are encrypted with.
@@ -21,11 +22,17 @@ pub struct BigUint {
 pub struct PublicKey {
     /// The modulus of the key.
     #[get(pub(super))]
-    pub(super) modulus: BigUint,
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) modulus: BigUint,
     /// The public exponent of the key.
     #[get(pub(super))]
-    pub(super) exponent: BigUint,
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) exponent: BigUint,
     /// The number of bytes one encrypted block holds.
     #[get(pub(super), type(copy))]
-    pub(super) size: usize,
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) size: usize,
 }

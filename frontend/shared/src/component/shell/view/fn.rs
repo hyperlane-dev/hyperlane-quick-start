@@ -16,21 +16,14 @@ use super::*;
 /// - `VirtualNode` - The shell around the page content.
 #[component]
 pub fn app_shell(node: VirtualNode<AppShellProps>) -> VirtualNode {
-    let AppShellProps {
-        mobile,
-        root_class,
-    }: AppShellProps = node.try_get_props().unwrap_or_default();
+    let AppShellProps { root_class, .. }: AppShellProps = node.try_get_props().unwrap_or_default();
     let content: VirtualNode = node.get_children().into();
     inject_shared_css();
     html! {
         div {
             class: root_class
             main {
-                class: if { mobile.get() } {
-                    c_mobile_main()
-                } else {
-                    c_app_main()
-                }
+                class: c_hls_main()
                 content
             }
         }

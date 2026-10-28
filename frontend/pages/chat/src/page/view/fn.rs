@@ -117,6 +117,7 @@ pub fn chat_page(node: VirtualNode<ChatPageProps>) -> VirtualNode {
                         class: c_textarea_input()
                         placeholder: PLACEHOLDER_MESSAGE
                         rows: ROWS_MESSAGE
+                        value: state.get_draft()
                         oninput: draft_handler(state)
                         onkeydown: key_handler(state)
                     }

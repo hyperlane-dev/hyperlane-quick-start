@@ -11,6 +11,7 @@ use super::*;
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_redis_records` free function.
 #[instrument_trace]
 pub fn openapi_redis_records() {}
 
@@ -25,6 +26,7 @@ pub fn openapi_redis_records() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_redis_record_create` free function.
 #[instrument_trace]
 pub fn openapi_redis_record_create() {}
 
@@ -39,6 +41,7 @@ pub fn openapi_redis_record_create() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_redis_record_update` free function.
 #[instrument_trace]
 pub fn openapi_redis_record_update() {}
 
@@ -53,5 +56,6 @@ pub fn openapi_redis_record_update() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_redis_record_delete` free function.
 #[instrument_trace]
 pub fn openapi_redis_record_delete() {}

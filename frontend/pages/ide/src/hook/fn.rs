@@ -13,10 +13,12 @@ pub fn use_ide_state() -> IdeState {
     let language_name: Signal<String> = App::use_signal(|| page_language().name);
     let code: Signal<String> = App::use_signal(|| stored_code(&page_language().id));
     let error: Signal<String> = App::use_signal(|| TEXT_EMPTY.to_string());
+    let notice: Signal<String> = App::use_signal(|| TEXT_EMPTY.to_string());
     let state: IdeState = IdeState {
         language,
         language_name,
         code,
+        notice,
         error,
     };
     let _started: Signal<bool> = App::use_signal(|| {
@@ -84,11 +86,8 @@ fn install_error_listener(state: IdeState) {
     let handler: Closure<dyn FnMut(String)> = Closure::wrap(Box::new(move |message: String| {
         report_error(state, message);
     }));
-    let _: Result<bool, JsValue> = js_sys::Reflect::set(
-        &window,
-        &JsValue::from_str(GLOBAL_ERROR),
-        handler.as_ref(),
-    );
+    let _: Result<bool, JsValue> =
+        js_sys::Reflect::set(&window, &JsValue::from_str(GLOBAL_ERROR), handler.as_ref());
     handler.forget();
     let script: String = format!(
         "window.addEventListener('{EVENT_ERROR}', function (event) {{ if (window.{GLOBAL_ERROR}) {{ window.{GLOBAL_ERROR}(event.message || ''); }} }}); window.addEventListener('{EVENT_REJECTION}', function (event) {{ if (window.{GLOBAL_ERROR}) {{ window.{GLOBAL_ERROR}(String(event.reason || '')); }} }});"

@@ -206,6 +206,7 @@ pub async fn submit_comment(state: BlogState) {
     };
     let content: String = state.get_comment_body().get();
     if content.trim().is_empty() {
+        state.get_error().set(MESSAGE_EMPTY_COMMENT.to_string());
         return;
     }
     let body: CommentDraft = CommentDraft {
@@ -216,6 +217,7 @@ pub async fn submit_comment(state: BlogState) {
     match post_json::<BlogComment, CommentDraft>(PATH_COMMENT_CREATE, &body).await {
         Ok(_) => {
             state.get_comment_body().set(COMMENT_EMPTY.to_string());
+            load_posts(state).await;
             open_post(state, post.id.clone()).await;
         }
         Err(error) => state.get_error().set(error.message),

@@ -14,7 +14,7 @@ impl BlogPostRepository {
     #[instrument_trace]
     pub async fn insert(active_model: BlogPostActiveModel) -> Result<BlogPostModel, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: BlogPostModel = active_model
             .insert(&db)
             .await
@@ -34,7 +34,7 @@ impl BlogPostRepository {
     #[instrument_trace]
     pub async fn find_by_id(id: i32) -> Result<Option<BlogPostModel>, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: Option<BlogPostModel> = BlogPostEntity::find_by_id(id)
             .filter(BlogPostColumn::IsDeleted.eq(false))
             .one(&db)
@@ -57,7 +57,7 @@ impl BlogPostRepository {
         query: BlogPostQuery,
     ) -> Result<(Vec<BlogPostModel>, i64), String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let mut base_select: sea_orm::Select<BlogPostEntity> = BlogPostEntity::find();
         if let Some(user_id) = query.try_get_user_id() {
             base_select = base_select.filter(BlogPostColumn::UserId.eq(user_id));
@@ -106,7 +106,7 @@ impl BlogPostRepository {
         active_model: BlogPostActiveModel,
     ) -> Result<BlogPostModel, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let model: BlogPostModel = BlogPostEntity::find_by_id(id)
             .filter(BlogPostColumn::IsDeleted.eq(false))
             .one(&db)
@@ -148,7 +148,7 @@ impl BlogPostRepository {
     #[instrument_trace]
     pub async fn soft_delete_by_id(id: i32) -> Result<(), String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let model: BlogPostModel = BlogPostEntity::find_by_id(id)
             .filter(BlogPostColumn::IsDeleted.eq(false))
             .one(&db)
@@ -176,7 +176,7 @@ impl BlogPostRepository {
     #[instrument_trace]
     pub async fn increment_view_count(id: i32) -> Result<(), String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let model: BlogPostModel = BlogPostEntity::find_by_id(id)
             .filter(BlogPostColumn::IsDeleted.eq(false))
             .one(&db)
@@ -206,7 +206,7 @@ impl BlogPostRepository {
     #[instrument_trace]
     pub async fn update_like_count(id: i32, delta: i32) -> Result<(), String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let model: BlogPostModel = BlogPostEntity::find_by_id(id)
             .filter(BlogPostColumn::IsDeleted.eq(false))
             .one(&db)
@@ -236,7 +236,7 @@ impl BlogPostRepository {
     #[instrument_trace]
     pub async fn update_favorite_count(id: i32, delta: i32) -> Result<(), String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let model: BlogPostModel = BlogPostEntity::find_by_id(id)
             .filter(BlogPostColumn::IsDeleted.eq(false))
             .one(&db)
@@ -266,7 +266,7 @@ impl BlogPostRepository {
     #[instrument_trace]
     pub async fn update_comment_count(id: i32, delta: i32) -> Result<(), String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let model: BlogPostModel = BlogPostEntity::find_by_id(id)
             .filter(BlogPostColumn::IsDeleted.eq(false))
             .one(&db)
@@ -298,7 +298,7 @@ impl BlogCommentRepository {
     #[instrument_trace]
     pub async fn insert(active_model: BlogCommentActiveModel) -> Result<BlogCommentModel, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: BlogCommentModel = active_model
             .insert(&db)
             .await
@@ -318,7 +318,7 @@ impl BlogCommentRepository {
     #[instrument_trace]
     pub async fn find_by_id(id: i32) -> Result<Option<BlogCommentModel>, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: Option<BlogCommentModel> = BlogCommentEntity::find_by_id(id)
             .filter(BlogCommentColumn::IsDeleted.eq(false))
             .one(&db)
@@ -341,7 +341,7 @@ impl BlogCommentRepository {
         query: BlogCommentQuery,
     ) -> Result<(Vec<BlogCommentModel>, i64), String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let base_select: sea_orm::Select<BlogCommentEntity> = BlogCommentEntity::find()
             .filter(BlogCommentColumn::PostId.eq(query.get_post_id()))
             .filter(BlogCommentColumn::IsDeleted.eq(false));
@@ -374,7 +374,7 @@ impl BlogCommentRepository {
         parent_id: i32,
     ) -> Result<Vec<BlogCommentModel>, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: Vec<BlogCommentModel> = BlogCommentEntity::find()
             .filter(BlogCommentColumn::ParentId.eq(parent_id))
             .filter(BlogCommentColumn::IsDeleted.eq(false))
@@ -397,7 +397,7 @@ impl BlogCommentRepository {
     #[instrument_trace]
     pub async fn soft_delete_by_id(id: i32) -> Result<(), String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let model: BlogCommentModel = BlogCommentEntity::find_by_id(id)
             .filter(BlogCommentColumn::IsDeleted.eq(false))
             .one(&db)
@@ -428,7 +428,7 @@ impl BlogLikeRepository {
     #[instrument_trace]
     pub async fn insert(active_model: BlogLikeActiveModel) -> Result<BlogLikeModel, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: BlogLikeModel = active_model
             .insert(&db)
             .await
@@ -452,7 +452,7 @@ impl BlogLikeRepository {
         user_id: i32,
     ) -> Result<Option<BlogLikeModel>, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: Option<BlogLikeModel> = BlogLikeEntity::find()
             .filter(BlogLikeColumn::PostId.eq(post_id))
             .filter(BlogLikeColumn::UserId.eq(user_id))
@@ -475,7 +475,7 @@ impl BlogLikeRepository {
     #[instrument_trace]
     pub async fn delete_by_post_and_user(post_id: i32, user_id: i32) -> Result<(), String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let model: BlogLikeModel = BlogLikeEntity::find()
             .filter(BlogLikeColumn::PostId.eq(post_id))
             .filter(BlogLikeColumn::UserId.eq(user_id))
@@ -503,7 +503,7 @@ impl BlogLikeRepository {
     #[instrument_trace]
     pub async fn count_by_post_id(post_id: i32) -> Result<i64, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let count: i64 = BlogLikeEntity::find()
             .filter(BlogLikeColumn::PostId.eq(post_id))
             .count(&db)
@@ -529,7 +529,7 @@ impl BlogFavoriteRepository {
         active_model: BlogFavoriteActiveModel,
     ) -> Result<BlogFavoriteModel, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: BlogFavoriteModel = active_model
             .insert(&db)
             .await
@@ -553,7 +553,7 @@ impl BlogFavoriteRepository {
         user_id: i32,
     ) -> Result<Option<BlogFavoriteModel>, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: Option<BlogFavoriteModel> = BlogFavoriteEntity::find()
             .filter(BlogFavoriteColumn::PostId.eq(post_id))
             .filter(BlogFavoriteColumn::UserId.eq(user_id))
@@ -576,7 +576,7 @@ impl BlogFavoriteRepository {
     #[instrument_trace]
     pub async fn delete_by_post_and_user(post_id: i32, user_id: i32) -> Result<(), String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let model: BlogFavoriteModel = BlogFavoriteEntity::find()
             .filter(BlogFavoriteColumn::PostId.eq(post_id))
             .filter(BlogFavoriteColumn::UserId.eq(user_id))
@@ -604,7 +604,7 @@ impl BlogFavoriteRepository {
     #[instrument_trace]
     pub async fn count_by_post_id(post_id: i32) -> Result<i64, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let count: i64 = BlogFavoriteEntity::find()
             .filter(BlogFavoriteColumn::PostId.eq(post_id))
             .count(&db)
@@ -631,7 +631,7 @@ impl BlogFavoriteRepository {
         limit: u64,
     ) -> Result<(Vec<BlogFavoriteModel>, i64), String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let base_select: sea_orm::Select<BlogFavoriteEntity> =
             BlogFavoriteEntity::find().filter(BlogFavoriteColumn::UserId.eq(user_id));
         let total: i64 = base_select
@@ -664,7 +664,7 @@ impl BlogImageRepository {
     #[instrument_trace]
     pub async fn insert(active_model: BlogImageActiveModel) -> Result<BlogImageModel, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: BlogImageModel = active_model
             .insert(&db)
             .await
@@ -684,7 +684,7 @@ impl BlogImageRepository {
     #[instrument_trace]
     pub async fn find_by_id(id: i32) -> Result<Option<BlogImageModel>, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: Option<BlogImageModel> = BlogImageEntity::find_by_id(id)
             .one(&db)
             .await
@@ -704,7 +704,7 @@ impl BlogImageRepository {
     #[instrument_trace]
     pub async fn find_by_post_id(post_id: i32) -> Result<Vec<BlogImageModel>, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: Vec<BlogImageModel> = BlogImageEntity::find()
             .filter(BlogImageColumn::PostId.eq(post_id))
             .order_by_desc(BlogImageColumn::Id)
@@ -727,7 +727,7 @@ impl BlogImageRepository {
     #[instrument_trace]
     pub async fn update_post_id(image_id: i32, post_id: i32) -> Result<(), String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let model: BlogImageModel = BlogImageEntity::find_by_id(image_id)
             .one(&db)
             .await
@@ -754,7 +754,7 @@ impl BlogImageRepository {
     #[instrument_trace]
     pub async fn delete_by_id(id: i32) -> Result<(), String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let model: BlogImageModel = BlogImageEntity::find_by_id(id)
             .one(&db)
             .await

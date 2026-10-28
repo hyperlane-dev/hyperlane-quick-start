@@ -10,5 +10,6 @@ use super::*;
     ),
     tag = OPENAPI_TAG_HEALTH
 )]
+/// Body of the `openapi_health` free function.
 #[instrument_trace]
 pub fn openapi_health() {}

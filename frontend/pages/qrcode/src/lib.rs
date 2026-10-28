@@ -15,7 +15,7 @@ pub(crate) use {app::*, hook::*, model::*, page::*, qr::*, style::*};
 
 use {
     euv::{
-        js_sys::Reflect,
+        js_sys::{Array, Reflect},
         wasm_bindgen_futures::{JsFuture, spawn_local},
         *,
     },

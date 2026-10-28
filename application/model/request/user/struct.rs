@@ -4,36 +4,58 @@ use super::*;
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct UpdateUserRequest {
     /// The email.
-    pub(super) email: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) email: Option<String>,
     /// The phone.
-    pub(super) phone: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) phone: Option<String>,
 }
 
 /// change password request.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct ChangePasswordRequest {
     /// The old password.
-    pub(super) old_password: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) old_password: String,
     /// The new password.
-    pub(super) new_password: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) new_password: String,
 }
 
 /// update user status request.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct UpdateUserStatusRequest {
     /// The approved.
-    #[get(type(copy))]
-    pub(super) approved: bool,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) approved: bool,
 }
 
 /// user list query request.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct UserListQueryRequest {
     /// The keyword.
-    pub(super) keyword: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) keyword: Option<String>,
     /// The last id.
-    pub(super) last_id: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) last_id: Option<String>,
     /// The limit.
-    #[get(type(copy))]
-    pub(super) limit: Option<u64>,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) limit: Option<u64>,
 }

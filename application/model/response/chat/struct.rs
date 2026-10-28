@@ -3,35 +3,58 @@ use super::*;
 /// web socket resp data.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct WebSocketRespData {
-    #[get(type(copy))]
-    pub(super) r#type: MessageType,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) r#type: MessageType,
     /// The name.
-    pub(super) name: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) name: String,
     /// The data.
-    pub(super) data: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) data: String,
     /// The time.
-    pub(super) time: i64,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) time: i64,
 }
 
 /// Represents a chat user list response with online user information.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct UserListResponse {
     /// The users.
-    pub(super) users: Vec<OnlineUser>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) users: Vec<OnlineUser>,
     /// The total count.
-    #[get(type(copy))]
-    pub(super) total_count: usize,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) total_count: usize,
 }
 
 /// chat history response.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct ChatHistoryResponse {
     /// The messages.
-    pub(super) messages: Vec<ChatHistory>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) messages: Vec<ChatHistory>,
     /// The total.
-    #[get(type(copy))]
-    pub(super) total: usize,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) total: usize,
     /// The has more.
-    #[get(type(copy))]
-    pub(super) has_more: bool,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) has_more: bool,
 }

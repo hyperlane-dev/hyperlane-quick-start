@@ -8,8 +8,13 @@ pub struct RedisPlugin;
 #[derive(Clone, Data, Debug, New)]
 pub struct RedisAutoCreation {
     /// The Redis instance configuration for this auto-creation handler.
-    pub(super) instance: RedisInstanceConfig,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) instance: RedisInstanceConfig,
     /// The database schema (unused for Redis but required by the trait).
     #[new(skip)]
-    pub(super) schema: DatabaseSchema,
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub schema: DatabaseSchema,
 }

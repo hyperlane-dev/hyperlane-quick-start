@@ -19,6 +19,7 @@ use {
     euv_ui::*,
     hyperlane_frontend_shared::*,
     serde::Deserialize,
+    serde_json::Value,
     std::cell::{Cell, RefCell, RefMut},
 };
 

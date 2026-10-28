@@ -89,8 +89,11 @@ pub fn tracking_page(node: VirtualNode<TrackingPageProps>) -> VirtualNode {
                     }
                 }
             }
-            div {
-                class: c_tracking_stats()
+            euv_grid {
+                cols: vec![EuvGridCol {
+                    span: 8, offset: 0
+                }; 3]
+                gutter: true
                 stat_tile {
                     label: LABEL_TOTAL
                     value: total.to_string()
@@ -211,11 +214,8 @@ pub fn tracking_page(node: VirtualNode<TrackingPageProps>) -> VirtualNode {
 /// - `VirtualNode` - The metric tile tree.
 #[component]
 pub fn stat_tile(node: VirtualNode<StatTileProps>) -> VirtualNode {
-    let StatTileProps {
-        label,
-        value,
-        icon,
-    }: StatTileProps = node.try_get_props().unwrap_or_default();
+    let StatTileProps { label, value, icon }: StatTileProps =
+        node.try_get_props().unwrap_or_default();
     html! {
         div {
             class: c_hls_stat_card()
@@ -499,7 +499,9 @@ fn next_page_handler(state: TrackingState) -> Option<Rc<dyn Fn(Event)>> {
 fn detail_handler(state: TrackingState, id: i64) -> Option<Rc<dyn Fn(Event)>> {
     Some(Rc::new(move |_: Event| {
         let records: Vec<TrackingRecord> = state.get_records().get();
-        let record: Option<TrackingRecord> = records.into_iter().find(|record: &TrackingRecord| record.id == id);
+        let record: Option<TrackingRecord> = records
+            .into_iter()
+            .find(|record: &TrackingRecord| record.id == id);
         state.get_detail().set(record);
     }))
 }

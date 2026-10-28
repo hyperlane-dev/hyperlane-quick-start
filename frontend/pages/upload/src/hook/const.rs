@@ -16,6 +16,13 @@ pub(crate) const STORAGE_KEY: &str = "hyperlane_upload_history";
 /// The name of the file the export of the history is written to.
 pub(crate) const EXPORT_FILE_NAME: &str = "upload_history.json";
 
+/// The feedback reported after the browser accepts a history export.
+pub(crate) const MESSAGE_EXPORT_SUCCESS: &str = "The upload history has been exported.";
+
+/// The feedback reported when a history export cannot be created.
+pub(crate) const MESSAGE_EXPORT_FAILED: &str =
+    "Could not export the upload history. Please try again.";
+
 /// The empty text of the page.
 pub(crate) const TEXT_EMPTY: &str = "";
 

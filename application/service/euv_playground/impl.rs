@@ -19,7 +19,7 @@ impl EuvPlaygroundService {
     ///     `Encode::execute` call fails so the playground never blocks on an encoding error.
     #[instrument_trace]
     pub fn encode_id(id: i64) -> String {
-        Encode::execute(CHARSETS, &id.to_string())
+        Encode::execute(charsets(), &id.to_string())
             .map_err(|_: EncodeError| ERROR_FAILED_TO_ENCODE_ID.to_string())
             .map(|encoded: String| {
                 if encoded.is_empty() {
@@ -44,7 +44,7 @@ impl EuvPlaygroundService {
     /// - `Result<i64, String>` - The decoded numeric id, or an error if the format is invalid.
     #[instrument_trace]
     pub fn decode_id(encoded: &str) -> Result<i64, String> {
-        let decoded: String = Decode::execute(CHARSETS, encoded)
+        let decoded: String = Decode::execute(charsets(), encoded)
             .map_err(|_: DecodeError| ERROR_INVALID_ID_FORMAT.to_string())
             .unwrap_or_else(|_| encoded.to_string());
         decoded
@@ -65,7 +65,7 @@ impl EuvPlaygroundService {
     /// - `String` - The encoded job id; never fails (mirrors [`Self::encode_id`]).
     #[instrument_trace]
     pub fn encode_job_id(job_id: BuildJobId) -> String {
-        Encode::execute(CHARSETS, &job_id.to_string())
+        Encode::execute(charsets(), &job_id.to_string())
             .map(|encoded: String| {
                 if encoded.is_empty() {
                     job_id.to_string()
@@ -91,7 +91,7 @@ impl EuvPlaygroundService {
     ///     format is invalid.
     #[instrument_trace]
     pub fn decode_job_id(encoded: &str) -> Result<BuildJobId, String> {
-        let decoded: String = Decode::execute(CHARSETS, encoded)
+        let decoded: String = Decode::execute(charsets(), encoded)
             .map(|text: String| text)
             .unwrap_or_else(|_| encoded.to_string());
         decoded
@@ -764,7 +764,7 @@ impl EuvPlaygroundService {
             "{job_id}{BUILD_TASK_SEPARATOR}{user_id}{BUILD_TASK_SEPARATOR}{project_id}{BUILD_TASK_SEPARATOR}{code}"
         )
         .into_bytes();
-        broker.publish(TOPIC_EUV_PLAYGROUND_BUILD, &payload).await
+        broker.publish(topic_euv_playground_build(), &payload).await
     }
 
     /// Looks up a build job by id, applying ownership authorization.
@@ -879,7 +879,7 @@ impl EuvPlaygroundService {
     /// - `MessagePayload` - The raw bytes from the topic.
     #[instrument_trace]
     pub async fn run_build_for_job(payload: MessagePayload) {
-        let sep_byte: u8 = BUILD_TASK_SEPARATOR.as_bytes()[0];
+        let sep_byte: u8 = build_task_separator().as_bytes()[0];
         let mut segments: Vec<&[u8]> = Vec::with_capacity(4);
         let mut start: usize = 0;
         for (idx, byte) in payload.iter().enumerate() {
@@ -995,7 +995,7 @@ impl EuvPlaygroundService {
             if snapshot.status != build_status::SUCCESS && snapshot.status != build_status::FAILED {
                 return true;
             }
-            now.saturating_sub(snapshot.updated_at_ms) < BUILD_JOB_TTL_MS
+            now.saturating_sub(snapshot.updated_at_ms) < build_job_ttl_ms()
         });
         let removed: usize = before.saturating_sub(map.len());
         if removed > 0 {

@@ -192,14 +192,17 @@ pub fn export_entries(state: QrcodeState) {
     let export: QrExport = QrExport {
         url_list: state.get_entries().get(),
     };
-    let Ok(encoded): Result<String, serde_json::Error> = serde_json::to_string(&export) else {
-        return;
-    };
-    download_file(EXPORT_FILE_NAME, &encoded);
-    state
-        .get_message()
-        .set("The list of the QR codes has been exported".to_string());
-    state.get_failed().set(false);
+    let downloaded: bool = serde_json::to_string(&export)
+        .is_ok_and(|encoded: String| download_file(EXPORT_FILE_NAME, &encoded));
+    state.get_message().set(
+        if downloaded {
+            MESSAGE_EXPORT_SUCCESS
+        } else {
+            MESSAGE_EXPORT_FAILED
+        }
+        .to_string(),
+    );
+    state.get_failed().set(!downloaded);
 }
 
 /// Reads the list of the QR codes out of an imported file.
@@ -428,7 +431,7 @@ fn theme_color(name: &str, fallback: &str) -> String {
 ///
 /// - `bool` - Whether the file has been downloaded.
 fn download_file(name: &str, content: &str) -> bool {
-    let parts: JsValue = JsValue::from_str(content);
+    let parts: Array = Array::of1(&JsValue::from_str(content));
     let Ok(blob): Result<Blob, JsValue> = Blob::new_with_str_sequence(&parts) else {
         return false;
     };

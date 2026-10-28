@@ -16,10 +16,18 @@ use super::*;
 pub struct Model {
     /// Unique primary key identifier used as the short link token.
     #[sea_orm(primary_key, auto_increment = true)]
-    #[get(type(copy))]
-    pub(super) id: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) id: i32,
     /// The original target URL that the short link redirects to.
-    pub(super) url: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) url: String,
     /// The timestamp when the short link was created.
-    pub(super) created_at: Option<NaiveDateTime>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) created_at: Option<NaiveDateTime>,
 }

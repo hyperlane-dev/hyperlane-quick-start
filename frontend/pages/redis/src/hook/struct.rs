@@ -1,7 +1,7 @@
 use super::*;
 
 /// The reactive state the redis page renders from.
-#[derive(Clone, Copy, CustomDebug, Data, Default, New)]
+#[derive(Clone, Copy, CustomDebug, Data, Default)]
 pub struct RedisState {
     /// The records of the cache.
     #[get(type(copy))]

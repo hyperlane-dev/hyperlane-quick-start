@@ -10,5 +10,6 @@ use super::*;
     ),
     tag = OPENAPI_TAG
 )]
+/// Body of the `openapi_euv_playground_view` free function.
 #[instrument_trace]
 pub fn openapi_euv_playground_view() {}

@@ -1,7 +1,7 @@
 use super::*;
 
 /// The reactive state the CI/CD page renders from.
-#[derive(Clone, Copy, CustomDebug, Data, Default, New)]
+#[derive(Clone, Copy, CustomDebug, Data, Default)]
 pub struct CicdState {
     /// The tab being displayed.
     #[get(type(copy))]

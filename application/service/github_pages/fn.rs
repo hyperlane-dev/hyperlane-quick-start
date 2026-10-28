@@ -774,3 +774,12 @@ pub async fn wait_for_pending_fetch(
     // wait_for guarantees `is_some` when it returns `Ok`
     receiver.borrow_and_update().clone().unwrap()
 }
+
+/// Returns the `SYNC_TASK_SEPARATOR` configuration value.
+///
+/// # Returns
+///
+/// - `&'static str` - The configured value.
+pub fn sync_task_separator() -> &'static str {
+    SYNC_TASK_SEPARATOR
+}

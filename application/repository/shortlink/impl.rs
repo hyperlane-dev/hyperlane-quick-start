@@ -14,7 +14,7 @@ impl ShortlinkRepository {
     #[instrument_trace]
     pub async fn find_by_url(url: &str) -> Result<Option<ShortlinkModel>, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: Option<ShortlinkModel> = Entity::find()
             .filter(Column::Url.eq(url))
             .one(&db)
@@ -35,7 +35,7 @@ impl ShortlinkRepository {
     #[instrument_trace]
     pub async fn find_by_id(id: i32) -> Result<Option<ShortlinkModel>, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: Option<ShortlinkModel> = Entity::find_by_id(id)
             .one(&db)
             .await
@@ -55,7 +55,7 @@ impl ShortlinkRepository {
     #[instrument_trace]
     pub async fn insert(url: &str) -> Result<ShortlinkModel, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let active_model: ActiveModel = ActiveModel {
             url: ActiveValue::Set(url.to_string()),
             id: ActiveValue::NotSet,

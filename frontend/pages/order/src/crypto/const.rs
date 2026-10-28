@@ -37,3 +37,15 @@ pub(crate) const ERROR_MESSAGE_TOO_LONG: &str = "the credential is longer than t
 
 /// The failure reported when a base64 text holds an unknown character.
 pub(crate) const ERROR_INVALID_BASE64: &str = "the base64 text holds an unknown character";
+
+/// The global object providing the browser's cryptographically secure random source.
+pub(crate) const PROPERTY_CRYPTO: &str = "crypto";
+
+/// The native method that fills a typed array with secure random bytes.
+pub(crate) const METHOD_RANDOM_VALUES: &str = "getRandomValues";
+
+/// The maximum number of zero random bytes rejected for one padding position.
+pub(crate) const RANDOM_RETRY_LIMIT: usize = 32;
+
+/// The failure reported when secure padding cannot be generated.
+pub(crate) const ERROR_SECURE_RANDOM: &str = "secure random padding is unavailable";

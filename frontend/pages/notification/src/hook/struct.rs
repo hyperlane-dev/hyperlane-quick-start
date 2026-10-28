@@ -1,7 +1,7 @@
 use super::*;
 
 /// The reactive state the notification page renders from.
-#[derive(Clone, Copy, CustomDebug, Data, Default, New)]
+#[derive(Clone, Copy, CustomDebug, Data, Default)]
 pub struct NotificationState {
     /// The notifications of the list being displayed.
     #[get(type(copy))]

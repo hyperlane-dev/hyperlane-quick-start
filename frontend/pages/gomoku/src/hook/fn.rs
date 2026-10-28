@@ -98,17 +98,32 @@ pub fn handle_frame(state: GomokuState, frame: GomokuFrame) {
 /// - `()` - The room has been written into the state.
 fn apply_room(state: GomokuState, room: GomokuRoom) {
     let user: String = state.get_user_id().get();
-    let role: &str = if room.players
+    let role: &str = if room
+        .players
         .iter()
-        .any(|player: &GomokuPlayer| player.user_id == user) {
+        .any(|player: &GomokuPlayer| player.user_id == user)
+    {
         ROLE_PLAYER
-    } else if room.spectators
+    } else if room
+        .spectators
         .iter()
-        .any(|spectator: &String| spectator == &user) {
+        .any(|spectator: &String| spectator == &user)
+    {
         ROLE_SPECTATOR
     } else {
         ROLE_NONE
     };
+    if role == ROLE_NONE {
+        state.get_room().set(None);
+        state.get_room_id().set(TEXT_EMPTY.to_string());
+        state.get_cells().set(Vec::new());
+        state.get_players().set(Vec::new());
+        state.get_spectators().set(Vec::new());
+        state.get_moves().set(Vec::new());
+        state.get_role().set(ROLE_NONE.to_string());
+        state.get_error().set(TEXT_EMPTY.to_string());
+        return;
+    }
     let cells: Vec<GomokuCell> = build_cells(&room.board);
     let mut moves: Vec<GomokuMove> = room.moves.clone();
     moves.reverse();
@@ -128,12 +143,12 @@ fn apply_room(state: GomokuState, room: GomokuRoom) {
 ///
 /// # Arguments
 ///
-/// - `&Vec<Vec<u8>>` - The board of the room.
+/// - `&[Vec<u8>]` - The board of the room.
 ///
 /// # Returns
 ///
 /// - `Vec<GomokuCell>` - The cells of the board.
-fn build_cells(board: &Vec<Vec<u8>>) -> Vec<GomokuCell> {
+fn build_cells(board: &[Vec<u8>]) -> Vec<GomokuCell> {
     let mut cells: Vec<GomokuCell> = Vec::with_capacity(BOARD_COLUMNS * BOARD_ROWS);
     for y in 0..BOARD_ROWS {
         for x in 0..BOARD_COLUMNS {
@@ -175,6 +190,7 @@ pub fn join_room(state: GomokuState) {
     let room: String = state.get_room_id().get();
     let room: &str = room.trim();
     if room.is_empty() {
+        state.get_error().set(ERROR_ROOM_REQUIRED.to_string());
         return;
     }
     send(TYPE_JOIN_ROOM, room, serde_json::json!({}));
@@ -193,6 +209,7 @@ pub fn spectate_room(state: GomokuState) {
     let room: String = state.get_room_id().get();
     let room: &str = room.trim();
     if room.is_empty() {
+        state.get_error().set(ERROR_ROOM_REQUIRED.to_string());
         return;
     }
     send(TYPE_SPECTATE, room, serde_json::json!({}));

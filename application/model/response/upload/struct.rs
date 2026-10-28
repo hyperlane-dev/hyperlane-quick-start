@@ -4,12 +4,18 @@ use super::*;
 #[derive(Clone, Copy, Data, Debug, Default, Serialize, ToSchema)]
 pub struct UploadResponse<'a> {
     /// The code.
-    #[get(type(copy))]
-    pub(super) code: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) code: i32,
     /// The url.
-    #[get(type(copy))]
-    pub(super) url: &'a str,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) url: &'a str,
     /// The msg.
-    #[get(type(copy))]
-    pub(super) msg: &'a str,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) msg: &'a str,
 }

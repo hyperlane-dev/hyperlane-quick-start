@@ -1,6 +1,15 @@
 use super::*;
 
 class! {
+    // Standalone pages need no sidebar or mobile-header reservation.
+    pub c_hls_main {
+        c_app_main();
+        min-width: "0px";
+        padding-bottom: var!(page-block-gap);
+        user-select: "text";
+        -webkit-user-select: "text";
+    }
+
     // ═══════════════════════════════════════════════════════════════════════════
     // Metric Tiles
     // ═══════════════════════════════════════════════════════════════════════════

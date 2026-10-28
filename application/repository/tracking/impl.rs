@@ -13,7 +13,7 @@ impl TrackingRepository {
             tokio::task::block_in_place(|| {
                 tokio::runtime::Handle::current().block_on(async {
                     let db: DatabaseConnection =
-                        PostgreSqlPlugin::connection_db(DEFAULT_POSTGRESQL_INSTANCE_NAME, None)
+                        PostgreSqlPlugin::connection_db(default_postgresql_instance_name(), None)
                             .await
                             .expect(ERROR_FAILED_TO_CONNECT_DATABASE);
                     db
@@ -34,7 +34,7 @@ impl TrackingRepository {
     #[instrument_trace]
     pub async fn insert(record: TrackingRecord) -> Result<(), DbErr> {
         let headers_json: String =
-            serde_json::to_string(record.get_headers()).map_err(|error: serde_json::Error| {
+            serde_json::to_string(record.get_headers()).map_err(|error: Error| {
                 DbErr::Custom(format!("Failed to serialize headers {error}"))
             })?;
         spawn(async move {

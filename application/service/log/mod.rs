@@ -2,9 +2,9 @@ mod r#const;
 mod r#impl;
 mod r#struct;
 
-pub use {r#const::*, r#struct::*};
+pub use r#struct::*;
 
-use {super::*, model::application::log::*};
+pub(crate) use r#const::*;
 
 use hyperlane_plugin::{common::*, env::*};
 use std::{
@@ -12,3 +12,4 @@ use std::{
     fs::{self, DirEntry, FileType, ReadDir},
     path::{Path, PathBuf},
 };
+use {super::*, model::application::log::*};

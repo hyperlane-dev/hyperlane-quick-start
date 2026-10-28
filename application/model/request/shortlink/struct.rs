@@ -4,5 +4,8 @@ use super::*;
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct ShortlinkInsertRequest {
     /// The url.
-    pub(super) url: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) url: String,
 }

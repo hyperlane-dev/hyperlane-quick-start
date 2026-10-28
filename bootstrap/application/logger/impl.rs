@@ -17,7 +17,7 @@ impl BootstrapSyncInit for LoggerBootstrap {
             hyperlane_plugin::logger::FileLogger::default();
         file_logger.set_path(env_config.get_server_log_dir().to_string());
         file_logger.set_limit_file_size(env_config.get_server_log_size());
-        Logger::init(LOG_LEVEL_FILTER, file_logger);
+        Logger::init(log_level_filter(), file_logger);
         Self
     }
 }

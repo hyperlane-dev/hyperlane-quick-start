@@ -74,7 +74,7 @@ impl UserRepository {
     #[instrument_trace]
     pub async fn find_by_id(user_id: i32) -> Result<Option<AuthUserModel>, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: Option<AuthUserModel> = AuthUserEntity::find_by_id(user_id)
             .one(&db)
             .await
@@ -94,7 +94,7 @@ impl UserRepository {
     #[instrument_trace]
     pub async fn find_by_username(username: String) -> Result<Option<AuthUserModel>, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: Option<AuthUserModel> = AuthUserEntity::find()
             .filter(AuthUserColumn::Username.eq(username))
             .one(&db)
@@ -115,7 +115,7 @@ impl UserRepository {
     #[instrument_trace]
     pub async fn find_by_ids(user_ids: Vec<i32>) -> Result<Vec<AuthUserModel>, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: Vec<AuthUserModel> = AuthUserEntity::find()
             .filter(AuthUserColumn::Id.is_in(user_ids))
             .all(&db)
@@ -137,7 +137,7 @@ impl UserRepository {
     pub async fn insert(active_model: AuthUserActiveModel) -> Result<AuthUserModel, String> {
         Self::validate_active_model(&active_model)?;
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: AuthUserModel = active_model
             .insert(&db)
             .await
@@ -158,7 +158,7 @@ impl UserRepository {
     pub async fn update(active_model: AuthUserActiveModel) -> Result<AuthUserModel, String> {
         Self::validate_active_model(&active_model)?;
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: AuthUserModel = active_model
             .update(&db)
             .await
@@ -184,7 +184,7 @@ impl UserRepository {
         limit: u64,
     ) -> Result<(Vec<AuthUserModel>, i64, bool), String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let mut base_select: Select<AuthUserEntity> = AuthUserEntity::find();
         if let Some(keyword) = keyword {
             let keyword_pattern: String = format!("%{keyword}%");
@@ -236,7 +236,7 @@ impl UserRepository {
         end: NaiveDateTime,
     ) -> Result<i64, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let count_u64: u64 = AuthUserEntity::find()
             .filter(AuthUserColumn::CreatedAt.gte(start))
             .filter(AuthUserColumn::CreatedAt.lte(end))
@@ -262,7 +262,7 @@ impl UserRepository {
         end: NaiveDateTime,
     ) -> Result<Vec<AuthUserModel>, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: Vec<AuthUserModel> = AuthUserEntity::find()
             .filter(AuthUserColumn::CreatedAt.gte(start))
             .filter(AuthUserColumn::CreatedAt.lte(end))
@@ -284,7 +284,7 @@ impl UserRepository {
     #[instrument_trace]
     pub async fn delete_by_id(user_id: i32) -> Result<(), String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         AuthUserEntity::delete_by_id(user_id)
             .exec(&db)
             .await

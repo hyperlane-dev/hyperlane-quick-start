@@ -73,7 +73,7 @@ impl ServerHook for QueryRoute {
 
     #[prologue_macros(
         is_get_method,
-        try_get_route_param(ID_KEY => id_opt),
+        try_get_route_param(id_key() => id_opt),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]

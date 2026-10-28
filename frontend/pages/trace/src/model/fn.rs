@@ -13,5 +13,8 @@ use super::*;
 ///
 /// - `String` - The path of the endpoint.
 pub fn trace_path(trace: &str) -> String {
-    format!("{PATH_TRACE}{PATH_SEPARATOR}{}", encode_uri_component(trace))
+    format!(
+        "{PATH_TRACE}{PATH_SEPARATOR}{}",
+        encode_uri_component(trace)
+    )
 }

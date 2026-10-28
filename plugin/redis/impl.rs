@@ -82,7 +82,7 @@ impl DatabaseConnectionPlugin for RedisPlugin {
             }
         }
         let db_url: String = instance.get_connection_url();
-        let client: Client = Client::open(db_url).map_err(|error: redis::RedisError| {
+        let client: Client = Client::open(db_url).map_err(|error: RedisError| {
             let error_msg: String = error.to_string();
             let instance_name_clone: String = instance_name_str.to_string();
             let error_msg_clone: String = error_msg.clone();
@@ -103,7 +103,7 @@ impl DatabaseConnectionPlugin for RedisPlugin {
             spawn_blocking(move || client.get_connection());
         let connection: Connection = match timeout(timeout_duration, connection_task).await {
             Ok(join_result) => match join_result {
-                Ok(result) => result.map_err(|error: redis::RedisError| {
+                Ok(result) => result.map_err(|error: RedisError| {
                     let error_msg: String = error.to_string();
                     let instance_name_clone: String = instance_name_str.to_string();
                     let error_msg_clone: String = error_msg.clone();

@@ -1,5 +1,5 @@
 /// Default name for the MySQL instance when no explicit name is provided.
-pub const DEFAULT_MYSQL_INSTANCE_NAME: &str = "mysql_default";
+pub(crate) const DEFAULT_MYSQL_INSTANCE_NAME: &str = "mysql_default";
 
 /// Log label for the auto-creation process of an instance.
 pub(crate) const AUTO_CREATION_PROCESS_LABEL: &str = "Auto-creation process";

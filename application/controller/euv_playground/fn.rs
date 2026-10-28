@@ -14,6 +14,7 @@ use super::*;
         ("cookie_auth" = [])
     )
 )]
+/// Body of the `openapi_euv_playground_projects_list` free function.
 #[instrument_trace]
 pub fn openapi_euv_playground_projects_list() {}
 
@@ -34,6 +35,7 @@ pub fn openapi_euv_playground_projects_list() {}
         ("cookie_auth" = [])
     )
 )]
+/// Body of the `openapi_euv_playground_projects_create` free function.
 #[instrument_trace]
 pub fn openapi_euv_playground_projects_create() {}
 
@@ -55,6 +57,7 @@ pub fn openapi_euv_playground_projects_create() {}
         ("cookie_auth" = [])
     )
 )]
+/// Body of the `openapi_euv_playground_projects_get` free function.
 #[instrument_trace]
 pub fn openapi_euv_playground_projects_get() {}
 
@@ -79,6 +82,7 @@ pub fn openapi_euv_playground_projects_get() {}
         ("cookie_auth" = [])
     )
 )]
+/// Body of the `openapi_euv_playground_projects_save` free function.
 #[instrument_trace]
 pub fn openapi_euv_playground_projects_save() {}
 
@@ -100,6 +104,7 @@ pub fn openapi_euv_playground_projects_save() {}
         ("cookie_auth" = [])
     )
 )]
+/// Body of the `openapi_euv_playground_projects_delete` free function.
 #[instrument_trace]
 pub fn openapi_euv_playground_projects_delete() {}
 
@@ -120,6 +125,7 @@ pub fn openapi_euv_playground_projects_delete() {}
         ("cookie_auth" = [])
     )
 )]
+/// Body of the `openapi_euv_playground_run` free function.
 #[instrument_trace]
 pub fn openapi_euv_playground_run() {}
 
@@ -142,6 +148,7 @@ pub fn openapi_euv_playground_run() {}
         ("cookie_auth" = [])
     )
 )]
+/// Body of the `openapi_euv_playground_run_status` free function.
 #[instrument_trace]
 pub fn openapi_euv_playground_run_status() {}
 
@@ -155,5 +162,6 @@ pub fn openapi_euv_playground_run_status() {}
     ),
     tag = OPENAPI_TAG_EUV_PLAYGROUND
 )]
+/// Body of the `openapi_euv_playground_default_code` free function.
 #[instrument_trace]
 pub fn openapi_euv_playground_default_code() {}

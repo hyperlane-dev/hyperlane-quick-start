@@ -11,5 +11,6 @@ use super::*;
         (status = 500, description = HTTP_REASON_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_not_found_view` free function.
 #[instrument_trace]
 pub fn openapi_not_found_view() {}

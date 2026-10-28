@@ -18,19 +18,27 @@ pub struct QrCode {
 pub(crate) struct QrBuilder {
     /// The number of modules on one side of the code.
     #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
     pub(crate) size: usize,
     /// The version of the code.
     #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
     pub(crate) version: usize,
     /// The error correction level of the code.
     #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
     pub(crate) level: QrErrorLevel,
     /// The modules of the code; a dark module is `true`.
     #[get(pub(crate))]
     #[get_mut(pub(crate))]
+    #[set(pub(crate))]
     pub(crate) modules: Vec<bool>,
     /// The modules that carry a function pattern and hold no data.
     #[get(pub(crate))]
     #[get_mut(pub(crate))]
+    #[set(pub(crate))]
     pub(crate) function: Vec<bool>,
 }

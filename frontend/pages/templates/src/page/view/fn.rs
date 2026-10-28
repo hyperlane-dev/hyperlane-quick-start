@@ -57,8 +57,11 @@ pub fn templates_page(node: VirtualNode<TemplatesPageProps>) -> VirtualNode {
                     }
                 }
             }
-            div {
-                class: c_home_stats()
+            euv_grid {
+                cols: vec![EuvGridCol {
+                    span: 6, offset: 0
+                }; 4]
+                gutter: true
                 stat_tile {
                     icon: ICON_FRAMEWORK
                     value: VALUE_FRAMEWORK
@@ -174,11 +177,8 @@ pub fn templates_page(node: VirtualNode<TemplatesPageProps>) -> VirtualNode {
 /// - `VirtualNode` - The metric tile tree.
 #[component]
 pub fn stat_tile(node: VirtualNode<StatTileProps>) -> VirtualNode {
-    let StatTileProps {
-        icon,
-        value,
-        label,
-    }: StatTileProps = node.try_get_props().unwrap_or_default();
+    let StatTileProps { icon, value, label }: StatTileProps =
+        node.try_get_props().unwrap_or_default();
     html! {
         div {
             class: format!("{} {}", c_home_stat_card().get_name(), c_hls_home_stat_card().get_name())

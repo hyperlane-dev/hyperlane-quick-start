@@ -209,7 +209,14 @@ async fn public_key() -> Result<PublicKey, String> {
 /// - `String` - The page of the query of the address, or the home page.
 fn return_location() -> String {
     match query_param(QUERY_LOCATION) {
-        Some(location) if !location.is_empty() => location,
+        Some(location)
+            if location.starts_with(RETURN_PATH_PREFIX)
+                && !location.starts_with(EXTERNAL_PATH_PREFIX)
+                && !location.contains(RETURN_PATH_BACKSLASH)
+                && !location.chars().any(char::is_control) =>
+        {
+            location
+        }
         _ => DEFAULT_LOCATION.to_string(),
     }
 }
@@ -224,9 +231,7 @@ fn return_location() -> String {
 ///
 /// - `Option<String>` - The value of the parameter, absent when the address holds none.
 fn query_param(name: &str) -> Option<String> {
-    let Some(window): Option<Window> = window() else {
-        return None;
-    };
+    let window: Window = window()?;
     let location: Location = window.location();
     let Ok(search): Result<String, JsValue> = location.search() else {
         return None;

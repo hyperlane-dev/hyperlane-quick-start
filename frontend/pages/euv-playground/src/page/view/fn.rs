@@ -14,7 +14,8 @@ use super::*;
 /// - `VirtualNode` - The page tree.
 #[component]
 pub fn playground_page(node: VirtualNode<PlaygroundPageProps>) -> VirtualNode {
-    let PlaygroundPageProps { state }: PlaygroundPageProps = node.try_get_props().unwrap_or_default();
+    let PlaygroundPageProps { state }: PlaygroundPageProps =
+        node.try_get_props().unwrap_or_default();
     let projects: Signal<Vec<PlaygroundProject>> = state.get_projects();
     html! {
     div {
@@ -28,6 +29,11 @@ pub fn playground_page(node: VirtualNode<PlaygroundPageProps>) -> VirtualNode {
             euv_alert {
                 variant: AlertVariant::Error
                 state.get_error().get().as_str()
+            }
+        }
+        if { !state.get_status().get().is_empty() } {
+            euv_alert {
+                state.get_status().get().as_str()
             }
         }
         div {
@@ -125,7 +131,7 @@ pub fn playground_page(node: VirtualNode<PlaygroundPageProps>) -> VirtualNode {
                                 euv_result {
                                     code: "0"
                                     title: TITLE_PREVIEW
-                                    description: TEXT_NO_PROJECT
+                                    description: TEXT_NO_PREVIEW
                                 }
                             }
                             false => {
@@ -177,7 +183,7 @@ pub fn playground_page(node: VirtualNode<PlaygroundPageProps>) -> VirtualNode {
         }
     }
     }
-    }
+}
 
 /// Renders the editor of the playground.
 ///
@@ -193,7 +199,8 @@ pub fn playground_page(node: VirtualNode<PlaygroundPageProps>) -> VirtualNode {
 /// - `VirtualNode` - The editor tree.
 #[component]
 pub fn playground_editor(node: VirtualNode<PlaygroundEditorProps>) -> VirtualNode {
-    let PlaygroundEditorProps { state }: PlaygroundEditorProps = node.try_get_props().unwrap_or_default();
+    let PlaygroundEditorProps { state }: PlaygroundEditorProps =
+        node.try_get_props().unwrap_or_default();
     let container: NodeRef<HtmlElement> = App::use_node_ref();
     let _started: Signal<bool> = App::use_signal(|| {
         let on_change: Rc<dyn Fn(String)> = Rc::new(move |code: String| {

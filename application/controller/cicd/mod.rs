@@ -3,8 +3,11 @@ mod r#fn;
 mod r#impl;
 mod r#struct;
 
-pub use {r#const::*, r#fn::*, r#struct::*};
+pub use {r#fn::*, r#struct::*};
 
+pub(crate) use r#const::*;
+
+use tokio::time::{Duration, Instant, sleep};
 use {
     super::*,
     model::{
@@ -13,5 +16,3 @@ use {
     },
     service::cicd::*,
 };
-
-use tokio::time::{Duration, Instant, sleep};

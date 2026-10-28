@@ -10,7 +10,7 @@ pub struct PendingAction {
 }
 
 /// The reactive state the user management page renders from.
-#[derive(Clone, Copy, CustomDebug, Data, Default, New)]
+#[derive(Clone, Copy, CustomDebug, Data, Default)]
 pub struct UserState {
     /// The users of the list being displayed.
     #[get(type(copy))]

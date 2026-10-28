@@ -1,7 +1,7 @@
 use super::*;
 
 /// The reactive state the euv playground page renders from.
-#[derive(Clone, Copy, CustomDebug, Data, Default, New)]
+#[derive(Clone, Copy, CustomDebug, Data, Default)]
 pub struct PlaygroundState {
     /// The projects of the visitor.
     #[get(type(copy))]

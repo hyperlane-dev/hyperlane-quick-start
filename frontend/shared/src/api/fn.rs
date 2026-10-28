@@ -71,7 +71,7 @@ pub async fn request_envelope<T: DeserializeOwned>(
     body: Option<String>,
 ) -> Result<ApiResponse<T>, ApiError> {
     let text: String = request_text(method, path, body).await?;
-    serde_json::from_str::<ApiResponse<T>>(&text).map_err(|error: serde_json::Error| ApiError {
+    serde_json::from_str::<ApiResponse<T>>(&text).map_err(|error: Error| ApiError {
         code: 0,
         message: format!("{MESSAGE_INVALID_PAYLOAD}{MESSAGE_SEPARATOR}{error}"),
     })
@@ -101,18 +101,18 @@ pub async fn request_json<T: DeserializeOwned>(
     path: &str,
     body: Option<String>,
 ) -> Result<T, ApiError> {
-    let envelope: ApiResponse<serde_json::Value> = request_envelope(method, path, body).await?;
+    let envelope: ApiResponse<Value> = request_envelope(method, path, body).await?;
     if envelope.code != STATUS_SUCCESS {
         return Err(ApiError {
             code: envelope.code,
             message: envelope.message,
         });
     }
-    let data: serde_json::Value = envelope.data.ok_or(ApiError {
+    let data: Value = envelope.data.ok_or(ApiError {
         code: envelope.code,
         message: envelope.message,
     })?;
-    serde_json::from_value::<T>(data).map_err(|error: serde_json::Error| ApiError {
+    serde_json::from_value::<T>(data).map_err(|error: Error| ApiError {
         code: 0,
         message: format!("{MESSAGE_INVALID_PAYLOAD}{MESSAGE_SEPARATOR}{error}"),
     })
@@ -145,7 +145,7 @@ pub async fn post_json<T: DeserializeOwned, B: Serialize + ?Sized>(
     path: &str,
     body: &B,
 ) -> Result<T, ApiError> {
-    let encoded: String = serde_json::to_string(body).map_err(|error: serde_json::Error| ApiError {
+    let encoded: String = serde_json::to_string(body).map_err(|error: Error| ApiError {
         code: 0,
         message: format!("{MESSAGE_INVALID_PAYLOAD}{MESSAGE_SEPARATOR}{error}"),
     })?;
@@ -166,7 +166,7 @@ pub async fn put_json<T: DeserializeOwned, B: Serialize + ?Sized>(
     path: &str,
     body: &B,
 ) -> Result<T, ApiError> {
-    let encoded: String = serde_json::to_string(body).map_err(|error: serde_json::Error| ApiError {
+    let encoded: String = serde_json::to_string(body).map_err(|error: Error| ApiError {
         code: 0,
         message: format!("{MESSAGE_INVALID_PAYLOAD}{MESSAGE_SEPARATOR}{error}"),
     })?;
@@ -197,9 +197,7 @@ pub async fn delete_json<T: DeserializeOwned>(path: &str) -> Result<T, ApiError>
 ///
 /// - `ApiError` - The failure describing the transport level problem.
 fn transport_error(prefix: &str, error: JsValue) -> ApiError {
-    let cause: String = error
-        .as_string()
-        .unwrap_or_else(|| format!("{error:?}"));
+    let cause: String = error.as_string().unwrap_or_else(|| format!("{error:?}"));
     ApiError {
         code: 0,
         message: format!("{prefix}{MESSAGE_SEPARATOR}{cause}"),

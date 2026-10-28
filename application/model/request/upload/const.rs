@@ -1,5 +1,5 @@
 /// HTTP header key for save upload dir.
-pub const HEADER_SAVE_UPLOAD_DIR: &str = "save_upload_dir";
+pub(crate) const HEADER_SAVE_UPLOAD_DIR: &str = "save_upload_dir";
 
 /// The name of the form field carrying the identifier of the upload session.
 pub(crate) const FIELD_FILE_ID: &str = "file_id";

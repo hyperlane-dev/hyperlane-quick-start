@@ -199,12 +199,10 @@ fn civil_from_days(days: i64) -> (i64, u32, u32) {
         (shifted - DAYS_PER_ERA) / DAYS_PER_ERA
     };
     let day_of_era: i64 = shifted - era * DAYS_PER_ERA;
-    let year_of_era: i64 = (day_of_era - day_of_era / 1460 + day_of_era / 36524
-        - day_of_era / 146096)
-        / 365;
+    let year_of_era: i64 =
+        (day_of_era - day_of_era / 1460 + day_of_era / 36524 - day_of_era / 146096) / 365;
     let year: i64 = year_of_era + era * YEARS_PER_ERA;
-    let day_of_year: i64 =
-        day_of_era - (365 * year_of_era + year_of_era / 4 - year_of_era / 100);
+    let day_of_year: i64 = day_of_era - (365 * year_of_era + year_of_era / 4 - year_of_era / 100);
     let month_of_year: i64 = (5 * day_of_year + 2) / 153;
     let day: u32 = (day_of_year - (153 * month_of_year + 2) / 5 + 1) as u32;
     let month: u32 = if month_of_year < 10 {

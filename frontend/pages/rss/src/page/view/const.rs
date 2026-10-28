@@ -1,3 +1,6 @@
+/// Native disabled attribute used by the pagination buttons.
+pub(crate) const ATTRIBUTE_DISABLED: &str = "disabled";
+
 /// The glyph of the rss page.
 pub(crate) const ICON_RSS: &str = "📰";
 

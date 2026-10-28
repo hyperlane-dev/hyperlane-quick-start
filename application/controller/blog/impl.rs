@@ -83,7 +83,7 @@ impl ServerHook for BlogPostUpdateRoute {
 
     #[prologue_macros(
         is_post_method,
-        try_get_route_param(ID_KEY => id_opt),
+        try_get_route_param(id_key() => id_opt),
         request_body_json_result(request_opt: UpdateBlogPostRequest),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
@@ -169,7 +169,7 @@ impl ServerHook for BlogPostDeleteRoute {
 
     #[prologue_macros(
         is_post_method,
-        try_get_route_param(ID_KEY => id_opt),
+        try_get_route_param(id_key() => id_opt),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
@@ -245,7 +245,7 @@ impl ServerHook for BlogPostGetRoute {
 
     #[prologue_macros(
         is_get_method,
-        try_get_route_param(ID_KEY => id_opt),
+        try_get_route_param(id_key() => id_opt),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
@@ -334,8 +334,13 @@ impl ServerHook for BlogPostListRoute {
     ///
     /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
-        let keyword_opt: Option<String> =
-            keyword_opt.and_then(|values: VecDeque<String>| values.front().cloned());
+        let keyword_opt: Option<String> = keyword_opt
+            .and_then(|values: VecDeque<String>| values.front().cloned())
+            .map(|keyword: String| {
+                decode(&keyword)
+                    .unwrap_or_else(|_: FromUtf8Error| keyword.clone().into())
+                    .into_owned()
+            });
         let is_published_opt: Option<String> =
             is_published_opt.and_then(|values: VecDeque<String>| values.front().cloned());
         let page_opt: Option<String> =
@@ -410,8 +415,13 @@ impl ServerHook for BlogPostMyListRoute {
     ///
     /// - `Status` - The hook status that tells the server how to continue.
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
-        let keyword_opt: Option<String> =
-            keyword_opt.and_then(|values: VecDeque<String>| values.front().cloned());
+        let keyword_opt: Option<String> = keyword_opt
+            .and_then(|values: VecDeque<String>| values.front().cloned())
+            .map(|keyword: String| {
+                decode(&keyword)
+                    .unwrap_or_else(|_: FromUtf8Error| keyword.clone().into())
+                    .into_owned()
+            });
         let page_opt: Option<String> =
             page_opt.and_then(|values: VecDeque<String>| values.front().cloned());
         let limit_opt: Option<String> =
@@ -472,7 +482,7 @@ impl ServerHook for BlogPostLikeRoute {
 
     #[prologue_macros(
         is_post_method,
-        try_get_route_param(ID_KEY => id_opt),
+        try_get_route_param(id_key() => id_opt),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
@@ -548,7 +558,7 @@ impl ServerHook for BlogPostFavoriteRoute {
 
     #[prologue_macros(
         is_post_method,
-        try_get_route_param(ID_KEY => id_opt),
+        try_get_route_param(id_key() => id_opt),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
@@ -764,7 +774,7 @@ impl ServerHook for BlogCommentDeleteRoute {
 
     #[prologue_macros(
         is_post_method,
-        try_get_route_param(ID_KEY => id_opt),
+        try_get_route_param(id_key() => id_opt),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
@@ -1000,7 +1010,7 @@ impl ServerHook for BlogImageDownloadRoute {
         Self
     }
 
-    #[prologue_macros(is_get_method, try_get_route_param(ID_KEY => id_opt))]
+    #[prologue_macros(is_get_method, try_get_route_param(id_key() => id_opt))]
     #[instrument_trace]
     /// Handles the `BlogImageDownloadRoute` route request and writes the JSON
     /// response envelope into the request context.

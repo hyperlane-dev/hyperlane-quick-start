@@ -90,7 +90,12 @@ pub async fn load_runs(state: CicdState, reset: bool) {
     let path: String = if reset {
         format!("{PATH_RUN_LIST}?page_size={RUNS_PAGE_SIZE}")
     } else {
-        let last: i32 = state.get_runs().get().last().map(|run: &Run| run.id).unwrap_or(0);
+        let last: i32 = state
+            .get_runs()
+            .get()
+            .last()
+            .map(|run: &Run| run.id)
+            .unwrap_or(0);
         format!("{PATH_RUN_LIST}?page_size={RUNS_PAGE_SIZE}&last_id={last}")
     };
     match get_json::<RunPage>(&path).await {
@@ -123,9 +128,7 @@ pub async fn load_runs(state: CicdState, reset: bool) {
 pub async fn create_pipeline(state: CicdState) {
     let name: String = state.get_draft_name().get().trim().to_string();
     if name.is_empty() {
-        state
-            .get_error()
-            .set("A pipeline needs a name".to_string());
+        state.get_error().set("A pipeline needs a name".to_string());
         return;
     }
     let description: String = state.get_draft_description().get().trim().to_string();
@@ -137,7 +140,11 @@ pub async fn create_pipeline(state: CicdState) {
         } else {
             Some(description)
         },
-        config_content: if config.is_empty() { None } else { Some(config) },
+        config_content: if config.is_empty() {
+            None
+        } else {
+            Some(config)
+        },
     };
     state.get_loading().set(true);
     match post_json::<i32, CreatePipelineBody>(PATH_PIPELINE_CREATE, &body).await {
@@ -251,14 +258,10 @@ pub fn tail_logs(state: CicdState, run_id: i32) {
         state.get_streaming().set(false);
     });
     let target: EventTarget = source.clone().unchecked_into();
-    let _logged: Result<(), JsValue> = target.add_event_listener_with_callback(
-        EVENT_LOG,
-        on_log.as_ref().unchecked_ref(),
-    );
-    let _completed: Result<(), JsValue> = target.add_event_listener_with_callback(
-        EVENT_COMPLETE,
-        on_complete.as_ref().unchecked_ref(),
-    );
+    let _logged: Result<(), JsValue> =
+        target.add_event_listener_with_callback(EVENT_LOG, on_log.as_ref().unchecked_ref());
+    let _completed: Result<(), JsValue> = target
+        .add_event_listener_with_callback(EVENT_COMPLETE, on_complete.as_ref().unchecked_ref());
     let _failed: Result<(), JsValue> =
         target.add_event_listener_with_callback("error", on_error.as_ref().unchecked_ref());
     let handlers: Vec<JsValue> = vec![

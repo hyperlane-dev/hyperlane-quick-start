@@ -57,15 +57,19 @@ pub async fn run_query(state: TrackingState) {
     let body: TrackingQuery = build_query(state);
     match post_json::<TrackingQueryResult, TrackingQuery>(PATH_TRACKING_QUERY, &body).await {
         Ok(result) => {
-            let first_id: Option<i64> = result.records.first().map(|record: &TrackingRecord| record.id);
+            let first_id: Option<i64> = result
+                .records
+                .first()
+                .map(|record: &TrackingRecord| record.id);
             let page: i64 = result.page;
             state.get_records().set(result.records);
             state.get_total().set(result.total);
             state.get_page().set(page);
-            if page == PAGE_FIRST && state.get_cache_id().get() == 0 {
-                if let Some(id) = first_id {
-                    state.get_cache_id().set(id);
-                }
+            if page == PAGE_FIRST
+                && state.get_cache_id().get() == 0
+                && let Some(id) = first_id
+            {
+                state.get_cache_id().set(id);
             }
             state.get_error().set(TEXT_EMPTY.to_string());
         }
@@ -196,12 +200,10 @@ fn civil_from_days(days: i64) -> (i64, u32, u32) {
         (shifted - DAYS_PER_ERA) / DAYS_PER_ERA
     };
     let day_of_era: i64 = shifted - era * DAYS_PER_ERA;
-    let year_of_era: i64 = (day_of_era - day_of_era / 1460 + day_of_era / 36524
-        - day_of_era / 146096)
-        / 365;
+    let year_of_era: i64 =
+        (day_of_era - day_of_era / 1460 + day_of_era / 36524 - day_of_era / 146096) / 365;
     let year: i64 = year_of_era + era * YEARS_PER_ERA;
-    let day_of_year: i64 =
-        day_of_era - (365 * year_of_era + year_of_era / 4 - year_of_era / 100);
+    let day_of_year: i64 = day_of_era - (365 * year_of_era + year_of_era / 4 - year_of_era / 100);
     let month_of_year: i64 = (5 * day_of_year + 2) / 153;
     let day: u32 = (day_of_year - (153 * month_of_year + 2) / 5 + 1) as u32;
     let month: u32 = if month_of_year < 10 {

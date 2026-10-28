@@ -43,9 +43,7 @@ impl BigUint {
     ///
     /// - `BigUint` - The number one.
     pub fn one() -> BigUint {
-        BigUint {
-            limbs: vec![1],
-        }
+        BigUint { limbs: vec![1] }
     }
 
     /// Reports whether the number holds zero.
@@ -137,14 +135,14 @@ impl BigUint {
     pub fn subtract(&self, other: &BigUint) -> BigUint {
         let mut limbs: Vec<u32> = self.get_limbs().clone();
         let mut borrow: u64 = 0;
-        for index in 0..limbs.len() {
+        for (index, limb) in limbs.iter_mut().enumerate() {
             let right: u64 = other.get_limbs().get(index).copied().unwrap_or(0) as u64 + borrow;
-            let left: u64 = limbs[index] as u64;
+            let left: u64 = *limb as u64;
             if left >= right {
-                limbs[index] = (left - right) as u32;
+                *limb = (left - right) as u32;
                 borrow = 0;
             } else {
-                limbs[index] = (left + (1u64 << LIMB_BITS) - right) as u32;
+                *limb = (left + (1u64 << LIMB_BITS) - right) as u32;
                 borrow = 1;
             }
         }
@@ -170,8 +168,9 @@ impl BigUint {
         for (left_index, left) in self.get_limbs().iter().enumerate() {
             let mut carry: u64 = 0;
             for (right_index, right) in other.get_limbs().iter().enumerate() {
-                let current: u64 =
-                    limbs[left_index + right_index] as u64 + (*left as u64) * (*right as u64) + carry;
+                let current: u64 = limbs[left_index + right_index] as u64
+                    + (*left as u64) * (*right as u64)
+                    + carry;
                 limbs[left_index + right_index] = current as u32;
                 carry = current >> LIMB_BITS;
             }
@@ -266,7 +265,11 @@ impl BigUint {
     pub fn to_bytes_be(&self, size: usize) -> Vec<u8> {
         let mut bytes: Vec<u8> = vec![0u8; size];
         for index in 0..size {
-            let limb: u32 = self.get_limbs().get(index / LIMB_BYTES).copied().unwrap_or(0);
+            let limb: u32 = self
+                .get_limbs()
+                .get(index / LIMB_BYTES)
+                .copied()
+                .unwrap_or(0);
             let shift: u32 = BITS_BYTE * (index % LIMB_BYTES) as u32;
             bytes[size - 1 - index] = ((limb >> shift) & 0xff) as u8;
         }
@@ -345,7 +348,7 @@ impl PublicKey {
     ///
     /// - `&BigUint` - The modulus of the key.
     pub fn modulus(&self) -> &BigUint {
-        &self.get_modulus()
+        self.get_modulus()
     }
 
     /// Returns the public exponent of the key.
@@ -354,7 +357,7 @@ impl PublicKey {
     ///
     /// - `&BigUint` - The public exponent of the key.
     pub fn exponent(&self) -> &BigUint {
-        &self.get_exponent()
+        self.get_exponent()
     }
 
     /// Returns the number of bytes one encrypted block holds.

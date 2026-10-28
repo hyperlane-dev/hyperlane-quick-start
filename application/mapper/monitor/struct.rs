@@ -4,14 +4,23 @@ use super::*;
 #[derive(Clone, Data, Debug)]
 pub struct PerformanceRingBuffer {
     /// The buffer.
-    pub(super) buffer: Vec<PerformanceDataPoint>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) buffer: Vec<PerformanceDataPoint>,
     /// The write index.
-    #[get(type(copy))]
-    pub(super) write_index: usize,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) write_index: usize,
     /// The count.
-    #[get(type(copy))]
-    pub(super) count: usize,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) count: usize,
     /// The capacity.
-    #[get(type(copy))]
-    pub(super) capacity: usize,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) capacity: usize,
 }

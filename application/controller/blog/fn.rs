@@ -11,6 +11,7 @@ use super::*;
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_blog_post_create` free function.
 #[instrument_trace]
 pub fn openapi_blog_post_create() {}
 
@@ -29,6 +30,7 @@ pub fn openapi_blog_post_create() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_blog_post_update` free function.
 #[instrument_trace]
 pub fn openapi_blog_post_update() {}
 
@@ -47,6 +49,7 @@ pub fn openapi_blog_post_update() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_blog_post_delete` free function.
 #[instrument_trace]
 pub fn openapi_blog_post_delete() {}
 
@@ -64,6 +67,7 @@ pub fn openapi_blog_post_delete() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_blog_post_get` free function.
 #[instrument_trace]
 pub fn openapi_blog_post_get() {}
 
@@ -76,6 +80,7 @@ pub fn openapi_blog_post_get() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_blog_post_list` free function.
 #[instrument_trace]
 pub fn openapi_blog_post_list() {}
 
@@ -89,6 +94,7 @@ pub fn openapi_blog_post_list() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_blog_post_my_list` free function.
 #[instrument_trace]
 pub fn openapi_blog_post_my_list() {}
 
@@ -107,6 +113,7 @@ pub fn openapi_blog_post_my_list() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_blog_post_like` free function.
 #[instrument_trace]
 pub fn openapi_blog_post_like() {}
 
@@ -125,6 +132,7 @@ pub fn openapi_blog_post_like() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_blog_post_favorite` free function.
 #[instrument_trace]
 pub fn openapi_blog_post_favorite() {}
 
@@ -138,6 +146,7 @@ pub fn openapi_blog_post_favorite() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_blog_post_favorite_list` free function.
 #[instrument_trace]
 pub fn openapi_blog_post_favorite_list() {}
 
@@ -152,6 +161,7 @@ pub fn openapi_blog_post_favorite_list() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_blog_comment_create` free function.
 #[instrument_trace]
 pub fn openapi_blog_comment_create() {}
 
@@ -170,6 +180,7 @@ pub fn openapi_blog_comment_create() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_blog_comment_delete` free function.
 #[instrument_trace]
 pub fn openapi_blog_comment_delete() {}
 
@@ -183,6 +194,7 @@ pub fn openapi_blog_comment_delete() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_blog_comment_list` free function.
 #[instrument_trace]
 pub fn openapi_blog_comment_list() {}
 
@@ -197,6 +209,7 @@ pub fn openapi_blog_comment_list() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_blog_image_upload` free function.
 #[instrument_trace]
 pub fn openapi_blog_image_upload() {}
 
@@ -214,5 +227,6 @@ pub fn openapi_blog_image_upload() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_blog_image_download` free function.
 #[instrument_trace]
 pub fn openapi_blog_image_download() {}

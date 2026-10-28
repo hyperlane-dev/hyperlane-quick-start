@@ -21,6 +21,7 @@ impl Default for FileLogger {
     }
 }
 
+/// Inherent implementation of [`FileLogger`].
 impl FileLogger {
     /// Creates new FileLogger configuration with specified parameters.
     ///

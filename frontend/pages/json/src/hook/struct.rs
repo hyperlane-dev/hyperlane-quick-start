@@ -1,7 +1,7 @@
 use super::*;
 
 /// The reactive state the JSON editor page renders from.
-#[derive(Clone, Copy, CustomDebug, Data, Default, New)]
+#[derive(Clone, Copy, CustomDebug, Data, Default)]
 pub struct JsonState {
     /// The text of the document.
     #[get(type(copy))]

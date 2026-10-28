@@ -45,8 +45,7 @@ pub fn load_history(state: UploadState) {
     let Some(raw): Option<String> = storage.get_item(STORAGE_KEY).ok().flatten() else {
         return;
     };
-    let Ok(items): Result<Vec<UploadHistoryItem>, serde_json::Error> = serde_json::from_str(&raw)
-    else {
+    let Ok(items): Result<Vec<UploadHistoryItem>, Error> = serde_json::from_str(&raw) else {
         return;
     };
     state.get_history().set(items);
@@ -65,8 +64,7 @@ pub fn store_history(state: UploadState) {
     let Some(storage): Option<Storage> = storage() else {
         return;
     };
-    let Ok(encoded): Result<String, serde_json::Error> =
-        serde_json::to_string(&state.get_history().get())
+    let Ok(encoded): Result<String, Error> = serde_json::to_string(&state.get_history().get())
     else {
         return;
     };
@@ -245,11 +243,10 @@ pub async fn upload_request(
         .await
         .map_err(|error: JsValue| transport_failure(error))?;
     let raw: String = body.as_string().unwrap_or_default();
-    let parsed: UploadResponse =
-        serde_json::from_str(&raw).map_err(|error: serde_json::Error| ApiError {
-            code: 0,
-            message: format!("{MESSAGE_INVALID_PAYLOAD}{MESSAGE_SEPARATOR}{error}"),
-        })?;
+    let parsed: UploadResponse = serde_json::from_str(&raw).map_err(|error: Error| ApiError {
+        code: 0,
+        message: format!("{MESSAGE_INVALID_PAYLOAD}{MESSAGE_SEPARATOR}{error}"),
+    })?;
     if parsed.code != STATUS_SUCCESS {
         return Err(ApiError {
             code: parsed.code,
@@ -269,12 +266,17 @@ pub async fn upload_request(
 ///
 /// - `()` - The file has been downloaded.
 pub fn export_history(state: UploadState) {
-    let Ok(encoded): Result<String, serde_json::Error> =
-        serde_json::to_string(&state.get_history().get())
-    else {
-        return;
-    };
-    download_file(EXPORT_FILE_NAME, &encoded, CONTENT_TYPE_JSON);
+    let downloaded: bool = serde_json::to_string(&state.get_history().get())
+        .is_ok_and(|encoded: String| download_file(EXPORT_FILE_NAME, &encoded, CONTENT_TYPE_JSON));
+    state.get_message().set(
+        if downloaded {
+            MESSAGE_EXPORT_SUCCESS
+        } else {
+            MESSAGE_EXPORT_FAILED
+        }
+        .to_string(),
+    );
+    state.get_failed().set(!downloaded);
 }
 
 /// Merges the upload history of an imported file into the history of the page.
@@ -288,9 +290,7 @@ pub fn export_history(state: UploadState) {
 ///
 /// - `()` - The history has been merged.
 pub fn import_history(state: UploadState, content: &str) {
-    let Ok(items): Result<Vec<UploadHistoryItem>, serde_json::Error> =
-        serde_json::from_str(content)
-    else {
+    let Ok(items): Result<Vec<UploadHistoryItem>, Error> = serde_json::from_str(content) else {
         state
             .get_message()
             .set("The imported file is not an upload history".to_string());
@@ -492,7 +492,7 @@ fn transport_failure(error: JsValue) -> ApiError {
 ///
 /// - `bool` - Whether the file has been downloaded.
 fn download_file(name: &str, content: &str, content_type: &str) -> bool {
-    let parts: JsValue = JsValue::from_str(content);
+    let parts: Array = Array::of1(&JsValue::from_str(content));
     let Ok(blob): Result<Blob, JsValue> = Blob::new_with_str_sequence(&parts) else {
         return false;
     };

@@ -10,6 +10,7 @@ use super::*;
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_record_create` free function.
 #[instrument_trace]
 pub fn openapi_record_create() {}
 
@@ -22,6 +23,7 @@ pub fn openapi_record_create() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_record_list` free function.
 #[instrument_trace]
 pub fn openapi_record_list() {}
 
@@ -39,6 +41,7 @@ pub fn openapi_record_list() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_record_get` free function.
 #[instrument_trace]
 pub fn openapi_record_get() {}
 
@@ -53,6 +56,7 @@ pub fn openapi_record_get() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_overview_statistics` free function.
 #[instrument_trace]
 pub fn openapi_overview_statistics() {}
 
@@ -67,6 +71,7 @@ pub fn openapi_overview_statistics() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_image_upload` free function.
 #[instrument_trace]
 pub fn openapi_image_upload() {}
 
@@ -83,6 +88,7 @@ pub fn openapi_image_upload() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_image_list` free function.
 #[instrument_trace]
 pub fn openapi_image_list() {}
 
@@ -99,5 +105,6 @@ pub fn openapi_image_list() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_image_download` free function.
 #[instrument_trace]
 pub fn openapi_image_download() {}

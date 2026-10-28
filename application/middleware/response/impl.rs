@@ -28,6 +28,16 @@ impl ServerHook for SendMiddleware {
         reject(ctx.get_request().is_ws_upgrade_type()),
         try_send
     )]
+    /// Implements the `handle` operation on [`SendMiddleware`].
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - Mutable reference to a `Stream` (mutated in place).
+    /// - `&mut Context` - Mutable reference to a `Context` (mutated in place).
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - A `Status` value.
     #[instrument_trace]
     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue

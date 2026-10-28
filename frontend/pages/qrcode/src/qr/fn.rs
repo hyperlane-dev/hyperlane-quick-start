@@ -93,7 +93,7 @@ fn build_codewords(data: &[u8], version: usize, level: QrErrorLevel) -> Vec<u8> 
     }
     let terminator: usize = min(MODE_BITS, capacity.saturating_sub(bits.len()));
     push_number(&mut bits, 0, terminator);
-    while bits.len() % 8 != 0 {
+    while !bits.len().is_multiple_of(8) {
         bits.push(false);
     }
     let mut padding: bool = true;
@@ -325,4 +325,3 @@ fn push_number(bits: &mut Vec<bool>, value: u32, count: usize) {
 pub(crate) fn get_bit(value: u32, index: usize) -> bool {
     (value >> index) & 1 == 1
 }
-

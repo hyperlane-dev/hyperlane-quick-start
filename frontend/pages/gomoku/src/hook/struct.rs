@@ -1,7 +1,7 @@
 use super::*;
 
 /// The reactive state the gomoku page renders from.
-#[derive(Clone, Copy, CustomDebug, Data, Default, New)]
+#[derive(Clone, Copy, CustomDebug, Data, Default)]
 pub struct GomokuState {
     /// The identifier of the visitor.
     #[get(type(copy))]

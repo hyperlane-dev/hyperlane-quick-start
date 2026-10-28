@@ -86,10 +86,10 @@ pub fn base64_decode(text: &str) -> Result<Vec<u8>, String> {
 pub fn encrypt_field(plaintext: &str, key: &PublicKey) -> Result<String, String> {
     let block: Vec<u8> = pad_block(plaintext.as_bytes(), key.block_size())?;
     let value: BigUint = BigUint::from_bytes_be(&block);
-    if value.compare(&key.modulus()) != Ordering::Less {
+    if value.compare(key.modulus()) != Ordering::Less {
         return Err(ERROR_MESSAGE_TOO_LONG.to_string());
     }
-    let cipher: BigUint = value.modpow(&key.exponent(), &key.modulus());
+    let cipher: BigUint = value.modpow(key.exponent(), key.modulus());
     Ok(base64_encode(&cipher.to_bytes_be(key.block_size())))
 }
 
@@ -113,27 +113,42 @@ fn pad_block(message: &[u8], size: usize) -> Result<Vec<u8>, String> {
     let mut block: Vec<u8> = vec![0u8; size];
     block[0] = BLOCK_PREFIX;
     block[1] = BLOCK_TYPE;
-    let filler: u8 = padding_filler();
     let separator: usize = size - message.len() - 1;
-    for index in 2..separator {
-        block[index] = filler;
+    for byte in &mut block[2..separator] {
+        *byte = padding_filler()?;
     }
     block[separator] = BLOCK_SEPARATOR;
     block[separator + 1..].copy_from_slice(message);
     Ok(block)
 }
 
-/// Returns the byte the padding of a block is filled with.
+/// Draws one nonzero padding byte from the browser's secure random source.
 ///
-/// The byte is derived from the clock, so two blocks of the same credential
-/// do not look alike, and it never holds zero.
+/// Random-source errors fail closed instead of falling back to predictable padding.
 ///
 /// # Returns
 ///
-/// - `u8` - The byte the padding is filled with.
-fn padding_filler() -> u8 {
-    let now: i64 = js_sys::Date::now() as i64;
-    ((now & 0x7f) as u8) + 1
+/// - `Result<u8, String>` - A nonzero random byte, or the random-source failure.
+fn padding_filler() -> Result<u8, String> {
+    let scope: JsValue = global().into();
+    let crypto: JsValue = Reflect::get(&scope, &JsValue::from_str(PROPERTY_CRYPTO))
+        .map_err(|_: JsValue| ERROR_SECURE_RANDOM.to_string())?;
+    let method: JsValue = Reflect::get(&crypto, &JsValue::from_str(METHOD_RANDOM_VALUES))
+        .map_err(|_: JsValue| ERROR_SECURE_RANDOM.to_string())?;
+    let random: Function = method
+        .dyn_into()
+        .map_err(|_: JsValue| ERROR_SECURE_RANDOM.to_string())?;
+    let sample: Uint8Array = Uint8Array::new_with_length(1);
+    for _ in 0..RANDOM_RETRY_LIMIT {
+        let _: JsValue = random
+            .call1(&crypto, &sample)
+            .map_err(|_: JsValue| ERROR_SECURE_RANDOM.to_string())?;
+        let value: u8 = sample.get_index(0);
+        if value != BLOCK_SEPARATOR {
+            return Ok(value);
+        }
+    }
+    Err(ERROR_SECURE_RANDOM.to_string())
 }
 
 /// Returns the value of one base64 character.

@@ -1,7 +1,7 @@
 use super::*;
 
 /// The reactive state the tracking page renders from.
-#[derive(Clone, Copy, CustomDebug, Data, Default, New)]
+#[derive(Clone, Copy, CustomDebug, Data, Default)]
 pub struct TrackingState {
     /// The start of the window the query looks at.
     #[get(type(copy))]

@@ -4,25 +4,43 @@ use super::*;
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct CreateNotificationRequest {
     /// The title.
-    pub(super) title: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) title: String,
     /// The content.
-    pub(super) content: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) content: String,
     /// The notification type.
-    pub(super) notification_type: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) notification_type: String,
 }
 
 /// notification list query request.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct NotificationListQueryRequest {
     /// The notification type.
-    pub(super) notification_type: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) notification_type: Option<String>,
     /// The is read.
-    #[get(type(copy))]
-    pub(super) is_read: Option<bool>,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) is_read: Option<bool>,
     /// The page.
-    #[get(type(copy))]
-    pub(super) page: Option<i32>,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) page: Option<i32>,
     /// The limit.
-    #[get(type(copy))]
-    pub(super) limit: Option<u64>,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) limit: Option<u64>,
 }

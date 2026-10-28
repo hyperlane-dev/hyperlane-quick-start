@@ -62,7 +62,10 @@ pub fn stored_code(id: &str) -> String {
         return String::new();
     };
     let key: String = format!("{STORAGE_PREFIX}{id}");
-    storage.get_item(&key).unwrap_or_default().unwrap_or_default()
+    storage
+        .get_item(&key)
+        .unwrap_or_default()
+        .unwrap_or_default()
 }
 
 /// Keeps the code of a language in the storage of the browser.

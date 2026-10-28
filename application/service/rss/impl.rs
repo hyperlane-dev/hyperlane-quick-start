@@ -95,7 +95,7 @@ impl RssService {
     /// - `Vec<UploadedFile>` - The list of uploaded file information objects.
     #[instrument_trace]
     pub async fn get_uploaded_files() -> Vec<UploadedFile> {
-        let entries: Vec<DirEntry> = match read_dir(UPLOAD_DIR).await {
+        let entries: Vec<DirEntry> = match read_dir(upload_dir()).await {
             Ok(mut read_dir) => {
                 let mut entries: Vec<DirEntry> = vec![];
                 while let Ok(Some(entry)) = read_dir.next_entry().await {
@@ -175,7 +175,7 @@ impl RssService {
         let file_name: String = path.file_name()?.to_string_lossy().to_string();
         let file_path_str: String = path.to_string_lossy().to_string();
         let relative_path: String = file_path_str
-            .replace(UPLOAD_DIR, EMPTY_STR)
+            .replace(upload_dir(), EMPTY_STR)
             .replace('\\', ROOT_PATH)
             .trim_start_matches(ROOT_PATH)
             .to_string();
@@ -195,24 +195,24 @@ impl RssService {
         let file_url: String = if let Some(parent_path) = path.parent() {
             let parent_str: String = parent_path.to_string_lossy().to_string();
             let dir_path: String = parent_str
-                .replace(UPLOAD_DIR, EMPTY_STR)
+                .replace(upload_dir(), EMPTY_STR)
                 .replace('\\', ROOT_PATH)
                 .trim_start_matches(ROOT_PATH)
                 .to_string();
             if dir_path.is_empty() {
                 let url_encode_file_name: String =
-                    Encode::execute(CHARSETS, &file_name).unwrap_or_default();
+                    Encode::execute(charsets(), &file_name).unwrap_or_default();
                 format!("/{STATIC_ROUTE}/{url_encode_file_name}")
             } else {
                 let url_encode_dir: String =
-                    Encode::execute(CHARSETS, &dir_path).unwrap_or_default();
+                    Encode::execute(charsets(), &dir_path).unwrap_or_default();
                 let url_encode_file_name: String =
-                    Encode::execute(CHARSETS, &file_name).unwrap_or_default();
+                    Encode::execute(charsets(), &file_name).unwrap_or_default();
                 format!("/{STATIC_ROUTE}/{url_encode_dir}/{url_encode_file_name}")
             }
         } else {
             let url_encode_file_name: String =
-                Encode::execute(CHARSETS, &file_name).unwrap_or_default();
+                Encode::execute(charsets(), &file_name).unwrap_or_default();
             format!("/{STATIC_ROUTE}/{url_encode_file_name}")
         };
         let extension_name: String = FileExtension::get_extension_name(&file_name);

@@ -1,7 +1,7 @@
 use super::*;
 
 /// The reactive state the order page renders from.
-#[derive(Clone, Copy, CustomDebug, Data, Default, New)]
+#[derive(Clone, Copy, CustomDebug, Data, Default)]
 pub struct OrderState {
     /// The tab being displayed.
     #[get(type(copy))]

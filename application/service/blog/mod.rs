@@ -2,8 +2,11 @@ mod r#const;
 mod r#impl;
 mod r#struct;
 
-pub use {r#const::*, r#struct::*};
+pub use r#struct::*;
 
+pub(crate) use r#const::*;
+
+use std::collections::HashMap;
 use {
     super::*,
     mapper::{
@@ -14,6 +17,4 @@ use {
     repository::{auth::*, blog::*},
     service::auth::*,
 };
-
-use std::collections::HashMap;
 use {chrono::NaiveDateTime, sea_orm::ActiveValue};

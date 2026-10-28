@@ -121,7 +121,10 @@ pub async fn update_record(state: RedisState) {
 ///
 /// - `()` - The record has been removed and the list has been reloaded.
 pub async fn delete_record(state: RedisState, key: String) {
-    let path: String = format!("{PATH_REDIS_DELETE}?{QUERY_KEY}={}", encode_uri_component(&key));
+    let path: String = format!(
+        "{PATH_REDIS_DELETE}?{QUERY_KEY}={}",
+        encode_uri_component(&key)
+    );
     match request_json::<serde_json::Value>(HttpMethod::Post, &path, None).await {
         Ok(_) => {
             state.get_error().set(TEXT_EMPTY.to_string());
