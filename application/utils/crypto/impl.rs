@@ -88,7 +88,7 @@ impl RsaUtil {
         Ok(private_key)
     }
 
-    /// Parses an RSA public key from a PEM-encoded PKCS#1 string.
+    /// Parses an RSA public key from a PEM-encoded SPKI or PKCS#1 string.
     ///
     /// # Arguments
     ///
@@ -99,9 +99,11 @@ impl RsaUtil {
     /// - `Result<RsaPublicKey, String>` - The parsed RSA public key, or an error message.
     #[instrument_trace]
     pub fn public_key_from_pem(pem_str: &str) -> Result<RsaPublicKey, String> {
-        let public_key: RsaPublicKey = RsaPublicKey::from_pkcs1_pem(pem_str)
-            .map_err(|error: rsa::pkcs1::Error| error.to_string())?;
-        Ok(public_key)
+        match RsaPublicKey::from_public_key_pem(pem_str) {
+            Ok(public_key) => Ok(public_key),
+            Err(_) => RsaPublicKey::from_pkcs1_pem(pem_str)
+                .map_err(|error: rsa::pkcs1::Error| error.to_string()),
+        }
     }
 
     /// Encrypts plaintext using an RSA public key with PKCS#1 v1.5 padding.

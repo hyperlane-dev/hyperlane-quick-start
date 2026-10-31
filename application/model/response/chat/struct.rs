@@ -3,58 +3,36 @@ use super::*;
 /// web socket resp data.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct WebSocketRespData {
-    #[get(pub(crate), type(copy))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) r#type: MessageType,
+    #[get(type(copy))]
+    pub r#type: MessageType,
     /// The name.
-    #[get(pub(crate))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) name: String,
+    pub name: String,
     /// The data.
-    #[get(pub(crate))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) data: String,
+    pub data: String,
     /// The time.
-    #[get(pub(crate), type(copy))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) time: i64,
+    #[get(type(copy))]
+    pub time: i64,
 }
 
 /// Represents a chat user list response with online user information.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct UserListResponse {
     /// The users.
-    #[get(pub(crate))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) users: Vec<OnlineUser>,
+    pub users: Vec<OnlineUser>,
     /// The total count.
-    #[get(pub(crate), type(copy))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) total_count: usize,
+    #[get(type(copy))]
+    pub total_count: usize,
 }
 
 /// chat history response.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct ChatHistoryResponse {
     /// The messages.
-    #[get(pub(crate))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) messages: Vec<ChatHistory>,
+    pub messages: Vec<ChatHistory>,
     /// The total.
-    #[get(pub(crate), type(copy))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) total: usize,
+    #[get(type(copy))]
+    pub total: usize,
     /// The has more.
-    #[get(pub(crate), type(copy))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) has_more: bool,
+    #[get(type(copy))]
+    pub has_more: bool,
 }

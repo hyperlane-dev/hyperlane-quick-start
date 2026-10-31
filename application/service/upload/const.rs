@@ -1,6 +1,9 @@
 /// The unit string for HTTP Content-Range headers, always "bytes".
 pub const BYTES_UNIT: &str = "bytes";
 
+/// Error message when a suffix range requests zero bytes from the end of the file.
+pub(crate) const ERROR_INVALID_RANGE_ZERO_LENGTH_SUFFIX: &str = "Invalid range: zero-length suffix";
+
 /// Error message when invalid directory or file name.
 pub(crate) const ERROR_INVALID_DIRECTORY_OR_FILE_NAME: &str = "Invalid directory or file name";
 

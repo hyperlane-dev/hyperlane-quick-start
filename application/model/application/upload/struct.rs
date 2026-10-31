@@ -26,38 +26,24 @@ pub struct FileChunkData {
 #[derive(Clone, Data, Debug, Default, ToSchema)]
 pub struct RangeRequest {
     /// The starting byte offset (inclusive) for the range request.
-    #[get(pub(crate), type(copy))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) start: u64,
-    #[get(pub(crate), type(copy))]
+    #[get(type(copy))]
+    pub start: u64,
+    #[get(type(copy))]
     /// The optional ending byte offset (inclusive) for the range request; if None, reads to end of file.
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) end: Option<u64>,
+    pub end: Option<u64>,
 }
 
 /// Represents a partial content response for an HTTP Range request.
 #[derive(Clone, Data, Debug, Default, ToSchema)]
 pub struct PartialContent {
     /// The binary data content for the requested range.
-    #[get(pub(crate))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) data: Vec<u8>,
+    pub data: Vec<u8>,
     /// The Content-Range header value (e.g., "bytes 0-1023/2048").
-    #[get(pub(crate))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) content_range: String,
+    pub content_range: String,
     /// The length of the returned content in bytes.
-    #[get(pub(crate), type(copy))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) content_length: u64,
+    #[get(type(copy))]
+    pub content_length: u64,
     /// The total size of the complete file in bytes.
-    #[get(pub(crate), type(copy))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) total_size: u64,
+    #[get(type(copy))]
+    pub total_size: u64,
 }

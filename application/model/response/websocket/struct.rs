@@ -4,13 +4,8 @@ use super::*;
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]
 pub struct MessageResponse {
     /// The message.
-    #[get(pub(crate))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) message: String,
+    pub message: String,
     /// The time.
-    #[get(pub(crate), type(copy))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) time: i64,
+    #[get(type(copy))]
+    pub time: i64,
 }

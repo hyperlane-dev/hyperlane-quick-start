@@ -8,23 +8,14 @@ where
     T: Clone + Default + Serialize,
 {
     /// The response status code.
-    #[get(pub(crate), type(copy))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) code: i32,
+    #[get(type(copy))]
+    pub code: i32,
     /// The response message describing the result.
-    #[set(pub(crate), type(AsRef<str>))]
-    #[get(pub(crate))]
-    #[get_mut(pub(crate))]
-    pub(crate) message: String,
+    #[set(type(AsRef<str>))]
+    pub message: String,
     /// The optional data payload of the response.
-    #[get(pub(crate))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) data: Option<T>,
+    pub data: Option<T>,
     /// The optional timestamp of the response in milliseconds since epoch.
-    #[get(pub(crate), type(copy))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) timestamp: Option<i64>,
+    #[get(type(copy))]
+    pub timestamp: Option<i64>,
 }

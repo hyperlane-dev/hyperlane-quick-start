@@ -12,15 +12,23 @@ pub struct Topic {
     #[set(pub(crate))]
     pub name: String,
     /// The broadcast sender used to publish messages to all subscribers of this topic.
-    #[get(pub(crate))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) sender: TopicSender,
+    pub sender: TopicSender,
     /// The current lifecycle state of the topic.
-    #[get(pub(crate))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) state: TopicState,
+    pub state: TopicState,
+    /// Messages published while the topic is paused, kept in publication order.
+    ///
+    /// The buffer never exceeds the capacity of the topic broadcast channel and
+    /// keeps only the most recent messages, so a long pause cannot grow memory
+    /// without bound.
+    #[get(skip)]
+    #[get_mut(skip)]
+    #[set(skip)]
+    pub(crate) buffered: VecDeque<MessagePayload>,
+    /// The broadcast channel capacity of this topic, bounding the paused buffer.
+    #[get(skip)]
+    #[get_mut(skip)]
+    #[set(skip)]
+    pub(crate) capacity: usize,
 }
 
 /// A consumer group bound to a specific topic, distributing messages among its members.
@@ -31,15 +39,9 @@ pub struct ConsumerGroup {
     #[set(pub(crate))]
     pub name: String,
     /// The name of the topic this consumer group is bound to.
-    #[get(pub(crate))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) topic_name: String,
+    pub topic_name: String,
     /// The broadcast sender used to fan out messages to group members.
-    #[get(pub(crate))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) sender: TopicSender,
+    pub sender: TopicSender,
 }
 
 /// A registered message handler that processes messages from a topic or consumer group.
@@ -67,13 +69,7 @@ pub struct MessageHandler {
 #[derive(Clone, Data, Debug)]
 pub struct MessageQueueBroker {
     /// The registry of all active topics, keyed by topic name.
-    #[get(pub(crate))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) topics: ArcRwLock<TopicRegistry>,
+    pub topics: ArcRwLock<TopicRegistry>,
     /// The registry of all consumer groups, keyed by `"{topic_name}::{group_name}"`.
-    #[get(pub(crate))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) consumer_groups: ArcRwLock<ConsumerGroupRegistry>,
+    pub consumer_groups: ArcRwLock<ConsumerGroupRegistry>,
 }

@@ -7,8 +7,14 @@ pub(crate) const ERROR_TOPIC_ALREADY_EXISTS: &str = "Topic already exists";
 /// Error message returned when a topic with the given name does not exist.
 pub(crate) const ERROR_TOPIC_NOT_FOUND: &str = "Topic not found";
 
+/// Error suffix reported when an operation is rejected because the topic is closed.
+pub(crate) const ERROR_TOPIC_CLOSED: &str = "is closed";
+
 /// Error message returned when a consumer group with the given name already exists for a topic.
 pub(crate) const ERROR_CONSUMER_GROUP_ALREADY_EXISTS: &str = "Consumer group already exists";
 
 /// Error message returned when a consumer group with the given name does not exist for a topic.
 pub(crate) const ERROR_CONSUMER_GROUP_NOT_FOUND: &str = "Consumer group not found";
+
+/// Error message returned when a requested broadcast channel capacity is not positive.
+pub(crate) const ERROR_INVALID_CAPACITY: &str = "Capacity must be positive";

@@ -1,5 +1,21 @@
 use super::*;
 
+/// Builds a closed broadcast channel of the given capacity and returns only its
+/// sender, so every receiver of the previous sender observes the channel closing.
+///
+/// # Arguments
+///
+/// - `usize` - The broadcast channel capacity to allocate.
+///
+/// # Returns
+///
+/// - `TopicSender` - The sender of a channel with no receiver left.
+pub(super) fn closed_sender(capacity: usize) -> TopicSender {
+    let (sender, receiver): (TopicSender, TopicReceiver) = channel(capacity);
+    drop(receiver);
+    sender
+}
+
 /// Returns a static reference to the global message queue broker, initializing it on first access.
 ///
 /// # Returns

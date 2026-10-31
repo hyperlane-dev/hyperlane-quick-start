@@ -14,7 +14,7 @@ use {
         RsaPrivateKey, RsaPublicKey,
         pkcs1::{DecodeRsaPrivateKey, DecodeRsaPublicKey, EncodeRsaPrivateKey},
         pkcs1v15::Pkcs1v15Encrypt,
-        pkcs8::EncodePublicKey,
+        pkcs8::{DecodePublicKey, EncodePublicKey},
         rand_core::OsRng,
         traits::PublicKeyParts,
     },

@@ -8,10 +8,8 @@ pub struct DatabasePlugin;
 #[derive(Clone, Data, Debug)]
 pub struct ConnectionCache<T: Clone> {
     /// The timestamp of the last connection attempt.
-    #[get(pub(crate), type(copy))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) last_attempt: Instant,
+    #[get(type(copy))]
+    pub last_attempt: Instant,
     /// The result of the connection attempt, either a connection or an error message.
     #[get_mut(pub(crate))]
     #[set(pub(crate))]
@@ -26,67 +24,40 @@ pub struct AutoCreationErrorHandler;
 #[derive(Clone, Data, Debug, Default)]
 pub struct AutoCreationResult {
     /// Whether a new database was created during the operation.
-    #[get(pub(crate), type(copy))]
-    #[get_mut(pub(crate))]
+    #[get(type(copy))]
     pub database_created: bool,
     /// The duration of the auto-creation operation.
-    #[get(pub(crate))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) duration: Duration,
+    pub duration: Duration,
     /// A list of error messages encountered during the operation.
-    #[get(pub(crate))]
-    #[get_mut(pub(crate))]
     pub errors: Vec<String>,
     /// A list of table names that were created during the operation.
-    #[get(pub(crate))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) tables_created: Vec<String>,
+    pub tables_created: Vec<String>,
 }
 
 /// Schema definition for a single database table, including its name, SQL, and dependencies.
 #[derive(Clone, Data, Debug, New)]
 pub struct TableSchema {
     /// A list of table names that this table depends on, used for creation ordering.
-    #[get(pub(crate))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) dependencies: Vec<String>,
+    pub dependencies: Vec<String>,
     /// The name of the table.
     #[get_mut(pub(crate))]
     #[set(pub(crate))]
     pub name: String,
     /// The SQL statement to create the table.
-    #[get(pub(crate))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) sql: String,
+    pub sql: String,
 }
 
 /// Schema definition for an entire database, including tables, indexes, constraints, and initialization data.
 #[derive(Clone, Data, Debug, Default)]
 pub struct DatabaseSchema {
     /// A list of constraint SQL statements to apply after table creation.
-    #[get(pub(crate))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) constraints: Vec<String>,
+    pub constraints: Vec<String>,
     /// A list of index SQL statements to apply after table creation.
-    #[get(pub(crate))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) indexes: Vec<String>,
+    pub indexes: Vec<String>,
     /// A list of SQL statements for initializing data after table creation.
-    #[get(pub(crate))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) init_data: Vec<String>,
+    pub init_data: Vec<String>,
     /// A list of table schemas defining the database structure.
-    #[get(pub(crate))]
-    #[get_mut(pub(crate))]
-    #[set(pub(crate))]
-    pub(crate) tables: Vec<TableSchema>,
+    pub tables: Vec<TableSchema>,
 }
 
 /// Configuration for auto-creation validation, ensuring required plugins are enabled.

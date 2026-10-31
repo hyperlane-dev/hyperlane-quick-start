@@ -2158,7 +2158,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "23.2.5"
+version = "23.2.6"
 dependencies = [
  "bin-encode-decode",
  "chrono",
