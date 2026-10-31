@@ -16,40 +16,73 @@ use super::*;
 pub struct Model {
     /// Unique primary key identifier for the blog post.
     #[sea_orm(primary_key, auto_increment = true)]
-    #[get(type(copy))]
-    pub(super) id: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) id: i32,
     /// The foreign key referencing the user who authored the post.
-    #[get(type(copy))]
-    pub(super) user_id: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) user_id: i32,
     /// The title of the blog post.
-    pub(super) title: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) title: String,
     /// The optional summary or excerpt of the post content.
-    pub(super) summary: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) summary: Option<String>,
     /// The full textual content of the blog post.
-    pub(super) content: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) content: String,
     /// The foreign key referencing the cover image for the post.
-    #[get(type(copy))]
-    pub(super) cover_image_id: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) cover_image_id: i32,
     /// Flag indicating whether the post has been published.
-    #[get(type(copy))]
-    pub(super) is_published: bool,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) is_published: bool,
     /// Soft delete flag indicating whether the post has been marked as deleted.
-    #[get(type(copy))]
-    pub(super) is_deleted: bool,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) is_deleted: bool,
     /// The number of times the post has been viewed.
-    #[get(type(copy))]
-    pub(super) view_count: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) view_count: i32,
     /// The number of likes the post has received.
-    #[get(type(copy))]
-    pub(super) like_count: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) like_count: i32,
     /// The number of favorites (bookmarks) the post has received.
-    #[get(type(copy))]
-    pub(super) favorite_count: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) favorite_count: i32,
     /// The number of comments on the post.
-    #[get(type(copy))]
-    pub(super) comment_count: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) comment_count: i32,
     /// The timestamp when the post was created.
-    pub(super) created_at: Option<NaiveDateTime>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) created_at: Option<NaiveDateTime>,
     /// The timestamp when the post was last updated.
-    pub(super) updated_at: Option<NaiveDateTime>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) updated_at: Option<NaiveDateTime>,
 }

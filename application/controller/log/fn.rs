@@ -11,6 +11,7 @@ use super::*;
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_log_trace` free function.
 #[instrument_trace]
 pub fn openapi_log_trace() {}
 
@@ -25,6 +26,7 @@ pub fn openapi_log_trace() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_log_debug` free function.
 #[instrument_trace]
 pub fn openapi_log_debug() {}
 
@@ -39,6 +41,7 @@ pub fn openapi_log_debug() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_log_info` free function.
 #[instrument_trace]
 pub fn openapi_log_info() {}
 
@@ -53,6 +56,7 @@ pub fn openapi_log_info() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_log_warn` free function.
 #[instrument_trace]
 pub fn openapi_log_warn() {}
 
@@ -67,5 +71,6 @@ pub fn openapi_log_warn() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_log_error` free function.
 #[instrument_trace]
 pub fn openapi_log_error() {}

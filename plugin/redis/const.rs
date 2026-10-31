@@ -1,5 +1,5 @@
 /// Default name for the Redis instance when no explicit name is provided.
-pub const DEFAULT_REDIS_INSTANCE_NAME: &str = "redis_default";
+pub(crate) const DEFAULT_REDIS_INSTANCE_NAME: &str = "redis_default";
 
 /// Log label for the auto-creation process of an instance.
 pub(crate) const AUTO_CREATION_PROCESS_LABEL: &str = "Auto-creation process";

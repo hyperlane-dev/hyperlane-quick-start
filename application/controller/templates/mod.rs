@@ -3,8 +3,8 @@ mod r#fn;
 mod r#impl;
 mod r#struct;
 
-pub use {r#const::*, r#fn::*};
+pub use r#fn::*;
+
+pub(crate) use r#const::*;
 
 use {super::*, r#struct::*};
-
-use hyperlane_resources::*;

@@ -9,5 +9,6 @@ use super::*;
         (status = 500, description = RESPONSE_DESCRIPTION_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_auth_view` free function.
 #[instrument_trace]
 pub fn openapi_auth_view() {}

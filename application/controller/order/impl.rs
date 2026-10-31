@@ -263,7 +263,7 @@ impl ServerHook for RecordGetRoute {
         Self
     }
 
-    #[prologue_macros(is_get_method, try_get_route_param(ID_KEY => id_opt), response_header(CONTENT_TYPE => APPLICATION_JSON))]
+    #[prologue_macros(is_get_method, try_get_route_param(id_key() => id_opt), response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
     /// Handles the `RecordGetRoute` route request and writes the JSON
     /// response envelope into the request context.
@@ -560,7 +560,7 @@ impl ServerHook for ImageDownloadRoute {
         Self
     }
 
-    #[prologue_macros(is_get_method, try_get_route_param(ID_KEY => id_opt))]
+    #[prologue_macros(is_get_method, try_get_route_param(id_key() => id_opt))]
     #[instrument_trace]
     /// Handles the `ImageDownloadRoute` route request and writes the JSON
     /// response envelope into the request context.

@@ -3,8 +3,9 @@ mod r#impl;
 mod r#static;
 mod r#struct;
 
-pub use {r#fn::*, r#static::*, r#struct::*};
+pub use {r#fn::*, r#struct::*};
 
-use {super::*, model::application::gomoku::*};
+pub(crate) use r#static::*;
 
 use tokio::sync::{RwLockReadGuard, RwLockWriteGuard};
+use {super::*, model::application::gomoku::*};

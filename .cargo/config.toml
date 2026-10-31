@@ -1,3 +1,0 @@
-[build]
-jobs = 16
-pipelining = true

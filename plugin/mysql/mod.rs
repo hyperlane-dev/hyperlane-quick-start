@@ -1,14 +1,17 @@
 mod r#const;
+mod r#fn;
 mod r#impl;
 mod r#static;
 mod r#struct;
 
-pub use {r#const::*, r#struct::*};
+pub use r#fn::*;
+pub use r#struct::*;
 
-use {super::*, database::*, env::*, r#static::*};
+pub(crate) use r#const::*;
 
 use tokio::{
     spawn,
     sync::{RwLock, RwLockWriteGuard},
     time::timeout,
 };
+use {super::*, database::*, env::*, r#static::*};

@@ -44,20 +44,11 @@ fn upload_parse_range_header_rejects_zero_length_suffix() {
 #[test]
 fn upload_parse_range_header_rejects_any_range_on_empty_file() {
     let start_error: String = UploadService::parse_range_header("bytes=0-", 0).unwrap_err();
-    assert_eq!(
-        start_error,
-        service::upload::ERROR_RANGE_START_EXCEEDS_FILE_SIZE
-    );
+    assert_eq!(start_error, ERROR_RANGE_START_EXCEEDS_FILE_SIZE);
     let suffix_error: String = UploadService::parse_range_header("bytes=-10", 0).unwrap_err();
-    assert_eq!(
-        suffix_error,
-        service::upload::ERROR_RANGE_START_EXCEEDS_FILE_SIZE
-    );
+    assert_eq!(suffix_error, ERROR_RANGE_START_EXCEEDS_FILE_SIZE);
     let single_error: String = UploadService::parse_range_header("bytes=0-0", 0).unwrap_err();
-    assert_eq!(
-        single_error,
-        service::upload::ERROR_RANGE_START_EXCEEDS_FILE_SIZE
-    );
+    assert_eq!(single_error, ERROR_RANGE_START_EXCEEDS_FILE_SIZE);
 }
 
 #[test]
@@ -107,7 +98,7 @@ fn upload_parse_range_header_rejects_missing_bytes_prefix() {
 #[test]
 fn upload_parse_range_header_rejects_empty_specification() {
     let error: String = UploadService::parse_range_header("bytes=", 4096).unwrap_err();
-    assert_eq!(error, service::upload::ERROR_INVALID_RANGE_SPECIFICATION);
+    assert_eq!(error, ERROR_INVALID_RANGE_SPECIFICATION);
 }
 
 #[test]
@@ -119,7 +110,7 @@ fn upload_parse_range_header_rejects_specification_with_both_bounds_empty() {
 #[test]
 fn upload_parse_range_header_rejects_multi_range_specification() {
     let error: String = UploadService::parse_range_header("bytes=0-100,200-300", 4096).unwrap_err();
-    assert_eq!(error, service::upload::ERROR_INVALID_RANGE_SPECIFICATION);
+    assert_eq!(error, ERROR_INVALID_RANGE_SPECIFICATION);
 }
 
 #[test]
@@ -143,31 +134,25 @@ fn upload_parse_range_header_rejects_non_numeric_suffix() {
 #[test]
 fn upload_parse_range_header_rejects_start_at_file_size() {
     let error: String = UploadService::parse_range_header("bytes=4096-", 4096).unwrap_err();
-    assert_eq!(error, service::upload::ERROR_RANGE_START_EXCEEDS_FILE_SIZE);
+    assert_eq!(error, ERROR_RANGE_START_EXCEEDS_FILE_SIZE);
 }
 
 #[test]
 fn upload_parse_range_header_rejects_start_past_file_size() {
     let error: String = UploadService::parse_range_header("bytes=5000-6000", 4096).unwrap_err();
-    assert_eq!(error, service::upload::ERROR_RANGE_START_EXCEEDS_FILE_SIZE);
+    assert_eq!(error, ERROR_RANGE_START_EXCEEDS_FILE_SIZE);
 }
 
 #[test]
 fn upload_parse_range_header_rejects_inverted_bounds() {
     let error: String = UploadService::parse_range_header("bytes=300-100", 4096).unwrap_err();
-    assert_eq!(
-        error,
-        service::upload::ERROR_INVALID_RANGE_START_GREATER_THAN_END
-    );
+    assert_eq!(error, ERROR_INVALID_RANGE_START_GREATER_THAN_END);
 }
 
 #[test]
 fn upload_parse_range_header_rejects_inverted_bounds_after_clamping() {
     let error: String = UploadService::parse_range_header("bytes=4000-10", 4096).unwrap_err();
-    assert_eq!(
-        error,
-        service::upload::ERROR_INVALID_RANGE_START_GREATER_THAN_END
-    );
+    assert_eq!(error, ERROR_INVALID_RANGE_START_GREATER_THAN_END);
 }
 
 #[tokio::test]

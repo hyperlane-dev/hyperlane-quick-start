@@ -21,6 +21,6 @@ impl WebSocketService {
         response
             .set_message(body.get_message().clone())
             .set_time(Utc::now().timestamp_millis());
-        serde_json::to_string(&response).map_err(|error: serde_json::Error| error.to_string())
+        serde_json::to_string(&response).map_err(|error: Error| error.to_string())
     }
 }

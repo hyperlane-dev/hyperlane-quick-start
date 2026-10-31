@@ -4,10 +4,18 @@ use super::*;
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct ShortlinkRecord {
     /// The unique identifier used as the short link token.
-    #[get(type(copy))]
-    pub(super) id: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) id: i32,
     /// The original target URL that the short link redirects to.
-    pub(super) url: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) url: String,
     /// The string-formatted timestamp when the short link was created.
-    pub(super) created_at: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) created_at: String,
 }

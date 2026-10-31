@@ -5,8 +5,9 @@
 # same stack as resources/docker/release/server_docker_compose.yml, which keeps
 # working unchanged; if the two ever differ, this is the verified copy.
 #
-# The application image is built from source on first run, which takes roughly 25
-# minutes. Pull it instead to skip that:
+# The server image is built from source on first run, which takes a while
+# because the whole workspace has to compile. Pull the published image
+# instead to skip that:
 #
 #   server:
 #     image: hkccr.ccs.tencentyun.com/hyperlane-dev/hyperlane-quick-start:1.0.0
@@ -17,6 +18,11 @@
 #   docker compose up -d
 #
 # The service is then on http://127.0.0.1:65002.
+#
+# The image itself is a two-stage build: the builder compiles a static musl
+# binary and the runtime stage keeps only that executable plus the static
+# assets, so the published image is a fraction of the size of a build-from-
+# source image and has no libc dependency.
 
 services:
   mysql:

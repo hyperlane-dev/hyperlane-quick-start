@@ -14,7 +14,7 @@ impl RecordRepository {
     #[instrument_trace]
     pub async fn find_by_id(record_id: i32) -> Result<Option<OrderRecordModel>, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: Option<OrderRecordModel> = OrderRecordEntity::find_by_id(record_id)
             .one(&db)
             .await
@@ -34,7 +34,7 @@ impl RecordRepository {
     #[instrument_trace]
     pub async fn insert(active_model: OrderRecordActiveModel) -> Result<OrderRecordModel, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: OrderRecordModel = active_model
             .insert(&db)
             .await
@@ -88,7 +88,7 @@ impl RecordRepository {
         cache_id: Option<i32>,
     ) -> Result<Vec<OrderRecordModel>, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let mut base_select: sea_orm::Select<OrderRecordEntity> = OrderRecordEntity::find();
         if let Some(user_id) = user_id {
             base_select = base_select.filter(OrderRecordColumn::UserId.eq(user_id));
@@ -130,7 +130,7 @@ impl RecordRepository {
         query: RecordPaginationQuery,
     ) -> Result<(Vec<OrderRecordModel>, i64), String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let mut base_select: sea_orm::Select<OrderRecordEntity> = OrderRecordEntity::find();
         if let Some(user_id) = query.try_get_user_id() {
             base_select = base_select.filter(OrderRecordColumn::UserId.eq(user_id));
@@ -191,7 +191,7 @@ impl RecordRepository {
         transaction_type: String,
     ) -> Result<Decimal, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let mut base_select: sea_orm::Select<OrderRecordEntity> = OrderRecordEntity::find();
         if let Some(user_id) = user_id {
             base_select = base_select.filter(OrderRecordColumn::UserId.eq(user_id));
@@ -239,7 +239,7 @@ impl RecordRepository {
         end_date: NaiveDate,
     ) -> Result<Vec<OrderRecordModel>, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: Vec<OrderRecordModel> = OrderRecordEntity::find()
             .filter(OrderRecordColumn::BillDate.gte(start_date))
             .filter(OrderRecordColumn::BillDate.lte(end_date))
@@ -268,7 +268,7 @@ impl RecordRepository {
         transaction_type: String,
     ) -> Result<Vec<OrderRecordModel>, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: Vec<OrderRecordModel> = OrderRecordEntity::find()
             .filter(OrderRecordColumn::BillDate.gte(start_date))
             .filter(OrderRecordColumn::BillDate.lte(end_date))
@@ -291,7 +291,7 @@ impl RecordRepository {
     #[instrument_trace]
     pub async fn find_by_bill_date(bill_date: NaiveDate) -> Result<Vec<OrderRecordModel>, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: Vec<OrderRecordModel> = OrderRecordEntity::find()
             .filter(OrderRecordColumn::BillDate.eq(bill_date))
             .all(&db)
@@ -308,7 +308,7 @@ impl RecordRepository {
     #[instrument_trace]
     pub async fn find_all() -> Result<Vec<OrderRecordModel>, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: Vec<OrderRecordModel> = OrderRecordEntity::find()
             .all(&db)
             .await
@@ -331,7 +331,7 @@ impl RecordImageRepository {
     #[instrument_trace]
     pub async fn find_by_id(image_id: i32) -> Result<Option<OrderRecordImageModel>, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: Option<OrderRecordImageModel> = OrderRecordImageEntity::find_by_id(image_id)
             .one(&db)
             .await
@@ -351,7 +351,7 @@ impl RecordImageRepository {
     #[instrument_trace]
     pub async fn find_by_record_id(record_id: i32) -> Result<Vec<OrderRecordImageModel>, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: Vec<OrderRecordImageModel> = OrderRecordImageEntity::find()
             .filter(OrderRecordImageColumn::RecordId.eq(record_id))
             .order_by_desc(OrderRecordImageColumn::Id)
@@ -375,7 +375,7 @@ impl RecordImageRepository {
         record_ids: Vec<i32>,
     ) -> Result<Vec<OrderRecordImageModel>, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: Vec<OrderRecordImageModel> = OrderRecordImageEntity::find()
             .filter(OrderRecordImageColumn::RecordId.is_in(record_ids))
             .order_by_desc(OrderRecordImageColumn::Id)
@@ -399,7 +399,7 @@ impl RecordImageRepository {
         active_model: OrderRecordImageActiveModel,
     ) -> Result<OrderRecordImageModel, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: OrderRecordImageModel = active_model
             .insert(&db)
             .await
@@ -443,7 +443,7 @@ impl RecordImageRepository {
         user_ids: Vec<i32>,
     ) -> Result<Vec<OrderRecordImageModel>, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: Vec<OrderRecordImageModel> = OrderRecordImageEntity::find()
             .filter(OrderRecordImageColumn::UserId.is_in(user_ids))
             .all(&db)
@@ -466,7 +466,7 @@ impl RecordImageRepository {
         active_model: OrderRecordImageActiveModel,
     ) -> Result<OrderRecordImageModel, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: OrderRecordImageModel = active_model
             .update(&db)
             .await

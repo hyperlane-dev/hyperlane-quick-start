@@ -208,8 +208,9 @@ impl EnvConfig {
     /// - `Result<Self, String>` - The loaded configuration on success, or an error message on failure.
     #[instrument_trace]
     pub(crate) fn load() -> Result<Self, String> {
-        dotenvy::from_path(SERVER_ENV_FILE_PATH)
-            .map_err(|error: dotenvy::Error| format!("Failed to load env file {error}"))?;
+        if let Err(error) = dotenvy::from_path(server_env_file_path()) {
+            return Err(format!("Failed to load env file {error}"));
+        }
         let get_env_required: fn(&str) -> Result<String, String> =
             |key: &str| -> Result<String, String> {
                 var(key).map_err(|_: VarError| format!("Environment variable {key} is not set"))
@@ -263,7 +264,7 @@ impl EnvConfig {
             }
         };
         let docker_config: DockerComposeConfig =
-            Self::load_from_docker_compose(SERVER_DOCKER_COMPOSE_FILE_PATH).unwrap_or_default();
+            Self::load_from_docker_compose(server_docker_compose_file_path()).unwrap_or_default();
         let mysql_instances: Vec<MySqlInstanceConfig> =
             Self::parse_mysql_instances(&docker_config)?;
         let postgresql_instances: Vec<PostgreSqlInstanceConfig> =
@@ -310,12 +311,14 @@ impl EnvConfig {
     fn parse_mysql_instances(
         docker_config: &DockerComposeConfig,
     ) -> Result<Vec<MySqlInstanceConfig>, String> {
-        let mut instances: Vec<MySqlInstanceConfig> = serde_json::from_str(
+        let mut instances: Vec<MySqlInstanceConfig> = match serde_json::from_str(
             var(ENV_KEY_MYSQL)
                 .map_err(|_: VarError| format!("Environment variable {ENV_KEY_MYSQL} is not set"))?
                 .trim_matches('\''),
-        )
-        .map_err(|error: serde_json::Error| format!("Failed to parse {ENV_KEY_MYSQL}: {error}"))?;
+        ) {
+            Ok(instances) => instances,
+            Err(error) => return Err(format!("Failed to parse {ENV_KEY_MYSQL}: {error}")),
+        };
         instances
             .iter_mut()
             .for_each(|instance: &mut MySqlInstanceConfig| {
@@ -338,16 +341,18 @@ impl EnvConfig {
     fn parse_postgresql_instances(
         docker_config: &DockerComposeConfig,
     ) -> Result<Vec<PostgreSqlInstanceConfig>, String> {
-        let mut instances: Vec<PostgreSqlInstanceConfig> = serde_json::from_str(
+        let mut instances: Vec<PostgreSqlInstanceConfig> = match serde_json::from_str(
             var(ENV_KEY_POSTGRESQL)
                 .map_err(|_: VarError| {
                     format!("Environment variable {ENV_KEY_POSTGRESQL} is not set")
                 })?
                 .trim_matches('\''),
-        )
-        .map_err(|error: serde_json::Error| {
-            format!("Failed to parse {ENV_KEY_POSTGRESQL}: {error}")
-        })?;
+        ) {
+            Ok(instances) => instances,
+            Err(error) => {
+                return Err(format!("Failed to parse {ENV_KEY_POSTGRESQL}: {error}"));
+            }
+        };
         instances
             .iter_mut()
             .for_each(|instance: &mut PostgreSqlInstanceConfig| {
@@ -370,12 +375,14 @@ impl EnvConfig {
     fn parse_redis_instances(
         docker_config: &DockerComposeConfig,
     ) -> Result<Vec<RedisInstanceConfig>, String> {
-        let mut instances: Vec<RedisInstanceConfig> = serde_json::from_str(
+        let mut instances: Vec<RedisInstanceConfig> = match serde_json::from_str(
             var(ENV_KEY_REDIS)
                 .map_err(|_: VarError| format!("Environment variable {ENV_KEY_REDIS} is not set"))?
                 .trim_matches('\''),
-        )
-        .map_err(|error: serde_json::Error| format!("Failed to parse {ENV_KEY_REDIS}: {error}"))?;
+        ) {
+            Ok(instances) => instances,
+            Err(error) => return Err(format!("Failed to parse {ENV_KEY_REDIS}: {error}")),
+        };
         instances
             .iter_mut()
             .for_each(|instance: &mut RedisInstanceConfig| {
@@ -401,32 +408,33 @@ impl EnvConfig {
             read_from_file(file_path).map_err(|error: Box<dyn Error>| {
                 format!("Failed to read docker-compose.yml {error}")
             })?;
-        let yaml: serde_yaml::Value = serde_yaml::from_slice(&docker_compose_content).map_err(
-            |error: serde_yaml::Error| format!("Failed to parse docker-compose.yml {error}"),
-        )?;
+        let yaml: Value = match serde_yaml::from_slice(&docker_compose_content) {
+            Ok(yaml) => yaml,
+            Err(error) => return Err(format!("Failed to parse docker-compose.yml {error}")),
+        };
         let mut config: DockerComposeConfig = DockerComposeConfig::default();
         if let Some(mysql) = yaml
             .get(DOCKER_YAML_SERVICES)
-            .and_then(|services: &serde_yaml::Value| services.get(DOCKER_SERVICE_MYSQL))
+            .and_then(|services: &Value| services.get(DOCKER_SERVICE_MYSQL))
         {
             if let Some(env) = mysql.get(DOCKER_YAML_ENVIRONMENT) {
                 if let Some(database) = env
                     .get(DOCKER_MYSQL_DATABASE)
-                    .and_then(|value: &serde_yaml::Value| value.as_str())
+                    .and_then(|value: &Value| value.as_str())
                     .map(String::from)
                 {
                     config.set_mysql_database(Some(database));
                 }
                 if let Some(username) = env
                     .get(DOCKER_MYSQL_USER)
-                    .and_then(|value: &serde_yaml::Value| value.as_str())
+                    .and_then(|value: &Value| value.as_str())
                     .map(String::from)
                 {
                     config.set_mysql_username(Some(username));
                 }
                 if let Some(password) = env
                     .get(DOCKER_MYSQL_PASSWORD)
-                    .and_then(|value: &serde_yaml::Value| value.as_str())
+                    .and_then(|value: &Value| value.as_str())
                     .map(String::from)
                 {
                     config.set_mysql_password(Some(password));
@@ -434,10 +442,8 @@ impl EnvConfig {
             }
             if let Some(ports) = mysql
                 .get(DOCKER_YAML_PORTS)
-                .and_then(|ports_value: &serde_yaml::Value| ports_value.as_sequence())
-                && let Some(port_mapping) = ports
-                    .first()
-                    .and_then(|port: &serde_yaml::Value| port.as_str())
+                .and_then(|ports_value: &Value| ports_value.as_sequence())
+                && let Some(port_mapping) = ports.first().and_then(|port: &Value| port.as_str())
                 && let Some(host_port) = port_mapping.split(COLON).next()
                 && let Ok(port) = host_port.parse()
             {
@@ -446,26 +452,26 @@ impl EnvConfig {
         }
         if let Some(postgresql) = yaml
             .get(DOCKER_YAML_SERVICES)
-            .and_then(|services: &serde_yaml::Value| services.get(DOCKER_SERVICE_POSTGRESQL))
+            .and_then(|services: &Value| services.get(DOCKER_SERVICE_POSTGRESQL))
         {
             if let Some(env) = postgresql.get(DOCKER_YAML_ENVIRONMENT) {
                 if let Some(database) = env
                     .get(DOCKER_POSTGRES_DB)
-                    .and_then(|value: &serde_yaml::Value| value.as_str())
+                    .and_then(|value: &Value| value.as_str())
                     .map(String::from)
                 {
                     config.set_postgresql_database(Some(database));
                 }
                 if let Some(username) = env
                     .get(DOCKER_POSTGRES_USER)
-                    .and_then(|value: &serde_yaml::Value| value.as_str())
+                    .and_then(|value: &Value| value.as_str())
                     .map(String::from)
                 {
                     config.set_postgresql_username(Some(username));
                 }
                 if let Some(password) = env
                     .get(DOCKER_POSTGRES_PASSWORD)
-                    .and_then(|value: &serde_yaml::Value| value.as_str())
+                    .and_then(|value: &Value| value.as_str())
                     .map(String::from)
                 {
                     config.set_postgresql_password(Some(password));
@@ -473,10 +479,8 @@ impl EnvConfig {
             }
             if let Some(ports) = postgresql
                 .get(DOCKER_YAML_PORTS)
-                .and_then(|ports_value: &serde_yaml::Value| ports_value.as_sequence())
-                && let Some(port_mapping) = ports
-                    .first()
-                    .and_then(|port: &serde_yaml::Value| port.as_str())
+                .and_then(|ports_value: &Value| ports_value.as_sequence())
+                && let Some(port_mapping) = ports.first().and_then(|port: &Value| port.as_str())
                 && let Some(host_port) = port_mapping.split(COLON).next()
                 && let Ok(port) = host_port.parse()
             {
@@ -485,21 +489,19 @@ impl EnvConfig {
         }
         if let Some(redis) = yaml
             .get(DOCKER_YAML_SERVICES)
-            .and_then(|services: &serde_yaml::Value| services.get(DOCKER_SERVICE_REDIS))
+            .and_then(|services: &Value| services.get(DOCKER_SERVICE_REDIS))
         {
             if let Some(command) = redis
                 .get(DOCKER_YAML_COMMAND)
-                .and_then(|command_value: &serde_yaml::Value| command_value.as_str())
+                .and_then(|command_value: &Value| command_value.as_str())
                 && let Some(password_part) = command.split(DOCKER_REDIS_PASSWORD_FLAG).nth(1)
             {
                 config.set_redis_password(Some(password_part.trim().to_string()));
             }
             if let Some(ports) = redis
                 .get(DOCKER_YAML_PORTS)
-                .and_then(|ports_value: &serde_yaml::Value| ports_value.as_sequence())
-                && let Some(port_mapping) = ports
-                    .first()
-                    .and_then(|port: &serde_yaml::Value| port.as_str())
+                .and_then(|ports_value: &Value| ports_value.as_sequence())
+                && let Some(port_mapping) = ports.first().and_then(|port: &Value| port.as_str())
                 && let Some(host_port) = port_mapping.split(COLON).next()
                 && let Ok(port) = host_port.parse()
             {
@@ -610,8 +612,14 @@ impl EnvConfig {
             info!("  SERVER_LOG_DIR: {}", config.get_server_log_dir());
             info!("  SERVER_INNER_PRINT: {}", config.get_server_inner_print());
             info!("  SERVER_INNER_LOG: {}", config.get_server_inner_log());
-            info!("  SERVER_NODELAY: {:?}", config.get_server_nodelay());
-            info!("  SERVER_TTI: {:?}", config.get_server_tti());
+            info!(
+                "  SERVER_NODELAY: {:?}",
+                config.try_get_server_nodelay().unwrap_or_default()
+            );
+            info!(
+                "  SERVER_TTI: {:?}",
+                config.try_get_server_tti().unwrap_or_default()
+            );
             info!(
                 "  SERVER_PID_FILE_PATH: {}",
                 config.get_server_pid_file_path()

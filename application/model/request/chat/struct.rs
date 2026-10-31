@@ -4,20 +4,20 @@ use super::*;
 #[derive(Clone, Data, Default, Deserialize, Serialize, ToSchema)]
 pub struct WebSocketReqData {
     #[get(type(copy))]
-    pub(super) r#type: MessageType,
+    pub r#type: MessageType,
     /// The data.
-    pub(super) data: String,
+    pub data: String,
 }
 
 /// chat history params.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct ChatHistoryParams {
     /// The session id.
-    pub(super) session_id: String,
+    pub session_id: String,
     #[get(type(copy))]
     /// The offset.
-    pub(super) offset: Option<i64>,
+    pub offset: Option<i64>,
     #[get(type(copy))]
     /// The limit.
-    pub(super) limit: Option<i64>,
+    pub limit: Option<i64>,
 }

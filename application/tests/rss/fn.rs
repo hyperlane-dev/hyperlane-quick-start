@@ -14,7 +14,7 @@ const RSS_TEST_MISSING_SCAN: &str =
     "rss::r#fn::uploaded_file_scan_returns_an_empty_list_when_the_upload_dir_is_missing";
 
 fn rss_upload_dir(root: &Path) -> PathBuf {
-    root.join(UPLOAD_DIR)
+    root.join(upload_dir())
 }
 
 fn rss_seed_fixture(path: &Path, contents: &[u8], mtime_offset_secs: u64) {

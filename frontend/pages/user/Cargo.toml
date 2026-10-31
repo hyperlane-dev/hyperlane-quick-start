@@ -1,0 +1,21 @@
+[package]
+name = "hyperlane_frontend_user"
+version.workspace = true
+readme = "README.md"
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = """The user management page of the Hyperlane Quick Start server, built with the euv framework and the euv-ui component library."""
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+hyperlane_frontend_shared = { workspace = true }
+
+euv = { workspace = true }
+serde = { workspace = true }
+euv-ui = { workspace = true }
+serde_json = { workspace = true }
+wasm-bindgen = { workspace = true }

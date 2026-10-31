@@ -4,33 +4,63 @@ use super::*;
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct UserResponse {
     /// The id.
-    pub(super) id: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) id: String,
     /// The username.
-    pub(super) username: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) username: String,
     /// The email.
-    pub(super) email: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) email: Option<String>,
     /// The phone.
-    pub(super) phone: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) phone: Option<String>,
     /// The role.
-    pub(super) role: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) role: String,
     /// The status.
-    pub(super) status: String,
-    #[get(type(copy))]
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) status: String,
+    #[get(pub(crate), type(copy))]
     /// The created at.
-    pub(super) created_at: Option<i64>,
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) created_at: Option<i64>,
 }
 
 /// Represents a paginated list of user responses with cursor-based pagination.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct UserListResponse {
     /// The users.
-    pub(super) users: Vec<UserResponse>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) users: Vec<UserResponse>,
     /// The has more.
-    #[get(type(copy))]
-    pub(super) has_more: bool,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) has_more: bool,
     /// The last id.
-    pub(super) last_id: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) last_id: Option<String>,
     /// The total count.
-    #[get(type(copy))]
-    pub(super) total_count: i64,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) total_count: i64,
 }

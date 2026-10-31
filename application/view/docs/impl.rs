@@ -28,6 +28,16 @@ impl ServerHook for DocsViewRoute {
         response_status_code(302),
         response_header(LOCATION => DOCS_VIEW_REDIRECT_PATH)
     )]
+    /// Implements the `handle` operation on [`DocsViewRoute`].
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - Mutable reference to a `Stream` (mutated in place).
+    /// - `&mut Context` - Mutable reference to a `Context` (mutated in place).
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - A `Status` value.
     #[instrument_trace]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue

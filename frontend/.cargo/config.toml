@@ -1,0 +1,9 @@
+# The frontend workspace keeps its own target directory.
+#
+# The shared global target directory lives outside the workspace and holds the
+# host build artifacts of every project on the machine. The frontend crates
+# are compiled to WebAssembly with a different target triple, so they would
+# only add noise to it, and the wasm artifacts of one page must not be reused
+# for another page.
+[build]
+target-dir = "target"

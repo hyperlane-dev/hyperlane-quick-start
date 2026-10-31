@@ -169,7 +169,7 @@ impl ServerHook for NotificationGetRoute {
 
     #[prologue_macros(
         is_get_method,
-        try_get_route_param(ID_KEY => id_opt),
+        try_get_route_param(id_key() => id_opt),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
@@ -256,7 +256,7 @@ impl ServerHook for NotificationReadRoute {
 
     #[prologue_macros(
         is_post_method,
-        try_get_route_param(ID_KEY => id_opt),
+        try_get_route_param(id_key() => id_opt),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
@@ -395,7 +395,7 @@ impl ServerHook for NotificationDeleteRoute {
 
     #[prologue_macros(
         is_post_method,
-        try_get_route_param(ID_KEY => id_opt),
+        try_get_route_param(id_key() => id_opt),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]

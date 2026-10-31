@@ -24,7 +24,13 @@ pub struct GomokuWebSocketService;
 #[derive(Clone, Data, Debug)]
 pub struct RoomBroadcastManager {
     /// The broadcast channel map for publishing game messages to room subscribers.
-    pub(super) broadcast_map: Arc<BroadcastMap<String>>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) broadcast_map: Arc<BroadcastMap<String>>,
     /// The map of user IDs to their subscribed room IDs.
-    pub(super) user_subscriptions: ArcRwLock<HashMap<String, String>>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) user_subscriptions: ArcRwLock<HashMap<String, String>>,
 }

@@ -4,122 +4,215 @@ use super::*;
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct CreateRecordRequest {
     /// The amount.
-    #[get(type(copy))]
+    #[get(pub(crate), type(copy))]
     #[schema(value_type = String)]
-    pub(super) amount: Decimal,
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) amount: Decimal,
     /// The category.
-    pub(super) category: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) category: String,
     /// The transaction type.
-    pub(super) transaction_type: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) transaction_type: String,
     /// The description.
-    pub(super) description: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) description: Option<String>,
     /// The bill date.
     #[schema(value_type = String)]
-    pub(super) bill_date: Option<NaiveDate>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) bill_date: Option<NaiveDate>,
     /// The target user id.
-    pub(super) target_user_id: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) target_user_id: Option<String>,
     /// The image ids.
-    pub(super) image_ids: Vec<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) image_ids: Vec<String>,
 }
 
 /// record query request.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct RecordQueryRequest {
     /// The user id.
-    #[get(type(copy))]
-    pub(super) user_id: Option<i32>,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) user_id: Option<i32>,
     /// The start date.
     #[schema(value_type = String)]
-    pub(super) start_date: Option<NaiveDate>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) start_date: Option<NaiveDate>,
     /// The end date.
     #[schema(value_type = String)]
-    pub(super) end_date: Option<NaiveDate>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) end_date: Option<NaiveDate>,
     /// The category.
-    pub(super) category: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) category: Option<String>,
     /// The transaction type.
-    pub(super) transaction_type: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) transaction_type: Option<String>,
     /// The cache id.
-    #[get(type(copy))]
-    pub(super) cache_id: Option<i32>,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) cache_id: Option<i32>,
     /// The page.
-    #[get(type(copy))]
-    pub(super) page: Option<i32>,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) page: Option<i32>,
     /// The limit.
-    #[get(type(copy))]
-    pub(super) limit: Option<u64>,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) limit: Option<u64>,
 }
 
 /// create record with images request.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct CreateRecordWithImagesRequest {
     /// The amount.
-    #[get(type(copy))]
+    #[get(pub(crate), type(copy))]
     #[schema(value_type = String)]
-    pub(super) amount: Decimal,
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) amount: Decimal,
     /// The category.
-    pub(super) category: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) category: String,
     /// The transaction type.
-    pub(super) transaction_type: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) transaction_type: String,
     /// The description.
-    pub(super) description: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) description: Option<String>,
     /// The bill date.
     #[schema(value_type = String)]
-    pub(super) bill_date: Option<NaiveDate>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) bill_date: Option<NaiveDate>,
     /// The target user id.
-    pub(super) target_user_id: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) target_user_id: Option<String>,
     /// The images.
-    pub(super) images: Vec<ImageUploadRequest>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) images: Vec<ImageUploadRequest>,
 }
 
 /// image upload request.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct ImageUploadRequest {
     /// The file name.
-    pub(super) file_name: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) file_name: String,
     /// The original name.
-    pub(super) original_name: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) original_name: Option<String>,
     /// The mime type.
-    pub(super) mime_type: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) mime_type: String,
     /// The file size.
-    #[get(type(copy))]
-    pub(super) file_size: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) file_size: i32,
     /// The file data.
     #[schema(value_type = String, format = Binary)]
-    pub(super) file_data: Vec<u8>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) file_data: Vec<u8>,
 }
 
 /// record image query request.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct RecordImageQueryRequest {
     /// The record id.
-    pub(super) record_id: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) record_id: String,
 }
 
 /// record pagination query.
 #[derive(Clone, Data, Debug, Default)]
 pub struct RecordPaginationQuery {
     /// The user id.
-    #[get(type(copy))]
-    pub(super) user_id: Option<i32>,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) user_id: Option<i32>,
     /// The start date.
-    #[get(type(copy))]
-    pub(super) start_date: Option<NaiveDate>,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) start_date: Option<NaiveDate>,
     /// The end date.
-    #[get(type(copy))]
-    pub(super) end_date: Option<NaiveDate>,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) end_date: Option<NaiveDate>,
     /// The category.
-    #[get(type(option))]
-    pub(super) category: Option<String>,
+    #[get(pub(crate), type(option))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) category: Option<String>,
     /// The transaction type.
-    #[get(type(option))]
-    pub(super) transaction_type: Option<String>,
+    #[get(pub(crate), type(option))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) transaction_type: Option<String>,
     /// The cache id.
-    #[get(type(copy))]
-    pub(super) cache_id: Option<i32>,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) cache_id: Option<i32>,
     /// The page.
-    #[get(type(copy))]
-    pub(super) page: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) page: i32,
     /// The limit.
-    #[get(type(copy))]
-    pub(super) limit: u64,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) limit: u64,
 }

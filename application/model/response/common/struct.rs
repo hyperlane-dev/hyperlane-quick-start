@@ -9,13 +9,13 @@ where
 {
     /// The response status code.
     #[get(type(copy))]
-    pub(super) code: i32,
+    pub code: i32,
     /// The response message describing the result.
     #[set(type(AsRef<str>))]
-    pub(super) message: String,
+    pub message: String,
     /// The optional data payload of the response.
-    pub(super) data: Option<T>,
+    pub data: Option<T>,
     /// The optional timestamp of the response in milliseconds since epoch.
     #[get(type(copy))]
-    pub(super) timestamp: Option<i64>,
+    pub timestamp: Option<i64>,
 }

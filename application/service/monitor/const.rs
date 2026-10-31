@@ -1,8 +1,8 @@
 /// Fallback value for unknown.
-pub const FALLBACK_UNKNOWN: &str = "Unknown";
+pub(crate) const FALLBACK_UNKNOWN: &str = "Unknown";
 
 /// Loopback interface lo.
-pub const LOOPBACK_INTERFACE_LO: &str = "lo";
+pub(crate) const LOOPBACK_INTERFACE_LO: &str = "lo";
 
 /// Loopback interface loopback.
-pub const LOOPBACK_INTERFACE_LOOPBACK: &str = "Loopback";
+pub(crate) const LOOPBACK_INTERFACE_LOOPBACK: &str = "Loopback";

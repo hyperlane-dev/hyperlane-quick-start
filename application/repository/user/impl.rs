@@ -14,7 +14,7 @@ impl UserRepository {
     #[instrument_trace]
     pub async fn find_by_id(user_id: i32) -> Result<Option<UserModel>, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: Option<UserModel> = UserEntity::find_by_id(user_id)
             .one(&db)
             .await
@@ -34,7 +34,7 @@ impl UserRepository {
     #[instrument_trace]
     pub async fn find_by_username(username: String) -> Result<Option<UserModel>, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: Option<UserModel> = UserEntity::find()
             .filter(UserColumn::Username.eq(username))
             .one(&db)
@@ -55,7 +55,7 @@ impl UserRepository {
     #[instrument_trace]
     pub async fn find_by_ids(user_ids: Vec<i32>) -> Result<Vec<UserModel>, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: Vec<UserModel> = UserEntity::find()
             .filter(UserColumn::Id.is_in(user_ids))
             .all(&db)
@@ -76,7 +76,7 @@ impl UserRepository {
     #[instrument_trace]
     pub async fn insert(active_model: UserActiveModel) -> Result<UserModel, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: UserModel = active_model
             .insert(&db)
             .await
@@ -96,7 +96,7 @@ impl UserRepository {
     #[instrument_trace]
     pub async fn update(active_model: UserActiveModel) -> Result<UserModel, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: UserModel = active_model
             .update(&db)
             .await
@@ -122,7 +122,7 @@ impl UserRepository {
         limit: u64,
     ) -> Result<(Vec<UserModel>, i64, bool), String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let mut base_select: Select<UserEntity> = UserEntity::find();
         if let Some(keyword) = keyword {
             let keyword_pattern: String = format!("%{keyword}%");
@@ -173,7 +173,7 @@ impl UserRepository {
         end: NaiveDateTime,
     ) -> Result<i64, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let count_u64: u64 = UserEntity::find()
             .filter(UserColumn::CreatedAt.gte(start))
             .filter(UserColumn::CreatedAt.lte(end))
@@ -199,7 +199,7 @@ impl UserRepository {
         end: NaiveDateTime,
     ) -> Result<Vec<UserModel>, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let result: Vec<UserModel> = UserEntity::find()
             .filter(UserColumn::CreatedAt.gte(start))
             .filter(UserColumn::CreatedAt.lte(end))
@@ -221,7 +221,7 @@ impl UserRepository {
     #[instrument_trace]
     pub async fn delete_by_id(user_id: i32) -> Result<(), String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         UserEntity::delete_by_id(user_id)
             .exec(&db)
             .await

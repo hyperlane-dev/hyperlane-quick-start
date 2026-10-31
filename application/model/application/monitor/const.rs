@@ -10,9 +10,6 @@ pub const DEFAULT_PACKET_BUFFER_SIZE: usize = 1000;
 /// Maximum connections display.
 pub const MAX_CONNECTIONS_DISPLAY: usize = 50;
 
-/// Interval value for monitor seconds.
-pub const MONITOR_INTERVAL_SECONDS: u64 = 60;
-
 /// Cache or TTL value for network stats ttl.
 pub const NETWORK_STATS_CACHE_TTL: u64 = 30;
 
@@ -58,8 +55,11 @@ pub const DIRECTION_IN: &str = "in";
 /// Direction label for out network traffic.
 pub const DIRECTION_OUT: &str = "out";
 
+/// Interval value for monitor seconds.
+pub(crate) const MONITOR_INTERVAL_SECONDS: u64 = 60;
+
 /// SSE data prefix.
-pub const SSE_DATA_PREFIX: &str = "data: ";
+pub(crate) const SSE_DATA_PREFIX: &str = "data: ";
 
 /// Maximum history seconds.
-pub const MAX_HISTORY_SECONDS: usize = 60;
+pub(crate) const MAX_HISTORY_SECONDS: usize = 60;

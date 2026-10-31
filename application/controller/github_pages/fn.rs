@@ -11,6 +11,7 @@ use super::*;
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_github_pages_list` free function.
 #[instrument_trace]
 pub fn openapi_github_pages_list() {}
 
@@ -29,5 +30,6 @@ pub fn openapi_github_pages_list() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_github_pages_sync` free function.
 #[instrument_trace]
 pub fn openapi_github_pages_sync() {}

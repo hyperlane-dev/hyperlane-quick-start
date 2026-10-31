@@ -197,7 +197,7 @@ impl ServerHook for UserUpdateRoute {
         Self
     }
 
-    #[prologue_macros(is_post_method, try_get_route_param(ID_KEY => id_opt), request_body_json_result(request_opt: UpdateUserRequest), response_header(CONTENT_TYPE => APPLICATION_JSON))]
+    #[prologue_macros(is_post_method, try_get_route_param(id_key() => id_opt), request_body_json_result(request_opt: UpdateUserRequest), response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
     /// Handles the `UserUpdateRoute` route request and writes the JSON
     /// response envelope into the request context.
@@ -304,7 +304,7 @@ impl ServerHook for UserChangePasswordRoute {
         Self
     }
 
-    #[prologue_macros(is_post_method, try_get_route_param(ID_KEY => id_opt), request_body_json_result(request_opt: ChangePasswordRequest), response_header(CONTENT_TYPE => APPLICATION_JSON))]
+    #[prologue_macros(is_post_method, try_get_route_param(id_key() => id_opt), request_body_json_result(request_opt: ChangePasswordRequest), response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
     /// Handles the `UserChangePasswordRoute` route request and writes the JSON
     /// response envelope into the request context.
@@ -377,7 +377,7 @@ impl ServerHook for UserUpdateStatusRoute {
         Self
     }
 
-    #[prologue_macros(is_post_method, try_get_route_param(ID_KEY => id_opt), request_body_json_result(request_opt: UpdateUserStatusRequest), response_header(CONTENT_TYPE => APPLICATION_JSON))]
+    #[prologue_macros(is_post_method, try_get_route_param(id_key() => id_opt), request_body_json_result(request_opt: UpdateUserStatusRequest), response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
     /// Handles the `UserUpdateStatusRoute` route request and writes the JSON
     /// response envelope into the request context.
@@ -538,7 +538,7 @@ impl ServerHook for UserGetRoute {
         Self
     }
 
-    #[prologue_macros(is_get_method, try_get_route_param(ID_KEY => id_opt), response_header(CONTENT_TYPE => APPLICATION_JSON))]
+    #[prologue_macros(is_get_method, try_get_route_param(id_key() => id_opt), response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
     /// Handles the `UserGetRoute` route request and writes the JSON
     /// response envelope into the request context.
@@ -605,7 +605,7 @@ impl ServerHook for UserDeleteRoute {
         Self
     }
 
-    #[prologue_macros(is_post_method, try_get_route_param(ID_KEY => id_opt), response_header(CONTENT_TYPE => APPLICATION_JSON))]
+    #[prologue_macros(is_post_method, try_get_route_param(id_key() => id_opt), response_header(CONTENT_TYPE => APPLICATION_JSON))]
     #[instrument_trace]
     /// Handles the `UserDeleteRoute` route request and writes the JSON
     /// response envelope into the request context.

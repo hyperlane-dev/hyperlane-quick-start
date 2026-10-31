@@ -27,6 +27,16 @@ impl ServerHook for OpenApiViewRoute {
         methods(get, post),
         response_header(CONTENT_TYPE => TEXT_HTML)
     )]
+    /// Implements the `handle` operation on [`OpenApiViewRoute`].
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - Mutable reference to a `Stream` (mutated in place).
+    /// - `&mut Context` - Mutable reference to a `Context` (mutated in place).
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - A `Status` value.
     #[instrument_trace]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         SwaggerUi::new(ROUTE_OPENAPI_FILE).url(PATH_OPENAPI_SPEC, ApiDoc::openapi());

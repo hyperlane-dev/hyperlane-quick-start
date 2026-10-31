@@ -23,14 +23,10 @@ impl ServerHook for UploadViewRoute {
     /// # Returns
     ///
     /// - `Status` - The handle result.
-    #[prologue_macros(
-        methods(get, post),
-        response_status_code(302),
-        response_header(LOCATION => UPLOAD_VIEW_REDIRECT_PATH)
-    )]
+    #[prologue_macros(methods(get, post))]
     #[instrument_trace]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
-        Status::Continue
+        serve_page(ctx, UPLOAD_VIEW_PAGE_NAME)
     }
 }
 
@@ -59,9 +55,19 @@ impl ServerHook for UploadFileRoute {
     /// - `Status` - The handle result.
     #[prologue_macros(
         methods(get),
-        try_get_route_param(UPLOAD_DIR_KEY => dir_opt),
-        try_get_route_param(UPLOAD_FILE_KEY => file_opt),
+        try_get_route_param(upload_dir_key() => dir_opt),
+        try_get_route_param(upload_file_key() => file_opt),
     )]
+    /// Implements the `handle` operation on [`UploadFileRoute`].
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - Mutable reference to a `Stream` (mutated in place).
+    /// - `&mut Context` - Mutable reference to a `Context` (mutated in place).
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - A `Status` value.
     #[try_get_request_header(RANGE => range_header_opt)]
     #[instrument_trace]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
@@ -72,8 +78,8 @@ impl ServerHook for UploadFileRoute {
             Some(range_header) => {
                 let file_path: String = format!(
                     "{UPLOAD_DIR}/{}/{}",
-                    Decode::execute(CHARSETS, &dir).unwrap_or_default(),
-                    Decode::execute(CHARSETS, &file).unwrap_or_default()
+                    Decode::execute(charsets(), &dir).unwrap_or_default(),
+                    Decode::execute(charsets(), &file).unwrap_or_default()
                 );
                 match metadata(&file_path) {
                     Ok(metadata) => {
@@ -92,8 +98,8 @@ impl ServerHook for UploadFileRoute {
                 .set_body(partial_content.get_data())
                 .set_header(CONTENT_TYPE, &content_type)
                 .set_header(ACCEPT_RANGES, BYTES)
-                .set_header(CACHE_CONTROL, DEFAULT_CACHE_CONTROL_STATIC_ASSETS)
-                .set_header(EXPIRES, DEFAULT_EXPIRES_FAR_FUTURE)
+                .set_header(CACHE_CONTROL, default_cache_control_static_assets())
+                .set_header(EXPIRES, default_expires_far_future())
                 .set_header(CONTENT_LENGTH, partial_content.get_total_size().to_string());
             if has_range_request {
                 ctx.get_mut_response()
@@ -104,7 +110,11 @@ impl ServerHook for UploadFileRoute {
                         partial_content.get_content_length().to_string(),
                     );
             }
+            return Status::Continue;
         }
+        ctx.get_mut_response()
+            .set_status_code(HttpStatus::NotFound.code())
+            .set_body(HTTP_REASON_NOT_FOUND);
         Status::Continue
     }
 }

@@ -63,22 +63,22 @@ impl DbBootstrap {
             .add_table(TableSchema::new(
                 vec![],
                 MysqlTableName::CicdPipeline.to_string(),
-                MYSQL_CICD_PIPELINE_TABLE_SQL.to_string(),
+                mysql_cicd_pipeline_table_sql().to_string(),
             ))
             .add_table(TableSchema::new(
                 vec![],
                 MysqlTableName::CicdRun.to_string(),
-                MYSQL_CICD_RUN_TABLE_SQL.to_string(),
+                mysql_cicd_run_table_sql().to_string(),
             ))
             .add_table(TableSchema::new(
                 vec![],
                 MysqlTableName::CicdJob.to_string(),
-                MYSQL_CICD_JOB_TABLE_SQL.to_string(),
+                mysql_cicd_job_table_sql().to_string(),
             ))
             .add_table(TableSchema::new(
                 vec![],
                 MysqlTableName::CicdStep.to_string(),
-                MYSQL_CICD_STEP_TABLE_SQL.to_string(),
+                mysql_cicd_step_table_sql().to_string(),
             ))
     }
 
@@ -93,71 +93,71 @@ impl DbBootstrap {
             .add_table(TableSchema::new(
                 vec![],
                 PostgresqlTableName::ChatHistory.to_string(),
-                POSTGRESQL_CHAT_HISTORY_TABLE_SQL.to_string(),
+                postgresql_chat_history_table_sql().to_string(),
             ))
-            .add_index(POSTGRESQL_CHAT_HISTORY_INDEX_SQL.to_string())
+            .add_index(postgresql_chat_history_index_sql().to_string())
             .add_table(TableSchema::new(
                 vec![],
                 PostgresqlTableName::TrackingRecord.to_string(),
-                POSTGRESQL_TRACKING_RECORD_TABLE_SQL.to_string(),
+                postgresql_tracking_record_table_sql().to_string(),
             ))
-            .add_index(POSTGRESQL_TRACKING_RECORD_INDEX_SQL.to_string())
+            .add_index(postgresql_tracking_record_index_sql().to_string())
             .add_table(TableSchema::new(
                 vec![],
                 PostgresqlTableName::Shortlink.to_string(),
-                POSTGRESQL_SHORTLINK_TABLE_SQL.to_string(),
+                postgresql_shortlink_table_sql().to_string(),
             ))
-            .add_index(POSTGRESQL_SHORTLINK_INDEX_SQL.to_string())
+            .add_index(postgresql_shortlink_index_sql().to_string())
             .add_table(TableSchema::new(
                 vec![],
                 POSTGRESQL_AUTH_USER_TABLE_NAME.to_string(),
-                POSTGRESQL_AUTH_USER_TABLE_SQL.to_string(),
+                postgresql_auth_user_table_sql().to_string(),
             ))
-            .add_index(POSTGRESQL_AUTH_INDEX_SQL.to_string())
-            .add_init_data(POSTGRESQL_AUTH_DATA_SQL.to_string())
+            .add_index(postgresql_auth_index_sql().to_string())
+            .add_init_data(postgresql_auth_data_sql().to_string())
             .add_table(TableSchema::new(
                 vec![POSTGRESQL_AUTH_USER_TABLE_NAME.to_string()],
                 POSTGRESQL_ORDER_RECORD_TABLE_NAME.to_string(),
-                POSTGRESQL_ORDER_RECORD_TABLE_SQL.to_string(),
+                postgresql_order_record_table_sql().to_string(),
             ))
             .add_table(TableSchema::new(
                 vec![POSTGRESQL_ORDER_RECORD_TABLE_NAME.to_string()],
                 POSTGRESQL_ORDER_RECORD_IMAGE_TABLE_NAME.to_string(),
-                POSTGRESQL_ORDER_RECORD_IMAGE_TABLE_SQL.to_string(),
+                postgresql_order_record_image_table_sql().to_string(),
             ))
-            .add_index(POSTGRESQL_ORDER_INDEX_SQL.to_string())
+            .add_index(postgresql_order_index_sql().to_string())
             .add_table(TableSchema::new(
                 vec![],
                 PostgresqlTableName::Notification.to_string(),
-                POSTGRESQL_NOTIFICATION_TABLE_SQL.to_string(),
+                postgresql_notification_table_sql().to_string(),
             ))
-            .add_index(POSTGRESQL_NOTIFICATION_INDEX_SQL.to_string())
+            .add_index(postgresql_notification_index_sql().to_string())
             .add_table(TableSchema::new(
                 vec![],
                 PostgresqlTableName::BlogPost.to_string(),
-                POSTGRESQL_BLOG_POST_TABLE_SQL.to_string(),
+                postgresql_blog_post_table_sql().to_string(),
             ))
             .add_table(TableSchema::new(
                 vec![PostgresqlTableName::BlogPost.to_string()],
                 PostgresqlTableName::BlogComment.to_string(),
-                POSTGRESQL_BLOG_COMMENT_TABLE_SQL.to_string(),
+                postgresql_blog_comment_table_sql().to_string(),
             ))
             .add_table(TableSchema::new(
                 vec![PostgresqlTableName::BlogPost.to_string()],
                 PostgresqlTableName::BlogLike.to_string(),
-                POSTGRESQL_BLOG_LIKE_TABLE_SQL.to_string(),
+                postgresql_blog_like_table_sql().to_string(),
             ))
             .add_table(TableSchema::new(
                 vec![PostgresqlTableName::BlogPost.to_string()],
                 PostgresqlTableName::BlogFavorite.to_string(),
-                POSTGRESQL_BLOG_FAVORITE_TABLE_SQL.to_string(),
+                postgresql_blog_favorite_table_sql().to_string(),
             ))
             .add_table(TableSchema::new(
                 vec![PostgresqlTableName::BlogPost.to_string()],
                 PostgresqlTableName::BlogImage.to_string(),
-                POSTGRESQL_BLOG_IMAGE_TABLE_SQL.to_string(),
+                postgresql_blog_image_table_sql().to_string(),
             ))
-            .add_index(POSTGRESQL_BLOG_INDEX_SQL.to_string())
+            .add_index(postgresql_blog_index_sql().to_string())
     }
 }
 
@@ -173,14 +173,14 @@ impl BootstrapAsyncInit for DbBootstrap {
         let mysql_schema: DatabaseSchema = Self::build_mysql_schema();
         let postgresql_schema: DatabaseSchema = Self::build_postgresql_schema();
         let _: Result<DatabaseConnection, String> =
-            MySqlPlugin::get_connection(DEFAULT_MYSQL_INSTANCE_NAME, Some(mysql_schema)).await;
+            MySqlPlugin::get_connection(default_mysql_instance_name(), Some(mysql_schema)).await;
         let _: Result<DatabaseConnection, String> = PostgreSqlPlugin::get_connection(
-            DEFAULT_POSTGRESQL_INSTANCE_NAME,
+            default_postgresql_instance_name(),
             Some(postgresql_schema),
         )
         .await;
         let _: Result<ArcRwLock<Connection>, String> =
-            RedisPlugin::get_connection(DEFAULT_REDIS_INSTANCE_NAME, None).await;
+            RedisPlugin::get_connection(default_redis_instance_name(), None).await;
         Self
     }
 }

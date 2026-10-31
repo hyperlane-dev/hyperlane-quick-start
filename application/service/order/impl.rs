@@ -78,7 +78,7 @@ impl OrderService {
     /// - `Result<RecordListResponse, String>` - The paginated list of records with statistics.
     #[instrument_trace]
     pub async fn list_records(query: RecordQueryRequest) -> Result<RecordListResponse, String> {
-        let page: i32 = query.get_page().unwrap_or(1);
+        let page: i32 = query.get_page().unwrap_or(DEFAULT_PAGE_NUMBER);
         let limit: u64 = query.get_limit().unwrap_or(20);
         let user_id: Option<i32> = query.get_user_id();
         let start_date: Option<NaiveDate> = *query.try_get_start_date();
@@ -1240,7 +1240,7 @@ impl OrderService {
         request: CreateRecordWithImagesRequest,
     ) -> Result<CreateRecordWithImagesResponse, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let bill_no: String = Self::generate_bill_no();
         let bill_date: NaiveDate = request
             .try_get_bill_date()
@@ -1318,7 +1318,7 @@ impl OrderService {
         image_request: ImageUploadRequest,
     ) -> Result<CreateRecordWithImagesResponse, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let bill_no: String = Self::generate_bill_no();
         let bill_date: NaiveDate = record_request
             .try_get_bill_date()
@@ -1388,7 +1388,7 @@ impl OrderService {
         image_request: ImageUploadRequest,
     ) -> Result<CreateRecordWithImagesResponse, String> {
         let db: DatabaseConnection =
-            PostgreSqlPlugin::get_connection(DEFAULT_POSTGRESQL_INSTANCE_NAME, None).await?;
+            PostgreSqlPlugin::get_connection(default_postgresql_instance_name(), None).await?;
         let record_model: OrderRecordModel = match RecordRepository::find_by_id(record_id).await? {
             Some(model) => model,
             None => return Err(ERROR_RECORD_NOT_FOUND.to_string()),

@@ -4,8 +4,12 @@ mod r#impl;
 mod r#static;
 mod r#struct;
 
-pub use {r#const::*, r#fn::*, r#static::*, r#struct::*};
+pub use {r#const::*, r#fn::*, r#struct::*};
 
+pub(crate) use r#static::*;
+
+use ::log::*;
+use tokio::sync::{RwLockReadGuard, RwLockWriteGuard, broadcast::error::SendError};
 use {
     super::*,
     domain::gomoku::*,
@@ -13,6 +17,3 @@ use {
     model::{application::gomoku::*, request::gomoku::*, response::gomoku::*},
     service::chat::*,
 };
-
-use ::log::*;
-use tokio::sync::{RwLockReadGuard, RwLockWriteGuard, broadcast::error::SendError};

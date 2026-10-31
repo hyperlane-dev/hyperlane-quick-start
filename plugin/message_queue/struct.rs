@@ -8,11 +8,13 @@ pub struct MessageQueuePlugin;
 #[derive(Clone, Data, Debug)]
 pub struct Topic {
     /// The unique name identifying this topic.
-    pub(super) name: String,
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub name: String,
     /// The broadcast sender used to publish messages to all subscribers of this topic.
-    pub(super) sender: TopicSender,
+    pub sender: TopicSender,
     /// The current lifecycle state of the topic.
-    pub(super) state: TopicState,
+    pub state: TopicState,
     /// Messages published while the topic is paused, kept in publication order.
     ///
     /// The buffer never exceeds the capacity of the topic broadcast channel and
@@ -21,34 +23,42 @@ pub struct Topic {
     #[get(skip)]
     #[get_mut(skip)]
     #[set(skip)]
-    pub(super) buffered: VecDeque<MessagePayload>,
+    pub(crate) buffered: VecDeque<MessagePayload>,
     /// The broadcast channel capacity of this topic, bounding the paused buffer.
     #[get(skip)]
     #[get_mut(skip)]
     #[set(skip)]
-    pub(super) capacity: usize,
+    pub(crate) capacity: usize,
 }
 
 /// A consumer group bound to a specific topic, distributing messages among its members.
 #[derive(Clone, Data, Debug)]
 pub struct ConsumerGroup {
     /// The name of the consumer group.
-    pub(super) name: String,
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub name: String,
     /// The name of the topic this consumer group is bound to.
-    pub(super) topic_name: String,
+    pub topic_name: String,
     /// The broadcast sender used to fan out messages to group members.
-    pub(super) sender: TopicSender,
+    pub sender: TopicSender,
 }
 
 /// A registered message handler that processes messages from a topic or consumer group.
 #[derive(Clone, Data, Debug)]
 pub struct MessageHandler {
     /// The name of the handler, used for identification and logging.
-    pub(super) name: String,
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub name: String,
     /// The topic name this handler is subscribed to.
-    pub(super) topic_name: String,
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub topic_name: String,
     /// The optional consumer group name this handler belongs to.
-    pub(super) group_name: Option<String>,
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub group_name: Option<String>,
 }
 
 /// Central broker managing topics, consumer groups, and message dispatching.
@@ -59,7 +69,7 @@ pub struct MessageHandler {
 #[derive(Clone, Data, Debug)]
 pub struct MessageQueueBroker {
     /// The registry of all active topics, keyed by topic name.
-    pub(super) topics: ArcRwLock<TopicRegistry>,
+    pub topics: ArcRwLock<TopicRegistry>,
     /// The registry of all consumer groups, keyed by `"{topic_name}::{group_name}"`.
-    pub(super) consumer_groups: ArcRwLock<ConsumerGroupRegistry>,
+    pub consumer_groups: ArcRwLock<ConsumerGroupRegistry>,
 }

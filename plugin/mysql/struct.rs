@@ -8,8 +8,14 @@ pub struct MySqlPlugin;
 #[derive(Clone, Data, Debug, New)]
 pub struct MySqlAutoCreation {
     /// The MySQL instance configuration for this auto-creation handler.
-    pub(super) instance: MySqlInstanceConfig,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) instance: MySqlInstanceConfig,
     /// The database schema containing table, index, and constraint definitions.
     #[new(skip)]
-    pub(super) schema: DatabaseSchema,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) schema: DatabaseSchema,
 }

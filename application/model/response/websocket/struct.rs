@@ -4,8 +4,8 @@ use super::*;
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize)]
 pub struct MessageResponse {
     /// The message.
-    pub(super) message: String,
+    pub message: String,
     /// The time.
     #[get(type(copy))]
-    pub(super) time: i64,
+    pub time: i64,
 }

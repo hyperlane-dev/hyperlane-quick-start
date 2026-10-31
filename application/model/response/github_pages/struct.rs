@@ -4,18 +4,33 @@ use super::*;
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct GithubPagesListResponse {
     /// The pages.
-    pub(super) pages: Vec<GithubPagesInfo>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) pages: Vec<GithubPagesInfo>,
 }
 
 /// Represents cached GitHub Pages information including owner, repository, and base URL.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct GithubPagesInfo {
     /// The owner.
-    pub(super) owner: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) owner: String,
     /// The repository.
-    pub(super) repository: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) repository: String,
     /// The base url.
-    pub(super) base_url: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) base_url: String,
     /// The last synced at.
-    pub(super) last_synced_at: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) last_synced_at: String,
 }

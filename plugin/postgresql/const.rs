@@ -1,5 +1,5 @@
 /// Default name for the PostgreSQL instance when no explicit name is provided.
-pub const DEFAULT_POSTGRESQL_INSTANCE_NAME: &str = "postgres_default";
+pub(crate) const DEFAULT_POSTGRESQL_INSTANCE_NAME: &str = "postgres_default";
 
 /// Log label for the auto-creation process of an instance.
 pub(crate) const AUTO_CREATION_PROCESS_LABEL: &str = "Auto-creation process";

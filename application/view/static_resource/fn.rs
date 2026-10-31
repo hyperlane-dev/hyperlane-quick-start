@@ -14,5 +14,6 @@ use super::*;
         (status = 500, description = HTTP_REASON_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_static_resource_view` free function.
 #[instrument_trace]
 pub fn openapi_static_resource_view() {}

@@ -3,13 +3,15 @@ mod r#fn;
 mod r#impl;
 mod r#struct;
 
-pub use {r#const::*, r#fn::*};
+pub use r#fn::*;
+
+pub(crate) use r#const::*;
 
 use {
     super::*,
     mapper::user::*,
     model::{
-        application::user::{ID_KEY, MAX_LIMIT},
+        application::user::{MAX_LIMIT, id_key},
         request::user::*,
         response::{common::*, user::*},
     },

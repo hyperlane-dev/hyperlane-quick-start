@@ -216,7 +216,7 @@ impl ChatService {
             .peer_addr()
             .map(|data: SocketAddr| data.to_string())
             .unwrap_or_default();
-        let encode_addr: String = Encode::execute(CHARSETS, &socket_addr).unwrap_or_default();
+        let encode_addr: String = Encode::execute(charsets(), &socket_addr).unwrap_or_default();
         ctx.get_mut_response()
             .set_header(HEADER_X_CLIENT_ADDR, &encode_addr);
     }
@@ -415,15 +415,14 @@ impl ChatService {
     ///
     /// # Returns
     ///
-    /// - `serde_json::Value` - The created GPT request body.
+    /// - `Value` - The created GPT request body.
     #[instrument_trace]
-    fn build_gpt_request_body(session: &ChatSession) -> serde_json::Value {
-        let schema_json: serde_json::Value =
-            serde_json::from_str(GPT_RESPONSE_SCHEMA).unwrap_or(json!({}));
-        let mut messages: Vec<serde_json::Value> = Vec::new();
+    fn build_gpt_request_body(session: &ChatSession) -> Value {
+        let schema_json: Value = serde_json::from_str(GPT_RESPONSE_SCHEMA).unwrap_or(json!({}));
+        let mut messages: Vec<Value> = Vec::new();
         let model: &String = EnvPlugin::get_or_init().get_gpt_model();
         let enable_thinking: bool = EnvPlugin::get_or_init().get_gpt_enable_thinking();
-        let session_messages: Vec<serde_json::Value> = session
+        let session_messages: Vec<Value> = session
             .get_messages()
             .iter()
             .map(|msg: &ChatMessage| {
@@ -476,26 +475,26 @@ impl ChatService {
     ///
     /// # Arguments
     ///
-    /// - `&serde_json::Value` - The response JSON.
+    /// - `&Value` - The response JSON.
     ///
     /// # Returns
     ///
     /// - `Option<String>` - The response content result, when present.
     #[instrument_trace]
-    fn extract_response_content(response_json: &serde_json::Value) -> Option<String> {
+    fn extract_response_content(response_json: &Value) -> Option<String> {
         response_json
             .get(JSON_FIELD_RESULT)
-            .and_then(|result: &serde_json::Value| result.get(JSON_FIELD_RESPONSE))
-            .and_then(|response: &serde_json::Value| response.as_str())
+            .and_then(|result: &Value| result.get(JSON_FIELD_RESPONSE))
+            .and_then(|response: &Value| response.as_str())
             .filter(|data: &&str| !data.is_empty())
             .map(String::from)
             .or_else(|| {
                 response_json
                     .get(JSON_FIELD_CHOICES)
-                    .and_then(|choices: &serde_json::Value| choices.get(0))
-                    .and_then(|choice: &serde_json::Value| choice.get(JSON_FIELD_MESSAGE))
-                    .and_then(|message: &serde_json::Value| message.get(JSON_FIELD_CONTENT))
-                    .and_then(|content: &serde_json::Value| content.as_str())
+                    .and_then(|choices: &Value| choices.get(0))
+                    .and_then(|choice: &Value| choice.get(JSON_FIELD_MESSAGE))
+                    .and_then(|message: &Value| message.get(JSON_FIELD_CONTENT))
+                    .and_then(|content: &Value| content.as_str())
                     .map(String::from)
             })
     }
@@ -514,16 +513,16 @@ impl ChatService {
         if response_text.trim().is_empty() {
             return Err(ERROR_EMPTY_API_RESPONSE.to_string());
         }
-        let response_json: serde_json::Value =
-            serde_json::from_str(response_text).map_err(|error: serde_json::Error| {
+        let response_json: Value =
+            serde_json::from_str(response_text).map_err(|error: Error| {
                 format!("JSON parsing failed {error} (response content {response_text})")
             })?;
         let raw_content_opt: Option<String> = Self::extract_response_content(&response_json);
         let mut parsed: GptStructuredResponse = GptStructuredResponse::default();
         parsed.set_data(response_text.to_string());
         if let Some(raw_content) = raw_content_opt {
-            parsed = serde_json::from_str(&raw_content)
-                .map_err(|_: serde_json::Error| raw_content.to_string())?;
+            parsed =
+                serde_json::from_str(&raw_content).map_err(|_: Error| raw_content.to_string())?;
         }
         Ok((parsed.get_data().clone(), parsed.get_continue_flag()))
     }
@@ -541,7 +540,7 @@ impl ChatService {
     async fn call_gpt_api_with_context(session: &ChatSession) -> Result<(String, bool), String> {
         let config: &EnvConfig = EnvPlugin::get_or_init();
         let api_key: &str = config.get_gpt_api_key();
-        let body: serde_json::Value = Self::build_gpt_request_body(session);
+        let body: Value = Self::build_gpt_request_body(session);
         debug!("GPT API request body: {}", body);
         let headers: HashMapXxHash3_64<&str, String> = Self::build_gpt_request_headers(api_key);
         let client: Client = Client::new();
@@ -552,10 +551,9 @@ impl ChatService {
         match request_builder.send().await {
             Ok(response) => {
                 let response_text: String = response.text().await.unwrap_or_default();
-                let compact_response: String =
-                    serde_json::from_str::<serde_json::Value>(&response_text)
-                        .map(|v: serde_json::Value| v.to_string())
-                        .unwrap_or(response_text);
+                let compact_response: String = serde_json::from_str::<Value>(&response_text)
+                    .map(|v: Value| v.to_string())
+                    .unwrap_or(response_text);
                 debug!("GPT API response: {}", compact_response);
                 Self::handle_gpt_api_response(&compact_response)
             }
@@ -572,10 +570,10 @@ impl ChatService {
     #[instrument_trace]
     pub async fn save_message_from_response(session_id: &str, response_body: &ResponseBody) {
         let response_body_string: String = String::from_utf8_lossy(response_body).into_owned();
-        if let Ok(resp_data) = serde_json::from_str::<serde_json::Value>(&response_body_string) {
+        if let Ok(resp_data) = serde_json::from_str::<Value>(&response_body_string) {
             let message_type: String = resp_data
                 .get(JSON_KEY_TYPE)
-                .and_then(|v: &serde_json::Value| v.as_str())
+                .and_then(|v: &Value| v.as_str())
                 .unwrap_or(MODEL_NAME_UNKNOWN)
                 .to_string();
             if message_type == CHAT_PING_TEXT || message_type == CHAT_PONG_TEXT {
@@ -583,12 +581,12 @@ impl ChatService {
             }
             let sender_name: String = resp_data
                 .get(JSON_KEY_NAME)
-                .and_then(|v: &serde_json::Value| v.as_str())
+                .and_then(|v: &Value| v.as_str())
                 .unwrap_or(MODEL_NAME_UNKNOWN)
                 .to_string();
             let content: String = resp_data
                 .get(JSON_KEY_DATA)
-                .and_then(|v: &serde_json::Value| v.as_str())
+                .and_then(|v: &Value| v.as_str())
                 .unwrap_or("")
                 .to_string();
             let session_id: String = session_id.to_string();

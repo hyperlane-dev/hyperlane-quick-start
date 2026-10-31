@@ -80,7 +80,7 @@ impl ServerHook for EuvPlaygroundProjectsListRoute {
         }
         items.sort_by(
             |left: &EuvPlaygroundProjectListItem, right: &EuvPlaygroundProjectListItem| {
-                right.get_updated_at_ms().cmp(left.get_updated_at_ms())
+                right.get_updated_at_ms().cmp(&left.get_updated_at_ms())
             },
         );
         items.truncate(EUV_PLAYGROUND_MAX_LIST_ITEMS);
@@ -199,7 +199,7 @@ impl ServerHook for EuvPlaygroundProjectsGetRoute {
 
     #[prologue_macros(
         methods(get),
-        try_get_route_param(ID_KEY => id_opt),
+        try_get_route_param(id_key() => id_opt),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
@@ -298,7 +298,7 @@ impl ServerHook for EuvPlaygroundProjectsSaveRoute {
 
     #[prologue_macros(
         methods(put),
-        try_get_route_param(ID_KEY => id_opt),
+        try_get_route_param(id_key() => id_opt),
         request_body_json_result(request_opt: EuvPlaygroundProjectSaveRequest),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
@@ -472,7 +472,7 @@ impl ServerHook for EuvPlaygroundProjectsDeleteRoute {
 
     #[prologue_macros(
         methods(delete),
-        try_get_route_param(ID_KEY => id_opt),
+        try_get_route_param(id_key() => id_opt),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
@@ -754,7 +754,7 @@ impl ServerHook for EuvPlaygroundBuildStatusRoute {
 
     #[prologue_macros(
         methods(get),
-        try_get_route_param(ID_KEY => id_opt),
+        try_get_route_param(id_key() => id_opt),
         response_header(CONTENT_TYPE => APPLICATION_JSON)
     )]
     #[instrument_trace]
@@ -810,13 +810,13 @@ impl ServerHook for EuvPlaygroundBuildStatusRoute {
         let mut payload: EuvPlaygroundBuildStatusResponse =
             EuvPlaygroundBuildStatusResponse::default();
         payload
-            .set_job_id(EuvPlaygroundService::encode_job_id(*job.get_job_id()))
-            .set_project_id(EuvPlaygroundService::encode_id(*job.get_project_id()))
+            .set_job_id(EuvPlaygroundService::encode_job_id(job.get_job_id()))
+            .set_project_id(EuvPlaygroundService::encode_id(job.get_project_id()))
             .set_status(job.get_status().clone())
             .set_build_url(job.get_build_url().clone())
             .set_stderr(job.get_stderr().clone())
-            .set_created_at_ms(*job.get_created_at_ms())
-            .set_updated_at_ms(*job.get_updated_at_ms());
+            .set_created_at_ms(job.get_created_at_ms())
+            .set_updated_at_ms(job.get_updated_at_ms());
         let resp: ApiResponse<EuvPlaygroundBuildStatusResponse> =
             ApiResponse::new(ApiResponseStatus::Success, payload);
         ctx.get_mut_response().set_body(resp.to_json_bytes());

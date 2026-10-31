@@ -8,8 +8,14 @@ pub struct PostgreSqlPlugin;
 #[derive(Clone, Data, Debug, New)]
 pub struct PostgreSqlAutoCreation {
     /// The PostgreSQL instance configuration for this auto-creation handler.
-    pub(super) instance: PostgreSqlInstanceConfig,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) instance: PostgreSqlInstanceConfig,
     /// The database schema containing table, index, and constraint definitions.
     #[new(skip)]
-    pub(super) schema: DatabaseSchema,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) schema: DatabaseSchema,
 }

@@ -28,6 +28,16 @@ impl ServerHook for HttpRequestMiddleware {
         reject(ctx.get_request().get_version().is_http()),
         send,
     )]
+    /// Implements the `handle` operation on [`HttpRequestMiddleware`].
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - Mutable reference to a `Stream` (mutated in place).
+    /// - `&mut Context` - Mutable reference to a `Context` (mutated in place).
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - A `Status` value.
     #[instrument_trace]
     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
         stream.set_closed(true);
@@ -164,6 +174,16 @@ impl ServerHook for OptionMethodMiddleware {
         filter(ctx.get_request().get_method().is_options()),
         send
     )]
+    /// Implements the `handle` operation on [`OptionMethodMiddleware`].
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - Mutable reference to a `Stream` (mutated in place).
+    /// - `&mut Context` - Mutable reference to a `Context` (mutated in place).
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - A `Status` value.
     #[instrument_trace]
     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Reject
@@ -204,6 +224,16 @@ impl ServerHook for UpgradeMiddleware {
         response_header(SEC_WEBSOCKET_ACCEPT => WebSocketFrame::generate_accept_key(ctx.get_request().get_header_back(SEC_WEBSOCKET_KEY))),
         send
     )]
+    /// Implements the `handle` operation on [`UpgradeMiddleware`].
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Stream` - Mutable reference to a `Stream` (mutated in place).
+    /// - `&mut Context` - Mutable reference to a `Context` (mutated in place).
+    ///
+    /// # Returns
+    ///
+    /// - `Status` - A `Status` value.
     #[instrument_trace]
     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue

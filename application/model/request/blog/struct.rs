@@ -4,89 +4,159 @@ use super::*;
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct CreateBlogPostRequest {
     /// The title.
-    pub(super) title: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) title: String,
     /// The summary.
-    pub(super) summary: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) summary: Option<String>,
     /// The content.
-    pub(super) content: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) content: String,
     /// The cover image id.
-    pub(super) cover_image_id: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) cover_image_id: Option<String>,
     /// The is published.
-    #[get(type(copy))]
-    pub(super) is_published: bool,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) is_published: bool,
     /// The image ids.
-    pub(super) image_ids: Vec<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) image_ids: Vec<String>,
 }
 
 /// update blog post request.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct UpdateBlogPostRequest {
     /// The title.
-    pub(super) title: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) title: Option<String>,
     /// The summary.
-    pub(super) summary: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) summary: Option<String>,
     /// The content.
-    pub(super) content: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) content: Option<String>,
     /// The cover image id.
-    pub(super) cover_image_id: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) cover_image_id: Option<String>,
     /// The is published.
-    #[get(type(copy))]
-    pub(super) is_published: Option<bool>,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) is_published: Option<bool>,
 }
 
 /// blog post list query request.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct BlogPostListQueryRequest {
     /// The keyword.
-    pub(super) keyword: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) keyword: Option<String>,
     /// The is published.
-    #[get(type(copy))]
-    pub(super) is_published: Option<bool>,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) is_published: Option<bool>,
     /// The page.
-    #[get(type(copy))]
-    pub(super) page: Option<i32>,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) page: Option<i32>,
     /// The limit.
-    #[get(type(copy))]
-    pub(super) limit: Option<u64>,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) limit: Option<u64>,
 }
 
 /// create blog comment request.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct CreateBlogCommentRequest {
     /// The post id.
-    pub(super) post_id: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) post_id: String,
     /// The parent id.
-    pub(super) parent_id: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) parent_id: Option<String>,
     /// The content.
-    pub(super) content: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) content: String,
 }
 
 /// blog comment list query request.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct BlogCommentListQueryRequest {
     /// The post id.
-    pub(super) post_id: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) post_id: String,
     /// The page.
-    #[get(type(copy))]
-    pub(super) page: Option<i32>,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) page: Option<i32>,
     /// The limit.
-    #[get(type(copy))]
-    pub(super) limit: Option<u64>,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) limit: Option<u64>,
 }
 
 /// blog image upload request.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct BlogImageUploadRequest {
     /// The file name.
-    pub(super) file_name: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) file_name: String,
     /// The original name.
-    pub(super) original_name: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) original_name: Option<String>,
     /// The mime type.
-    pub(super) mime_type: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) mime_type: String,
     /// The file size.
-    #[get(type(copy))]
-    pub(super) file_size: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) file_size: i32,
     /// The file data.
     #[schema(value_type = String, format = Binary)]
-    pub(super) file_data: Vec<u8>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) file_data: Vec<u8>,
 }

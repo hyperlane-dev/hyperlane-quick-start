@@ -12,6 +12,7 @@ use super::*;
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_upload_register` free function.
 #[instrument_trace]
 pub fn openapi_upload_register() {}
 
@@ -27,6 +28,7 @@ pub fn openapi_upload_register() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_upload_save` free function.
 #[instrument_trace]
 pub fn openapi_upload_save() {}
 
@@ -42,5 +44,6 @@ pub fn openapi_upload_save() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_upload_merge` free function.
 #[instrument_trace]
 pub fn openapi_upload_merge() {}

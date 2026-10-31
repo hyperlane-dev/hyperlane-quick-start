@@ -514,7 +514,7 @@ impl GomokuWebSocketService {
         let (x, y): (usize, usize) = Self::parse_position(req_data.get_payload())?;
         let result: GomokuPlaceResult = GomokuDomain::place_stone(&mut room, sender_id, x, y)?;
         GomokuRoomMapper::save_room(room.clone()).await;
-        let payload: serde_json::Value = json!({
+        let payload: Value = json!({
             JSON_KEY_RESULT: result,
             JSON_KEY_ROOM: room
         });
@@ -564,21 +564,21 @@ impl GomokuWebSocketService {
     ///
     /// # Arguments
     ///
-    /// - `&serde_json::Value` - The payload containing "x" and "y" fields.
+    /// - `&Value` - The payload containing "x" and "y" fields.
     ///
     /// # Returns
     ///
     /// - `Result<(usize, usize), String>` - The parsed coordinates on success, or an error message
     ///     if values are missing or invalid.
     #[instrument_trace]
-    fn parse_position(payload: &serde_json::Value) -> Result<(usize, usize), String> {
+    fn parse_position(payload: &Value) -> Result<(usize, usize), String> {
         let x: usize = payload
             .get("x")
-            .and_then(|val: &serde_json::Value| val.as_u64())
+            .and_then(|val: &Value| val.as_u64())
             .ok_or(ERROR_INVALID_X.to_string())? as usize;
         let y: usize = payload
             .get("y")
-            .and_then(|val: &serde_json::Value| val.as_u64())
+            .and_then(|val: &Value| val.as_u64())
             .ok_or(ERROR_INVALID_Y.to_string())? as usize;
         Ok((x, y))
     }
@@ -589,7 +589,7 @@ impl GomokuWebSocketService {
     ///
     /// - `GomokuMessageType` - The type of the response message.
     /// - `&str` - The room identifier.
-    /// - `serde_json::Value` - The JSON payload to include in the response.
+    /// - `Value` - The JSON payload to include in the response.
     ///
     /// # Returns
     ///
@@ -600,7 +600,7 @@ impl GomokuWebSocketService {
         msg_type: GomokuMessageType,
         room_id: &str,
         sender_id: &str,
-        payload: serde_json::Value,
+        payload: Value,
     ) -> Result<ResponseBody, String> {
         let mut resp: GomokuWsResponse = GomokuWsResponse::default();
         resp.set_type(msg_type)
@@ -608,7 +608,7 @@ impl GomokuWebSocketService {
             .set_sender_id(sender_id.to_string())
             .set_payload(payload)
             .set_time(Utc::now().timestamp_millis());
-        serde_json::to_vec(&resp).map_err(|error: serde_json::Error| error.to_string())
+        serde_json::to_vec(&resp).map_err(|error: Error| error.to_string())
     }
 
     /// Builds an error response body for a failed Gomoku WebSocket request.
@@ -628,7 +628,7 @@ impl GomokuWebSocketService {
         req_data: &GomokuWsRequest,
         error: String,
     ) -> ResponseBody {
-        let payload: serde_json::Value = json!({ JSON_KEY_MESSAGE: error });
+        let payload: Value = json!({ JSON_KEY_MESSAGE: error });
         Self::build_response_body(
             GomokuMessageType::Error,
             req_data.get_room_id(),

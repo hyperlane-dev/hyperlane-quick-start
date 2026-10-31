@@ -29,8 +29,12 @@ to report healthy, and starts the server. Nothing has to be configured first —
 release environment file is read automatically in a release build and already
 names the three containers.
 
-**The first run takes 25 to 30 minutes** because it compiles from source. To skip
-that, pull the published image instead:
+The first run compiles from source and can take a long time on a small machine.
+The repository leaves build parallelism to Cargo's defaults. Set it explicitly
+with `cargo build --release -j <N>` when needed. The release profile disables
+LTO to reduce build-time memory pressure. CI compiles the tree inside a
+container capped at 2 CPUs and 4 GiB with no swap and prints the measured peak
+in the job log. To skip the build entirely, pull the published image instead:
 
 | Branch       | Image                                                                           |
 | ------------ | ------------------------------------------------------------------------------- |
@@ -41,6 +45,30 @@ that, pull the published image instead:
 docker compose pull;
 docker compose up -d;
 ```
+
+The image is a two-stage build: the builder stage compiles a statically linked
+binary and the runtime stage keeps only that executable plus the static assets
+the server serves. The Rust toolchain, the crate registry and the whole build
+directory are discarded with the builder stage, so the published image carries
+no compiler and no intermediate objects.
+
+## Run the binary directly
+
+Every release also ships the static binary as a release asset, so the server
+can run without a container and without a libc:
+
+```sh
+curl -L -o hyperlane-quick-start \
+  https://github.com/hyperlane-dev/hyperlane-quick-start/releases/latest/download/hyperlane-quick-start-<version>-linux-x86_64
+chmod +x hyperlane-quick-start
+./hyperlane-quick-start
+```
+
+The binary is built for `x86_64-unknown-linux-musl` and is statically linked,
+so it runs on any Linux distribution and needs no shared library. It does need
+the repository next to it, because the server reads `./resources/env` and
+serves `./resources/static`; a clone of this repository is the simplest way to
+provide them.
 
 The server logs its own progress; this is what a healthy start looks like:
 
@@ -70,6 +98,29 @@ docker compose exec redis redis-cli -a hyperlane ping;
 Add `-T` and a command when running these from a script, or they wait on stdin
 forever.
 
+## Frontend
+
+The browser pages of the server are WebAssembly applications of the
+[euv](https://crates.io/crates/euv) framework that render with the components
+of the [euv-ui](https://crates.io/crates/euv-ui) library. They live in their
+own workspace under `frontend/`, one package per page, and the build script of
+the server package builds every page with the
+[euv](https://crates.io/crates/euv-cli) command line interface and writes the
+artifacts into `resources/static/`, the directory the server serves them
+from.
+
+The build needs the `wasm32-unknown-unknown` target, `wasm-pack` and the
+command line interface of the framework:
+
+```sh
+rustup target add wasm32-unknown-unknown
+cargo install wasm-pack
+cargo install euv-cli --version 0.32.15
+```
+
+See the [frontend readme](frontend/README.md) for the layout of the
+workspace and for the rules the pages follow.
+
 ## Api Docs
 
 - [Api Docs](https://docs.rs/hyperlane/latest/)
@@ -84,4 +135,4 @@ Contributions are welcome! Please submit an issue or create a pull request.
 
 ## Contact
 
-If you have any questions, please contact the author: [root@ltpp.vip](mailto:root@ltpp.vip).
+If you have any questions, please contact the author: [root@devhub.vip](mailto:root@devhub.vip).

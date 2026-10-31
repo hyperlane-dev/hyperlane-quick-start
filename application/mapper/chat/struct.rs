@@ -9,18 +9,38 @@ pub struct ChatHistoryMapper;
 pub struct Model {
     /// Unique primary key identifier for the chat message.
     #[sea_orm(primary_key, auto_increment = true)]
-    #[get(type(copy))]
-    pub(super) id: i64,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) id: i64,
     /// The session identifier grouping related messages together.
-    pub(super) session_id: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) session_id: String,
     /// The display name of the message sender.
-    pub(super) sender_name: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) sender_name: String,
     /// The type of the sender (e.g., "user", "assistant").
-    pub(super) sender_type: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) sender_type: String,
     /// The type of the message (e.g., "text", "image").
-    pub(super) message_type: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) message_type: String,
     /// The textual content of the chat message.
-    pub(super) content: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) content: String,
     /// The timestamp when the message was created.
-    pub(super) created_at: Option<NaiveDateTime>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) created_at: Option<NaiveDateTime>,
 }

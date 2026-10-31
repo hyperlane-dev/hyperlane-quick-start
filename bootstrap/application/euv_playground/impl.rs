@@ -12,32 +12,27 @@ impl BootstrapAsyncInit for EuvPlaygroundBootstrap {
     #[instrument_trace]
     async fn init() -> Self {
         let broker: &MessageQueueBroker = get_message_queue_broker();
+        let topic: &str = topic_euv_playground_build();
+        let consumer_group: &str = consumer_group_build_worker();
         if let Err(error) = broker
-            .create_topic_with_capacity(TOPIC_EUV_PLAYGROUND_BUILD, BUILD_TOPIC_CAPACITY)
+            .create_topic_with_capacity(topic, build_topic_capacity())
             .await
         {
-            error!("{ERROR_CREATE_TOPIC_PREFIX} '{TOPIC_EUV_PLAYGROUND_BUILD}' {error}");
+            error!("{ERROR_CREATE_TOPIC_PREFIX} '{topic}' {error}");
         }
-        if let Err(error) = broker
-            .create_consumer_group(TOPIC_EUV_PLAYGROUND_BUILD, CONSUMER_GROUP_BUILD_WORKER)
-            .await
-        {
-            error!("{ERROR_CREATE_CONSUMER_GROUP_PREFIX} '{CONSUMER_GROUP_BUILD_WORKER}' {error}");
+        if let Err(error) = broker.create_consumer_group(topic, consumer_group).await {
+            error!("{ERROR_CREATE_CONSUMER_GROUP_PREFIX} '{consumer_group}' {error}");
         }
-        listen_consumer_group(
-            TOPIC_EUV_PLAYGROUND_BUILD,
-            CONSUMER_GROUP_BUILD_WORKER,
-            |payload: MessagePayload| {
-                spawn(EuvPlaygroundService::run_build_for_job(payload));
-            },
-        );
+        listen_consumer_group(topic, consumer_group, |payload: MessagePayload| {
+            spawn(EuvPlaygroundService::run_build_for_job(payload));
+        });
         spawn(async move {
             loop {
                 EuvPlaygroundService::purge_expired_jobs().await;
-                tokio::time::sleep(Duration::from_millis(BUILD_JOB_GC_INTERVAL_MS)).await;
+                tokio::time::sleep(Duration::from_millis(build_job_gc_interval_ms())).await;
             }
         });
-        info!("Euv playground build pipeline initialized on topic '{TOPIC_EUV_PLAYGROUND_BUILD}'");
+        info!("Euv playground build pipeline initialized on topic '{topic}'");
         Self
     }
 }

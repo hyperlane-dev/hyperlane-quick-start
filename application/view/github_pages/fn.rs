@@ -15,6 +15,7 @@ use super::*;
         (status = 500, description = HTTP_REASON_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_github_pages_proxy_root` free function.
 #[instrument_trace]
 pub fn openapi_github_pages_proxy_root() {}
 
@@ -34,5 +35,6 @@ pub fn openapi_github_pages_proxy_root() {}
         (status = 500, description = HTTP_REASON_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_github_pages_proxy` free function.
 #[instrument_trace]
 pub fn openapi_github_pages_proxy() {}

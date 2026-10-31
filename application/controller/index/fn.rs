@@ -10,5 +10,6 @@ use super::*;
     ),
     tag = OPENAPI_TAG_INDEX
 )]
+/// Body of the `openapi_index` free function.
 #[instrument_trace]
 pub fn openapi_index() {}

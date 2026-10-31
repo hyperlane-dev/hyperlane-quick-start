@@ -88,7 +88,7 @@ impl GithubPagesService {
             return Ok((rewritten, content_type));
         }
         // --- Designated fetcher: do the actual remote fetch ---
-        let base_url: String = BASE_URL_TEMPLATE
+        let base_url: String = base_url_template()
             .replace(PLACEHOLDER_OWNER, owner)
             .replace(PLACEHOLDER_REPOSITORY, repository);
         let remote_url: String = format!("{base_url}{normalized_path}");
@@ -230,7 +230,7 @@ impl GithubPagesService {
     #[instrument_trace]
     pub async fn list_github_pages() -> Result<GithubPagesListResponse, String> {
         let mut pages: Vec<GithubPagesInfo> = Vec::new();
-        let cache_dir: String = CACHE_DIR.to_string();
+        let cache_dir: String = cache_dir().to_string();
         let mut owner_entries: fs::ReadDir = fs::read_dir(&cache_dir)
             .await
             .map_err(|error: Error| error.to_string())?;
@@ -275,7 +275,7 @@ impl GithubPagesService {
                         datetime.format(FORMAT_DATE_TIME).to_string()
                     })
                     .unwrap_or_default();
-                let base_url: String = BASE_URL_TEMPLATE
+                let base_url: String = base_url_template()
                     .replace(PLACEHOLDER_OWNER, &owner_name)
                     .replace(PLACEHOLDER_REPOSITORY, &repo_name);
                 let mut info: GithubPagesInfo = GithubPagesInfo::default();
@@ -317,7 +317,7 @@ impl GithubPagesService {
         let temp_dir: String = format!("{CACHE_DIR}/{owner}/{repository}.tmp");
         // Clean up any stale temp directory from a previous interrupted sync
         let _: Result<(), Error> = fs::remove_dir_all(&temp_dir).await;
-        let base_url: String = BASE_URL_TEMPLATE
+        let base_url: String = base_url_template()
             .replace(PLACEHOLDER_OWNER, owner)
             .replace(PLACEHOLDER_REPOSITORY, repository);
         let client: &Client = get_http_client();
@@ -753,6 +753,6 @@ impl GithubPagesService {
         let broker: &MessageQueueBroker = get_message_queue_broker();
         let payload: MessagePayload =
             format!("{owner}{SYNC_TASK_SEPARATOR}{repository}").into_bytes();
-        broker.publish(TOPIC_GITHUB_PAGES_SYNC, &payload).await
+        broker.publish(topic_github_pages_sync(), &payload).await
     }
 }

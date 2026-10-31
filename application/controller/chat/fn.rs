@@ -11,5 +11,6 @@ use super::*;
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_get_online_users` free function.
 #[instrument_trace]
 pub fn openapi_get_online_users() {}

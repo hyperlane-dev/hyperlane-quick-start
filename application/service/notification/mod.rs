@@ -2,7 +2,9 @@ mod r#const;
 mod r#impl;
 mod r#struct;
 
-pub use {r#const::*, r#struct::*};
+pub use r#struct::*;
+
+pub(crate) use r#const::*;
 
 use {
     super::*,
@@ -11,5 +13,4 @@ use {
     repository::notification::*,
     service::auth::*,
 };
-
 use {chrono::NaiveDateTime, sea_orm::ActiveValue};

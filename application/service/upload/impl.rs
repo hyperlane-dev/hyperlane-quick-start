@@ -14,118 +14,176 @@ impl UploadService {
         full_dir
     }
 
-    /// Validates that a file ID is present, setting an error response if missing.
+    /// Reads the parts of a multipart form data body.
+    ///
+    /// The parts are decoded by the framework itself, so the file name, the
+    /// media type and the raw content of every part come from the request
+    /// rather than from a hand written parser.
     ///
     /// # Arguments
     ///
-    /// - `Option<String>` - The optional file ID from the request header.
-    /// - `&mut Context` - The request context for setting error responses.
+    /// - `&mut Context` - The request context holding the request.
     ///
     /// # Returns
     ///
-    /// - `Result<String, ()>` - The file ID if present, or an error.
+    /// - `Option<MultipartFormDataParts>` - The decoded parts, or `None` when the body carries no multipart form data.
     #[instrument_trace]
-    async fn validate_file_id(
-        file_id_opt: Option<String>,
-        ctx: &mut Context,
-    ) -> Result<String, ()> {
+    async fn get_request_parts(ctx: &mut Context) -> Option<MultipartFormDataParts> {
+        if ctx.get_request().try_get_content_type().as_deref() != Some(UPLOAD_FORM_CONTENT_TYPE) {
+            Self::set_common_error_response_body(ctx, ERROR_INVALID_MULTIPART.to_string()).await;
+            return None;
+        }
+        let parts: Option<MultipartFormDataParts> = ctx.get_request().try_get_body_form_data();
+        if parts.is_none() {
+            Self::set_common_error_response_body(ctx, ERROR_INVALID_MULTIPART.to_string()).await;
+        }
+        parts
+    }
+
+    /// Reads the file name of the uploaded file part.
+    ///
+    /// The name is taken from the part itself, so it is neither URL encoded
+    /// nor URL decoded on the way.
+    ///
+    /// # Arguments
+    ///
+    /// - `&[BodyPart]` - The parts of the multipart form data body.
+    ///
+    /// # Returns
+    ///
+    /// - `Option<String>` - The file name of the uploaded file, or `None` when the body carries no file part.
+    #[instrument_trace]
+    fn get_part_file_name(parts: &[BodyPart]) -> Option<String> {
+        let part: &BodyPart = MultipartFormData::try_get_part(parts, PART_FILE)?;
+        part.try_get_file_name().cloned()
+    }
+
+    /// Reads the raw bytes of the uploaded file part.
+    ///
+    /// The bytes are the content of the file part, so a chunk of an upload
+    /// is read through the file object of the framework rather than from the
+    /// raw body of the request.
+    ///
+    /// # Arguments
+    ///
+    /// - `&[BodyPart]` - The parts of the multipart form data body.
+    ///
+    /// # Returns
+    ///
+    /// - `Option<RequestBody>` - The raw bytes of the file part, or `None` when the body carries no file part.
+    #[instrument_trace]
+    fn get_file_part_data(parts: &[BodyPart]) -> Option<RequestBody> {
+        let part: &BodyPart = MultipartFormData::try_get_part(parts, PART_FILE)?;
+        part.try_get_file_name()?;
+        let data: &[u8] = part.try_get_data().unwrap_or_default();
+        Some(data.to_vec())
+    }
+
+    /// Validates that a file ID is present.
+    ///
+    /// # Arguments
+    ///
+    /// - `Option<String>` - The optional file ID from the request body.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<String, String>` - The file ID if present, or the error message.
+    #[instrument_trace]
+    fn validate_file_id(file_id_opt: Option<String>) -> Result<String, String> {
         match file_id_opt {
-            Some(id) => Ok(id),
-            None => {
-                Self::set_common_error_response_body(
-                    ctx,
-                    ChunkStrategyError::MissingFileId.to_string(),
-                )
-                .await;
-                Err(())
+            Some(id)
+                if !id.is_empty()
+                    && id.chars().all(|value: char| {
+                        value.is_ascii_alphanumeric() || value == '-' || value == '_'
+                    }) =>
+            {
+                Ok(id)
             }
+            Some(_) => Err(ERROR_INVALID_FILE_ID.to_string()),
+            None => Err(ERROR_MISSING_FILE_ID.to_string()),
         }
     }
 
-    /// Validates that the total chunks header is present and parseable, setting an error response if invalid.
+    /// Validates that the total chunks field is present and parseable.
     ///
     /// # Arguments
     ///
-    /// - `Option<String>` - The optional total chunks value from the request header.
-    /// - `&mut Context` - The request context for setting error responses.
+    /// - `Option<String>` - The optional total chunks value from the request body.
     ///
     /// # Returns
     ///
-    /// - `Result<usize, ()>` - The parsed total chunks count, or an error.
+    /// - `Result<usize, String>` - The parsed total chunks count, or the error message.
     #[instrument_trace]
-    async fn validate_total_chunks(
-        total_chunks_opt: Option<String>,
-        ctx: &mut Context,
-    ) -> Result<usize, ()> {
+    fn validate_total_chunks(total_chunks_opt: Option<String>) -> Result<usize, String> {
         match total_chunks_opt {
             Some(total) => match total.parse::<usize>() {
-                Ok(t) => Ok(t),
-                Err(_) => {
-                    Self::set_common_error_response_body(
-                        ctx,
-                        ChunkStrategyError::InvalidTotalChunks.to_string(),
-                    )
-                    .await;
-                    Err(())
-                }
+                Ok(count) if count > 0 => Ok(count),
+                _ => Err(ERROR_INVALID_TOTAL_CHUNKS.to_string()),
             },
-            None => {
-                Self::set_common_error_response_body(
-                    ctx,
-                    ChunkStrategyError::MissingTotalChunks.to_string(),
-                )
-                .await;
-                Err(())
-            }
+            None => Err(ERROR_MISSING_TOTAL_CHUNKS.to_string()),
         }
     }
 
-    /// Validates that the file name header is present, URL-decoding it, setting an error response if missing.
+    /// Validates that the file name of the uploaded file is present.
     ///
     /// # Arguments
     ///
-    /// - `Option<String>` - The optional file name from the request header.
-    /// - `&mut Context` - The request context for setting error responses.
+    /// - `Option<String>` - The optional file name of the uploaded file part.
     ///
     /// # Returns
     ///
-    /// - `Result<String, ()>` - The decoded file name, or an error.
+    /// - `Result<String, String>` - The file name, or the error message.
     #[instrument_trace]
-    async fn validate_file_name(
-        file_name_opt: Option<String>,
-        ctx: &mut Context,
-    ) -> Result<String, ()> {
+    fn validate_file_name(file_name_opt: Option<String>) -> Result<String, String> {
         match file_name_opt {
-            Some(name) => Ok(urlencoding::decode(&name).unwrap_or_default().into_owned()),
-            None => {
-                Self::set_common_error_response_body(
-                    ctx,
-                    ChunkStrategyError::MissingFileName.to_string(),
-                )
-                .await;
-                Err(())
+            Some(name)
+                if !name.is_empty()
+                    && name != "."
+                    && name != ".."
+                    && !name.contains(['/', '\\', '\0']) =>
+            {
+                Ok(name)
             }
+            Some(_) => Err(ERROR_INVALID_DIRECTORY_OR_FILE_NAME.to_string()),
+            None => Err(ERROR_MISSING_FILE_NAME.to_string()),
         }
     }
 
-    /// Validates and URL-decodes a directory header, falling back to the base file dir if invalid or missing.
+    /// Validates the index of the chunk stored by a request.
     ///
     /// # Arguments
     ///
-    /// - `Option<String>` - The optional URL-encoded directory from the request header.
+    /// - `Option<String>` - The optional chunk index value from the request body.
     ///
     /// # Returns
     ///
-    /// - `String` - The decoded directory path, or the default base file dir.
+    /// - `Result<usize, String>` - The parsed chunk index, or the error message.
     #[instrument_trace]
-    fn validate_and_decode_directory(base_file_dir_opt: Option<String>) -> String {
+    fn validate_chunk_index(chunk_index_opt: Option<String>) -> Result<usize, String> {
+        match chunk_index_opt {
+            Some(index) => match index.parse::<usize>() {
+                Ok(value) => Ok(value),
+                Err(_) => Err(ERROR_INVALID_CHUNK_INDEX.to_string()),
+            },
+            None => Err(ERROR_MISSING_CHUNK_INDEX.to_string()),
+        }
+    }
+
+    /// Validates a directory field, falling back to the base file dir if invalid or missing.
+    ///
+    /// # Arguments
+    ///
+    /// - `Option<String>` - The optional directory from the request body.
+    ///
+    /// # Returns
+    ///
+    /// - `String` - The directory path, or the default base file dir.
+    #[instrument_trace]
+    fn validate_directory(base_file_dir_opt: Option<String>) -> String {
         match base_file_dir_opt {
-            Some(encode_dir) => {
-                let decode_dir: String = urlencoding::decode(&encode_dir)
-                    .unwrap_or_default()
-                    .into_owned();
-                if Self::is_valid_directory_path(&decode_dir) {
-                    decode_dir
+            Some(dir) => {
+                if Self::is_valid_directory_path(&dir) {
+                    dir
                 } else {
                     Self::get_base_file_dir()
                 }
@@ -146,35 +204,56 @@ impl UploadService {
     #[instrument_trace]
     fn is_valid_directory_path(path: &str) -> bool {
         !path.is_empty()
-            && !path.contains("../")
-            && path.chars().all(|c: char| c.is_ascii_digit() || c == '/')
+            && path.split('/').all(|component: &str| {
+                !component.is_empty() && component.chars().all(|value: char| value.is_ascii_digit())
+            })
     }
 
-    /// Extracts and validates file chunk data from request headers for a chunk upload registration.
+    /// Extracts and validates file chunk data from the multipart body of a chunk upload registration.
+    ///
+    /// The file name comes from the file part of the body, the session
+    /// identifier and the number of chunks come from its text fields.
     ///
     /// # Arguments
     ///
-    /// - `&mut Stream` - The stream.
     /// - `&mut Context` - The request context.
     ///
     /// # Returns
     ///
     /// - `Option<FileChunkData>` - The validated file chunk data, or `None` if validation fails.
-    #[try_get_request_header(HEADER_X_FILE_ID => file_id_opt)]
-    #[try_get_request_header(HEADER_X_TOTAL_CHUNKS => total_chunks_opt)]
-    #[try_get_request_header(HEADER_X_FILE_NAME => file_name_opt)]
-    #[try_get_request_header(HEADER_X_DIRECTORY => base_file_dir_opt)]
     #[instrument_trace]
-    pub async fn get_register_file_chunk_data<'a>(
-        _stream: &mut Stream,
-        ctx: &mut Context,
-    ) -> Option<FileChunkData> {
-        let file_id: String = Self::validate_file_id(file_id_opt, ctx).await.ok()?;
-        let total_chunks: usize = Self::validate_total_chunks(total_chunks_opt, ctx)
-            .await
-            .ok()?;
-        let file_name: String = Self::validate_file_name(file_name_opt, ctx).await.ok()?;
-        let base_file_dir: String = Self::validate_and_decode_directory(base_file_dir_opt);
+    pub async fn get_register_file_chunk_data(ctx: &mut Context) -> Option<FileChunkData> {
+        let parts: MultipartFormDataParts = Self::get_request_parts(ctx).await?;
+        let file_id: String = match Self::validate_file_id(MultipartFormData::try_get_part_text(
+            &parts,
+            FIELD_FILE_ID,
+        )) {
+            Ok(id) => id,
+            Err(error) => {
+                Self::set_common_error_response_body(ctx, error).await;
+                return None;
+            }
+        };
+        let total_chunks: usize = match Self::validate_total_chunks(
+            MultipartFormData::try_get_part_text(&parts, FIELD_TOTAL_CHUNKS),
+        ) {
+            Ok(count) => count,
+            Err(error) => {
+                Self::set_common_error_response_body(ctx, error).await;
+                return None;
+            }
+        };
+        let file_name: String = match Self::validate_file_name(Self::get_part_file_name(&parts)) {
+            Ok(name) => name,
+            Err(error) => {
+                Self::set_common_error_response_body(ctx, error).await;
+                return None;
+            }
+        };
+        let base_file_dir: String = Self::validate_directory(MultipartFormData::try_get_part_text(
+            &parts,
+            FIELD_DIRECTORY,
+        ));
         let mut data: FileChunkData = FileChunkData::default();
         data.set_file_id(file_id)
             .set_file_name(file_name)
@@ -186,44 +265,62 @@ impl UploadService {
 
     /// Extracts and validates file chunk data for saving a chunk, including the chunk index.
     ///
+    /// The chunk index comes from a text field of the multipart body, and the
+    /// raw bytes of the chunk come from the file part of the same body.
+    ///
     /// # Arguments
     ///
     /// - `&mut Context` - The request context for setting error responses.
-    /// - `Option<String>` - The optional file ID.
     ///
     /// # Returns
     ///
-    /// - `Option<FileChunkData>` - The validated file chunk data with chunk index, or `None`.
+    /// - `Option<(FileChunkData, RequestBody)>` - The validated file chunk data with chunk index and the raw bytes of the chunk, or `None`.
     #[instrument_trace]
     pub async fn get_save_file_chunk_data(
         ctx: &mut Context,
-        file_id_opt: Option<String>,
-        chunk_index_opt: Option<String>,
-    ) -> Option<FileChunkData> {
-        let mut data: FileChunkData = Self::get_merge_file_chunk_data(ctx, file_id_opt).await?;
-        let chunk_index: usize = match chunk_index_opt {
-            Some(idx) => match idx.parse::<usize>() {
-                Ok(i) => i,
-                Err(_) => {
-                    Self::set_common_error_response_body(
-                        ctx,
-                        ChunkStrategyError::InvalidChunkIndex.to_string(),
-                    )
-                    .await;
-                    return None;
-                }
-            },
-            None => {
-                Self::set_common_error_response_body(
-                    ctx,
-                    ChunkStrategyError::MissingChunkIndex.to_string(),
-                )
-                .await;
+    ) -> Option<(FileChunkData, RequestBody)> {
+        let parts: MultipartFormDataParts = Self::get_request_parts(ctx).await?;
+        let file_id: String = match Self::validate_file_id(MultipartFormData::try_get_part_text(
+            &parts,
+            FIELD_FILE_ID,
+        )) {
+            Ok(id) => id,
+            Err(error) => {
+                Self::set_common_error_response_body(ctx, error).await;
                 return None;
             }
         };
+        let mut data: FileChunkData = match Self::get_merge_file_chunk_data(file_id).await {
+            Some(data) => data,
+            None => {
+                Self::set_common_error_response_body(ctx, ERROR_UPLOAD_NOT_REGISTERED.to_string())
+                    .await;
+                return None;
+            }
+        };
+        let chunk_index: usize = match Self::validate_chunk_index(
+            MultipartFormData::try_get_part_text(&parts, FIELD_CHUNK_INDEX),
+        ) {
+            Ok(index) => index,
+            Err(error) => {
+                Self::set_common_error_response_body(ctx, error).await;
+                return None;
+            }
+        };
+        if chunk_index >= data.get_total_chunks() {
+            Self::set_common_error_response_body(ctx, ERROR_INVALID_CHUNK_INDEX.to_string()).await;
+            return None;
+        }
         data.set_chunk_index(chunk_index);
-        Some(data)
+        let chunk_data: RequestBody = match Self::get_file_part_data(&parts) {
+            Some(bytes) => bytes,
+            None => {
+                Self::set_common_error_response_body(ctx, ERROR_MISSING_FILE_PART.to_string())
+                    .await;
+                return None;
+            }
+        };
+        Some((data, chunk_data))
     }
 
     /// Adds a file chunk data entry to the in-memory file ID map via the repository.
@@ -250,31 +347,41 @@ impl UploadService {
     ///
     /// # Arguments
     ///
-    /// - `&mut Context` - The request context for setting error responses.
-    /// - `Option<String>` - The optional file ID.
+    /// - `String` - The file ID of the upload session.
     ///
     /// # Returns
     ///
     /// - `Option<FileChunkData>` - The file chunk data if found, or `None`.
     #[instrument_trace]
-    pub async fn get_merge_file_chunk_data(
-        ctx: &mut Context,
-        file_id_opt: Option<String>,
-    ) -> Option<FileChunkData> {
-        let file_id: String = match file_id_opt {
-            Some(id) => id,
-            None => {
-                Self::set_common_error_response_body(
-                    ctx,
-                    ChunkStrategyError::MissingFileId.to_string(),
-                )
-                .await;
-                return None;
-            }
-        };
+    pub async fn get_merge_file_chunk_data(file_id: String) -> Option<FileChunkData> {
         let result: Option<FileChunkData> =
             FileChunkRepository::get_merge_file_chunk_data(&file_id).await;
         result
+    }
+
+    /// Extracts the file ID of an upload session from the multipart body.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Context` - The request context for setting error responses.
+    ///
+    /// # Returns
+    ///
+    /// - `Option<String>` - The file ID, or `None` when the body carries none.
+    #[instrument_trace]
+    pub async fn get_merge_file_id(ctx: &mut Context) -> Option<String> {
+        let parts: MultipartFormDataParts = Self::get_request_parts(ctx).await?;
+        let file_id: String = match Self::validate_file_id(MultipartFormData::try_get_part_text(
+            &parts,
+            FIELD_FILE_ID,
+        )) {
+            Ok(id) => id,
+            Err(error) => {
+                Self::set_common_error_response_body(ctx, error).await;
+                return None;
+            }
+        };
+        Some(file_id)
     }
 
     /// Sets a common success response with status 200, the uploaded file URL, and a JSON body.
@@ -318,8 +425,8 @@ impl UploadService {
     /// - `Result<(Vec<u8>, String), String>` - The file data bytes and content type, or an error.
     #[instrument_trace]
     pub async fn serve_static_file(dir: &str, file: &str) -> Result<(Vec<u8>, String), String> {
-        let decode_dir: String = Decode::execute(CHARSETS, dir).unwrap_or_default();
-        let decode_file: String = Decode::execute(CHARSETS, file).unwrap_or_default();
+        let decode_dir: String = Decode::execute(charsets(), dir).unwrap_or_default();
+        let decode_file: String = Decode::execute(charsets(), file).unwrap_or_default();
         if decode_dir.is_empty() || decode_file.is_empty() {
             return Err(ERROR_INVALID_DIRECTORY_OR_FILE_NAME.to_string());
         }
@@ -456,8 +563,8 @@ impl UploadService {
     ///     error.
     #[instrument_trace]
     fn validate_file_paths(dir: &str, file: &str) -> Result<(String, String), String> {
-        let decode_dir: String = Decode::execute(CHARSETS, dir).unwrap_or_default();
-        let decode_file: String = Decode::execute(CHARSETS, file).unwrap_or_default();
+        let decode_dir: String = Decode::execute(charsets(), dir).unwrap_or_default();
+        let decode_file: String = Decode::execute(charsets(), file).unwrap_or_default();
         if decode_dir.is_empty() || decode_file.is_empty() {
             return Err(ERROR_INVALID_DIRECTORY_OR_FILE_NAME.to_string());
         }
@@ -660,9 +767,9 @@ impl UploadService {
         )
         .map_err(|error: ChunkStrategyError| error.to_string())?;
         let url_encode_dir: String =
-            Encode::execute(CHARSETS, &format!("{base_file_dir}/{file_id}")).unwrap_or_default();
+            Encode::execute(charsets(), &format!("{base_file_dir}/{file_id}")).unwrap_or_default();
         let url_encode_dir_file_name: String =
-            Encode::execute(CHARSETS, file_name).unwrap_or_default();
+            Encode::execute(charsets(), file_name).unwrap_or_default();
         let url: String = format!("/{STATIC_ROUTE}/{url_encode_dir}/{url_encode_dir_file_name}");
         upload_strategy
             .merge_chunks()

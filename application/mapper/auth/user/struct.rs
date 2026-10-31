@@ -16,24 +16,48 @@ use super::*;
 pub struct Model {
     /// Unique primary key identifier for the user.
     #[sea_orm(primary_key, auto_increment = true)]
-    #[get(type(copy))]
-    pub(super) id: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) id: i32,
     /// The login username of the user.
-    pub(super) username: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) username: String,
     /// The bcrypt-hashed password string.
-    pub(super) password_hash: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) password_hash: String,
     /// The optional email address of the user.
-    pub(super) email: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) email: Option<String>,
     /// The optional phone number of the user.
-    pub(super) phone: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) phone: Option<String>,
     /// The numeric role identifier (e.g., admin, regular user).
-    #[get(type(copy))]
-    pub(super) role: i16,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) role: i16,
     /// The numeric status indicator (e.g., active, disabled).
-    #[get(type(copy))]
-    pub(super) status: i16,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) status: i16,
     /// The timestamp when the user record was created.
-    pub(super) created_at: Option<NaiveDateTime>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) created_at: Option<NaiveDateTime>,
     /// The timestamp when the user record was last updated.
-    pub(super) updated_at: Option<NaiveDateTime>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) updated_at: Option<NaiveDateTime>,
 }

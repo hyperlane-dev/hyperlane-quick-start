@@ -10,6 +10,7 @@ use super::*;
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_create_pipeline` free function.
 #[instrument_trace]
 pub fn openapi_create_pipeline() {}
 
@@ -22,6 +23,7 @@ pub fn openapi_create_pipeline() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_list_pipelines` free function.
 #[instrument_trace]
 pub fn openapi_list_pipelines() {}
 
@@ -38,6 +40,7 @@ pub fn openapi_list_pipelines() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_get_pipeline` free function.
 #[instrument_trace]
 pub fn openapi_get_pipeline() {}
 
@@ -51,6 +54,7 @@ pub fn openapi_get_pipeline() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_trigger_run` free function.
 #[instrument_trace]
 pub fn openapi_trigger_run() {}
 
@@ -63,6 +67,7 @@ pub fn openapi_trigger_run() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_list_runs` free function.
 #[instrument_trace]
 pub fn openapi_list_runs() {}
 
@@ -76,6 +81,7 @@ pub fn openapi_list_runs() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_get_run` free function.
 #[instrument_trace]
 pub fn openapi_get_run() {}
 
@@ -89,6 +95,7 @@ pub fn openapi_get_run() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_get_run_detail` free function.
 #[instrument_trace]
 pub fn openapi_get_run_detail() {}
 
@@ -102,6 +109,7 @@ pub fn openapi_get_run_detail() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_update_job` free function.
 #[instrument_trace]
 pub fn openapi_update_job() {}
 
@@ -115,6 +123,7 @@ pub fn openapi_update_job() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_update_step` free function.
 #[instrument_trace]
 pub fn openapi_update_step() {}
 
@@ -127,5 +136,6 @@ pub fn openapi_update_step() {}
         (status = 500, description = OPENAPI_DESCRIPTION_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_cicd_view` free function.
 #[instrument_trace]
 pub fn openapi_cicd_view() {}

@@ -602,7 +602,9 @@ impl CicdService {
     ///     has-more flag.
     #[instrument_trace]
     pub async fn query_runs(param: QueryRunsParam) -> Result<PaginatedRunsDto, String> {
-        let page_size: u64 = param.try_get_page_size().unwrap_or(50) as u64;
+        let page_size: u64 = param
+            .try_get_page_size()
+            .map_or(DEFAULT_PAGE_SIZE, |page_size: i32| page_size as u64);
         let status_str: Option<String> = param
             .try_get_status()
             .map(|status: CicdStatus| status.to_string());

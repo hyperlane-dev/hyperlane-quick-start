@@ -20,7 +20,7 @@ impl PipelineRepository {
         config_content: Option<String>,
     ) -> Result<i32, String> {
         let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
+            MySqlPlugin::connection_db(default_mysql_instance_name(), None).await?;
         let active_model: CicdPipelineActiveModel =
             CicdPipelineActiveModel::new(name, description, config_content);
         let result: CicdPipelineModel = active_model
@@ -42,7 +42,7 @@ impl PipelineRepository {
     #[instrument_trace]
     pub async fn find_by_id(id: i32) -> Result<Option<CicdPipelineModel>, String> {
         let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
+            MySqlPlugin::connection_db(default_mysql_instance_name(), None).await?;
         let result: Option<CicdPipelineModel> = CicdPipelineEntity::find_by_id(id)
             .one(&db)
             .await
@@ -58,7 +58,7 @@ impl PipelineRepository {
     #[instrument_trace]
     pub async fn find_all() -> Result<Vec<CicdPipelineModel>, String> {
         let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
+            MySqlPlugin::connection_db(default_mysql_instance_name(), None).await?;
         let models: Vec<CicdPipelineModel> = CicdPipelineEntity::find()
             .order_by_desc(CicdPipelineColumn::CreatedAt)
             .all(&db)
@@ -92,7 +92,7 @@ impl RunRepository {
         commit_message: Option<String>,
     ) -> Result<CicdRunModel, String> {
         let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
+            MySqlPlugin::connection_db(default_mysql_instance_name(), None).await?;
         let active_model: CicdRunActiveModel = CicdRunActiveModel::new(
             pipeline_id,
             run_number,
@@ -119,7 +119,7 @@ impl RunRepository {
     #[instrument_trace]
     pub async fn find_by_id(id: i32) -> Result<Option<CicdRunModel>, String> {
         let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
+            MySqlPlugin::connection_db(default_mysql_instance_name(), None).await?;
         let result: Option<CicdRunModel> = CicdRunEntity::find_by_id(id)
             .one(&db)
             .await
@@ -139,7 +139,7 @@ impl RunRepository {
     #[instrument_trace]
     pub async fn find_by_pipeline(pipeline_id: i32) -> Result<Vec<CicdRunModel>, String> {
         let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
+            MySqlPlugin::connection_db(default_mysql_instance_name(), None).await?;
         let models: Vec<CicdRunModel> = CicdRunEntity::find()
             .filter(CicdRunColumn::PipelineId.eq(pipeline_id))
             .order_by_desc(CicdRunColumn::CreatedAt)
@@ -169,7 +169,7 @@ impl RunRepository {
         page_size: u64,
     ) -> Result<(Vec<CicdRunModel>, i32, bool), String> {
         let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
+            MySqlPlugin::connection_db(default_mysql_instance_name(), None).await?;
         let mut query: Select<CicdRunEntity> = CicdRunEntity::find();
         if let Some(pid) = pipeline_id {
             query = query.filter(CicdRunColumn::PipelineId.eq(pid));
@@ -211,7 +211,7 @@ impl RunRepository {
     #[instrument_trace]
     pub async fn get_next_run_number(pipeline_id: i32) -> Result<i32, String> {
         let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
+            MySqlPlugin::connection_db(default_mysql_instance_name(), None).await?;
         let result: Option<(Option<i32>,)> = CicdRunEntity::find()
             .filter(CicdRunColumn::PipelineId.eq(pipeline_id))
             .select_only()
@@ -238,7 +238,7 @@ impl RunRepository {
     #[instrument_trace]
     pub async fn start(id: i32) -> Result<(), String> {
         let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
+            MySqlPlugin::connection_db(default_mysql_instance_name(), None).await?;
         let now: NaiveDateTime = Local::now().naive_local();
         CicdRunEntity::update_many()
             .filter(CicdRunColumn::Id.eq(id))
@@ -266,7 +266,7 @@ impl RunRepository {
     #[instrument_trace]
     pub async fn complete(id: i32, status: CicdStatus) -> Result<(), String> {
         let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
+            MySqlPlugin::connection_db(default_mysql_instance_name(), None).await?;
         let run: Option<CicdRunModel> = CicdRunEntity::find_by_id(id)
             .one(&db)
             .await
@@ -301,7 +301,7 @@ impl RunRepository {
     #[instrument_trace]
     pub async fn update_status(id: i32, status: CicdStatus) -> Result<(), String> {
         let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
+            MySqlPlugin::connection_db(default_mysql_instance_name(), None).await?;
         CicdRunEntity::update_many()
             .filter(CicdRunColumn::Id.eq(id))
             .col_expr(CicdRunColumn::Status, Expr::value(status.to_string()))
@@ -323,7 +323,7 @@ impl RunRepository {
     #[instrument_trace]
     pub async fn find_by_status(status: CicdStatus) -> Result<Vec<CicdRunModel>, String> {
         let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
+            MySqlPlugin::connection_db(default_mysql_instance_name(), None).await?;
         let models: Vec<CicdRunModel> = CicdRunEntity::find()
             .filter(CicdRunColumn::Status.eq(status.to_string()))
             .all(&db)
@@ -348,7 +348,7 @@ impl JobRepository {
     #[instrument_trace]
     pub async fn create(run_id: i32, name: String) -> Result<CicdJobModel, String> {
         let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
+            MySqlPlugin::connection_db(default_mysql_instance_name(), None).await?;
         let active_model: CicdJobActiveModel = CicdJobActiveModel::new(run_id, name);
         let result: CicdJobModel = active_model
             .insert(&db)
@@ -369,7 +369,7 @@ impl JobRepository {
     #[instrument_trace]
     pub async fn find_by_id(id: i32) -> Result<Option<CicdJobModel>, String> {
         let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
+            MySqlPlugin::connection_db(default_mysql_instance_name(), None).await?;
         let result: Option<CicdJobModel> = CicdJobEntity::find_by_id(id)
             .one(&db)
             .await
@@ -389,7 +389,7 @@ impl JobRepository {
     #[instrument_trace]
     pub async fn find_by_run(run_id: i32) -> Result<Vec<CicdJobModel>, String> {
         let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
+            MySqlPlugin::connection_db(default_mysql_instance_name(), None).await?;
         let models: Vec<CicdJobModel> = CicdJobEntity::find()
             .filter(CicdJobColumn::RunId.eq(run_id))
             .order_by_asc(CicdJobColumn::CreatedAt)
@@ -417,7 +417,7 @@ impl JobRepository {
         runner: Option<String>,
     ) -> Result<(), String> {
         let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
+            MySqlPlugin::connection_db(default_mysql_instance_name(), None).await?;
         let now: NaiveDateTime = Local::now().naive_local();
         if status == CicdStatus::Running {
             CicdJobEntity::update_many()
@@ -475,7 +475,7 @@ impl JobRepository {
         status: CicdStatus,
     ) -> Result<Vec<CicdJobModel>, String> {
         let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
+            MySqlPlugin::connection_db(default_mysql_instance_name(), None).await?;
         let models: Vec<CicdJobModel> = CicdJobEntity::find()
             .filter(CicdJobColumn::RunId.eq(run_id))
             .filter(CicdJobColumn::Status.eq(status.to_string()))
@@ -506,7 +506,7 @@ impl StepRepository {
         command: Option<String>,
     ) -> Result<CicdStepModel, String> {
         let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
+            MySqlPlugin::connection_db(default_mysql_instance_name(), None).await?;
         let active_model: CicdStepActiveModel = CicdStepActiveModel::new(job_id, name, command);
         let result: CicdStepModel = active_model
             .insert(&db)
@@ -527,7 +527,7 @@ impl StepRepository {
     #[instrument_trace]
     pub async fn find_by_id(id: i32) -> Result<Option<CicdStepModel>, String> {
         let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
+            MySqlPlugin::connection_db(default_mysql_instance_name(), None).await?;
         let result: Option<CicdStepModel> = CicdStepEntity::find_by_id(id)
             .one(&db)
             .await
@@ -547,7 +547,7 @@ impl StepRepository {
     #[instrument_trace]
     pub async fn find_by_job(job_id: i32) -> Result<Vec<CicdStepModel>, String> {
         let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
+            MySqlPlugin::connection_db(default_mysql_instance_name(), None).await?;
         let models: Vec<CicdStepModel> = CicdStepEntity::find()
             .filter(CicdStepColumn::JobId.eq(job_id))
             .order_by_asc(CicdStepColumn::CreatedAt)
@@ -575,7 +575,7 @@ impl StepRepository {
         output: Option<String>,
     ) -> Result<(), String> {
         let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
+            MySqlPlugin::connection_db(default_mysql_instance_name(), None).await?;
         let now: NaiveDateTime = Local::now().naive_local();
         if status == CicdStatus::Running {
             CicdStepEntity::update_many()
@@ -634,7 +634,7 @@ impl StepRepository {
         status: CicdStatus,
     ) -> Result<Vec<CicdStepModel>, String> {
         let db: DatabaseConnection =
-            MySqlPlugin::connection_db(DEFAULT_MYSQL_INSTANCE_NAME, None).await?;
+            MySqlPlugin::connection_db(default_mysql_instance_name(), None).await?;
         let models: Vec<CicdStepModel> = CicdStepEntity::find()
             .filter(CicdStepColumn::JobId.eq(job_id))
             .filter(CicdStepColumn::Status.eq(status.to_string()))

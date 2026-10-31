@@ -72,7 +72,7 @@ fn web_socket_resp_data_defaults_to_text_and_a_zero_timestamp() {
     assert_eq!(resp.get_type(), MessageType::Text);
     assert_eq!(resp.get_name(), "");
     assert_eq!(resp.get_data(), "");
-    assert_eq!(*resp.get_time(), 0);
+    assert_eq!(resp.get_time(), 0);
 }
 
 #[test]
@@ -89,7 +89,7 @@ fn web_socket_resp_data_carries_every_field_over_the_wire() {
     let parsed: WebSocketRespData = from_str(&wire).expect("deserializes");
     assert_eq!(parsed.get_type(), MessageType::GptResponse);
     assert_eq!(parsed.get_name(), "alice");
-    assert_eq!(*parsed.get_time(), 1_700_000_000_000);
+    assert_eq!(parsed.get_time(), 1_700_000_000_000);
 }
 
 #[test]

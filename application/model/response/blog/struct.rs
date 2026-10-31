@@ -4,166 +4,303 @@ use super::*;
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct BlogPostResponse {
     /// The id.
-    pub(super) id: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) id: String,
     /// The user id.
-    pub(super) user_id: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) user_id: String,
     /// The username.
-    pub(super) username: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) username: Option<String>,
     /// The title.
-    pub(super) title: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) title: String,
     /// The summary.
-    pub(super) summary: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) summary: Option<String>,
     /// The content.
-    pub(super) content: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) content: String,
     /// The cover image.
-    pub(super) cover_image: Option<BlogImageResponse>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) cover_image: Option<BlogImageResponse>,
     /// The images.
-    pub(super) images: Vec<BlogImageResponse>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) images: Vec<BlogImageResponse>,
     /// The is published.
-    #[get(type(copy))]
-    pub(super) is_published: bool,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) is_published: bool,
     /// The view count.
-    #[get(type(copy))]
-    pub(super) view_count: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) view_count: i32,
     /// The like count.
-    #[get(type(copy))]
-    pub(super) like_count: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) like_count: i32,
     /// The favorite count.
-    #[get(type(copy))]
-    pub(super) favorite_count: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) favorite_count: i32,
     /// The comment count.
-    #[get(type(copy))]
-    pub(super) comment_count: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) comment_count: i32,
     /// The is liked.
-    #[get(type(copy))]
-    pub(super) is_liked: bool,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) is_liked: bool,
     /// The is favorited.
-    #[get(type(copy))]
-    pub(super) is_favorited: bool,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) is_favorited: bool,
     /// The created at.
-    #[get(type(copy))]
-    pub(super) created_at: i64,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) created_at: i64,
     /// The updated at.
-    #[get(type(copy))]
-    pub(super) updated_at: i64,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) updated_at: i64,
 }
 
 /// blog post list response.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct BlogPostListResponse {
     /// The posts.
-    pub(super) posts: Vec<BlogPostResponse>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) posts: Vec<BlogPostResponse>,
     /// The total.
-    #[get(type(copy))]
-    pub(super) total: i64,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) total: i64,
     /// The page.
-    #[get(type(copy))]
-    pub(super) page: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) page: i32,
     /// The limit.
-    #[get(type(copy))]
-    pub(super) limit: u64,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) limit: u64,
 }
 
 /// blog comment response.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct BlogCommentResponse {
     /// The id.
-    pub(super) id: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) id: String,
     /// The post id.
-    pub(super) post_id: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) post_id: String,
     /// The user id.
-    pub(super) user_id: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) user_id: String,
     /// The username.
-    pub(super) username: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) username: String,
     /// The avatar.
-    pub(super) avatar: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) avatar: Option<String>,
     /// The parent id.
-    pub(super) parent_id: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) parent_id: Option<String>,
     /// The content.
-    pub(super) content: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) content: String,
     /// The created at.
-    #[get(type(copy))]
-    pub(super) created_at: i64,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) created_at: i64,
     /// The replies.
-    pub(super) replies: Vec<BlogCommentResponse>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) replies: Vec<BlogCommentResponse>,
 }
 
 /// blog comment list response.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct BlogCommentListResponse {
     /// The comments.
-    pub(super) comments: Vec<BlogCommentResponse>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) comments: Vec<BlogCommentResponse>,
     /// The total.
-    #[get(type(copy))]
-    pub(super) total: i64,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) total: i64,
     /// The page.
-    #[get(type(copy))]
-    pub(super) page: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) page: i32,
     /// The limit.
-    #[get(type(copy))]
-    pub(super) limit: u64,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) limit: u64,
 }
 
 /// Represents a blog image response with download URL and metadata.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct BlogImageResponse {
     /// The id.
-    pub(super) id: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) id: String,
     /// The post id.
-    pub(super) post_id: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) post_id: String,
     /// The user id.
-    pub(super) user_id: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) user_id: String,
     /// The file name.
-    pub(super) file_name: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) file_name: String,
     /// The original name.
-    pub(super) original_name: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) original_name: Option<String>,
     /// The mime type.
-    pub(super) mime_type: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) mime_type: String,
     /// The file size.
-    #[get(type(copy))]
-    pub(super) file_size: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) file_size: i32,
     /// The created at.
-    #[get(type(copy))]
-    pub(super) created_at: i64,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) created_at: i64,
     /// The download url.
-    pub(super) download_url: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) download_url: String,
 }
 
 /// blog image data response.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct BlogImageDataResponse {
     /// The id.
-    pub(super) id: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) id: String,
     /// The post id.
-    pub(super) post_id: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) post_id: String,
     /// The file name.
-    pub(super) file_name: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) file_name: String,
     /// The original name.
-    pub(super) original_name: Option<String>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) original_name: Option<String>,
     /// The mime type.
-    pub(super) mime_type: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) mime_type: String,
     /// The file data.
-    pub(super) file_data: Vec<u8>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) file_data: Vec<u8>,
 }
 
 /// blog like status response.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct BlogLikeStatusResponse {
     /// The liked.
-    #[get(type(copy))]
-    pub(super) liked: bool,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) liked: bool,
     /// The like count.
-    #[get(type(copy))]
-    pub(super) like_count: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) like_count: i32,
 }
 
 /// blog favorite status response.
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct BlogFavoriteStatusResponse {
     /// The favorited.
-    #[get(type(copy))]
-    pub(super) favorited: bool,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) favorited: bool,
     /// The favorite count.
-    #[get(type(copy))]
-    pub(super) favorite_count: i32,
+    #[get(pub(crate), type(copy))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) favorite_count: i32,
 }

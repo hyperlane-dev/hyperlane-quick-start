@@ -4,7 +4,7 @@ use super::*;
 #[derive(Clone, Data, Debug, Default, Deserialize, Serialize, ToSchema)]
 pub struct WebSocketMessage {
     /// The name.
-    pub(super) name: String,
+    pub name: String,
     /// The message.
-    pub(super) message: String,
+    pub message: String,
 }

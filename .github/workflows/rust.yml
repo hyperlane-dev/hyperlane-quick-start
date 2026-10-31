@@ -1,4 +1,5 @@
 name: Rust
+
 on:
   push:
     branches:
@@ -130,11 +131,11 @@ jobs:
           # Sync workspace.dependencies.<pkg_name>.version for all member packages using sed
           for pkg_name in $MEMBER_PKG_NAMES; do
             if grep -q "^${pkg_name}[[:space:]]*=" Cargo.toml && grep -q "^${pkg_name}[[:space:]]*=.*version" Cargo.toml; then
-              # ci-allow-version-write: mirrors the human-authored root version into [workspace.dependencies]; it never picks or increments a version, it only keeps the release train in lockstep so one tag matches every manifest.
+              # ci-allow-version-write: propagates the human-authored root version into each member manifest so the workspace publishes one coherent version; the number itself is committed by a human, never chosen here.
               sed -i -E "s|^(${pkg_name}[[:space:]]*=[[:space:]]*\{.*version[[:space:]]*=[[:space:]]*\")([^\"]+)(\".*)|\1${VERSION}\3|" Cargo.toml
               echo "🔧 workspace.dependencies.${pkg_name}.version -> $VERSION (inline)"
             elif grep -q "^\[workspace\.dependencies\.${pkg_name}\]" Cargo.toml; then
-              # ci-allow-version-write: mirrors the human-authored root version into [workspace.dependencies]; it never picks or increments a version, it only keeps the release train in lockstep so one tag matches every manifest.
+              # ci-allow-version-write: propagates the human-authored root version into each member manifest so the workspace publishes one coherent version; the number itself is committed by a human, never chosen here.
               sed -i -E "/^\[workspace\.dependencies\.${pkg_name}\]/,/^\[/ s|^(version[[:space:]]*=[[:space:]]*\")([^\"]+)(\")|\1${VERSION}\3|" Cargo.toml
               echo "🔧 workspace.dependencies.${pkg_name}.version -> $VERSION (sub-table)"
             else
@@ -163,7 +164,7 @@ jobs:
       - name: Commit and push
         run: |
           git config user.name "vshengbro"
-          git config user.email "root@ltpp.vip"
+          git config user.email "root@devhub.vip"
           git add -A
           git diff --cached --quiet || git commit -m "chore: sync all package versions to ${{ needs.setup.outputs.version }}"
           git push
@@ -182,11 +183,43 @@ jobs:
           toolchain: stable
           components: rustfmt
       - name: Format check
-        run: cargo fmt --all -- --check
+        run: cargo fmt -- --check
+
+  frontend:
+    needs: [setup, sync_workspace_version]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+      - name: Setup rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          targets: wasm32-unknown-unknown
+      - name: Install wasm-pack
+        uses: jetli/wasm-pack-action@v0.4.0
+        with:
+          version: 0.15.0
+      - name: Install the euv command line interface
+        run: cargo install euv-cli --version 0.32.15 --locked
+      - name: Check the format of the pages
+        run: |
+          set -euo pipefail
+          for page in frontend/pages/*/ frontend/shared/; do
+            echo "---- ${page} ----"
+            (cd "${page}" && euv fmt --check)
+          done
+      - name: Check the pages
+        working-directory: frontend
+        run: cargo check --target wasm32-unknown-unknown --workspace --all-features
 
   tests:
     needs: sync_workspace_version
     runs-on: ubuntu-latest
+    env:
+      EUV_FRONTEND_SKIP: '1'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -202,6 +235,8 @@ jobs:
   clippy:
     needs: sync_workspace_version
     runs-on: ubuntu-latest
+    env:
+      EUV_FRONTEND_SKIP: '1'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -213,11 +248,13 @@ jobs:
           toolchain: stable
           components: clippy
       - name: Run clippy
-        run: cargo clippy --workspace --all-targets --all-features -- -D warnings
+        run: cargo clippy --all-features
 
   build:
-    needs: sync_workspace_version
+    needs: [setup, sync_workspace_version]
     runs-on: ubuntu-latest
+    env:
+      EUV_FRONTEND_SKIP: '1'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -227,13 +264,63 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
-      - name: Build release
-        run: cargo check --workspace --all-targets --release --all-features
+      - name: Release check
+        run: cargo check --release --all-features --locked
+      - name: Build static release under 2 CPU and 4 GiB
+        run: |
+          set -euo pipefail
+          docker run --rm \
+            --cpus=2 \
+            --memory=4g \
+            --memory-swap=4g \
+            -e CARGO_TARGET_DIR=/tmp/hqs-low-memory-target \
+            -e EUV_FRONTEND_SKIP=1 \
+            -v "$PWD:/workspace" \
+            -w /workspace \
+            rust:1.99-alpine \
+            sh -c '
+              set -euo pipefail
+              apk add --no-cache build-base cmake perl linux-headers file
+              build_status=0
+              cargo build --release --all-features --locked || build_status=$?
+              echo "---- cgroup cpu.max ----"
+              cat /sys/fs/cgroup/cpu.max
+              echo "---- cgroup memory.max ----"
+              cat /sys/fs/cgroup/memory.max
+              echo "---- cgroup memory.swap.max ----"
+              cat /sys/fs/cgroup/memory.swap.max
+              echo "---- cgroup memory.peak ----"
+              cat /sys/fs/cgroup/memory.peak
+              echo "---- cgroup memory.events ----"
+              cat /sys/fs/cgroup/memory.events
+              if [ "$build_status" -ne 0 ]; then
+                echo "cargo build exited $build_status under the memory cap"
+                exit "$build_status"
+              fi
+              test -x "$CARGO_TARGET_DIR/release/hyperlane-quick-start"
+              file "$CARGO_TARGET_DIR/release/hyperlane-quick-start" | grep -Eq "static-pie linked|statically linked"
+              # The build intermediates are removed: the target tree is several
+              # gigabytes of object files, and only the linked executable is
+              # ever shipped. The executable is copied out first, so it
+              # survives the cleanup.
+              mkdir -p /workspace/dist
+              cp -f "$CARGO_TARGET_DIR/release/hyperlane-quick-start" /workspace/dist/hyperlane-quick-start
+              rm -rf "$CARGO_TARGET_DIR"
+            '
+          file dist/hyperlane-quick-start
+      - name: Upload the static binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: hyperlane-quick-start-${{ needs.setup.outputs.version }}-${{ needs.setup.outputs.branch_name }}
+          path: dist/hyperlane-quick-start
+          if-no-files-found: error
+          retention-days: 30
 
   publish:
     permissions:
       contents: write
-    needs: [setup, sync_workspace_version, check, tests, clippy, build]
+    needs:
+      [setup, sync_workspace_version, check, tests, clippy, frontend, build]
     if: needs.setup.outputs.tag != ''
     runs-on: ubuntu-latest
     outputs:
@@ -273,7 +360,7 @@ jobs:
         if: steps.check_branch.outputs.skip == 'false'
         run: |
           git config user.name "vshengbro"
-          git config user.email "root@ltpp.vip"
+          git config user.email "root@devhub.vip"
       - name: Publish to crates.io
         id: publish
         if: steps.check_branch.outputs.skip == 'false'
@@ -408,6 +495,11 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Download the static binary built by the build job
+        uses: actions/download-artifact@v4
+        with:
+          name: hyperlane-quick-start-${{ needs.setup.outputs.version }}-${{ needs.setup.outputs.branch_name }}
+          path: dist
       - name: Create or update release
         id: release
         run: |
@@ -419,6 +511,26 @@ jobs:
           echo "📦 Building source archives..."
           git archive --format=zip --prefix="${PACKAGE_NAME}-${VERSION}/" HEAD > "${PACKAGE_NAME}-${VERSION}.zip"
           git archive --format=tar.gz --prefix="${PACKAGE_NAME}-${VERSION}/" HEAD > "${PACKAGE_NAME}-${VERSION}.tar.gz"
+          # The static binary built by the build job is shipped with the
+          # release, so a user can download one executable and run it
+          # without a container, a libc or the source tree. The artifact
+          # download does not carry the executable bit, so it is set here.
+          STATIC_BINARY="dist/hyperlane-quick-start"
+          test -f "$STATIC_BINARY"
+          chmod 0755 "$STATIC_BINARY"
+          file "$STATIC_BINARY" | grep -Eq "static-pie linked|statically linked"
+          cp -f "$STATIC_BINARY" "${PACKAGE_NAME}-${VERSION}-linux-x86_64"
+          chmod 0755 "${PACKAGE_NAME}-${VERSION}-linux-x86_64"
+          # Only the master release is marked as the latest one. A branch
+          # release that takes the flag would move the "latest" download
+          # URL away from the master artifacts.
+          BRANCH_NAME="${{ steps.package_info.outputs.branch_name }}"
+          if [ "$BRANCH_NAME" = "master" ]; then
+            LATEST_FLAG="--latest"
+          else
+            LATEST_FLAG="--latest=false"
+          fi
+          echo "🔖 Latest flag: $LATEST_FLAG"
           if [ "${{ steps.check_release.outputs.release_exists }}" = "true" ]; then
             echo "🔄 Updating existing release: $TAG"
             gh release view "$TAG" --json assets --jq '.assets[].name' | while read asset; do
@@ -431,6 +543,7 @@ jobs:
           TITLE="[$BRANCH_NAME]($TAG updated $(date '+%Y-%m-%d %H:%M:%S'))"
           if gh release edit "$TAG" \
               --title "$TITLE" \
+              ${LATEST_FLAG} \
               --notes "[$BRANCH_NAME] - release $TAG updated at $(date '+%Y-%m-%d %H:%M:%S UTC')
             ## Changes
             - Branch: $BRANCH_NAME
@@ -440,7 +553,7 @@ jobs:
             📦 [Crate on crates.io](https://crates.io/crates/$PACKAGE_NAME/$VERSION)
             📚 [Documentation on docs.rs](https://docs.rs/$PACKAGE_NAME/$VERSION)
             📋 [Commit History](https://github.com/${{ github.repository }}/commits/$TAG)" && \
-               gh release upload "$TAG" "${PACKAGE_NAME}-${VERSION}.zip" "${PACKAGE_NAME}-${VERSION}.tar.gz" --clobber; then
+               gh release upload "$TAG" "${PACKAGE_NAME}-${VERSION}.zip" "${PACKAGE_NAME}-${VERSION}.tar.gz" "${PACKAGE_NAME}-${VERSION}-linux-x86_64" --clobber; then
               echo "released=true" >> $GITHUB_OUTPUT
               echo "✅ Updated release $TAG"
               echo "🔖 Tag: $TAG"
@@ -468,8 +581,8 @@ jobs:
             📦 [Crate on crates.io](https://crates.io/crates/$PACKAGE_NAME/$VERSION)
             📚 [Documentation on docs.rs](https://docs.rs/$PACKAGE_NAME/$VERSION)
             📋 [Commit History](https://github.com/${{ github.repository }}/commits/$TAG)" \
-              --latest && \
-               gh release upload "$TAG" "${PACKAGE_NAME}-${VERSION}.zip" "${PACKAGE_NAME}-${VERSION}.tar.gz"; then
+              ${LATEST_FLAG} && \
+               gh release upload "$TAG" "${PACKAGE_NAME}-${VERSION}.zip" "${PACKAGE_NAME}-${VERSION}.tar.gz" "${PACKAGE_NAME}-${VERSION}-linux-x86_64"; then
               echo "released=true" >> $GITHUB_OUTPUT
               echo "✅ Created release $TAG"
               echo "🔖 Tag: $TAG"

@@ -8,16 +8,28 @@ pub struct PasswordUtil;
 #[derive(Clone, Data, Debug)]
 pub struct RsaKeyCache {
     /// The JSON-serialized RSA public key response string.
-    pub(super) response_json: String,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) response_json: String,
     /// The timestamp when this cache entry was created, used for TTL expiration.
-    pub(super) created_at: Instant,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) created_at: Instant,
 }
 
 /// Authentication service managing RSA key pairs, user registration, login, and account operations.
 #[derive(Clone, Data, Debug)]
 pub struct AuthService {
     /// The currently loaded RSA private key, stored behind a read-write lock for concurrent access.
-    pub(super) rsa_private_key: Arc<RwLock<Option<RsaPrivateKey>>>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) rsa_private_key: Arc<RwLock<Option<RsaPrivateKey>>>,
     /// The cached RSA public key response, stored behind a read-write lock for concurrent access.
-    pub(super) rsa_key_cache: Arc<RwLock<Option<RsaKeyCache>>>,
+    #[get(pub(crate))]
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub(crate) rsa_key_cache: Arc<RwLock<Option<RsaKeyCache>>>,
 }

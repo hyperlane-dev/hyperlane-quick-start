@@ -11,6 +11,7 @@ use super::*;
         (status = 500, description = HTTP_REASON_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_upload_view` free function.
 #[instrument_trace]
 pub fn openapi_upload_view() {}
 
@@ -29,5 +30,6 @@ pub fn openapi_upload_view() {}
         (status = 500, description = HTTP_REASON_INTERNAL_SERVER_ERROR)
     )
 )]
+/// Body of the `openapi_upload_file` free function.
 #[instrument_trace]
 pub fn openapi_upload_file() {}

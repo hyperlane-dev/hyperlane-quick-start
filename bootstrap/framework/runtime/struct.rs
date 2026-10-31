@@ -4,5 +4,7 @@ use super::*;
 #[derive(Data, Debug)]
 pub struct RuntimeBootstrap {
     /// The Tokio runtime instance used for async operations.
-    pub(super) runtime: Runtime,
+    #[get_mut(pub(crate))]
+    #[set(pub(crate))]
+    pub runtime: Runtime,
 }

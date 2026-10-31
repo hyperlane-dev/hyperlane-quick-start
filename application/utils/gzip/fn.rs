@@ -14,5 +14,5 @@ use super::*;
 /// - `bool` - `true` if the extension is gzip-compressible, `false` otherwise.
 #[instrument_trace]
 pub fn is_gzip_compressible(extension: &str) -> bool {
-    GZIP_COMPRESSIBLE_EXTENSIONS.contains(&extension)
+    gzip_compressible_extensions().contains(&extension)
 }
