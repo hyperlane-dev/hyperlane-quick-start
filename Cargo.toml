@@ -15,6 +15,7 @@ exclude = [
     "*.pid",
     "target",
     ".github",
+    ".codegraph",
     ".vscode",
     "node_modules",
     "Cargo.lock",

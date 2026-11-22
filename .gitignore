@@ -8,3 +8,4 @@ node_modules
 dist
 /resources/static/*/index.html
 /resources/static/*/pkg
+.codegraph/
