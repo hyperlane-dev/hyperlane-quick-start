@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane_config"
-version = "23.2.3"
+version = "23.3.0"
 readme = "README.md"
 edition = "2024"
 authors = ["root@devhub.vip"]
