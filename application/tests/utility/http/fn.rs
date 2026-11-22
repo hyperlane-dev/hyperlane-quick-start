@@ -54,7 +54,7 @@ fn http_build_auth_redirect_url_without_query() {
 fn http_build_auth_redirect_url_encodes_query_values() {
     let mut ctx: Context = Context::default();
     ctx.get_mut_request().set_path("/search".to_string());
-    ctx.get_mut_request().querys.insert(
+    ctx.get_mut_request().get_mut_querys().insert(
         "q".to_string(),
         VecDeque::from(vec!["rust wasm".to_string()]),
     );
@@ -69,7 +69,7 @@ fn http_build_auth_redirect_url_encodes_query_values() {
 fn http_build_auth_redirect_url_joins_repeated_query_values() {
     let mut ctx: Context = Context::default();
     ctx.get_mut_request().set_path("/list".to_string());
-    ctx.get_mut_request().querys.insert(
+    ctx.get_mut_request().get_mut_querys().insert(
         "tag".to_string(),
         VecDeque::from(vec!["a".to_string(), "b".to_string()]),
     );

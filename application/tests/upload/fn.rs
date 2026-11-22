@@ -13,20 +13,16 @@ fn try_headers(content_type: &str) -> RequestHeaders {
     headers
 }
 
-fn try_querys() -> RequestQuerys {
-    hash_map_xx_hash3_64()
-}
-
 fn try_request(body: Vec<u8>, content_type: String) -> Request {
-    Request {
-        method: Method::Post,
-        host: "localhost".to_string(),
-        version: HttpVersion::Http1_1,
-        path: "/api/upload/save".to_string(),
-        querys: try_querys(),
-        headers: try_headers(&content_type),
-        body,
-    }
+    let mut ctx: Context = Context::default();
+    ctx.get_mut_request()
+        .set_method(Method::Post)
+        .set_host("localhost".to_string())
+        .set_version(HttpVersion::Http1_1)
+        .set_path("/api/upload/save".to_string())
+        .set_headers(try_headers(&content_type))
+        .set_body(body);
+    ctx.get_request().clone()
 }
 
 fn try_context(body: Vec<u8>, content_type: String) -> Context {

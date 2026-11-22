@@ -71,7 +71,7 @@ use std::{
 use {
     hyperlane::{
         BodyPart, Context, HttpVersion, Method, MultipartFormData, Request, RequestHeaders,
-        RequestQuerys, hash_map_xx_hash3_64,
+        hash_map_xx_hash3_64,
         serde_json::{Error, Value, from_slice, from_str, from_value, to_string, to_value},
     },
     hyperlane_config::application::upload::upload_dir,
