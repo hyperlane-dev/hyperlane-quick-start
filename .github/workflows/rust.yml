@@ -201,7 +201,7 @@ jobs:
       - name: Install wasm-pack
         uses: jetli/wasm-pack-action@v0.4.0
         with:
-          version: 0.15.0
+          version: v0.15.0
       - name: Install the euv command line interface
         run: cargo install euv-cli --version 0.32.15 --locked
       - name: Check the format of the pages
