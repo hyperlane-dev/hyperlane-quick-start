@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane-quick-start"
-version = "23.2.2"
+version = "23.2.3"
 readme = "README.md"
 edition = "2024"
 authors = ["root@devhub.vip"]
@@ -25,11 +25,11 @@ resolver = "3"
 members = ["application", "bootstrap", "config", "plugin", "resources"]
 
 [workspace.dependencies]
-hyperlane_config = { path = "config", version = "23.0.45" }
-hyperlane_plugin = { path = "plugin", version = "23.0.45" }
-hyperlane_bootstrap = { path = "bootstrap", version = "23.0.45" }
-hyperlane_resources = { path = "resources", version = "23.0.45" }
-hyperlane_application = { path = "application", version = "23.0.45" }
+hyperlane_config = { path = "config", version = "23.2.3" }
+hyperlane_plugin = { path = "plugin", version = "23.2.3" }
+hyperlane_bootstrap = { path = "bootstrap", version = "23.2.3" }
+hyperlane_resources = { path = "resources", version = "23.2.3" }
+hyperlane_application = { path = "application", version = "23.2.3" }
 
 log = "0.4.34"
 redis = "1.8.0"
@@ -40,7 +40,7 @@ dotenvy = "0.15.7"
 tracing = "0.1.44"
 num_cpus = "1.17.0"
 tempfile = "3.27.0"
-hyperlane = "22.0.10"
+hyperlane = "22.8.1"
 serde_with = "3.24.0"
 serde_yaml = "0.9.34"
 color-output = "10.3.1"
