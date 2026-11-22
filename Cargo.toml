@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane-quick-start"
-version = "23.2.2"
+version = "23.2.3"
 readme = "README.md"
 edition = "2024"
 authors = ["root@devhub.vip"]
@@ -40,7 +40,7 @@ dotenvy = "0.15.7"
 tracing = "0.1.44"
 num_cpus = "1.17.0"
 tempfile = "3.27.0"
-hyperlane = "22.0.10"
+hyperlane = "22.8.1"
 serde_with = "3.24.0"
 serde_yaml = "0.9.34"
 color-output = "10.3.1"
