@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane_plugin"
-version = "23.3.0"
+version = "23.4.0"
 autotests = false
 readme = "README.md"
 edition = "2024"
