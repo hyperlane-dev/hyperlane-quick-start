@@ -1,31 +1,55 @@
-<center>
+<div align="center">
 
-## hyperlane-plugin
+# hyperlane_plugin
 
-<img src="https://ltpp.vip/github/pages/docs-pages/pages/img/hyperlane.png" alt="" height="160">
+**Infrastructure Adapters for Databases, Environment, Logging, Process & Shutdown**
 
-[![](https://img.shields.io/crates/v/hyperlane.svg)](https://crates.io/crates/hyperlane)
-[![](https://img.shields.io/crates/d/hyperlane.svg)](https://img.shields.io/crates/d/hyperlane.svg)
-[![](https://docs.rs/hyperlane/badge.svg)](https://docs.rs/hyperlane)
-[![](https://github.com/hyperlane-dev/hyperlane/workflows/Rust/badge.svg)](https://github.com/hyperlane-dev/hyperlane/actions?query=workflow:Rust)
-[![](https://img.shields.io/crates/l/hyperlane.svg)](./license)
+[![crates.io](https://flat.badgen.net/crates/v/hyperlane_plugin)](https://crates.io/crates/hyperlane_plugin)
+[![docs.rs](https://img.shields.io/docsrs/hyperlane_plugin?style=flat-square)](https://docs.rs/hyperlane_plugin)
+[![Rust 2024](https://img.shields.io/badge/edition-2024-orange.svg?style=flat-square)](https://www.rust-lang.org)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](./LICENSE)
 
-</center>
+[Workspace Overview](../README.md) · [API Docs](https://docs.rs/hyperlane_plugin/latest/) · [Agent Engineering Rules](../AGENTS.md)
 
-> A powerful and extensible plugin system for the hyperlane framework, providing modularity and customization capabilities.
+</div>
 
-## Api Docs
+---
 
-- [Api Docs](https://docs.rs/hyperlane/latest/)
+## Overview
+
+Infrastructure-plugin workspace crate for [`hyperlane-quick-start`](../README.md), providing `OnceLock`-backed runtime adapters for environment parsing, structured file/console logging, MySQL/PostgreSQL/Redis connectivity, topological database schema auto-creation, PID process management, and graceful shutdown hooks.
+
+## Responsibilities & Module Layout
+
+- `common` — `GetOrInit` plugin initialization trait
+- `database` / `mysql` / `postgresql` / `redis` — Pooled SeaORM and Redis connectors plus topological `DatabaseSchema` auto-creation
+- `env` / `logger` — `.env` loader (`EnvPlugin`, `EnvConfig`) and size-rotating file/console logger (`LoggerPlugin`)
+- `process` / `shutdown` — PID file lifecycle (`ProcessPlugin`) and shutdown hook storage (`ShutdownPlugin`)
+
+## Installation
+
+```sh
+cargo add hyperlane_plugin
+```
+
+## Verification
+
+Run crate-scoped lint and test gates from the workspace root:
+
+```sh
+cargo clippy -p hyperlane_plugin --all-features --all-targets -- -D warnings
+cargo test -p hyperlane_plugin --all-features
+```
+
+## Documentation & Governance
+
+- Update this `README.md` alongside any infrastructure adapter or `GetOrInit` contract change per [`../AGENTS.md`](../AGENTS.md).
+- Project standards and release workflows live in [`../.agents/skills/hyperlane-quick-start/SKILL.md`](../.agents/skills/hyperlane-quick-start/SKILL.md).
 
 ## License
 
-This project is licensed under the MIT License. For more details, please see the [license](license) file.
-
-## Contributing
-
-Contributions are welcome! Please submit an issue or create a pull request.
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
 
 ## Contact
 
-If you have any questions, please contact the author: [root@devhub.vip](mailto:root@devhub.vip).
+For inquiries, please contact the author at [root@devhub.vip](mailto:root@devhub.vip).

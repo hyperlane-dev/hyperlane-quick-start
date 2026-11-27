@@ -1,31 +1,55 @@
-<center>
+<div align="center">
 
-## hyperlane-application
+# hyperlane_application
 
-<img src="https://ltpp.vip/github/pages/docs-pages/pages/img/hyperlane.png" alt="" height="160">
+**Application Layer for Controllers, Services, Middleware, Views & Exception Hooks**
 
-[![](https://img.shields.io/crates/v/hyperlane.svg)](https://crates.io/crates/hyperlane)
-[![](https://img.shields.io/crates/d/hyperlane.svg)](https://img.shields.io/crates/d/hyperlane.svg)
-[![](https://docs.rs/hyperlane/badge.svg)](https://docs.rs/hyperlane)
-[![](https://github.com/hyperlane-dev/hyperlane/workflows/Rust/badge.svg)](https://github.com/hyperlane-dev/hyperlane/actions?query=workflow:Rust)
-[![](https://img.shields.io/crates/l/hyperlane.svg)](./license)
+[![crates.io](https://flat.badgen.net/crates/v/hyperlane_application)](https://crates.io/crates/hyperlane_application)
+[![docs.rs](https://img.shields.io/docsrs/hyperlane_application?style=flat-square)](https://docs.rs/hyperlane_application)
+[![Rust 2024](https://img.shields.io/badge/edition-2024-orange.svg?style=flat-square)](https://www.rust-lang.org)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](./LICENSE)
 
-</center>
+[Workspace Overview](../README.md) · [API Docs](https://docs.rs/hyperlane_application/latest/) · [Agent Engineering Rules](../AGENTS.md)
 
-> Hyperlane application module containing core application logic, controllers, services, and middleware components.
+</div>
 
-## Api Docs
+---
 
-- [Api Docs](https://docs.rs/hyperlane/latest/)
+## Overview
+
+Application-layer workspace crate for [`hyperlane-quick-start`](../README.md), encapsulating HTTP controllers, business services, persistence repositories/mappers, request/response models, middlewares, views, and panic/error hooks wired into Hyperlane's `ServerHook` lifecycle.
+
+## Responsibilities & Module Layout
+
+- `controller` / `service` / `repository` / `mapper` / `domain` — Layered domain and HTTP endpoint modules
+- `middleware/request` / `middleware/response` — `HttpRequestMiddleware`, `CrossMiddleware`, `ResponseHeaderMiddleware`, `ResponseStatusCodeMiddleware`, `SendMiddleware`, and `LogMiddleware`
+- `exception` — `TaskPanicHook` and `RequestErrorHook` structured JSON error responses
+- `model` / `view` / `utils` — Common `ApiResponse`, `FaviconRoute`, JSON serialization, and response-sending helpers
+
+## Installation
+
+```sh
+cargo add hyperlane_application
+```
+
+## Verification
+
+Run crate-scoped lint and test gates from the workspace root:
+
+```sh
+cargo clippy -p hyperlane_application --all-features --all-targets -- -D warnings
+cargo test -p hyperlane_application --all-features
+```
+
+## Documentation & Governance
+
+- Update this `README.md` alongside any middleware, hook, or module-boundary change per [`../AGENTS.md`](../AGENTS.md).
+- Project standards and release workflows live in [`../.agents/skills/hyperlane-quick-start/SKILL.md`](../.agents/skills/hyperlane-quick-start/SKILL.md).
 
 ## License
 
-This project is licensed under the MIT License. For more details, please see the [license](license) file.
-
-## Contributing
-
-Contributions are welcome! Please submit an issue or create a pull request.
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
 
 ## Contact
 
-If you have any questions, please contact the author: [root@devhub.vip](mailto:root@devhub.vip).
+For inquiries, please contact the author at [root@devhub.vip](mailto:root@devhub.vip).

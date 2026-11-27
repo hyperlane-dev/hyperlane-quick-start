@@ -1,31 +1,53 @@
-<center>
+<div align="center">
 
-## hyperlane-config
+# hyperlane_config
 
-<img src="https://ltpp.vip/github/pages/docs-pages/pages/img/hyperlane.png" alt="" height="160">
+**Static Application & Framework Configuration Layer**
 
-[![](https://img.shields.io/crates/v/hyperlane.svg)](https://crates.io/crates/hyperlane)
-[![](https://img.shields.io/crates/d/hyperlane.svg)](https://img.shields.io/crates/d/hyperlane.svg)
-[![](https://docs.rs/hyperlane/badge.svg)](https://docs.rs/hyperlane)
-[![](https://github.com/hyperlane-dev/hyperlane/workflows/Rust/badge.svg)](https://github.com/hyperlane-dev/hyperlane/actions?query=workflow:Rust)
-[![](https://img.shields.io/crates/l/hyperlane.svg)](./license)
+[![crates.io](https://flat.badgen.net/crates/v/hyperlane_config)](https://crates.io/crates/hyperlane_config)
+[![docs.rs](https://img.shields.io/docsrs/hyperlane_config?style=flat-square)](https://docs.rs/hyperlane_config)
+[![Rust 2024](https://img.shields.io/badge/edition-2024-orange.svg?style=flat-square)](https://www.rust-lang.org)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](./LICENSE)
 
-</center>
+[Workspace Overview](../README.md) · [API Docs](https://docs.rs/hyperlane_config/latest/) · [Agent Engineering Rules](../AGENTS.md)
 
-> Hyperlane configuration module providing comprehensive configuration management capabilities for the framework.
+</div>
 
-## Api Docs
+---
 
-- [Api Docs](https://docs.rs/hyperlane/latest/)
+## Overview
+
+Static configuration workspace crate for [`hyperlane-quick-start`](../README.md), holding compile-time application and framework constants without coupling to database pools or HTTP route handlers.
+
+## Responsibilities & Module Layout
+
+- `application/logger` / `application/logo_img` — Application logger defaults and static branding asset constants
+- `framework` — Framework-level server and runtime configuration constants
+
+## Installation
+
+```sh
+cargo add hyperlane_config
+```
+
+## Verification
+
+Run crate-scoped lint and test gates from the workspace root:
+
+```sh
+cargo clippy -p hyperlane_config --all-features --all-targets -- -D warnings
+cargo test -p hyperlane_config --all-features
+```
+
+## Documentation & Governance
+
+- Update this `README.md` alongside any static configuration module change per [`../AGENTS.md`](../AGENTS.md).
+- Project standards and release workflows live in [`../.agents/skills/hyperlane-quick-start/SKILL.md`](../.agents/skills/hyperlane-quick-start/SKILL.md).
 
 ## License
 
-This project is licensed under the MIT License. For more details, please see the [license](license) file.
-
-## Contributing
-
-Contributions are welcome! Please submit an issue or create a pull request.
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
 
 ## Contact
 
-If you have any questions, please contact the author: [root@devhub.vip](mailto:root@devhub.vip).
+For inquiries, please contact the author at [root@devhub.vip](mailto:root@devhub.vip).
