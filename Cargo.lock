@@ -432,9 +432,9 @@ checksum = "776dfebd015e2d8732c684a2c71003674ccb49457b539b9e82151ba38e96dd7c"
 
 [[package]]
 name = "cc"
-version = "1.11.3"
+version = "1.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "02f0e023adb368345ce0ca6cdfc0f24a06554468d0e8503e14a0841de79bfa69"
+checksum = "95e45cf2980b2d467be49a9ed942c9179b701063a7ca3d037de7ee9bd67f8d66"
 dependencies = [
  "find-msvc-tools",
  "shlex",
@@ -485,9 +485,9 @@ checksum = "0c9ea0ac24bc397ab3c98583a3c9ba74fa56b09a4449bbe172b9b1ddb016027a"
 
 [[package]]
 name = "color-output"
-version = "10.8.0"
+version = "10.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bbfa94e0416986231bec8159aff4c2df9b17d5c628b195b38e38cbd679ff868a"
+checksum = "e1a077c520a27f788b15b6d5c9700d342396efeea56b679e048341f7d487f8d0"
 dependencies = [
  "lombok-macros",
  "system-time",
@@ -806,9 +806,9 @@ dependencies = [
 
 [[package]]
 name = "find-msvc-tools"
-version = "0.1.15"
+version = "0.1.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1c66915cc5391097de7a2b0b972e8505aa33c0df401fd3a6811dbdb32881ba48"
+checksum = "3e44f110d1777dc6559a51e7d45083945ded4f1bf3305494350f693b6d20b9c8"
 
 [[package]]
 name = "flate2"
@@ -1118,9 +1118,9 @@ dependencies = [
 
 [[package]]
 name = "http-compress"
-version = "22.12.0"
+version = "22.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d9dcb17a10128a8c7235af4eeca70fb8dae234fa08431bf62f0c44bfd22232b5"
+checksum = "7d191b591a34a56270db653cb5d40fb5891a76c8f81536fb11783484bd4c3856"
 dependencies = [
  "brotli",
  "flate2",
@@ -1129,15 +1129,15 @@ dependencies = [
 
 [[package]]
 name = "http-constant"
-version = "22.12.0"
+version = "22.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b02ddb61e680ee92c45359ab283b965696419d9674b9449cc0bdcff02e502bf2"
+checksum = "d248f8b1b971d442ac1ef33b88f3c792a74f4a6639cc56598691593c18a28be2"
 
 [[package]]
 name = "http-type"
-version = "22.12.0"
+version = "22.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a360194abc47d6ed53e762af5a3d9a808295614e57ebf4cd669f37d10312af74"
+checksum = "cccaa13c831eb19987cd02c022d4984b76fb16fab16a46bfd61974ee68b12275"
 dependencies = [
  "hex",
  "http-compress",
@@ -1162,9 +1162,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane"
-version = "22.12.0"
+version = "22.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6996ab30115939b7e3de0434745eb41392331fdf10e49dcc435d9bd5f1ed2aa7"
+checksum = "4287ed7222a3c64e48366b366e8d5dcf7f95da359f358aa4147751f1fac1d6f0"
 dependencies = [
  "hyperlane-core",
  "hyperlane-macros",
@@ -1172,9 +1172,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-core"
-version = "22.12.0"
+version = "22.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "978c8beafeb8f0e6d42db79b870063e07326bb0c3258e1a531c4c4529f695eed"
+checksum = "2e54175635b240cdf9bc502b0cc33b20275900a41baf24796e48964390bc21a9"
 dependencies = [
  "bytes",
  "futures",
@@ -1196,9 +1196,9 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-macros"
-version = "22.12.0"
+version = "22.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f83cf5b3b12a582499cd038194d566af372d1e9dfb72940d2bc85ae4f45d98e4"
+checksum = "65c90d63c60139e6434384468dc4ef05bbcb737bdcbfcda080876aa79317f68e"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1207,7 +1207,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane-quick-start"
-version = "23.6.0"
+version = "23.7.0"
 dependencies = [
  "chrono",
  "color-output",
@@ -1240,7 +1240,7 @@ checksum = "e5480b89b70d89bc6d07bea700bf052bb00bea5e9175468a775128e174dfd614"
 
 [[package]]
 name = "hyperlane_application"
-version = "23.6.0"
+version = "23.7.0"
 dependencies = [
  "chrono",
  "hyperlane",
@@ -1260,7 +1260,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_bootstrap"
-version = "23.6.0"
+version = "23.7.0"
 dependencies = [
  "hyperlane",
  "hyperlane_application",
@@ -1277,7 +1277,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_config"
-version = "23.6.0"
+version = "23.7.0"
 dependencies = [
  "hyperlane",
  "instrument-level",
@@ -1288,7 +1288,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_plugin"
-version = "23.6.0"
+version = "23.7.0"
 dependencies = [
  "color-output",
  "dotenvy",
@@ -1310,7 +1310,7 @@ dependencies = [
 
 [[package]]
 name = "hyperlane_resources"
-version = "23.6.0"
+version = "23.7.0"
 
 [[package]]
 name = "iana-time-zone"
@@ -1471,9 +1471,9 @@ dependencies = [
 
 [[package]]
 name = "instrument-level"
-version = "10.8.0"
+version = "10.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0b2e38196d0821573549c967a641e83cea5e5b515242928773eca4485e1590ce"
+checksum = "501bb63ef54ff51ad51e5218ba9399a7759c86b90a077b470b5a675a959d926e"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1747,9 +1747,9 @@ checksum = "5d15f86d12da44cd8d4ec3c73984537eb7f4cadcb9776a575a0a8a05ca11005c"
 
 [[package]]
 name = "lombok-macros"
-version = "10.8.0"
+version = "10.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "58007278f62b9de05bd92b0acf9f8557bbb96fd01b15f7f4f0f416e00f685738"
+checksum = "a6ae1dc26c111ea38d00bfcab89c2767d826e2c21a4db0645ee86920e2fbb7ef"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3047,9 +3047,9 @@ dependencies = [
 
 [[package]]
 name = "system-time"
-version = "10.8.0"
+version = "10.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "472d52c324c31c406cd99912dea321dad6bef074670181fe1ec6c260b9e502bb"
+checksum = "dc6f58c4e1a25e7577958cb10b969a96030de0255755bb5f7c3a9729416ea697"
 
 [[package]]
 name = "tempfile"

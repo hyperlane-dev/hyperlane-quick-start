@@ -78,6 +78,11 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}
+      - name: Install rust-toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
       - name: Restore toml-cli
         id: cache_toml_cli
         uses: actions/cache@v3
@@ -92,6 +97,36 @@ jobs:
               break
             fi
             echo "🔁 Retrying..."
+          done
+      - name: Restore crate-cli
+        id: cache_crate_cli
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/bin/crate
+          key: crate-cli-10.9.0-${{ runner.os }}
+      - name: Install crate-cli
+        if: steps.cache_crate_cli.outputs.cache-hit != 'true'
+        run: |
+          for i in 1 2 3 4 5 6 7 8; do
+            if cargo install crate-cli --locked; then
+              break
+            fi
+            echo "Retrying..."
+          done
+      - name: Restore hyperlane-cli
+        id: cache_hyperlane_cli
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/bin/hyperlane
+          key: hyperlane-cli-22.13.0-${{ runner.os }}
+      - name: Install hyperlane-cli
+        if: steps.cache_hyperlane_cli.outputs.cache-hit != 'true'
+        run: |
+          for i in 1 2 3 4 5 6 7 8; do
+            if cargo install hyperlane-cli --locked; then
+              break
+            fi
+            echo "Retrying..."
           done
       - name: Sync workspace version
         run: |
@@ -161,13 +196,38 @@ jobs:
           echo "🔧 Cargo.toml package.version -> $VERSION"
       - name: Update Cargo.lock
         run: cargo generate-lockfile
+      - name: Format workspace
+        run: |
+          set -euo pipefail
+          crate fmt
+          hyperlane fmt
       - name: Commit and push
         run: |
+          set -euo pipefail
           git config user.name "vshengbro"
           git config user.email "root@devhub.vip"
-          git add -A
-          git diff --cached --quiet || git commit -m "chore: sync all package versions to ${{ needs.setup.outputs.version }}"
-          git push
+          git add -u
+          COMMITTED=false
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: sync all package versions to ${{ needs.setup.outputs.version }}"
+            COMMITTED=true
+          fi
+          crate fmt
+          hyperlane fmt
+          if ! git diff --quiet; then
+            git add -u
+            if [ "$COMMITTED" = "true" ]; then
+              git commit --amend --no-edit
+            else
+              git commit -m "chore: apply crate fmt and hyperlane fmt"
+              COMMITTED=true
+            fi
+          fi
+          git diff --quiet
+          git diff --cached --quiet
+          if [ "$COMMITTED" = "true" ]; then
+            git push
+          fi
 
   check:
     needs: sync_workspace_version
@@ -181,9 +241,42 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
-          components: rustfmt
+          components: rustfmt, clippy
+      - name: Restore crate-cli
+        id: cache_crate_cli
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/bin/crate
+          key: crate-cli-10.9.0-${{ runner.os }}
+      - name: Install crate-cli
+        if: steps.cache_crate_cli.outputs.cache-hit != 'true'
+        run: |
+          for i in 1 2 3 4 5 6 7 8; do
+            if cargo install crate-cli --locked; then
+              break
+            fi
+            echo "Retrying..."
+          done
+      - name: Restore hyperlane-cli
+        id: cache_hyperlane_cli
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/bin/hyperlane
+          key: hyperlane-cli-22.13.0-${{ runner.os }}
+      - name: Install hyperlane-cli
+        if: steps.cache_hyperlane_cli.outputs.cache-hit != 'true'
+        run: |
+          for i in 1 2 3 4 5 6 7 8; do
+            if cargo install hyperlane-cli --locked; then
+              break
+            fi
+            echo "Retrying..."
+          done
       - name: Format check
-        run: cargo fmt -- --check
+        run: |
+          crate fmt --check
+          hyperlane fmt --check
+          cargo fmt --all -- --check
 
   tests:
     needs: sync_workspace_version
